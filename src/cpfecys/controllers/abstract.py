@@ -3,9 +3,11 @@
 def index(): return dict(message="hello from abstract.py")
 
 def user_active():
-    uid = request.post_vars['uid']
+    uid = request.vars['uid']
+    carnet = None
     if uid is None:
         success = False
     else:
         success = True
-    return dict(success=success)
+        carnet = db2(db2.user_user.id==uid).select().first().username
+    return dict(success=success, carnet = carnet)
