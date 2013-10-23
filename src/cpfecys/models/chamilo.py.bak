@@ -17,4 +17,4 @@ db.define_table('person',
                 Field('firstname'),
                 Field('username'),
                 Field('password'),
-                Field('external_uid'))
+               Field('external_uid'))
