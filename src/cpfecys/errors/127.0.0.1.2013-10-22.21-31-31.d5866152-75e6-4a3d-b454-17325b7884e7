@@ -1,0 +1,21 @@
+(dp1
+S'output'
+p2
+S"<type 'exceptions.NameError'> global name 'success' is not defined"
+p3
+sS'layer'
+p4
+S'/home/boris/Work/deploy-web2py-local/applications/cpfecys/controllers/abstract.py'
+p5
+sS'code'
+p6
+S'# coding: utf8\n# intente algo como\ndef index(): return dict(message="hello from abstract.py")\n\ndef user_active():\n    uid = request.vars[\'uid\']\n    if uid is None:\n        uid = False\n    else:\n        uid = True\n    return dict(success=success)\n\nresponse._vars=response._caller(user_active)\n'
+p7
+sS'snapshot'
+p8
+(dp9
+sS'traceback'
+p10
+S'Traceback (most recent call last):\n  File "/home/boris/Work/deploy-web2py-local/gluon/restricted.py", line 217, in restricted\n    exec ccode in environment\n  File "/home/boris/Work/deploy-web2py-local/applications/cpfecys/controllers/abstract.py", line 13, in <module>\n  File "/home/boris/Work/deploy-web2py-local/gluon/globals.py", line 372, in <lambda>\n    self._caller = lambda f: f()\n  File "/home/boris/Work/deploy-web2py-local/applications/cpfecys/controllers/abstract.py", line 11, in user_active\n    return dict(success=success)\nNameError: global name \'success\' is not defined\n'
+p11
+s.

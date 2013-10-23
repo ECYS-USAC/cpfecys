@@ -1,0 +1,11 @@
+# coding: utf8
+# intente algo como
+def index(): return dict(message="hello from abstract.py")
+
+def user_active():
+    uid = request.vars['uid']
+    if uid is None:
+        uid = False
+    else:
+        uid = True
+    return dict(success=success)
