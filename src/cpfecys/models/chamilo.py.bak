@@ -12,9 +12,9 @@ else:
     ## from google.appengine.api.memcache import Client
     ## session.connect(request, response, db = MEMDB(Client()))
 
-db.define_table('person',
+db2.define_table('person',
                 Field('lastname'),
                 Field('firstname'),
                 Field('username'),
                 Field('password'),
-               Field('external_uid'))
+                Field('external_uid'))

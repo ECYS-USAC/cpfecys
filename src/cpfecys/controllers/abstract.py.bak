@@ -3,9 +3,10 @@
 def index(): return dict(message="hello from abstract.py")
 
 def user_active():
-    uid = request.vars['uid']
+    uid = request.post_vars['uid']
     if uid is None:
-        uid = False
+        success = False
     else:
-        uid = True
+        success = True
+        db2(db2.)
     return dict(success=success)
