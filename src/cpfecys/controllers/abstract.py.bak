@@ -13,5 +13,6 @@ def user_active():
         cpfCarnet = db(db.auth_user.carnet == carnet).select().first().carnet()
         if(cpfCarnet):
             success = True
+            carnet = cpfCarnet
         
     return dict(success=success, carnet = carnet)

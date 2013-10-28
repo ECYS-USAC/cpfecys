@@ -11,8 +11,5 @@ def user_active():
         #success = True
         carnet = db2(db2.user_user.id ==uid).select().first().username
         cpfCarnet = db(db.auth_user.carnet == carnet).select().first().carnet()
-        if(cpfCarnet):
-            success = True
-            carnet = cpfCarnet
         
     return dict(success=success, carnet = carnet)
