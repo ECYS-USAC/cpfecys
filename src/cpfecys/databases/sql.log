@@ -159,3 +159,6 @@ success!
 timestamp: 2013-10-27T22:12:47.308923
 ALTER TABLE auth_user DROP COLUMN carnet;
 success!
+timestamp: 2013-10-27T22:48:45.371250
+ALTER TABLE auth_user ADD carnet INT;
+success!
