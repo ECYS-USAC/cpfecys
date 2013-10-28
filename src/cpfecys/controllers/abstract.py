@@ -8,7 +8,7 @@ def user_active():
     if uid is None:
         success = False
     else:
-        #success = True
+        success = True
         carnet = db2(db2.user_user.id ==uid).select().first().username
         
     return dict(success=success, carnet = carnet)
