@@ -45,7 +45,7 @@ crud, service, plugins = Crud(db), Service(), PluginManager()
 
 
 auth.settings.extra_fields['auth_user']= [
-  Field('carnet'),
+  Field('carnet', 'integer'),
   ]
 
 ## create all tables needed by auth if not custom tables

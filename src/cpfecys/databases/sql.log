@@ -117,3 +117,42 @@ success!
 timestamp: 2013-10-27T20:48:28.966299
 ALTER TABLE auth_user ADD carnet VARCHAR(255);
 success!
+timestamp: 2013-10-27T21:59:08.601956
+ALTER TABLE auth_user ADD carnet__tmp INT;
+success!
+UPDATE auth_user SET carnet__tmp=carnet;
+success!
+ALTER TABLE auth_user DROP COLUMN carnet;
+success!
+ALTER TABLE auth_user ADD carnet INT;
+success!
+UPDATE auth_user SET carnet=carnet__tmp;
+success!
+ALTER TABLE auth_user DROP COLUMN carnet__tmp;
+success!
+timestamp: 2013-10-27T22:02:48.723140
+ALTER TABLE auth_user ADD carnet__tmp VARCHAR(255);
+success!
+UPDATE auth_user SET carnet__tmp=carnet;
+success!
+ALTER TABLE auth_user DROP COLUMN carnet;
+success!
+ALTER TABLE auth_user ADD carnet VARCHAR(255);
+success!
+UPDATE auth_user SET carnet=carnet__tmp;
+success!
+ALTER TABLE auth_user DROP COLUMN carnet__tmp;
+success!
+timestamp: 2013-10-27T22:03:11.551582
+ALTER TABLE auth_user ADD carnet__tmp INT;
+success!
+UPDATE auth_user SET carnet__tmp=carnet;
+success!
+ALTER TABLE auth_user DROP COLUMN carnet;
+success!
+ALTER TABLE auth_user ADD carnet INT;
+success!
+UPDATE auth_user SET carnet=carnet__tmp;
+success!
+ALTER TABLE auth_user DROP COLUMN carnet__tmp;
+success!
