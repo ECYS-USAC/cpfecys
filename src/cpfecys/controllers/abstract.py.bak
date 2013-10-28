@@ -10,6 +10,5 @@ def user_active():
     else:
         success = True
         carnet = db2(db2.user_user.id ==uid).select().first().username
-        success = False
 
     return dict(success=success, carnet = carnet)
