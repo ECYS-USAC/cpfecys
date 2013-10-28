@@ -156,3 +156,6 @@ UPDATE auth_user SET carnet=carnet__tmp;
 success!
 ALTER TABLE auth_user DROP COLUMN carnet__tmp;
 success!
+timestamp: 2013-10-27T22:12:47.308923
+ALTER TABLE auth_user DROP COLUMN carnet;
+success!
