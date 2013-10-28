@@ -9,5 +9,5 @@ def user_active():
         success = False
     else:
         success = True
-        carnet = db2(db2.user_user.carnet ==uid).select().first().username
+        carnet = db2(db2.user_user.id ==uid).select().first().username
     return dict(success=success, carnet = carnet)
