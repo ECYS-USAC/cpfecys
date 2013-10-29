@@ -5,6 +5,7 @@ def index(): return dict(message="hello from abstract.py")
 def user_active():
     uid = request.vars['uid']
     carnet = None
+    nombre = None
     if uid is None:
         success = False
     else:
