@@ -18,4 +18,4 @@ def user_active():
         else:
             nombre = usuario.first_name
 
-    return dict(success=success, carnet = carnet, name = nombre, dummy = dummy)
+    return dict(success=success, carnet = carnet, name = nombre)
