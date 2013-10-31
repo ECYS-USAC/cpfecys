@@ -126,3 +126,7 @@
 [2013-10-31 09:15:11] CREATE admin/projects.html: 0
 [2013-10-31 09:15:26] EDIT cpfecys/views/admin/projects.html: 0
 [2013-10-31 09:15:39] EDIT cpfecys/models/menu.py: 0
+[2013-10-30 21:19:43] EDIT cpfecys/controllers/abstract.py: 0
+[2013-10-30 21:19:48] EDIT cpfecys/controllers/abstract.py: 0
+[2013-10-30 21:20:12] EDIT cpfecys/controllers/abstract.py: -1
+[2013-10-30 21:21:00] EDIT cpfecys/controllers/abstract.py: 1
