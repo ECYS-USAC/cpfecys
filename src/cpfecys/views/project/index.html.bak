@@ -1,0 +1,3 @@
+{{extend 'layout.html'}}
+<h1>Created Projects</h1>
+{{=BEAUTIFY(response._vars)}}

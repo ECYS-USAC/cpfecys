@@ -4,7 +4,7 @@ p2
 (dp3
 S'length'
 p4
-I255
+I512
 sS'unique'
 p5
 I00
@@ -26,7 +26,7 @@ ssS'user_id'
 p12
 (dp13
 g4
-I255
+I512
 sg5
 I00
 sg6
@@ -43,7 +43,7 @@ ssS'id'
 p16
 (dp17
 g4
-I255
+I512
 sg5
 I00
 sg6

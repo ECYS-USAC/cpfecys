@@ -1,80 +1,27 @@
-timestamp: 2013-10-22T19:56:41.139276
-CREATE TABLE auth_user(
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    first_name CHAR(128),
-    last_name CHAR(128),
-    email CHAR(512),
-    password CHAR(512),
-    registration_key CHAR(512),
-    reset_password_key CHAR(512),
-    registration_id CHAR(512)
-);
-success!
-timestamp: 2013-10-22T19:56:41.302430
-CREATE TABLE auth_group(
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    role CHAR(512),
-    description TEXT
-);
-success!
-timestamp: 2013-10-22T19:56:41.449142
-CREATE TABLE auth_membership(
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    user_id INTEGER REFERENCES auth_user (id) ON DELETE CASCADE,
-    group_id INTEGER REFERENCES auth_group (id) ON DELETE CASCADE
-);
-success!
-timestamp: 2013-10-22T19:56:41.695573
-CREATE TABLE auth_permission(
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    group_id INTEGER REFERENCES auth_group (id) ON DELETE CASCADE,
-    name CHAR(512),
-    table_name CHAR(512),
-    record_id INTEGER
-);
-success!
-timestamp: 2013-10-22T19:56:41.823024
-CREATE TABLE auth_event(
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    time_stamp TIMESTAMP,
-    client_ip CHAR(512),
-    user_id INTEGER REFERENCES auth_user (id) ON DELETE CASCADE,
-    origin CHAR(512),
-    description TEXT
-);
-success!
-timestamp: 2013-10-22T19:56:41.947011
-CREATE TABLE auth_cas(
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    user_id INTEGER REFERENCES auth_user (id) ON DELETE CASCADE,
-    created_on TIMESTAMP,
-    service CHAR(512),
-    ticket CHAR(512),
-    renew CHAR(1)
-);
-success!
-timestamp: 2013-10-26T22:20:10.603766
+timestamp: 2013-10-31T07:51:39.006578
 CREATE TABLE auth_user(
     id INT AUTO_INCREMENT NOT NULL,
     first_name VARCHAR(128),
     last_name VARCHAR(128),
-    email VARCHAR(255),
-    password VARCHAR(255),
-    registration_key VARCHAR(255),
-    reset_password_key VARCHAR(255),
-    registration_id VARCHAR(255),
+    email VARCHAR(512),
+    password VARCHAR(512),
+    registration_key VARCHAR(512),
+    reset_password_key VARCHAR(512),
+    registration_id VARCHAR(512),
+    carnet VARCHAR(512),
+    dummyField VARCHAR(512),
     PRIMARY KEY(id)
 ) ENGINE=InnoDB CHARACTER SET utf8;
 success!
-timestamp: 2013-10-26T22:20:10.726200
+timestamp: 2013-10-31T07:51:39.291611
 CREATE TABLE auth_group(
     id INT AUTO_INCREMENT NOT NULL,
-    role VARCHAR(255),
+    role VARCHAR(512),
     description LONGTEXT,
     PRIMARY KEY(id)
 ) ENGINE=InnoDB CHARACTER SET utf8;
 success!
-timestamp: 2013-10-26T22:20:10.841605
+timestamp: 2013-10-31T07:51:39.452013
 CREATE TABLE auth_membership(
     id INT AUTO_INCREMENT NOT NULL,
     user_id INT, INDEX user_id__idx (user_id), FOREIGN KEY (user_id) REFERENCES auth_user (id) ON DELETE CASCADE,
@@ -82,86 +29,52 @@ CREATE TABLE auth_membership(
     PRIMARY KEY(id)
 ) ENGINE=InnoDB CHARACTER SET utf8;
 success!
-timestamp: 2013-10-26T22:20:11.012223
+timestamp: 2013-10-31T07:51:39.679527
 CREATE TABLE auth_permission(
     id INT AUTO_INCREMENT NOT NULL,
     group_id INT, INDEX group_id__idx (group_id), FOREIGN KEY (group_id) REFERENCES auth_group (id) ON DELETE CASCADE,
-    name VARCHAR(255),
-    table_name VARCHAR(255),
+    name VARCHAR(512),
+    table_name VARCHAR(512),
     record_id INT,
     PRIMARY KEY(id)
 ) ENGINE=InnoDB CHARACTER SET utf8;
 success!
-timestamp: 2013-10-26T22:20:11.155328
+timestamp: 2013-10-31T07:51:39.833455
 CREATE TABLE auth_event(
     id INT AUTO_INCREMENT NOT NULL,
     time_stamp DATETIME,
-    client_ip VARCHAR(255),
+    client_ip VARCHAR(512),
     user_id INT, INDEX user_id__idx (user_id), FOREIGN KEY (user_id) REFERENCES auth_user (id) ON DELETE CASCADE,
-    origin VARCHAR(255),
+    origin VARCHAR(512),
     description LONGTEXT,
     PRIMARY KEY(id)
 ) ENGINE=InnoDB CHARACTER SET utf8;
 success!
-timestamp: 2013-10-26T22:20:11.286179
+timestamp: 2013-10-31T07:51:40.153823
 CREATE TABLE auth_cas(
     id INT AUTO_INCREMENT NOT NULL,
     user_id INT, INDEX user_id__idx (user_id), FOREIGN KEY (user_id) REFERENCES auth_user (id) ON DELETE CASCADE,
     created_on DATETIME,
-    service VARCHAR(255),
-    ticket VARCHAR(255),
+    service VARCHAR(512),
+    ticket VARCHAR(512),
     renew CHAR(1),
     PRIMARY KEY(id)
 ) ENGINE=InnoDB CHARACTER SET utf8;
 success!
-timestamp: 2013-10-27T20:48:28.966299
-ALTER TABLE auth_user ADD carnet VARCHAR(255);
+timestamp: 2013-10-31T08:43:52.068537
+CREATE TABLE project(
+    id INT AUTO_INCREMENT NOT NULL,
+    name VARCHAR(512),
+    description LONGTEXT,
+    cycles INT,
+    PRIMARY KEY(id)
+) ENGINE=InnoDB CHARACTER SET utf8;
 success!
-timestamp: 2013-10-27T21:59:08.601956
-ALTER TABLE auth_user ADD carnet__tmp INT;
-success!
-UPDATE auth_user SET carnet__tmp=carnet;
-success!
-ALTER TABLE auth_user DROP COLUMN carnet;
-success!
-ALTER TABLE auth_user ADD carnet INT;
-success!
-UPDATE auth_user SET carnet=carnet__tmp;
-success!
-ALTER TABLE auth_user DROP COLUMN carnet__tmp;
-success!
-timestamp: 2013-10-27T22:02:48.723140
-ALTER TABLE auth_user ADD carnet__tmp VARCHAR(255);
-success!
-UPDATE auth_user SET carnet__tmp=carnet;
-success!
-ALTER TABLE auth_user DROP COLUMN carnet;
-success!
-ALTER TABLE auth_user ADD carnet VARCHAR(255);
-success!
-UPDATE auth_user SET carnet=carnet__tmp;
-success!
-ALTER TABLE auth_user DROP COLUMN carnet__tmp;
-success!
-timestamp: 2013-10-27T22:03:11.551582
-ALTER TABLE auth_user ADD carnet__tmp INT;
-success!
-UPDATE auth_user SET carnet__tmp=carnet;
-success!
-ALTER TABLE auth_user DROP COLUMN carnet;
-success!
-ALTER TABLE auth_user ADD carnet INT;
-success!
-UPDATE auth_user SET carnet=carnet__tmp;
-success!
-ALTER TABLE auth_user DROP COLUMN carnet__tmp;
-success!
-timestamp: 2013-10-27T22:12:47.308923
-ALTER TABLE auth_user DROP COLUMN carnet;
-success!
-timestamp: 2013-10-27T22:48:45.371250
-ALTER TABLE auth_user ADD carnet INT;
-success!
-timestamp: 2013-10-30T21:05:08.665412
-ALTER TABLE auth_user ADD dummyfield VARCHAR(255);
+timestamp: 2013-10-31T08:44:17.990722
+CREATE TABLE user_project(
+    id INT AUTO_INCREMENT NOT NULL,
+    student INT, INDEX student__idx (student), FOREIGN KEY (student) REFERENCES auth_user (id) ON DELETE CASCADE,
+    project INT, INDEX project__idx (project), FOREIGN KEY (project) REFERENCES project (id) ON DELETE CASCADE,
+    PRIMARY KEY(id)
+) ENGINE=InnoDB CHARACTER SET utf8;
 success!

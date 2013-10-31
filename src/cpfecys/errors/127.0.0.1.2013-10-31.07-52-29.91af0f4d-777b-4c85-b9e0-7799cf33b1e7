@@ -1,0 +1,21 @@
+(dp1
+S'output'
+p2
+S'<class \'gluon.contrib.pymysql.err.ProgrammingError\'> (1146, u"Table \'chamilo4.user_user\' doesn\'t exist")'
+p3
+sS'layer'
+p4
+S'/home/boris/Work/deploy-web2py-local/applications/cpfecys/controllers/abstract.py'
+p5
+sS'code'
+p6
+S'# coding: utf8\n# intente algo como\ndef index(): return dict(message="hello from abstract.py")\n\ndef user_active():\n    uid = request.vars[\'uid\']\n    carnet = None\n    nombre = None\n#    dummyVar = None\n#changos monos xD\n    if uid is None:\n        success = False\n    else:\n        success = True\n        carnet = db2(db2.user_user.id == uid).select().first().username\n        usuario = db(db.auth_user.carnet == carnet).select().first()\n        if usuario is None:\n            success = False\n        else:\n            nombre = usuario.first_name\n\n    return dict(success=success, carnet = carnet, name = nombre)\n\nresponse._vars=response._caller(user_active)\n'
+p7
+sS'snapshot'
+p8
+(dp9
+sS'traceback'
+p10
+S'Traceback (most recent call last):\n  File "/home/boris/Work/deploy-web2py-local/gluon/restricted.py", line 217, in restricted\n    exec ccode in environment\n  File "/home/boris/Work/deploy-web2py-local/applications/cpfecys/controllers/abstract.py", line 24, in <module>\n  File "/home/boris/Work/deploy-web2py-local/gluon/globals.py", line 372, in <lambda>\n    self._caller = lambda f: f()\n  File "/home/boris/Work/deploy-web2py-local/applications/cpfecys/controllers/abstract.py", line 15, in user_active\n    carnet = db2(db2.user_user.id == uid).select().first().username\n  File "/home/boris/Work/deploy-web2py-local/gluon/dal.py", line 10087, in select\n    return adapter.select(self.query,fields,attributes)\n  File "/home/boris/Work/deploy-web2py-local/gluon/dal.py", line 1751, in select\n    return self._select_aux(sql,fields,attributes)\n  File "/home/boris/Work/deploy-web2py-local/gluon/dal.py", line 1716, in _select_aux\n    self.execute(sql)\n  File "/home/boris/Work/deploy-web2py-local/gluon/dal.py", line 1836, in execute\n    return self.log_execute(*a, **b)\n  File "/home/boris/Work/deploy-web2py-local/gluon/dal.py", line 1830, in log_execute\n    ret = self.cursor.execute(command, *a[1:], **b)\n  File "/home/boris/Work/deploy-web2py-local/gluon/contrib/pymysql/cursors.py", line 117, in execute\n    self.errorhandler(self, exc, value)\n  File "/home/boris/Work/deploy-web2py-local/gluon/contrib/pymysql/connections.py", line 202, in defaulterrorhandler\n    raise errorclass, errorvalue\nProgrammingError: (1146, u"Table \'chamilo4.user_user\' doesn\'t exist")\n'
+p11
+s.

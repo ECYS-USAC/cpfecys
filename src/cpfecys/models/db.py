@@ -84,5 +84,20 @@ use_janrain(auth, filename='private/janrain.key')
 ## >>> for row in rows: print row.id, row.myfield
 #########################################################################
 
+# A project contains an N number of cycles
+# still isn't clear if cycles are only meant as 'semester'
+db.define_table('project',
+                Field('name', 'string'),
+                Field('description', 'text'),
+                Field('cycles', 'integer'))
+
+# The relationship between a user and a project contains
+# the history of the final practice, 
+# it has the starting cycle and the ending cycle
+# it also is the central key for all operations with interesting data
+db.define_table('user_project',
+                Field('student', 'reference auth_user'),
+                Field('project', 'reference project'))
+
 ## after defining tables, uncomment below to enable auditing
 # auth.enable_record_versioning(db)
