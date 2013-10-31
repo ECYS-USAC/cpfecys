@@ -43,7 +43,8 @@ from gluon.tools import Auth, Crud, Service, PluginManager, prettydate
 auth = Auth(db)
 
 auth.settings.extra_fields['auth_user']= [
-  Field('carnet')]
+  Field('carnet'),
+  Field('dummyField')]
 
 crud, service, plugins = Crud(db), Service(), PluginManager()
 
