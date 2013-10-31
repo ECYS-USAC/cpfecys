@@ -6,7 +6,6 @@ def user_active():
     uid = request.vars['uid']
     carnet = None
     nombre = None
-    dummy = None
     if uid is None:
         success = False
     else:
