@@ -6,6 +6,7 @@ def user_active():
     uid = request.vars['uid']
     carnet = None
     nombre = None
+    dummy = None
     if uid is None:
         success = False
     else:
@@ -17,4 +18,4 @@ def user_active():
         else:
             nombre = usuario.first_name
 
-    return dict(success=success, carnet = carnet, name = nombre)
+    return dict(success=success, carnet = carnet, name = nombre, dummy = dummy)
