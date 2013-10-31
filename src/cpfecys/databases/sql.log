@@ -162,3 +162,6 @@ success!
 timestamp: 2013-10-27T22:48:45.371250
 ALTER TABLE auth_user ADD carnet INT;
 success!
+timestamp: 2013-10-30T21:05:08.665412
+ALTER TABLE auth_user ADD dummyfield VARCHAR(255);
+success!
