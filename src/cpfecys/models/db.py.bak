@@ -42,14 +42,20 @@ response.generic_patterns = ['*'] if request.is_local else []
 from gluon.tools import Auth, Crud, Service, PluginManager, prettydate
 auth = Auth(db)
 
+
+# NOTE: length=255 is needed because a bug in mysql
+# as describede here: http://goo.gl/NBG5JM
 auth.settings.extra_fields['auth_user']= [
-  Field('carnet'),
-  Field('dummyField')]
+  Field('carnet', 'string', unique=True, length=255)]
 
 crud, service, plugins = Crud(db), Service(), PluginManager()
 
 ## create all tables needed by auth if not custom tables
 auth.define_tables(username=False, signature=False, migrate=True)
+
+## Change the display format for a user within this system.
+## Carnet is our best chance for identifying users.
+db.auth_user._format = '%(carnet)s'
 
 ## configure email
 mail = auth.settings.mailer
@@ -84,19 +90,22 @@ use_janrain(auth, filename='private/janrain.key')
 ## >>> for row in rows: print row.id, row.myfield
 #########################################################################
 
+
+
 # A project contains an N number of cycles
 # still isn't clear if cycles are only meant as 'semester'
 db.define_table('project',
                 Field('name', 'string'),
                 Field('description', 'text'),
-                Field('cycles', 'integer'))
+                Field('cycles', 'integer'),
+                format='%(name)s')
 
 # The relationship between a user and a project contains
 # the history of the final practice, 
 # it has the starting cycle and the ending cycle
 # it also is the central key for all operations with interesting data
 db.define_table('user_project',
-                Field('user', 'reference auth_user'),
+                Field('student', 'reference auth_user'),
                 Field('project', 'reference project'))
 
 ## after defining tables, uncomment below to enable auditing

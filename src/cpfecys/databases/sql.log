@@ -1,4 +1,4 @@
-timestamp: 2013-10-31T07:51:39.006578
+timestamp: 2013-11-04T10:36:35.366261
 CREATE TABLE auth_user(
     id INT AUTO_INCREMENT NOT NULL,
     first_name VARCHAR(128),
@@ -13,7 +13,7 @@ CREATE TABLE auth_user(
     PRIMARY KEY(id)
 ) ENGINE=InnoDB CHARACTER SET utf8;
 success!
-timestamp: 2013-10-31T07:51:39.291611
+timestamp: 2013-11-04T10:36:35.826277
 CREATE TABLE auth_group(
     id INT AUTO_INCREMENT NOT NULL,
     role VARCHAR(512),
@@ -21,7 +21,7 @@ CREATE TABLE auth_group(
     PRIMARY KEY(id)
 ) ENGINE=InnoDB CHARACTER SET utf8;
 success!
-timestamp: 2013-10-31T07:51:39.452013
+timestamp: 2013-11-04T10:36:36.309852
 CREATE TABLE auth_membership(
     id INT AUTO_INCREMENT NOT NULL,
     user_id INT, INDEX user_id__idx (user_id), FOREIGN KEY (user_id) REFERENCES auth_user (id) ON DELETE CASCADE,
@@ -29,7 +29,7 @@ CREATE TABLE auth_membership(
     PRIMARY KEY(id)
 ) ENGINE=InnoDB CHARACTER SET utf8;
 success!
-timestamp: 2013-10-31T07:51:39.679527
+timestamp: 2013-11-04T10:36:37.151022
 CREATE TABLE auth_permission(
     id INT AUTO_INCREMENT NOT NULL,
     group_id INT, INDEX group_id__idx (group_id), FOREIGN KEY (group_id) REFERENCES auth_group (id) ON DELETE CASCADE,
@@ -39,7 +39,7 @@ CREATE TABLE auth_permission(
     PRIMARY KEY(id)
 ) ENGINE=InnoDB CHARACTER SET utf8;
 success!
-timestamp: 2013-10-31T07:51:39.833455
+timestamp: 2013-11-04T10:36:37.714138
 CREATE TABLE auth_event(
     id INT AUTO_INCREMENT NOT NULL,
     time_stamp DATETIME,
@@ -50,7 +50,7 @@ CREATE TABLE auth_event(
     PRIMARY KEY(id)
 ) ENGINE=InnoDB CHARACTER SET utf8;
 success!
-timestamp: 2013-10-31T07:51:40.153823
+timestamp: 2013-11-04T10:36:38.307855
 CREATE TABLE auth_cas(
     id INT AUTO_INCREMENT NOT NULL,
     user_id INT, INDEX user_id__idx (user_id), FOREIGN KEY (user_id) REFERENCES auth_user (id) ON DELETE CASCADE,
@@ -61,7 +61,7 @@ CREATE TABLE auth_cas(
     PRIMARY KEY(id)
 ) ENGINE=InnoDB CHARACTER SET utf8;
 success!
-timestamp: 2013-10-31T08:43:52.068537
+timestamp: 2013-11-04T10:36:38.824365
 CREATE TABLE project(
     id INT AUTO_INCREMENT NOT NULL,
     name VARCHAR(512),
@@ -70,11 +70,87 @@ CREATE TABLE project(
     PRIMARY KEY(id)
 ) ENGINE=InnoDB CHARACTER SET utf8;
 success!
-timestamp: 2013-10-31T08:44:17.990722
+timestamp: 2013-11-04T10:36:39.206692
 CREATE TABLE user_project(
     id INT AUTO_INCREMENT NOT NULL,
     student INT, INDEX student__idx (student), FOREIGN KEY (student) REFERENCES auth_user (id) ON DELETE CASCADE,
     project INT, INDEX project__idx (project), FOREIGN KEY (project) REFERENCES project (id) ON DELETE CASCADE,
     PRIMARY KEY(id)
 ) ENGINE=InnoDB CHARACTER SET utf8;
+success!
+timestamp: 2013-11-04T10:46:21.457021
+CREATE TABLE user_auth(
+    id INT AUTO_INCREMENT NOT NULL,
+    PRIMARY KEY(id)
+) ENGINE=InnoDB CHARACTER SET utf8;
+success!
+timestamp: 2013-11-04T11:33:08.538738
+ALTER TABLE auth_user ADD carnet__tmp VARCHAR(512) NOT NULL UNIQUE;
+timestamp: 2013-11-04T11:33:45.235206
+ALTER TABLE auth_user ADD carnet__tmp VARCHAR(512) NOT NULL UNIQUE;
+timestamp: 2013-11-04T11:34:08.525252
+ALTER TABLE auth_user ADD carnet__tmp VARCHAR(512) NOT NULL;
+success!
+UPDATE auth_user SET carnet__tmp=carnet;
+success!
+ALTER TABLE auth_user DROP COLUMN carnet;
+success!
+ALTER TABLE auth_user ADD carnet VARCHAR(512) NOT NULL;
+success!
+UPDATE auth_user SET carnet=carnet__tmp;
+success!
+ALTER TABLE auth_user DROP COLUMN carnet__tmp;
+success!
+success!
+timestamp: 2013-11-04T11:34:20.345627
+ALTER TABLE auth_user ADD carnet__tmp VARCHAR(512) NOT NULL UNIQUE;
+timestamp: 2013-11-04T11:34:48.176650
+ALTER TABLE auth_user ADD carnet__tmp VARCHAR(512) UNIQUE;
+timestamp: 2013-11-04T11:35:22.834548
+ALTER TABLE auth_user ADD carnet__tmp VARCHAR(512) UNIQUE;
+timestamp: 2013-11-04T11:35:40.304043
+ALTER TABLE auth_user ADD carnet__tmp INT UNIQUE;
+success!
+UPDATE auth_user SET carnet__tmp=carnet;
+success!
+ALTER TABLE auth_user DROP COLUMN carnet;
+success!
+ALTER TABLE auth_user ADD carnet INT UNIQUE;
+success!
+UPDATE auth_user SET carnet=carnet__tmp;
+success!
+ALTER TABLE auth_user DROP COLUMN carnet__tmp;
+success!
+success!
+timestamp: 2013-11-04T11:37:22.143189
+ALTER TABLE auth_user ADD carnet__tmp VARCHAR(512) UNIQUE;
+timestamp: 2013-11-04T11:38:27.454390
+ALTER TABLE auth_user ADD carnet__tmp VARCHAR(255) UNIQUE;
+success!
+UPDATE auth_user SET carnet__tmp=carnet;
+success!
+ALTER TABLE auth_user DROP COLUMN carnet;
+success!
+ALTER TABLE auth_user ADD carnet VARCHAR(255) UNIQUE;
+success!
+UPDATE auth_user SET carnet=carnet__tmp;
+success!
+ALTER TABLE auth_user DROP COLUMN carnet__tmp;
+success!
+success!
+timestamp: 2013-11-04T11:40:46.387739
+ALTER TABLE auth_user ADD carnet__tmp VARCHAR(255) NOT NULL UNIQUE;
+success!
+UPDATE auth_user SET carnet__tmp=carnet;
+success!
+ALTER TABLE auth_user DROP COLUMN carnet;
+success!
+ALTER TABLE auth_user ADD carnet VARCHAR(255) NOT NULL UNIQUE;
+success!
+UPDATE auth_user SET carnet=carnet__tmp;
+success!
+ALTER TABLE auth_user DROP COLUMN carnet__tmp;
+success!
+timestamp: 2013-11-04T11:40:49.555662
+ALTER TABLE auth_user DROP COLUMN dummyfield;
 success!
