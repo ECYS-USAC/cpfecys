@@ -6,14 +6,12 @@ def user_active():
     uid = request.vars['uid']
     carnet = None
     nombre = None
-#    dummyVar = None
-#changos monos xD
     if uid is None:
         success = False
     else:
         success = True
         carnet = db2(db2.user_user.id == uid).select().first().username
-        usuario = db(db.auth_user.carnet == carnet).select().first()
+        usuario = db(db.auth_user.username == carnet).select().first()
         if usuario is None:
             success = False
         else:

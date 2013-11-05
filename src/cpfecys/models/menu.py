@@ -27,7 +27,8 @@ response.menu = [
     (T('Home'), False, URL('default', 'index'), []),
     (T('Administration'), False, URL(),[
                                  (T('Projects'), False, URL('admin', 'projects'), []),
-                                 (T('Students in Projects'), False, URL('admin', 'user_project'), [])
+                                 (T('Students in Projects'), False, URL('admin', 'user_project'), []),
+                                 (T('Users'), False, URL('admin', 'users'), [])
                                  ])
 ]
 

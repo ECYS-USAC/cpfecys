@@ -42,20 +42,19 @@ response.generic_patterns = ['*'] if request.is_local else []
 from gluon.tools import Auth, Crud, Service, PluginManager, prettydate
 auth = Auth(db)
 
-
 # NOTE: length=255 is needed because a bug in mysql
 # as describede here: http://goo.gl/NBG5JM
-auth.settings.extra_fields['auth_user']= [
-  Field('carnet', 'string', unique=True, length=255, notnull=True)]
+#auth.settings.extra_fields['auth_user']= [
+#  Field('carnet', 'string', unique=True, length=255, notnull=True)]
 
 crud, service, plugins = Crud(db), Service(), PluginManager()
 
 ## create all tables needed by auth if not custom tables
-auth.define_tables(username=False, signature=False, migrate=True)
+auth.define_tables(username=True, signature=False, migrate=True)
 
 ## Change the display format for a user within this system.
 ## Carnet is our best chance for identifying users.
-db.auth_user._format = '%(carnet)s'
+## db.auth_user._format = '%(carnet)s'
 
 ## configure email
 mail = auth.settings.mailer
@@ -90,8 +89,6 @@ use_janrain(auth, filename='private/janrain.key')
 ## >>> for row in rows: print row.id, row.myfield
 #########################################################################
 
-
-
 # A project contains an N number of cycles
 # still isn't clear if cycles are only meant as 'semester'
 db.define_table('project',
@@ -108,5 +105,21 @@ db.define_table('user_project',
                 Field('student', 'reference auth_user'),
                 Field('project', 'reference project'))
 
+# User Roles
+## Super-Administrator:
+setup = db.auth_user(db.auth_user.username == 'admin')
+if setup is None:
+    super = db.auth_user.insert(email = 'admin@admin.com', first_name = 'Super',
+                                         last_name = 'Administrator', username = 'admin',
+                                         password = db.auth_user.password.validate('superadmin')[0])
+    superadmins = auth.add_group(role = 'Super-Administrator',
+                                 description = 'In charge of the whole system administration.')
+    auth.add_membership(superadmins, super)
+    ## Student:
+    sutdents = auth.add_group('Student',
+                              'User that is enrolled in some practice. Limited access.')
+    ## Teacher:
+    teachers = auth.add_group('Teacher',
+                              'User that evaluates students in some courses. When final practice is teaching.')
 ## after defining tables, uncomment below to enable auditing
 # auth.enable_record_versioning(db)
