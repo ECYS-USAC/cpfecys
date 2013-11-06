@@ -1,0 +1,20 @@
+# coding: utf8
+# try something like
+import csv
+@auth.requires_login()
+def index():
+    """User import index loads all user
+    data via uploading a csv file, and verifies
+    if user exists on LMS database """
+    string = ''
+    if request.vars.csvfile != None:
+        file = request.vars.csvfile.file
+        cr = csv.reader(file)
+        
+        for row in cr:    
+            string = string + row[0]
+            
+        response.flash = T('Data uploaded')
+        return dict(file=string)
+    else:
+        return dict(file=False)
