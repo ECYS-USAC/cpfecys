@@ -1,11 +1,14 @@
 {{extend 'layout.html'}}
 {{if success:}}
-    Users found in database: <br/> 
-	{{=BEAUTIFY(=data)}}
+    Users inserted: <br/> 
+	{{=BEAUTIFY(data)}}
 	<br/>
 Errors:<br/>
-    {{=BEAUTIFY(=errors)}}
-    
+    {{=BEAUTIFY(errors)}}
+
+Existing:<br/>
+	{{=BEAUTIFY(existUsers)}}
+
 {{else:}} 	
 	{{=FORM(INPUT(_type='file',_name='csvfile'),INPUT(_type='submit',_value='Upload'))}}
 {{ pass }}
