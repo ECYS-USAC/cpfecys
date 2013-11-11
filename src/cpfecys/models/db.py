@@ -44,8 +44,11 @@ auth = Auth(db)
 
 # NOTE: length=255 is needed because a bug in mysql
 # as describede here: http://goo.gl/NBG5JM
-#auth.settings.extra_fields['auth_user']= [
-#  Field('carnet', 'string', unique=True, length=255, notnull=True)]
+auth.settings.extra_fields['auth_user']= [
+  Field('phone', 'string', length=16, notnull=False),
+  Field('working', 'boolean', notnull=False),
+  Field('work_address', 'string', unique=True, length=255, notnull=False),
+  Field('pro_bono', 'boolean', length=255, notnull=False),]
 
 crud, service, plugins = Crud(db), Service(), PluginManager()
 
