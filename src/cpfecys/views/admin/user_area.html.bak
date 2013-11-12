@@ -1,0 +1,3 @@
+{{extend 'layout.html'}}
+<h1>Esta es la plantilla admin/user_area.html</h1>
+{{=grid}}

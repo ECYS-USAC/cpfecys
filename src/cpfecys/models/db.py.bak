@@ -92,21 +92,26 @@ use_janrain(auth, filename='private/janrain.key')
 ## >>> for row in rows: print row.id, row.myfield
 #########################################################################
 
-# A project contains an N number of cycles
-# still isn't clear if cycles are only meant as 'semester'
+# A project contains an description and name
 db.define_table('project',
                 Field('name', 'string'),
                 Field('description', 'text'),
-                Field('cycles', 'integer'),
                 format='%(name)s')
 
-# The relationship between a user and a project contains
-# the history of the final practice, 
+db.define_table('area',
+                Field ('project', 'reference project'),
+                Field ('name', 'string'),
+                Field ('description', 'text'),
+                Field ('physical_location', 'text'),
+                format='%(name)s')
+
+# The relationship between a user and a subproject contains
+# the history of the final practice,
 # it has the starting cycle and the ending cycle
 # it also is the central key for all operations with interesting data
-db.define_table('user_project',
+db.define_table('user_subproject',
                 Field('student', 'reference auth_user'),
-                Field('project', 'reference project'))
+                Field('area', 'reference area'))
 
 # User Roles
 ## Super-Administrator:

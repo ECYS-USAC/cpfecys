@@ -8,8 +8,14 @@ def projects():
 
 @auth.requires_login()
 @auth.requires_membership('Super-Administrator')
-def user_project():
-    grid = SQLFORM.grid(db.user_project.student != auth.user.id)
+def areas():
+    grid = SQLFORM.grid(db.area)
+    return locals()
+
+@auth.requires_login()
+@auth.requires_membership('Super-Administrator')
+def user_area():
+    grid = SQLFORM.grid(db.user_subproject.student != auth.user.id)
     return locals()
 
 @auth.requires_login()
