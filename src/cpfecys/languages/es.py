@@ -277,6 +277,7 @@
 'Profile': 'Profile',
 'Profile updated': 'Profile updated',
 'Project': 'Project',
+'Project Area': 'Project Area',
 'Projects': 'Projects',
 'Python': 'Python',
 'Query:': 'Consulta:',

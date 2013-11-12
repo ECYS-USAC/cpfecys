@@ -98,7 +98,7 @@ db.define_table('project',
                 Field('description', 'text'),
                 format='%(name)s')
 
-db.define_table('area',
+db.define_table('project_area',
                 Field ('project', 'reference project'),
                 Field ('name', 'string'),
                 Field ('description', 'text'),
@@ -111,7 +111,7 @@ db.define_table('area',
 # it also is the central key for all operations with interesting data
 db.define_table('user_area',
                 Field('student', 'reference auth_user'),
-                Field('area', 'reference area'))
+                Field('project_area', 'reference project_area'))
 
 # User Roles
 ## Super-Administrator:

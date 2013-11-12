@@ -9,7 +9,7 @@ def projects():
 @auth.requires_login()
 @auth.requires_membership('Super-Administrator')
 def areas():
-    grid = SQLFORM.grid(db.area)
+    grid = SQLFORM.grid(db.project_area)
     return locals()
 
 @auth.requires_login()
