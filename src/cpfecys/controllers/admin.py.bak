@@ -15,7 +15,7 @@ def areas():
 @auth.requires_login()
 @auth.requires_membership('Super-Administrator')
 def user_area():
-    grid = SQLFORM.grid(db.user_subproject.student != auth.user.id)
+    grid = SQLFORM.grid(db.user_area.student != auth.user.id)
     return locals()
 
 @auth.requires_login()

@@ -98,7 +98,7 @@ db.define_table('project',
                 Field('description', 'text'),
                 format='%(name)s')
 
-db.define_table('area',
+db.define_table('project_area',
                 Field ('project', 'reference project'),
                 Field ('name', 'string'),
                 Field ('description', 'text'),
