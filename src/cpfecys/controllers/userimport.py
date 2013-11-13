@@ -34,13 +34,13 @@ def index():
                     areacode = row[10]
                     pro_bono = row[8]
                     cycles = row[9]
-                    area = db(db.area.id==row[10]).select().first()
+                    area = db(db.project_area.id==row[10]).select().first()
                     
                     if area:
                         tempUser = db.auth_user.insert(username=user.username, \
                         first_name=first_name, email=email, pro_bono=pro_bono, \
                         phone=phone)
-                        db.user_area.insert(student=tempUser, area=area)
+                        db.user_area.insert(student=tempUser, project_area=area)
                     
                     newUsrs[UsrIndx] = first_name
                     UsrIndx = UsrIndx + 1
