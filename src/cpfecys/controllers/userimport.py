@@ -42,7 +42,7 @@ def index():
                         phone=phone)
                         db.user_area.insert(student=tempUser, project_area=area)
                     
-                    newUsrs[UsrIndx] = first_name
+                    newUsrs[UsrIndx] = first_name + ' :' + area.name
                     UsrIndx = UsrIndx + 1
                 else:
                     existUsers[exisIndex] = row[1]

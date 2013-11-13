@@ -40,9 +40,9 @@ def index():
                         tempUser = db.auth_user.insert(username=user.username, \
                         first_name=first_name, email=email, pro_bono=pro_bono, \
                         phone=phone)
-                        db.user_area.insert(student=tempUser, area=area)
+                        db.user_area.insert(student=tempUser, project_area=area)
                     
-                    newUsrs[UsrIndx] = first_name
+                    newUsrs[UsrIndx] = first_name + ' : <strong>' + area.name + '</strong>'
                     UsrIndx = UsrIndx + 1
                 else:
                     existUsers[exisIndex] = row[1]
