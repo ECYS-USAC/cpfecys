@@ -1,20 +1,49 @@
-# coding: utf8
+content# coding: utf8
 # try something like
 import csv
 @auth.requires_login()
 def index():
-    """User import index loads all user
-    data via uploading a csv file, and verifies
-    if user exists on LMS database """
-    string = ''
+    newUsrs = {}
+    errUsrs = {}
+    existUsers ={}
+    exisIndex = 0
+    UsrIndx = 0
+    errIndx = 0
+    success = False
     if request.vars.csvfile != None:
         file = request.vars.csvfile.file
-        cr = csv.reader(file)
-        
+        cr = csv.reader(file, delimiter=',', quotechar='|')
+        success = True
         for row in cr:    
-            string = string + row[0]
-            
+            user = None
+            user = db2(db2.user_user.username==row[1]).select().first()
+            if user is None:
+                errUsrs[errIndx] = row[1]
+                errIndx = errIndx + 1
+            else:
+                currentUser = None
+                currentUser = db(db.auth_user.username==user.username).select().first()
+                if currentUser is None:
+                    first_name = ''
+                    phone = ''
+                    first_name = row[2]
+                    phone = row[3]
+                    email = row[4]
+                    area = row[7]
+                    pro_bono = row[8]
+                    cycles = row[9]
+                    
+                    tempUser = db.auth_user.insert(username=user.username, \
+                    first_name=first_name, email=email, pro_bono=pro_bono, \
+                    phone=phone)
+                    
+                    newUsrs[UsrIndx] = tempUser.name
+                    UsrIndx = UsrIndx + 1
+                else:
+                    existUsers[exisIndex] = row[1]
+                    exisIndex = exisIndex + 1
+        
         response.flash = T('Data uploaded')
-        return dict(file=string)
+        return dict(success=success, data=newUsrs, errors=errUsrs, existUsers=existUsers)
     else:
-        return dict(file=False)
+        return dict(success=False, file=False)

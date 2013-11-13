@@ -1,9 +1,9 @@
 {{extend 'layout.html'}}
 {{if success:}}
-    Users inserted: <br/> 
+    Inserted users: <br/> 
 	{{=BEAUTIFY(data)}}
 	<br/>
-Errors:<br/>
+Users not found:<br/>
     {{=BEAUTIFY(errors)}}
 
 Existing:<br/>

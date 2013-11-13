@@ -14,7 +14,8 @@ def index():
         file = request.vars.csvfile.file
         cr = csv.reader(file, delimiter=',', quotechar='|')
         success = True
-        for row in cr:    
+        header = next(cr)
+        for row in cr:   
             user = None
             user = db2(db2.user_user.username==row[1]).select().first()
             if user is None:
@@ -24,18 +25,24 @@ def index():
                 currentUser = None
                 currentUser = db(db.auth_user.username==user.username).select().first()
                 if currentUser is None:
-                    first_name = ''
                     phone = ''
+                    area = None
+                    first_name = ''
                     first_name = row[2]
                     phone = row[3]
-                    email = row[4]
-                    area = row[7]
+                    email = row[4]                    
+                    areacode = row[10]
                     pro_bono = row[8]
                     cycles = row[9]
+                    area = db(db.area.id==row[10]).select().first()
                     
-                    db.auth_user.insert(username=user.username, first_name=first_name, \
-                    email=email, pro_bono=pro_bono, phone=phone)
-                    newUsrs[UsrIndx] = row[1]
+                    if area:
+                        tempUser = db.auth_user.insert(username=user.username, \
+                        first_name=first_name, email=email, pro_bono=pro_bono, \
+                        phone=phone)
+                        db.user_area.insert(student=tempUser, area=area)
+                    
+                    newUsrs[UsrIndx] = first_name
                     UsrIndx = UsrIndx + 1
                 else:
                     existUsers[exisIndex] = row[1]
