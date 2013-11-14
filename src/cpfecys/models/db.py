@@ -48,7 +48,8 @@ auth.settings.extra_fields['auth_user']= [
                   Field('phone', 'string', length=16, notnull=False),
                   Field('working', 'boolean', notnull=False),
                   Field('work_address', 'string', unique=True, length=255, notnull=False),
-                  Field('pro_bono', 'boolean', length=255, notnull=False),]
+                  Field('pro_bono', 'boolean', length=255, notnull=False),
+                  Field('uv_token', 'string', length=64, notnull=False),]
 
 crud, service, plugins = Crud(db), Service(), PluginManager()
 
