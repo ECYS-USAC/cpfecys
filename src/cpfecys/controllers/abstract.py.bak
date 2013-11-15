@@ -24,7 +24,7 @@ def user_active():
     #carnet = None
     #nombre = None
     if uid is None:
-        success = "a"
+        success = False
     else:
         success = True
         chamilo_user = db2.user_user(uid)

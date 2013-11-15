@@ -40,5 +40,5 @@ def user_active():
         elif not (usuario.first()):
             success = False
         #else:
-            #nombre = usuario.first_name
+        #    nombre = usuario.first_name
     return dict(success=success)
