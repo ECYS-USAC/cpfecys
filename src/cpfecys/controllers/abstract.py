@@ -3,6 +3,22 @@
 import string, random
 def index(): return dict(message="hello from abstract.py")
 
+def oauth_login():
+    token = request.vars['token']
+    if not (token):
+        #no token provided
+        session.flash = T('No token was provided.')
+        redirect(URL('cpfecys','default','user/login'))
+    user = db(db.auth_user.uv_token==token).select()
+    if not user:
+        #bad token
+        session.flash = T('The provided token is not valid.')
+        redirect(URL('cpfecys','default','user/login'))
+    auth.login_user(user.first())
+    #sucessfull login :D
+    redirect(URL('cpfecys', 'default', 'index'))
+    return dict()
+
 def user_active():
     uid = request.vars['uid']
     carnet = None
