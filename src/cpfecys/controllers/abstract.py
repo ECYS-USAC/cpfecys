@@ -21,21 +21,24 @@ def oauth_login():
 
 def user_active():
     uid = request.vars['uid']
-    carnet = None
-    nombre = None
+    #carnet = None
+    #nombre = None
     if uid is None:
         success = False
     else:
         success = True
-        carnet = db2(db2.user_user.id == uid).select().first().username
-        usuario = db(db.auth_user.username == carnet).select().first()
-        token = usuario.uv_token = ''.join(random.choice(string.ascii_uppercase\
-                                    + string.ascii_lowercase + string.digits)\
-                                    for x in range(63))
-        usuario.update_record()
+        chamilo_user = db2.user_user(uid)
+        if not chamilo_user:
+            success = False
+        usuario = db(db.auth_user.username == chamilo_user.username).select()
+        #token = usuario.uv_token = ''.join(random.choice(string.ascii_uppercase\
+        #                            + string.ascii_lowercase + string.digits)\
+        #                            for x in range(63))
+        #usuario.update_record()
         if usuario is None:
             success = False
-        else:
-            nombre = usuario.first_name
-
-    return dict(success=success, carnet = carnet, name = nombre, token=usuario.uv_token)
+        elif not (usuario.first()):
+            success = False
+        #else:
+            #nombre = usuario.first_name
+    return dict(success=success)

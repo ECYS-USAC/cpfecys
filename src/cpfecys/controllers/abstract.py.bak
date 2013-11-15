@@ -8,12 +8,12 @@ def oauth_login():
     if not (token):
         #no token provided
         session.flash = T('No token was provided.')
-        redirect(URL('cpfecys','default','index'))
+        redirect(URL('cpfecys','default','user/login'))
     user = db(db.auth_user.uv_token==token).select()
     if not user:
         #bad token
         session.flash = T('The provided token is not valid.')
-        redirect(URL('cpfecys','default','index'))
+        redirect(URL('cpfecys','default','user/login'))
     auth.login_user(user.first())
     #sucessfull login :D
     redirect(URL('cpfecys', 'default', 'index'))
@@ -21,21 +21,24 @@ def oauth_login():
 
 def user_active():
     uid = request.vars['uid']
-    carnet = None
-    nombre = None
+    #carnet = None
+    #nombre = None
     if uid is None:
-        success = False
+        success = "a"
     else:
         success = True
-        carnet = db2(db2.user_user.id == uid).select().first().username
-        usuario = db(db.auth_user.username == carnet).select().first()
-        token = usuario.uv_token = ''.join(random.choice(string.ascii_uppercase\
-                                    + string.ascii_lowercase + string.digits)\
-                                    for x in range(63))
-        usuario.update_record()
+        chamilo_user = db2.user_user(uid)
+        if not chamilo_user:
+            success = False
+        usuario = db(db.auth_user.username == chamilo_user.username).select()
+        #token = usuario.uv_token = ''.join(random.choice(string.ascii_uppercase\
+        #                            + string.ascii_lowercase + string.digits)\
+        #                            for x in range(63))
+        #usuario.update_record()
         if usuario is None:
             success = False
-        else:
-            nombre = usuario.first_name
-
-    return dict(success=success, carnet = carnet, name = nombre, token=usuario.uv_token)
+        elif not (usuario.first()):
+            success = False
+        #else:
+            #nombre = usuario.first_name
+    return dict(success=success)
