@@ -1,3 +1,0 @@
-{{extend 'layout.html'}}
-<h1>Final Practice Assignation</h1>
-{{=grid}}

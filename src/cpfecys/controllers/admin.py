@@ -9,13 +9,68 @@ def projects():
 @auth.requires_login()
 @auth.requires_membership('Super-Administrator')
 def areas():
-    grid = SQLFORM.grid(db.project_area)
+    grid = SQLFORM.grid(db.area)
     return locals()
 
 @auth.requires_login()
 @auth.requires_membership('Super-Administrator')
-def user_area():
-    grid = SQLFORM.grid(db.user_area.student != auth.user.id)
+def assignation():
+    import csv
+    newUsrs = {}
+    errUsrs = {}
+    existUsers ={}
+    exisIndex = 0
+    UsrIndx = 0
+    errIndx = 0
+    success = False
+    grid = SQLFORM.grid(db.user_project.student != auth.user.id)
+    if request.vars.csvfile:
+        cr = csv.reader(file, delimiter=',', quotechar='|')
+        success = True
+        header = next(cr)
+        for row in cr:
+            user = None
+            user = db2(db2.user_user.username==row[1]).select().first()
+            if not user:
+                errUsrs[errIndx] = row[1]
+                errIndx = errIndx + 1
+            else:
+                currentUser = None
+                currentUser = db(db.auth_user.username==user.username).select().first()
+                if not currentUser:
+                    phone = ''
+                    area = None
+                    first_name = ''
+                    first_name = row[2]
+                    phone = row[3]
+                    email = row[4]
+                    areacode = row[10]
+                    pro_bono = row[8]
+                    cycles = row[9]
+                    project = db(db.project.id==row[10]).select().first()
+
+                    if project:
+                        tempUser = db.auth_user.insert(username=user.username, \
+                        first_name=first_name, email=email, pro_bono=pro_bono, \
+                        phone=phone)
+                        db.user_project.insert(student=tempUser, project=project)
+
+                    newUsrs[UsrIndx] = first_name + ' :' + area.name
+                    UsrIndx = UsrIndx + 1
+                else:
+                    existUsers[exisIndex] = row[1]
+                    exisIndex = exisIndex + 1
+
+        response.flash = T('Data uploaded')
+        return dict(grid = grid,
+                    success = success,
+                    data = newUsrs,
+                    errors = errUsrs,
+                    existUsers = existUsers)
+    else:
+        return dict(grid = grid,
+                    success = False,
+                    file = False)
     return locals()
 
 @auth.requires_login()

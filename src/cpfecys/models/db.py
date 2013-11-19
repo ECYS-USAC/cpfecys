@@ -94,13 +94,13 @@ use_janrain(auth, filename='private/janrain.key')
 #########################################################################
 
 # A project contains an description and name
-db.define_table('project',
+db.define_table('area',
                 Field('name', 'string'),
                 Field('description', 'text'),
                 format='%(name)s')
 
-db.define_table('project_area',
-                Field ('project', 'reference project'),
+db.define_table('project',
+                Field ('area', 'reference area'),
                 Field ('name', 'string'),
                 Field ('description', 'text'),
                 Field ('physical_location', 'text'),
@@ -110,9 +110,9 @@ db.define_table('project_area',
 # the history of the final practice,
 # it has the starting cycle and the ending cycle
 # it also is the central key for all operations with interesting data
-db.define_table('user_area',
+db.define_table('user_project',
                 Field('student', 'reference auth_user'),
-                Field('project_area', 'reference project_area'))
+                Field('project', 'reference project'))
 
 # User Roles
 ## Super-Administrator:

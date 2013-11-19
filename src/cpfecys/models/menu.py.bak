@@ -26,9 +26,9 @@ response.google_analytics_id = None
 response.menu = [
     (T('Home'), False, URL('default', 'index'), []),
     (T('Administration'), False, URL(),[
+                                (T('Areas'), False, URL('admin', 'areas'), []),
                                  (T('Projects'), False, URL('admin', 'projects'), []),
-                                 (T('Areas'), False, URL('admin', 'areas'), []),
-                                 (T('Final Practice Assignation'), False, URL('admin', 'user_subproject'), []),
+                                 (T('Final Practice Assignation'), False, URL('admin', 'user_area'), []),
                                  (T('Users'), False, URL('admin', 'users'), [])
                                  ])
 ]

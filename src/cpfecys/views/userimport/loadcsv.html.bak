@@ -1,6 +1,0 @@
-{{extend 'layout.html'}}
-{{if file:}}
-You uploaded a file {{file}}
-{{else:}} 	
-	{{=FORM(INPUT(_type='file',_name='csvfile'),INPUT(_type='submit',_value='Upload'))}}
-{{ pass }}

@@ -1,3 +1,0 @@
-{{extend 'layout.html'}}
-<h1>{{=T('Students enrolled in projects')</h1>
-{{=grid}}

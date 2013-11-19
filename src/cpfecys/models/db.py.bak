@@ -49,7 +49,7 @@ auth.settings.extra_fields['auth_user']= [
                   Field('working', 'boolean', notnull=False),
                   Field('work_address', 'string', unique=True, length=255, notnull=False),
                   Field('pro_bono', 'boolean', length=255, notnull=False),
-                  Field('uv_token', 'string', lenght=64, notnull=False),]
+                  Field('uv_token', 'string', length=64, notnull=False),]
 
 crud, service, plugins = Crud(db), Service(), PluginManager()
 
@@ -94,13 +94,13 @@ use_janrain(auth, filename='private/janrain.key')
 #########################################################################
 
 # A project contains an description and name
-db.define_table('project',
+db.define_table('area',
                 Field('name', 'string'),
                 Field('description', 'text'),
                 format='%(name)s')
 
-db.define_table('project_area',
-                Field ('project', 'reference project'),
+db.define_table('project',
+                Field ('area', 'reference area'),
                 Field ('name', 'string'),
                 Field ('description', 'text'),
                 Field ('physical_location', 'text'),
