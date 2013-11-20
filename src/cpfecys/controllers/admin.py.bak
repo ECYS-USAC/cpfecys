@@ -55,7 +55,7 @@ def assignation():
                         phone=phone)
                         db.user_project.insert(student=tempUser, project=project)
 
-                    newUsrs[UsrIndx] = first_name + ' :' + project.name
+                    newUsrs[UsrIndx] = first_name + ' :' + area.name
                     UsrIndx = UsrIndx + 1
                 else:
                     existUsers[exisIndex] = row[1]
