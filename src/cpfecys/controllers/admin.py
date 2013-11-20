@@ -29,36 +29,27 @@ def assignation():
         success = True
         header = next(cr)
         for row in cr:
-            user = None
-            user = db2(db2.user_user.username==row[1]).select().first()
-            if not user:
-                errUsrs[errIndx] = row[1]
-                errIndx = errIndx + 1
-            else:
-                currentUser = None
-                currentUser = db(db.auth_user.username==user.username).select().first()
-                if not currentUser:
-                    phone = ''
-                    area = None
-                    first_name = ''
-                    first_name = row[2]
-                    phone = row[3]
-                    email = row[4]
-                    areacode = row[10]
-                    pro_bono = row[8]
-                    cycles = row[9]
-                    project = db(db.project.id==row[10]).select().first()
-
-                    if project:
-                        tempUser = db.auth_user.insert(username=user.username, \
-                        first_name=first_name, email=email, pro_bono=pro_bono, \
-                        phone=phone)
-                        db.user_project.insert(student=tempUser, project=project)
-
-                    newUsrs[UsrIndx] = first_name + ' :' + project.name
-                    UsrIndx = UsrIndx + 1
-                else:
-                    existUsers[exisIndex] = row[1]
+            project = None
+            currentUser = None
+            currentUser = db(db.auth_user.username==row[1]).select().first()
+            project = db(db.project.id==row[10]).select().first()
+            if currentUser is None:
+                phone = ''
+                first_name = ''
+                username = ''
+                phone = row[3]
+                email = row[4]
+                cycles = row[9]
+                pro_bono = row[8]
+                username = row[1]
+                first_name = row[2]
+                currentUser = db.auth_user.insert(username=username, \
+                                                   first_name=first_name, \
+                                                   email=email, pro_bono=pro_bono,\
+                                                   phone=phone)
+            if project:
+                    db.user_project.insert(student=currentUser, project=project)
+                    existUsers[exisIndex] = currentUser.first_name + ' - ' + project.name
                     exisIndex = exisIndex + 1
 
         response.flash = T('Data uploaded')
