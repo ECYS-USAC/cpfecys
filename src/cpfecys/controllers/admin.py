@@ -16,12 +16,8 @@ def areas():
 @auth.requires_membership('Super-Administrator')
 def assignation():
     import csv
-    newUsrs = {}
-    errUsrs = {}
-    existUsers ={}
-    exisIndex = 0
-    UsrIndx = 0
-    errIndx = 0
+    newUsrs, errUsrs, existUsers = {}, {}, {}
+    exisIndex, UsrIndx, errIndx = 0
     success = False
     grid = SQLFORM.grid(db.user_project.student != auth.user.id)
     if request.vars.csvfile:
@@ -29,14 +25,11 @@ def assignation():
         success = True
         header = next(cr)
         for row in cr:
-            project = None
-            currentUser = None
+            project, currentUser = None, None            
             currentUser = db(db.auth_user.username==row[1]).select().first()
             project = db(db.project.id==row[10]).select().first()
             if currentUser is None:
-                phone = ''
-                first_name = ''
-                username = ''
+                phone, first_name, username = '', '', ''
                 phone = row[3]
                 email = row[4]
                 cycles = row[9]
