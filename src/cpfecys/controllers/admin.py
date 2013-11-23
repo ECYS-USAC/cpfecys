@@ -30,7 +30,7 @@ def areas():
 def assignation():
     import csv
     newUsrs, errUsrs, existUsers = {}, {}, {}
-    exisIndex, UsrIndx, errIndx = 0
+    exisIndex, UsrIndx, errIndx = 0, 0 ,0
     success = False
     #need the period_year id that belongs the current year and period
     import datetime
