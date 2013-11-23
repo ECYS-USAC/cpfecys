@@ -15,7 +15,7 @@ def links():
 @auth.requires_login()
 @auth.requires_membership('Super-Administrator')
 def areas():
-    grid = SQLFORM.grid(db.area)
+    grid = SQLFORM.grid(db.area_level)
     return locals()
 
 
@@ -23,27 +23,20 @@ def areas():
 @auth.requires_membership('Super-Administrator')
 def assignation():
     import csv
-    newUsrs = {}
-    errUsrs = {}
-    existUsers = {}
-    exisIndex = 0
-    UsrIndx = 0
-    errIndx =0
+    newUsrs, errUsrs, existUsers = {}, {}, {}
+    exisIndex, UsrIndx, errIndx = 0
     success = False
     grid = SQLFORM.grid(db.user_project.student != auth.user.id)
-    if request.vars.csvfile != None:
-        cr = csv.reader(request.vars.csvfile.file, delimiter=',', quotechar='|')
+    if request.vars.csvfile:
+        cr = csv.reader(file, delimiter=',', quotechar='|')
         success = True
-        next(cr)
+        header = next(cr)
         for row in cr:
-            project = None
-            currentUser = None
+            project, currentUser = None, None            
             currentUser = db(db.auth_user.username==row[1]).select().first()
             project = db(db.project.id==row[10]).select().first()
             if currentUser is None:
-                phone = ''
-                first_name = ''
-                username = ''
+                phone, first_name, username = '', '', ''
                 phone = row[3]
                 email = row[4]
                 cycles = row[9]
@@ -74,7 +67,7 @@ def assignation():
 @auth.requires_login()
 @auth.requires_membership('Super-Administrator')
 def users():
-    grid = SQLFORM.grid(db.auth_user)
+    grid = SQLFORM.grid(db.auth_membership)
     return dict(grid = grid)
 
 @auth.requires_login()

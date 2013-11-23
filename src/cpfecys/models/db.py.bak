@@ -94,13 +94,13 @@ use_janrain(auth, filename='private/janrain.key')
 #########################################################################
 
 # A project contains an description and name
-db.define_table('area',
+db.define_table('area_level',
                 Field('name', 'string'),
                 Field('description', 'text'),
                 format='%(name)s')
 
 db.define_table('project',
-                Field ('area', 'reference area'),
+                Field ('area', 'reference area_level'),
                 Field ('name', 'string'),
                 Field ('description', 'text'),
                 Field ('physical_location', 'text'),
