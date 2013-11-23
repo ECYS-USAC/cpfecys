@@ -14,6 +14,12 @@ def projects():
 
 @auth.requires_login()
 @auth.requires_membership('Super-Administrator')
+def links():
+    grid = SQLFORM.grid(db.area)
+    return locals()
+
+@auth.requires_login()
+@auth.requires_membership('Super-Administrator')
 def areas():
     grid = SQLFORM.grid(db.area_level)
     return locals()
@@ -24,7 +30,7 @@ def assignation():
     import csv
     newUsrs = {}
     errUsrs = {}
-    existUsers ={}
+    existUsers = {}
     exisIndex = 0
     UsrIndx = 0
     errIndx = 0
@@ -83,7 +89,7 @@ def assignation():
     if request.vars.csvfile:
         cr = csv.reader(file, delimiter=',', quotechar='|')
         success = True
-        header = next(cr)
+        next(cr)
         for row in cr:
             project = None
             currentUser = None
@@ -123,7 +129,7 @@ def assignation():
 @auth.requires_login()
 @auth.requires_membership('Super-Administrator')
 def users():
-    grid = SQLFORM.grid(db.auth_membership)
+    grid = SQLFORM.grid(db.auth_user)
     return dict(grid = grid)
 
 @auth.requires_login()

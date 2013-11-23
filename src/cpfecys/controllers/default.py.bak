@@ -25,7 +25,7 @@ def links():
     user. 
     """
     links = db(db.link).select()
-    return dict(links=links)
+    return dict(message='What is up?')
 
 def user():
     """
