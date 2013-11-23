@@ -106,6 +106,12 @@ db.define_table('project',
                 Field ('physical_location', 'text'),
                 format='%(name)s')
 
+db.define_table('link',
+                Field('url', 'text', notnull=True),
+                Field('blank', 'boolean'),
+                Field('url_text', 'text', notnull=True),
+                Field('visible', 'boolean', notnull=True),
+                format='%(url_text)s')
 # The relationship between a user and a subproject contains
 # the history of the final practice,
 # it has the starting cycle and the ending cycle

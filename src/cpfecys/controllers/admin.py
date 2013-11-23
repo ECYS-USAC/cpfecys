@@ -8,9 +8,16 @@ def projects():
 
 @auth.requires_login()
 @auth.requires_membership('Super-Administrator')
+def links():
+    grid = SQLFORM.grid(db.link)
+    return locals()
+
+@auth.requires_login()
+@auth.requires_membership('Super-Administrator')
 def areas():
     grid = SQLFORM.grid(db.area)
     return locals()
+
 
 @auth.requires_login()
 @auth.requires_membership('Super-Administrator')
