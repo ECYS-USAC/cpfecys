@@ -106,6 +106,7 @@ db.define_table('project',
                 Field ('physical_location', 'text'),
                 format='%(name)s')
 
+<<<<<<< HEAD
 db.define_table('period',
                 Field ('name', 'string', unique = True, length = 255),
                 format = '%(name)s')
@@ -113,14 +114,16 @@ db.define_table('period',
 db.define_table('period_year',
                 Field('yearp', 'integer'),
                 Field('period', 'reference period'),
-                format = '%(yearp)s - %(period)s')
+                format = '%(yearp)s - %(name)s')
 
+=======
 db.define_table('link',
                 Field('url', 'text', notnull=True),
                 Field('blank', 'boolean'),
                 Field('url_text', 'text', notnull=True),
                 Field('visible', 'boolean', notnull=True),
                 format='%(url_text)s')
+>>>>>>> 7fdc23f6fe032e21dac672151cdeca84368f9f7d
 # The relationship between a user and a subproject contains
 # the history of the final practice,
 # it has the starting cycle and the ending cycle
