@@ -100,11 +100,20 @@ db.define_table('area_level',
                 format='%(name)s')
 
 db.define_table('project',
-                Field ('area', 'reference area_level'),
+                Field ('area_level', 'reference area_level'),
                 Field ('name', 'string'),
                 Field ('description', 'text'),
                 Field ('physical_location', 'text'),
                 format='%(name)s')
+
+db.define_table('period',
+                Field ('name', 'string', unique = True, length = 255),
+                format = '%(name)s')
+
+db.define_table('period_year',
+                Field('yearp', 'integer'),
+                Field('period', 'reference period'),
+                format = '%(yearp)s - %(name)s')
 
 # The relationship between a user and a subproject contains
 # the history of the final practice,
@@ -112,12 +121,17 @@ db.define_table('project',
 # it also is the central key for all operations with interesting data
 db.define_table('user_project',
                 Field('student', 'reference auth_user'),
-                Field('project', 'reference project'))
+                Field('project', 'reference project'),
+                Field('period', 'reference period_year'))
 
+first_period_name = 'First Semester'
+second_period_name = 'Second Semester'
 # User Roles
 ## Super-Administrator:
 setup = db.auth_user(db.auth_user.username == 'admin')
 if setup is None:
+    semester1 = db.period.insert(name = first_period_name)
+    semester2 = db.period.insert(name = second_period_name)
     super = db.auth_user.insert(email = 'admin@admin.com', first_name = 'Super',
                                          last_name = 'Administrator', username = 'admin',
                                          password = db.auth_user.password.validate('superadmin')[0])
@@ -130,5 +144,22 @@ if setup is None:
     ## Teacher:
     teachers = auth.add_group('Teacher',
                               'User that evaluates students in some courses. When final practice is teaching.')
+#
+# automatically creating the next two periods for the year
+#
+fp = db.period(db.period.name == first_period_name)
+sp = db.period(db.period.name == second_period_name)
+import datetime
+now = datetime.datetime.now()
+year = now.year
+next_year = year + 1
+pery = db.period_year(db.period_year.yearp == year)
+if not pery:
+    db.period_year.insert(yearp = year, period = fp)
+    db.period_year.insert(yearp = year, period = sp)
+pery = db.period_year(db.period_year.yearp == next_year)
+if not pery:
+    db.period_year.insert(yearp = next_year, period = fp)
+    db.period_year.insert(yearp = next_year, period = sp)
 ## after defining tables, uncomment below to enable auditing
 # auth.enable_record_versioning(db)

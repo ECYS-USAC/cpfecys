@@ -3,7 +3,7 @@
 <div class="tabbable"> <!-- Only required for left/right tabs -->
   <ul class="nav nav-tabs">
     {{for (i, item) in enumerate(periods):}}
-      <li><a href="#{{=i}}tab" data-toggle="tab">{{=item['name']}}</a></li>
+      <li class="active"><a href="#{{=i}}tab" data-toggle="tab">{{=item['name']}}</a></li>
     {{pass}}
   </ul>
   <div class="tab-content">

@@ -2,6 +2,12 @@
 # intente algo como
 @auth.requires_login()
 @auth.requires_membership('Super-Administrator')
+def periods():
+    grid = SQLFORM.grid(db.period_year)
+    return locals()
+
+@auth.requires_login()
+@auth.requires_membership('Super-Administrator')
 def projects():
     grid = SQLFORM.grid(db.project)
     return locals()
@@ -23,7 +29,57 @@ def assignation():
     UsrIndx = 0
     errIndx = 0
     success = False
-    grid = SQLFORM.grid(db.user_project.student != auth.user.id)
+    #need the period_year id that belongs the current year and period
+    import datetime
+    cdate = datetime.datetime.now()
+    cyear = cdate.year
+    cyear_before = cdate.year
+    cyear_before2 = cdate.year
+    cmonth = cdate.month
+    periodname = second_period_name
+    #current period depends if we are in dates between jan-jun and jul-dec
+    if cmonth < 7 :
+        periodname = first_period_name
+        period_before_name = second_period_name
+        period_before2_name = first_period_name
+        cyear_before = cyear - 1
+        cyear_before2 = cyear - 1
+    else:
+        period_before_name = first_period_name
+        period_before2_name = second_period_name
+        cyear_before = cyear
+        cyear_before2 = cyear - 1
+
+    periodcurrent = db.period(db.period.name == periodname)
+    period_year = db.period_year((db.period_year.yearp == cyear)&
+                                 (db.period_year.period == periodcurrent))
+    grid_current_period = SQLFORM.grid((db.user_project.period == period_year))
+
+    periodcurrent = db.period(db.period.name == period_before_name)
+    period_year = db.period_year((db.period_year.yearp == cyear_before)&
+                                 (db.period_year.period == periodcurrent))
+    grid_before_period = SQLFORM.grid((db.user_project.period == period_year))
+
+    periodcurrent = db.period(db.period.name == period_before2_name)
+    period_year = db.period_year((db.period_year.yearp == cyear_before2)&
+                                 (db.period_year.period == periodcurrent))
+    grid_before2_period = SQLFORM.grid((db.user_project.period == period_year))
+    periods = []
+    name = T(period_before2_name) + '-' + str(cyear_before2)
+    a = {}
+    a['grid'] = grid_before2_period
+    a['name'] = name
+    periods.append(a)
+    name = T(period_before_name) + '-' + str(cyear_before)
+    a = {}
+    a['grid'] = grid_before_period
+    a['name'] = name
+    periods.append(a)
+    name = T(periodname) + '-' + str(cyear)
+    a = {}
+    a['grid'] = grid_current_period
+    a['name'] = name
+    periods.append(a)
     if request.vars.csvfile:
         cr = csv.reader(file, delimiter=',', quotechar='|')
         success = True
@@ -53,15 +109,15 @@ def assignation():
                     exisIndex = exisIndex + 1
 
         response.flash = T('Data uploaded')
-        return dict(grid = grid,
-                    success = success,
+        return dict(success = success,
                     data = newUsrs,
                     errors = errUsrs,
-                    existUsers = existUsers)
+                    existUsers = existUsers,
+                    periods = periods)
     else:
-        return dict(grid = grid,
-                    success = False,
-                    file = False)
+        return dict(success = False,
+                    file = False,
+                    periods = periods)
     return locals()
 
 @auth.requires_login()
