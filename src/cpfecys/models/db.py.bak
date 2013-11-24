@@ -113,7 +113,7 @@ db.define_table('period',
 db.define_table('period_year',
                 Field('yearp', 'integer'),
                 Field('period', 'reference period'),
-                format = '%(yearp)s - %(name)s')
+                format = '%(yearp)s - %(period)s')
 
 db.define_table('link',
                 Field('url', 'text', notnull=True),

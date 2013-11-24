@@ -83,7 +83,8 @@ def assignation():
     a['grid'] = grid_current_period
     a['name'] = name
     periods.append(a)
-    if request.vars.csvfile:
+    if request.vars.csvfile != None:
+        file = request.vars.csvfile.file
         cr = csv.reader(file, delimiter=',', quotechar='|')
         success = True
         header = next(cr)
@@ -104,7 +105,10 @@ def assignation():
                                                    email=email, pro_bono=pro_bono,\
                                                    phone=phone)
             if project:
-                    db.user_project.insert(student=currentUser, project=project)
+                    periodcurrent = db.period(db.period.name == periodname)
+                    period_year = db.period_year((db.period_year.yearp == cyear)&
+                                 (db.period_year.period == periodcurrent))
+                    db.user_project.insert(student=currentUser, project=project, period=period_year)
                     existUsers[exisIndex] = currentUser.first_name + ' - ' + project.name
                     exisIndex = exisIndex + 1
 

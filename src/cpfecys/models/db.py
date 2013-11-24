@@ -115,12 +115,6 @@ db.define_table('period_year',
                 Field('period', 'reference period'),
                 format = '%(yearp)s - %(period)s')
 
-db.define_table('link',
-                Field('url', 'text', notnull=True),
-                Field('blank', 'boolean'),
-                Field('url_text', 'text', notnull=True),
-                Field('visible', 'boolean', notnull=True),
-                format='%(url_text)s')
 # The relationship between a user and a subproject contains
 # the history of the final practice,
 # it has the starting cycle and the ending cycle
@@ -132,6 +126,14 @@ db.define_table('user_project',
 
 first_period_name = 'First Semester'
 second_period_name = 'Second Semester'
+
+
+db.define_table('link',
+                Field('url', 'text', notnull=True),
+                Field('blank', 'boolean'),
+                Field('url_text', 'text', notnull=True),
+                Field('visible', 'boolean', notnull=True),
+                format='%(url_text)s')
 # User Roles
 ## Super-Administrator:
 setup = db.auth_user(db.auth_user.username == 'admin')
