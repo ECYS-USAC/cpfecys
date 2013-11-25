@@ -29,9 +29,55 @@ def areas():
 @auth.requires_membership('Super-Administrator')
 def assignation():
     import csv
+    import datetime
+    cdate = datetime.datetime.now()
+    cyear = cdate.year
     newUsrs, errUsrs, existUsers = {}, {}, {}
     exisIndex, UsrIndx, errIndx = 0, 0 ,0
     success = False
+    periods, periodname = getPeriods()
+    if request.vars.csvfile != None:
+        file = request.vars.csvfile.file
+        cr = csv.reader(file, delimiter=',', quotechar='|')
+        success = True
+        header = next(cr)
+        for row in cr:
+            project, currentUser = None, None            
+            currentUser = db(db.auth_user.username==row[1]).select().first()
+            project = db(db.project.id==row[10]).select().first()
+            if currentUser is None:
+                phone, first_name, username = '', '', ''
+                phone = row[3]
+                email = row[4]
+                cycles = row[9]
+                pro_bono = row[8]
+                username = row[1]
+                first_name = row[2]
+                currentUser = db.auth_user.insert(username=username, \
+                                                   first_name=first_name, \
+                                                   email=email, pro_bono=pro_bono,\
+                                                   phone=phone)
+            if project:
+                    periodcurrent = db.period(db.period.name == periodname)
+                    period_year = db.period_year((db.period_year.yearp == cyear)&
+                                 (db.period_year.period == periodcurrent))
+                    db.user_project.insert(student=currentUser, project=project, period=period_year)
+                    existUsers[exisIndex] = currentUser.first_name + ' - ' + project.name
+                    exisIndex = exisIndex + 1
+
+        response.flash = T('Data uploaded')
+        return dict(success = success,
+                    data = newUsrs,
+                    errors = errUsrs,
+                    existUsers = existUsers,
+                    periods = periods)
+    else:
+        return dict(success = False,
+                    file = False,
+                    periods = periods)
+    return locals()
+
+def getPeriods():
     #need the period_year id that belongs the current year and period
     import datetime
     cdate = datetime.datetime.now()
@@ -83,47 +129,8 @@ def assignation():
     a['grid'] = grid_current_period
     a['name'] = name
     periods.append(a)
-    if request.vars.csvfile != None:
-        file = request.vars.csvfile.file
-        cr = csv.reader(file, delimiter=',', quotechar='|')
-        success = True
-        header = next(cr)
-        for row in cr:
-            project, currentUser = None, None            
-            currentUser = db(db.auth_user.username==row[1]).select().first()
-            project = db(db.project.id==row[10]).select().first()
-            if currentUser is None:
-                phone, first_name, username = '', '', ''
-                phone = row[3]
-                email = row[4]
-                cycles = row[9]
-                pro_bono = row[8]
-                username = row[1]
-                first_name = row[2]
-                currentUser = db.auth_user.insert(username=username, \
-                                                   first_name=first_name, \
-                                                   email=email, pro_bono=pro_bono,\
-                                                   phone=phone)
-            if project:
-                    periodcurrent = db.period(db.period.name == periodname)
-                    period_year = db.period_year((db.period_year.yearp == cyear)&
-                                 (db.period_year.period == periodcurrent))
-                    db.user_project.insert(student=currentUser, project=project, period=period_year)
-                    existUsers[exisIndex] = currentUser.first_name + ' - ' + project.name
-                    exisIndex = exisIndex + 1
-
-        response.flash = T('Data uploaded')
-        return dict(success = success,
-                    data = newUsrs,
-                    errors = errUsrs,
-                    existUsers = existUsers,
-                    periods = periods)
-    else:
-        return dict(success = False,
-                    file = False,
-                    periods = periods)
-    return locals()
-
+    return periods, periodname
+    
 @auth.requires_login()
 @auth.requires_membership('Super-Administrator')
 def users():
