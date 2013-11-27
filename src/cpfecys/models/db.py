@@ -140,6 +140,15 @@ setup = db.auth_user(db.auth_user.username == 'admin')
 if setup is None:
     semester1 = db.period.insert(name = first_period_name)
     semester2 = db.period.insert(name = second_period_name)
+    ## Final Practice Areas of DTT
+    db.area_level.insert(name = "DTT Tutor Académico", description = "")
+    db.area_level.insert(name = "DTT Tutor de Comunicación", description = "")
+    db.area_level.insert(name = "DTT Tutor de Desarrollo", description = "")
+    db.area_level.insert(name = "DTT Tutor de Innovación", description = "")
+    db.area_level.insert(name = "DTT Tutor de Investigación", description = "")
+    db.area_level.insert(name = "DTT Tutor de Infraestructura", description = "")
+    ## Would be a good idea to at least join courses with UV here
+    ## User Roles Setup:
     super = db.auth_user.insert(email = 'admin@admin.com', first_name = 'Super',
                                          last_name = 'Administrator', username = 'admin',
                                          password = db.auth_user.password.validate('superadmin')[0])

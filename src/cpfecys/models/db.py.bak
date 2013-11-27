@@ -115,12 +115,6 @@ db.define_table('period_year',
                 Field('period', 'reference period'),
                 format = '%(yearp)s - %(period)s')
 
-db.define_table('link',
-                Field('url', 'text', notnull=True),
-                Field('blank', 'boolean'),
-                Field('url_text', 'text', notnull=True),
-                Field('visible', 'boolean', notnull=True),
-                format='%(url_text)s')
 # The relationship between a user and a subproject contains
 # the history of the final practice,
 # it has the starting cycle and the ending cycle
@@ -132,12 +126,29 @@ db.define_table('user_project',
 
 first_period_name = 'First Semester'
 second_period_name = 'Second Semester'
+
+
+db.define_table('link',
+                Field('url', 'text', notnull=True),
+                Field('blank', 'boolean'),
+                Field('url_text', 'text', notnull=True),
+                Field('visible', 'boolean', notnull=True),
+                format='%(url_text)s')
 # User Roles
 ## Super-Administrator:
 setup = db.auth_user(db.auth_user.username == 'admin')
 if setup is None:
     semester1 = db.period.insert(name = first_period_name)
     semester2 = db.period.insert(name = second_period_name)
+    ## Final Practice Areas of DTT
+    db.area_level.insert(name = "DTT Tutor Académico", description = "")
+    db.area_level.insert(name = "DTT Tutor de Comunicación", description = "")
+    db.area_level.insert(name = "DTT Tutor de Desarrollo", description = "")
+    db.area_level.insert(name = "DTT Tutor de Innovación", description = "")
+    db.area_level.insert(name = "DTT Tutor de Investigación", description = "")
+    db.area_level.insert(name = "DTT Tutor de Infraestructura", description = "")
+    ## Would be a good idea to at least join courses with UV here
+    ## User Roles Setup:
     super = db.auth_user.insert(email = 'admin@admin.com', first_name = 'Super',
                                          last_name = 'Administrator', username = 'admin',
                                          password = db.auth_user.password.validate('superadmin')[0])
