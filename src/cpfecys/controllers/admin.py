@@ -24,6 +24,11 @@ def areas():
     grid = SQLFORM.grid(db.area_level)
     return locals()
 
+@auth.requires_login()
+@auth.requires_membership('Super-Administrator')
+def upload_file():
+    grid = SQLFORM.grid(db.uploaded_file)
+    return locals()
 
 @auth.requires_login()
 @auth.requires_membership('Super-Administrator')
