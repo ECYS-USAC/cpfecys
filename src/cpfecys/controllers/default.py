@@ -27,6 +27,14 @@ def links():
     links = db(db.link).select()
     return dict(links=links)
 
+def files():
+    """ This url shows all important links published by admin
+    user. 
+    """
+    files = db(db.uploaded_file).select()
+    return dict(files=files)
+
+
 def user():
     """
     exposes:

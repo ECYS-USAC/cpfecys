@@ -1,0 +1,4 @@
+{{extend 'template.html'}}
+{{for file in files:}}
+	<a href="{{=URL('uploads', file.file_data)}}" target="blank"> {{=file.name}} </a>
+{{pass}}
