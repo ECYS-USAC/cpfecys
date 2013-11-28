@@ -42,7 +42,7 @@ def assignation():
         success = True
         header = next(cr)
         for row in cr:
-            project, currentUser = None, None            
+            project, currentUser = None, None
             currentUser = db(db.auth_user.username==row[1]).select().first()
             project = db(db.project.id==row[10]).select().first()
             if currentUser is None:
@@ -130,7 +130,7 @@ def getPeriods():
     a['name'] = name
     periods.append(a)
     return periods, periodname
-    
+
 @auth.requires_login()
 @auth.requires_membership('Super-Administrator')
 def users():

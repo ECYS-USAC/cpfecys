@@ -29,6 +29,9 @@ def areas():
 @auth.requires_membership('Super-Administrator')
 def assignation():
     import csv
+    import datetime
+    cdate = datetime.datetime.now()
+    cyear = cdate.year
     newUsrs, errUsrs, existUsers = {}, {}, {}
     exisIndex, UsrIndx, errIndx = 0, 0 ,0
     success = False
@@ -39,7 +42,7 @@ def assignation():
         success = True
         header = next(cr)
         for row in cr:
-            project, currentUser = None, None            
+            project, currentUser = None, None
             currentUser = db(db.auth_user.username==row[1]).select().first()
             project = db(db.project.id==row[10]).select().first()
             if currentUser is None:
