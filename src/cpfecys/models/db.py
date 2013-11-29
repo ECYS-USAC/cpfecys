@@ -135,7 +135,7 @@ db.define_table('link',
                 Field('url_text', 'text', notnull=True),
                 Field('visible', 'boolean', notnull=True),
                 format='%(url_text)s')
-                
+
 db.define_table('uploaded_file',
                 Field('name', 'string', notnull=True),
                 Field('visible', 'boolean'),
@@ -169,21 +169,24 @@ if setup is None:
     teachers = auth.add_group('Teacher',
                               'User that evaluates students in some courses. When final practice is teaching.')
 #
-# automatically creating the next two periods for the year
+# automatically creates the two periods of the current year and the next year
+# when the year changes so automatically new periods are created
+# example: we are in year 2013; automatically first semester and second semester are created for this year
+#  and the next one (2014)
 #
-fp = db.period(db.period.name == first_period_name)
-sp = db.period(db.period.name == second_period_name)
+first_period = db.period(db.period.name == first_period_name)
+second_period = db.period(db.period.name == second_period_name)
 import datetime
 now = datetime.datetime.now()
 year = now.year
 next_year = year + 1
 pery = db.period_year(db.period_year.yearp == year)
 if not pery:
-    db.period_year.insert(yearp = year, period = fp)
-    db.period_year.insert(yearp = year, period = sp)
+    db.period_year.insert(yearp = year, period = first_period)
+    db.period_year.insert(yearp = year, period = second_period)
 pery = db.period_year(db.period_year.yearp == next_year)
 if not pery:
-    db.period_year.insert(yearp = next_year, period = fp)
-    db.period_year.insert(yearp = next_year, period = sp)
+    db.period_year.insert(yearp = next_year, period = first_period)
+    db.period_year.insert(yearp = next_year, period = second_period)
 ## after defining tables, uncomment below to enable auditing
 # auth.enable_record_versioning(db)
