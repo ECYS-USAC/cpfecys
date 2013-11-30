@@ -33,22 +33,19 @@ def upload_file():
 
 @auth.requires_login()
 @auth.requires_membership('Super-Administrator')
-def assignation():
+def assignation_upload():
+    periodcurrent = current_year_period()
     import csv
-    import datetime
-    cdate = datetime.datetime.now()
-    cyear = cdate.year
     newUsrs, errUsrs, existUsers = {}, {}, {}
     exisIndex, UsrIndx, errIndx = 0, 0 ,0
     success = False
-    periods, periodname = getPeriods()
     if request.vars.csvfile != None:
         file = request.vars.csvfile.file
         cr = csv.reader(file, delimiter=',', quotechar='|')
         success = True
         header = next(cr)
         for row in cr:
-            project, currentUser = None, None            
+            project, currentUser = None, None
             currentUser = db(db.auth_user.username==row[1]).select().first()
             project = db(db.project.id==row[10]).select().first()
             if currentUser is None:
@@ -64,10 +61,7 @@ def assignation():
                                                    email=email, pro_bono=pro_bono,\
                                                    phone=phone)
             if project:
-                    periodcurrent = db.period(db.period.name == periodname)
-                    period_year = db.period_year((db.period_year.yearp == cyear)&
-                                 (db.period_year.period == periodcurrent))
-                    db.user_project.insert(student=currentUser, project=project, period=period_year)
+                    db.user_project.insert(student=currentUser, project=project, period=periodcurrent)
                     existUsers[exisIndex] = currentUser.first_name + ' - ' + project.name
                     exisIndex = exisIndex + 1
 
@@ -77,66 +71,50 @@ def assignation():
                     errors = errUsrs,
                     existUsers = existUsers,
                     periods = periods)
-    else:
-        return dict(success = False,
-                    file = False,
-                    periods = periods)
-    return locals()
+    return dict(success = False,
+                file = False,
+                periods = periods)
 
-def getPeriods():
-    #need the period_year id that belongs the current year and period
+@auth.requires_login()
+@auth.requires_membership('Super-Administrator')
+def assignation():
+    #requires parameter year_period if no one is provided then it is automatically detected
+    #and shows the current period
+    year_period = request.vars['year_period']
+    max_display = 1
+    currentyear_period = db.period_year(db.period_year.id == year_period)
+    if not currentyear_period:
+        currentyear_period = current_year_period()
+    grid = SQLFORM.grid((db.user_project.period == currentyear_period.id))
+    current_period_name = T(second_period_name)
+    if currentyear_period.period == first_period.id:
+        current_period_name = T(first_period_name)
+    start_index = currentyear_period.id - max_display - 1
+    if start_index<1:
+        start_index = 0
+    end_index = currentyear_period.id + max_display
+    periods_before = db(db.period_year).select(limitby=(start_index, currentyear_period.id - 1))
+    periods_after = db(db.period_year).select(limitby=(currentyear_period.id, end_index))
+    other_periods = db(db.period_year).select()
+    return dict(grid = grid,
+                currentyear_period = currentyear_period,
+                current_period_name = current_period_name,
+                periods_before = periods_before,
+                periods_after = periods_after,
+                other_periods = other_periods)
+
+def current_year_period():
     import datetime
     cdate = datetime.datetime.now()
     cyear = cdate.year
-    cyear_before = cdate.year
-    cyear_before2 = cdate.year
     cmonth = cdate.month
-    periodname = second_period_name
+    period = second_period
     #current period depends if we are in dates between jan-jun and jul-dec
     if cmonth < 7 :
-        periodname = first_period_name
-        period_before_name = second_period_name
-        period_before2_name = first_period_name
-        cyear_before = cyear - 1
-        cyear_before2 = cyear - 1
-    else:
-        period_before_name = first_period_name
-        period_before2_name = second_period_name
-        cyear_before = cyear
-        cyear_before2 = cyear - 1
+        period = first_period
+    return db.period_year((db.period_year.yearp == cyear)&
+                          (db.period_year.period == period))
 
-    periodcurrent = db.period(db.period.name == periodname)
-    period_year = db.period_year((db.period_year.yearp == cyear)&
-                                 (db.period_year.period == periodcurrent))
-    grid_current_period = SQLFORM.grid((db.user_project.period == period_year))
-
-    periodcurrent = db.period(db.period.name == period_before_name)
-    period_year = db.period_year((db.period_year.yearp == cyear_before)&
-                                 (db.period_year.period == periodcurrent))
-    grid_before_period = SQLFORM.grid((db.user_project.period == period_year))
-
-    periodcurrent = db.period(db.period.name == period_before2_name)
-    period_year = db.period_year((db.period_year.yearp == cyear_before2)&
-                                 (db.period_year.period == periodcurrent))
-    grid_before2_period = SQLFORM.grid((db.user_project.period == period_year))
-    periods = []
-    name = T(period_before2_name) + '-' + str(cyear_before2)
-    a = {}
-    a['grid'] = grid_before2_period
-    a['name'] = name
-    periods.append(a)
-    name = T(period_before_name) + '-' + str(cyear_before)
-    a = {}
-    a['grid'] = grid_before_period
-    a['name'] = name
-    periods.append(a)
-    name = T(periodname) + '-' + str(cyear)
-    a = {}
-    a['grid'] = grid_current_period
-    a['name'] = name
-    periods.append(a)
-    return periods, periodname
-    
 @auth.requires_login()
 @auth.requires_membership('Super-Administrator')
 def users():

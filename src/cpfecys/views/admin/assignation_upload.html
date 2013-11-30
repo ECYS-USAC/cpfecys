@@ -1,0 +1,15 @@
+{{extend 'template.html'}}
+<h2>{{=T('Bulk Final Practice Assignation')}}</h2>
+{{if success:}}
+    Inserted users: <br/>
+	{{=BEAUTIFY(data)}}
+	<br/>
+Users not found:<br/>
+    {{=BEAUTIFY(errors)}}
+
+Already existing users:<br/>
+	{{=BEAUTIFY(existUsers)}}
+
+{{else:}}
+	{{=FORM(INPUT(_type='file',_name='csvfile'),INPUT(_type='submit',_value='Upload'))}}
+{{ pass }}

@@ -87,11 +87,12 @@ a {
 	color: #006699;
 	text-decoration: underline;
 }
-/*
+
 a:hover, a:active, a:focus {
 	color: #666666;
+	/*text-decoration: underline;*/
 	font-weight: bold;
-}*/
+}
 
 /*Menu links*/
 #menulist_root .mainlevel
