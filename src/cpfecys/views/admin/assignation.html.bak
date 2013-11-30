@@ -3,46 +3,52 @@
 <div class="tabbable"> <!-- Only required for left/right tabs -->
   <ul class="nav nav-tabs">
       <li><a href="#setuptab" data-toggle="tab">{{=T('Other Periods')}}</a></li>
-    {{for (i, item) in enumerate(periods):}}
-      <li><a href="#{{=i}}tab" data-toggle="tab">{{=item['name']}}</a></li>
+    {{for item in periods_before:}}
+      <li><a href="{{=URL(vars=dict(year_period=item.id))}}">
+          {{if item.period == first_period.id:}}
+          {{=str(item.yearp) + ' - ' + T(first_period_name)}}
+          {{else:}}
+          {{=str(item.yearp) + ' - ' + T(second_period_name)}}
+          {{pass}}
+      </a></li>
     {{pass}}
+      <li class="active"><a href="#data{{=currentyear_period.id}}" data-toggle="tab">
+          {{=str(currentyear_period.yearp) + ' - ' + current_period_name }}
+      </a></li>
+    {{for item in periods_after:}}
+      <li><a href="{{=URL(vars=dict(year_period=item.id))}}">
+          {{if item.period == first_period.id:}}
+          {{=str(item.yearp) + ' - ' + T(first_period_name)}}
+          {{else:}}
+          {{=str(item.yearp) + ' - ' + T(second_period_name)}}
+          {{pass}}
+      </a></li>
+    {{pass}}
+      <li><a href="{{=URL('assignation_upload')}}">
+          {{=T('Upload Assignation CSV')}}
+      </a></li>
   </ul>
   <div class="tab-content">
       <div class="tab-pane" id="setuptab">
           <form>
               <select name="year_period">
-                  {{for item in periods_years:}}
-                  <option value="{{=item.id}}">{{=str(item.yearp) + ' - ' + str(item.period) }}</option>
+                  {{for item in other_periods:}}
+                  {{if item.period == first_period.id:}}
+                  <option value="{{=item.id}}">{{=str(item.yearp) + ' - ' + T(first_period_name) }}</option>
+                  {{else:}}
+                  <option value="{{=item.id}}">{{=str(item.yearp) + ' - ' + T(second_period_name) }}</option>
+                  {{pass}}
                   {{pass}}
               </select>
-              <input type="submit" value="go" >
+              <input type="submit" value="{{=T('go')}}" >
           </form>
       </div>
-    {{for (i, item) in enumerate(periods):}}
-        <div class="tab-pane" id="{{=i}}tab">
-            <h2>
-                {{=item['name']}}
-            </h2>
-            {{=item['grid']}}
-        </div>
-    {{pass}}
+      <div class="tab-pane active" id="data{{=currentyear_period.id}}">
+          {{=grid}}
+      </div>
   </div>
 </div>
-<h1>{{=T('Bulk Final Practice Assignation')}}</h1>
-{{if success:}}
-    Inserted users: <br/>
-	{{=BEAUTIFY(data)}}
-	<br/>
-Users not found:<br/>
-    {{=BEAUTIFY(errors)}}
-
-Already existing users:<br/>
-	{{=BEAUTIFY(existUsers)}}
-
-{{else:}}
-	{{=FORM(INPUT(_type='file',_name='csvfile'),INPUT(_type='submit',_value='Upload'))}}
-{{ pass }}
-
+<hr />
 {{if request.is_local:}}
 {{=response.toolbar()}}
 {{pass}}
