@@ -28,8 +28,10 @@ response.menu = [
     (T('Administration'), False, URL(),[
                                 (T('Areas'), False, URL('admin', 'areas'), []),
                                  (T('Projects'), False, URL('admin', 'projects'), []),
-                                 (T('Final Practice Assignation'), False, URL('admin', 'user_area'), []),
-                                 (T('Users'), False, URL('admin', 'users'), [])
+                                 (T('Final Practice Assignation'), False, URL('admin', 'assignation'), []),
+                                 (T('Users'), False, URL('admin', 'users'), []),
+                                 (T('Important Links'), False, URL('admin', 'links'), []),
+                                 (T('Important Links'), False, URL('admin', 'files_manager'), []),
                                  ])
 ]
 
