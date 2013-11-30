@@ -1,4 +1,3 @@
 {{extend 'template.html'}}
-{{for file in files:}}
-	<a href="{{=URL('uploads', file.file_data)}}"> {{=file.name}} </a>
-{{pass}}
+
+{{=BEAUTIFY(files)}}

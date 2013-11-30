@@ -141,6 +141,11 @@ db.define_table('uploaded_file',
                 Field('visible', 'boolean'),
                 Field('file_data', 'upload', default=''),
                 format='%(name)s')
+                
+db.define_table('file_access',
+                Field ('user_role', 'reference auth_group'),
+                Field ('uploaded_file', 'reference uploaded_file'),
+                )
 # User Roles
 ## Super-Administrator:
 setup = db.auth_user(db.auth_user.username == 'admin')

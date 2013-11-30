@@ -27,7 +27,8 @@ def areas():
 @auth.requires_login()
 @auth.requires_membership('Super-Administrator')
 def upload_file():
-    grid = SQLFORM.grid(db.area_level)
+    user = db(db.auth_membership.user_id == auth.user.id).select()
+    grid = SQLFORM.smartgrid(db.uploaded_file, linked_tables=['file_access'])
     return locals()
 
 @auth.requires_login()

@@ -127,13 +127,25 @@ db.define_table('user_project',
 first_period_name = 'First Semester'
 second_period_name = 'Second Semester'
 
-
+# This are the tables that store important links and uploaded
+# files by admin.
 db.define_table('link',
                 Field('url', 'text', notnull=True),
                 Field('blank', 'boolean'),
                 Field('url_text', 'text', notnull=True),
                 Field('visible', 'boolean', notnull=True),
                 format='%(url_text)s')
+                
+db.define_table('uploaded_file',
+                Field('name', 'string', notnull=True),
+                Field('visible', 'boolean'),
+                Field('file_data', 'upload', default=''),
+                format='%(name)s')
+                
+db.define_table('file_access',
+                Field ('user_role', 'reference auth_group'),
+                Field ('uploaded_file', 'reference uploaded_file'),
+                )
 # User Roles
 ## Super-Administrator:
 setup = db.auth_user(db.auth_user.username == 'admin')
