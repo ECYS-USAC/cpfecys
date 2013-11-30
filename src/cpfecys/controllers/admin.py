@@ -15,7 +15,8 @@ def projects():
 @auth.requires_login()
 @auth.requires_membership('Super-Administrator')
 def links():
-    grid = SQLFORM.grid(db.link)
+    user = db(db.auth_membership.user_id == auth.user.id).select(db.auth_group.ALL)
+    grid = SQLFORM.smartgrid(db.link, linked_tables=['link_access'])
     return locals()
 
 @auth.requires_login()

@@ -25,16 +25,21 @@ def links():
     user. 
     """
     links = db(db.link).select()
+    groups = db((db.auth_membership.user_id==auth.user.id)&\
+                    (db.auth_group.id==db.auth_membership.group_id)).\
+                    select(db.auth_group.ALL)
+    links = db((db.link.id == db.link_access.link)&\
+               (db.link_access.user_role.belongs(groups))).select(db.link.ALL)
     return dict(links=links)
 
 def files():
     """ This url shows all published files published by admin"""
     groups = db((db.auth_membership.user_id==auth.user.id)&\
                     (db.auth_group.id==db.auth_membership.group_id)).\
-                        select(db.auth_group.ALL)
+                    select(db.auth_group.ALL)
     files = db((db.uploaded_file.id == db.file_access.uploaded_file)&\
-               (db.file_access.uploaded_file.belongs(groups))).select(db.uploaded_file.ALL, distinct=True)
-    return dict(files=files)
+               (db.file_access.user_role.belongs(groups))).select(db.uploaded_file.ALL, distinct=True)
+    return dict(files=groups)
 
 
 def user():

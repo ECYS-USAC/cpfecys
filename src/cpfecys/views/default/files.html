@@ -1,4 +1,6 @@
 {{extend 'template.html'}}
+<ul>
 {{for file in files:}}
-	<a href="{{=URL('uploads', file.file_data)}}" target="blank"> {{=file.name}} </a>
+<li><a href="{{=URL('uploads', file.file_data)}}" target="blank"> {{=file.name}} </a></li>
 {{pass}}
+</ul>
