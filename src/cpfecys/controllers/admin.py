@@ -114,29 +114,6 @@ def current_year_period():
     return db.period_year((db.period_year.yearp == cyear)&
                           (db.period_year.period == period))
 
-def getPeriods(cyear = None, period = None, periods_ammount = 3):
-    #if cyear and period not provided provide the current ones
-    if (not cyear) or (not period):
-        cyear, period = current_year_period()
-    #need the period_year id that belongs the current year and period
-    is_first_period = (first_period == period)
-    periods = []
-    for x in range(0, periods_ammount):
-        a = {}
-        #get the current period
-        if is_first_period:
-            a['grid'] = SQLFORM.grid((db.user_project.period == first_period))
-            a['name'] = str(cyear) + '-' + T(first_period_name)
-            #if the period_name is the first period change year-1
-            cyear = cyear - 1
-        else:
-            a['grid'] = SQLFORM.grid((db.user_project.period == second_period))
-            a['name'] = str(cyear) + '-' + T(second_period_name)
-        periods.insert(0, a)
-        #alternate the current period
-        is_first_period = not is_first_period
-    return periods
-
 @auth.requires_login()
 @auth.requires_membership('Super-Administrator')
 def users():
