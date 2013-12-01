@@ -22,9 +22,17 @@ response.google_analytics_id = None
 #########################################################################
 ## this is the main application menu add/remove items as required
 #########################################################################
-if auth.has_membership(role="Super-Administrator"):
-    response.menu = [
+response.menu = [
         (T('Home'), False, URL('default', 'index'), []),
+        (T('Help'), False, URL(), [
+                            (T('Links'), False, URL('default', 'links'), []),
+                            (T('Files'), False, URL('default', 'files'), []),
+        ])
+]
+        
+    
+if auth.has_membership(role="Super-Administrator"):
+    response.menu.extend([
         (T('Administration'), False, URL(),[
                                     (T('Areas'), False, URL('admin', 'areas'), []),
                                      (T('Projects'), False, URL('admin', 'projects'), []),
@@ -33,13 +41,13 @@ if auth.has_membership(role="Super-Administrator"):
                                      (T('Links Manager'), False, URL('admin', 'links'), []),
                                      (T('Files Manager'), False, URL('admin', 'files_manager'), []),
                                      ])
-    ]
+    ])
+elif auth.has_membership(role="Student"):
+    pass
+elif auth.has_membership(role="Student"):
+    pass
 else:
-    response.menu = [
-        (T('Home'), False, URL('default', 'index'), []),
-        (T('Links'), False, URL('default', 'links'), []),
-        (T('Files'), False, URL('default', 'files'), []),
-    ]
+    pass
     
 DEVELOPMENT_MENU = False
 
