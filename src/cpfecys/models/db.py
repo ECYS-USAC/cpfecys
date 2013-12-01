@@ -134,12 +134,14 @@ db.define_table('link',
                 Field('blank', 'boolean'),
                 Field('url_text', 'text', notnull=True),
                 Field('visible', 'boolean', notnull=True),
+                Field('is_public', 'boolean', notnull=False),
                 format='%(url_text)s')
 
 db.define_table('uploaded_file',
                 Field('name', 'string', notnull=True),
                 Field('visible', 'boolean'),
                 Field('file_data', 'upload', default=''),
+                Field('is_public', 'boolean', notnull=False),
                 format='%(name)s')
                 
 db.define_table('file_access',

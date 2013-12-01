@@ -146,6 +146,11 @@ db.define_table('file_access',
                 Field ('user_role', 'reference auth_group'),
                 Field ('uploaded_file', 'reference uploaded_file'),
                 )
+                
+db.define_table('link_access',
+                Field ('user_role', 'reference auth_group'),
+                Field ('link', 'reference link'),
+                )
 # User Roles
 ## Super-Administrator:
 setup = db.auth_user(db.auth_user.username == 'admin')

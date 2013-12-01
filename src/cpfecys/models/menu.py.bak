@@ -22,19 +22,25 @@ response.google_analytics_id = None
 #########################################################################
 ## this is the main application menu add/remove items as required
 #########################################################################
-
-response.menu = [
-    (T('Home'), False, URL('default', 'index'), []),
-    (T('Administration'), False, URL(),[
-                                (T('Areas'), False, URL('admin', 'areas'), []),
-                                 (T('Projects'), False, URL('admin', 'projects'), []),
-                                 (T('Final Practice Assignation'), False, URL('admin', 'assignation'), []),
-                                 (T('Users'), False, URL('admin', 'users'), []),
-                                 (T('Important Links'), False, URL('admin', 'links'), []),
-                                 (T('Important Links'), False, URL('admin', 'files_manager'), []),
-                                 ])
-]
-
+if auth.has_membership(role="Super-Administrator"):
+    response.menu = [
+        (T('Home'), False, URL('default', 'index'), []),
+        (T('Administration'), False, URL(),[
+                                    (T('Areas'), False, URL('admin', 'areas'), []),
+                                     (T('Projects'), False, URL('admin', 'projects'), []),
+                                     (T('Final Practice Assignation'), False, URL('admin', 'assignation'), []),
+                                     (T('Users'), False, URL('admin', 'users'), []),
+                                     (T('Links Manager'), False, URL('admin', 'links'), []),
+                                     (T('Files Manager'), False, URL('admin', 'files_manager'), []),
+                                     ])
+    ]
+else:
+    response.menu = [
+        (T('Home'), False, URL('default', 'index'), []),
+        (T('Links'), False, URL('default', 'links'), []),
+                                     (T('Files'), False, URL('default', 'files'), []),
+    ]
+    
 DEVELOPMENT_MENU = False
 
 #########################################################################
