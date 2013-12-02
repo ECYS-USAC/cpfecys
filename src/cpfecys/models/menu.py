@@ -22,15 +22,7 @@ response.google_analytics_id = None
 #########################################################################
 ## this is the main application menu add/remove items as required
 #########################################################################
-response.menu = [
-        (T('Home'), False, URL('default', 'index'), []),
-        (T('Help'), False, URL(), [
-                            (T('Links'), False, URL('default', 'links'), []),
-                            (T('Files'), False, URL('default', 'files'), []),
-        ])
-]
-        
-    
+response.menu = [(T('Home'), False, URL('default', 'index'), [])]
 if auth.has_membership(role="Super-Administrator"):
     response.menu.extend([
         (T('Administration'), False, URL(),[
@@ -42,13 +34,20 @@ if auth.has_membership(role="Super-Administrator"):
                                      (T('Files Manager'), False, URL('admin', 'files_manager'), []),
                                      ])
     ])
-elif auth.has_membership(role="Student"):
+elif auth.has_membership(role="Teacher"):
     pass
 elif auth.has_membership(role="Student"):
     pass
 else:
     pass
-    
+
+#any user should be able to see this menu
+response.menu.extend([
+    (T('Help'), False, URL(), [
+                               (T('Links'), False, URL('default', 'links'), []),
+                               (T('Files'), False, URL('default', 'files'), []),
+    ])])
+
 DEVELOPMENT_MENU = False
 
 #########################################################################
