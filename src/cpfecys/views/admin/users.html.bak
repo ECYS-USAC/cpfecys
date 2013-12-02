@@ -3,6 +3,3 @@
     {{=T('User Administration')}}
 </h1>
 {{=grid}}
-{{if request.is_local:}}
-{{=response.toolbar()}}
-{{pass}}

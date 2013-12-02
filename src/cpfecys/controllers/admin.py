@@ -119,7 +119,7 @@ def current_year_period():
 @auth.requires_login()
 @auth.requires_membership('Super-Administrator')
 def users():
-    grid = SQLFORM.grid(db.auth_membership)
+    grid = SQLFORM.smartgrid(db.auth_user)
     return dict(grid = grid)
 
 @auth.requires_login()

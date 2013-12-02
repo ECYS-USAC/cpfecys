@@ -143,12 +143,12 @@ db.define_table('uploaded_file',
                 Field('file_data', 'upload', default=''),
                 Field('is_public', 'boolean', notnull=False),
                 format='%(name)s')
-                
+
 db.define_table('file_access',
                 Field ('user_role', 'reference auth_group'),
                 Field ('uploaded_file', 'reference uploaded_file'),
                 )
-                
+
 db.define_table('link_access',
                 Field ('user_role', 'reference auth_group'),
                 Field ('link', 'reference link'),
@@ -175,7 +175,7 @@ if setup is None:
                                  description = 'In charge of the whole system administration.')
     auth.add_membership(superadmins, super)
     ## Student:
-    sutdents = auth.add_group('Student',
+    students = auth.add_group('Student',
                               'User that is enrolled in some practice. Limited access.')
     ## Teacher:
     teachers = auth.add_group('Teacher',

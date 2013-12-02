@@ -16,7 +16,7 @@ def projects():
 @auth.requires_membership('Super-Administrator')
 def links():
     user = db(db.auth_membership.user_id == auth.user.id).select(db.auth_group.ALL)
-    grid = SQLFORM.smartgrid(db.link, linked_tables=['file_access'])
+    grid = SQLFORM.smartgrid(db.link, linked_tables=['link_access'])
     return locals()
 
 @auth.requires_login()
@@ -119,7 +119,7 @@ def current_year_period():
 @auth.requires_login()
 @auth.requires_membership('Super-Administrator')
 def users():
-    grid = SQLFORM.grid(db.auth_membership)
+    grid = SQLFORM.smartgrid(db.auth_membership)
     return dict(grid = grid)
 
 @auth.requires_login()
