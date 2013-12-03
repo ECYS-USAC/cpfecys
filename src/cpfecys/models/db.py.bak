@@ -175,7 +175,7 @@ if setup is None:
                                  description = 'In charge of the whole system administration.')
     auth.add_membership(superadmins, super)
     ## Student:
-    sutdents = auth.add_group('Student',
+    students = auth.add_group('Student',
                               'User that is enrolled in some practice. Limited access.')
     ## Teacher:
     teachers = auth.add_group('Teacher',
