@@ -2,7 +2,7 @@
 <ul>
 {{for link in links:}}
     {{if link.visible:}}
-    	<li><a href="{{=link.url}}" {{if link.blank:}}target="blank"{{pass}}>{{=link.url_text}}</a></li>
+    	<li><a href="{{=link.url}}" {{if link.blank:}}target="_blank"{{pass}}>{{=link.url_text}}</a></li>
     {{pass}}
 {{pass}}
 </ul>
