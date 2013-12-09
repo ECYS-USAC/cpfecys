@@ -32,6 +32,7 @@ if auth.has_membership(role="Super-Administrator"):
                                      (T('Users'), False, URL('admin', 'users'), []),
                                      (T('Links Manager'), False, URL('admin', 'links'), []),
                                      (T('Files Manager'), False, URL('admin', 'files_manager'), []),
+                                     (T('Notifications Manager'), False, URL('admin', 'notifications_manager'), []),
                                      ])
     ])
 elif auth.has_membership(role="Teacher"):

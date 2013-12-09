@@ -18,6 +18,16 @@ def index():
     if you need a simple wiki simple replace the two lines below with:
     return auth.wiki()
     """
+    if auth.user != None:
+        notifications = db(db.front_notification).select()
+        groups = db((db.auth_membership.user_id==auth.user.id)& \
+                        (db.auth_group.id==db.auth_membership.group_id)). \
+                        select(db.auth_group.ALL)
+        front_notification = db((db.front_notification.id == db.notification_access.front_notification)& \
+                   (db.notification_access.user_role.belongs(groups))).select(db.front_notification.ALL)
+    else:
+        notifications = db(db.front_notification.is_public == True).select()
+    return locals()
     return dict(message=T('Hello World'))
 
 def links():

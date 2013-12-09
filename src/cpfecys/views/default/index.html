@@ -1,4 +1,18 @@
 {{extend 'template.html'}}
-<h2>
-    {{=T('Welcome to the final practice administration system.')}}
-</h2>
+
+            
+{{for notification in notifications:}}
+    {{if notification.visible:}}
+        {{if notification.promoted:}}
+            <div class="hero-unit">
+                <h1>{{=notification.name}}</h1>
+                <p>{{=notification.content_text}}</p>
+            </div>
+		{{else:}}
+        	<div class="jumbotron">
+                <h1>{{=notification.name}}</h1>
+                <p>{{=notification.content_text}}</p>
+            </div>
+        {{pass}}
+    {{pass}}
+{{pass}}

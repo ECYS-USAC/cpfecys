@@ -4,7 +4,9 @@
 @auth.requires_membership('Teacher')
 def index():
     return dict()
-   
+
+@auth.requires_login()
+@auth.requires_membership('Teacher')
 def courses():
     cyear = get_current_year()
     year_period = request.vars['year_period']

@@ -139,7 +139,20 @@ db.define_table('link',
                 Field('visible', 'boolean', notnull=True),
                 Field('is_public', 'boolean', notnull=False),
                 format='%(url_text)s')
+                
+#Frontend notification
+db.define_table('front_notification',
+                Field('name', 'string', notnull=True),
+                Field('content_text', 'text', notnull=False),
+                Field('url', 'string', notnull=False),
+                Field('visible', 'boolean', notnull=False),
+                Field('is_public', 'boolean', notnull=False),
+                Field('file_data', 'upload', default='', notnull=False),
+                Field('promoted', 'boolean', notnull=False),
+                format='%(name)s'
+                )
 
+#Published files entity
 db.define_table('uploaded_file',
                 Field('name', 'string', notnull=True),
                 Field('visible', 'boolean'),
@@ -147,6 +160,7 @@ db.define_table('uploaded_file',
                 Field('is_public', 'boolean', notnull=False),
                 format='%(name)s')
 
+#User gruops relationships with files, notifications, links
 db.define_table('file_access',
                 Field ('user_role', 'reference auth_group'),
                 Field ('uploaded_file', 'reference uploaded_file'),
@@ -157,7 +171,10 @@ db.define_table('link_access',
                 Field ('link', 'reference link'),
                 )
                 
-#Student report
+db.define_table('notification_access',
+                Field ('user_role', 'reference auth_group'),
+                Field ('front_notification', 'reference front_notification'),
+                )
 
 # User Roles
 ## Super-Administrator:

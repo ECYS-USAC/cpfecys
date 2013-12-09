@@ -32,10 +32,11 @@ if auth.has_membership(role="Super-Administrator"):
                                      (T('Users'), False, URL('admin', 'users'), []),
                                      (T('Links Manager'), False, URL('admin', 'links'), []),
                                      (T('Files Manager'), False, URL('admin', 'files_manager'), []),
+                                     (T('Notifications Manager'), False, URL('admin', 'notifications'), []),
                                      ])
     ])
 elif auth.has_membership(role="Teacher"):
-    response.menu.extend([(T('Grading'), False, URL('teacher', 'grading'), []),
+    response.menu.extend([(T('Courses'), False, URL('teacher', 'courses'), []),
     ])
 elif auth.has_membership(role="Student"):
     response.menu.extend([(T('Reports'), False, URL('student', 'report_list'), [])])
