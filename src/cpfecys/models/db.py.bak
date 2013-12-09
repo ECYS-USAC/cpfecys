@@ -70,6 +70,8 @@ mail.settings.login = 'username:password'
 auth.settings.registration_requires_verification = False
 auth.settings.registration_requires_approval = False
 auth.settings.reset_password_requires_verification = True
+## disable registration
+auth.settings.actions_disabled.append('register')
 
 ## if you need to use OpenID, Facebook, MySpace, Twitter, Linkedin, etc.
 ## register with janrain.com, write your domain:api_key in private/janrain.key
@@ -122,7 +124,8 @@ db.define_table('period_year',
 db.define_table('user_project',
                 Field('student', 'reference auth_user'),
                 Field('project', 'reference project'),
-                Field('period', 'reference period_year'))
+                Field('period', 'reference period_year'),
+                Field ('periods', 'integer', notnull=False))
 
 first_period_name = 'First Semester'
 second_period_name = 'Second Semester'
@@ -153,6 +156,9 @@ db.define_table('link_access',
                 Field ('user_role', 'reference auth_group'),
                 Field ('link', 'reference link'),
                 )
+                
+#Student report
+
 # User Roles
 ## Super-Administrator:
 setup = db.auth_user(db.auth_user.username == 'admin')

@@ -2,5 +2,8 @@
 # intente algo como
 @auth.requires_login()
 @auth.requires_membership('Student')
-def index(): 
+def index():
+    return dict()
+    
+def report_list():
     return dict()

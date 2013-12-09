@@ -124,7 +124,8 @@ db.define_table('period_year',
 db.define_table('user_project',
                 Field('student', 'reference auth_user'),
                 Field('project', 'reference project'),
-                Field('period', 'reference period_year'))
+                Field('period', 'reference period_year'),
+                Field ('periods', 'integer', notnull=False))
 
 first_period_name = 'First Semester'
 second_period_name = 'Second Semester'
@@ -155,6 +156,9 @@ db.define_table('link_access',
                 Field ('user_role', 'reference auth_group'),
                 Field ('link', 'reference link'),
                 )
+                
+#Student report
+
 # User Roles
 ## Super-Administrator:
 setup = db.auth_user(db.auth_user.username == 'admin')

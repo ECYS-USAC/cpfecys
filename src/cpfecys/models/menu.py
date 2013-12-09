@@ -28,16 +28,17 @@ if auth.has_membership(role="Super-Administrator"):
         (T('Administration'), False, URL(),[
                                     (T('Areas'), False, URL('admin', 'areas'), []),
                                      (T('Projects'), False, URL('admin', 'projects'), []),
-                                     (T('Final Practice Assignation'), False, URL('admin', 'assignation'), []),
+                                     (T('Final Practice Admin'), False, URL('admin', 'assignation'), []),
                                      (T('Users'), False, URL('admin', 'users'), []),
                                      (T('Links Manager'), False, URL('admin', 'links'), []),
                                      (T('Files Manager'), False, URL('admin', 'files_manager'), []),
                                      ])
     ])
 elif auth.has_membership(role="Teacher"):
-    pass
+    response.menu.extend([(T('Courses'), False, URL('teacher', 'courses'), []),
+    ])
 elif auth.has_membership(role="Student"):
-    pass
+    response.menu.extend([(T('Reports'), False, URL('student', 'report_list'), [])])
 else:
     pass
 

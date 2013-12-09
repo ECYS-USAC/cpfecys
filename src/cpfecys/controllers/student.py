@@ -4,3 +4,6 @@
 @auth.requires_membership('Student')
 def index():
     return dict()
+    
+def report_list():
+    return dict()

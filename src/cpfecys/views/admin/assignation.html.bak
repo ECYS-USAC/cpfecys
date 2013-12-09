@@ -1,7 +1,7 @@
 {{extend 'template.html'}}
 
 <div class="tabbable"> <!-- Only required for left/right tabs -->
-  <ul class="nav nav-tabs">
+  <ul class="">
       <li><a href="#setuptab" data-toggle="tab">{{=T('Other Periods')}}</a></li>
     {{for item in periods_before:}}
       <li><a href="{{=URL(vars=dict(year_period=item.id))}}">
@@ -25,7 +25,7 @@
       </a></li>
     {{pass}}
       <li><a href="{{=URL('assignation_upload')}}">
-          {{=T('Upload Assignation CSV')}}
+          {{=T('CSV Assignation')}}
       </a></li>
   </ul>
   <div class="tab-content">
