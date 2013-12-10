@@ -122,7 +122,7 @@ db.define_table('period_year',
 # it has the starting cycle and the ending cycle
 # it also is the central key for all operations with interesting data
 db.define_table('user_project',
-                Field('student', 'reference auth_user'),
+                Field('assigned_user', 'reference auth_user'),
                 Field('project', 'reference project'),
                 Field('period', 'reference period_year'),
                 Field ('periods', 'integer', notnull=False))

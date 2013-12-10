@@ -1,0 +1,76 @@
+{{extend 'template.html'}}
+<h2>
+    <a onclick="window.history.back()" class="btn" ><i class="icon-arrow-left"></i> Back</a> My Projects <small>"{{=str(currentyear_period.yearp) + ' - ' + current_period_name }}"</small>
+</h2>
+<div class="tabbable"> <!-- Only required for left/right tabs -->
+  <ul class="nav nav-tabs">
+      <li><a href="#setuptab" data-toggle="tab">{{=T('Other Periods')}}</a></li>
+    {{for item in periods_before:}}
+      <li><a href="{{=URL(vars=dict(year_period=item.id))}}">
+          {{if item.period == first_period.id:}}
+          {{=str(item.yearp) + ' - ' + T(first_period_name)}}
+          {{else:}}
+          {{=str(item.yearp) + ' - ' + T(second_period_name)}}
+          {{pass}}
+      </a></li>
+    {{pass}}
+      <li class="active"><a href="#data{{=currentyear_period.id}}" data-toggle="tab">
+          {{=str(currentyear_period.yearp) + ' - ' + current_period_name }}
+      </a></li>
+    {{for item in periods_after:}}
+      <li><a href="{{=URL(vars=dict(year_period=item.id))}}">
+          {{if item.period == first_period.id:}}
+          {{=str(item.yearp) + ' - ' + T(first_period_name)}}
+          {{else:}}
+          {{=str(item.yearp) + ' - ' + T(second_period_name)}}
+          {{pass}}
+      </a></li>
+    {{pass}}
+  </ul>
+  <div class="tab-content">
+      <div class="tab-pane" id="setuptab">
+          <form>
+              <select name="year_period">
+                  {{for item in other_periods:}}
+                  {{if item.period == first_period.id:}}
+                  <option value="{{=item.id}}">{{=str(item.yearp) + ' - ' + T(first_period_name) }}</option>
+                  {{else:}}
+                  <option value="{{=item.id}}">{{=str(item.yearp) + ' - ' + T(second_period_name) }}</option>
+                  {{pass}}
+                  {{pass}}
+              </select>
+              <input type="submit" value="{{=T('go')}}" >
+          </form>
+      </div>
+      <div class="tab-pane active" id="data{{=currentyear_period.id}}">
+          <table>
+              <thead>
+                  <tr>
+                      <th>{{=T('Id')}}</th>
+                      <th>{{=T('Project Name')}}</th>
+                      <th>{{=T('Actions')}}</th>
+                  </tr>
+              </thead>
+              <tbody>
+                  {{for item in current_data:}}
+                  <tr>
+                      <td>{{=item.project['id']}}</td>
+                      <td>{{=item.project['name']}}</td>
+                      <td>
+                          <a class="btn" href="{{=URL('students',
+                                               vars=dict(year_period=currentyear_period.id,
+                                               project=item.project['id']))}}">
+                              <i class="icon-user"></i> Show Students
+                          </a>
+                      </td>
+                  </tr>
+                  {{pass}}
+              </tbody>
+          </table>
+      </div>
+  </div>
+</div>
+<hr />
+{{if request.is_local:}}
+{{=response.toolbar()}}
+{{pass}}

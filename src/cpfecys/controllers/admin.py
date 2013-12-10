@@ -99,7 +99,7 @@ def assignation():
     if currentyear_period.period == first_period.id:
         current_period_name = T(first_period_name)
     start_index = currentyear_period.id - max_display - 1
-    if start_index<1:
+    if start_index < 1:
         start_index = 0
     end_index = currentyear_period.id + max_display
     periods_before = db(db.period_year).select(limitby=(start_index, currentyear_period.id - 1))
