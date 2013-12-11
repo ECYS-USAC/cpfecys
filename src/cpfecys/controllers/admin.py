@@ -69,7 +69,7 @@ def assignation_upload():
                                                    email=email, pro_bono=pro_bono,\
                                                    phone=phone)
             if project:
-                    db.user_project.insert(student=currentUser, project=project, period=periodcurrent)
+                    db.user_project.insert(assigned_user=currentUser, project=project, period=periodcurrent)
                     existUsers[exisIndex] = currentUser.first_name + ' - ' + project.name
                     exisIndex = exisIndex + 1
 

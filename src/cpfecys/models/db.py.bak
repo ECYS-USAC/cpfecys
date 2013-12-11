@@ -112,10 +112,6 @@ db.define_table('period',
                 Field ('name', 'string', unique = True, length = 255),
                 format = '%(name)s')
 
-db.define_table('table1',
-                Field('field1', 'integer'),
-                Field('field2', 'integer'))
-
 db.define_table('period_year',
                 Field('yearp', 'integer'),
                 Field('period', 'reference period'),
