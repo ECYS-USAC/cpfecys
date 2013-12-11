@@ -1,11 +1,8 @@
 {{extend 'template.html'}}
-<<<<<<< HEAD
-=======
 <a onclick="window.history.back()" class="btn" ><i class="icon-arrow-left"></i> Back</a>
 <h2>
     My Projects <small>"{{=str(currentyear_period.yearp) + ' - ' + current_period_name }}"</small>
 </h2>
->>>>>>> 7844ed18e94efead9f948372c171bed0cd0cf042
 <div class="tabbable"> <!-- Only required for left/right tabs -->
   <ul class="nav nav-tabs">
       <li><a href="#setuptab" data-toggle="tab">{{=T('Other Periods')}}</a></li>
@@ -30,12 +27,10 @@
           {{pass}}
       </a></li>
     {{pass}}
-<<<<<<< HEAD
       <li><a href="{{=URL('assignation_upload')}}">
           {{=T('CSV Assignation')}}
       </a></li>
-=======
->>>>>>> 7844ed18e94efead9f948372c171bed0cd0cf042
+
   </ul>
   <div class="tab-content">
       <div class="tab-pane" id="setuptab">
@@ -52,24 +47,12 @@
               <input type="submit" value="{{=T('go')}}" >
           </form>
       </div>
-      <div class="tab-pane active" id="data{{=currentyear_period.id}}">
-<<<<<<< HEAD
-          {{for item in user_projects:}}
-              {{if currentyear_period.id <= item.period + item.periods - 1:}}
-                  <ul class="breadcrumb">
-                      <li>
-                          <strong>{{=item.project.name}} - {{=item.project.area_level.name}}</strong>,  
-                          {{=item.periods}} {{=T('Periods')}}
-                      </li>
-                  </ul>
-              {{pass}}
-          {{pass}}
-      </div>
+
   </div>
 
 </div>
 <hr />
-=======
+
           <table>
               <thead>
                   <tr>
@@ -101,4 +84,3 @@
 {{if request.is_local:}}
 {{=response.toolbar()}}
 {{pass}}
->>>>>>> 7844ed18e94efead9f948372c171bed0cd0cf042
