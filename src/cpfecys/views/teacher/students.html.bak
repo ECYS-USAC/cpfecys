@@ -1,15 +1,13 @@
 {{extend 'template.html'}}
-<<<<<<< HEAD
-=======
 <h2>
-    <a onclick="window.history.back()" class="btn" ><i class="icon-arrow-left"></i> Back</a> My Projects <small>"{{=str(currentyear_period.yearp) + ' - ' + current_period_name }}"</small>
+    Final Practice Students <small>"{{=current_project.project.name}}"</small>
 </h2>
->>>>>>> 7844ed18e94efead9f948372c171bed0cd0cf042
 <div class="tabbable"> <!-- Only required for left/right tabs -->
   <ul class="nav nav-tabs">
       <li><a href="#setuptab" data-toggle="tab">{{=T('Other Periods')}}</a></li>
     {{for item in periods_before:}}
-      <li><a href="{{=URL(vars=dict(year_period=item.id))}}">
+      <li><a href="{{=URL(vars=dict(year_period=item.id,
+                   project = current_project.project.id))}}">
           {{if item.period == first_period.id:}}
           {{=str(item.yearp) + ' - ' + T(first_period_name)}}
           {{else:}}
@@ -21,7 +19,8 @@
           {{=str(currentyear_period.yearp) + ' - ' + current_period_name }}
       </a></li>
     {{for item in periods_after:}}
-      <li><a href="{{=URL(vars=dict(year_period=item.id))}}">
+      <li><a href="{{=URL(vars=dict(year_period=item.id,
+                   project = current_project.project.id))}}">
           {{if item.period == first_period.id:}}
           {{=str(item.yearp) + ' - ' + T(first_period_name)}}
           {{else:}}
@@ -29,12 +28,6 @@
           {{pass}}
       </a></li>
     {{pass}}
-<<<<<<< HEAD
-      <li><a href="{{=URL('assignation_upload')}}">
-          {{=T('CSV Assignation')}}
-      </a></li>
-=======
->>>>>>> 7844ed18e94efead9f948372c171bed0cd0cf042
   </ul>
   <div class="tab-content">
       <div class="tab-pane" id="setuptab">
@@ -52,42 +45,23 @@
           </form>
       </div>
       <div class="tab-pane active" id="data{{=currentyear_period.id}}">
-<<<<<<< HEAD
-          {{for item in user_projects:}}
-              {{if currentyear_period.id - 1 <= item.period + item.periods - 1:}}
-                  <ul class="breadcrumb">
-                      <li>
-                          <strong>{{=item.project.name}} - {{=item.project.area_level.name}}</strong>,  
-                          {{=item.periods}} {{=T('Periods')}} || {{=currentyear_period.id - 1}} , {{=item.period + item.periods - 1}}
-                          || Started on: {{=item.period}}
-                      </li>
-                  </ul>
-              {{pass}}
-          {{pass}}
-      </div>
-  </div>
-
-</div>
-<hr />
-=======
           <table>
               <thead>
                   <tr>
-                      <th>{{=T('Id')}}</th>
-                      <th>{{=T('Project Name')}}</th>
+                      <th>{{=T('Carnet')}}</th>
+                      <th>{{=T('Name')}}</th>
                       <th>{{=T('Actions')}}</th>
                   </tr>
               </thead>
               <tbody>
                   {{for item in current_data:}}
                   <tr>
-                      <td>{{=item.project['id']}}</td>
-                      <td>{{=item.project['name']}}</td>
+                      <td>{{=item.assigned_user['username']}}</td>
+                      <td>{{=item.assigned_user['first_name'] + ' ' + item.assigned_user['last_name']}}</td>
                       <td>
-                          <a class="btn" href="{{=URL('students',
-                                               vars=dict(year_period=currentyear_period.id,
-                                               project=item.project['id']))}}">
-                              <i class="icon-user"></i> Show Students
+                          <a class="btn" href="{{=URL('final_practice',
+                                               vars=dict(assignation=item.id))}}">
+                              <i class="icon-list"></i> Final Practice Progress
                           </a>
                       </td>
                   </tr>
@@ -101,4 +75,3 @@
 {{if request.is_local:}}
 {{=response.toolbar()}}
 {{pass}}
->>>>>>> 7844ed18e94efead9f948372c171bed0cd0cf042

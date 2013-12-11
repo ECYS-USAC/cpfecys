@@ -1,4 +1,11 @@
 {{extend 'template.html'}}
+<<<<<<< HEAD
+=======
+<a onclick="window.history.back()" class="btn" ><i class="icon-arrow-left"></i> Back</a>
+<h2>
+    My Projects <small>"{{=str(currentyear_period.yearp) + ' - ' + current_period_name }}"</small>
+</h2>
+>>>>>>> 7844ed18e94efead9f948372c171bed0cd0cf042
 <div class="tabbable"> <!-- Only required for left/right tabs -->
   <ul class="nav nav-tabs">
       <li><a href="#setuptab" data-toggle="tab">{{=T('Other Periods')}}</a></li>
@@ -23,9 +30,12 @@
           {{pass}}
       </a></li>
     {{pass}}
+<<<<<<< HEAD
       <li><a href="{{=URL('assignation_upload')}}">
           {{=T('CSV Assignation')}}
       </a></li>
+=======
+>>>>>>> 7844ed18e94efead9f948372c171bed0cd0cf042
   </ul>
   <div class="tab-content">
       <div class="tab-pane" id="setuptab">
@@ -43,6 +53,7 @@
           </form>
       </div>
       <div class="tab-pane active" id="data{{=currentyear_period.id}}">
+<<<<<<< HEAD
           {{for item in user_projects:}}
               {{if currentyear_period.id <= item.period + item.periods - 1:}}
                   <ul class="breadcrumb">
@@ -58,3 +69,36 @@
 
 </div>
 <hr />
+=======
+          <table>
+              <thead>
+                  <tr>
+                      <th>{{=T('Id')}}</th>
+                      <th>{{=T('Project Name')}}</th>
+                      <th>{{=T('Actions')}}</th>
+                  </tr>
+              </thead>
+              <tbody>
+                  {{for item in current_data:}}
+                  <tr>
+                      <td>{{=item.project['id']}}</td>
+                      <td>{{=item.project['name']}}</td>
+                      <td>
+                          <a class="btn" href="{{=URL('students',
+                                               vars=dict(year_period=currentyear_period.id,
+                                               project=item.project['id']))}}">
+                              <i class="icon-user"></i> Show Students
+                          </a>
+                      </td>
+                  </tr>
+                  {{pass}}
+              </tbody>
+          </table>
+      </div>
+  </div>
+</div>
+<hr />
+{{if request.is_local:}}
+{{=response.toolbar()}}
+{{pass}}
+>>>>>>> 7844ed18e94efead9f948372c171bed0cd0cf042

@@ -122,7 +122,7 @@ db.define_table('period_year',
 # it has the starting cycle and the ending cycle
 # it also is the central key for all operations with interesting data
 db.define_table('user_project',
-                Field('student', 'reference auth_user'),
+                Field('assigned_user', 'reference auth_user'),
                 Field('project', 'reference project'),
                 Field('period', 'reference period_year'),
                 Field ('periods', 'integer', notnull=False))
@@ -139,7 +139,7 @@ db.define_table('link',
                 Field('visible', 'boolean', notnull=True),
                 Field('is_public', 'boolean', notnull=False),
                 format='%(url_text)s')
-                
+
 #Frontend notification
 db.define_table('front_notification',
                 Field('name', 'string', notnull=True),
@@ -170,7 +170,7 @@ db.define_table('link_access',
                 Field ('user_role', 'reference auth_group'),
                 Field ('link', 'reference link'),
                 )
-                
+
 db.define_table('notification_access',
                 Field ('user_role', 'reference auth_group'),
                 Field ('front_notification', 'reference front_notification'),

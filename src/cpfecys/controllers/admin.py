@@ -31,7 +31,7 @@ def files_manager():
     user = db(db.auth_membership.user_id == auth.user.id).select(db.auth_group.ALL)
     grid = SQLFORM.smartgrid(db.uploaded_file, linked_tables=['file_access'])
     return locals()
-    
+
 @auth.requires_login()
 @auth.requires_membership('Super-Administrator')
 def notifications_manager():
@@ -93,12 +93,13 @@ def assignation():
     currentyear_period = db.period_year(db.period_year.id == year_period)
     if not currentyear_period:
         currentyear_period = current_year_period()
-    grid = SQLFORM.grid((db.user_project.period == currentyear_period.id))
+    grid = SQLFORM.grid((db.user_project.period <= currentyear_period.id)&
+              ((db.user_project.period + db.user_project.periods) > currentyear_period.id))
     current_period_name = T(second_period_name)
     if currentyear_period.period == first_period.id:
         current_period_name = T(first_period_name)
     start_index = currentyear_period.id - max_display - 1
-    if start_index<1:
+    if start_index < 1:
         start_index = 0
     end_index = currentyear_period.id + max_display
     periods_before = db(db.period_year).select(limitby=(start_index, currentyear_period.id - 1))
