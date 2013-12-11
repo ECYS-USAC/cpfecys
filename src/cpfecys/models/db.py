@@ -214,14 +214,24 @@ second_period = db.period(db.period.name == second_period_name)
 import datetime
 now = datetime.datetime.now()
 year = now.year
-next_year = year + 1
-pery = db.period_year(db.period_year.yearp == year)
-if not pery:
-    db.period_year.insert(yearp = year, period = first_period)
-    db.period_year.insert(yearp = year, period = second_period)
-pery = db.period_year(db.period_year.yearp == next_year)
-if not pery:
-    db.period_year.insert(yearp = next_year, period = first_period)
-    db.period_year.insert(yearp = next_year, period = second_period)
+## New semesters will be created in november and may respectively.
+if now.month >= 11:
+    #check and create first semester of next year
+    pery = db.period_year((db.period_year.yearp == (year + 1))&
+                          (db.period_year.period == first_period))
+    if not pery:
+        db.period_year.insert(yearp = (year + 1), period = first_period)
+if now.month >= 5:
+    #check and create second semester of current year
+    pery = db.period_year((db.period_year.yearp == year)&
+                          (db.period_year.period == second_period))
+    if not pery:
+        db.period_year.insert(yearp = year, period = second_period)
+if now.month >= 0:
+    #check and create first semester of current year
+    pery = db.period_year((db.period_year.yearp == year)&
+                          (db.period_year.period == first_period))
+    if not pery:
+        db.period_year.insert(yearp = year, period = first_period)
 ## after defining tables, uncomment below to enable auditing
 # auth.enable_record_versioning(db)
