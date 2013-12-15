@@ -176,6 +176,39 @@ db.define_table('notification_access',
                 Field ('front_notification', 'reference front_notification'),
                 )
 
+#Project item requirements structure
+db.define_table('item_type',
+                Field('name', 'string', notnull=True),
+                )
+
+db.define_table('item',
+                Field('name', 'string', notnull=True),
+                Field('start_date', 'date', notnull=True),
+                Field('start_old', 'date', notnull=True),
+                Field('end_date', 'date', notnull=True),
+                Field('is_active', 'boolean', notnull=True),
+                Field('description', 'text', notnull=False),
+                Field('period_year', 'reference period_year'),
+                )
+                
+db.define_table('file_item',
+                Field('file_name', 'upload', default='', notnull=True),
+                Field('uploaded', 'datetime', notnull=True),
+                )
+
+db.define_table('activity_item',
+                Field('done', 'boolean', notnull=True),
+                Field('uploaded', 'datetime', notnull=True),
+                )
+                
+db.define_table('user_project_item', 
+                Field('is_active', 'boolean', notnull=True),
+                Field('item', 'reference item'),
+                Field('file_item', 'reference file_item'),
+                Field('activity_item', 'reference activity_item'),
+                Field('user_project', 'reference user_project'),
+                )
+
 # User Roles
 ## Super-Administrator:
 setup = db.auth_user(db.auth_user.username == 'admin')
