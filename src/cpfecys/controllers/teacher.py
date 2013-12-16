@@ -8,7 +8,15 @@ def index():
 @auth.requires_login()
 @auth.requires_membership('Teacher')
 def final_practice():
-    return dict()
+    assignation = request.vars['assignation']
+    if not assignation: redirect(URL('courses'))
+    final_practice = db((db.user_project.id == assignation)&
+                        (db.user_project.assigned_user == db.auth_user.id)&
+                        (db.user_project.project == db.project.id)&
+                        (db.project.area_level == db.area_level.id)&
+                        (db.user_project.period == db.period_year.id)).select()
+    if not final_practice: redirect(URL('courses'))
+    return dict(final_practice = final_practice.first())
 
 @auth.requires_login()
 @auth.requires_membership('Teacher')

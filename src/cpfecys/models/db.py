@@ -190,7 +190,7 @@ db.define_table('item',
                 Field('description', 'text', notnull=False),
                 Field('period_year', 'reference period_year'),
                 )
-                
+
 db.define_table('file_item',
                 Field('file_name', 'upload', default='', notnull=True),
                 Field('uploaded', 'datetime', notnull=True),
@@ -200,7 +200,7 @@ db.define_table('activity_item',
                 Field('done', 'boolean', notnull=True),
                 Field('uploaded', 'datetime', notnull=True),
                 )
-                
+
 db.define_table('user_project_item', 
                 Field('is_active', 'boolean', notnull=True),
                 Field('item', 'reference item'),

@@ -237,10 +237,11 @@ if setup is None:
     teachers = auth.add_group('Teacher',
                               'User that evaluates students in some courses. When final practice is teaching.')
 #
-# automatically tries to create the next period of every year.
-# In May..Dec the second period of current year is created.
-# In Nov the first period of next year is created.
-# In Jan..Apr the first period of current year is created.
+# automatically tries to create the next period in may and november respectively
+# Using the following logic:
+# - In May..Dec the second period of current year is created.
+# - In Nov the first period of next year is created.
+# - In Jan..Apr the first period of current year is created.
 #
 first_period = db.period(db.period.name == first_period_name)
 second_period = db.period(db.period.name == second_period_name)

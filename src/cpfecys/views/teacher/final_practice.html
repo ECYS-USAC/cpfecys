@@ -1,4 +1,29 @@
 {{extend 'template.html'}}
 <a onclick="window.history.back()" class="btn" ><i class="icon-arrow-left"></i> Back</a>
-<h1>Esta es la plantilla teacher/final_practice.html</h1>
-{{=BEAUTIFY(response._vars)}}
+<h2>{{=T('Final Practice Assignation')}} <small>{{=final_practice.project.name}}</small></h2>
+<h3>
+    {{=T('Student Information')}}
+</h3>
+<ul>
+    <li>{{=T('Student')}}: {{=final_practice.auth_user.username}}</li>
+    <li>{{=T('First Name')}}: {{=final_practice.auth_user.first_name}}</li>
+    <li>{{=T('Last Name')}}: {{=final_practice.auth_user.last_name}}</li>
+</ul>
+<h3>
+    {{=T('Assignation')}}
+</h3>
+<ul>
+    <li>{{=T('Area')}}: {{=final_practice.area_level.name}}</li>
+    <li>{{=T('Project')}}: {{=final_practice.project.name}}</li>
+    <li>{{=T('Assignation Date')}}:  {{=T('Semester')}} {{=final_practice.period_year.period}} - {{=final_practice.period_year.yearp}}</li>
+    <li>{{=T('Assignation Length')}}: {{=final_practice.user_project.periods}} {{=T('Semesters')}}</li>
+</ul>
+<h3>
+    {{=T('Report Scoring')}}
+</h3>
+<h3>
+    {{=T('Deliverable Items')}}
+</h3>
+<h3>
+    {{=T('Current Status')}}
+</h3>
