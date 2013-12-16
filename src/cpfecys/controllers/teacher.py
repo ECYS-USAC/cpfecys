@@ -16,7 +16,11 @@ def final_practice():
                         (db.project.area_level == db.area_level.id)&
                         (db.user_project.period == db.period_year.id)).select()
     if not final_practice: redirect(URL('courses'))
-    return dict(final_practice = final_practice.first())
+    final_practice = final_practice.first()
+    available_periods = db((db.period_year.id >= final_practice.user_project.period)&
+                           (db.period_year.id < (final_practice.user_project.period + final_practice.user_project.periods))).select()
+    return dict(final_practice = final_practice,
+                available_periods = available_periods)
 
 @auth.requires_login()
 @auth.requires_membership('Teacher')
