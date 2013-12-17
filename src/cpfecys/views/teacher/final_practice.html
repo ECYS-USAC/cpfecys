@@ -1,4 +1,90 @@
 {{extend 'template.html'}}
 <a onclick="window.history.back()" class="btn" ><i class="icon-arrow-left"></i> Back</a>
-<h1>Esta es la plantilla teacher/final_practice.html</h1>
-{{=BEAUTIFY(response._vars)}}
+<h2>{{=T('Final Practice Assignation')}} <small>{{=final_practice.project.name}}</small></h2>
+<h3>
+    {{=T('Student Information')}}
+</h3>
+<ul>
+    <li>{{=T('Student')}}: {{=final_practice.auth_user.username}}</li>
+    <li>{{=T('First Name')}}: {{=final_practice.auth_user.first_name}}</li>
+    <li>{{=T('Last Name')}}: {{=final_practice.auth_user.last_name}}</li>
+</ul>
+<h3>
+    {{=T('Assignation')}}
+</h3>
+<ul>
+    <li>{{=T('Area')}}: {{=final_practice.area_level.name}}</li>
+    <li>{{=T('Project')}}: {{=final_practice.project.name}}</li>
+    <li>{{=T('Assignation Date')}}:  {{=T('Semester')}} {{=final_practice.period_year.period}} - {{=final_practice.period_year.yearp}}</li>
+    <li>{{=T('Assignation Length')}}: {{=final_practice.user_project.periods}} {{=T('Semesters')}}</li>
+</ul>
+<h3>
+    {{=T('Report Scoring')}}
+</h3>
+<div class="accordion" id="reports_accordion">
+    <div class="accordion-group">
+    {{for item in available_periods:}}
+        <div class="accordion-heading">
+            <a class="accordion-toggle" data-toggle="collapse" data-parent="#reports_accordion" href="#r{{=item.id}}">
+                {{=item.yearp}} - {{=T('Semester')}} {{=item.period}}
+                <span class="right">
+                    <span>Average Score: 85</span> |
+                    <span>Delivered Reports: 4/4</span>
+                </span>
+            </a>
+        </div>
+        <div id="r{{=item.id}}" class="accordion-body collapse">
+            <div class="accordion-inner">
+                <table style="width:100%;">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Month</th>
+                            <th>Status</th>
+                            <th>Score</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>1</td>
+                            <td>Mayo</td>
+                            <td>Calificado</td>
+                            <td>80</td>
+                            <td>
+                                <a class="btn disabled"> Ver Reporte</a>
+                                <a class="btn disabled"> Calificar Reporte</a>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    {{pass}}
+    </div>
+</div>
+<h3>
+    {{=T('Deliverable Items')}}
+</h3>
+<div class="accordion" id="deliverable_items_accordion">
+    <div class="accordion-group">
+    {{for item in available_periods:}}
+        <div class="accordion-heading">
+            <a class="accordion-toggle" data-toggle="collapse" data-parent="#deliverable_items_accordion" href="#i{{=item.id}}">
+                {{=item.yearp}} - {{=T('Semester')}} {{=item.period}}
+                <span class="right">
+                    <span>Delivered Requirements: 8/8</span>
+                </span>
+            </a>
+        </div>
+        <div id="i{{=item.id}}" class="accordion-body collapse">
+            <div class="accordion-inner">
+                Anim pariatur cliche...
+            </div>
+        </div>
+    {{pass}}
+    </div>
+</div>
+<h3>
+    {{=T('Current Status')}}
+</h3>

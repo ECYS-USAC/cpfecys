@@ -195,8 +195,11 @@ db.define_table('item',
                 format='%(name)s'
                 )
 
+<<<<<<< HEAD
 db.item.start_old.writable=db.item.start_old.readable=False
 
+=======
+>>>>>>> 7310cfb911b2bcdf4f04e06bf77be1f4ea2d687c
 db.define_table('file_item',
                 Field('file_name', 'upload', default='', notnull=True),
                 Field('uploaded', 'datetime', notnull=True),
@@ -208,7 +211,7 @@ db.define_table('activity_item',
                 Field('uploaded', 'datetime', notnull=True),
                 format='%(done)s'
                 )
-                
+
 db.define_table('user_project_item', 
                 Field('item', 'reference item'),
                 Field('file_item', 'reference file_item'),
@@ -254,34 +257,34 @@ if setup is None:
     teachers = auth.add_group('Teacher',
                               'User that evaluates students in some courses. When final practice is teaching.')
 #
-# automatically creates the two periods of the current year and the next year
-# when the year changes so automatically new periods are created
-# example: we are in year 2013; automatically first semester and second semester are created for this year
-#  and the next one (2014)
+# automatically tries to create the next period in may and november respectively
+# Using the following logic:
+# - In May..Dec the second period of current year is created.
+# - In Nov the first period of next year is created.
+# - In Jan..Apr the first period of current year is created.
 #
 first_period = db.period(db.period.name == first_period_name)
 second_period = db.period(db.period.name == second_period_name)
 import datetime
 now = datetime.datetime.now()
 year = now.year
-## New semesters will be created in november and may respectively.
-if now.month >= 11:
-    #check and create first semester of next year
-    pery = db.period_year((db.period_year.yearp == (year + 1))&
-                          (db.period_year.period == first_period))
-    if not pery:
-        db.period_year.insert(yearp = (year + 1), period = first_period)
 if now.month >= 5:
     #check and create second semester of current year
     pery = db.period_year((db.period_year.yearp == year)&
                           (db.period_year.period == second_period))
     if not pery:
         db.period_year.insert(yearp = year, period = second_period)
-if now.month >= 0:
-    #check and create first semester of current year
+else:
+    #check and create second semester of current year
     pery = db.period_year((db.period_year.yearp == year)&
+                          (db.period_year.period == second_period))
+    if not pery:
+        db.period_year.insert(yearp = year, period = second_period)
+if now.month >= 11:
+    #check and create first semester of next year
+    pery = db.period_year((db.period_year.yearp == (year + 1))&
                           (db.period_year.period == first_period))
     if not pery:
-        db.period_year.insert(yearp = year, period = first_period)
+        db.period_year.insert(yearp = (year + 1), period = first_period)
 ## after defining tables, uncomment below to enable auditing
 # auth.enable_record_versioning(db)
