@@ -38,6 +38,12 @@ def notifications_manager():
     user = db(db.auth_membership.user_id == auth.user.id).select(db.auth_group.ALL)
     grid = SQLFORM.smartgrid(db.front_notification, linked_tables=['notification_access'])
     return locals()
+    
+@auth.requires_login()
+@auth.requires_membership('Super-Administrator')
+def items_manager():
+    grid = SQLFORM.smartgrid(db.item, linked_tables=['project_item'])
+    return locals()
 
 @auth.requires_login()
 @auth.requires_membership('Super-Administrator')

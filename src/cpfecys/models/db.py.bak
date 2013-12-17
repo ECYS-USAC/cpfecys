@@ -179,40 +179,57 @@ db.define_table('notification_access',
 #Project item requirements structure
 db.define_table('item_type',
                 Field('name', 'string', notnull=True),
-                )
-
-db.define_table('item',
-                Field('name', 'string', notnull=True),
-                Field('start_date', 'date', notnull=True),
-                Field('start_old', 'date', notnull=True),
-                Field('end_date', 'date', notnull=True),
-                Field('is_active', 'boolean', notnull=True),
-                Field('description', 'text', notnull=False),
-                Field('period_year', 'reference period_year'),
+                format='%(name)s'
                 )
                 
+db.define_table('item',
+                Field('name', 'string', notnull=True),
+                Field('start_date', 'date', notnull=False),
+                Field('end_date', 'date', notnull=False),
+                Field('start_old', 'date', notnull=False),
+                Field('is_active', 'boolean', notnull=False),
+                Field('permanent', 'boolean', notnull=False),
+                Field('description', 'text', notnull=False),
+                Field('item_type', 'reference item_type'),
+                Field('teacher_only', 'boolean', notnull=True),
+                format='%(name)s'
+                )
+
+db.item.start_old.writable=db.item.start_old.readable=False
+
 db.define_table('file_item',
                 Field('file_name', 'upload', default='', notnull=True),
                 Field('uploaded', 'datetime', notnull=True),
+                format='%(file_name)s'
                 )
 
 db.define_table('activity_item',
                 Field('done', 'boolean', notnull=True),
                 Field('uploaded', 'datetime', notnull=True),
+                format='%(done)s'
                 )
                 
 db.define_table('user_project_item', 
-                Field('is_active', 'boolean', notnull=True),
                 Field('item', 'reference item'),
                 Field('file_item', 'reference file_item'),
                 Field('activity_item', 'reference activity_item'),
                 Field('user_project', 'reference user_project'),
                 )
 
+
+db.define_table('project_item', 
+                Field('item', 'reference item'),
+                Field('project', 'reference project'),
+                )
+
 # User Roles
 ## Super-Administrator:
 setup = db.auth_user(db.auth_user.username == 'admin')
 if setup is None:
+    #Default item types
+    db.item_type.insert(name='File')
+    db.item_type.insert(name='Activity')
+
     semester1 = db.period.insert(name = first_period_name)
     semester2 = db.period.insert(name = second_period_name)
     ## Final Practice Areas of DTT
