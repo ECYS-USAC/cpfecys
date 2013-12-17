@@ -195,11 +195,8 @@ db.define_table('item',
                 format='%(name)s'
                 )
 
-<<<<<<< HEAD
 db.item.start_old.writable=db.item.start_old.readable=False
 
-=======
->>>>>>> 7310cfb911b2bcdf4f04e06bf77be1f4ea2d687c
 db.define_table('file_item',
                 Field('file_name', 'upload', default='', notnull=True),
                 Field('uploaded', 'datetime', notnull=True),
