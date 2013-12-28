@@ -1,3 +1,99 @@
 {{extend 'template.html'}}
-<h1>{{=T('Welcome Student!')}}</h1>
-{{=BEAUTIFY(response._vars)}}
+<a onclick="window.history.back()" class="btn" ><i class="icon-arrow-left"></i> Back</a>
+<h2>{{=T('Final Practice Record')}} <small>{{=assignations[0].auth_user.username}}</small></h2>
+<h3>
+    {{=T('Student Information')}}
+</h3>
+<ul>
+    <li>{{=T('Student')}}: {{=assignations[0].auth_user.username}}</li>
+    <li>{{=T('First Name')}}: {{=assignations[0].auth_user.first_name}}</li>
+    <li>{{=T('Last Name')}}: {{=assignations[0].auth_user.last_name}}</li>
+</ul>
+<h3>
+    {{=T('Assignation History')}}
+</h3>
+<div class="accordion" id="practice_assignation_accordion">
+    <div class="accordion-group">
+        {{for item in assignations:}}
+        <div class="accordion-heading">
+            <a class="accordion-toggle" data-toggle="collapse" data-parent="#practice_assignation_accordion" href="#i">
+                <strong>Project Name:</strong> {{=item.project.name}} | <strong>Area:</strong> {{=item.area_level.name}}
+                <span class="right">
+                    <span><strong>Start:</strong> {{=item.period_year.yearp}} - Semester {{=item.period_year.period}}</span> |
+                    <span><strong>Length:</strong> {{=item.user_project.periods}} Semesters</span> |
+                    <span><strong>Status</strong>: Running</span>
+                </span>
+            </a>
+        </div>
+        <div id="i" class="accordion-body collapse">
+            <div class="accordion-inner">
+                <div class="well reports">
+                    <h3>
+                    {{=T('Reports')}}
+                    </h3>
+                    <table style="width:100%;">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Month</th>
+                                <th>Status</th>
+                                <th>Score</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>1</td>
+                                <td>Mayo</td>
+                                <td>Calificado</td>
+                                <td>80</td>
+                                <td>
+                                    <a class="btn disabled"> Ver Reporte</a>
+                                    <a class="btn disabled"> Calificar Reporte</a>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <div class="row">
+                        <div class="span5">
+                            <strong>Average Score:</strong> 80
+                        </div>
+                        <div class="span6">
+                            <a class="pull-right btn"><span class="icon-plus"></span>{{=T('Monthly Report')}}</a>
+                        </div>
+                    </div>
+                </div>
+                <div class="well item_deliver">
+                    <h3>
+                    {{=T('Delivery Items')}}
+                    </h3>
+                    <a class="btn"><span class="icon-plus"></span>{{=T('Item Delivery')}}</a>
+                    <table style="width:100%;">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Month</th>
+                                <th>Status</th>
+                                <th>Score</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>1</td>
+                                <td>Mayo</td>
+                                <td>Calificado</td>
+                                <td>80</td>
+                                <td>
+                                    <a class="btn disabled"> Ver Reporte</a>
+                                    <a class="btn disabled"> Calificar Reporte</a>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        {{pass}}
+    </div>
+</div>
