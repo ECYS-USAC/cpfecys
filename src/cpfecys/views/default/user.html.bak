@@ -1,6 +1,9 @@
 {{extend 'template.html'}}
 
 <h2>{{=T( request.args(0).replace('_',' ').capitalize() )}}</h2>
+<h3>
+    Before
+</h3>
 <div>
 {{
 if request.args(0)=='login':
