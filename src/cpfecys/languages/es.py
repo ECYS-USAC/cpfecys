@@ -274,6 +274,7 @@
 'IP del Cliente': 'IP del Cliente',
 'Is Active': 'esta Activo',
 'Is Eanbled': 'Is Eanbled',
+'Is Enabled': 'Is Enabled',
 'Is Public': 'Is Public',
 'Item': 'Item',
 'Item Delivery': 'Item Delivery',

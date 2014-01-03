@@ -368,12 +368,12 @@ if setup is None:
     db.project.insert(project_id = 'PV008', area_level = lvl_3, name = 'Escuela de Ciencias y Sistemas FIUSAC', description = 'Desarrollo de aplicaciones y utilidades para la Escuela de Ciencias y Sistemas FIUSAC.', physical_location = 'Escuela de Ciencias y Sistemas, Edificio T3.')
     ## Would be a good idea to at least join courses with UV here
     ## User Roles Setup:
-    super = db.auth_user.insert(email = 'admin@admin.com', first_name = 'Super',
+    supersu = db.auth_user.insert(email = 'admin@admin.com', first_name = 'Super',
                                          last_name = 'Administrator', username = 'admin',
                                          password = db.auth_user.password.validate('superadmin')[0])
     superadmins = auth.add_group(role = 'Super-Administrator',
                                  description = 'In charge of the whole system administration.')
-    auth.add_membership(superadmins, super)
+    auth.add_membership(superadmins, supersu)
     ## Student:
     students = auth.add_group('Student',
                               'User that is enrolled in some practice. Limited access.')

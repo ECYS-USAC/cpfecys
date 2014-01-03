@@ -184,7 +184,7 @@ db.define_table('enabled_date',
                 Field('name', 'string', notnull=False),
                 Field('start_date', 'date', notnull=False),
                 Field('end_date', 'date', notnull=False),
-                Field('is_eanbled', 'boolean', notnull=False),
+                Field('is_enabled', 'boolean', notnull=False),
                 )
 
 db.define_table('report_head',
