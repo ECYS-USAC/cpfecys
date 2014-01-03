@@ -1,0 +1,36 @@
+{{extend 'template.html'}}
+<div class="center">
+<table class="table">
+    <th>Activity Type</th>
+    <th>Activity Date</th>
+    <th>Description</th>
+    {{if creport_head:}}
+            	<th>Actions</th>
+    {{pass}}
+    {{if entries_size > 0:}}
+        {{for entry in entries:}}
+        {{if entry.log_type.name == "Anomaly":}}
+        	<tr class="warning">
+        {{else:}}
+        	<tr class="info">
+        {{pass}}
+            <td>{{=entry.log_type.name}}</td>
+            <td>{{=entry.entry_date}}</td>
+            <td>{{=entry.description[:100]}}</td>
+            {{if creport_head:}}
+            	<td>Edit, update, view</td>
+            {{pass}}
+        </tr>
+        {{pass}}
+    {{else:}}
+    	
+    {{pass}}
+</table>
+{{if c_enab_date:}}
+    <a class="btn" href="{{=URL('logs_area', vars=dict(date=c_enab_date.id, assignation=user_project))}}"> 
+        <i class="icon-pencil"></i>
+        {{=T('New Entry Log')}} 
+    </a>
+{{pass}}
+</div>
+<p><a onclick="window.history.back()" class="btn" ><i class="icon-arrow-left"></i> Back</a></p>

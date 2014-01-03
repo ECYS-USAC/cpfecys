@@ -1,0 +1,14 @@
+{{extend 'template.html'}}
+{{=form}}
+
+<a onclick="window.history.back()" class="btn" ><i class="icon-arrow-left"></i> Back</a>
+
+<script>
+    Calendar.setup({
+        cont: "sample1",
+        min: 20131201,
+        max: 20131231,
+        trigger    : "calendar-trigger",
+        inputField : "my_calendar",
+    });
+</script>

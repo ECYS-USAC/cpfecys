@@ -1,0 +1,12 @@
+{{extend 'template.html'}}
+
+
+    <div class="span12 center">
+{{if c_enab_date:}}
+    <a class="btn" href="{{=URL('student', 'logs_list', vars=dict(assignation=user_project, date=c_enab_date.id))}}">{{=T('Activities Log')}}<icon class="icon-th-list"></icon></a>
+{{else:}}
+	<a class="btn" href="{{=URL('student', 'logs_list', vars=dict(assignation=user_project, report=report))}}">{{=T('Activities Log')}}<icon class="icon-th-list"></icon></a>
+{{pass}}
+</div>
+
+<p><a onclick="window.history.back()" class="btn" ><i class="icon-arrow-left"></i> Back</a></p>

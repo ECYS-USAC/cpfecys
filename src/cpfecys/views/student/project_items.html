@@ -1,0 +1,26 @@
+{{extend 'template.html'}}
+
+<h1>{{=project.name}}</h1>
+
+{{if c_enab_date != None:}}
+<h2>{{=T('Current Report')}}: {{=c_enab_date.name}} <small>{{=T('From')}} {{=c_enab_date.start_date}} {{=T('To')}} {{=c_enab_date.end_date}}</small></h2>
+{{pass}}
+
+{{for item in usr_reports:}}
+            {{if c_enab_date:}}
+                <p><a class="btn" href="{{=URL('student', 'report_detail', vars=dict(assignation=user_project,report=item.id))}}">
+                <icon class="icon-edit"></icon> 
+            {{else:}}
+            	<p><a class="btn" href="{{=URL('student', 'report_detail', vars=dict(assignation=user_project,report=item.id))}}">
+            	<icon class="icon-eye-open"></icon>
+            {{pass}}
+        {{=item.enabled_date.name}} </a></p>
+{{pass}}
+<hr>
+{{if create_current and c_enab_date:}}
+	<p><a class="btn" href="{{=URL('student', 'report_detail', vars=dict(date=c_enab_date.id, assignation=user_project))}}"><icon class="icon-plus"></icon> {{=c_enab_date.name}} </a></p>
+{{pass}}
+
+<h1>{{=T('Timeless Items')}}</h1>
+
+<p><a onclick="window.history.back()" class="btn" ><i class="icon-arrow-left"></i> Back</a></p>

@@ -1,0 +1,22 @@
+{{extend 'template.html'}}
+
+<div class="tabbable"> <!-- Only required for left/right tabs -->
+  <ul class="nav nav-tabs">
+      {{if filter == 1:}}
+      	<li class="active"><a href="{{=URL(vars=dict(filter=1))}}">{{=T('Area')}}</a></li>
+      	<li><a href="{{=URL(vars=dict(filter=2))}}">{{=T('Project')}}</a></li>
+      {{else:}}
+      	<li><a href="{{=URL(vars=dict(filter=1))}}">{{=T('Area')}}</a></li>
+      	<li class="active"><a href="{{=URL(vars=dict(filter=2))}}">{{=T('Project')}}</a></li>
+      {{pass}}
+      
+  </ul>
+  <div class="tab-content">
+      <div class="tab-pane" id="setuptab">
+      </div>
+      <div class="tab-pane active" id="data currentyearperiod">
+          La Data
+      </div>
+  </div>
+</div>
+<hr />
