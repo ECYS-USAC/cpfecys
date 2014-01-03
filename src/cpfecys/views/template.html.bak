@@ -48,10 +48,8 @@
       middle_columns = {0:'span12',1:'span9',2:'span6'}[
       (left_sidebar_enabled and 1 or 0)+(right_sidebar_enabled and 1 or 0)]
       }}
-
-    <link rel="stylesheet" href="{{=URL('static', 'css/template.css')}}" type="text/css" />
     <link rel="stylesheet" href="{{=URL('static', 'css/ja-sosdmenu.css')}}" type="text/css" />
-    <script language="javascript" type="text/javascript" src="{{=URL('static', 'js/ja.cssmenu.js')}}"></script>
+    <link rel="stylesheet" href="{{=URL('static', 'css/template.css')}}" type="text/css" />
       <!-- uncomment here to load jquery-ui
 <link rel="stylesheet" href="http://ajax.googleapis.com/ajax/libs/jqueryui/1.10.3/themes/ui-lightness/jquery-ui.css" type="text/css" media="all" />
 <script src="http://ajax.googleapis.com/ajax/libs/jqueryui/1.10.3/jquery-ui.min.js" type="text/javascript"></script>
@@ -72,8 +70,8 @@ uncomment to load jquery-ui //-->
     </div>
     <!-- END: HEADER -->
     <!-- BEGIN: MAIN NAVIGATION -->
-    <div id="ja-mainnavwrap">
-      <div id="ja-mainnav" class="clearfix">
+    <div id="ja-">
+      <div id="ja-mainnav" class="">
           <!-- Navbar ================================================== -->
           <div class="navbar navbar-inverse">
             <div class="flash">{{=response.flash or ''}}</div>
@@ -100,11 +98,6 @@ uncomment to load jquery-ui //-->
     <!-- END: MAIN NAVIGATION -->
       <div class="container">
           <section id="main" class="main row">
-            {{if session.arg_title:}}
-            {{=breadcrumb(session.arg_title)}}
-            {{else:}}
-            {{=breadcrumb()}}
-            {{pass}}
               {{if left_sidebar_enabled:}}
               <div class="span3 left-sidebar">
                   {{block left_sidebar}}
@@ -151,7 +144,7 @@ uncomment to load jquery-ui //-->
   <script src="{{=URL('static','js/analytics.min.js')}}"></script>
   <script type="text/javascript">
   analytics.initialize({
-    'Google Analytics':{trackingId:'{{=response.google_analytics_id}}'} 
+    'Google Analytics':{trackingId:'{{=response.google_analytics_id}}'}
   });</script>
   {{pass}}
   <script src="{{=URL('static','js/share.js',vars=dict(static=URL('static','images')))}}"></script>

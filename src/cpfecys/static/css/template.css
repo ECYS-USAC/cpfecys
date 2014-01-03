@@ -1613,3 +1613,12 @@ div.moduletable h3, div.moduletable_menu h3, div.moduletable_text h3 {
       #ja-header {
       background: url(http://ecys.ingenieria.usac.edu.gt/portalecys/templates/ja_purity2/images/header/header3.png) no-repeat top right;
       }
+#ja-mainnav ul ul a{
+	width:auto;
+}
+#ja-mainnav li ul{
+	width:auto;
+}
+#ja-mainnav .dropdown-menu li{
+	float:none;
+}

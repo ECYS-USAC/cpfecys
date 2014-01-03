@@ -87,12 +87,11 @@ a {
 	color: #006699;
 	text-decoration: underline;
 }
-
+/*
 a:hover, a:active, a:focus {
 	color: #666666;
-	/*text-decoration: underline;*/
 	font-weight: bold;
-}
+}*/
 
 /*Menu links*/
 #menulist_root .mainlevel
@@ -208,51 +207,6 @@ img {
 }
 /* FORM
 --------------------------------------------------------- */
-form {
-	margin: 0;
-	padding: 0;
-}
-
-form label {
-	cursor: pointer;
-}
-
-input, select, textarea, .inputbox {
-	padding: 3px 5px;
-	font-family: Tahoma, Arial, Helvetica, sans-serif;
-	font-size: 100%;
-}
-
-.button {
-	padding: 3px 5px;
-	border: 1px solid #333333;
-	color: #CCCCCC;
-	font-size: 85%;
-	text-transform: uppercase;
-}
-
-.button:hover, .button:focus {
-	border: 1px solid #999999;
-	background: #333333;
-	color: #FFFFFF;
-}
-
-* html .button {
-	padding: 2px 0 !important; /*IE 6*/
-}
-
-*+html .button {
-	padding: 2px 0 !important; /*IE 7*/
-}
-
-.inputbox {
-	border: 1px solid #CCCCCC;
-	background: #FFFFFF;
-}
-
-.inputbox:hover, .inputbox:focus {
-	background: #FFFFCC;
-}
 
 /* BONUS TYPOGRAPHY STYLES
 --------------------------------------------------------- */
@@ -1659,3 +1613,12 @@ div.moduletable h3, div.moduletable_menu h3, div.moduletable_text h3 {
       #ja-header {
       background: url(http://ecys.ingenieria.usac.edu.gt/portalecys/templates/ja_purity2/images/header/header3.png) no-repeat top right;
       }
+#ja-mainnav ul ul a{
+	width:100%;
+}
+#ja-mainnav li ul{
+	width:auto;
+}
+#ja-mainnav .dropdown-menu li{
+	float:none;
+}
