@@ -8,6 +8,12 @@ def periods():
 
 @auth.requires_login()
 @auth.requires_membership('Super-Administrator')
+def enabled_date():
+    grid = SQLFORM.grid(db.enabled_date)
+    return locals()
+
+@auth.requires_login()
+@auth.requires_membership('Super-Administrator')
 def projects():
     grid = SQLFORM.grid(db.project)
     return locals()
@@ -42,7 +48,34 @@ def notifications_manager():
 @auth.requires_login()
 @auth.requires_membership('Super-Administrator')
 def items_manager():
-    grid = SQLFORM.smartgrid(db.item, linked_tables=['project_item'])
+    if request.function == 'new':
+        db.item.created.writable=db.item.created.readable=False
+    grid = SQLFORM.grid(db.item)
+    return dict(grid=grid)
+
+@auth.requires_login()
+@auth.requires_membership('Super-Administrator')
+def manage_items():
+    return dict()
+
+@auth.requires_login()
+@auth.requires_membership('Super-Administrator')
+def assign_items():
+    filter = 1
+    if request.vars['filter'] != None:
+        filter = int(request.vars['filter'])
+        
+    if filter == 1:
+        pass
+    dct = {}
+    items = db((db.item.is_active==True)).select()
+    rows=db().select(db.item.ALL, db.item_project.ALL,
+         left=db.item_project.on(db.item.id==db.item_project.item))
+    for item in items:
+        dct.update({item.name:[]})
+        
+    for row in rows:
+        dct[row.item.name].append(row)
     return locals()
 
 @auth.requires_login()

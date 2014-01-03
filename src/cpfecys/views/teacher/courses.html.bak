@@ -27,9 +27,6 @@
           {{pass}}
       </a></li>
     {{pass}}
-      <li><a href="{{=URL('assignation_upload')}}">
-          {{=T('CSV Assignation')}}
-      </a></li>
 
   </ul>
   <div class="tab-content">
@@ -68,8 +65,7 @@
                       <td>{{=item.project['name']}}</td>
                       <td>
                           <a class="btn" href="{{=URL('students',
-                                               vars=dict(year_period=currentyear_period.id,
-                                               project=item.project['id']))}}">
+                                               vars=dict(project=item.project['id']))}}">
                               <i class="icon-user"></i> Show Students
                           </a>
                       </td>
