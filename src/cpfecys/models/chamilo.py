@@ -17,4 +17,6 @@ db2.define_table('user_user',
                 Field('firstname'),
                 Field('username'),
                 Field('password'),
+                Field('phone'),
+                Field('email'),
                 Field('external_uid'))

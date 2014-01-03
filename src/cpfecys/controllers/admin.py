@@ -38,7 +38,7 @@ def notifications_manager():
     user = db(db.auth_membership.user_id == auth.user.id).select(db.auth_group.ALL)
     grid = SQLFORM.smartgrid(db.front_notification, linked_tables=['notification_access'])
     return locals()
-    
+
 @auth.requires_login()
 @auth.requires_membership('Super-Administrator')
 def items_manager():
@@ -48,42 +48,76 @@ def items_manager():
 @auth.requires_login()
 @auth.requires_membership('Super-Administrator')
 def assignation_upload():
-    periodcurrent = current_year_period()
     import csv
-    newUsrs, errUsrs, existUsers = {}, {}, {}
-    exisIndex, UsrIndx, errIndx = 0, 0 ,0
+    error_users = []
+    warning_users = []
     success = False
     if request.vars.csvfile != None:
-        file = request.vars.csvfile.file
-        cr = csv.reader(file, delimiter=',', quotechar='|')
-        success = True
-        header = next(cr)
-        for row in cr:
-            project, currentUser = None, None
-            currentUser = db(db.auth_user.username==row[1]).select().first()
-            project = db(db.project.id==row[10]).select().first()
-            if currentUser is None:
-                phone, first_name, username = '', '', ''
-                phone = row[3]
-                email = row[4]
-                cycles = row[9]
-                pro_bono = row[8]
-                username = row[1]
-                first_name = row[2]
-                currentUser = db.auth_user.insert(username=username, \
-                                                   first_name=first_name, \
-                                                   email=email, pro_bono=pro_bono,\
-                                                   phone=phone)
-            if project:
-                    db.user_project.insert(assigned_user=currentUser, project=project, period=periodcurrent)
-                    existUsers[exisIndex] = currentUser.first_name + ' - ' + project.name
-                    exisIndex = exisIndex + 1
-
+        try:
+            file = request.vars.csvfile.file
+        except AttributeError:
+            response.flash = T('Please upload a file.')
+            return dict(success = False,
+                file = False,
+                periods = periods)
+        try:
+            cr = csv.reader(file, delimiter=',', quotechar='"')
+            success = True
+            header = next(cr)
+            for row in cr:
+                ## parameters
+                rusername = row[1]
+                rproject = row[3]
+                rassignation_length = row[4]
+                rpro_bono = (row[5] == 'Si') or (row[5] == 'si')
+                ## check if user exists
+                usr = db.auth_user(db.auth_user.username == rusername)
+                project = db.project(db.project.project_id == rproject)
+                current_period = current_year_period()
+                if usr is None:
+                    ## find it on chamilo (db2)
+                    usr = db2.user_user(db2.user_user.username == rusername)
+                    if usr is None:
+                        # report error and get on to next row
+                        row.append('error: ' + T('User is not valid. User doesn\'t exist in UV.'))
+                        error_users.append(row)
+                        continue
+                    else:
+                        # insert the new user
+                        usr = db.auth_user.insert(username = usr.username,
+                                            password = usr.password,
+                                            phone = usr.phone,
+                                            last_name = usr.lastname,
+                                            first_name = usr.firstname)
+                else:
+                    assignation = db.user_project((db.user_project.assigned_user == usr.id)&
+                                                  (db.user_project.project == project)&
+                                                  (db.user_project.period == current_period))
+                    if assignation != None:
+                        row.append('warning: ' + T('User was already assigned, Updating Data.'))
+                        warning_users.append(row)
+                        assignation.update_record(periods = rassignation_length, pro_bono = rpro_bono)
+                        continue
+                if project != None:
+                    db.user_project.insert(assigned_user = usr,
+                                            project = project,
+                                            period = current_period,
+                                            periods = rassignation_length,
+                                            pro_bono = rpro_bono)
+                else:
+                    # project_id is not valid
+                    row.append('error: ' + T('Project code is not valid. Check please.'))
+                    error_users.append(row)
+                    continue
+        except csv.Error:
+            response.flash = T('File doesn\'t seem properly encoded.')
+            return dict(success = False,
+                file = False,
+                periods = periods)
         response.flash = T('Data uploaded')
         return dict(success = success,
-                    data = newUsrs,
-                    errors = errUsrs,
-                    existUsers = existUsers,
+                    errors = error_users,
+                    warnings = warning_users,
                     periods = periods)
     return dict(success = False,
                 file = False,
@@ -99,6 +133,7 @@ def assignation():
     currentyear_period = db.period_year(db.period_year.id == year_period)
     if not currentyear_period:
         currentyear_period = current_year_period()
+        changid = currentyear_period.id
     grid = SQLFORM.grid((db.user_project.period <= currentyear_period.id)&
               ((db.user_project.period + db.user_project.periods) > currentyear_period.id))
     current_period_name = T(second_period_name)
