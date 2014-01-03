@@ -45,7 +45,7 @@ if auth.has_membership(role="Super-Administrator"):
                                      (T('Items Manager'), False, URL('admin', 'items_manager'), []),
                                      ]),                             
     ])
-elif auth.has_membership(role="Teacher"):
+if auth.has_membership(role="Teacher"):
     response.menu.extend([(T('Courses'), False, URL('teacher', 'courses'), []),
     ])
 elif auth.has_membership(role="Student"):
@@ -53,6 +53,8 @@ elif auth.has_membership(role="Student"):
     response.menu.extend([(T('Activities Log'), False, URL('student', 'logs_list'), [])])
 else:
     pass
+if auth.has_membership(role="Student"):
+    response.menu.extend([(T('Reports'), False, URL('student', 'report_list'), [])])
 
 #any user should be able to see this menu
 response.menu.extend([
