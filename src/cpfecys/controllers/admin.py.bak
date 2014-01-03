@@ -112,7 +112,7 @@ def assignation_upload():
                     usr = db2.user_user(db2.user_user.username == rusername)
                     if usr is None:
                         # report error and get on to next row
-                        row.append('error: ' + T('User is not valid. User doesn\'t exist in UV.'))
+                        row.append(T('Error: ') + T('User is not valid. User doesn\'t exist in UV.'))
                         error_users.append(row)
                         continue
                     else:
@@ -122,12 +122,13 @@ def assignation_upload():
                                             phone = usr.phone,
                                             last_name = usr.lastname,
                                             first_name = usr.firstname)
+                        #add user to role 'student'
                 else:
                     assignation = db.user_project((db.user_project.assigned_user == usr.id)&
                                                   (db.user_project.project == project)&
                                                   (db.user_project.period == current_period))
                     if assignation != None:
-                        row.append('warning: ' + T('User was already assigned, Updating Data.'))
+                        row.append(T('Warning: ') + T('User was already assigned, Updating Data.'))
                         warning_users.append(row)
                         assignation.update_record(periods = rassignation_length, pro_bono = rpro_bono)
                         continue
