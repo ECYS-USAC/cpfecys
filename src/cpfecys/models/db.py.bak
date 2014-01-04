@@ -178,40 +178,43 @@ db.define_table('notification_access',
                 )
 
 #Reports and Activities structure
-db.define_table('enabled_date',
+db.define_table('report_restriction',
                 Field('name', 'string', notnull=False),
                 Field('start_date', 'date', notnull=False),
                 Field('end_date', 'date', notnull=False),
                 Field('is_enabled', 'boolean', notnull=False),
                 )
 
-db.define_table('report_head',
-                Field('created', 'date'),
-                Field('repor_user', 'reference auth_user'),
-                Field('project', 'reference project'),
-                Field('enabled_date', 'reference enabled_date'),
-                )
+db.define_table('report_status',
+                Field('name', 'string', notnull=True),
+                Field('description', 'string', notnull=True))
 
 db.define_table('report',
+                Field('created', 'date'),
+                Field('assignation', 'reference user_project'),
+                Field('report_restriction', 'reference report_restriction'),
+                Field('status', 'reference report_status', notnull=True),
+                )
+
+db.define_table('report_detail',
                 Field('created', 'datetime', notnull=True),
-                Field('project', 'reference project'),
-                Field('head', 'reference report_head'),
-                )              
-                  
+                Field('report', 'reference report'),
+                )
+
 db.define_table('log_type',
                 Field('name', 'string', notnull=True),
                 format='%(entry_date)s'
-                )  
-                                
+                )
+
 db.define_table('log_entry',
                 Field('log_type', 'reference log_type'),
                 Field('entry_date', 'date', notnull=True),
                 Field('description', 'text', notnull=True),
                 Field('entry_user', 'reference auth_user'),
                 Field('project', 'reference project'),
-                Field('head', 'reference report_head'),
+                Field('head', 'reference report_restriction'),
                 format='%(entry_date)s'
-                )              
+                )
 #Project item requirements structure
 db.define_table('item_type',
                 Field('name', 'string', notnull=True),
@@ -270,10 +273,15 @@ db.define_table('project_item',
 ## Super-Administrator:
 setup = db.auth_user(db.auth_user.username == 'admin')
 if setup is None:
+    ## Report Status Types
+    db.report_status.insert(name="Draft", description="")
+    db.report_status.insert(name="Grading", description="")
+    db.report_status.insert(name="Recheck", description="")
+    db.report_status.insert(name="Acceptance", description="")
     #Default item types
     db.item_type.insert(name='File')
     db.item_type.insert(name='Activity')
-    
+
     #Default log types
     db.log_type.insert(name='Activity')
     db.log_type.insert(name='Anomaly')
@@ -369,8 +377,7 @@ if setup is None:
     supersu = db.auth_user.insert(email = 'admin@admin.com', first_name = 'Super',
                                          last_name = 'Administrator', username = 'admin',
                                          password = db.auth_user.password.validate('superadmin')[0])
-    superadmins = auth.add_group(role = 'Super-Administrator',
-                                 description = 'In charge of the whole system administration.')
+    superadmins = auth.add_group(role = 'Super-Administrator',description = 'In charge of the whole system administration.')
     auth.add_membership(superadmins, supersu)
     ## Student:
     students = auth.add_group('Student',

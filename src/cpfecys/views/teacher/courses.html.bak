@@ -1,7 +1,7 @@
 {{extend 'template.html'}}
 <a onclick="window.history.back()" class="btn" ><i class="icon-arrow-left"></i> Back</a>
 <h2>
-    My Projects <small>"{{=str(currentyear_period.yearp) + ' - ' + current_period_name }}"</small>
+    My Projects <small>"{{=user}}"</small>
 </h2>
 <div class="tabbable"> <!-- Only required for left/right tabs -->
   <ul class="nav nav-tabs">
@@ -65,7 +65,8 @@
                       <td>{{=item.project['name']}}</td>
                       <td>
                           <a class="btn" href="{{=URL('students',
-                                               vars=dict(project=item.project['id']))}}">
+                                               vars=dict(year_period=currentyear_period.id,
+                                               project=item.project['id']))}}">
                               <i class="icon-user"></i> Show Students
                           </a>
                       </td>

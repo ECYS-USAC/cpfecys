@@ -1,7 +1,6 @@
 {{extend 'template.html'}}
-<a onclick="window.history.back()" class="btn" ><i class="icon-arrow-left"></i> Back</a>
 <h2>
-    My Projects <small>"{{=str(currentyear_period.yearp) + ' - ' + current_period_name }}"</small>
+    {{=T('Final Practice')}} <small>{{=auth.user.username}}</small>
 </h2>
 
 
@@ -51,9 +50,9 @@
 
 
 		{{for item in current_data:}}
-			<a class="btn" href="{{=URL('student', 'project_items', 
+			<a class="btn" href="{{=URL('student', 'project_items',
                                vars=dict(assignation=item.id, year_period=currentyear_period.yearp))}}">
-                              <i class="icon-user"></i> {{=item.project.area_level.name}}: 
+                              <i class="icon-user"></i> {{=item.project.area_level.name}}:
 								{{=item.project.name}}
 			</a>
 		{{pass}}

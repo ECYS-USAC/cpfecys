@@ -8,8 +8,8 @@ def periods():
 
 @auth.requires_login()
 @auth.requires_membership('Super-Administrator')
-def enabled_date():
-    grid = SQLFORM.grid(db.enabled_date)
+def report_restrictions():
+    grid = SQLFORM.grid(db.report_restriction)
     return locals()
 
 @auth.requires_login()

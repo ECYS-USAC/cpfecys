@@ -26,42 +26,37 @@ response.menu = [(T('Home'), False, URL('default', 'index'), [])]
 if auth.has_membership(role="Super-Administrator"):
     response.menu.extend([
         (T('Users Administration'), False, URL(),[
-                                     (T('Final Practice Admin'), False, URL('admin', 'assignation'), []),
-                                     (T('Users'), False, URL('admin', 'users'), []),
-                                     ]),
+             (T('Final Practice Admin'), False, URL('admin', 'assignation'), []),
+             (T('Users'), False, URL('admin', 'users'), []),
+             ]),
          (T('Projects Administration'), False, URL(),[
-                                    (T('Areas'), False, URL('admin', 'areas'), []),
-                                     (T('Projects'), False, URL('admin', 'projects'), []),
-                                     ]),
+            (T('Areas'), False, URL('admin', 'areas'), []),
+            (T('Projects'), False, URL('admin', 'projects'), []),
+            ]),
          (T('Frontend Administration'), False, URL(),[
-                                     (T('Links Manager'), False, URL('admin', 'links'), []),
-                                     (T('Files Manager'), False, URL('admin', 'files_manager'), []),
-                                     (T('Notifications Manager'), False, URL('admin', 'notifications_manager'), []),
-                                     ]), 
+             (T('Links Manager'), False, URL('admin', 'links'), []),
+             (T('Files Manager'), False, URL('admin', 'files_manager'), []),
+             (T('Notifications Manager'), False, URL('admin', 'notifications_manager'), []),
+             ]),
          (T('Reports Administration'), False, URL(),[
-                                     (T('Report Dates'), False, URL('admin', 'enabled_date'), []),
-                                     (T('Files Manager'), False, URL('admin', 'files_manager'), []),
-                                     (T('Notifications Manager'), False, URL('admin', 'notifications_manager'), []),
-                                     (T('Items Manager'), False, URL('admin', 'items_manager'), []),
-                                     ]),                             
+             (T('Reports and Restrictions'), False, URL('admin', 'report_restrictions'), []),
+             (T('Items Manager'), False, URL('admin', 'items_manager'), []),
+             ]),
     ])
 if auth.has_membership(role="Teacher"):
     response.menu.extend([(T('Courses'), False, URL('teacher', 'courses'), []),
     ])
-elif auth.has_membership(role="Student"):
-    response.menu.extend([(T('Final Practice'), False, URL('student', 'courses'), [])])
-    response.menu.extend([(T('Activities Log'), False, URL('student', 'logs_list'), [])])
-else:
-    pass
 if auth.has_membership(role="Student"):
+    response.menu.extend([(T('Final Practice'), False, URL('student', 'index'), [])])
+    response.menu.extend([(T('Activities Log'), False, URL('student', 'logs_list'), [])])
     response.menu.extend([(T('Reports'), False, URL('student', 'report_list'), [])])
 
 #any user should be able to see this menu
 response.menu.extend([
-    (T('Help'), False, URL(), [
-                               (T('Links'), False, URL('default', 'links'), []),
-                               (T('Files'), False, URL('default', 'files'), []),
-    ])])
+(T('Help'), False, URL(), [
+   (T('Links'), False, URL('default', 'links'), []),
+   (T('Files'), False, URL('default', 'files'), []),
+])])
 
 DEVELOPMENT_MENU = False
 

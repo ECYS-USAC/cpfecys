@@ -8,8 +8,8 @@ def periods():
 
 @auth.requires_login()
 @auth.requires_membership('Super-Administrator')
-def enabled_date():
-    grid = SQLFORM.grid(db.enabled_date)
+def report_restrictions():
+    grid = SQLFORM.grid(db.report_restriction)
     return locals()
 
 @auth.requires_login()
@@ -123,6 +123,7 @@ def assignation_upload():
                                             last_name = usr.lastname,
                                             first_name = usr.firstname)
                         #add user to role 'student'
+                        auth.add_membership('Student', usr)
                 else:
                     assignation = db.user_project((db.user_project.assigned_user == usr.id)&
                                                   (db.user_project.project == project)&

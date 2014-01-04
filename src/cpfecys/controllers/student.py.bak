@@ -3,9 +3,103 @@
 @auth.requires_login()
 @auth.requires_membership('Student')
 def index():
-<<<<<<< HEAD
+    assignations = db((db.user_project.assigned_user == auth.user.id)&
+                      (db.user_project.assigned_user == db.auth_user.id)&
+                      (db.user_project.project == db.project.id)&
+                      (db.project.area_level == db.area_level.id)&
+                      (db.user_project.period == db.period_year.id)).select()
+    def available_reports(assignation_period):
+        import datetime
+        current_date = datetime.datetime.now()
+        #if it is the first semester then the restriction should be:
+        #start date >= January 1 year 00:00:00
+        #end date >= January 1 year 00:00:00
+        #start date < July 1 year 00:00:00
+        #end date < July 1 year 00:00:00
+        #if it is the second semester then the restriction should be:
+        #start date >= July 1 year 00:00:00
+        #end date >= July 1 year 00:00:00
+        #start date < Jan 1 year 00:00:00
+        #end date < Jan 1 year 00:00:00
+        if assignation_period.period == first_period:
+            date_min = datetime.datetime(assignation_period.yearp, 1, 1)
+            date_max = datetime.datetime(assignation_period.yearp, 7, 1)
+        else:
+            date_min = datetime.datetime(assignation_period.yearp, 7, 1)
+            date_max = datetime.datetime(assignation_period.yearp, 1, 1)
+        return db((db.report_restriction.start_date <= current_date)&
+                  (db.report_restriction.end_date >= current_date)&
+                  (db.report_restriction.start_date >= date_min)&
+                  (db.report_restriction.end_date >= date_min)&
+                  (db.report_restriction.start_date < date_max)&
+                  (db.report_restriction.end_date < date_max)&
+                  (db.report_restriction.is_enabled == True))
+    return dict(assignations = assignations,
+                available_reports = available_reports)
+
+@auth.requires_login()
+@auth.requires_membership('Student')
+def report():
+    if (request.args(0) == 'new'):
+        assignation = request.vars['assignation']
+        report_restriction = request.vars['report_restriction']
+        ## TODO: Validate DB report_restriction to obey TIMING rules
+        # Validate report_restriction
+        report_restrict = db.report_restriction(db.report_restriction.id == report_restriction)
+        valid_report = report_restrict != None
+        # Validate assignation belongs to this user
+        assign = db.user_project((db.user_project.id == assignation)&
+                                (db.user_project.assigned_user == auth.user.id)&
+                                (db.user_project.project == db.project.id))
+        valid_assignation = assign != None
+        # Validate there is not an already inserted report
+        valid = db.report((db.report.assignation == assignation)&
+                  (db.report.report_restriction == report_restriction)) is None
+        if not(assignation and report_restriction and valid and valid_assignation and valid_report):
+            session.flash = T('Invalid selected assignation and report. Select a valid one.')
+            redirect(URL('student','index'))
+        #Create New Report
+        return dict(state = 'new',
+                    report_restriction = report_restrict,
+                    assignation = assign)
+    elif (request.args(0) == 'save'):
+        #get the data & save the report
+        assignation = request.vars['assignation']
+        report_restriction = request.vars['report_restriction']
+        # Validate report_restriction
+        report_restrict = db.report_restriction(db.report_restriction.id == report_restriction)
+        valid_report = report_restrict != None
+        # Validate assignation belongs to this user
+        assign = db.user_project((db.user_project.id == assignation)&
+                                (db.user_project.assigned_user == auth.user.id))
+        valid_assignation = assign != None
+        # Validate there is not an already inserted report
+        valid = db.report((db.report.assignation == assignation)&
+                  (db.report.report_restriction == report_restriction)) is None
+        if not(assignation and report_restriction and valid and valid_assignation and valid_report):
+            session.flash = T('Invalid selected assignation and report. Select a valid one.')
+            redirect(URL('student','index'))
+        import datetime
+        current_date = datetime.datetime.now()
+        db.report.insert(created = current_date,
+                         assignation = assignation,
+                         report_restriction = report_restriction,
+                         status = db.report_status(name = 'Draft'))
+        session.flash = T('Draft Saved.')
+        redirect(URL('student','index'))
+    elif (request.args(0) == 'update'):
+        #get the data & save the report
+        report = request.vars['report']
+        if not(report):
+            session.flash = T('Selected report can\'t be updated. Select a valid report.')
+            redirect(URL('student'))
+        import datetime
+        current_date = datetime.datetime.now()
+        #db.report.update(created = current_date, assignation = 
+    else:
+        redirect(URL('student', 'index'))
     return dict()
-    
+
 @auth.requires_login()
 @auth.requires_membership('Student')
 def project_items():
@@ -13,13 +107,13 @@ def project_items():
     cdate = datetime.datetime.now()
     user_project = request.vars['assignation']
     create_current, c_enab_date, creport = False, False, False
-    
+
     project = db((db.user_project.id==user_project)&
                 (db.project.id==db.user_project.project)).select(db.project.ALL).first()
-                
+
     c_enab_date = db((db.enabled_date.start_date <= cdate)&
              (db.enabled_date.end_date >= cdate)).select().first()
-             
+
     if c_enab_date:
         creport = db((db.report_head.repor_user==auth.user.id)&
               (db.report_head.enabled_date == c_enab_date.id)&
@@ -34,9 +128,9 @@ def project_items():
                  (db.report_head.project == project.id)).select()
     else:
         usr_reports = db((db.report_head.repor_user==auth.user.id)&
-                 (db.report_head.project == project.id)).select()          
+                 (db.report_head.project == project.id)).select()
     return locals()
-    
+
 @auth.requires_login()
 @auth.requires_membership('Student')
 def report_detail():
@@ -50,7 +144,7 @@ def report_detail():
                 (db.project.id==db.user_project.project)).select(db.project.ALL).first()
     c_enab_date = db((db.enabled_date.start_date <= cdate)&
              (db.enabled_date.end_date >= cdate)).select().first()
-             
+
     if c_enab_date and project:
         creport_head = db((db.report_head.repor_user==auth.user.id)&
               (db.report_head.enabled_date == c_enab_date.id)&
@@ -61,7 +155,7 @@ def report_detail():
             db.commit()
             go_create = True
     return locals()
-    
+
 def get_report_head(user_project):
     import datetime
     cdate = datetime.datetime.now()
@@ -73,12 +167,12 @@ def get_report_head(user_project):
     if project:
         c_enab_date = db((db.enabled_date.start_date <= cdate)&
                  (db.enabled_date.end_date >= cdate)).select().first()
-             
+
     if c_enab_date and project:
         creport_head = db((db.report_head.repor_user==auth.user.id)&
               (db.report_head.enabled_date == c_enab_date.id)&
               (db.report_head.project == project.id)).select(db.report_head.ALL).first()
-    
+
     return creport_head, c_enab_date
 
 @auth.requires_login()
@@ -115,7 +209,7 @@ def logs_area():
               T('Description:'),
               TEXTAREA(_label=T('Description'), _name="description",
                    requires=IS_NOT_EMPTY()),
-                   
+
               INPUT(_type='submit', _value=T('Save activity')))
     if form.process().accepted:
         date = request.vars['event_date']
@@ -189,7 +283,6 @@ def current_year_period():
         period = first_period
     return db.period_year((db.period_year.yearp == cyear)&
                           (db.period_year.period == period))
-=======
     assignations = db((db.user_project.assigned_user == auth.user.id)&
                       (db.user_project.assigned_user == db.auth_user.id)&
                       (db.user_project.project == db.project.id)&
@@ -212,4 +305,3 @@ def report_list():
                            (db.period_year.id < (final_practice.user_project.period + final_practice.user_project.periods))).select()
     return dict(final_practice = final_practice,
                 available_periods = available_periods)
->>>>>>> ed28a3b123cb5fd47c92ff0f44994d27551b29af

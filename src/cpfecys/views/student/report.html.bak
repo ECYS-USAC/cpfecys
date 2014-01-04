@@ -1,0 +1,8 @@
+{{extend 'template.html'}}
+{{if state=='new':}}
+<h1>{{=T('New Report:')}} <small>{{=report_restriction.name}}</small></h1>
+<h2>
+    {{=T('Project')}} <small>{{=assignation.project.name}}</small>
+</h2>
+<a class="btn btn-active" href="{{=URL('','','')}}">Guardar Borrador</a>
+{{pass}}

@@ -1,13 +1,13 @@
 {{extend 'template.html'}}
 <a onclick="window.history.back()" class="btn" ><i class="icon-arrow-left"></i> Back</a>
-<h2>{{=T('Final Practice Record')}} <small>{{=assignations[0].auth_user.username}}</small></h2>
+<h2>{{=T('Final Practice Record')}} <small>{{=auth.user.username}}</small></h2>
 <h3>
     {{=T('Student Information')}}
 </h3>
 <ul>
-    <li>{{=T('Student')}}: {{=assignations[0].auth_user.username}}</li>
-    <li>{{=T('First Name')}}: {{=assignations[0].auth_user.first_name}}</li>
-    <li>{{=T('Last Name')}}: {{=assignations[0].auth_user.last_name}}</li>
+    <li>{{=T('Student')}}: {{=auth.user.username}}</li>
+    <li>{{=T('First Name')}}: {{=auth.user.first_name}}</li>
+    <li>{{=T('Last Name')}}: {{=auth.user.last_name}}</li>
 </ul>
 <h3>
     {{=T('Assignation History')}}
@@ -34,17 +34,18 @@
                     <table style="width:100%;">
                         <thead>
                             <tr>
-                                <th>ID</th>
-                                <th>Month</th>
-                                <th>Status</th>
-                                <th>Score</th>
-                                <th>Actions</th>
+                                <th>{{=T('Name')}}</th>
+                                <th>{{=T('Month')}}</th>
+                                <th>{{=T('Status')}}</th>
+                                <th>{{=T('Score')}}</th>
+                                <th>{{=T('Actions')}}</th>
                             </tr>
                         </thead>
                         <tbody>
+                            {{for report in item.user_project.report.select():}}
                             <tr>
-                                <td>1</td>
-                                <td>Mayo</td>
+                                <td>{{=db.report_restriction(report.report_restriction).name}}</td>
+                                <td>{{=report.created}}</td>
                                 <td>Calificado</td>
                                 <td>80</td>
                                 <td>
@@ -52,14 +53,26 @@
                                     <a class="btn disabled"> Calificar Reporte</a>
                                 </td>
                             </tr>
+                            {{pass}}
                         </tbody>
                     </table>
                     <div class="row">
                         <div class="span5">
-                            Average Score: 80
+                            <strong>Average Score:</strong> 80
                         </div>
                         <div class="span6">
-                            <a class="pull-right btn"><span class="icon-plus"></span>{{=T('Monthly Report')}}</a>
+                            {{for available_report in available_reports(item.period_year).select():}}
+                            {{if available_report.report.count() < 1:}}
+                            <a class="pull-right btn" href="{{=URL('student','report/new', vars=dict(assignation = item.user_project.id, report_restriction = available_report.id))}}">
+                                <span class="icon-plus"></span>{{=available_report.name}}
+                                <small>
+                                    {{=T('Available:') + ' ' +
+                                    str(available_report.start_date) + ' - ' +
+                                    str(available_report.end_date)}}
+                                </small>
+                            </a>
+                            {{pass}}
+                            {{pass}}
                         </div>
                     </div>
                 </div>
@@ -97,3 +110,6 @@
         {{pass}}
     </div>
 </div>
+{{if request.is_local:}}
+{{=response.toolbar()}}
+{{pass}}
