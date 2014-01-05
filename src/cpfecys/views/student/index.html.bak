@@ -1,5 +1,4 @@
 {{extend 'template.html'}}
-<a onclick="window.history.back()" class="btn" ><i class="icon-arrow-left"></i> Back</a>
 <h2>{{=T('Final Practice Record')}} <small>{{=auth.user.username}}</small></h2>
 <h3>
     {{=T('Student Information')}}
@@ -17,11 +16,11 @@
         {{for item in assignations:}}
         <div class="accordion-heading">
             <a class="accordion-toggle" data-toggle="collapse" data-parent="#practice_assignation_accordion" href="#i">
-                <strong>Project Name:</strong> {{=item.project.name}} | <strong>Area:</strong> {{=item.area_level.name}}
+                <strong>{{=T('Project Name')}}:</strong> {{=item.project.name}} | <strong>{{=T('Area')}}:</strong> {{=item.area_level.name}}
                 <span class="right">
-                    <span><strong>Start:</strong> {{=item.period_year.yearp}} - Semester {{=item.period_year.period}}</span> |
-                    <span><strong>Length:</strong> {{=item.user_project.periods}} Semesters</span> |
-                    <span><strong>Status</strong>: Running</span>
+                    <span><strong>{{=T('Start')}}:</strong> {{=item.period_year.yearp}} - {{=T('Semester')}}  {{=item.period_year.period}}</span> |
+                    <span><strong>{{=T('Length')}}:</strong> {{=item.user_project.periods}} {{=T('Semesters')}}</span> |
+                    <span><strong>{{=T('Status')}}</strong>: Running</span>
                 </span>
             </a>
         </div>
@@ -35,7 +34,8 @@
                         <thead>
                             <tr>
                                 <th>{{=T('Name')}}</th>
-                                <th>{{=T('Month')}}</th>
+                                <th>{{=T('Created Date')}}</th>
+                                <th>{{=T('Delivery Dates')}}</th>
                                 <th>{{=T('Status')}}</th>
                                 <th>{{=T('Score')}}</th>
                                 <th>{{=T('Actions')}}</th>
@@ -43,14 +43,28 @@
                         </thead>
                         <tbody>
                             {{for report in item.user_project.report.select():}}
+                            {{restriction = db.report_restriction(report.report_restriction)}}
                             <tr>
-                                <td>{{=db.report_restriction(report.report_restriction).name}}</td>
+                                <td>{{=restriction.name}}</td>
                                 <td>{{=report.created}}</td>
-                                <td>Calificado</td>
+                                <td>{{=restriction.start_date}} - {{=restriction.end_date}}</td>
+                                <td>{{=report.status['name']}}</td>
                                 <td>80</td>
                                 <td>
-                                    <a class="btn disabled"> Ver Reporte</a>
-                                    <a class="btn disabled"> Calificar Reporte</a>
+                                    <a class="btn"
+                                       href="{{=URL('student', 'report/view', vars=dict(report=report.id))}}">
+                                        <span class="icon-eye-open"></span>
+                                        {{=T('View Report')}}
+                                    </a>
+                                    {{if report.status['name'] == 'Draft' or report.status['name'] == 'Recheck':}}
+                                    {{if restriction.start_date <= current_date and restriction.end_date >= current_date:}}
+                                    <a class="btn"
+                                       href="{{=URL('student', 'report/edit', vars=dict(report=report.id))}}">
+                                        <span class="icon-edit"></span>
+                                        {{=T('Edit Report')}}
+                                    </a>
+                                    {{pass}}
+                                    {{pass}}
                                 </td>
                             </tr>
                             {{pass}}
@@ -58,7 +72,7 @@
                     </table>
                     <div class="row">
                         <div class="span5">
-                            <strong>Average Score:</strong> 80
+                            <strong>{{=T('Average Score')}}:</strong> 80
                         </div>
                         <div class="span6">
                             {{for available_report in available_reports(item.period_year).select():}}

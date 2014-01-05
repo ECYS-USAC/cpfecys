@@ -16,10 +16,3 @@
         {{pass}}
     {{pass}}
 {{pass}}
-      
-{{for notification in notifications:}}
-    {{if notification.visible and !notification.promoted:}}
-        
-    {{pass}}
-<hr>
-{{pass}}

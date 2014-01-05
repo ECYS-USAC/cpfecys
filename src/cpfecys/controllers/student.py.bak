@@ -34,8 +34,11 @@ def index():
                   (db.report_restriction.start_date < date_max)&
                   (db.report_restriction.end_date < date_max)&
                   (db.report_restriction.is_enabled == True))
+    import datetime
+    current_date = datetime.datetime.now()
     return dict(assignations = assignations,
-                available_reports = available_reports)
+                available_reports = available_reports,
+                current_date = current_date)
 
 @auth.requires_login()
 @auth.requires_membership('Student')
@@ -62,10 +65,11 @@ def report():
         return dict(state = 'new',
                     report_restriction = report_restrict,
                     assignation = assign)
-    elif (request.args(0) == 'save'):
+    elif (request.args(0) == 'create'):
         #get the data & save the report
         assignation = request.vars['assignation']
         report_restriction = request.vars['report_restriction']
+        ## TODO: Validate DB report_restriction to obey TIMING rules
         # Validate report_restriction
         report_restrict = db.report_restriction(db.report_restriction.id == report_restriction)
         valid_report = report_restrict != None
@@ -87,15 +91,61 @@ def report():
                          status = db.report_status(name = 'Draft'))
         session.flash = T('Draft Saved.')
         redirect(URL('student','index'))
-    elif (request.args(0) == 'update'):
-        #get the data & save the report
+    elif (request.args(0) == 'edit'):
+        #Get the report id
         report = request.vars['report']
         if not(report):
-            session.flash = T('Selected report can\'t be updated. Select a valid report.')
+            session.flash = T('Selected report can\'t be edited. Select a valid report.')
             redirect(URL('student'))
+        #TODO: Validate that the report belongs to user
+        #TODO: Retrieve report data
+        report = db.report(db.report.id == report)
+        #TODO: Display report data as writable
+        return dict(state = 'edit',
+                    report = report)
+    elif (request.args(0) == 'save'):
+        #get the data & save the report
+        report = request.vars['report']
+        report = db.report(db.report.id == report)
+        ## TODO: Validate DB report_restriction to obey TIMING rules
+        # Validate assignation belongs to this user
+        assign = db.user_project((db.user_project.id == report.assignation)&
+                                (db.user_project.assigned_user == auth.user.id))
+        valid_assignation = assign != None
+        if not(report and valid_assignation):
+            session.flash = T('Invalid selected assignation and report. Select a valid one.')
+            redirect(URL('student','index'))
         import datetime
         current_date = datetime.datetime.now()
-        #db.report.update(created = current_date, assignation = 
+        report.update(created = current_date,
+                      status = db.report_status(name = 'Draft'))
+        session.flash = T('Draft Updated.')
+        redirect(URL('student','index'))
+    elif (request.args(0) == 'acceptance'):
+        #get the data & save the report
+        report = request.vars['report']
+        report = db.report(db.report.id == report)
+        ## TODO: Validate DB report_restriction to obey TIMING rules
+        # Validate assignation belongs to this user
+        assign = db.user_project((db.user_project.id == report.assignation)&
+                                (db.user_project.assigned_user == auth.user.id))
+        valid_assignation = assign != None
+        if not(report and valid_assignation):
+            session.flash = T('Invalid selected assignation and report. Select a valid one.')
+            redirect(URL('student','index'))
+        import datetime
+        current_date = datetime.datetime.now()
+        report.update_record(created = current_date,
+                      status = db.report_status(name = 'Grading'))
+        session.flash = T('Report sent to Grading.')
+        redirect(URL('student','index'))
+    elif (request.args(0) == 'view'):
+        #Get the report id
+        report = request.vars['report']
+        #TODO: validate that the report belongs to user
+        #TODO: retrieve report data
+        #TODO: Display report data as read_only
+        return dict(state='view')
     else:
         redirect(URL('student', 'index'))
     return dict()
