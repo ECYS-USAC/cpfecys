@@ -99,7 +99,7 @@ def report():
         valid = db.report((db.report.assignation == assignation)&
                   (db.report.report_restriction == report_restriction)) is None
         if not(assignation and report_restriction and valid and valid_assignation and valid_report 
-           and val_rep_restr):
+           and valid_rep_restr):
             session.flash = T('Invalid selected assignation and report. Select a valid one.')
             redirect(URL('student','index'))
         import datetime
@@ -117,7 +117,6 @@ def report():
             session.flash = T('Selected report can\'t be edited. Select a valid report.')
             redirect(URL('student'))
         #TODO: Validate that the report belongs to user
-        
         #TODO: Retrieve report data
         report = db.report(db.report.id == report)
         #TODO: Display report data as writable
@@ -133,7 +132,7 @@ def report():
         assign = db.user_project((db.user_project.id == report.assignation)&
                                 (db.user_project.assigned_user == auth.user.id))
         valid_assignation = assign != None
-        if not(report and valid_assignation and val_rep_restr):
+        if not(report and valid_assignation and valid_rep_restr):
             session.flash = T('Invalid selected assignation and report. Select a valid one.')
             redirect(URL('student','index'))
         import datetime
@@ -152,7 +151,7 @@ def report():
         assign = db.user_project((db.user_project.id == report.assignation)&
                                 (db.user_project.assigned_user == auth.user.id))
         valid_assignation = assign != None
-        if not(report and valid_assignation and val_rep_restr):
+        if not(report and valid_assignation and valid_rep_restr):
             session.flash = T('Invalid selected assignation and report. Select a valid one.')
             redirect(URL('student','index'))
         import datetime
