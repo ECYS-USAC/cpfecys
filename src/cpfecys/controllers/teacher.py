@@ -17,10 +17,15 @@ def final_practice():
                         (db.user_project.period == db.period_year.id)).select()
     if not final_practice: redirect(URL('courses'))
     final_practice = final_practice.first()
+    #TODO evaluate if available_periods is really necessary
     available_periods = db((db.period_year.id >= final_practice.user_project.period)&
                            (db.period_year.id < (final_practice.user_project.period + final_practice.user_project.periods))).select()
+    #TODO Only show reports with status of != 'Draft'
+    #TODO (in view) Only allow to grade the ones with status of Grading
+    reports = db(db.report.assignation == final_practice.user_project.id).select()
     return dict(final_practice = final_practice,
-                available_periods = available_periods)
+                available_periods = available_periods,
+                reports = reports)
 
 @auth.requires_login()
 @auth.requires_membership('Teacher')
@@ -40,6 +45,7 @@ def students():
         currentyear_period = current_year_period()
     current_data = db((db.user_project.period <= currentyear_period.id)&
               ((db.user_project.period + db.user_project.periods) > currentyear_period.id)&
+              (db.user_project.project == current_project.project.id)&
               (db.user_project.assigned_user != auth.user.id)).select()
     current_period_name = T(second_period_name)
     if currentyear_period.period == first_period.id:

@@ -29,7 +29,7 @@
                 {{=item.yearp}} - {{=T('Semester')}} {{=item.period}}
                 <span class="right">
                     <span>Average Score: 85</span> |
-                    <span>Delivered Reports: 8/8</span>
+                    <span>Delivered Reports: 4/4</span>
                 </span>
             </a>
         </div>
@@ -39,23 +39,25 @@
                     <thead>
                         <tr>
                             <th>ID</th>
-                            <th>Month</th>
+                            <th>Delivery Date</th>
                             <th>Status</th>
                             <th>Score</th>
                             <th>Actions</th>
                         </tr>
                     </thead>
                     <tbody>
+                        {{for report in reports:}}
                         <tr>
                             <td>1</td>
-                            <td>Mayo</td>
-                            <td>Calificado</td>
+                            <td>{{=report.created}}</td>
+                            <td>{{=report.status['name']}}</td>
                             <td>80</td>
                             <td>
                                 <a class="btn disabled"> Ver Reporte</a>
                                 <a class="btn disabled"> Calificar Reporte</a>
                             </td>
                         </tr>
+                        {{pass}}
                     </tbody>
                 </table>
             </div>
