@@ -46,7 +46,7 @@ def val_rep_restr(report_restriction):
     rep_restr = db((db.report_restriction.id == report_restriction)&
         (db.report_restriction.start_date <= current_date)&
         (db.report_restriction.end_date >= current_date)&
-        (db.report_restriction.is_enabled == True)).select()
+        (db.report_restriction.is_enabled == True)).select().first()
     return rep_restr != None
 
 @auth.requires_login()

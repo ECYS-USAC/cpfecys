@@ -58,11 +58,13 @@
                                     </a>
                                     {{if report.status['name'] == 'Draft' or report.status['name'] == 'Recheck':}}
                                     {{if restriction.start_date <= current_date and restriction.end_date >= current_date:}}
+                                    {{if restriction.is_enabled:}}
                                     <a class="btn"
                                        href="{{=URL('student', 'report/edit', vars=dict(report=report.id))}}">
                                         <span class="icon-edit"></span>
                                         {{=T('Edit Report')}}
                                     </a>
+                                    {{pass}}
                                     {{pass}}
                                     {{pass}}
                                 </td>
