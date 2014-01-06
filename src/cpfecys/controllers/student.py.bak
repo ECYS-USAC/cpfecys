@@ -47,7 +47,7 @@ def val_rep_restr(report_restriction):
         (db.report_restriction.start_date <= current_date)&
         (db.report_restriction.end_date >= current_date)&
         (db.report_restriction.is_enabled)).select()
-    return rep_restr == None
+    return rep_restr != None
 
 @auth.requires_login()
 @auth.requires_membership('Student')
