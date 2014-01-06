@@ -35,7 +35,7 @@ def index():
                   (db.report_restriction.end_date < date_max)&
                   (db.report_restriction.is_enabled == True))
     import datetime
-    current_date = datetime.datetime.now()
+    current_date = datetime.datetime.now().date()
     return dict(assignations = assignations,
                 available_reports = available_reports,
                 current_date = current_date)

@@ -21,7 +21,7 @@ def index():
         #end date >= July 1 year 00:00:00
         #start date < Jan 1 year 00:00:00
         #end date < Jan 1 year 00:00:00
-        if assignation_period.period == first_period:
+        if assignation_period.period == first_period.id:
             date_min = datetime.datetime(assignation_period.yearp, 1, 1)
             date_max = datetime.datetime(assignation_period.yearp, 7, 1)
         else:
