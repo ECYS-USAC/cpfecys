@@ -47,11 +47,15 @@ def val_rep_restr(report_restriction):
         (db.report_restriction.start_date <= current_date)&
         (db.report_restriction.end_date >= current_date)&
         (db.report_restriction.is_enabled == True)).select().first()
-    print db((db.report_restriction.id == report_restriction)&
-        (db.report_restriction.start_date <= current_date)&
-        (db.report_restriction.end_date >= current_date)&
-        (db.report_restriction.is_enabled == True))._select()
     return rep_restr != None
+    
+def val_rep_owner(report):
+    usr_rep = db((db.report.id == report)&
+            (db.report.assignation == db.user_project.id)&
+            (db.user_project.assigned_user == auth.user.id)&
+            (db.user_project.assigned_user == db.auth_user.id)&
+            (db.auth_user.id == auth.user.id))
+    return usr_rep != None
 
 @auth.requires_login()
 @auth.requires_membership('Student')
@@ -117,8 +121,11 @@ def report():
             session.flash = T('Selected report can\'t be edited. Select a valid report.')
             redirect(URL('student'))
         valid_rep_restr = val_rep_restr(report.report_restriction.id)
-        #TODO: Validate that the report belongs to user
-        
+        # Validate that the report belongs to user
+        valid_report_owner = val_rep_owner(report.id)
+        if not(valid_report_owner):
+            session.flash = T('Selected report can\'t be edited. Select a valid report.')
+            redirect(URL('student'))
         #TODO: Display report data as writable
         return dict(state = 'edit',
                     report = report)
@@ -163,7 +170,16 @@ def report():
     elif (request.args(0) == 'view'):
         #Get the report id
         report = request.vars['report']
-        #TODO: validate that the report belongs to user
+        # Validate that the report belongs to user
+        report = db.report(db.report.id == report)
+        if not(report):
+            session.flash = T('Selected report can\'t be edited. Select a valid report.')
+            redirect(URL('student'))
+            
+        valid_report_owner = val_rep_owner(report.id)
+        if not(valid_reoprt_owner):
+            session.flash = T('Selected report can\'t be edited. Select a valid report.')
+            redirect(URL('student'))
         #TODO: retrieve report data
         #TODO: Display report data as read_only
         return dict(state='view')
