@@ -40,7 +40,7 @@ def index():
                 available_reports = available_reports,
                 current_date = current_date)
                 
-def val_rep_restr(report_restriction=False):
+def val_rep_restr(report_restriction):
     import datetime
     current_date = datetime.datetime.now()
     if not report_restriction:
@@ -128,7 +128,7 @@ def report():
         report = request.vars['report']
         report = db.report(db.report.id == report)
         # Validate DB report_restriction to obey TIMING rules
-        valid_rep_restr = val_rep_restr(report_restriction)
+        valid_rep_restr = val_rep_restr(False)
         # Validate assignation belongs to this user
         assign = db.user_project((db.user_project.id == report.assignation)&
                                 (db.user_project.assigned_user == auth.user.id))
