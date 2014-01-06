@@ -46,8 +46,8 @@ def val_rep_restr(report_restriction):
     rep_restr = db((db.report_restriction.id == report_restriction)&
         (db.report_restriction.start_date <= current_date)&
         (db.report_restriction.end_date >= current_date)&
-        (db.report_restriction.is_enabled == True)).select()
-    return rep_restr == None
+        (db.report_restriction.is_enabled)).select()
+    return rep_restr != None
 
 @auth.requires_login()
 @auth.requires_membership('Student')
@@ -107,14 +107,14 @@ def report():
     elif (request.args(0) == 'edit'):
         #Get the report id
         report = request.vars['report']
+        #TODO: Retrieve report data
+        report = db.report(db.report.id == report)
         if not(report):
             session.flash = T('Selected report can\'t be edited. Select a valid report.')
             redirect(URL('student'))
-        valid_rep_restr = val_rep_restr(report.report_restriction)
+        valid_rep_restr = val_rep_restr(report.report_restriction.id)
         #TODO: Validate that the report belongs to user
         
-        #TODO: Retrieve report data
-        report = db.report(db.report.id == report)
         #TODO: Display report data as writable
         return dict(state = 'edit',
                     report = report)
@@ -123,7 +123,7 @@ def report():
         report = request.vars['report']
         report = db.report(db.report.id == report)
         # Validate DB report_restriction to obey TIMING rules
-        valid_rep_restr = val_rep_restr(report.report_restriction)
+        valid_rep_restr = val_rep_restr(report.report_restriction.id)
         # Validate assignation belongs to this user
         assign = db.user_project((db.user_project.id == report.assignation)&
                                 (db.user_project.assigned_user == auth.user.id))
@@ -142,7 +142,7 @@ def report():
         report = request.vars['report']
         report = db.report(db.report.id == report)
         # Validate DB report_restriction to obey TIMING rules
-        valid_rep_restr = val_rep_restr(report.report_restriction)
+        valid_rep_restr = val_rep_restr(report.report_restriction.id)
         # Validate assignation belongs to this user
         assign = db.user_project((db.user_project.id == report.assignation)&
                                 (db.user_project.assigned_user == auth.user.id))
