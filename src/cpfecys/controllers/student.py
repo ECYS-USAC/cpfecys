@@ -39,6 +39,16 @@ def index():
     return dict(assignations = assignations,
                 available_reports = available_reports,
                 current_date = current_date)
+                
+def val_rep_restr(report_restriction):
+    import datetime
+    current_date = datetime.datetime.now()
+    rep_restr = db((db.report_restriction.id == report_restriction)&
+    (db.report_restriction.start_date <= current_date)&
+    (db.report_restriction.end_date >= current_date)&
+    (db.report_restriction.is_enabled))
+    
+    return rep_restr == None
 
 @auth.requires_login()
 @auth.requires_membership('Student')
@@ -46,7 +56,8 @@ def report():
     if (request.args(0) == 'new'):
         assignation = request.vars['assignation']
         report_restriction = request.vars['report_restriction']
-        ## TODO: Validate DB report_restriction to obey TIMING rules
+        # Validate DB report_restriction to obey TIMING rules
+        val_rep_restr = val_rep_restr(report_restriction)
         # Validate report_restriction
         report_restrict = db.report_restriction(db.report_restriction.id == report_restriction)
         valid_report = report_restrict != None
@@ -58,7 +69,8 @@ def report():
         # Validate there is not an already inserted report
         valid = db.report((db.report.assignation == assignation)&
                   (db.report.report_restriction == report_restriction)) is None
-        if not(assignation and report_restriction and valid and valid_assignation and valid_report):
+        if not(assignation and report_restriction and valid and valid_assignation and valid_report and
+           val_rep_restr):
             session.flash = T('Invalid selected assignation and report. Select a valid one.')
             redirect(URL('student','index'))
         #Create New Report
@@ -69,7 +81,8 @@ def report():
         #get the data & save the report
         assignation = request.vars['assignation']
         report_restriction = request.vars['report_restriction']
-        ## TODO: Validate DB report_restriction to obey TIMING rules
+        # Validate DB report_restriction to obey TIMING rules
+        val_rep_restr = val_rep_restr(report_restriction)
         # Validate report_restriction
         report_restrict = db.report_restriction(db.report_restriction.id == report_restriction)
         valid_report = report_restrict != None
@@ -80,7 +93,8 @@ def report():
         # Validate there is not an already inserted report
         valid = db.report((db.report.assignation == assignation)&
                   (db.report.report_restriction == report_restriction)) is None
-        if not(assignation and report_restriction and valid and valid_assignation and valid_report):
+        if not(assignation and report_restriction and valid and valid_assignation and valid_report 
+           and val_rep_restr):
             session.flash = T('Invalid selected assignation and report. Select a valid one.')
             redirect(URL('student','index'))
         import datetime
@@ -107,12 +121,13 @@ def report():
         #get the data & save the report
         report = request.vars['report']
         report = db.report(db.report.id == report)
-        ## TODO: Validate DB report_restriction to obey TIMING rules
+        # Validate DB report_restriction to obey TIMING rules
+        val_rep_restr = val_rep_restr(report_restriction)
         # Validate assignation belongs to this user
         assign = db.user_project((db.user_project.id == report.assignation)&
                                 (db.user_project.assigned_user == auth.user.id))
         valid_assignation = assign != None
-        if not(report and valid_assignation):
+        if not(report and valid_assignation and val_rep_restr):
             session.flash = T('Invalid selected assignation and report. Select a valid one.')
             redirect(URL('student','index'))
         import datetime
@@ -125,12 +140,13 @@ def report():
         #get the data & save the report
         report = request.vars['report']
         report = db.report(db.report.id == report)
-        ## TODO: Validate DB report_restriction to obey TIMING rules
+        # Validate DB report_restriction to obey TIMING rules
+        val_rep_restr = val_rep_restr(report_restriction)
         # Validate assignation belongs to this user
         assign = db.user_project((db.user_project.id == report.assignation)&
                                 (db.user_project.assigned_user == auth.user.id))
         valid_assignation = assign != None
-        if not(report and valid_assignation):
+        if not(report and valid_assignation and val_rep_restr):
             session.flash = T('Invalid selected assignation and report. Select a valid one.')
             redirect(URL('student','index'))
         import datetime
