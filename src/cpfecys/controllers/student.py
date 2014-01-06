@@ -40,13 +40,18 @@ def index():
                 available_reports = available_reports,
                 current_date = current_date)
                 
-def val_rep_restr(report_restriction):
+def val_rep_restr(report_restriction=False):
     import datetime
     current_date = datetime.datetime.now()
-    rep_restr = db((db.report_restriction.id == report_restriction)&
-    (db.report_restriction.start_date <= current_date)&
-    (db.report_restriction.end_date >= current_date)&
-    (db.report_restriction.is_enabled))
+    if not report_restriction:
+        rep_restr = db((db.report_restriction.start_date <= current_date)&
+        (db.report_restriction.end_date >= current_date)&
+        (db.report_restriction.is_enabled)).select()
+    else:
+        rep_restr = db((db.report_restriction.id == report_restriction)&
+        (db.report_restriction.start_date <= current_date)&
+        (db.report_restriction.end_date >= current_date)&
+        (db.report_restriction.is_enabled)).select()
     
     return rep_restr == None
 
