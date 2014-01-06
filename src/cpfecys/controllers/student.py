@@ -127,7 +127,7 @@ def report():
         report = request.vars['report']
         report = db.report(db.report.id == report)
         # Validate DB report_restriction to obey TIMING rules
-        valid_rep_restr = val_rep_restr(False)
+        valid_rep_restr = val_rep_restr(report.report_restriction)
         # Validate assignation belongs to this user
         assign = db.user_project((db.user_project.id == report.assignation)&
                                 (db.user_project.assigned_user == auth.user.id))
