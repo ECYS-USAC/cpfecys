@@ -177,7 +177,7 @@ def report():
             redirect(URL('student'))
             
         valid_report_owner = val_rep_owner(report.id)
-        if not(valid_reoprt_owner):
+        if not(valid_report_owner):
             session.flash = T('Selected report can\'t be edited. Select a valid report.')
             redirect(URL('student'))
         #TODO: retrieve report data

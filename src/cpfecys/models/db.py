@@ -231,54 +231,30 @@ db.define_table('item_type',
                 format='%(name)s'
                 )
 
-db.define_table('item',
-                Field('name', 'string', notnull=True),
-                Field('is_active', 'boolean', notnull=False),
+db.define_table('item_restriction',
+                Field('name', 'string', notnull=False),
+                Field('start_date', 'date', notnull=False),
+                Field('end_date', 'date', notnull=False),
+                Field('is_enabled', 'boolean', notnull=False),
                 Field('permanent', 'boolean', notnull=False),
-                Field('description', 'text', notnull=False),
                 Field('item_type', 'reference item_type'),
-                Field('teacher_only', 'boolean', notnull=True),
-                Field('created', 'reference period_year'),
                 format='%(name)s'
                 )
 
-db.define_table('item_project',
-                Field('assigned_project', 'reference project'),
-                Field('item', 'reference item'),
-                Field('gkey', 'string', notnull=True),
-                Field('assigned_date', 'reference period_year'),
-                Field('is_active', 'boolean', notnull=True),
-                Field('available_periods' , 'integer')
+db.define_table('item_restriction_area', 
+                Field('area_level', 'reference area_level'),
+                Field('item_restriction', 'reference item_restriction'),
                 )
 
-db.define_table('file_item',
-                Field('file_name', 'upload', default='', notnull=True),
-                Field('uploaded', 'datetime', notnull=True),
-                Field('owner_user', 'reference auth_user'),
-                Field('gkey', 'string', notnull=True),
-                format='%(file_name)s'
+db.define_table('item',
+                Field('name', 'string', notnull=True),
+                Field('is_active', 'boolean', notnull=False),
+                Field('description', 'text', notnull=False),
+                Field('teacher_only', 'boolean', notnull=True),
+                Field('created', 'reference period_year'),
+                Field('item_restriction', 'reference item_restriction'),
+                format='%(name)s'
                 )
-
-db.define_table('activity_item',
-                Field('done', 'boolean', notnull=True),
-                Field('completed', 'datetime', notnull=True),
-                Field('owner_user', 'reference auth_user'),
-                Field('gkey', 'string', notnull=True),
-                format='%(done)s'
-                )
-
-db.define_table('user_project_item',
-                Field('item', 'reference item'),
-                Field('file_item', 'reference file_item'),
-                Field('activity_item', 'reference activity_item'),
-                Field('user_project', 'reference user_project'),
-                )
-
-db.define_table('project_item',
-                Field('item', 'reference item'),
-                Field('project', 'reference project'),
-                )
-
 # User Roles
 ## Super-Administrator:
 setup = db.auth_user(db.auth_user.username == 'admin')
