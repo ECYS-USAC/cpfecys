@@ -32,6 +32,7 @@ def final_practice():
 def students():
     #requires parameter of project if none is provided then redirected to courses
     project_id = request.vars['project']
+    #This also validates the current user is assigned in the project
     if not project_id: redirect(URL('courses'))
     current_project = db((db.user_project.assigned_user == auth.user.id)&
                          (db.project.id == project_id)).select().first()
@@ -46,7 +47,9 @@ def students():
     current_data = db((db.user_project.period <= currentyear_period.id)&
               ((db.user_project.period + db.user_project.periods) > currentyear_period.id)&
               (db.user_project.project == current_project.project.id)&
-              (db.user_project.assigned_user != auth.user.id)).select()
+              (db.auth_group.role == 'Student')&
+              (db.auth_membership.group_id == db.auth_group.id)&
+              (db.user_project.assigned_user == db.auth_membership.user_id)).select()
     current_period_name = T(second_period_name)
     if currentyear_period.period == first_period.id:
         current_period_name = T(first_period_name)
