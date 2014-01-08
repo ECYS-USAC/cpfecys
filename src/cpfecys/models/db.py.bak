@@ -22,6 +22,17 @@ else:
     ## from google.appengine.api.memcache import Client
     ## session.connect(request, response, db = MEMDB(Client()))
 
+#Some weird web2py bug fixed here to avoid overwritting code in core
+from gluon.dal import BaseAdapter
+def ADD(self, first, second):
+    print 'changos'
+    if self.is_numerical_type(first.type) or isinstance(first, Field):
+        return '(%s + %s)' % (self.expand(first),
+                              self.expand(second, first.type))
+    else:
+        return self.CONCAT(first, second)
+BaseAdapter.ADD = ADD
+
 ## by default give a view/generic.extension to all actions from localhost
 ## none otherwise. a pattern can be 'controller/function.extension'
 response.generic_patterns = ['*'] if request.is_local else []
