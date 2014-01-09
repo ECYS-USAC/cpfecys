@@ -1,12 +1,11 @@
 {{extend 'template.html'}}
-{{if state=='new':}}
-<h1>{{=T('New Report:')}} <small>{{=report_restriction.name}}</small></h1>
-<h2>
-    {{=T('Project')}} <small>{{=assignation.project.name}}</small>
-</h2>
-<a class="btn" href="{{=URL('student','report/create', vars=dict(assignation = assignation.user_project.id, report_restriction = report_restriction.id))}}">{{=T('Save Draft')}}</a>
-{{elif state == 'edit':}}
+{{if state == 'edit':}}
 <h1>{{=T('Edit Report:')}} <small>{{=report.report_restriction['name']}}</small></h1>
-<a class="btn" href="{{=URL('student','report/save', vars=dict(report = report.id))}}">{{=T('Save Draft')}}</a>
-<a class="btn" href="{{=URL('student','report/acceptance', vars=dict(report = report.id))}}">{{=T('Send to Grading')}}</a>
+
+<a class="btn" href="{{=URL('student','report/save', vars=dict(report = report.id))}}">
+    {{=T('Save Draft')}}
+</a>
+<a class="btn" href="{{=URL('student','report/acceptance', vars=dict(report = report.id))}}">
+    {{=T('Send to Grading')}}
+</a>
 {{pass}}

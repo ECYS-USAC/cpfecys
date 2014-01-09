@@ -68,37 +68,13 @@ def val_rep_owner(report):
             (db.report.assignation == db.user_project.id)&
             (db.user_project.assigned_user == auth.user.id)&
             (db.user_project.assigned_user == db.auth_user.id)&
-            (db.auth_user.id == auth.user.id))
+            (db.auth_user.id == auth.user.id)).select().first()
     return usr_rep != None
 
 @auth.requires_login()
 @auth.requires_membership('Student')
 def report():
-    if (request.args(0) == 'new'):
-        assignation = request.vars['assignation']
-        report_restriction = request.vars['report_restriction']
-        # Validate DB report_restriction to obey TIMING rules
-        valid_rep_restr = val_rep_restr(report_restriction)
-        # Validate report_restriction
-        report_restrict = db.report_restriction(db.report_restriction.id == report_restriction)
-        valid_report = report_restrict != None
-        # Validate assignation belongs to this user
-        assign = db.user_project((db.user_project.id == assignation)&
-                                (db.user_project.assigned_user == auth.user.id)&
-                                (db.user_project.project == db.project.id))
-        valid_assignation = assign != None
-        # Validate there is not an already inserted report
-        valid = db.report((db.report.assignation == assignation)&
-                  (db.report.report_restriction == report_restriction)) is None
-        if not(assignation and report_restriction and valid and valid_assignation and valid_report and
-           valid_rep_restr):
-            session.flash = T('Invalid selected assignation and report. Select a valid one.')
-            redirect(URL('student','index'))
-        #Create New Report
-        return dict(state = 'new',
-                    report_restriction = report_restrict,
-                    assignation = assign)
-    elif (request.args(0) == 'create'):
+    if (request.args(0) == 'create'):
         #get the data & save the report
         assignation = request.vars['assignation']
         report_restriction = request.vars['report_restriction']
@@ -120,12 +96,12 @@ def report():
             redirect(URL('student','index'))
         import datetime
         current_date = datetime.datetime.now()
-        db.report.insert(created = current_date,
-                         assignation = assignation,
-                         report_restriction = report_restriction,
-                         status = db.report_status(name = 'Draft'))
-        session.flash = T('Draft Saved.')
-        redirect(URL('student','index'))
+        report = db.report.insert(created = current_date,
+                             assignation = assignation,
+                             report_restriction = report_restriction,
+                             status = db.report_status(name = 'Draft'))
+        session.flash = T('Report is now a draft.')
+        redirect(URL('student','report/edit', vars = dict(report = report.id)))
     elif (request.args(0) == 'edit'):
         #Get the report id
         report = request.vars['report']

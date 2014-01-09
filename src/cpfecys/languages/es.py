@@ -159,6 +159,7 @@
 'Deliverable Items': 'Entregables',
 'Delivery Dates': 'Delivery Dates',
 'Delivery Items': 'Entregables',
+'Delivery Reports': 'Delivery Reports',
 'Demo': 'Demo',
 'Deploy on Google App Engine': 'Despliegue en Google App Engine',
 'Deployment Recipes': 'Recetas de despliegue',
