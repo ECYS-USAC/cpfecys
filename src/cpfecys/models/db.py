@@ -238,6 +238,7 @@ db.define_table('item_restriction',
                 Field('is_enabled', 'boolean', notnull=False),
                 Field('permanent', 'boolean', notnull=False),
                 Field('item_type', 'reference item_type'),
+                Field('period', 'reference period_year'),
                 format='%(name)s'
                 )
 

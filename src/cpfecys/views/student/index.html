@@ -91,10 +91,31 @@
                             {{pass}}
                         </div>
                     </div>
+                    <p>
+                    <div class="row">
+                        <div class="span5">
+                            <strong>{{=T('Deliverable Items')}}:</strong>
+                        </div>
+                        <div class="span6">
+                            {{for available_item in available_items(item.period_year).select():}}
+                            {{if available_item.item.count() < 1:}}
+                            <a class="pull-right btn" href="{{=URL('student','report/new', vars=dict(assignation = item.user_project.id, report_restriction = available_item.id))}}">
+                                <span class="icon-plus"></span>{{=available_item.name}}
+                                <small>
+                                    {{=T('Available:') + ' ' +
+                                    str(available_item.start_date) + ' - ' +
+                                    str(available_item.end_date)}}
+                                </small>
+                            </a>
+                            {{pass}}
+                            {{pass}}
+                        </div>
+                    </div>
+                    </p>
                 </div>
                 <div class="well item_deliver">
                     <h3>
-                    {{=T('Delivery Items')}}
+                    {{=T('Delivery Reports')}}
                     </h3>
                     <a class="btn"><span class="icon-plus"></span>{{=T('Item Delivery')}}</a>
                     <table style="width:100%;">

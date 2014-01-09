@@ -34,9 +34,23 @@ def index():
                   (db.report_restriction.start_date < date_max)&
                   (db.report_restriction.end_date < date_max)&
                   (db.report_restriction.is_enabled == True))
+        
+    def available_items(assignation_period):
+        import datetime
+        current_date = datetime.datetime.now()
+        if assignation_period.period == first_period.id:
+            date_min = datetime.datetime(assignation_period.yearp, 1, 1)
+            date_max = datetime.datetime(assignation_period.yearp, 7, 1)
+        else:
+            date_min = datetime.datetime(assignation_period.yearp, 7, 1)
+            date_max = datetime.datetime(assignation_period.yearp, 1, 1)
+        return db((db.item_restriction.permanent == True)&
+                    (db.item_restriction.is_enabled == True))
+
     import datetime
     current_date = datetime.datetime.now().date()
     return dict(assignations = assignations,
+                available_items = available_items,
                 available_reports = available_reports,
                 current_date = current_date)
                 
