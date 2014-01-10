@@ -220,9 +220,7 @@ db.define_table('log_entry',
                 Field('log_type', 'reference log_type'),
                 Field('entry_date', 'date', notnull=True),
                 Field('description', 'text', notnull=True),
-                Field('entry_user', 'reference auth_user'),
-                Field('project', 'reference project'),
-                Field('head', 'reference report_restriction'),
+                Field('report', 'reference report'),
                 format='%(entry_date)s'
                 )
 #Project item requirements structure

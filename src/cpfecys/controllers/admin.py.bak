@@ -1,5 +1,8 @@
 # coding: utf8
 # intente algo como
+def changos():
+    return auth.wiki()
+
 @auth.requires_login()
 @auth.requires_membership('Super-Administrator')
 def periods():
@@ -50,7 +53,7 @@ def notifications_manager():
 def items_manager():
     if request.function == 'new':
         db.item.created.writable=db.item.created.readable=False
-    grid = SQLFORM.grid(db.item)
+    grid = SQLFORM.smartgrid(db.item_restriction, linked_tables=['item_restriction_area'])
     return dict(grid=grid)
 
 @auth.requires_login()

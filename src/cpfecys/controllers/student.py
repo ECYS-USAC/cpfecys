@@ -66,9 +66,7 @@ def val_rep_restr(report_restriction):
 def val_rep_owner(report):
     usr_rep = db((db.report.id == report)&
             (db.report.assignation == db.user_project.id)&
-            (db.user_project.assigned_user == auth.user.id)&
-            (db.user_project.assigned_user == db.auth_user.id)&
-            (db.auth_user.id == auth.user.id)).select().first()
+            (db.user_project.assigned_user == auth.user.id)).select().first()
     return usr_rep != None
 
 @auth.requires_login()
@@ -116,8 +114,22 @@ def report():
         if not(valid_report_owner):
             session.flash = T('Selected report can\'t be edited. Select a valid report.')
             redirect(URL('student'))
-        #TODO: Display report data as writable
+        # Markmin formatting of reports
+        LATEX = '<img src="http://chart.apis.google.com/chart?cht=tx&chl=%s" align="center"/>'
+        markmin_settings = {
+            'latex':lambda code: LATEX % code.replace('"','"'),
+            'code_cpp':lambda text: CODE(text,language='cpp').xml(),
+            'code_java':lambda text: CODE(text,language='java').xml(),
+            'code_python':lambda text: CODE(text,language='python').xml(),
+            'code_html':lambda text: CODE(text,language='html').xml()}
         return dict(state = 'edit',
+                    log_types = db(db.log_type.id > 0).select(),
+                    logs = db((db.log_entry.id > 0)&
+                              (db.log_entry.report == report.id)).select(),
+                    anomalies = db((db.log_type.name == 'Anomaly')&
+                                   (db.log_entry.log_type == db.log_type.id)&
+                                   (db.log_entry.report == report.id)).count(),
+                    markmin_settings = markmin_settings,
                     report = report)
     elif (request.args(0) == 'save'):
         #get the data & save the report
@@ -165,7 +177,6 @@ def report():
         if not(report):
             session.flash = T('Selected report can\'t be edited. Select a valid report.')
             redirect(URL('student'))
-            
         valid_report_owner = val_rep_owner(report.id)
         if not(valid_report_owner):
             session.flash = T('Selected report can\'t be edited. Select a valid report.')
@@ -175,6 +186,73 @@ def report():
         return dict(state='view')
     else:
         redirect(URL('student', 'index'))
+    return dict()
+
+@auth.requires_login()
+@auth.requires_membership('Student')
+def log():
+    if (request.args(0) == 'save'):
+        # validate the user owns this report
+        report = request.vars['report']
+        report = db.report(db.report.id == report)
+        valid_report = report != None
+        if valid_report: valid_report = val_rep_owner(report.id)
+        # validate report is editable
+        if valid_report: valid_report = val_rep_restr(report.report_restriction)
+        # validate we receive log-date, log-type, log-content
+        log_type = request.vars['log-type']
+        log_date = request.vars['log-date']
+        log_content = request.vars['log-content']
+        if valid_report: valid_report = (log_type and log_date and log_content)
+        if valid_report:
+            db.log_entry.insert(log_type = log_type,
+                                entry_date = log_date,
+                                description = log_content,
+                                report = report.id)
+            session.flash = T('Log added')
+            redirect(URL('student', 'report/edit', vars=dict(report=report.id)))
+        else:
+            session.flash = T('Operation not allowed.')
+            redirect(URL('student', 'index'))
+    elif (request.args(0) == 'update'):
+        # validate the requested log
+        log = request.vars['log']
+        log = db.log_entry(db.log_entry.id == log)
+        valid_log = log != None
+        # validate log report owner is valid
+        if valid_log: valid_log = val_rep_owner(log.report)
+        # validate report is editable
+        if valid_log: valid_log = val_rep_restr(log.report['report_restriction'])
+        # validate we receive log-date, log-type, log-content
+        log_type = request.vars['log-type']
+        log_date = request.vars['log-date']
+        log_content = request.vars['log-content']
+        if valid_log: valid_log = (log_type and log_date and log_content)
+        if valid_log:
+            log.update_record(log_type = log_type,
+                              entry_date = log_date,
+                              description = log_content)
+            session.flash = T('Log Aupdated')
+            redirect(URL('student', 'report/edit', vars=dict(report=log.report)))
+        else:
+            session.flash = T('Operation not allowed.')
+            redirect(URL('student', 'index'))
+    elif (request.args(0) == 'delete'):
+        # validate the requested log
+        log = request.vars['log']
+        log = db.log_entry(db.log_entry.id == log)
+        valid_log = log != None
+        # validate log report owner is valid
+        if valid_log: valid_log = val_rep_owner(log.report)
+        # validate report is editable
+        if valid_log: valid_log = val_rep_restr(log.report['report_restriction'])
+        if valid_log:
+            log.delete_record()
+            session.flash = T('Log Deleted')
+            redirect(URL('student', 'report/edit', vars=dict(report=log.report)))
+        else:
+            session.flash = T('Operation not allowed.')
+            redirect(URL('student', 'index'))
     return dict()
 
 @auth.requires_login()
