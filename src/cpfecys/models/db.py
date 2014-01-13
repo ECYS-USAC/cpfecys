@@ -58,7 +58,8 @@ auth.settings.extra_fields['auth_user']= [
                   Field('phone', 'string', length=16, notnull=False),
                   Field('working', 'boolean', notnull=False),
                   Field('work_address', 'string',length=255, notnull=False),
-                  Field('uv_token', 'string', length=64, notnull=False),]
+                  Field('uv_token', 'string', length=64, notnull=False),
+                  Field('data_updated', 'boolean', notnull=False),]
 
 crud, service, plugins = Crud(db), Service(), PluginManager()
 
@@ -254,6 +255,19 @@ db.define_table('item',
                 Field('item_restriction', 'reference item_restriction'),
                 format='%(name)s'
                 )
+
+#User updated data validation function
+def user_updated_data():
+    if auth.user != None:
+        groups = db((db.auth_membership.user_id==auth.user.id)& \
+                        (db.auth_group.role=='Student')& \
+                        (db.auth_group.id==db.auth_membership.group_id)). \
+                        select().first()
+        if groups != None:
+            return db(db.auth_user.id==auth.user.id).select().first().data_updated
+        else:
+            return True
+
 # User Roles
 ## Super-Administrator:
 setup = db.auth_user(db.auth_user.username == 'admin')

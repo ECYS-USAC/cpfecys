@@ -58,6 +58,11 @@ response.menu.extend([
    (T('Files'), False, URL('default', 'files'), []),
 ])])
 
+if auth.user != None:
+    cuser = db(db.auth_user.id==auth.user.id).select().first()
+    if cuser.data_updated == None or not cuser.data_updated:
+        response.menu = []
+
 DEVELOPMENT_MENU = False
 
 #########################################################################

@@ -2,6 +2,7 @@
 # intente algo como
 @auth.requires_login()
 @auth.requires_membership('Student')
+@auth.requires(user_updated_data())
 def index():
     assignations = db((db.user_project.assigned_user == auth.user.id)&
                       (db.user_project.assigned_user == db.auth_user.id)&
@@ -53,7 +54,7 @@ def index():
                 available_items = available_items,
                 available_reports = available_reports,
                 current_date = current_date)
-                
+
 def val_rep_restr(report_restriction):
     import datetime
     current_date = datetime.datetime.now()
@@ -71,6 +72,7 @@ def val_rep_owner(report):
 
 @auth.requires_login()
 @auth.requires_membership('Student')
+@auth.requires(user_updated_data())
 def report():
     if (request.args(0) == 'create'):
         #get the data & save the report
@@ -190,6 +192,7 @@ def report():
 
 @auth.requires_login()
 @auth.requires_membership('Student')
+@auth.requires(user_updated_data())
 def log():
     if (request.args(0) == 'save'):
         # validate the user owns this report
@@ -257,6 +260,7 @@ def log():
 
 @auth.requires_login()
 @auth.requires_membership('Student')
+@auth.requires(user_updated_data())
 def project_items():
     import datetime
     cdate = datetime.datetime.now()
@@ -288,6 +292,7 @@ def project_items():
 
 @auth.requires_login()
 @auth.requires_membership('Student')
+@auth.requires(user_updated_data())
 def report_detail():
     import datetime
     report = request.vars['report']
@@ -332,6 +337,7 @@ def get_report_head(user_project):
 
 @auth.requires_login()
 @auth.requires_membership('Student')
+@auth.requires(user_updated_data())
 def logs_list():
     report = False
     report = request.vars['report']
@@ -349,6 +355,7 @@ def logs_list():
 
 @auth.requires_login()
 @auth.requires_membership('Student')
+@auth.requires(user_updated_data())
 def logs_area():
     log_types = db(db.log_type).select()
     log_count = len(log_types)
@@ -399,6 +406,7 @@ def logs_area():
 
 @auth.requires_login()
 @auth.requires_membership('Student')    
+@auth.requires(user_updated_data())
 def courses():
     year_period = request.vars['year_period']
     max_display = 1
