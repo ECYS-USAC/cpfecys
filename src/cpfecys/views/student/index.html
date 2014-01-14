@@ -92,20 +92,20 @@
                     <p>
                     <div class="row">
                         <div class="span5">
-                            <strong>{{=T('Deliverable Items')}}:</strong>
+                            <strong>{{=T('Period Items')}}:</strong>
                         </div>
                         <div class="span6">
-                            {{for available_item in available_items(item.period_year).select():}}
-                            {{if available_item.item.count() < 1:}}
-                            <a class="pull-right btn" href="{{=URL('student','report/new', vars=dict(assignation = item.user_project.id, report_restriction = available_item.id))}}">
-                                <span class="icon-plus"></span>{{=available_item.name}}
-                                <small>
-                                    {{=T('Available:') + ' ' +
-                                    str(available_item.start_date) + ' - ' +
-                                    str(available_item.end_date)}}
-                                </small>
-                            </a>
-                            {{pass}}
+                            {{for available_item in available_items(item.period_year, item.project).select(db.item_restriction.ALL):}}
+                                {{if available_item.item.count() < 1:}}
+                                <a class="pull-right btn" href="{{=URL('student','item/create', vars=dict(assignation = item.user_project.id, report_restriction = available_item.id))}}">
+                                    <span class="icon-plus"></span>{{=available_item.name}}
+                                    <small>
+                                        {{=T('Available:') + ' ' +
+                                        str(available_item.start_date) + ' - ' +
+                                        str(available_item.end_date)}}
+                                    </small>
+                                </a>
+                                {{pass}}
                             {{pass}}
                         </div>
                     </div>

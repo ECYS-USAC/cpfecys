@@ -34,12 +34,18 @@ def index():
                   (db.report_restriction.end_date >= date_min)&
                   (db.report_restriction.start_date < date_max)&
                   (db.report_restriction.end_date < date_max)&
+<<<<<<< HEAD
                   (db.report_restriction.is_enabled == True)&
                   (db.report.report_restriction == db.report_restriction.id)&
                   (db.user_project.id == db.report.assignation)&
                   (db.user_project.assigned_user == auth.user.id))
 
+    def available_items(assignation_period):
+=======
+                  (db.report_restriction.is_enabled == True))
+        
     def available_items(assignation_period, project):
+>>>>>>> 6e1ed674c9c5b15277c1e64a87806f9504cf22ea
         import datetime
         current_date = datetime.datetime.now()
         if assignation_period.period == first_period.id:
@@ -48,8 +54,14 @@ def index():
         else:
             date_min = datetime.datetime(assignation_period.yearp, 7, 1)
             date_max = datetime.datetime(assignation_period.yearp, 1, 1)
-        return db((db.item_restriction.permanent == True)&
-                    (db.item_restriction.is_enabled == True))
+        return db((db.item_restriction.permanent==True)&
+                    (db.item_restriction.is_enabled==True)&
+                    (db.item_restriction_area.item_restriction==\
+                        db.item_restriction.id)&
+                    (db.item_restriction_area.area_level==\
+                        db.area_level.id)&
+                    (db.item_restriction_area.area_level==\
+                        project.area_level.id))
 
     import datetime
     current_date = datetime.datetime.now().date()
