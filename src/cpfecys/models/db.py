@@ -256,17 +256,17 @@ db.define_table('item',
                 format='%(name)s'
                 )
 
-#User updated data validation function
-def user_updated_data():
-    if auth.user != None:
-        groups = db((db.auth_membership.user_id==auth.user.id)& \
-                        (db.auth_group.role=='Student')& \
-                        (db.auth_group.id==db.auth_membership.group_id)). \
-                        select().first()
-        if groups != None:
-            return db(db.auth_user.id==auth.user.id).select().first().data_updated
-        else:
-            return True
+#User updated data validation
+if auth.user != None:
+    groups = db((db.auth_membership.user_id==auth.user.id)& \
+                    (db.auth_group.role=='Student')& \
+                    (db.auth_group.id==db.auth_membership.group_id)). \
+                    select().first()
+    if groups != None:
+        print request.env.path_info
+        if not db(db.auth_user.id==auth.user.id).select().first().data_updated:
+                if request.env.path_info != '/cpfecys/student/update_data':
+                    redirect(URL('student','update_data'))
 
 # User Roles
 ## Super-Administrator:

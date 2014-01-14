@@ -1,13 +1,4 @@
 {{extend 'template.html'}}
-
-{{if update_data_form:}}
-<div class="span6">
-    <div class="hero-unit">
-    <h2>{{=T("Please Update your Data before proceed")}}</h2>
-        {{=form}}
-    </div>
-</div>
-{{else:}}
     {{for notification in notifications:}}
         {{if notification.visible:}}
             {{if notification.promoted:}}
@@ -23,4 +14,3 @@
             {{pass}}
         {{pass}}
     {{pass}}
-{{pass}}
