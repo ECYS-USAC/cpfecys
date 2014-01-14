@@ -78,8 +78,10 @@
                         </div>
                         <div class="span6">
                             {{for available_report in available_reports(item.period_year).select():}}
-                            {{if available_report.report.count() < 1:}}
-                            <a class="pull-right btn" href="{{=URL('student','report/new', vars=dict(assignation = item.user_project.id, report_restriction = available_report.id))}}">
+                            {{if db((db.report.report_restriction == available_report.id)&
+                                (db.report.assignation == db.user_project.id)&
+                                (db.user_project.assigned_user == auth.user.id)).count() < 1:}}
+                            <a class="pull-right btn" href="{{=URL('student','report/create', vars=dict(assignation = item.user_project.id, report_restriction = available_report.id))}}">
                                 <span class="icon-plus"></span>{{=available_report.name}}
                                 <small>
                                     {{=T('Available:') + ' ' +

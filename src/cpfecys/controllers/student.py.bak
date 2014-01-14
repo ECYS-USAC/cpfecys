@@ -33,8 +33,11 @@ def index():
                   (db.report_restriction.end_date >= date_min)&
                   (db.report_restriction.start_date < date_max)&
                   (db.report_restriction.end_date < date_max)&
-                  (db.report_restriction.is_enabled == True))
-        
+                  (db.report_restriction.is_enabled == True)&
+                  (db.report.report_restriction == db.report_restriction.id)&
+                  (db.user_project.id == db.report.assignation)&
+                  (db.user_project.assigned_user == auth.user.id))
+
     def available_items(assignation_period):
         import datetime
         current_date = datetime.datetime.now()
@@ -53,7 +56,7 @@ def index():
                 available_items = available_items,
                 available_reports = available_reports,
                 current_date = current_date)
-                
+
 def val_rep_restr(report_restriction):
     import datetime
     current_date = datetime.datetime.now()
@@ -62,7 +65,7 @@ def val_rep_restr(report_restriction):
         (db.report_restriction.end_date >= current_date)&
         (db.report_restriction.is_enabled == True)).select().first()
     return rep_restr != None
-    
+
 def val_rep_owner(report):
     usr_rep = db((db.report.id == report)&
             (db.report.assignation == db.user_project.id)&
@@ -71,6 +74,7 @@ def val_rep_owner(report):
 
 @auth.requires_login()
 @auth.requires_membership('Student')
+@auth.requires(user_updated_data())
 def report():
     if (request.args(0) == 'create'):
         #get the data & save the report
@@ -88,7 +92,7 @@ def report():
         # Validate there is not an already inserted report
         valid = db.report((db.report.assignation == assignation)&
                   (db.report.report_restriction == report_restriction)) is None
-        if not(assignation and report_restriction and valid and valid_assignation and valid_report 
+        if not(assignation and report_restriction and valid and valid_assignation and valid_report
            and valid_rep_restr):
             session.flash = T('Invalid selected assignation and report. Select a valid one.')
             redirect(URL('student','index'))
@@ -128,7 +132,7 @@ def report():
                               (db.log_entry.report == report.id)).select(),
                     anomalies = db((db.log_type.name == 'Anomaly')&
                                    (db.log_entry.log_type == db.log_type.id)&
-                                   (db.log_entry.report == report.id)).count()
+                                   (db.log_entry.report == report.id)).count(),
                     markmin_settings = markmin_settings,
                     report = report)
     elif (request.args(0) == 'save'):
@@ -190,6 +194,7 @@ def report():
 
 @auth.requires_login()
 @auth.requires_membership('Student')
+@auth.requires(user_updated_data())
 def log():
     if (request.args(0) == 'save'):
         # validate the user owns this report
@@ -257,6 +262,7 @@ def log():
 
 @auth.requires_login()
 @auth.requires_membership('Student')
+@auth.requires(user_updated_data())
 def project_items():
     import datetime
     cdate = datetime.datetime.now()
@@ -288,6 +294,7 @@ def project_items():
 
 @auth.requires_login()
 @auth.requires_membership('Student')
+@auth.requires(user_updated_data())
 def report_detail():
     import datetime
     report = request.vars['report']
@@ -332,6 +339,7 @@ def get_report_head(user_project):
 
 @auth.requires_login()
 @auth.requires_membership('Student')
+@auth.requires(user_updated_data())
 def logs_list():
     report = False
     report = request.vars['report']
@@ -349,6 +357,7 @@ def logs_list():
 
 @auth.requires_login()
 @auth.requires_membership('Student')
+@auth.requires(user_updated_data())
 def logs_area():
     log_types = db(db.log_type).select()
     log_count = len(log_types)
@@ -359,7 +368,7 @@ def logs_area():
                requires=IS_NOT_EMPTY()),
               T('Type:'),
               SELECT(_name="type_select", *[OPTION(log_types[i].name,
-                                  _value=str(log_types[i].id)) 
+                                  _value=str(log_types[i].id))
                                   for i in range(log_count)]),
               T('Description:'),
               TEXTAREA(_label=T('Description'), _name="description",
@@ -372,7 +381,7 @@ def logs_area():
         description = request.vars['description']
         user_project = request.vars['assignation']
         creport_head, c_enab_date = get_report_head(user_project)
-        
+
         if creport_head and c_enab_date:
             db.log_entry.insert(entry_date=date, log_type=log_type,
                     description=description, entry_user=auth.user.id,
@@ -390,15 +399,16 @@ def logs_area():
                                 and no report set created')
                 redirect(URL('student', 'courses'))
         redirect(URL('logs_list', vars=dict(date=c_enab_date.id, assignation=user_project)))
-        
+
     elif form.errors:
         response.flash = 'form has errors'
     else:
-        response.flash = 'please fill the form'    
+        response.flash = 'please fill the form'
     return locals()
 
 @auth.requires_login()
-@auth.requires_membership('Student')    
+@auth.requires_membership('Student')
+@auth.requires(user_updated_data())
 def courses():
     year_period = request.vars['year_period']
     max_display = 1

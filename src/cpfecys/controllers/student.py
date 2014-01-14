@@ -2,6 +2,7 @@
 # intente algo como
 @auth.requires_login()
 @auth.requires_membership('Student')
+@auth.requires(user_updated_data())
 def index():
     assignations = db((db.user_project.assigned_user == auth.user.id)&
                       (db.user_project.assigned_user == db.auth_user.id)&
@@ -33,8 +34,11 @@ def index():
                   (db.report_restriction.end_date >= date_min)&
                   (db.report_restriction.start_date < date_max)&
                   (db.report_restriction.end_date < date_max)&
-                  (db.report_restriction.is_enabled == True))
-        
+                  (db.report_restriction.is_enabled == True)&
+                  (db.report.report_restriction == db.report_restriction.id)&
+                  (db.user_project.id == db.report.assignation)&
+                  (db.user_project.assigned_user == auth.user.id))
+
     def available_items(assignation_period):
         import datetime
         current_date = datetime.datetime.now()
@@ -62,7 +66,7 @@ def val_rep_restr(report_restriction):
         (db.report_restriction.end_date >= current_date)&
         (db.report_restriction.is_enabled == True)).select().first()
     return rep_restr != None
-    
+
 def val_rep_owner(report):
     usr_rep = db((db.report.id == report)&
             (db.report.assignation == db.user_project.id)&
@@ -71,100 +75,7 @@ def val_rep_owner(report):
 
 @auth.requires_login()
 @auth.requires_membership('Student')
-def update_data():
-    update_data_form = False
-    if auth.user != None:
-        cuser = db(db.auth_user.id==auth.user.id).select().first()
-        form = FORM(
-                        DIV(LABEL(T('First Name:')),
-                                    INPUT(_name="first_name", 
-                                        _type="text", _id="first_name", 
-                                        _value=cuser.first_name,
-                                        requires=IS_NOT_EMPTY())),
-
-                        DIV(LABEL(T('Last Name:')),
-                                       INPUT(_name="last_name", 
-                                        _type="text", _id="last_name", 
-                                         _value=cuser.last_name, 
-                                         requires=IS_NOT_EMPTY())),
-
-                        DIV(LABEL(T('Email:')),
-                                       INPUT(_name="email", 
-                                        _type="text", _id="email", 
-                                        _value=cuser.email, 
-                                        requires=IS_NOT_EMPTY())),
-
-                        DIV(LABEL(T('Password: (Leave the same for no \
-                            change)')),
-                                      INPUT(_name="password", 
-                                        _type="password", _id="password", 
-                                        _value=cuser.password, 
-                                        requires=IS_NOT_EMPTY())),
-
-                        DIV(LABEL(T('Repeat password: (Leave the blank for \
-                            no change)')),
-                                      INPUT(_name="repass", 
-                                        _type="password", _id="repass")),
-
-                        DIV(LABEL(T('Phone:')),
-                                      INPUT(_name="phone", _type="text", 
-                                        _id="phone", _value=cuser.phone, 
-                                        requires=IS_LENGTH(minsize=8, 
-                                                        maxsize=12))),
-
-                        DIV(LABEL(T('Working:')),
-                                      INPUT(_name="working", 
-                                        _type="checkbox", _id="working", 
-                                        _value=cuser.working)),
-
-                        DIV(LABEL(T('Work Address:')),
-                                      INPUT(_name="work_address", 
-                                        _type="text", _id="work_address", 
-                                        _value=cuser.work_address)),
-                        BR(),
-                        DIV(INPUT(_type='submit', 
-                            _value=T('Update Profile'), 
-                            _class="btn-primary")),
-                            _class="form-horizontal",)
-        if form.process().accepted:
-            first_name = request.vars['first_name']
-            last_name = request.vars['last_name']
-            email = request.vars['email']
-            password = request.vars['password']
-            repass = request.vars['repass']
-            phone = request.vars['phone']
-            working = request.vars['working']
-            work_address = request.vars['work_address']
-
-            #TODO analyze for aditional security steps
-            cuser=db(db.auth_user.id==auth.user.id).select().first()
-            if cuser != None:
-                cuser.first_name = first_name
-                cuser.last_name = last_name
-                cuser.email = email
-                cuser.phone = phone
-                cuser.data_updated = True
-                if password == repass and len(repass) > 0:
-                    #TODO Fix password update
-                    cuser.password = db.auth_user.password.validate(password)
-                if working:
-                    cuser.working = working
-                    cuser.work_address = work_address
-
-                cuser.update_record()
-                response.flash = 'User data updated!'
-                redirect(URL('default', 'index'))
-            else:
-                response.flash = 'Error!'
-
-        elif form.errors:
-            response.flash = 'form has errors'
-        else:
-            response.flash = 'please fill the form'
-    return dict(form=form, update_data_form=True)  
-
-@auth.requires_login()
-@auth.requires_membership('Student')
+@auth.requires(user_updated_data())
 def report():
     if (request.args(0) == 'create'):
         #get the data & save the report
@@ -182,7 +93,7 @@ def report():
         # Validate there is not an already inserted report
         valid = db.report((db.report.assignation == assignation)&
                   (db.report.report_restriction == report_restriction)) is None
-        if not(assignation and report_restriction and valid and valid_assignation and valid_report 
+        if not(assignation and report_restriction and valid and valid_assignation and valid_report
            and valid_rep_restr):
             session.flash = T('Invalid selected assignation and report. Select a valid one.')
             redirect(URL('student','index'))
@@ -284,6 +195,7 @@ def report():
 
 @auth.requires_login()
 @auth.requires_membership('Student')
+@auth.requires(user_updated_data())
 def log():
     if (request.args(0) == 'save'):
         # validate the user owns this report
@@ -351,6 +263,7 @@ def log():
 
 @auth.requires_login()
 @auth.requires_membership('Student')
+@auth.requires(user_updated_data())
 def project_items():
     import datetime
     cdate = datetime.datetime.now()
@@ -382,6 +295,7 @@ def project_items():
 
 @auth.requires_login()
 @auth.requires_membership('Student')
+@auth.requires(user_updated_data())
 def report_detail():
     import datetime
     report = request.vars['report']
@@ -426,6 +340,7 @@ def get_report_head(user_project):
 
 @auth.requires_login()
 @auth.requires_membership('Student')
+@auth.requires(user_updated_data())
 def logs_list():
     report = False
     report = request.vars['report']
@@ -443,6 +358,7 @@ def logs_list():
 
 @auth.requires_login()
 @auth.requires_membership('Student')
+@auth.requires(user_updated_data())
 def logs_area():
     log_types = db(db.log_type).select()
     log_count = len(log_types)
@@ -453,7 +369,7 @@ def logs_area():
                requires=IS_NOT_EMPTY()),
               T('Type:'),
               SELECT(_name="type_select", *[OPTION(log_types[i].name,
-                                  _value=str(log_types[i].id)) 
+                                  _value=str(log_types[i].id))
                                   for i in range(log_count)]),
               T('Description:'),
               TEXTAREA(_label=T('Description'), _name="description",
@@ -466,7 +382,7 @@ def logs_area():
         description = request.vars['description']
         user_project = request.vars['assignation']
         creport_head, c_enab_date = get_report_head(user_project)
-        
+
         if creport_head and c_enab_date:
             db.log_entry.insert(entry_date=date, log_type=log_type,
                     description=description, entry_user=auth.user.id,
@@ -484,15 +400,16 @@ def logs_area():
                                 and no report set created')
                 redirect(URL('student', 'courses'))
         redirect(URL('logs_list', vars=dict(date=c_enab_date.id, assignation=user_project)))
-        
+
     elif form.errors:
         response.flash = 'form has errors'
     else:
-        response.flash = 'please fill the form'    
+        response.flash = 'please fill the form'
     return locals()
 
 @auth.requires_login()
-@auth.requires_membership('Student')    
+@auth.requires_membership('Student')
+@auth.requires(user_updated_data())
 def courses():
     year_period = request.vars['year_period']
     max_display = 1
