@@ -244,6 +244,7 @@ db.define_table('item_restriction',
 db.define_table('item_restriction_area', 
                 Field('area_level', 'reference area_level'),
                 Field('item_restriction', 'reference item_restriction'),
+                Field('is_enabled', 'boolean', notnull=False),
                 )
 
 db.define_table('item',
@@ -253,6 +254,7 @@ db.define_table('item',
                 Field('teacher_only', 'boolean', notnull=True),
                 Field('created', 'reference period_year'),
                 Field('item_restriction', 'reference item_restriction'),
+                Field('assignation', 'reference user_project'),
                 format='%(name)s'
                 )
 

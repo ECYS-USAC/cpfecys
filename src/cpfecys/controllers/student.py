@@ -35,7 +35,7 @@ def index():
                   (db.report_restriction.end_date < date_max)&
                   (db.report_restriction.is_enabled == True))
         
-    def available_items(assignation_period):
+    def available_items(assignation_period, project):
         import datetime
         current_date = datetime.datetime.now()
         if assignation_period.period == first_period.id:
@@ -44,8 +44,14 @@ def index():
         else:
             date_min = datetime.datetime(assignation_period.yearp, 7, 1)
             date_max = datetime.datetime(assignation_period.yearp, 1, 1)
-        return db((db.item_restriction.permanent == True)&
-                    (db.item_restriction.is_enabled == True))
+        return db((db.item_restriction.permanent==True)&
+                    (db.item_restriction.is_enabled==True)&
+                    (db.item_restriction_area.item_restriction==\
+                        db.item_restriction.id)&
+                    (db.item_restriction_area.area_level==\
+                        db.area_level.id)&
+                    (db.item_restriction_area.area_level==\
+                        project.area_level.id))
 
     import datetime
     current_date = datetime.datetime.now().date()
