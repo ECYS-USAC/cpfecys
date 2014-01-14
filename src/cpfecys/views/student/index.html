@@ -78,6 +78,9 @@
                         </div>
                         <div class="span6">
                             {{for available_report in available_reports(item.period_year).select():}}
+                            {{if db((db.report.report_restriction == available_report.id)&
+                                  (db.user_project.id == db.report.assignation)&
+                                (db.user_project.assigned_user == auth.user.id)).count() < 1:}}
                             <a class="pull-right btn" href="{{=URL('student','report/create', vars=dict(assignation = item.user_project.id, report_restriction = available_report.id))}}">
                                 <span class="icon-plus"></span>{{=available_report.name}}
                                 <small>
@@ -87,12 +90,13 @@
                                 </small>
                             </a>
                             {{pass}}
+                            {{pass}}
                         </div>
                     </div>
                     <p>
                     <div class="row">
                         <div class="span5">
-                            <strong>{{=T('Period Items')}}:</strong>
+                            <strong>{{=T('Deliverable Items')}}:</strong>
                         </div>
                         <div class="span6">
                             {{for available_item in available_items(item.period_year, item.project).select(db.item_restriction.ALL):}}

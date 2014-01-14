@@ -265,7 +265,7 @@ if auth.user != None:
                     (db.auth_group.id==db.auth_membership.group_id)). \
                     select().first()
     if groups != None:
-        print request.env.path_info
+        #print request.env.path_info
         if not db(db.auth_user.id==auth.user.id).select().first().data_updated:
                 if request.env.path_info != '/cpfecys/student/update_data':
                     redirect(URL('student','update_data'))
