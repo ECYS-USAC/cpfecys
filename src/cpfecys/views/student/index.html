@@ -97,18 +97,50 @@
                             <strong>{{=T('Period Items')}}:</strong>
                         </div>
                         <div class="span6">
-                            {{for available_item in available_items(item.period_year, item.project).select(db.item_restriction.ALL):}}
-                                {{if available_item.item.count() < 1:}}
-                                <a class="pull-right btn" href="{{=URL('student','item/create', vars=dict(assignation = item.user_project.id, report_restriction = available_item.id))}}">
-                                    <span class="icon-plus"></span>{{=available_item.name}}
-                                    <small>
-                                        {{=T('Available:') + ' ' +
-                                        str(available_item.start_date) + ' - ' +
-                                        str(available_item.end_date)}}
-                                    </small>
-                                </a>
-                                {{pass}}
-                            {{pass}}
+                            <table>
+                            <tr>
+                                <th>
+                                    Name
+                                </th>
+                                <th>
+                                    Created
+                                </th>
+                                <th>
+                                    Actions
+                                </th>
+                            </tr>
+                            <tr>
+                                    {{for item_restriction in available_item_restriction(cyear_period, item).select():}}
+                                            {{count_feo = 0}}
+                                            {{ for items in items_instance(item_restriction.item_restriction, item).select():}}
+                                                {{count_feo = count_feo + 1}}
+                                            {{pass}}
+                                            {{if count_feo == 0:}}
+                                                <td></td>
+                                                <td></td>
+                                                <td>Create</td>
+                                            {{else:}}
+                                                <td>{{=item_restriction.item_restriction.name}}</td>
+                                                <td>
+                                                    {{=items.created.period.name}} {{=items.created.yearp}}
+                                                </td>
+                                                <td>
+                                                    <a href="" class="btn">
+                                                        <span class="icon-eye-open"></span>
+                                                        View Item
+                                                    </a>
+                                                    {{if items.created == cyear_period:}}
+                                                    <a href="" class="btn">
+                                                        <span class="icon-edit"></span>
+                                                        Edit Item
+                                                    </a>
+                                                    {{pass}}
+                                                </td>
+                                                {{pass}}
+                                            {{pass}}
+                                    {{pass}}
+                            </tr>
+                            </table>
                         </div>
                     </div>
                     </p>

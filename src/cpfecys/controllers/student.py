@@ -8,6 +8,7 @@ def index():
                       (db.user_project.project == db.project.id)&
                       (db.project.area_level == db.area_level.id)&
                       (db.user_project.period == db.period_year.id)).select()
+    cyear_period = current_year_period()
     def available_reports(assignation_period):
         import datetime
         current_date = datetime.datetime.now()
@@ -34,31 +35,30 @@ def index():
                   (db.report_restriction.start_date < date_max)&
                   (db.report_restriction.end_date < date_max)&
                   (db.report_restriction.is_enabled == True))
-        
-    def available_items(assignation_period, project):
-        import datetime
-        current_date = datetime.datetime.now()
-        if assignation_period.period == first_period.id:
-            date_min = datetime.datetime(assignation_period.yearp, 1, 1)
-            date_max = datetime.datetime(assignation_period.yearp, 7, 1)
-        else:
-            date_min = datetime.datetime(assignation_period.yearp, 7, 1)
-            date_max = datetime.datetime(assignation_period.yearp, 1, 1)
-        return db((db.item_restriction.permanent==True)&
-                    (db.item_restriction.is_enabled==True)&
-                    (db.item_restriction_area.item_restriction==\
-                        db.item_restriction.id)&
-                    (db.item_restriction_area.area_level==\
-                        db.area_level.id)&
-                    (db.item_restriction_area.area_level==\
-                        project.area_level.id))
 
+    def available_item_restriction(period_year, user_project):
+        return db(  (
+                        (db.item_restriction.period==period_year) |
+                        (db.item_restriction.permanent==True)
+                    )&
+                (db.item_restriction.is_enabled==True)&
+                (db.item_restriction_area.item_restriction==\
+                    db.item_restriction.id)&
+                (db.item_restriction_area.area_level==\
+                    user_project.project.area_level.id))
+    def items_instance(item_restriction, assignation):
+        return db((db.item.item_restriction==item_restriction.id)&
+                    (db.item.assignation==assignation.user_project.id)&
+                    (db.item.is_active==True))
+        
     import datetime
     current_date = datetime.datetime.now().date()
     return dict(assignations = assignations,
-                available_items = available_items,
                 available_reports = available_reports,
-                current_date = current_date)
+                current_date = current_date,
+                cyear_period = cyear_period,
+                available_item_restriction = available_item_restriction,
+                items_instance = items_instance)
 
 def val_rep_restr(report_restriction):
     import datetime
@@ -68,6 +68,18 @@ def val_rep_restr(report_restriction):
         (db.report_restriction.end_date >= current_date)&
         (db.report_restriction.is_enabled == True)).select().first()
     return rep_restr != None
+
+def current_year_period():
+    import datetime
+    cdate = datetime.datetime.now()
+    cyear = cdate.year
+    cmonth = cdate.month
+    period = second_period
+    #current period depends if we are in dates between jan-jun and jul-dec
+    if cmonth < 7 :
+        period = first_period
+    return db.period_year((db.period_year.yearp == cyear)&
+                          (db.period_year.period == period))
     
 def val_rep_owner(report):
     usr_rep = db((db.report.id == report)&
