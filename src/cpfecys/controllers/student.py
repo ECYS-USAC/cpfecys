@@ -8,7 +8,7 @@ def index():
                       (db.user_project.project == db.project.id)&
                       (db.project.area_level == db.area_level.id)&
                       (db.user_project.period == db.period_year.id)).select()
-    cyear_period = current_year_period()
+    cyear_period = get_current_year_period()
     def available_reports(assignation_period):
         import datetime
         current_date = datetime.datetime.now()
@@ -69,7 +69,7 @@ def val_rep_restr(report_restriction):
         (db.report_restriction.is_enabled == True)).select().first()
     return rep_restr != None
 
-def current_year_period():
+def get_current_year_period():
     import datetime
     cdate = datetime.datetime.now()
     cyear = cdate.year
@@ -180,6 +180,43 @@ def update_data():
         else:
             response.flash = 'please fill the form'
     return dict(form=form, update_data_form=True)  
+
+@auth.requires_login()
+@auth.requires_membership('Student')
+def item():
+    cyear_period = get_current_year_period()
+    if(request.args(0) == 'create'):
+        item_restriction = request.vars['restriction']
+        user_project = request.vars['assignation']
+        item_query = db((db.item.created==cyear_period)&
+                (db.item.item_restriction==item_restriction)&
+                (db.item.assignation==user_project))
+        item_restriction = db(db.item_restriction.id==\
+                item_restriction).select().first()
+        if item_query.select().first() == None:
+            if item_restriction.item_type.name == 'File':
+                form = FORM(
+                            DIV(LABEL(T('Upload '+item_restriction.name+' \
+                                File:')),
+                                        INPUT(_name="upload", 
+                                            _type="file", _id="first_name", 
+                                            requires=IS_NOT_EMPTY())),
+                            BR(),
+                            DIV(INPUT(_type='submit', 
+                                _value=T('Upload File'), 
+                                _class="btn-primary")),
+                                _class="form-horizontal",)
+                if form.process().accepted:
+                    response.flash = "No Errores"
+                elif form.errors:
+                    response.flash = "Errors"
+                else:
+                    response.flash = "please fill the form"
+                return  dict(form=form, create=True)
+        else:
+            return 'Sorry Mate'
+    else:
+        return 'View or Edit action'
 
 @auth.requires_login()
 @auth.requires_membership('Student')
