@@ -69,7 +69,6 @@ def val_rep_restr(report_restriction):
         (db.report_restriction.is_enabled == True)).select().first()
     return rep_restr != None
 
-<<<<<<< HEAD
 def current_year_period():
     import datetime
     cdate = datetime.datetime.now()
@@ -82,8 +81,6 @@ def current_year_period():
     return db.period_year((db.period_year.yearp == cyear)&
                           (db.period_year.period == period))
     
-=======
->>>>>>> 2ae0c0dccf42087b03ba929e5b3f16f461cde34b
 def val_rep_owner(report):
     usr_rep = db((db.report.id == report)&
             (db.report.assignation == db.user_project.id)&
