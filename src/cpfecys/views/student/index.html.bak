@@ -180,13 +180,7 @@
                                         item).select()) == 0:}}
                                         <td></td>
                                         <td></td>
-                                        <td>
-                                            <a href="{{=URL('student',
-                                                     'item/create',
-                                                     vars=dict(
-                                                         restriction=item_restriction.item_restriction.id,
-                                                         assignation=item.user_project.id))}}"
-                                               class="btn">
+                                        <td><a href="{{=URL('student','item/create', vars=dict(restriction=item_restriction.item_restriction.id, assignation=item.user_project.id))}}" class="btn">
                                                 <span class="icon-plus"></span>
                                                 {{=T('Create Item')}}
                                             </a>

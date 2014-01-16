@@ -298,7 +298,7 @@ def report():
         valid_rep_restr = val_rep_restr(report.report_restriction.id)
         ## Validate that the report status is editable (it is either 'Draft' or 'Recheck')
         if not(valid_status(report)):
-            session.flash = T('Selected report can\'t be saved. Select a valid report.')
+            session.flash = T('Selected report can\'t be edited. Select a valid report.')
             redirect(URL('student','index'))
         # Validate assignation belongs to this user
         assign = db.user_project((db.user_project.id == report.assignation)&

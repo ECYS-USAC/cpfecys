@@ -204,7 +204,6 @@ db.define_table('report',
                 Field('created', 'date'),
                 Field('assignation', 'reference user_project'),
                 Field('report_restriction', 'reference report_restriction'),
-                Field('score', 'integer'),
                 Field('status', 'reference report_status', notnull=True),
                 )
 
