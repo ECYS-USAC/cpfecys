@@ -69,6 +69,7 @@ def val_rep_restr(report_restriction):
         (db.report_restriction.is_enabled == True)).select().first()
     return rep_restr != None
 
+<<<<<<< HEAD
 def current_year_period():
     import datetime
     cdate = datetime.datetime.now()
@@ -81,6 +82,8 @@ def current_year_period():
     return db.period_year((db.period_year.yearp == cyear)&
                           (db.period_year.period == period))
     
+=======
+>>>>>>> 2ae0c0dccf42087b03ba929e5b3f16f461cde34b
 def val_rep_owner(report):
     usr_rep = db((db.report.id == report)&
             (db.report.assignation == db.user_project.id)&
@@ -200,7 +203,7 @@ def report():
         # Validate there is not an already inserted report
         valid = db.report((db.report.assignation == assignation)&
                   (db.report.report_restriction == report_restriction)) is None
-        if not(assignation and report_restriction and valid and valid_assignation and valid_report 
+        if not(assignation and report_restriction and valid and valid_assignation and valid_report
            and valid_rep_restr):
             session.flash = T('Invalid selected assignation and report. Select a valid one.')
             redirect(URL('student','index'))
@@ -471,7 +474,7 @@ def logs_area():
                requires=IS_NOT_EMPTY()),
               T('Type:'),
               SELECT(_name="type_select", *[OPTION(log_types[i].name,
-                                  _value=str(log_types[i].id)) 
+                                  _value=str(log_types[i].id))
                                   for i in range(log_count)]),
               T('Description:'),
               TEXTAREA(_label=T('Description'), _name="description",
@@ -484,7 +487,7 @@ def logs_area():
         description = request.vars['description']
         user_project = request.vars['assignation']
         creport_head, c_enab_date = get_report_head(user_project)
-        
+
         if creport_head and c_enab_date:
             db.log_entry.insert(entry_date=date, log_type=log_type,
                     description=description, entry_user=auth.user.id,
@@ -502,15 +505,15 @@ def logs_area():
                                 and no report set created')
                 redirect(URL('student', 'courses'))
         redirect(URL('logs_list', vars=dict(date=c_enab_date.id, assignation=user_project)))
-        
+
     elif form.errors:
         response.flash = 'form has errors'
     else:
-        response.flash = 'please fill the form'    
+        response.flash = 'please fill the form'
     return locals()
 
 @auth.requires_login()
-@auth.requires_membership('Student')    
+@auth.requires_membership('Student')
 def courses():
     year_period = request.vars['year_period']
     max_display = 1
