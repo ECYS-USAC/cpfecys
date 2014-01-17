@@ -131,12 +131,12 @@
                                                 {{=items.created.period.name}} {{=items.created.yearp}}
                                             </td>
                                             <td>
-                                                <a href="{{=URL('student', 'item/view')}}" class="btn">
+                                                <a href="{{=URL('student','item/view', vars=dict(restriction=item_restriction.item_restriction.id, assignation=item.user_project.id))}}" class="btn">
                                                     <span class="icon-eye-open"></span>
                                                     {{=T('View Item')}}
                                                 </a>
                                                 {{if items.created == cyear_period:}}
-                                                <a href="{{=URL('student', 'item/edit')}}" class="btn">
+                                                <a href="{{=URL('student','item/edit', vars=dict(restriction=item_restriction.item_restriction.id, assignation=item.user_project.id))}}" class="btn">
                                                     <span class="icon-edit"></span>
                                                     {{=T('Edit Item')}}
                                                 </a>

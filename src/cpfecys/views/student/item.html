@@ -1,5 +1,17 @@
 {{extend 'template.html'}}
 
-{{if create:}}
+{{if action == 'create':}}
     {{=form}}
 {{pass}}
+
+{{if action == 'view':}}
+    {{=BEAUTIFY(item)}}
+{{pass}}
+
+{{if action == 'edit':}}
+    {{=form}}
+{{pass}}
+
+<p>
+    <a onclick="window.history.back()" class="btn" ><i class="icon-arrow-left"></i> Back</a>
+</p>

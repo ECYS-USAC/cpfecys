@@ -1,0 +1,16 @@
+enabled_date
+id	name		date_start		date_end
+1	February report	2013-1-1		2013-1-30
+
+
+report_head
+id	enabled_date	project_id
+1	1		1
+
+report
+id	report_head	created_date		
+1	1		2013-1-8	
+
+log_entry
+id	log_type	report_head	entry_date	description	entry_user	project
+1	1		1		2013-1-8	A description	40		1

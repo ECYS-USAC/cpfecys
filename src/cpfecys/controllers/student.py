@@ -185,16 +185,19 @@ def update_data():
 @auth.requires_membership('Student')
 def item():
     cyear_period = get_current_year_period()
-    if(request.args(0) == 'create'):
-        item_restriction = request.vars['restriction']
-        user_project = request.vars['assignation']
-        item_query = db((db.item.created==cyear_period)&
+    item_restriction = request.vars['restriction']
+    user_project = request.vars['assignation']
+    item_query = db((db.item.created==cyear_period)&
                 (db.item.item_restriction==item_restriction)&
                 (db.item.assignation==user_project))
-        item_restriction = db(db.item_restriction.id==\
-                item_restriction).select().first()
+    item_restriction = db(db.item_restriction.id==\
+            item_restriction).select().first()
+
+    if(request.args(0) == 'create'):
         if item_query.select().first() == None:
-            if item_restriction.item_type.name == 'File':
+            if item_restriction.item_type.name == 'File' and \
+                item_restriction.teacher_only != True:
+
                 form = FORM(
                             DIV(LABEL(T('Upload '+item_restriction.name+' \
                                 File:')),
@@ -207,16 +210,68 @@ def item():
                                 _class="btn-primary")),
                                 _class="form-horizontal",)
                 if form.process().accepted:
-                    response.flash = "No Errores"
+                    if request.vars.upload != None:
+                        item = db.item.uploaded_file.store(request.vars.upload.file, request.vars.upload.filename)
+                        db.item.insert(name='Stuff',
+                            uploaded_file=item,
+                            is_active=True,
+                            created=cyear_period,
+                            item_restriction=item_restriction.id,
+                            assignation=user_project)
+                        db.commit()
+                        response.flash = request.vars.upload.file
+                    else:
+                        response.flash = T("Error")
+                elif form.errors:
+                    response.flash = T("Errors")
+                else:
+                    response.flash = T("please fill the form")
+                return  dict(form=form, action='create')
+        else:
+            response.flash = T('Action not allowed')
+            redirect(URL('student', 'index'))
+
+    elif(request.args(0) == 'view'):
+        item = db((db.item.item_restriction==item_restriction)&
+            (db.item.assignation==user_project)).select().first()
+        if item == None or item_restriction.teacher_only == True \
+                or item.is_active != True:
+            redirect(URL('student', 'index'))
+        return dict(item=item, action='view')
+
+    elif(request.args(0) == 'edit'):
+        item = db((db.item.created==cyear_period)&
+            (db.item.item_restriction==item_restriction)&
+            (db.item.assignation==user_project)).select().first()
+        if item == None or item_restriction.teacher_only == True \
+                or item.is_active != True:
+            redirect(URL('student', 'index'))
+        form = FORM(
+                    DIV(LABEL(T('Upload '+item_restriction.name+' \
+                        File:')),
+                                INPUT(_name="upload", 
+                                    _type="file", _id="first_name", 
+                                    requires=IS_NOT_EMPTY())),
+                    BR(),
+                    DIV(INPUT(_type='submit', 
+                        _value=T('Upload File'), 
+                        _class="btn-primary")),
+                        _class="form-horizontal",)
+        if form.process().accepted:
+            if request.vars.upload != None:
+                uploaded = db.item.uploaded_file.store(request.vars.upload.file, request.vars.upload.filename)
+                item = db((db.item.created==cyear_period)&
+                    (db.item.item_restriction==item_restriction)&
+                    (db.item.assignation==user_project)).select().first()
+                if item != None:
+                    item.update_record(uploaded_file = uploaded)
+                    db.commit()
+                    redirect(URL('student', 'index'))
                 elif form.errors:
                     response.flash = "Errors"
                 else:
                     response.flash = "please fill the form"
-                return  dict(form=form, create=True)
-        else:
-            return 'Sorry Mate'
-    else:
-        return 'View or Edit action'
+        return  dict(form=form, action='edit')
 
 @auth.requires_login()
 @auth.requires_membership('Student')
