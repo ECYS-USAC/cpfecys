@@ -224,19 +224,19 @@ def item():
                             item_restriction=item_restriction.id,
                             assignation=user_project)
                         db.commit()
-                        response.flash = T('Item created!')
+                        session.flash = T('Item created!')
                         redirect(URL('student', 'index'))
                     else:
-                        response.flash = T('Error')
+                        session.flash = T('Error')
                         redirect(URL('student', 'index'))
                 elif form.errors:
-                    response.flash = T('Errors')
+                    session.flash = T('Errors')
                     redirect(URL('student', 'index'))
                 else:
-                    response.flash = T('please fill the form')
+                    session.flash = T('please fill the form')
                 return  dict(form=form, action='create')
         else:
-            response.flash = T('Action not allowed')
+            session.flash = T('Action not allowed')
             redirect(URL('student', 'index'))
 
     elif(request.args(0) == 'view'):
