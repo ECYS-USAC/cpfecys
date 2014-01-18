@@ -218,7 +218,7 @@ def item():
                 if form.process().accepted:
                     if request.vars.upload != None:
                         item = db.item.uploaded_file.store(request.vars.upload.file, request.vars.upload.filename)
-                        db.item.insert(name='Stuff',
+                        db.item.insert(name=item_restriction.name,
                             uploaded_file=item,
                             is_active=True,
                             created=cyear_period,
