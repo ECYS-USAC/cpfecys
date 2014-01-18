@@ -174,23 +174,12 @@
                             <tbody>
                                 {{for item_restriction in \
                                     available_item_restriction(cyear_period, item).select():}}
-                                    {{if len(items_instance(
+                                    {{if items_instance(
                                         item_restriction.item_restriction,
-                                        item).select()) == 0:}}
-                                        <td></td>
-                                        <td></td>
-                                        <td>
-                                            <a href="{{=URL('student',
-                                                     'item/create',
-                                                     vars=dict(
-                                                         restriction=item_restriction.item_restriction.id,
-                                                         assignation=item.user_project.id))}}"
-                                               class="btn">
-                                                <span class="icon-plus"></span>
-                                                {{=T('Create Item')}}
-                                            </a>
-                                        </td>
-                                    {{else:}}
+                                        item).count() != 0:}}
+                                        {{items = items_instance(
+                                            item_restriction.item_restriction,
+                                            item).select().first()}}
                                         <td>{{=item_restriction.item_restriction.name}}</td>
                                         <td>
                                             {{=items.created.period.name}} {{=items.created.yearp}}
@@ -213,11 +202,29 @@
                                                 </a>
                                                 {{pass}}
                                         </td>
-                                        {{pass}}
                                     {{pass}}
-                            {{pass}}
+                                {{pass}}
                             </tbody>
                         </table>
+                        <div class="row-fluid right">
+                            {{for item_restriction in \
+                                    available_item_restriction(cyear_period, item).select():}}
+                            {{if items_instance(
+                                        item_restriction.item_restriction,
+                                        item).count() == 0:}}
+                            <a href="{{=URL('student',
+                                     'item/create',
+                                     vars=dict(
+                                     restriction=item_restriction.item_restriction.id,
+                                     assignation=item.user_project.id))}}"
+                               class="btn">
+                                <span class="icon-plus"></span>
+                                {{=T('Create Item')}}
+                                <small>{{=item_restriction.item_restriction.name}}</small>
+                            </a>
+                            {{pass}}
+                            {{pass}}
+                        </div>
                     </div>
                 </div>
             </div>
