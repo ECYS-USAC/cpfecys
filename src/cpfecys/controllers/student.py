@@ -225,10 +225,13 @@ def item():
                             assignation=user_project)
                         db.commit()
                         response.flash = T('Item created!')
+                        redirect(URL('student', 'index'))
                     else:
                         response.flash = T('Error')
+                        redirect(URL('student', 'index'))
                 elif form.errors:
                     response.flash = T('Errors')
+                    redirect(URL('student', 'index'))
                 else:
                     response.flash = T('please fill the form')
                 return  dict(form=form, action='create')
