@@ -250,7 +250,6 @@ db.define_table('item_restriction_area',
                 )
 
 db.define_table('item',
-                Field('name', 'string', notnull=True),
                 Field('is_active', 'boolean', notnull=False),
                 Field('description', 'text', notnull=False),
                 Field('uploaded_file', 'upload', default='', notnull=False),
