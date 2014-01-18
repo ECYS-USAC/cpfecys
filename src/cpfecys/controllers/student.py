@@ -224,13 +224,13 @@ def item():
                             item_restriction=item_restriction.id,
                             assignation=user_project)
                         db.commit()
-                        response.flash = request.vars.upload.file
+                        response.flash = T('Item created!')
                     else:
-                        response.flash = T("Error")
+                        response.flash = T('Error')
                 elif form.errors:
-                    response.flash = T("Errors")
+                    response.flash = T('Errors')
                 else:
-                    response.flash = T("please fill the form")
+                    response.flash = T('please fill the form')
                 return  dict(form=form, action='create')
         else:
             response.flash = T('Action not allowed')

@@ -267,11 +267,13 @@ if auth.user != None:
                     (db.auth_group.id==db.auth_membership.group_id)). \
                     select().first()
     if groups != None:
-        #print request.env.path_info
+        path  = request.env.path_info
+        update_url = '/cpfecys/student/update_data'
+        logout_url = '/default/user/logout'
+        print logout_url
         if not db(db.auth_user.id==auth.user.id).select().first().data_updated:
-                if request.env.path_info != '/cpfecys/student/update_data':
+                if path != update_url and not logout_url in path:
                     redirect(URL('student','update_data'))
-
 # User Roles
 ## Super-Administrator:
 setup = db.auth_user(db.auth_user.username == 'admin')
