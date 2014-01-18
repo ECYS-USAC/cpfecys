@@ -36,53 +36,6 @@
                             {{=item.period_year.yearp}} - {{=T('Semester')}}
                             {{=item.period_year.period}}
                         </div>
-<<<<<<< HEAD
-                        <div class="span6">
-                            <table>
-                            <tr>
-                                <th>
-                                    Name
-                                </th>
-                                <th>
-                                    Created
-                                </th>
-                                <th>
-                                    Actions
-                                </th>
-                            </tr>
-                            <tr>
-                                {{for item_restriction in available_item_restriction(cyear_period, item).select():}}
-                                        {{count_feo = 0}}
-                                        {{ for items in items_instance(item_restriction.item_restriction, item).select():}}
-                                            {{count_feo = count_feo + 1}}
-                                        {{pass}}
-                                        {{if count_feo == 0:}}
-                                            <td></td>
-                                            <td></td>
-                                            <td><a href="{{=URL('student','item/create', vars=dict(restriction=item_restriction.item_restriction.id, assignation=item.user_project.id))}}" class="btn">
-                                                    <span class="icon-plus"></span>
-                                                    {{=T('Create Item')}}
-                                                </a>
-                                            </td>
-                                        {{else:}}
-                                            <td>{{=item_restriction.item_restriction.name}}</td>
-                                            <td>
-                                                {{=items.created.period.name}} {{=items.created.yearp}}
-                                            </td>
-                                            <td>
-                                                <a href="{{=URL('student','item/view', vars=dict(restriction=item_restriction.item_restriction.id, assignation=item.user_project.id))}}" class="btn">
-                                                    <span class="icon-eye-open"></span>
-                                                    {{=T('View Item')}}
-                                                </a>
-                                                {{if items.created == cyear_period:}}
-                                                <a href="{{=URL('student','item/edit', vars=dict(restriction=item_restriction.item_restriction.id, assignation=item.user_project.id))}}" class="btn">
-                                                    <span class="icon-edit"></span>
-                                                    {{=T('Edit Item')}}
-                                                </a>
-                                                {{pass}}
-                                            </td>
-                                            {{pass}}
-=======
                         <div>
                             <strong>{{=T('Length')}}:</strong>
                             {{=item.user_project.periods}} {{=T('Semesters')}}
@@ -145,7 +98,6 @@
                                         {{=report.score}}
                                     </td>
                                     {{if report.score: average_report_scoring += report.score}}
-                                    {{pass}}
                                     <td>
                                         <a class="btn"
                                            href="{{=URL('student',
@@ -166,7 +118,6 @@
                                             <span class="icon-edit"></span>
                                             {{=T('Edit Report')}}
                                         </a>
->>>>>>> 8a081b648484b7adceda2bbcd93d297ee0c49619
                                         {{pass}}
                                     </td>
                                 </tr>
@@ -245,16 +196,22 @@
                                             {{=items.created.period.name}} {{=items.created.yearp}}
                                         </td>
                                         <td>
-                                            <a href="{{=URL('student', 'item/view')}}" class="btn">
-                                                <span class="icon-eye-open"></span>
-                                                {{=T('View Item')}}
-                                            </a>
-                                            {{if items.created == cyear_period:}}
-                                            <a href="{{=URL('student', 'item/edit')}}" class="btn">
-                                                <span class="icon-edit"></span>
-                                                {{=T('Edit Item')}}
-                                            </a>
-                                            {{pass}}
+                                            <a href="{{=URL('student',
+                                                     'item/view',
+                                                    vars=dict(restriction=item_restriction.item_restriction.id,
+                                                     assignation=item.user_project.id))}}" class="btn">
+                                                    <span class="icon-eye-open"></span>
+                                                    {{=T('View Item')}}
+                                                </a>
+                                                {{if items.created == cyear_period:}}
+                                                <a href="{{=URL('student',
+                                                         'item/edit',
+                                                    vars=dict(restriction=item_restriction.item_restriction.id,
+                                                         assignation=item.user_project.id))}}" class="btn">
+                                                    <span class="icon-edit"></span>
+                                                    {{=T('Edit Item')}}
+                                                </a>
+                                                {{pass}}
                                         </td>
                                         {{pass}}
                                     {{pass}}
