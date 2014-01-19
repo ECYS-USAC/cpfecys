@@ -270,7 +270,6 @@ if auth.user != None:
         path  = request.env.path_info
         update_url = '/cpfecys/student/update_data'
         logout_url = '/default/user/logout'
-        print logout_url
         if not db(db.auth_user.id==auth.user.id).select().first().data_updated:
                 if path != update_url and not logout_url in path:
                     redirect(URL('student','update_data'))

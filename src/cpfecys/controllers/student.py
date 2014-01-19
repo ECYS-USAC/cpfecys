@@ -206,18 +206,25 @@ def item():
 
                 form = FORM(
                             DIV(LABEL(T('Upload '+item_restriction.name+' \
-                                File:')),
-                                        INPUT(_name="upload", 
-                                            _type="file", _id="first_name", 
-                                            requires=IS_NOT_EMPTY())),
+                            File:')),
+                            INPUT(_name="upload", 
+                                _type="file", _id="first_name", 
+                                requires=[IS_NOT_EMPTY(), \
+                                            IS_UPLOAD_FILENAME( \
+                                            extension='^(pdf|doc|docx)$',\
+                                            error_message=T('Invalid Format, \
+                                            Please upload only PDF, DOC or \
+                                            DOCX files files'))])),
                             BR(),
                             DIV(INPUT(_type='submit', 
-                                _value=T('Upload File'), 
-                                _class="btn-primary")),
-                                _class="form-horizontal",)
+                                            _value=T('Upload File'), 
+                                            _class="btn-primary")),
+                                            _class="form-horizontal",)
                 if form.process().accepted:
                     if request.vars.upload != None:
-                        item = db.item.uploaded_file.store(request.vars.upload.file, request.vars.upload.filename)
+                        item = db.item.uploaded_file.store( \
+                            request.vars.upload.file,  \
+                            request.vars.upload.filename)
                         db.item.insert(uploaded_file=item,
                             is_active=True,
                             created=cyear_period,
@@ -245,7 +252,7 @@ def item():
         if item == None or item_restriction.teacher_only == True \
                 or item.is_active != True:
             redirect(URL('student', 'index'))
-        return dict(item=item, action='view')
+        return dict(item=item, name=item_restriction.name, action='view')
 
     elif(request.args(0) == 'edit'):
         item = db((db.item.created==cyear_period)&
@@ -259,7 +266,12 @@ def item():
                         File:')),
                                 INPUT(_name="upload", 
                                     _type="file", _id="first_name", 
-                                    requires=IS_NOT_EMPTY())),
+                                    requires=[IS_NOT_EMPTY(), \
+                                            IS_UPLOAD_FILENAME( \
+                                            extension='^(pdf|doc|docx)$',\
+                                            error_message=T('Invalid Format, \
+                                            Please upload only PDF, DOC or \
+                                            DOCX files files'))])),
                     BR(),
                     DIV(INPUT(_type='submit', 
                         _value=T('Upload File'), 
