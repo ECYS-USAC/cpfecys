@@ -37,15 +37,14 @@ def index():
                   (db.report_restriction.is_enabled == True))
 
     def available_item_restriction(period_year, user_project):
-        return db(  (
-                        (db.item_restriction.period==period_year) |
-                        (db.item_restriction.permanent==True)
-                    )&
+        return db(((db.item_restriction.period==period_year) |
+                    (db.item_restriction.permanent==True))&
                 (db.item_restriction.is_enabled==True)&
                 (db.item_restriction_area.item_restriction==\
                     db.item_restriction.id)&
                 (db.item_restriction_area.area_level==\
-                    user_project.project.area_level.id))
+                    user_project.project.area_level.id)&
+                (db.item_restriction.item_type!=2))
     def items_instance(item_restriction, assignation):
         return db((db.item.item_restriction==item_restriction.id)&
                     (db.item.assignation==assignation.user_project.id)&
