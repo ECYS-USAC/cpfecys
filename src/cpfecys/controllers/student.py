@@ -187,6 +187,17 @@ def update_data():
             response.flash = 'please fill the form'
     return dict(form=form, update_data_form=True)  
 
+@cache.action()
+@auth.requires_login()
+@auth.requires_membership('Student')
+def download():
+    item = db(db.item.uploaded_file==request.args[0]).select().first()
+    if item != None and item.assignation.assigned_user == auth.user.id:
+        return response.download(request, db)
+    else:
+        session.flash = T('Access Forbidden')
+        redirect(URL('default', 'index'))
+
 @auth.requires_login()
 @auth.requires_membership('Student')
 def item():
@@ -247,12 +258,17 @@ def item():
             redirect(URL('student', 'index'))
 
     elif(request.args(0) == 'view'):
+        item_upload = request.vars['file']
         item = db((db.item.item_restriction==item_restriction)&
-            (db.item.assignation==user_project)).select().first()
-        if item == None or item_restriction.teacher_only == True \
-                or item.is_active != True:
+            (db.item.assignation==user_project)&
+            (db.item.uploaded_file==item_upload)).select().first()
+        if item != None and item_restriction.teacher_only != True \
+                and item.is_active == True \
+                and item.assignation.assigned_user == auth.user.id:
+            return dict(item=item, name=item_restriction.name, action='view')
+        else:
+            session.flash = T('Access Forbidden')
             redirect(URL('student', 'index'))
-        return dict(item=item, name=item_restriction.name, action='view')
 
     elif(request.args(0) == 'edit'):
         item = db((db.item.created==cyear_period)&

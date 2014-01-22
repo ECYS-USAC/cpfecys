@@ -185,22 +185,20 @@
                                             {{=items.created.period.name}} {{=items.created.yearp}}
                                         </td>
                                         <td>
+                                            <a class="btn" href="{{=URL('cpfecys/student', 'download', items.uploaded_file)}}">
+                                            <span class="icon-eye-open"></span>
+                                            {{=T('View Item')}}
+                                            </a>
+
+                                            {{if items.created == cyear_period:}}
                                             <a href="{{=URL('student',
-                                                     'item/view',
-                                                    vars=dict(restriction=item_restriction.item_restriction.id,
-                                                     assignation=item.user_project.id))}}" class="btn">
-                                                    <span class="icon-eye-open"></span>
-                                                    {{=T('View Item')}}
-                                                </a>
-                                                {{if items.created == cyear_period:}}
-                                                <a href="{{=URL('student',
-                                                         'item/edit',
-                                                    vars=dict(restriction=item_restriction.item_restriction.id,
-                                                         assignation=item.user_project.id))}}" class="btn">
-                                                    <span class="icon-edit"></span>
-                                                    {{=T('Edit Item')}}
-                                                </a>
-                                                {{pass}}
+                                                     'item/edit',
+                                                vars=dict(restriction=item_restriction.item_restriction.id,
+                                                     assignation=item.user_project.id, file=items.uploaded_file))}}" class="btn">
+                                                <span class="icon-edit"></span>
+                                                {{=T('Edit Item')}}
+                                            </a>
+                                            {{pass}}
                                         </td>
                                     {{pass}}
                                 {{pass}}

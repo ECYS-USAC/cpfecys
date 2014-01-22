@@ -4,10 +4,6 @@
     {{=form}}
 {{pass}}
 
-{{if action == 'view':}}
-    <a target="_blank" href="{{=URL('download', item.uploaded_file)}}"> {{=name}} </a>
-{{pass}}
-
 {{if action == 'edit':}}
     {{=form}}
 {{pass}}
