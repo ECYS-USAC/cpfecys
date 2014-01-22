@@ -208,11 +208,6 @@ db.define_table('report',
                 Field('status', 'reference report_status', notnull=True),
                 )
 
-db.define_table('report_detail',
-                Field('created', 'datetime', notnull=True),
-                Field('report', 'reference report'),
-                )
-
 db.define_table('log_type',
                 Field('name', 'string', notnull=True),
                 format='%(entry_date)s'
