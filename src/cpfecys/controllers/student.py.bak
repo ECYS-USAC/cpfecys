@@ -73,7 +73,7 @@ def val_rep_restr(report_restriction):
 ## Validate that the report status is editable (it is either 'Draft' or 'Recheck')
 def valid_status(report):
     return (report.status == db.report_status(db.report_status.name == 'Draft').id) or \
-            (report.status == db.report_status(db.report_status.name == 'Recheck'))
+            (report.status == db.report_status(db.report_status.name == 'Recheck').id)
 
 def get_current_year_period():
     import datetime
@@ -101,53 +101,53 @@ def update_data():
         cuser = db(db.auth_user.id==auth.user.id).select().first()
         form = FORM(
                         DIV(LABEL(T('First Name:')),
-                                    INPUT(_name="first_name", 
-                                        _type="text", _id="first_name", 
+                                    INPUT(_name="first_name",
+                                        _type="text", _id="first_name",
                                         _value=cuser.first_name,
                                         requires=IS_NOT_EMPTY())),
 
                         DIV(LABEL(T('Last Name:')),
-                                       INPUT(_name="last_name", 
-                                        _type="text", _id="last_name", 
+                                       INPUT(_name="last_name",
+                                        _type="text", _id="last_name",
                                          _value=cuser.last_name, 
                                          requires=IS_NOT_EMPTY())),
 
                         DIV(LABEL(T('Email:')),
-                                       INPUT(_name="email", 
-                                        _type="text", _id="email", 
-                                        _value=cuser.email, 
+                                       INPUT(_name="email",
+                                        _type="text", _id="email",
+                                        _value=cuser.email,
                                         requires=IS_NOT_EMPTY())),
 
                         DIV(LABEL(T('Password: (Leave the same for no \
                             change)')),
-                                      INPUT(_name="password", 
-                                        _type="password", _id="password", 
-                                        _value=cuser.password, 
+                                      INPUT(_name="password",
+                                        _type="password", _id="password",
+                                        _value=cuser.password,
                                         requires=IS_NOT_EMPTY())),
 
                         DIV(LABEL(T('Repeat password: (Leave the blank for \
                             no change)')),
-                                      INPUT(_name="repass", 
+                                      INPUT(_name="repass",
                                         _type="password", _id="repass")),
 
                         DIV(LABEL(T('Phone:')),
-                                      INPUT(_name="phone", _type="text", 
-                                        _id="phone", _value=cuser.phone, 
-                                        requires=IS_LENGTH(minsize=8, 
+                                      INPUT(_name="phone", _type="text",
+                                        _id="phone", _value=cuser.phone,
+                                        requires=IS_LENGTH(minsize=8,
                                                         maxsize=12))),
 
                         DIV(LABEL(T('Working:')),
-                                      INPUT(_name="working", 
-                                        _type="checkbox", _id="working", 
+                                      INPUT(_name="working",
+                                        _type="checkbox", _id="working",
                                         _value=cuser.working)),
 
                         DIV(LABEL(T('Work Address:')),
-                                      INPUT(_name="work_address", 
-                                        _type="text", _id="work_address", 
+                                      INPUT(_name="work_address",
+                                        _type="text", _id="work_address",
                                         _value=cuser.work_address)),
                         BR(),
-                        DIV(INPUT(_type='submit', 
-                            _value=T('Update Profile'), 
+                        DIV(INPUT(_type='submit',
+                            _value=T('Update Profile'),
                             _class="btn-primary")),
                             _class="form-horizontal",)
         if form.process().accepted:
@@ -185,44 +185,113 @@ def update_data():
             response.flash = 'form has errors'
         else:
             response.flash = 'please fill the form'
-    return dict(form=form, update_data_form=True)  
+    return dict(form=form, update_data_form=True)
 
 @auth.requires_login()
 @auth.requires_membership('Student')
 def item():
     cyear_period = get_current_year_period()
-    if(request.args(0) == 'create'):
-        item_restriction = request.vars['restriction']
-        user_project = request.vars['assignation']
-        item_query = db((db.item.created==cyear_period)&
+    item_restriction = request.vars['restriction']
+    user_project = request.vars['assignation']
+    item_query = db((db.item.created==cyear_period)&
                 (db.item.item_restriction==item_restriction)&
                 (db.item.assignation==user_project))
-        item_restriction = db(db.item_restriction.id==\
-                item_restriction).select().first()
+    item_restriction = db(db.item_restriction.id==\
+            item_restriction).select().first()
+
+    if(request.args(0) == 'create'):
         if item_query.select().first() == None:
-            if item_restriction.item_type.name == 'File':
+            if item_restriction.item_type.name == 'File' and \
+                item_restriction.teacher_only != True:
+
                 form = FORM(
                             DIV(LABEL(T('Upload '+item_restriction.name+' \
-                                File:')),
-                                        INPUT(_name="upload", 
-                                            _type="file", _id="first_name", 
-                                            requires=IS_NOT_EMPTY())),
+                            File:')),
+                            INPUT(_name="upload", 
+                                _type="file", _id="first_name", 
+                                requires=[IS_NOT_EMPTY(), \
+                                            IS_UPLOAD_FILENAME( \
+                                            extension='^(pdf|doc|docx)$',\
+                                            error_message=T('Invalid Format, \
+                                            Please upload only PDF, DOC or \
+                                            DOCX files files'))])),
                             BR(),
-                            DIV(INPUT(_type='submit', 
-                                _value=T('Upload File'), 
-                                _class="btn-primary")),
-                                _class="form-horizontal",)
+                            DIV(INPUT(_type='submit',
+                                            _value=T('Upload File'),
+                                            _class="btn-primary")),
+                                            _class="form-horizontal",)
                 if form.process().accepted:
-                    response.flash = "No Errores"
+                    if request.vars.upload != None:
+                        item = db.item.uploaded_file.store( \
+                            request.vars.upload.file,  \
+                            request.vars.upload.filename)
+                        db.item.insert(uploaded_file=item,
+                            is_active=True,
+                            created=cyear_period,
+                            item_restriction=item_restriction.id,
+                            assignation=user_project)
+                        db.commit()
+                        session.flash = T('Item created!')
+                        redirect(URL('student', 'index'))
+                    else:
+                        session.flash = T('Error')
+                        redirect(URL('student', 'index'))
+                elif form.errors:
+                    session.flash = T('Errors')
+                    redirect(URL('student', 'index'))
+                else:
+                    session.flash = T('please fill the form')
+                return  dict(form=form, action='create')
+        else:
+            session.flash = T('Action not allowed')
+            redirect(URL('student', 'index'))
+
+    elif(request.args(0) == 'view'):
+        item = db((db.item.item_restriction==item_restriction)&
+            (db.item.assignation==user_project)).select().first()
+        if item == None or item_restriction.teacher_only == True \
+                or item.is_active != True:
+            redirect(URL('student', 'index'))
+        return dict(item=item, name=item_restriction.name, action='view')
+
+    elif(request.args(0) == 'edit'):
+        item = db((db.item.created==cyear_period)&
+            (db.item.item_restriction==item_restriction)&
+            (db.item.assignation==user_project)).select().first()
+        if item == None or item_restriction.teacher_only == True \
+                or item.is_active != True:
+            redirect(URL('student', 'index'))
+        form = FORM(
+                    DIV(LABEL(T('Upload '+item_restriction.name+' \
+                        File:')),
+                                INPUT(_name="upload", 
+                                    _type="file", _id="first_name", 
+                                    requires=[IS_NOT_EMPTY(), \
+                                            IS_UPLOAD_FILENAME( \
+                                            extension='^(pdf|doc|docx)$',\
+                                            error_message=T('Invalid Format, \
+                                            Please upload only PDF, DOC or \
+                                            DOCX files files'))])),
+                    BR(),
+                    DIV(INPUT(_type='submit', 
+                        _value=T('Upload File'), 
+                        _class="btn-primary")),
+                        _class="form-horizontal",)
+        if form.process().accepted:
+            if request.vars.upload != None:
+                uploaded = db.item.uploaded_file.store(request.vars.upload.file, request.vars.upload.filename)
+                item = db((db.item.created==cyear_period)&
+                    (db.item.item_restriction==item_restriction)&
+                    (db.item.assignation==user_project)).select().first()
+                if item != None:
+                    item.update_record(uploaded_file = uploaded)
+                    db.commit()
+                    redirect(URL('student', 'index'))
                 elif form.errors:
                     response.flash = "Errors"
                 else:
                     response.flash = "please fill the form"
-                return  dict(form=form, create=True)
-        else:
-            return 'Sorry Mate'
-    else:
-        return 'View or Edit action'
+        return  dict(form=form, action='edit')
 
 @auth.requires_login()
 @auth.requires_membership('Student')
@@ -263,7 +332,11 @@ def report():
         if not(report):
             session.flash = T('Selected report can\'t be edited. Select a valid report.')
             redirect(URL('student','index'))
+        ## Validate report TIMING restriction
         valid_rep_restr = val_rep_restr(report.report_restriction.id)
+        if not(valid_rep_restr):
+            session.flash = T('Selected report can\'t be edited. Select a valid report.')
+            redirect(URL('student','index'))
         ## Validate that the report belongs to user
         valid_report_owner = val_rep_owner(report.id)
         if not(valid_report_owner):
@@ -283,22 +356,21 @@ def report():
             'code_html':lambda text: CODE(text,language='html').xml()}
         return dict(state = 'edit',
                     log_types = db(db.log_type.id > 0).select(),
-                    logs = db((db.log_entry.id > 0)&
-                              (db.log_entry.report == report.id)).select(),
+                    logs = db.log_entry((db.log_entry.report == report.id)).select(),
                     anomalies = db((db.log_type.name == 'Anomaly')&
                                    (db.log_entry.log_type == db.log_type.id)&
                                    (db.log_entry.report == report.id)).count(),
                     markmin_settings = markmin_settings,
                     report = report)
     elif (request.args(0) == 'save'):
-        #get the data & save the report
+        ## get the data & save the report
         report = request.vars['report']
         report = db.report(db.report.id == report)
-        # Validate DB report_restriction to obey TIMING rules
+        ## Validate DB report_restriction to obey TIMING rules
         valid_rep_restr = val_rep_restr(report.report_restriction.id)
         ## Validate that the report status is editable (it is either 'Draft' or 'Recheck')
         if not(valid_status(report)):
-            session.flash = T('Selected report can\'t be edited. Select a valid report.')
+            session.flash = T('Selected report can\'t be saved. Select a valid report.')
             redirect(URL('student','index'))
         # Validate assignation belongs to this user
         assign = db.user_project((db.user_project.id == report.assignation)&
@@ -319,6 +391,10 @@ def report():
         report = db.report(db.report.id == report)
         # Validate DB report_restriction to obey TIMING rules
         valid_rep_restr = val_rep_restr(report.report_restriction.id)
+        ## Validate that the report status is editable (it is either 'Draft' or 'Recheck')
+        if not(valid_status(report)):
+            session.flash = T('Invalid selected assignation and report. Select a valid one.')
+            redirect(URL('student','index'))
         # Validate assignation belongs to this user
         assign = db.user_project((db.user_project.id == report.assignation)&
                                 (db.user_project.assigned_user == auth.user.id))
@@ -335,18 +411,31 @@ def report():
     elif (request.args(0) == 'view'):
         #Get the report id
         report = request.vars['report']
-        # Validate that the report belongs to user
+        # Validate that the report exists
         report = db.report(db.report.id == report)
-        if not(report):
-            session.flash = T('Selected report can\'t be edited. Select a valid report.')
-            redirect(URL('student'))
-        valid_report_owner = val_rep_owner(report.id)
-        if not(valid_report_owner):
-            session.flash = T('Selected report can\'t be edited. Select a valid report.')
-            redirect(URL('student'))
-        #TODO: retrieve report data
-        #TODO: Display report data as read_only
-        return dict(state='view')
+        valid = not(report is None)
+        # Validate that the report belongs to user
+        if valid: valid = val_repo_owner(report.id)
+        if valid:
+            ## Markmin formatting of reports
+            LATEX = '<img src="http://chart.apis.google.com/chart?cht=tx&chl=%s" align="center"/>'
+            markmin_settings = {
+                'latex':lambda code: LATEX % code.replace('"','"'),
+                'code_cpp':lambda text: CODE(text,language='cpp').xml(),
+                'code_java':lambda text: CODE(text,language='java').xml(),
+                'code_python':lambda text: CODE(text,language='python').xml(),
+                'code_html':lambda text: CODE(text,language='html').xml()}
+            return dict(state='view',
+                        log_types = db(db.log_type.id > 0).select(),
+                        logs = db((db.log_entry.report == report.id)).select(),
+                        anomalies = db((db.log_type.name == 'Anomaly')&
+                                   (db.log_entry.log_type == db.log_type.id)&
+                                   (db.log_entry.report == report.id)).count(),
+                        markmin_settings = markmin_settings,
+                        report = report)
+        else:
+            session.flash = T('Selected report can\'t be viewed. Select a valid report.')
+            redirect(URL('student', 'index'))
     else:
         redirect(URL('student', 'index'))
     return dict()
@@ -362,6 +451,8 @@ def log():
         if valid_report: valid_report = val_rep_owner(report.id)
         # validate report is editable
         if valid_report: valid_report = val_rep_restr(report.report_restriction)
+        # validate report is 'Draft' or 'Recheck'
+        if valid_report: valid_report = valid_status(report)
         # validate we receive log-date, log-type, log-content
         log_type = request.vars['log-type']
         log_date = request.vars['log-date']
@@ -386,6 +477,8 @@ def log():
         if valid_log: valid_log = val_rep_owner(log.report)
         # validate report is editable
         if valid_log: valid_log = val_rep_restr(log.report['report_restriction'])
+        # validate report is 'Draft' or 'Recheck'
+        if valid_log: valid_log = valid_status(db.report(db.report.id == log.report))
         # validate we receive log-date, log-type, log-content
         log_type = request.vars['log-type']
         log_date = request.vars['log-date']
@@ -409,6 +502,8 @@ def log():
         if valid_log: valid_log = val_rep_owner(log.report)
         # validate report is editable
         if valid_log: valid_log = val_rep_restr(log.report['report_restriction'])
+        # validate report is 'Draft' or 'Recheck'
+        if valid_log: valid_log = valid_status(db.report(db.report.id == log.report))
         if valid_log:
             log.delete_record()
             session.flash = T('Log Deleted')
@@ -448,178 +543,3 @@ def project_items():
         usr_reports = db((db.report_head.repor_user==auth.user.id)&
                  (db.report_head.project == project.id)).select()
     return locals()
-
-@auth.requires_login()
-@auth.requires_membership('Student')
-def report_detail():
-    import datetime
-    report = request.vars['report']
-    cdate = datetime.datetime.now()
-    creport_head, report_head, c_enab_date, project, go_create = False, False\
-                                                        ,False, False, False
-    user_project = request.vars['assignation']
-    project = db((db.user_project.id==user_project)&
-                (db.project.id==db.user_project.project)).select(db.project.ALL).first()
-    c_enab_date = db((db.enabled_date.start_date <= cdate)&
-             (db.enabled_date.end_date >= cdate)).select().first()
-
-    if c_enab_date and project:
-        creport_head = db((db.report_head.repor_user==auth.user.id)&
-              (db.report_head.enabled_date == c_enab_date.id)&
-              (db.report_head.project == project.id)).select(db.report_head.ALL)
-        if not creport_head:
-            report_head = db.report_head.insert(created=cdate, project=project.id,
-                     repor_user=auth.user.id, enabled_date=c_enab_date.id)
-            db.commit()
-            go_create = True
-    return locals()
-
-def get_report_head(user_project):
-    import datetime
-    cdate = datetime.datetime.now()
-    creport_head, report_head, c_enab_date, project, go_create = False, False\
-                                                        ,False, False, False
-    user_project = user_project
-    project = db((db.user_project.id==user_project)&
-                (db.project.id==db.user_project.project)).select(db.project.ALL).first()
-    if project:
-        c_enab_date = db((db.enabled_date.start_date <= cdate)&
-                 (db.enabled_date.end_date >= cdate)).select().first()
-
-    if c_enab_date and project:
-        creport_head = db((db.report_head.repor_user==auth.user.id)&
-              (db.report_head.enabled_date == c_enab_date.id)&
-              (db.report_head.project == project.id)).select(db.report_head.ALL).first()
-
-    return creport_head, c_enab_date
-
-@auth.requires_login()
-@auth.requires_membership('Student')
-def logs_list():
-    report = False
-    report = request.vars['report']
-    user_project = request.vars['assignation']
-    creport_head, c_enab_date = get_report_head(user_project)
-    entries = []
-    if creport_head:
-        entries = db((db.log_entry.entry_user==auth.user.id)&
-        (db.log_entry.head==creport_head.id)).select()
-    elif report:
-        entries = db((db.log_entry.entry_user==auth.user.id)&
-        (db.log_entry.head==report)).select()
-    entries_size = len(entries)
-    return locals()
-
-@auth.requires_login()
-@auth.requires_membership('Student')
-def logs_area():
-    log_types = db(db.log_type).select()
-    log_count = len(log_types)
-    user_project = request.vars['assignation']
-    form = FORM(
-              T('Entry Date:'),
-              INPUT(_name="event_date", _type="text", _id="my_calendar",
-               requires=IS_NOT_EMPTY()),
-              T('Type:'),
-              SELECT(_name="type_select", *[OPTION(log_types[i].name,
-                                  _value=str(log_types[i].id))
-                                  for i in range(log_count)]),
-              T('Description:'),
-              TEXTAREA(_label=T('Description'), _name="description",
-                   requires=IS_NOT_EMPTY()),
-
-              INPUT(_type='submit', _value=T('Save activity')))
-    if form.process().accepted:
-        date = request.vars['event_date']
-        log_type = request.vars['type_select']
-        description = request.vars['description']
-        user_project = request.vars['assignation']
-        creport_head, c_enab_date = get_report_head(user_project)
-
-        if creport_head and c_enab_date:
-            db.log_entry.insert(entry_date=date, log_type=log_type,
-                    description=description, entry_user=auth.user.id,
-                    project = 1, head=creport_head)
-            session.flash = T('Log Inserted')
-        else:
-            if creport_head:
-                session.flash = T('Activity Logs creation not longer available')
-                redirect(URL('student', 'courses'))
-            elif c_enab_date:
-                session.flash = T('No report set created')
-                redirect(URL('logs_list', vars=dict(date=c_enab_date.id, assignation=user_project)))
-            else:
-                session.flash = T('Activity Logs creation not longer available,\
-                                and no report set created')
-                redirect(URL('student', 'courses'))
-        redirect(URL('logs_list', vars=dict(date=c_enab_date.id, assignation=user_project)))
-
-    elif form.errors:
-        response.flash = 'form has errors'
-    else:
-        response.flash = 'please fill the form'
-    return locals()
-
-@auth.requires_login()
-@auth.requires_membership('Student')
-def courses():
-    year_period = request.vars['year_period']
-    max_display = 1
-    currentyear_period = db.period_year(db.period_year.id == year_period)
-    if not currentyear_period:
-        currentyear_period = current_year_period()
-    current_data = db((db.user_project.period <= currentyear_period.id)&
-              ((db.user_project.period + db.user_project.periods) > currentyear_period.id)&
-              (db.user_project.assigned_user == auth.user.id)).select()
-    current_period_name = T(second_period_name)
-    if currentyear_period.period == first_period.id:
-        current_period_name = T(first_period_name)
-    start_index = currentyear_period.id - max_display - 1
-    if start_index < 1:
-        start_index = 0
-    end_index = currentyear_period.id + max_display
-    periods_before = db(db.period_year).select(limitby=(start_index, currentyear_period.id - 1))
-    periods_after = db(db.period_year).select(limitby=(currentyear_period.id, end_index))
-    other_periods = db(db.period_year).select()
-    return dict(current_data = current_data,
-                currentyear_period = currentyear_period,
-                current_period_name = current_period_name,
-                periods_before = periods_before,
-                periods_after = periods_after,
-                other_periods = other_periods)
-
-
-def current_year_period():
-    #this should be a module's method
-    import datetime
-    cdate = datetime.datetime.now()
-    cyear = cdate.year
-    cmonth = cdate.month
-    period = second_period
-    #current period depends if we are in dates between jan-jun and jul-dec
-    if cmonth < 7 :
-        period = first_period
-    return db.period_year((db.period_year.yearp == cyear)&
-                          (db.period_year.period == period))
-    assignations = db((db.user_project.assigned_user == auth.user.id)&
-                      (db.user_project.assigned_user == db.auth_user.id)&
-                      (db.user_project.project == db.project.id)&
-                      (db.project.area_level == db.area_level.id)&
-                      (db.user_project.period == db.period_year.id)).select()
-    return dict(assignations = assignations)
-
-def report_list():
-    assignation = request.vars['assignation']
-    #TODO: security statement goes here
-    if not assignation: redirect(URL('index'))
-    final_practice = db((db.user_project.id == assignation)&
-                        (db.user_project.assigned_user == db.auth_user.id)&
-                        (db.user_project.project == db.project.id)&
-                        (db.project.area_level == db.area_level.id)&
-                        (db.user_project.period == db.period_year.id)).select()
-    if not final_practice: redirect(URL('index'))
-    final_practice = final_practice.first()
-    available_periods = db((db.period_year.id >= final_practice.user_project.period)&
-                           (db.period_year.id < (final_practice.user_project.period + final_practice.user_project.periods))).select()
-    return dict(final_practice = final_practice,
-                available_periods = available_periods)

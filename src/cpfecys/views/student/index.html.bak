@@ -1,0 +1,239 @@
+{{extend 'template.html'}}
+<h2>{{=T('Final Practice Record')}} <small>{{=auth.user.username}}</small></h2>
+<h3>
+    {{=T('Student Information')}}
+</h3>
+<ul>
+    <li>{{=T('Student')}}: {{=auth.user.username}}</li>
+    <li>{{=T('First Name')}}: {{=auth.user.first_name}}</li>
+    <li>{{=T('Last Name')}}: {{=auth.user.last_name}}</li>
+</ul>
+<h3>
+    {{=T('Assignation History')}}
+</h3>
+<div class="accordion" id="practice_assignation_accordion">
+    <div class="accordion-group">
+        {{for item in assignations:}}
+        <div class="accordion-heading">
+            <div class="row-fluid">
+                <a class="accordion-toggle"
+                   data-toggle="collapse"
+                   data-parent="#practice_assignation_accordion"
+                   href="#i{{=item.user_project.id}}">
+                    <span class="span6">
+                        <div>
+                            <strong>{{=T('Project Name')}}:</strong>
+                            {{=item.project.name}}
+                        </div>
+                        <div>
+                            <strong>{{=T('Area')}}:</strong>
+                            {{=item.area_level.name}}
+                        </div>
+                    </span>
+                    <span class="span6 right">
+                        <div>
+                            <strong>{{=T('Start')}}:</strong>
+                            {{=item.period_year.yearp}} - {{=T('Semester')}}
+                            {{=item.period_year.period}}
+                        </div>
+                        <div>
+                            <strong>{{=T('Length')}}:</strong>
+                            {{=item.user_project.periods}} {{=T('Semesters')}}
+                        </div>
+                    </span>
+                </a>
+            </div>
+        </div>
+        <div id="i{{=item.user_project.id}}"
+             class="accordion-body collapse">
+            <div class="accordion-inner">
+                <div class="row-fluid reports">
+                    <div class="well span12">
+                        <h3>
+                            {{=T('Reports')}}
+                        </h3>
+                        <table style="width:100%;">
+                            <thead>
+                                <tr>
+                                    <th>
+                                        {{=T('Name')}}
+                                    </th>
+                                    <th>
+                                        {{=T('Created Date')}}
+                                    </th>
+                                    <th>
+                                        {{=T('Delivery Dates')}}
+                                    </th>
+                                    <th>
+                                        {{=T('Status')}}
+                                    </th>
+                                    <th>
+                                        {{=T('Score')}}
+                                    </th>
+                                    <th>
+                                        {{=T('Actions')}}
+                                    </th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {{average_report_scoring = 0}}
+                                {{reports = item.user_project.report.select()}}
+                                {{average_report_count = len(reports)}}
+                                {{for report in reports:}}
+                                {{restriction = db.report_restriction(report.report_restriction)}}
+                                <tr>
+                                    <td>
+                                        {{=restriction.name}}
+                                    </td>
+                                    <td>
+                                        {{=report.created}}
+                                    </td>
+                                    <td>
+                                        {{=restriction.start_date}} - {{=restriction.end_date}}
+                                    </td>
+                                    <td>
+                                        {{=T(report.status['name'])}}
+                                    </td>
+                                    <td>
+                                        {{=report.score}}
+                                    </td>
+                                    {{if report.score: average_report_scoring += report.score}}
+                                    <td>
+                                        <a class="btn"
+                                           href="{{=URL('student',
+                                                 'report/view',
+                                                 vars=dict(report=report.id))}}">
+                                            <span class="icon-eye-open"></span>
+                                            {{=T('View Report')}}
+                                        </a>
+                                        {{=(restriction.start_date <= current_date and \
+                                                restriction.end_date >= current_date)}}
+                                        {{if (report.status['name'] == 'Draft' or \
+                                                report.status['name'] == 'Recheck') and \
+                                            (restriction.start_date <= current_date and \
+                                                restriction.end_date >= current_date) and \
+                                            restriction.is_enabled:}}
+                                        <a class="btn"
+                                           href="{{=URL('student',
+                                                 'report/edit',
+                                                 vars=dict(report=report.id))}}">
+                                            <span class="icon-edit"></span>
+                                            {{=T('Edit Report')}}
+                                        </a>
+                                        {{pass}}
+                                    </td>
+                                </tr>
+                                {{pass}}
+                            </tbody>
+                        </table>
+                        <div class="span12">
+                            <div class="span6">
+                                <strong>{{=T('Average Score')}}:</strong>
+                                {{if average_report_count > 0:}}
+                                    {{=average_report_scoring/average_report_count}}
+                                {{else:}}
+                                    0
+                                {{pass}}
+                            </div>
+                            <div class="span6">
+                                {{for available_report in available_reports(item.period_year).select():}}
+                                {{if db((db.report.report_restriction == available_report.id)&
+                                      (db.user_project.id == db.report.assignation)&
+                                    (db.user_project.assigned_user == auth.user.id)).count() < 1:}}
+                                <a class="pull-right btn" href="{{=URL('student','report/create', vars=dict(assignation = item.user_project.id, report_restriction = available_report.id))}}">
+                                    <span class="icon-plus"></span>{{=available_report.name}}
+                                    <small>
+                                        {{=T('Available:') + ' ' +
+                                        str(available_report.start_date) + ' - ' +
+                                        str(available_report.end_date)}}
+                                    </small>
+                                </a>
+                                {{pass}}
+                                {{pass}}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row-fluid">
+                    <div class="span12 well">
+                    <h3>
+                        {{=T('Deliverable Items')}}
+                    </h3>
+                        <table style="width:100%;">
+                            <thead>
+                                <tr>
+                                    <th>
+                                        {{=T('Name')}}
+                                    </th>
+                                    <th>
+                                        {{=T('Created')}}
+                                    </th>
+                                    <th>
+                                        {{=T('Actions')}}
+                                    </th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {{for item_restriction in \
+                                    available_item_restriction(cyear_period, item).select():}}
+                                    {{if items_instance(
+                                        item_restriction.item_restriction,
+                                        item).count() != 0:}}
+                                        {{items = items_instance(
+                                            item_restriction.item_restriction,
+                                            item).select().first()}}
+                                        <td>{{=item_restriction.item_restriction.name}}</td>
+                                        <td>
+                                            {{=items.created.period.name}} {{=items.created.yearp}}
+                                        </td>
+                                        <td>
+                                            <a href="{{=URL('student',
+                                                     'item/view',
+                                                    vars=dict(restriction=item_restriction.item_restriction.id,
+                                                     assignation=item.user_project.id))}}" class="btn">
+                                                    <span class="icon-eye-open"></span>
+                                                    {{=T('View Item')}}
+                                                </a>
+                                                {{if items.created == cyear_period:}}
+                                                <a href="{{=URL('student',
+                                                         'item/edit',
+                                                    vars=dict(restriction=item_restriction.item_restriction.id,
+                                                         assignation=item.user_project.id))}}" class="btn">
+                                                    <span class="icon-edit"></span>
+                                                    {{=T('Edit Item')}}
+                                                </a>
+                                                {{pass}}
+                                        </td>
+                                    {{pass}}
+                                {{pass}}
+                            </tbody>
+                        </table>
+                        <div class="row-fluid right">
+                            {{for item_restriction in \
+                                    available_item_restriction(cyear_period, item).select():}}
+                            {{if items_instance(
+                                        item_restriction.item_restriction,
+                                        item).count() == 0:}}
+                            <a href="{{=URL('student',
+                                     'item/create',
+                                     vars=dict(
+                                     restriction=item_restriction.item_restriction.id,
+                                     assignation=item.user_project.id))}}"
+                               class="btn">
+                                <span class="icon-plus"></span>
+                                {{=T('Create Item')}}
+                                <small>{{=item_restriction.item_restriction.name}}</small>
+                            </a>
+                            {{pass}}
+                            {{pass}}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {{pass}}
+    </div>
+</div>
+{{if request.is_local:}}
+{{=response.toolbar()}}
+{{pass}}

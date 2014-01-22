@@ -256,6 +256,76 @@
 <a class="btn" href="{{=URL('student','report/acceptance', vars=dict(report = report.id))}}">
     {{=T('Send to Grading')}}
 </a>
+{{elif state == 'view':}}
+<div class="row-fluid">
+  <div class="navbar">
+      <div class="navbar-inner">
+        <a class="brand" href="#">
+            {{=T('View Report:')}}
+            <small>{{=report.report_restriction['name']}}</small>
+        </a>
+        <ul class="nav pull-right">
+        </ul>
+      </div>
+  </div>
+</div>
+<div class="">
+<div class="accordion" id="accordion2">
+  <div class="accordion-group">
+    <div class="accordion-heading">
+      <a class="accordion-toggle" data-toggle="collapse" data-parent="#accordion2" href="#collapseOne">
+          <strong>
+              <span class="icon-tasks"></span>
+              {{=T('Activities Log')}}
+          </strong>
+          <span class="right">
+              <span><strong>{{=T('Total Anomalies')}}:</strong> {{=anomalies}} </span> |
+              <span><strong>{{=T('Total Registered Activities')}}:</strong> {{=len(logs)}} </span>
+          </span>
+      </a>
+    </div>
+    <div id="collapseOne" class="accordion-body collapse">
+      <div class="accordion-inner">
+          <div style="container">
+              {{for log in logs:}}
+              <div class="row-fluid">
+                  <div class="well span12">
+                      <div class="span12">
+                          {{if log.log_type['name'] == 'Anomaly':}}
+                          <div class="alert">
+                              <strong><span class="icon-warning-sign"></span>
+                                  {{=T('Anomaly')}}
+                              </strong>
+                          </div>
+                          {{pass}}
+                          <strong>Log type:</strong> {{=T(log.log_type['name'])}}
+                          <strong>Date:</strong> {{=log.entry_date}}
+                      </div>
+                      <div class="span12">
+                          {{=MARKMIN(log.description, markmin_settings)}}
+                      </div>
+                  </div>
+              </div>
+              {{pass}}
+          </div>
+      </div>
+    </div>
+  </div>
+  <div class="accordion-group">
+    <div class="accordion-heading">
+      <a class="accordion-toggle" data-toggle="collapse" data-parent="#accordion2" href="#collapseTwo">
+          <span class="icon-adjust"></span>
+          {{=T('Activities Log with metrics')}}
+      </a>
+    </div>
+    <div id="collapseTwo" class="accordion-body collapse">
+      <div class="accordion-inner">
+        asdf
+      </div>
+    </div>
+  </div>
+</div>
+</div>
 {{pass}}
 <!-- Enable Markmin in textarea -->
 <script>
