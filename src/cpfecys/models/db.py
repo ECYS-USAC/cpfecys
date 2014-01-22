@@ -108,25 +108,28 @@ use_janrain(auth, filename='private/janrain.key')
 
 # A project contains an description and name
 db.define_table('area_level',
-                Field('name', 'string'),
-                Field('description', 'text'),
+                Field('name', 'string', label = T('Nombre')),
+                Field('description', 'text', label = T('Descripción')),
                 format='%(name)s')
 
 db.define_table('project',
-                Field ('project_id', 'string', unique = True, length = 255),
-                Field ('name', 'string'),
-                Field ('area_level', 'reference area_level'),
-                Field ('description', 'text'),
-                Field ('physical_location', 'text'),
+                Field ('project_id', 'string', unique = True, length = 255, \
+                    label = T('Proyecto')),
+                Field ('name', 'string', label = T('Nombre')),
+                Field ('area_level', 'reference area_level', label = T('Área')),
+                Field ('description', 'text', label = T('Descripción')),
+                Field ('physical_location', 'text', \
+                    label = T('Ubicación física')),
                 format='%(name)s')
 
 db.define_table('period',
-                Field ('name', 'string', unique = True, length = 255),
+                Field ('name', 'string', unique = True, length = 255, \
+                    label = T('Nombre')),
                 format = '%(name)s')
 
 db.define_table('period_year',
-                Field('yearp', 'integer'),
-                Field('period', 'reference period'),
+                Field('yearp', 'integer', label = T('Anio')),
+                Field('period', 'reference period', label = T('Período')),
                 format = '%(yearp)s - %(period)s')
 
 # The relationship between a user and a subproject contains
@@ -134,11 +137,14 @@ db.define_table('period_year',
 # it has the starting cycle and the ending cycle
 # it also is the central key for all operations with interesting data
 db.define_table('user_project',
-                Field('assigned_user', 'reference auth_user'),
-                Field('project', 'reference project'),
-                Field('period', 'reference period_year'),
-                Field('pro_bono', 'boolean', length=255, notnull=False),
-                Field ('periods', 'integer', notnull=False))
+                Field('assigned_user', 'reference auth_user', \
+                    label = T('Usuario')),
+                Field('project', 'reference project', label = T('Proyecto')),
+                Field('period', 'reference period_year', label = T('Período')),
+                Field('pro_bono', 'boolean', length=255, notnull=False, \
+                    label = T('Es Voluntario?')),
+                Field ('periods', 'integer', notnull=False, \
+                    label = T('Cantidad de Períodos')))
 
 first_period_name = 'First Semester'
 second_period_name = 'Second Semester'
@@ -146,118 +152,161 @@ second_period_name = 'Second Semester'
 # This are the tables that store important links and uploaded
 # files by admin.
 db.define_table('link',
-                Field('url', 'text', notnull=True),
-                Field('blank', 'boolean'),
-                Field('url_text', 'text', notnull=True),
-                Field('visible', 'boolean', notnull=True),
-                Field('is_public', 'boolean', notnull=False),
+                Field('url', 'text', notnull=True, label = T('Enlace/URL')),
+                Field('blank', 'boolean', label = T('Abrir en nueva pestaña')),
+                Field('url_text', 'text', notnull=True, \
+                    label = T('Texto del Enlace')),
+                Field('visible', 'boolean', notnull=True, \
+                    label = T('Es visible?')),
+                Field('is_public', 'boolean', notnull=False, 
+                    label = T('Es público?')),
                 format='%(url_text)s')
 
 #Frontend notification
 db.define_table('front_notification',
-                Field('name', 'string', notnull=True),
-                Field('content_text', 'text', notnull=False),
-                Field('url', 'string', notnull=False),
-                Field('visible', 'boolean', notnull=False),
-                Field('is_public', 'boolean', notnull=False),
-                Field('file_data', 'upload', default='', notnull=False),
-                Field('promoted', 'boolean', notnull=False),
+                Field('name', 'string', notnull=True, label = T('Nombre')),
+                Field('content_text', 'text', notnull=False, \
+                    label = T('Contenido')),
+                Field('url', 'string', notnull=False, label = T('Enlace/URL')),
+                Field('visible', 'boolean', notnull=False, label = T('Visible')),
+                Field('is_public', 'boolean', notnull=False, \
+                    label = T('Es público?')),
+                Field('file_data', 'upload', default='', notnull=False, \
+                    label = T('Archivo')),
+                Field('promoted', 'boolean', notnull=False, \
+                    label = T('Mostrar como principal notificación')),
                 format='%(name)s'
                 )
 
 #Published files entity
 db.define_table('uploaded_file',
-                Field('name', 'string', notnull=True),
-                Field('visible', 'boolean'),
-                Field('file_data', 'upload', default=''),
-                Field('is_public', 'boolean', notnull=False),
+                Field('name', 'string', notnull=True, label = T('Nombre')),
+                Field('visible', 'boolean', label = T('Es visible?')),
+                Field('file_data', 'upload', default='', \
+                    label = T('Archivo')),
+                Field('is_public', 'boolean', notnull=False, \
+                    label = T('Es público?')),
                 format='%(name)s')
 
 #User gruops relationships with files, notifications, links
 db.define_table('file_access',
-                Field ('user_role', 'reference auth_group'),
-                Field ('uploaded_file', 'reference uploaded_file'),
+                Field ('user_role', 'reference auth_group', \
+                    label = T('Grupo de usuarios')),
+                Field ('uploaded_file', 'reference uploaded_file', \
+                    label = T('Archivo')),
                 )
 
 db.define_table('link_access',
-                Field ('user_role', 'reference auth_group'),
-                Field ('link', 'reference link'),
+                Field ('user_role', 'reference auth_group', \
+                    label = T('Grupo de usuarios')),
+                Field ('link', 'reference link', \
+                    label = T('Enlace')),
                 )
 
 db.define_table('notification_access',
-                Field ('user_role', 'reference auth_group'),
-                Field ('front_notification', 'reference front_notification'),
+                Field ('user_role', 'reference auth_group', \
+                    label = T('Grupo de usuarios')),
+                Field ('front_notification', 'reference front_notification',\
+                    label = T('Notificación')),
                 )
 
 #Reports and Activities structure
 db.define_table('report_restriction',
-                Field('name', 'string', notnull=False),
-                Field('start_date', 'date', notnull=False),
-                Field('end_date', 'date', notnull=False),
-                Field('is_enabled', 'boolean', notnull=False),
+                Field('name', 'string', notnull=False, \
+                    label = T('Nombre')),
+                Field('start_date', 'date', notnull=False, \
+                    label = T('Fecha de inicio')),
+                Field('end_date', 'date', notnull=False, \
+                    label = T('Fecha de Final')),
+                Field('is_enabled', 'boolean', notnull=False, \
+                    label = T('Está habilitado?')),
                 )
 
 db.define_table('report_status',
-                Field('name', 'string', notnull=True),
-                Field('description', 'string', notnull=True))
+                Field('name', 'string', notnull=True, label = T('Nombre')),
+                Field('description', 'string', notnull=True), \
+                label = T('Descripción'))
 
 db.define_table('report',
-                Field('created', 'date'),
-                Field('assignation', 'reference user_project'),
-                Field('report_restriction', 'reference report_restriction'),
-                Field('score', 'integer'),
-                Field('status', 'reference report_status', notnull=True),
-                )
-
-db.define_table('report_detail',
-                Field('created', 'datetime', notnull=True),
-                Field('report', 'reference report'),
+                Field('created', 'date', \
+                label = T('Fecha de creación')),
+                Field('assignation', 'reference user_project', \
+                label = T('Usuario asignado')),
+                Field('report_restriction', 'reference report_restriction', \
+                label = T('Restriccion')),
+                Field('score', 'integer', \
+                label = T('Nota')),
+                Field('status', 'reference report_status', notnull=True, \
+                label = T('Status')),
                 )
 
 db.define_table('log_type',
-                Field('name', 'string', notnull=True),
+                Field('name', 'string', notnull=True, label = T('Nombre')),
                 format='%(entry_date)s'
                 )
 
 db.define_table('log_entry',
-                Field('log_type', 'reference log_type'),
-                Field('entry_date', 'date', notnull=True),
-                Field('description', 'text', notnull=True),
-                Field('report', 'reference report'),
+                Field('log_type', 'reference log_type', \
+                    label = T('Tipo de actividad')),
+                Field('entry_date', 'date', notnull=True, \
+                    label = T('Fecha de creación')),
+                Field('description', 'text', notnull=True, \
+                    label = T('Descripción')),
+                Field('report', 'reference report', \
+                    label = T('Reporte')),
                 format='%(entry_date)s'
                 )
 #Project item requirements structure
 db.define_table('item_type',
-                Field('name', 'string', notnull=True),
+                Field('name', 'string', notnull=True, label = T('Nombre')),
                 format='%(name)s'
                 )
 
 db.define_table('item_restriction',
-                Field('name', 'string', notnull=False),
-                Field('start_date', 'date', notnull=False),
-                Field('end_date', 'date', notnull=False),
-                Field('is_enabled', 'boolean', notnull=False),
-                Field('permanent', 'boolean', notnull=False),
-                Field('teacher_only', 'boolean', notnull=True),
-                Field('item_type', 'reference item_type'),
-                Field('period', 'reference period_year'),
+                Field('name', 'string', notnull=False, label = T('Nombre')),
+                Field('start_date', 'date', notnull=False, \
+                    label = T('Fecha de inicio')),
+                Field('end_date', 'date', notnull=False, \
+                    label = T('Fecha final')),
+                Field('is_enabled', 'boolean', notnull=False, \
+                    label = T('Está habilitado?')),
+                Field('permanent', 'boolean', notnull=False, \
+                    label = T('Es permanente?')),
+                Field('teacher_only', 'boolean', notnull=True, \
+                    label = T('Sólo catedrático?')),
+                Field('admin_only', 'boolean', notnull=True, \
+                    label = T('Sólo administrador?')),
+                Field('item_type', 'reference item_type', \
+                    label = T('Tipo de ítem')),
+                Field('period', 'reference period_year', \
+                    label = T('Período')),
                 format='%(name)s'
                 )
 
 db.define_table('item_restriction_area', 
-                Field('area_level', 'reference area_level'),
-                Field('item_restriction', 'reference item_restriction'),
-                Field('is_enabled', 'boolean', notnull=False),
+                Field('area_level', 'reference area_level', \
+                    label = T('Área')),
+                Field('item_restriction', 'reference item_restriction', \
+                    label = T('Restriccion de ítem')),
+                Field('is_enabled', 'boolean', notnull=False, \
+                    label = T('Está habilitado?')),
                 )
 
 db.define_table('item',
-                Field('is_active', 'boolean', notnull=False),
-                Field('description', 'text', notnull=False),
-                Field('uploaded_file', 'upload', default='', notnull=False),
-                Field('done_activity', 'boolean', notnull=False),
-                Field('created', 'reference period_year'),
-                Field('item_restriction', 'reference item_restriction'),
-                Field('assignation', 'reference user_project'),
+                Field('is_active', 'boolean', notnull=False, \
+                    label = T('Está activo?')),
+                Field('description', 'text', notnull=False, \
+                    label = T('Descripción')),
+                Field('uploaded_file', 'upload', default='', notnull=False, \
+                    label = T('Archivo')),
+                Field('done_activity', 'boolean', notnull=False, \
+                    label = T('Actividad realizada')),
+                Field('created', 'reference period_year', \
+                    label = T('Fecha de creación')),
+                Field('item_restriction', 'reference item_restriction', \
+                    label = T('Restricción de item')),
+                Field('assignation', 'reference user_project', \
+                    label = T('Usuario asignado')),
                 format='%(name)s'
                 )
 
@@ -274,6 +323,7 @@ if auth.user != None:
         if not db(db.auth_user.id==auth.user.id).select().first().data_updated:
                 if path != update_url and not logout_url in path:
                     redirect(URL('student','update_data'))
+
 # User Roles
 ## Super-Administrator:
 setup = db.auth_user(db.auth_user.username == 'admin')
