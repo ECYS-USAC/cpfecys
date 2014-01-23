@@ -264,10 +264,6 @@ db.define_table('item_type',
 
 db.define_table('item_restriction',
                 Field('name', 'string', notnull=False, label = T('name')),
-                Field('start_date', 'date', notnull=False, \
-                    label = T('start_date')),
-                Field('end_date', 'date', notnull=False, \
-                    label = T('end_date')),
                 Field('is_enabled', 'boolean', notnull=False, \
                     label = T('is_enabled')),
                 Field('permanent', 'boolean', notnull=False, \
