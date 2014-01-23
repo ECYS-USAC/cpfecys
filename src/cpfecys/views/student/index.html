@@ -176,7 +176,10 @@
                                     available_item_restriction(cyear_period, item).select():}}
                                     {{if items_instance(
                                         item_restriction.item_restriction,
-                                        item).count() != 0:}}
+                                        item).count() != 0 and \
+                                        restriction_project_exception(
+                                        item_restriction.item_restriction,
+                                        item).count() == 0:}}
                                         {{items = items_instance(
                                             item_restriction.item_restriction,
                                             item).select().first()}}
@@ -208,6 +211,9 @@
                             {{for item_restriction in \
                                     available_item_restriction(cyear_period, item).select():}}
                             {{if items_instance(
+                                        item_restriction.item_restriction,
+                                        item).count() == 0 and \
+                                        restriction_project_exception(
                                         item_restriction.item_restriction,
                                         item).count() == 0:}}
                             <a href="{{=URL('student',

@@ -45,6 +45,12 @@ def index():
                 (db.item_restriction_area.area_level==\
                     user_project.project.area_level.id)&
                 (db.item_restriction.item_type!=2))
+
+    def restriction_project_exception(item_restriction, assignation):
+        return db((db.item_restriction_exception.project== \
+                    assignation.project.id)&
+                    (db.item_restriction.id==item_restriction))
+
     def items_instance(item_restriction, assignation):
         return db((db.item.item_restriction==item_restriction.id)&
                     (db.item.assignation==assignation.user_project.id)&
@@ -57,7 +63,8 @@ def index():
                 current_date = current_date,
                 cyear_period = cyear_period,
                 available_item_restriction = available_item_restriction,
-                items_instance = items_instance)
+                items_instance = items_instance,
+                restriction_project_exception=restriction_project_exception)
 
 ## Validate that the report date restriction and is_enabled restriction apply to current date
 def val_rep_restr(report_restriction):

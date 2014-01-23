@@ -50,7 +50,7 @@ def notifications_manager():
 def items_manager():
     if request.function == 'new':
         db.item.created.writable=db.item.created.readable=False
-    grid = SQLFORM.smartgrid(db.item_restriction, linked_tables=['item_restriction_area'])
+    grid = SQLFORM.smartgrid(db.item_restriction, linked_tables=['item_restriction_area', 'item_restriction_exception'])
     return dict(grid=grid)
 
 @auth.requires_login()

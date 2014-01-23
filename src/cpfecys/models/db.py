@@ -288,6 +288,13 @@ db.define_table('item_restriction_area',
                     label = T('is_enabled')),
                 )
 
+db.define_table('item_restriction_exception', 
+                Field('project', 'reference project', \
+                    label = T('project')),
+                Field('item_restriction', 'reference item_restriction', \
+                    label = T('item_restriction')),
+                )
+
 db.define_table('item',
                 Field('is_active', 'boolean', notnull=False, \
                     label = T('is_active')),
