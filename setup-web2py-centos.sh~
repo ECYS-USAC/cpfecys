@@ -237,4 +237,3 @@ cd ${current_directory}
 
 echo " - Complete!"
 echo " Ahora puedes visitar https://dominio/dtt/admin/ para administrar web2py"
-echo " con la contrasena ingresada anteriormente"

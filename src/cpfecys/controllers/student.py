@@ -376,9 +376,9 @@ def report():
             'code_java':lambda text: CODE(text,language='java').xml(),
             'code_python':lambda text: CODE(text,language='python').xml(),
             'code_html':lambda text: CODE(text,language='html').xml()}
-        return dict(state = 'edit',
-                    log_types = db(db.log_type.id > 0).select(),
-                    logs = db.log_entry((db.log_entry.report == report.id)).select(),
+        response.view = 'student/report_edit.html'
+        return dict(log_types = db(db.log_type.id > 0).select(),
+                    logs = db((db.log_entry.report == report.id)).select(),
                     anomalies = db((db.log_type.name == 'Anomaly')&
                                    (db.log_entry.log_type == db.log_type.id)&
                                    (db.log_entry.report == report.id)).count(),
@@ -447,8 +447,8 @@ def report():
                 'code_java':lambda text: CODE(text,language='java').xml(),
                 'code_python':lambda text: CODE(text,language='python').xml(),
                 'code_html':lambda text: CODE(text,language='html').xml()}
-            return dict(state='view',
-                        log_types = db(db.log_type.id > 0).select(),
+            response.view = 'student/report_view.html'
+            return dict(log_types = db(db.log_type.id > 0).select(),
                         logs = db((db.log_entry.report == report.id)).select(),
                         anomalies = db((db.log_type.name == 'Anomaly')&
                                    (db.log_entry.log_type == db.log_type.id)&
