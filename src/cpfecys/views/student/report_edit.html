@@ -18,12 +18,12 @@
             <span class="row-fluid">
                 <span class="row">
                     <span class="span3">
-                        <h3 id="changos">{{=T('Log Activity')}}</h3>
+                        <h3 id="changos">{{=T('Log Activity')}} <small>YYY-MM-DD</small></h3>
                     </span>
                     <span class="span8">
                         <div class="input-prepend">
                             <span class="add-on">{{=T('Log Date')}} <span class="icon-calendar"></span></span>
-                            <input class="span7" id="log-metrics-date" name="log-date" type="date">
+                            <input class="span7" id="log-metrics-date" name="log-date" placeholder="YYY-MM-DD" type="date">
                         </div>
                     </span>
                     <span class="span1">
@@ -144,12 +144,12 @@
             <span class="row-fluid">
                 <span class="row">
                     <span class="span3">
-                        <h3 id="changos">{{=T('Log Activity')}}</h3>
+                        <h3 id="changos">{{=T('Log Activity')}} <small>YYY-MM-DD</small></h3>
                     </span>
                     <span class="span8">
                         <div class="input-prepend">
                             <span class="add-on">{{=T('Log Date')}} <span class="icon-calendar"></span></span>
-                            <input class="span7" id="log-date" name="log-date" type="date">
+                            <input class="span7" id="log-date" name="log-date" placeholder="YYY-MM-DD" type="date">
                         </div>
                     </span>
                     <span class="span1">
@@ -251,7 +251,7 @@
                                         <input class="span7"
                                                id="log-date-{{=log.id}}"
                                                value="{{=log.entry_date}}"
-                                               name="log-date"
+                                               name="log-date" placeholder="YYY-MM-DD"
                                                type="date">
                                     </div>
                                 </span>
