@@ -312,7 +312,7 @@ db.define_table('item',
 import cpfecys
 cpfecys.setup(db, auth)
 cpfecys.force_student_data_update(request.env.path_info,
-                                  ['/cpfecys/student/update_data',
+                                  ['/student/update_data',
                                    '/default/user/logout'])
 
 ## after defining tables, uncomment below to enable auditing
