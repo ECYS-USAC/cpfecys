@@ -286,6 +286,8 @@
 'HTML': 'HTML',
 'htmledit': 'htmledit',
 'Id': 'Id',
+'ID de Grupo': 'ID de Grupo',
+'ID de Usuario': 'ID de Usuario',
 'import': 'importar',
 'Import/Export': 'Importar/Exportar',
 'Important Links': 'Links Importantes',

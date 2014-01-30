@@ -64,7 +64,6 @@ def assign_items():
     filter = 1
     if request.vars['filter'] != None:
         filter = int(request.vars['filter'])
-        
     if filter == 1:
         pass
     dct = {}
@@ -73,7 +72,6 @@ def assign_items():
          left=db.item_project.on(db.item.id==db.item_project.item))
     for item in items:
         dct.update({item.name:[]})
-        
     for row in rows:
         dct[row.item.name].append(row)
     return locals()
@@ -106,7 +104,8 @@ def assignation_upload():
                 ## check if user exists
                 usr = db.auth_user(db.auth_user.username == rusername)
                 project = db.project(db.project.project_id == rproject)
-                current_period = current_year_period()
+                import cpfecys
+                current_period = cpfecys.current_year_period()
                 if usr is None:
                     ## find it on chamilo (db2)
                     usr = db2.user_user(db2.user_user.username == rusername)
@@ -141,7 +140,7 @@ def assignation_upload():
                                             pro_bono = rpro_bono)
                 else:
                     # project_id is not valid
-                    row.append('error: ' + T('Project code is not valid. Check please.'))
+                    row.append('Error: ' + T('Project code is not valid. Check please.'))
                     error_users.append(row)
                     continue
         except csv.Error:
@@ -165,15 +164,16 @@ def assignation():
     #and shows the current period
     year_period = request.vars['year_period']
     max_display = 1
+    import cpfecys
     currentyear_period = db.period_year(db.period_year.id == year_period)
     if not currentyear_period:
-        currentyear_period = current_year_period()
+        currentyear_period = cpfecys.current_year_period()
         changid = currentyear_period.id
     grid = SQLFORM.grid((db.user_project.period <= currentyear_period.id)&
               ((db.user_project.period + db.user_project.periods) > currentyear_period.id))
-    current_period_name = T(second_period_name)
-    if currentyear_period.period == first_period.id:
-        current_period_name = T(first_period_name)
+    current_period_name = T(cpfecys.second_period.name)
+    if currentyear_period.period == cpfecys.first_period.id:
+        current_period_name = T(cpfecys.first_period.name)
     start_index = currentyear_period.id - max_display - 1
     if start_index < 1:
         start_index = 0
@@ -188,45 +188,8 @@ def assignation():
                 periods_after = periods_after,
                 other_periods = other_periods)
 
-def current_year_period():
-    import datetime
-    cdate = datetime.datetime.now()
-    cyear = cdate.year
-    cmonth = cdate.month
-    period = second_period
-    #current period depends if we are in dates between jan-jun and jul-dec
-    if cmonth < 7 :
-        period = first_period
-    return db.period_year((db.period_year.yearp == cyear)&
-                          (db.period_year.period == period))
-
 @auth.requires_login()
 @auth.requires_membership('Super-Administrator')
 def users():
     grid = SQLFORM.smartgrid(db.auth_user)
     return dict(grid = grid)
-
-@auth.requires_login()
-@auth.requires_membership('Super-Administrator')
-def add_student():
-    #get the username
-    #other data is fetched from db2
-    #if that data exists then the user is created here
-    #teacher role is assigned
-    return dict()
-
-@auth.requires_login()
-@auth.requires_membership('Super-Administrator')
-def add_teacher():
-    #get the username
-    #other data is fetched from db2
-    #if that data exists then the user is created here
-    #teacher role is assigned
-    return dict()
-
-@auth.requires_login()
-@auth.requires_membership('Super-Administrator')
-def add_administrator():
-    #get the username
-    #administrator role is assigned
-    return dict()

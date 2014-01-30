@@ -8,7 +8,7 @@ def index():
                       (db.user_project.project == db.project.id)&
                       (db.project.area_level == db.area_level.id)&
                       (db.user_project.period == db.period_year.id)).select()
-    cyear_period = get_current_year_period()
+    cyear_period = cpfecys.current_year_period()
     def available_reports(assignation_period):
         import datetime
         current_date = datetime.datetime.now()
@@ -22,7 +22,7 @@ def index():
         #end date >= July 1 year 00:00:00
         #start date < Jan 1 year 00:00:00
         #end date < Jan 1 year 00:00:00
-        if assignation_period.period == first_period.id:
+        if assignation_period.period == cpfecys.first_period.id:
             date_min = datetime.datetime(assignation_period.yearp, 1, 1)
             date_max = datetime.datetime(assignation_period.yearp, 7, 1)
         else:
@@ -65,39 +65,6 @@ def index():
                 available_item_restriction = available_item_restriction,
                 items_instance = items_instance,
                 restriction_project_exception=restriction_project_exception)
-
-## Validate that the report date restriction and is_enabled restriction apply to current date
-def val_rep_restr(report_restriction):
-    import datetime
-    current_date = datetime.datetime.now()
-    rep_restr = db((db.report_restriction.id == report_restriction)&
-        (db.report_restriction.start_date <= current_date)&
-        (db.report_restriction.end_date >= current_date)&
-        (db.report_restriction.is_enabled == True)).select().first()
-    return rep_restr != None
-
-## Validate that the report status is editable (it is either 'Draft' or 'Recheck')
-def valid_status(report):
-    return (report.status == db.report_status(db.report_status.name == 'Draft').id) or \
-            (report.status == db.report_status(db.report_status.name == 'Recheck').id)
-
-def get_current_year_period():
-    import datetime
-    cdate = datetime.datetime.now()
-    cyear = cdate.year
-    cmonth = cdate.month
-    period = second_period
-    #current period depends if we are in dates between jan-jun and jul-dec
-    if cmonth < 7 :
-        period = first_period
-    return db.period_year((db.period_year.yearp == cyear)&
-                          (db.period_year.period == period))
-
-def val_rep_owner(report):
-    usr_rep = db((db.report.id == report)&
-            (db.report.assignation == db.user_project.id)&
-            (db.user_project.assigned_user == auth.user.id)).select().first()
-    return usr_rep != None
 
 @auth.requires_login()
 @auth.requires_membership('Student')
@@ -207,7 +174,7 @@ def download():
 @auth.requires_login()
 @auth.requires_membership('Student')
 def item():
-    cyear_period = get_current_year_period()
+    cyear_period = cpfecys.current_year_period()
     item_restriction = request.vars['restriction']
     user_project = request.vars['assignation']
     item_query = db((db.item.created==cyear_period)&
@@ -295,8 +262,8 @@ def item():
                                             Please upload only PDF, DOC or \
                                             DOCX files files'))])),
                     BR(),
-                    DIV(INPUT(_type='submit', 
-                        _value=T('Upload File'), 
+                    DIV(INPUT(_type='submit',
+                        _value=T('Upload File'),
                         _class="btn-primary")),
                         _class="form-horizontal",)
         if form.process().accepted:
@@ -323,7 +290,7 @@ def report():
         assignation = request.vars['assignation']
         report_restriction = request.vars['report_restriction']
         # Validate DB report_restriction to obey TIMING rules
-        valid_rep_restr = val_rep_restr(report_restriction)
+        valid_rep_restr = cpfecys.student_validation_report_restrictions(report_restriction)
         # Validate report_restriction
         report_restrict = db.report_restriction(db.report_restriction.id == report_restriction)
         valid_report = report_restrict != None
@@ -355,17 +322,17 @@ def report():
             session.flash = T('Selected report can\'t be edited. Select a valid report.')
             redirect(URL('student','index'))
         ## Validate report TIMING restriction
-        valid_rep_restr = val_rep_restr(report.report_restriction.id)
+        valid_rep_restr = cpfecys.student_validation_report_restrictions(report.report_restriction.id)
         if not(valid_rep_restr):
             session.flash = T('Selected report can\'t be edited. Select a valid report.')
             redirect(URL('student','index'))
         ## Validate that the report belongs to user
-        valid_report_owner = val_rep_owner(report.id)
+        valid_report_owner = cpfecys.student_validation_report_owner(report.id)
         if not(valid_report_owner):
             session.flash = T('Selected report can\'t be edited. Select a valid report.')
             redirect(URL('student','index'))
         ## Validate that the report status is editable (it is either 'Draft' or 'Recheck')
-        if not(valid_status(report)):
+        if not(cpfecys.student_validation_report_status(report)):
             session.flash = T('Selected report can\'t be edited. Select a valid report.')
             redirect(URL('student','index'))
         ## Markmin formatting of reports
@@ -389,9 +356,9 @@ def report():
         report = request.vars['report']
         report = db.report(db.report.id == report)
         ## Validate DB report_restriction to obey TIMING rules
-        valid_rep_restr = val_rep_restr(report.report_restriction.id)
+        valid_rep_restr = cpfecys.student_validation_report_restrictions(report.report_restriction.id)
         ## Validate that the report status is editable (it is either 'Draft' or 'Recheck')
-        if not(valid_status(report)):
+        if not(cpfecys.student_validation_report_status(report)):
             session.flash = T('Selected report can\'t be saved. Select a valid report.')
             redirect(URL('student','index'))
         # Validate assignation belongs to this user
@@ -412,9 +379,9 @@ def report():
         report = request.vars['report']
         report = db.report(db.report.id == report)
         # Validate DB report_restriction to obey TIMING rules
-        valid_rep_restr = val_rep_restr(report.report_restriction.id)
+        valid_rep_restr = cpfecys.student_validation_report_restrictions(report.report_restriction.id)
         ## Validate that the report status is editable (it is either 'Draft' or 'Recheck')
-        if not(valid_status(report)):
+        if not(cpfecys.student_validation_report_status(report)):
             session.flash = T('Invalid selected assignation and report. Select a valid one.')
             redirect(URL('student','index'))
         # Validate assignation belongs to this user
@@ -437,7 +404,7 @@ def report():
         report = db.report(db.report.id == report)
         valid = not(report is None)
         # Validate that the report belongs to user
-        if valid: valid = val_rep_owner(report.id)
+        if valid: valid = cpfecys.student_validation_report_owner(report.id)
         if valid:
             ## Markmin formatting of reports
             LATEX = '<img src="http://chart.apis.google.com/chart?cht=tx&chl=%s" align="center"/>'
@@ -470,11 +437,12 @@ def log():
         report = request.vars['report']
         report = db.report(db.report.id == report)
         valid_report = report != None
-        if valid_report: valid_report = val_rep_owner(report.id)
+        if valid_report: valid_report = cpfecys.student_validation_report_owner(report.id)
         # validate report is editable
-        if valid_report: valid_report = val_rep_restr(report.report_restriction)
+        if valid_report: valid_report = cpfecys.student_validation_report_restrictions \
+            (report.report_restriction)
         # validate report is 'Draft' or 'Recheck'
-        if valid_report: valid_report = valid_status(report)
+        if valid_report: valid_report = cpfecys.student_validation_report_status(report)
         # validate we receive log-date, log-type, log-content
         log_type = request.vars['log-type']
         log_date = request.vars['log-date']
@@ -496,11 +464,13 @@ def log():
         log = db.log_entry(db.log_entry.id == log)
         valid_log = log != None
         # validate log report owner is valid
-        if valid_log: valid_log = val_rep_owner(log.report)
+        if valid_log: valid_log = cpfecys.student_validation_report_owner(log.report)
         # validate report is editable
-        if valid_log: valid_log = val_rep_restr(log.report['report_restriction'])
+        if valid_log: valid_log = cpfecys.student_validation_report_restrictions \
+            (log.report['report_restriction'])
         # validate report is 'Draft' or 'Recheck'
-        if valid_log: valid_log = valid_status(db.report(db.report.id == log.report))
+        if valid_log: valid_log = cpfecys.student_validation_report_status \
+            (db.report(db.report.id == log.report))
         # validate we receive log-date, log-type, log-content
         log_type = request.vars['log-type']
         log_date = request.vars['log-date']
@@ -521,11 +491,13 @@ def log():
         log = db.log_entry(db.log_entry.id == log)
         valid_log = log != None
         # validate log report owner is valid
-        if valid_log: valid_log = val_rep_owner(log.report)
+        if valid_log: valid_log = cpfecys.student_validation_report_owner(log.report)
         # validate report is editable
-        if valid_log: valid_log = val_rep_restr(log.report['report_restriction'])
+        if valid_log: valid_log = cpfecys.student_validation_report_restrictions \
+            (log.report['report_restriction'])
         # validate report is 'Draft' or 'Recheck'
-        if valid_log: valid_log = valid_status(db.report(db.report.id == log.report))
+        if valid_log: valid_log = cpfecys.student_validation_report_status \
+            (db.report(db.report.id == log.report))
         if valid_log:
             log.delete_record()
             session.flash = T('Log Deleted')
@@ -534,34 +506,3 @@ def log():
             session.flash = T('Operation not allowed.')
             redirect(URL('student', 'index'))
     return dict()
-
-@auth.requires_login()
-@auth.requires_membership('Student')
-def project_items():
-    import datetime
-    cdate = datetime.datetime.now()
-    user_project = request.vars['assignation']
-    create_current, c_enab_date, creport = False, False, False
-
-    project = db((db.user_project.id==user_project)&
-                (db.project.id==db.user_project.project)).select(db.project.ALL).first()
-
-    c_enab_date = db((db.enabled_date.start_date <= cdate)&
-             (db.enabled_date.end_date >= cdate)).select().first()
-
-    if c_enab_date:
-        creport = db((db.report_head.repor_user==auth.user.id)&
-              (db.report_head.enabled_date == c_enab_date.id)&
-              (db.report_head.project == project.id)).select(db.report_head.ALL)
-        if len(creport) == 0 and c_enab_date:
-          create_current = True
-          usr_reports = db((db.report_head.repor_user==auth.user.id)&
-                 (db.report_head.enabled_date != c_enab_date.id)&
-                 (db.report_head.project == project.id)).select()
-        else:
-          usr_reports = db((db.report_head.repor_user==auth.user.id)&
-                 (db.report_head.project == project.id)).select()
-    else:
-        usr_reports = db((db.report_head.repor_user==auth.user.id)&
-                 (db.report_head.project == project.id)).select()
-    return locals()

@@ -146,9 +146,6 @@ db.define_table('user_project',
                 Field ('periods', 'integer', notnull=False, \
                     label = T('periods')))
 
-first_period_name = 'First Semester'
-second_period_name = 'Second Semester'
-
 # This are the tables that store important links and uploaded
 # files by admin.
 db.define_table('link',
@@ -312,166 +309,11 @@ db.define_table('item',
                     label = T('assignation')),
                 format='%(name)s'
                 )
+import cpfecys
+cpfecys.setup(db, auth)
+cpfecys.force_student_data_update(request.env.path_info,
+                                  ['/cpfecys/student/update_data',
+                                   '/default/user/logout'])
 
-#User updated data validation
-if auth.user != None:
-    groups = db((db.auth_membership.user_id==auth.user.id)& \
-                    (db.auth_group.role=='Student')& \
-                    (db.auth_group.id==db.auth_membership.group_id)). \
-                    select().first()
-    if groups != None:
-        path  = request.env.path_info
-        update_url = '/cpfecys/student/update_data'
-        logout_url = '/default/user/logout'
-        if not db(db.auth_user.id==auth.user.id).select().first().data_updated:
-                if path != update_url and not logout_url in path:
-                    redirect(URL('student','update_data'))
-
-# User Roles
-## Super-Administrator:
-setup = db.auth_user(db.auth_user.username == 'admin')
-if setup is None:
-    ## Report Status Types
-    db.report_status.insert(name="Draft", description="")
-    db.report_status.insert(name="Grading", description="")
-    db.report_status.insert(name="Recheck", description="")
-    db.report_status.insert(name="Acceptance", description="")
-    #Default item types
-    db.item_type.insert(name='File')
-    db.item_type.insert(name='Activity')
-
-    #Default log types
-    db.log_type.insert(name='Activity')
-    db.log_type.insert(name='Anomaly')
-
-    semester1 = db.period.insert(name = first_period_name)
-    semester2 = db.period.insert(name = second_period_name)
-    ## Final Practice Areas of DTT
-    lvl_1 = db.area_level.insert(name = "DTT Tutor Académico", description = "")
-    lvl_2 = db.area_level.insert(name = "DTT Tutor de Comunicación", description = "")
-    lvl_3 = db.area_level.insert(name = "DTT Tutor de Desarrollo", description = "")
-    lvl_4 = db.area_level.insert(name = "DTT Tutor de Innovación", description = "")
-    lvl_5 = db.area_level.insert(name = "DTT Tutor de Investigación", description = "")
-    lvl_6 = db.area_level.insert(name = "DTT Tutor de Infraestructura", description = "")
-    ## Creation of standard 'Projects'
-    db.project.insert(project_id = '0283A', area_level = lvl_1, name = 'Análisis y Diseño de Sistemas 1 (Sección A)', description = '', physical_location = '')
-    db.project.insert(project_id = '0785A', area_level = lvl_1, name = 'Análisis y Diseño de Sistemas 2 (Sección A)', description = '', physical_location = '')
-    db.project.insert(project_id = '0785B', area_level = lvl_1, name = 'Análisis y Diseño de Sistemas 2 (Sección B)', description = '', physical_location = '')
-    db.project.insert(project_id = '0778A', area_level = lvl_1, name = 'Arquitectura de Computadoras y Ensambladores 1 (Sección A)', description = '', physical_location = '')
-    db.project.insert(project_id = '0778B', area_level = lvl_1, name = 'Arquitectura de Computadoras y Ensambladores 1 (Sección B)', description = '', physical_location = '')
-    db.project.insert(project_id = '0779A', area_level = lvl_1, name = 'Arquitectura de Computadoras y Ensambladores 2 (Sección A)', description = '', physical_location = '')
-    db.project.insert(project_id = '0774A', area_level = lvl_1, name = 'Bases de Datos 1 (Sección A)', description = '', physical_location = '')
-    db.project.insert(project_id = '0774B', area_level = lvl_1, name = 'Bases de Datos 1 (Sección B)', description = '', physical_location = '')
-    db.project.insert(project_id = '0775A', area_level = lvl_1, name = 'Bases de Datos 2 (Sección A)', description = '', physical_location = '')
-    db.project.insert(project_id = '0775B', area_level = lvl_1, name = 'Bases de Datos 2 (Sección B)', description = '', physical_location = '')
-    db.project.insert(project_id = '0738A', area_level = lvl_1, name = 'Bases de Datos Avanzadas (Sección A)', description = '', physical_location = '')
-    db.project.insert(project_id = '0014A+', area_level = lvl_1, name = 'Economía (Sección A+)', description = '', physical_location = '')
-    db.project.insert(project_id = '0014A-', area_level = lvl_1, name = 'Economía (Sección A-)', description = '', physical_location = '')
-    db.project.insert(project_id = '0790A', area_level = lvl_1, name = 'Emprendedores de Negocios Informáticos	 (Sección A)', description = '', physical_location = '')
-    db.project.insert(project_id = '0772A', area_level = lvl_1, name = 'Estructura de Datos (Sección A)', description = '', physical_location = '')
-    db.project.insert(project_id = '0772B', area_level = lvl_1, name = 'Estructura de Datos (Sección B)', description = '', physical_location = '')
-    db.project.insert(project_id = '0786N', area_level = lvl_1, name = 'Gerenciales 1 (Sección N)', description = '', physical_location = '')
-    db.project.insert(project_id = '0786P', area_level = lvl_1, name = 'Gerenciales 1 (Sección P)', description = '', physical_location = '')
-    db.project.insert(project_id = '0787A', area_level = lvl_1, name = 'Gerenciales 2 (Sección A)', description = '', physical_location = '')
-    db.project.insert(project_id = '0972A', area_level = lvl_1, name = 'Inteligencia Artificial 1 (Sección A)', description = '', physical_location = '')
-    db.project.insert(project_id = '0972B', area_level = lvl_1, name = 'Inteligencia Artificial 1 (Sección B)', description = '', physical_location = '')
-    db.project.insert(project_id = '0770A', area_level = lvl_1, name = 'Introducción a la Programación y Computación 1 (Sección A)', description = '', physical_location = '')
-    db.project.insert(project_id = '0770B', area_level = lvl_1, name = 'Introducción a la Programación y Computación 1 (Sección B)', description = '', physical_location = '')
-    db.project.insert(project_id = '0770C', area_level = lvl_1, name = 'Introducción a la Programación y Computación 1 (Sección C)', description = '', physical_location = '')
-    db.project.insert(project_id = '0770D', area_level = lvl_1, name = 'Introducción a la Programación y Computación 1 (Sección D)', description = '', physical_location = '')
-    db.project.insert(project_id = '0770E', area_level = lvl_1, name = 'Introducción a la Programación y Computación 1 (Sección E)', description = '', physical_location = '')
-    db.project.insert(project_id = '0771A', area_level = lvl_1, name = 'Introducción a la Programación y Computación 2 (Sección A)', description = '', physical_location = '')
-    db.project.insert(project_id = '0771B', area_level = lvl_1, name = 'Introducción a la Programación y Computación 2 (Sección B)', description = '', physical_location = '')
-    db.project.insert(project_id = '0771C', area_level = lvl_1, name = 'Introducción a la Programación y Computación 2 (Sección C)', description = '', physical_location = '')
-    db.project.insert(project_id = '0771D', area_level = lvl_1, name = 'Introducción a la Programación y Computación 2 (Sección D)', description = '', physical_location = '')
-    db.project.insert(project_id = '0771E', area_level = lvl_1, name = 'Introducción a la Programación y Computación 2 (Sección E)', description = '', physical_location = '')
-    db.project.insert(project_id = '0796A+', area_level = lvl_1, name = 'Lenguajes Formales y de Programación (Sección A+)', description = '', physical_location = '')
-    db.project.insert(project_id = '0796A-', area_level = lvl_1, name = 'Lenguajes Formales y de Programación (Sección A-)', description = '', physical_location = '')
-    db.project.insert(project_id = '0796B+', area_level = lvl_1, name = 'Lenguajes Formales y de Programación (Sección B+)', description = '', physical_location = '')
-    db.project.insert(project_id = '0796B-', area_level = lvl_1, name = 'Lenguajes Formales y de Programación (Sección B-)', description = '', physical_location = '')
-    db.project.insert(project_id = '0795A+', area_level = lvl_1, name = 'Lógica de Sistemas (Sección A+)', description = '', physical_location = '')
-    db.project.insert(project_id = '0795A-', area_level = lvl_1, name = 'Lógica de Sistemas (Sección A-)', description = '', physical_location = '')
-    db.project.insert(project_id = '0773A+', area_level = lvl_1, name = 'Manejo e Implementación de Archivos (Sección A+)', description = '', physical_location = '')
-    db.project.insert(project_id = '0773A-', area_level = lvl_1, name = 'Manejo e Implementación de Archivos (Sección A-)', description = '', physical_location = '')
-    db.project.insert(project_id = '0729A', area_level = lvl_1, name = 'Modelación y Simulación 1 (Sección A)', description = '', physical_location = '')
-    db.project.insert(project_id = '0730A', area_level = lvl_1, name = 'Modelación y Simulación 2 (Sección A)', description = '', physical_location = '')
-    db.project.insert(project_id = '0964A', area_level = lvl_1, name = 'Organización Comptuacional (Sección A)', description = '', physical_location = '')
-    db.project.insert(project_id = '0964B', area_level = lvl_1, name = 'Organización Comptuacional (Sección B)', description = '', physical_location = '')
-    db.project.insert(project_id = '0777A', area_level = lvl_1, name = 'Organización Lenguajes y Compiladores 1 (Sección A)', description = '', physical_location = '')
-    db.project.insert(project_id = '0777B', area_level = lvl_1, name = 'Organización Lenguajes y Compiladores 1 (Sección B)', description = '', physical_location = '')
-    db.project.insert(project_id = '0777C', area_level = lvl_1, name = 'Organización Lenguajes y Compiladores 1 (Sección C)', description = '', physical_location = '')
-    db.project.insert(project_id = '0777D', area_level = lvl_1, name = 'Organización Lenguajes y Compiladores 1 (Sección D)', description = '', physical_location = '')
-    db.project.insert(project_id = '0781A+', area_level = lvl_1, name = 'Organización Lenguajes y Compiladores 2 (Sección A+)', description = '', physical_location = '')
-    db.project.insert(project_id = '0781A-', area_level = lvl_1, name = 'Organización Lenguajes y Compiladores 2 (Sección A+)', description = '', physical_location = '')
-    db.project.insert(project_id = '2025A', area_level = lvl_1, name = 'Prácticas Iniciales (Sección A)', description = '', physical_location = '')
-    db.project.insert(project_id = '2036A', area_level = lvl_1, name = 'Prácticas Intermedias (Sección A)', description = '', physical_location = '')
-    db.project.insert(project_id = '0667P', area_level = lvl_1, name = 'Programación Comercial 1 (Sección P)', description = '', physical_location = '')
-    db.project.insert(project_id = '0090A', area_level = lvl_1, name = 'Programación de Computadoras 1 (090 Sección A)', description = '', physical_location = '')
-    db.project.insert(project_id = '0092N', area_level = lvl_1, name = 'Programación de Computadoras 2 (Sección N)', description = '', physical_location = '')
-    db.project.insert(project_id = '0092P', area_level = lvl_1, name = 'Programación de Computadoras 2 (Sección P)', description = '', physical_location = '')
-    db.project.insert(project_id = '0092Q', area_level = lvl_1, name = 'Programación de Computadoras 2 (Sección Q)', description = '', physical_location = '')
-    db.project.insert(project_id = '0970A', area_level = lvl_1, name = 'Redes de Computadoras 1 (Sección A)', description = '', physical_location = '')
-    db.project.insert(project_id = '0975A', area_level = lvl_1, name = 'Redes de Computadoras 2 (Sección A)', description = '', physical_location = '')
-    db.project.insert(project_id = '0966A', area_level = lvl_1, name = 'Seguridad y Auditoria de Redes (Sección A)', description = '', physical_location = '')
-    db.project.insert(project_id = '0799A', area_level = lvl_1, name = 'Seminario de Investigación (Sección A)', description = '', physical_location = '')
-    db.project.insert(project_id = '0797A', area_level = lvl_1, name = 'Seminario de Sistemas 1 (Sección A)', description = '', physical_location = '')
-    db.project.insert(project_id = '0798A', area_level = lvl_1, name = 'Seminario de Sistemas 2 (Sección A)', description = '', physical_location = '')
-    db.project.insert(project_id = '0281A', area_level = lvl_1, name = 'Sistemas Operativos 1 (Sección A)', description = '', physical_location = '')
-    db.project.insert(project_id = '0285A', area_level = lvl_1, name = 'Sistemas Operativos 2 (Sección A)', description = '', physical_location = '')
-    db.project.insert(project_id = '0780A', area_level = lvl_1, name = 'Software Avanzado (Sección A)', description = '', physical_location = '')
-    db.project.insert(project_id = '0722A', area_level = lvl_1, name = 'Teoria de Sistemas 1 (Sección A)', description = '', physical_location = '')
-    db.project.insert(project_id = '0721A', area_level = lvl_1, name = 'Teoria de Sistemas 2 (Sección A)', description = '', physical_location = '')
-    # Various Projects
-    db.project.insert(project_id = 'PV001', area_level = lvl_6, name = 'COECYS', description = 'Congreso de Estudiantes de Ingeniería en Ciencias y Sistemas', physical_location = 'Oficina de Congresos Estudiantiles Ingeniería USAC, Edificio T-1, tercer nivel')
-    db.project.insert(project_id = 'PV002', area_level = lvl_1, name = 'DSI', description = 'Departamento de Soporte Informático', physical_location = 'Edificio T3, Salon 104; Universidad de San Carlos de Guatemala.')
-    db.project.insert(project_id = 'PV003', area_level = lvl_4, name = 'SAE-SAP', description = '', physical_location = '')
-    db.project.insert(project_id = 'PV004', area_level = lvl_4, name = 'ITCoE', description = '', physical_location = '')
-    db.project.insert(project_id = 'PV005', area_level = lvl_3, name = 'Centro de Cálculo FIUSAC', description = '', physical_location = 'Centro de Cálculo Facultad de Ingeniería USAC.')
-    db.project.insert(project_id = 'PV006', area_level = lvl_4, name = 'Rectoría (Infraestructura)', description = 'Proyecto de Infraestructura en Rectoría Universidad de San Carlos de Guatemala', physical_location = 'Rectoría USAC.')
-    db.project.insert(project_id = 'PV007', area_level = lvl_3, name = 'Centro de Investigación FIUSAC', description = '', physical_location = 'Centro de Investigación Facultad de Ingeniería USAC.')
-    db.project.insert(project_id = 'PV008', area_level = lvl_3, name = 'Escuela de Ciencias y Sistemas FIUSAC', description = 'Desarrollo de aplicaciones y utilidades para la Escuela de Ciencias y Sistemas FIUSAC.', physical_location = 'Escuela de Ciencias y Sistemas, Edificio T3.')
-    ## Would be a good idea to at least join courses with UV here
-    ## User Roles Setup:
-    supersu = db.auth_user.insert(email = 'admin@admin.com', first_name = 'Super',
-                                         last_name = 'Administrator', username = 'admin',
-                                         password = db.auth_user.password.validate('superadmin')[0])
-    superadmins = auth.add_group(role = 'Super-Administrator',description = 'In charge of the whole system administration.')
-    auth.add_membership(superadmins, supersu)
-    ## Student:
-    students = auth.add_group('Student',
-                              'User that is enrolled in some practice. Limited access.')
-    ## Teacher:
-    teachers = auth.add_group('Teacher',
-                              'User that evaluates students in some courses. When final practice is teaching.')
-#
-# automatically tries to create the next period in may and november respectively
-# Using the following logic:
-# - In May..Dec the second period of current year is created.
-# - In Nov the first period of next year is created.
-# - In Jan..Apr the first period of current year is created.
-#
-first_period = db.period(db.period.name == first_period_name)
-second_period = db.period(db.period.name == second_period_name)
-import datetime
-now = datetime.datetime.now()
-year = now.year
-if now.month >= 5:
-    #check and create second semester of current year
-    pery = db.period_year((db.period_year.yearp == year)&
-                          (db.period_year.period == second_period))
-    if not pery:
-        db.period_year.insert(yearp = year, period = second_period)
-else:
-    #check and create first semester of current year
-    pery = db.period_year((db.period_year.yearp == year)&
-                          (db.period_year.period == first_period))
-    if not pery:
-        db.period_year.insert(yearp = year, period = first_period)
-if now.month >= 11:
-    #check and create first semester of next year
-    pery = db.period_year((db.period_year.yearp == (year + 1))&
-                          (db.period_year.period == first_period))
-    if not pery:
-        db.period_year.insert(yearp = (year + 1), period = first_period)
 ## after defining tables, uncomment below to enable auditing
-# auth.enable_record_versioning(db)
+    # auth.enable_record_versioning(db)

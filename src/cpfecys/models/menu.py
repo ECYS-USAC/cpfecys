@@ -48,8 +48,6 @@ if auth.has_membership(role="Teacher"):
     ])
 if auth.has_membership(role="Student"):
     response.menu.extend([(T('Final Practice'), False, URL('student', 'index'), [])])
-    response.menu.extend([(T('Activities Log'), False, URL('student', 'logs_list'), [])])
-    response.menu.extend([(T('Reports'), False, URL('student', 'report_list'), [])])
 
 #any user should be able to see this menu
 response.menu.extend([
