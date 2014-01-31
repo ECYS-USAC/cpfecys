@@ -28,9 +28,9 @@ def force_student_data_update(path, ignore_paths):
         data_updated = _db.auth_user(_db.auth_user.id==_auth.user.id).data_updated
         if data_updated:
             return
-        for ignored_path in ignore_paths:
-            if ignored_path in path:
-                redirect(URL('student','update_data'))
+        if any(s in path for s in ignore_paths):
+            return
+        redirect(URL('student','update_data'))
 
 def current_year_period():
     db = _db
