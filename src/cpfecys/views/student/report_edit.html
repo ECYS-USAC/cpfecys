@@ -13,7 +13,7 @@
      role="dialog"
      aria-labelledby="changos"
      aria-hidden="true">
-    <form action="{{=URL('log/save', vars=dict(report = report.id))}}" method="POST">
+    <form action="{{=URL('metrics/save', vars=dict(report = report.id))}}" method="POST">
         <div class="modal-header">
             <span class="row-fluid">
                 <span class="row">
@@ -37,85 +37,99 @@
             <div class="control-group">
                 <label class="control-label" for="media-metrics">Media</label>
                 <div class="controls">
-                    <input type="text" id="media-metrics" placeholder="Media">
+                    <input type="text" id="media-metrics" 
+                    name="media-metrics" placeholder="Media">
                 </div>
             </div>
             <div class="control-group">
                 <label class="control-label" for="error-tipico-metrics">Error Típico</label>
                 <div class="controls">
-                    <input type="text" id="error-tipico-metrics" placeholder="Error Típico">
+                    <input type="text" id="error-tipico-metrics"
+                    name="error-tipico-metrics" placeholder="Error Típico">
                 </div>
             </div>
             <div class="control-group">
                 <label class="control-label" for="mediana-metrics">Mediana</label>
                 <div class="controls">
-                    <input type="text" id="mediana-metrics" placeholder="Mediana">
+                    <input type="text" id="mediana-metrics" 
+                    name="mediana-metrics" placeholder="Mediana">
                 </div>
             </div>
             <div class="control-group">
                 <label class="control-label" for="moda-metrics">Moda</label>
                 <div class="controls">
-                    <input type="text" id="moda-metrics" placeholder="Moda">
+                    <input type="text" id="moda-metrics" 
+                    name="moda-metrics" placeholder="Moda">
                 </div>
             </div>
             <div class="control-group">
                 <label class="control-label" for="desviacion-estandar-metrics">Desviación Estandar</label>
                 <div class="controls">
-                    <input type="text" id="desviacion-estandar-metrics" placeholder="Desviación Estandar">
+                    <input type="text" id="desviacion-estandar-metrics"
+                    name="desviacion-estandar-metrics" placeholder="Desviación Estandar">
                 </div>
             </div>
             <div class="control-group">
                 <label class="control-label" for="varianza-metrics">Varianza de la Muestra</label>
                 <div class="controls">
-                    <input type="text" id="varianza-metrics" placeholder="Varianza de la Muestra">
+                    <input type="text" id="varianza-metrics" 
+                    name="varianza-metrics" placeholder="Varianza de la Muestra">
                 </div>
             </div>
             <div class="control-group">
                 <label class="control-label" for="curtosis-metrics">Curtosis</label>
                 <div class="controls">
-                    <input type="text" id="curtosis-metrics" placeholder="Curtosis">
+                    <input type="text" id="curtosis-metrics" 
+                    name="curtosis-metrics" placeholder="Curtosis">
                 </div>
             </div>
             <div class="control-group">
                 <label class="control-label" for="coeficiente-metrics">Coeficiente de asimetría</label>
                 <div class="controls">
-                    <input type="text" id="coeficiente-metrics" placeholder="Coeficiente de asimetría">
+                    <input type="text" id="coeficiente-metrics" 
+                    name="coeficiente-metrics" placeholder="Coeficiente de asimetría">
                 </div>
             </div>
             <div class="control-group">
                 <label class="control-label" for="rango-metrics">Rango</label>
                 <div class="controls">
-                    <input type="text" id="rango-metrics" placeholder="Rango">
+                    <input type="text" id="rango-metrics" 
+                    name="rango-metrics" placeholder="Rango">
                 </div>
             </div>
             <div class="control-group">
                 <label class="control-label" for="minimo-metrics">Mínimo</label>
                 <div class="controls">
-                    <input type="text" id="minimo-metrics" placeholder="Mínimo">
+                    <input type="text" id="minimo-metrics" 
+                    name="minimo-metrics" placeholder="Mínimo">
                 </div>
             </div>
             <div class="control-group">
                 <label class="control-label" for="maximo-metrics">Máximo</label>
                 <div class="controls">
-                    <input type="text" id="maximo-metrics" placeholder="Máximo">
+                    <input type="text" id="maximo-metrics" 
+                    name="maximo-metrics" placeholder="Máximo">
                 </div>
             </div>
             <div class="control-group">
                 <label class="control-label" for="total-metrics">Total de Alumnos</label>
                 <div class="controls">
-                    <input type="text" id="total-metrics" placeholder="Total de Alumnos">
+                    <input type="text" id="total-metrics" 
+                    name="total-metrics" placeholder="Total de Alumnos">
                 </div>
             </div>
             <div class="control-group">
                 <label class="control-label" for="reprobados-metrics">Reprobados</label>
                 <div class="controls">
-                    <input type="text" id="reprobados-metrics" placeholder="Reprobados">
+                    <input type="text" id="reprobados-metrics" 
+                    name="reprobados-metrics" placeholder="Reprobados">
                 </div>
             </div>
             <div class="control-group">
                 <label class="control-label" for="aprobados-metrics">Aprobados</label>
                 <div class="controls">
-                    <input type="text" id="aprobados-metrics" placeholder="Aprobados">
+                    <input type="text" id="aprobados-metrics" 
+                    name="aprobados-metrics" placeholder="Aprobados">
                 </div>
             </div>
         </div>
@@ -124,11 +138,27 @@
                 data-dismiss="modal"
                 aria-hidden="true">{{=T('Close')}}</button>
           <input type="submit"
-          onclick="if ($('#log-type').val()&&
-              $('#log-content').val()&&
-              $('#log-date').val())
+          onclick="if (
+              $('#media-metrics').val()&&
+              $('#error-tipico-metrics').val()&&
+              $('#mediana-metrics').val()&&
+              $('#moda-metrics').val()&&
+              $('#desviacion-estandar-metrics').val()&&
+              $('#varianza-metrics').val()&&
+              $('#curtosis-metrics').val()&&
+              $('#coeficiente-metrics').val()&&
+              $('#rango-metrics').val()&&
+              $('#minimo-metrics').val()&&
+              $('#maximo-metrics').val()&&
+              $('#aprobados-metrics').val()&&
+              $('#reprobados-metrics').val()&&
+              parseInt($('#total-metrics').val()) > 0&&
+              parseInt($('#total-metrics').val()) == 
+                  parseInt($('#aprobados-metrics').val()) 
+                  + parseInt($('#reprobados-metrics').val()))
               return true;
-              else return false;"
+              else alert('{{=T('Please verify all data is correct')}}'); 
+                return false;"
               class="btn btn-primary"
                  value="{{=T('Save Changes')}} *{{=T('All fields are required.')}}"></input>
         </div>
@@ -367,7 +397,10 @@
     <div class="accordion-heading">
       <a class="accordion-toggle" data-toggle="collapse" data-parent="#accordion2" href="#collapseTwo">
           <span class="icon-adjust"></span>
-          {{=T('Activities Log with metrics')}}
+          <strong>{{=T('Activities Log with metrics')}}</strong>
+          <span class="right">
+            <span><strong>{{=T('Total activity logs with metrics')}}:</strong>N</span>
+          </span>
       </a>
     </div>
     <div id="collapseTwo" class="accordion-body collapse">

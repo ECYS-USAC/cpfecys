@@ -73,48 +73,48 @@ def update_data():
     if auth.user != None:
         cuser = db(db.auth_user.id==auth.user.id).select().first()
         form = FORM(
-                        DIV(LABEL(T('First Name:')),
+                        DIV(LABEL(T('First Name')),
                                     INPUT(_name="first_name",
                                         _type="text", _id="first_name",
                                         _value=cuser.first_name,
                                         requires=IS_NOT_EMPTY())),
 
-                        DIV(LABEL(T('Last Name:')),
+                        DIV(LABEL(T('Last Name')),
                                        INPUT(_name="last_name",
                                         _type="text", _id="last_name",
                                          _value=cuser.last_name, 
                                          requires=IS_NOT_EMPTY())),
 
-                        DIV(LABEL(T('Email:')),
+                        DIV(LABEL(T('Email')),
                                        INPUT(_name="email",
                                         _type="text", _id="email",
                                         _value=cuser.email,
                                         requires=IS_NOT_EMPTY())),
 
-                        DIV(LABEL(T('Password: (Leave the same for no \
+                        DIV(LABEL(T('Password (Leave the same for no \
                             change)')),
                                       INPUT(_name="password",
                                         _type="password", _id="password",
                                         _value=cuser.password,
                                         requires=IS_NOT_EMPTY())),
 
-                        DIV(LABEL(T('Repeat password: (Leave the blank for \
+                        DIV(LABEL(T('Repeat password (Leave the blank for \
                             no change)')),
                                       INPUT(_name="repass",
                                         _type="password", _id="repass")),
 
-                        DIV(LABEL(T('Phone:')),
+                        DIV(LABEL(T('Phone')),
                                       INPUT(_name="phone", _type="text",
                                         _id="phone", _value=cuser.phone,
                                         requires=IS_LENGTH(minsize=8,
                                                         maxsize=12))),
 
-                        DIV(LABEL(T('Working:')),
+                        DIV(LABEL(T('Working')),
                                       INPUT(_name="working",
                                         _type="checkbox", _id="working",
                                         _value=cuser.working)),
 
-                        DIV(LABEL(T('Work Address:')),
+                        DIV(LABEL(T('Work Address')),
                                       INPUT(_name="work_address",
                                         _type="text", _id="work_address",
                                         _value=cuser.work_address)),
@@ -143,7 +143,7 @@ def update_data():
                 cuser.data_updated = True
                 if password == repass and len(repass) > 0:
                     #TODO Fix password update
-                    cuser.password = db.auth_user.password.validate(password)
+                    cuser.password = db.auth_user.password.validate(password)[0]
                 if working:
                     cuser.working = working
                     cuser.work_address = work_address
@@ -505,4 +505,75 @@ def log():
         else:
             session.flash = T('Operation not allowed.')
             redirect(URL('student', 'index'))
+    return dict()
+
+
+@auth.requires_login()
+@auth.requires_membership('Student')
+def metrics():
+    import datetime
+    cdate = datetime.datetime.now()
+    if (request.args(0) == 'save'):
+        # validate the user owns this report
+        report = request.vars['report']
+        report = db.report(db.report.id == report)
+        valid_report = report != None
+        if valid_report: valid_report = cpfecys.student_validation_report_owner(report.id)
+        # validate report is editable
+        if valid_report: valid_report = cpfecys.student_validation_report_restrictions \
+            (report.report_restriction)
+        # validate report is 'Draft' or 'Recheck'
+        if valid_report: valid_report = cpfecys.student_validation_report_status(report)
+        # validate we receive log-date, log-type, log-content
+
+        media = request.vars['media-metrics']
+        error_tipico = request.vars['error-tipico-metrics']
+        mediana = request.vars['mediana-metrics']
+        moda = request.vars['moda-metrics']
+        desviacion_estandar = request.vars['desviacion-estandar-metrics']
+        varianza = request.vars['varianza-metrics']
+        curtosis = request.vars['curtosis-metrics']
+        coeficiente = request.vars['coeficiente-metrics']
+        rango = request.vars['rango-metrics']
+        minimo = request.vars['minimo-metrics']
+        maximo = request.vars['maximo-metrics']
+        total = request.vars['total-metrics']
+        reprobados = request.vars['reprobados-metrics']
+        aprobados = request.vars['aprobados-metrics']
+
+        if valid_report: valid_report = (media and error_tipico and mediana \
+                                         and moda and desviacion_estandar  
+                                         and varianza and curtosis \
+                                         and coeficiente and rango \
+                                         and minimo and maximo and total \
+                                         and reprobados and aprobados)
+
+        if valid_report:
+            db.log_metrics.insert(report = report.id,
+                                media = media,
+                                error = error_tipico,
+                                mediana = mediana,
+                                moda = moda,
+                                desviacion = desviacion_estandar,
+                                varianza = varianza,
+                                curtosis = curtosis,
+                                coeficiente = coeficiente,
+                                rango = rango,
+                                minimo = minimo,
+                                maximo = maximo,
+                                total = total,
+                                reprobados = reprobados,
+                                aprobados = aprobados,
+                                created = cdate)
+            session.flash = T('Log added')
+            redirect(URL('student', 'report/edit', vars=dict(report=report.id)))
+        else:
+            session.flash = T('Operation not allowed.')
+            redirect(URL('student', 'index'))
+    elif (request.args(0) == 'update'):
+        return 'Foo'
+        
+    elif (request.args(0) == 'delete'):
+        return 'Foo'
+        
     return dict()

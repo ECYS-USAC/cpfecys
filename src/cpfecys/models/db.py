@@ -243,15 +243,58 @@ db.define_table('log_type',
                 )
 
 db.define_table('log_entry',
-                Field('log_type', 'reference log_type', \
-                    label = T('Tlog_type')),
+                Field('log_type', 'reference log_type', label = T('log_type')),
                 Field('entry_date', 'date', notnull=True, \
                     label = T('entry_date')),
                 Field('description', 'text', notnull=True, \
                     label = T('description')),
+                Field('report', 'reference report', label = T('report')),
+                format='%(entry_date)s'
+                )
+
+db.define_table('log_metrics',
+                Field('media', 'decimal(8,2)', notnull=True, \
+                    label = T('media')),
+                Field('error', 'decimal(8,2)', notnull=True, \
+                    label = T('error')),
+                Field('mediana', 'decimal(8,2)', notnull=True, \
+                    label = T('mediana')),
+                Field('moda', 'decimal(8,2)', notnull=True, \
+                    label = T('moda')),
+                Field('desviacion', 'decimal(8,2)', notnull=True, \
+                    label = T('desviacion')),
+                Field('varianza', 'decimal(8,2)', notnull=True, \
+                    label = T('varianza')),
+                Field('curtosis', 'decimal(8,2)', notnull=True, \
+                    label = T('curtosis')),
+                Field('coeficiente', 'decimal(8,2)', notnull=True, \
+                    label = T('coeficiente')),
+                Field('rango', 'decimal(8,2)', notnull=True, \
+                    label = T('rango')),
+                Field('minimo', 'decimal(8,2)', notnull=True, \
+                    label = T('minimo')),
+                Field('maximo', 'decimal(8,2)', notnull=True, \
+                    label = T('maximo')),
+                Field('total', 'integer', notnull=True, \
+                    label = T('total')),
+                Field('reprobados', 'integer', notnull=True, \
+                    label = T('reprobados')),
+                Field('aprobados', 'integer', notnull=True, \
+                    label = T('aprobados')),
+                Field('created', 'date', notnull=True, label = T('entry_date')),
+                Field('report', 'reference report', label = T('report')),
+                format='%(created)s'
+                )
+
+db.define_table('log_desertion', 
+                Field('started', 'integer',notnull=True, label=T('started')),
+                Field('gone', 'integer',notnull=True, label=T('gone')),
+                Field('continued', 'integer',notnull=True, label=T('continued')),
+                Field('created', 'date', notnull=True, \
+                    label = T('entry_date')),
                 Field('report', 'reference report', \
                     label = T('report')),
-                format='%(entry_date)s'
+                format='%(created)s'
                 )
 #Project item requirements structure
 db.define_table('item_type',

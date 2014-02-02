@@ -7,13 +7,15 @@ _db = None
 _auth = None
 first_period = None
 second_period = None
+first_period_name = None
+second_period_name = None
 
 def setup(db, auth):
     global _db, _auth
     _db = db
     _auth = auth
-    _database_setup()
     _module_variables_setup()
+    _database_setup()
     _period_setup()
 
 def force_student_data_update(path, ignore_paths):
@@ -240,6 +242,7 @@ def _report_status_setup():
 
 def _module_variables_setup():
     global first_period, second_period
+    global first_period_name, second_period_name
     first_period_name = 'First Semester'
     second_period_name = 'Second Semester'
 
