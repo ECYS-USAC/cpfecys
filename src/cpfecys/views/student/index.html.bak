@@ -106,8 +106,6 @@
                                             <span class="icon-eye-open"></span>
                                             {{=T('View Report')}}
                                         </a>
-                                        {{=(restriction.start_date <= current_date and \
-                                                restriction.end_date >= current_date)}}
                                         {{if (report.status['name'] == 'Draft' or \
                                                 report.status['name'] == 'Recheck') and \
                                             (restriction.start_date <= current_date and \
@@ -178,7 +176,10 @@
                                     available_item_restriction(cyear_period, item).select():}}
                                     {{if items_instance(
                                         item_restriction.item_restriction,
-                                        item).count() != 0:}}
+                                        item).count() != 0 and \
+                                        restriction_project_exception(
+                                        item_restriction.item_restriction,
+                                        item).count() == 0:}}
                                         {{items = items_instance(
                                             item_restriction.item_restriction,
                                             item).select().first()}}
@@ -187,22 +188,20 @@
                                             {{=items.created.period.name}} {{=items.created.yearp}}
                                         </td>
                                         <td>
+                                            <a class="btn" href="{{=URL('cpfecys/student', 'download', items.uploaded_file)}}">
+                                            <span class="icon-eye-open"></span>
+                                            {{=T('View Item')}}
+                                            </a>
+
+                                            {{if items.created == cyear_period:}}
                                             <a href="{{=URL('student',
-                                                     'item/view',
-                                                    vars=dict(restriction=item_restriction.item_restriction.id,
-                                                     assignation=item.user_project.id))}}" class="btn">
-                                                    <span class="icon-eye-open"></span>
-                                                    {{=T('View Item')}}
-                                                </a>
-                                                {{if items.created == cyear_period:}}
-                                                <a href="{{=URL('student',
-                                                         'item/edit',
-                                                    vars=dict(restriction=item_restriction.item_restriction.id,
-                                                         assignation=item.user_project.id))}}" class="btn">
-                                                    <span class="icon-edit"></span>
-                                                    {{=T('Edit Item')}}
-                                                </a>
-                                                {{pass}}
+                                                     'item/edit',
+                                                vars=dict(restriction=item_restriction.item_restriction.id,
+                                                     assignation=item.user_project.id, file=items.uploaded_file))}}" class="btn">
+                                                <span class="icon-edit"></span>
+                                                {{=T('Edit Item')}}
+                                            </a>
+                                            {{pass}}
                                         </td>
                                     {{pass}}
                                 {{pass}}
@@ -212,6 +211,9 @@
                             {{for item_restriction in \
                                     available_item_restriction(cyear_period, item).select():}}
                             {{if items_instance(
+                                        item_restriction.item_restriction,
+                                        item).count() == 0 and \
+                                        restriction_project_exception(
                                         item_restriction.item_restriction,
                                         item).count() == 0:}}
                             <a href="{{=URL('student',

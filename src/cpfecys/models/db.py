@@ -286,7 +286,7 @@ db.define_table('log_metrics',
                 format='%(created)s'
                 )
 
-db.define_table('log_desertion', 
+db.define_table('log_desertion',
                 Field('started', 'integer',notnull=True, label=T('started')),
                 Field('gone', 'integer',notnull=True, label=T('gone')),
                 Field('continued', 'integer',notnull=True, label=T('continued')),

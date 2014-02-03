@@ -7,6 +7,79 @@
 <link rel="stylesheet" type="text/css" href="{{=URL('static','markitup')}}/sets/markmin/style.css"/>
 <!-- //Additional Scripts for MARKMIN -->
 <!-- This are Helpers -->
+<!-- log-desertion-activity -->
+<div id="log-desertion-activity"
+     class="modal hide fade" tabindex="-1"
+     role="dialog"
+     aria-labelledby="changos"
+     aria-hidden="true">
+    <form action="{{=URL('desertion/save', vars=dict(report = report.id))}}" method="POST">
+        <div class="modal-header">
+            <span class="row-fluid">
+                <span class="row">
+                    <span class="span3">
+                        <h3 id="changos">{{=T('Log Desertion')}}</h3>
+                    </span>
+                    <span class="span8">
+                        <div class="input-prepend">
+                            <span class="add-on">{{=T('Log Date')}} <span class="icon-calendar"></span></span>
+                            <input class="span7" id="desertion-date" name="desertion-date" placeholder="{{=T("YYY-MM-DD")}}" type="date">
+                        </div>
+                        <div><small>{{=T("YYY-MM-DD")}}</small></div>
+                    </span>
+                    <span class="span1">
+                        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+                    </span>
+                </span>
+            </span>
+        </div>
+        <div class="modal-body">
+            <div class="alert" style="display:none;" id="desertion-error">
+              <button type="button" class="close" data-dismiss="alert">&times;</button>
+                <strong>{{=T('Alert')}}!</strong> {{=T('All fields are mandatory, please check and try again.')}}
+            </div>
+            <div class="control-group">
+                <label class="control-label" for="desertion-started">{{=T('students started')}}</label>
+                <div class="controls">
+                    <input type="text" id="desertion-started"
+                    name="desertion-started" placeholder="{{=T('students started')}}">
+                </div>
+            </div>
+            <div class="control-group">
+                <label class="control-label" for="desertion-gone">{{=T('students gone')}}</label>
+                <div class="controls">
+                    <input type="text" id="desertion-gone"
+                    name="desertion-gone" placeholder="{{=T('students gone')}}">
+                </div>
+            </div>
+            <div class="control-group">
+                <label class="control-label" for="desertion-continued">{{=T('students continued')}}</label>
+                <div class="controls">
+                    <input type="text" id="desertion-continued"
+                    name="desertion-continued" placeholder="{{=T('students continued')}}">
+                </div>
+            </div>
+        </div>
+        <div class="modal-footer">
+          <button class="btn"
+                data-dismiss="modal"
+                aria-hidden="true">{{=T('Close')}}</button>
+          <input type="submit"
+          onclick="if (
+              $('#desertion-date').val()&&
+              parseInt($('#desertion-started').val()) > 0 &&
+              parseInt($('#desertion-continued').val()) > 0)
+              return true;
+                   else {
+                       $('#desertion-error').show();
+                       return false;
+                   }
+                "
+              class="btn btn-primary"
+                 value="{{=T('Save Changes')}}"></input>
+        </div>
+    </form>
+</div>
 <!-- log-new-metrics-activity -->
 <div id="log-new-metrics-activity"
      class="modal hide fade" tabindex="-1"
@@ -34,6 +107,10 @@
             </span>
         </div>
         <div class="modal-body">
+            <div class="alert" style="display:none;" id="metrics-error">
+              <button type="button" class="close" data-dismiss="alert">&times;</button>
+                <strong>{{=T('Alert')}}!</strong> {{=T('All fields are mandatory, please check and try again.')}}
+            </div>
             <div class="control-group">
                 <label class="control-label" for="media-metrics">Media</label>
                 <div class="controls">
@@ -153,14 +230,17 @@
               $('#aprobados-metrics').val()&&
               $('#reprobados-metrics').val()&&
               parseInt($('#total-metrics').val()) > 0&&
-              parseInt($('#total-metrics').val()) == 
-                  parseInt($('#aprobados-metrics').val()) 
+              parseInt($('#total-metrics').val()) ==
+                  parseInt($('#aprobados-metrics').val())
                   + parseInt($('#reprobados-metrics').val()))
               return true;
-              else alert('{{=T('Please verify all data is correct')}}'); 
-                return false;"
+                   else {
+                       $('#metrics-error').show();
+                       return false;
+                   }
+                "
               class="btn btn-primary"
-                 value="{{=T('Save Changes')}} *{{=T('All fields are required.')}}"></input>
+                 value="{{=T('Save Changes')}}"></input>
         </div>
     </form>
 </div>
@@ -191,9 +271,9 @@
             </span>
         </div>
         <div class="modal-body">
-            <div class="alert">
+            <div class="alert" style="display:none;" id="log-error">
               <button type="button" class="close" data-dismiss="alert">&times;</button>
-              <strong>Information!</strong> If there happened something to report to school please select as anomaly.
+                <strong>{{=T('Alert')}}!</strong> {{=T('All fields are mandatory, please check and try again.')}}
             </div>
             <div class="input-prepend">
                 <span class="add-on">{{=T('Type')}}</span>
@@ -214,9 +294,12 @@
               $('#log-content').val()&&
               $('#log-date').val())
               return true;
-              else return false;"
+                   else{
+                       $('#log-error').show();
+                       return false;
+                   }"
               class="btn btn-primary"
-                 value="{{=T('Save Changes')}} *{{=T('All fields are required.')}}"></input>
+                 value="{{=T('Save Changes')}}"></input>
         </div>
     </form>
 </div>
@@ -237,6 +320,11 @@
             <li>
                 <a data-toggle="modal" href="#log-new-metrics-activity">
                     <span class="icon-adjust"></span> {{=T('Log Metrics')}}
+                </a>
+            </li>
+            <li>
+                <a data-toggle="modal" href="#log-desertion-activity">
+                    <span class="icon-user"></span> {{=T('Log Desertion')}}
                 </a>
             </li>
         </ul>
