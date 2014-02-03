@@ -14,8 +14,8 @@ def setup(db, auth):
     global _db, _auth
     _db = db
     _auth = auth
-    _module_variables_setup()
     _database_setup()
+    _module_variables_setup()
     _period_setup()
 
 def force_student_data_update(path, ignore_paths):
@@ -104,6 +104,9 @@ def _period_setup():
             db.period_year.insert(yearp = (year + 1), period = first_period)
 
 def _database_setup():
+    global first_period_name, second_period_name
+    first_period_name = 'First Semester'
+    second_period_name = 'Second Semester'
     db = _db
     ## Super-Administrator:
     setup = db.auth_user(db.auth_user.username == 'admin')
@@ -259,9 +262,5 @@ def _report_status_setup():
 
 def _module_variables_setup():
     global first_period, second_period
-    global first_period_name, second_period_name
-    first_period_name = 'First Semester'
-    second_period_name = 'Second Semester'
-
     first_period = _db.period(_db.period.name == first_period_name)
     second_period = _db.period(_db.period.name == second_period_name)
