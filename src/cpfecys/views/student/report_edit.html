@@ -13,19 +13,20 @@
      role="dialog"
      aria-labelledby="changos"
      aria-hidden="true">
+     <!-- metrics-new-activity -->
     <form action="{{=URL('metrics/save', vars=dict(report = report.id))}}" method="POST">
         <div class="modal-header">
             <span class="row-fluid">
                 <span class="row">
                     <span class="span3">
-                        <h3 id="changos">{{=T('Log Activity')}}</h3>
+                        <h3 id="changos">{{=T('Log Metrics')}}</h3>
                     </span>
                     <span class="span8">
                         <div class="input-prepend">
                             <span class="add-on">{{=T('Log Date')}} <span class="icon-calendar"></span></span>
-                            <input class="span7" id="log-metrics-date" name="log-date" placeholder="{{=T("YYY-MM-DD")}}" type="date">
+                            <input class="span7" id="log-metrics-date" name="log-date" placeholder="{{=T("YYYY-MM-DD")}}" type="date">
                         </div>
-                        <div><small>{{=T("YYY-MM-DD")}}</small></div>
+                        <div><small>{{=T("YYYY-MM-DD")}}</small></div>
                     </span>
                     <span class="span1">
                         <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
@@ -34,6 +35,16 @@
             </span>
         </div>
         <div class="modal-body">
+            <div class="control-group">
+                <label class="control-label" for="media-metrics">{{=T('Metric Report Type')}}</label>
+                <div class="controls">
+                    <select name="metric-type">
+                      {{for metric in metrics_type:}}
+                        <option value="{{=metric.id}}">{{=metric.name}}</option>
+                      {{pass}}
+                    </select>
+                </div>
+            </div>
             <div class="control-group">
                 <label class="control-label" for="media-metrics">Media</label>
                 <div class="controls">
@@ -180,9 +191,9 @@
                     <span class="span8">
                         <div class="input-prepend">
                             <span class="add-on">{{=T('Log Date')}} <span class="icon-calendar"></span></span>
-                            <input class="span7" id="log-date" name="log-date" placeholder="{{=T("YYY-MM-DD")}}" type="date">
+                            <input class="span7" id="log-date" name="log-date" placeholder="{{=T("YYYY-MM-DD")}}" type="date">
                         </div>
-                        <div><small>{{=T("YYY-MM-DD")}}</small></div>
+                        <div><small>{{=T("YYYY-MM-DD")}}</small></div>
                     </span>
                     <span class="span1">
                         <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
@@ -283,10 +294,10 @@
                                         <input class="span7"
                                                id="log-date-{{=log.id}}"
                                                value="{{=log.entry_date}}"
-                                               name="log-date" placeholder="{{=T("YYY-MM-DD")}}"
+                                               name="log-date" placeholder="{{=T("YYYY-MM-DD")}}"
                                                type="date">
                                     </div>
-                                    <div><small>{{=T("YYY-MM-DD")}}</small></div>
+                                    <div><small>{{=T("YYYY-MM-DD")}}</small></div>
                                 </span>
                                 <span class="span1">
                                     <button type="button"
@@ -383,7 +394,7 @@
                                 </div>
                           </div>
                       </div>
-                      <div class="span12">
+                      <div class="span11">
                           {{=MARKMIN(log.description, markmin_settings)}}
                       </div>
                   </div>
@@ -399,13 +410,267 @@
           <span class="icon-adjust"></span>
           <strong>{{=T('Activities Log with metrics')}}</strong>
           <span class="right">
-            <span><strong>{{=T('Total activity logs with metrics')}}:</strong>N</span>
+            <span><strong>{{=T('Total activity logs with metrics')}}:</strong> {{=len(metrics)}}</span>
           </span>
       </a>
     </div>
     <div id="collapseTwo" class="accordion-body collapse">
       <div class="accordion-inner">
-        asdf
+        <div style="container">
+          {{for metric in metrics:}}
+                <!-- Metric edit Helper-->
+                <div id="metric-edit-activity-{{=metric.id}}"
+                 class="modal hide fade" tabindex="-1"
+                 role="dialog"
+                 aria-labelledby="metric-edit-activity-{{=metric.id}}"
+                 aria-hidden="true">
+                <form action="{{=URL('metrics/update', vars=dict(metric = metric.id))}}" method="POST">
+                  <div class="modal-header">
+                      <span class="row-fluid">
+                          <span class="row">
+                              <span class="span3">
+                                  <h3 id="changos">{{=T('Log Metrics')}}</h3>
+                              </span>
+                              <span class="span8">
+                                  <div class="input-prepend">
+                                      <span class="add-on">{{=T('Log Date')}} <span class="icon-calendar"></span></span>
+                                      <input class="span7" id="log-metrics-date" name="log-date" 
+                                      value="{{=metric.created}}" placeholder="{{=T("YYYY-MM-DD")}}" type="date">
+                                  </div>
+                                  <div><small>{{=T("YYYY-MM-DD")}}</small></div>
+                              </span>
+                              <span class="span1">
+                                  <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+                              </span>
+                          </span>
+                      </span>
+                  </div>
+                  <div class="modal-body">
+                      <div class="control-group">
+                          <label class="control-label" for="media-metrics">{{=T('Metric Report Type')}}</label>
+                          <div class="controls">
+                              <select name="metric-type">
+                                {{for m_type in metrics_type:}}
+                                  <option value="{{=m_type.id}}"
+                                  {{if m_type.id == metric.metrics_type.id:}}
+                                    selected="selected"
+                                    {{pass}}>{{=m_type.name}}</option>
+                                {{pass}}
+                              </select>
+                          </div>
+                      </div>
+                      <div class="control-group">
+                          <label class="control-label" for="media-metrics">Media</label>
+                          <div class="controls">
+                              <input type="text" id="edit-media-metrics" 
+                              name="media-metrics" placeholder="Media" value="{{=metric.media}}">
+                          </div>
+                      </div>
+                      <div class="control-group">
+                          <label class="control-label" for="error-tipico-metrics">Error Típico</label>
+                          <div class="controls">
+                              <input type="text" id="edit-error-tipico-metrics"
+                              name="error-tipico-metrics" placeholder="Error Típico" value="{{=metric.error}}">
+                          </div>
+                      </div>
+                      <div class="control-group">
+                          <label class="control-label" for="mediana-metrics">Mediana</label>
+                          <div class="controls">
+                              <input type="text" id="edit-mediana-metrics" 
+                              name="mediana-metrics" placeholder="Mediana" value="{{=metric.mediana}}">
+                          </div>
+                      </div>
+                      <div class="control-group">
+                          <label class="control-label" for="moda-metrics">Moda</label>
+                          <div class="controls">
+                              <input type="text" id="edit-moda-metrics" 
+                              name="moda-metrics" placeholder="Moda" value="{{=metric.moda}}">
+                          </div>
+                      </div>
+                      <div class="control-group">
+                          <label class="control-label" for="desviacion-estandar-metrics">Desviación Estandar</label>
+                          <div class="controls">
+                              <input type="text" id="edit-desviacion-estandar-metrics"
+                              name="desviacion-estandar-metrics" placeholder="Desviación Estandar" value="{{=metric.desviacion}}">
+                          </div>
+                      </div>
+                      <div class="control-group">
+                          <label class="control-label" for="varianza-metrics">Varianza de la Muestra</label>
+                          <div class="controls">
+                              <input type="text" id="edit-varianza-metrics" 
+                              name="varianza-metrics" placeholder="Varianza de la Muestra" value="{{=metric.varianza}}">
+                          </div>
+                      </div>
+                      <div class="control-group">
+                          <label class="control-label" for="curtosis-metrics">Curtosis</label>
+                          <div class="controls">
+                              <input type="text" id="edit-curtosis-metrics" 
+                              name="curtosis-metrics" placeholder="Curtosis" value="{{=metric.curtosis}}">
+                          </div>
+                      </div>
+                      <div class="control-group">
+                          <label class="control-label" for="coeficiente-metrics">Coeficiente de asimetría</label>
+                          <div class="controls">
+                              <input type="text" id="edit-coeficiente-metrics" 
+                              name="coeficiente-metrics" placeholder="Coeficiente de asimetría" value="{{=metric.coeficiente}}">
+                          </div>
+                      </div>
+                      <div class="control-group">
+                          <label class="control-label" for="rango-metrics">Rango</label>
+                          <div class="controls">
+                              <input type="text" id="edit-rango-metrics" 
+                              name="rango-metrics" placeholder="Rango" value="{{=metric.rango}}">
+                          </div>
+                      </div>
+                      <div class="control-group">
+                          <label class="control-label" for="minimo-metrics">Mínimo</label>
+                          <div class="controls">
+                              <input type="text" id="edit-minimo-metrics" 
+                              name="minimo-metrics" placeholder="Mínimo" value="{{=metric.minimo}}">
+                          </div>
+                      </div>
+                      <div class="control-group">
+                          <label class="control-label" for="maximo-metrics">Máximo</label>
+                          <div class="controls">
+                              <input type="text" id="edit-maximo-metrics" 
+                              name="maximo-metrics" placeholder="Máximo" value="{{=metric.maximo}}">
+                          </div>
+                      </div>
+                      <div class="control-group">
+                          <label class="control-label" for="total-metrics">Total de Alumnos</label>
+                          <div class="controls">
+                              <input type="text" id="edit-total-metrics" 
+                              name="total-metrics" placeholder="Total de Alumnos" value="{{=metric.total}}">
+                          </div>
+                      </div>
+                      <div class="control-group">
+                          <label class="control-label" for="reprobados-metrics">Reprobados</label>
+                          <div class="controls">
+                              <input type="text" id="edit-reprobados-metrics" 
+                              name="reprobados-metrics" placeholder="Reprobados" value="{{=metric.reprobados}}">
+                          </div>
+                      </div>
+                      <div class="control-group">
+                          <label class="control-label" for="aprobados-metrics">Aprobados</label>
+                          <div class="controls">
+                              <input type="text" id="edit-aprobados-metrics" 
+                              name="aprobados-metrics" placeholder="Aprobados" value="{{=metric.aprobados}}">
+                          </div>
+                      </div>
+                  </div>
+                  <div class="modal-footer">
+                    <button class="btn"
+                          data-dismiss="modal"
+                          aria-hidden="true">{{=T('Close')}}</button>
+                    <input type="submit"
+                    onclick="if (
+                        $('#edit-media-metrics').val()&&
+                        $('#edit-error-tipico-metrics').val()&&
+                        $('#edit-mediana-metrics').val()&&
+                        $('#edit-moda-metrics').val()&&
+                        $('#edit-desviacion-estandar-metrics').val()&&
+                        $('#edit-varianza-metrics').val()&&
+                        $('#edit-curtosis-metrics').val()&&
+                        $('#edit-coeficiente-metrics').val()&&
+                        $('#edit-rango-metrics').val()&&
+                        $('#edit-minimo-metrics').val()&&
+                        $('#edit-maximo-metrics').val()&&
+                        $('#edit-aprobados-metrics').val()&&
+                        $('#edit-reprobados-metrics').val()&&
+                        parseInt($('#edit-total-metrics').val()) > 0&&
+                        parseInt($('#edit-total-metrics').val()) == 
+                            parseInt($('#edit-aprobados-metrics').val()) 
+                            + parseInt($('#edit-reprobados-metrics').val()))
+                        return true;
+                        else alert('{{=T('Please verify all data is correct')}}'); 
+                          return false;"
+                        class="btn btn-primary"
+                           value="{{=T('Save Changes')}} *{{=T('All fields are required.')}}"></input>
+                  </div>
+              </form>
+            </div>
+            <!-- //Metric edit Helper-->
+
+            <!-- Metric delete Helper-->
+            <div id="delete-metric-{{=metric.id}}"
+                   class="modal hide fade"
+                   tabindex="-1"
+                   role="dialog"
+                   aria-labelledby="DeleteModalLabel{{=metric.id}}"
+                   aria-hidden="true">
+                  <div class="modal-header">
+                      <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+                      <h3 id="DeleteModalLabel{{=metric.id}}">{{=T('Confirm Delete')}}</h3>
+                  </div>
+                  <div class="modal-body">
+                      <p>{{=T("Delete operation can't be undone, do you want to continue?")}}</p>
+                  </div>
+                  <div class="modal-footer">
+                      <button class="btn" data-dismiss="modal" aria-hidden="true">{{=T('Cancel')}}</button>
+                      <a class="btn btn-danger"
+                         href="{{=URL('metrics/delete', vars=dict(metric = metric.id))}}">
+                          {{=T('Delete')}}
+                      </a>
+                  </div>
+              </div>
+            <!-- //Metric delete Helper-->
+            <div class="row-fluid">
+                  <div class="well span12">
+                    
+                      <div class="span12">
+                          <strong>{{=T('Date')}}:</strong> {{=metric.created}}
+                          <div class="pull-right">
+                              <div class="btn-group">
+                                  <a href="#metric-edit-activity-{{=metric.id}}" data-toggle="modal" class="btn">
+                                      <span class="icon-edit"></span>
+                                  </a>
+                                  <a href="#delete-metric-{{=metric.id}}" data-toggle="modal" class="btn btn-danger">
+                                      <span class="icon-remove icon-white"></span>
+                                  </a>
+                                </div>
+                          </div>
+                      </div>
+                      <div class="span11">
+                        <div class="span8">
+                          <h2>{{=metric.metrics_type.name}}</h2>
+                          <table class="table table-striped table-bordered">
+                              <thead>
+                                <tr>
+                                  <td>
+                                    <strong>{{=T('Metric')}}</strong>
+                                  </td>
+                                  <td>
+                                    <strong>{{=T('Value')}}</strong>
+                                  </td>
+                                </tr>
+                              </thead>                              
+                            <tbody>
+                            <tr>
+                              <td><strong>{{=T('Media')}}:</strong> </td> <td>{{=metric.media}}</td></tr>
+                              <tr><td><strong>{{=T('Error')}}:</strong> </td> <td>{{=metric.error}}</td></tr>
+                              <tr><td><strong>{{=T('Mediana')}}:</strong></td> <td> {{=metric.mediana}}</td></tr>
+                              <tr><td><strong>{{=T('Moda')}}:</strong> </td> <td>{{=metric.moda}}</td></tr>
+                              <tr><td><strong>{{=T('Desviacion')}}:</strong></td> <td> {{=metric.desviacion}}</td></tr>
+                              <tr><td><strong>{{=T('Varianza')}}:</strong></td> <td> {{=metric.varianza}}</td></tr>
+                              <tr><td><strong>{{=T('Curtosis')}}:</strong></td> <td> {{=metric.curtosis}}</td></tr>
+                              <tr><td><strong>{{=T('Coeficiente')}}:</strong></td> <td> {{=metric.coeficiente}}</td></tr>
+                              <tr><td><strong>{{=T('Rango')}}:</strong> </td> <td>{{=metric.rango}}</td></tr>
+                              <tr><td><strong>{{=T('Minimo')}}:</strong> </td> <td>{{=metric.minimo}}</td></tr>
+                              <tr><td><strong>{{=T('Maximo')}}:</strong> </td> <td>{{=metric.maximo}}</td></tr>
+                              <tr><td><strong>{{=T('Total')}}:</strong> </td> <td>{{=metric.total}}</td></tr>
+                              <tr><td><strong>{{=T('Reprobados')}}:</strong></td> <td> {{=metric.reprobados}}</td></tr>
+                              <tr><td><strong>{{=T('Aprobados')}}:</strong></td> <td> {{=metric.aprobados}}</td>
+                            </tr>
+                            </tbody>
+                            </table>
+                          </ul>
+                        </div>
+                      </div>
+                  </div>
+              </div>
+          {{pass}}
+        </div>
+        
       </div>
     </div>
   </div>

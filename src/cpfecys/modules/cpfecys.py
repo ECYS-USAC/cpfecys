@@ -224,6 +224,23 @@ def _log_type_setup():
     #Default log types
     db.log_type.insert(name='Activity')
     db.log_type.insert(name='Anomaly')
+    #Metrics log default types
+    db.metrics_type.insert(name="PRIMER PARCIAL")
+    db.metrics_type.insert(name="SEGUNDO PARCIAL")
+    db.metrics_type.insert(name="TERCER PARCIAL")
+    db.metrics_type.insert(name="EXAMEN FINAL")
+    db.metrics_type.insert(name="PRIMERA RETRASADA")
+    db.metrics_type.insert(name="SEGUNDA RETRASADA")
+    db.metrics_type.insert(name="HOJA DE TRABAJO")
+    db.metrics_type.insert(name="EXAMEN CORTO")
+    db.metrics_type.insert(name="FASE DE PROYECTO")
+    db.metrics_type.insert(name="FASE FINAL")
+    db.metrics_type.insert(name="OTRA ACTIVIDAD")
+    db.metrics_type.insert(name="TAREA")
+    db.metrics_type.insert(name="PRACTICA")
+    db.metrics_type.insert(name="PROYECTO 1")
+    db.metrics_type.insert(name="PROYECTO 2")
+    
 
 def _item_type_setup():
     db = _db
