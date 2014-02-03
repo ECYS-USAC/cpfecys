@@ -346,6 +346,8 @@ def report():
         response.view = 'student/report_edit.html'
         return dict(log_types = db(db.log_type.id > 0).select(),
                     logs = db((db.log_entry.report == report.id)).select(),
+                    metrics = db((db.log_metrics.report == report.id)).select(),
+                    metrics_type = db(db.metrics_type).select(),
                     anomalies = db((db.log_type.name == 'Anomaly')&
                                    (db.log_entry.log_type == db.log_type.id)&
                                    (db.log_entry.report == report.id)).count(),
@@ -540,13 +542,16 @@ def metrics():
         total = request.vars['total-metrics']
         reprobados = request.vars['reprobados-metrics']
         aprobados = request.vars['aprobados-metrics']
+        metric_type = request.vars['metric-type']
+        log_date = request.vars['log-date']
 
         if valid_report: valid_report = (media and error_tipico and mediana \
                                          and moda and desviacion_estandar  
                                          and varianza and curtosis \
                                          and coeficiente and rango \
                                          and minimo and maximo and total \
-                                         and reprobados and aprobados)
+                                         and reprobados and aprobados \
+                                         and metric_type and log_date)
 
         if valid_report:
             db.log_metrics.insert(report = report.id,
@@ -564,16 +569,91 @@ def metrics():
                                 total = total,
                                 reprobados = reprobados,
                                 aprobados = aprobados,
-                                created = cdate)
+                                created = log_date,
+                                metrics_type = metric_type)
             session.flash = T('Log added')
             redirect(URL('student', 'report/edit', vars=dict(report=report.id)))
         else:
             session.flash = T('Operation not allowed.')
             redirect(URL('student', 'index'))
     elif (request.args(0) == 'update'):
-        return 'Foo'
+        # validate the requested metric
+        metric = request.vars['metric']
+        metric = db.log_metrics(db.log_metrics.id == metric)
+        valid_metric = metric != None
+        # validate metric report owner is valid
+        if valid_metric: valid_metric = cpfecys.student_validation_report_owner(metric.report)
+        # validate report is editable
+        if valid_metric: valid_metric = cpfecys.student_validation_report_restrictions \
+            (metric.report['report_restriction'])
+        # validate report is 'Draft' or 'Recheck'
+        if valid_metric: valid_metric = cpfecys.student_validation_report_status \
+            (db.report(db.report.id == metric.report))
+        # validate we receive log-date, log-type, log-content
         
+        media = request.vars['media-metrics']
+        error_tipico = request.vars['error-tipico-metrics']
+        mediana = request.vars['mediana-metrics']
+        moda = request.vars['moda-metrics']
+        desviacion_estandar = request.vars['desviacion-estandar-metrics']
+        varianza = request.vars['varianza-metrics']
+        curtosis = request.vars['curtosis-metrics']
+        coeficiente = request.vars['coeficiente-metrics']
+        rango = request.vars['rango-metrics']
+        minimo = request.vars['minimo-metrics']
+        maximo = request.vars['maximo-metrics']
+        total = request.vars['total-metrics']
+        reprobados = request.vars['reprobados-metrics']
+        aprobados = request.vars['aprobados-metrics']
+        metric_type = request.vars['metric-type']
+        log_date = request.vars['log-date']
+        if valid_metric: valid_metric = (media and error_tipico and mediana \
+                                         and moda and desviacion_estandar  
+                                         and varianza and curtosis \
+                                         and coeficiente and rango \
+                                         and minimo and maximo and total \
+                                         and reprobados and aprobados \
+                                         and metric_type and log_date)
+        if valid_metric:
+            metric.update_record(report = metric.report.id,
+                                media = media,
+                                error = error_tipico,
+                                mediana = mediana,
+                                moda = moda,
+                                desviacion = desviacion_estandar,
+                                varianza = varianza,
+                                curtosis = curtosis,
+                                coeficiente = coeficiente,
+                                rango = rango,
+                                minimo = minimo,
+                                maximo = maximo,
+                                total = total,
+                                reprobados = reprobados,
+                                aprobados = aprobados,
+                                created = log_date,
+                                metrics_type = metric_type)
+            session.flash = T('Metric Updated')
+            redirect(URL('student', 'report/edit', vars=dict(report=metric.report)))
+        else:
+            session.flash = T('Operation not allowed.')
+            redirect(URL('student', 'index'))
     elif (request.args(0) == 'delete'):
-        return 'Foo'
-        
-    return dict()
+        # validate the requested metric
+        metric = request.vars['metric']
+        metric = db.log_metrics(db.log_metrics.id == metric)
+        valid_metric = metric != None
+        # validate metric report owner is valid
+        if valid_metric: valid_metric = cpfecys.student_validation_report_owner(metric.report)
+        # validate report is editable
+        if valid_metric: valid_metric = cpfecys.student_validation_report_restrictions \
+            (metric.report['report_restriction'])
+        # validate report is 'Draft' or 'Recheck'
+        if valid_metric: valid_metric = cpfecys.student_validation_report_status \
+            (db.report(db.report.id == metric.report))
+        if valid_metric:
+            metric.delete_record()
+            session.flash = T('Log Deleted')
+            redirect(URL('student', 'report/edit', vars=dict(report=metric.report)))
+        else:
+            session.flash = T('Operation not allowed.')
+            redirect(URL('student', 'index'))

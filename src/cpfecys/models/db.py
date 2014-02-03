@@ -252,6 +252,11 @@ db.define_table('log_entry',
                 format='%(entry_date)s'
                 )
 
+db.define_table('metrics_type',
+                Field('name', 'string', notnull=True, label = T('name')),
+                format='%(entry_date)s'
+                )
+
 db.define_table('log_metrics',
                 Field('media', 'decimal(8,2)', notnull=True, \
                     label = T('media')),
@@ -283,6 +288,7 @@ db.define_table('log_metrics',
                     label = T('aprobados')),
                 Field('created', 'date', notnull=True, label = T('entry_date')),
                 Field('report', 'reference report', label = T('report')),
+                Field('metrics_type', 'reference metrics_type', label = T('type')),
                 format='%(created)s'
                 )
 
