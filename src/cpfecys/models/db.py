@@ -236,6 +236,10 @@ db.define_table('report',
                 label = T('report_restriction')),
                 Field('score', 'integer', \
                 label = T('score')),
+                Field('heading', 'text', \
+                label = T('heading')),
+                Field('footer', 'text', \
+                label = T('footer')),
                 Field('status', 'reference report_status', notnull=True, \
                 label = T('status')),
                 )

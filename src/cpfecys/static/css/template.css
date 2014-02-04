@@ -164,10 +164,10 @@ ul {
 	list-style: none;
 }
 
-ul li {
-	padding-left: 30px;
+#ja-mainnav ul li {
+	/*padding-left: 0px;
 	background: url(../images/bullet.gif) no-repeat 18px 8px;
-	line-height: 180%;
+	line-height: 180%;*/
 }
 
 ol li {
@@ -1630,4 +1630,7 @@ a {
 }
 ul li{
 	background-image:none;
+}
+#ja-mainnav ul ul.dropdown-menu {
+    left:auto;
 }

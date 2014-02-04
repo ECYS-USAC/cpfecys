@@ -18,7 +18,7 @@ jQuery(function(){
         }
   }
   function hoverMenu(){
-    jQuery('ul.nav a.dropdown-toggle').parent().hover(function(){
+    jQuery('#ja-mainnav ul.nav a.dropdown-toggle').parent().hover(function(){
         adjust_height_of_collapsed_nav();
         mi = jQuery(this).addClass('open');
         mi.children('.dropdown-menu').stop(true, true).delay(200).fadeIn(400);
@@ -29,5 +29,5 @@ jQuery(function(){
   }
   hoverMenu(); // first page load
   jQuery(window).resize(hoverMenu); // on resize event
-  jQuery('ul.nav li.dropdown a').click(function(){window.location=jQuery(this).attr('href');});
+  jQuery('#ja-mainnav ul.nav li.dropdown a').click(function(){window.location=jQuery(this).attr('href');});
 });
