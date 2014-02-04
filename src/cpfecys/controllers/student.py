@@ -347,6 +347,7 @@ def report():
         return dict(log_types = db(db.log_type.id > 0).select(),
                     logs = db((db.log_entry.report == report.id)).select(),
                     metrics = db((db.log_metrics.report == report.id)).select(),
+                    desertions = db((db.log_desertion.report == report.id)).select(),
                     metrics_type = db(db.metrics_type).select(),
                     anomalies = db((db.log_type.name == 'Anomaly')&
                                    (db.log_entry.log_type == db.log_type.id)&
@@ -482,7 +483,7 @@ def log():
             log.update_record(log_type = log_type,
                               entry_date = log_date,
                               description = log_content)
-            session.flash = T('Log Aupdated')
+            session.flash = T('Log Updated')
             redirect(URL('student', 'report/edit', vars=dict(report=log.report)))
         else:
             session.flash = T('Operation not allowed.')
@@ -657,3 +658,91 @@ def metrics():
         else:
             session.flash = T('Operation not allowed.')
             redirect(URL('student', 'index'))
+
+@auth.requires_login()
+@auth.requires_membership('Student')
+def desertions():
+    if (request.args(0) == 'save'):
+        # validate the user owns this report
+        report = request.vars['report']
+        report = db.report(db.report.id == report)
+        valid_report = report != None
+        if valid_report: valid_report = cpfecys.student_validation_report_owner(report.id)
+        # validate report is editable
+        if valid_report: valid_report = cpfecys.student_validation_report_restrictions \
+            (report.report_restriction)
+        # validate report is 'Draft' or 'Recheck'
+        if valid_report: valid_report = cpfecys.student_validation_report_status(report)
+        # validate we receive log-date, log-type, log-content
+        desertion_started = request.vars['desertion-started']
+        desertion_gone = request.vars['desertion-gone']
+        desertion_continued = request.vars['desertion-continued']
+        if valid_report: valid_report = (desertion_started and desertion_gone 
+                                         and desertion_continued)
+        if valid_report:
+            import datetime
+            cdate = datetime.datetime.now()
+            db.log_desertion.insert(started = desertion_started,
+                                gone = desertion_gone,
+                                continued = desertion_continued,
+                                created = cdate,
+                                report = report.id)
+            session.flash = T('Desertion log added')
+            redirect(URL('student', 'report/edit', vars=dict(report=report.id)))
+        else:
+            session.flash = T('Operation not allowed.')
+            redirect(URL('student', 'index'))
+    elif (request.args(0) == 'update'):
+        # validate the requested desertion
+        des = request.vars['desertion']
+        des = db.log_desertion(db.log_desertion.id == des)
+        valid_des = des != None
+        # validate desertion report owner is valid
+        if valid_des: valid_des = cpfecys.student_validation_report_owner(des.report)
+        # validate report is editable
+        if valid_des: valid_des = cpfecys.student_validation_report_restrictions \
+            (des.report['report_restriction'])
+        # validate report is 'Draft' or 'Recheck'
+        if valid_des: valid_des = cpfecys.student_validation_report_status \
+            (db.report(db.report.id == des.report))
+        
+        desertion_started = request.vars['edit-desertion-started']
+        desertion_gone = request.vars['edit-desertion-gone']
+        desertion_continued = request.vars['edit-desertion-continued']
+
+        if valid_des: valid_des = (desertion_started 
+                                   and desertion_gone 
+                                   and desertion_continued
+                                   and int(desertion_started)== \
+                                        int(desertion_gone) + \
+                                        int(desertion_continued))
+        if valid_des:
+            des.update_record(started = desertion_started,
+                              gone = desertion_gone,
+                              continued = desertion_continued)
+            session.flash = T('Desertion Log Updated')
+            redirect(URL('student', 'report/edit', vars=dict(report=des.report)))
+        else:
+            session.flash = T('Operation not allowed.')
+            redirect(URL('student', 'index'))
+    elif (request.args(0) == 'delete'):
+        # validate the requested log
+        des = request.vars['desertion']
+        des = db.log_desertion(db.log_desertion.id == des)
+        valid_des = des != None
+        # validate des report owner is valid
+        if valid_des: valid_des = cpfecys.student_validation_report_owner(des.report)
+        # validate report is editable
+        if valid_des: valid_des = cpfecys.student_validation_report_restrictions \
+            (des.report['report_restriction'])
+        # validate report is 'Draft' or 'Recheck'
+        if valid_des: valid_des = cpfecys.student_validation_report_status \
+            (db.report(db.report.id == des.report))
+        if valid_des:
+            des.delete_record()
+            session.flash = T('Desertion log deleted')
+            redirect(URL('student', 'report/edit', vars=dict(report=des.report)))
+        else:
+            session.flash = T('Operation not allowed.')
+            redirect(URL('student', 'index'))
+    return dict()
