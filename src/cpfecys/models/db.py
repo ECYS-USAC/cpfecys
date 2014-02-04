@@ -105,6 +105,9 @@ use_janrain(auth, filename='private/janrain.key')
 ## >>> rows=db(db.mytable.myfield=='value').select(db.mytable.ALL)
 ## >>> for row in rows: print row.id, row.myfield
 #########################################################################
+# Table to save if we are done with setup
+db.define_table('setup',
+                Field('done', 'boolean', unique = True))
 
 # A project contains an description and name
 db.define_table('area_level',

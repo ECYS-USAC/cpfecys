@@ -1,3 +1,0 @@
-{{extend 'template.html'}}
-<h1>Esta es la plantilla admin/report_restrictions.html</h1>
-{{=grid}}

@@ -1,3 +1,0 @@
-{{extend 'template.html'}}
-<h1>This is the admin/links.html template</h1>
-{{=BEAUTIFY(response._vars)}}

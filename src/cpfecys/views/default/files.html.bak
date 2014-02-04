@@ -1,2 +1,0 @@
-{{extend 'template.html'}}
-{{=BEAUTIFY(files)}}

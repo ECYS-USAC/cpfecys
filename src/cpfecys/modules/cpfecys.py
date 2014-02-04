@@ -109,13 +109,14 @@ def _database_setup():
     second_period_name = 'Second Semester'
     db = _db
     ## Super-Administrator:
-    setup = db.auth_user(db.auth_user.username == 'admin')
+    setup = db.setup(done = True)
     if setup is None:
         _report_status_setup()
         _item_type_setup()
         _log_type_setup()
         _projects_setup()
         _roles_setup()
+        db.setup.insert(done = True)
 
 def _roles_setup():
     db = _db
@@ -262,5 +263,5 @@ def _report_status_setup():
 
 def _module_variables_setup():
     global first_period, second_period
-    first_period = _db.period(_db.period.name == first_period_name)
-    second_period = _db.period(_db.period.name == second_period_name)
+    first_period = _db.period(name = first_period_name)
+    second_period = _db.period(name = second_period_name)

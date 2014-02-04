@@ -1,0 +1,9 @@
+src/cpfecys/errors/
+src/cpfecys/sessions/
+src/cpfecys/databases/
+src/cpfecys/progress.log
+src/cpfecys/progress.log.orig
+src/cpfecys/uploads/*
+*.pyc
+*.bak
+*~

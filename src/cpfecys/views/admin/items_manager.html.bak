@@ -1,4 +1,0 @@
-{{extend 'template.html'}}
-<a onclick="window.history.back()" class="btn" ><i class="icon-arrow-left"></i> Back</a>
-<p>{{=grid}}</p>
-<p><a class="btn" href="{{=URL('admin', 'assign_items')}}"> <i class="icon-circle-arrow-right"></i> {{=T('Manage Items Asignation')}}</a></p>

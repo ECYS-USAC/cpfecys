@@ -1,5 +1,0 @@
-{{extend 'template.html'}}
-<h1>
-    {{=T('User Administration')}}
-</h1>
-{{=grid}}
