@@ -322,16 +322,26 @@
                     <span class="icon-plus-sign"></span> {{=T('Add Block')}}
                 </a>
                 <ul class="dropdown-menu">
+                    <li class="disabled"><a tabindex="-1" href="#">{{=T('Common')}}</a></li>
                     <li>
                         <a data-toggle="modal" href="#">
                             <span class="icon-align-left"></span> {{=T('Heading')}}
                         </a>
                     </li>
                     <li>
+                        <a data-toggle="modal" href="#">
+                            <span class="icon-align-left"></span> {{=T('Footer')}}
+                        </a>
+                    </li>
+                    <li class="divider"></li>
+                    <li class="disabled"><a tabindex="-1" href="#">{{=T('General Activities')}}</a></li>
+                    <li>
                         <a data-toggle="modal" href="#log-new-activity">
                             <span class="icon-tasks"></span> {{=T('Log Activity')}}
                         </a>
                     </li>
+                    <li class="divider"></li>
+                    <li class="disabled"><a tabindex="-1" href="#">{{=T('Auxiliar Activities')}}</a></li>
                     <li>
                         <a data-toggle="modal" href="#log-new-metrics-activity">
                             <span class="icon-adjust"></span> {{=T('Log Metrics')}}
