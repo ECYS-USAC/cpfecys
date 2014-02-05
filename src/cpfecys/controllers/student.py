@@ -420,6 +420,8 @@ def report():
             response.view = 'student/report_view.html'
             return dict(log_types = db(db.log_type.id > 0).select(),
                         logs = db((db.log_entry.report == report.id)).select(),
+                        metrics = db((db.log_metrics.report == report.id)).select(),
+                        desertions = db((db.log_desertion.report == report.id)).select(),
                         anomalies = db((db.log_type.name == 'Anomaly')&
                                    (db.log_entry.log_type == db.log_type.id)&
                                    (db.log_entry.report == report.id)).count(),
