@@ -3,6 +3,8 @@
 <script src="http://code.jquery.com/jquery-migrate-1.2.1.js"></script>
 <script type="text/javascript" src="{{=URL('static','markitup')}}/jquery.markitup.pack.js"></script>
 <script type="text/javascript" src="{{=URL('static','markitup')}}/sets/markmin/set.js"></script>
+<script type="text/javascript" src="{{=URL('static','js')}}/highcharts/js/highcharts.js"></script>
+<script type="text/javascript" src="{{=URL('static','js')}}/highcharts/js/modules/exporting.js"></script>
 <link rel="stylesheet" type="text/css" href="{{=URL('static','markitup')}}/skins/markitup/style.css"/>
 <link rel="stylesheet" type="text/css" href="{{=URL('static','markitup')}}/sets/markmin/style.css"/>
 <!-- //Additional Scripts for MARKMIN -->
@@ -734,9 +736,9 @@
                                 </div>
                           </div>
                       </div>
-                      <div class="span11">
-                        <div class="span8">
-                          <h2>{{=metric.metrics_type.name}}</h2>
+                      <div class="span12">
+                          <h2 class="center">{{=metric.metrics_type.name}}</h2>
+                        <div class="span6">
                           <table class="table table-striped table-bordered">
                               <thead>
                                 <tr>
@@ -767,8 +769,117 @@
                             </tr>
                             </tbody>
                             </table>
-                          </ul>
                         </div>
+                          <div class="span5 center">
+                              <div>
+                                  <h3>
+                                      {{=T('Aproved vrs. Failed Students')}}
+                                  </h3>
+                                  <div style="width:100%; height:300px;"
+                                          width=100% height=300px id="graphpie{{=metric.id}}"></div>
+                              </div>
+                              <div>
+                                  <div style="width:100%; height:300px;"
+                                          width=100% height=300px id="graphbars{{=metric.id}}"></div>
+                              </div>
+                              {{if metric.total > 0:}}
+                              		<script type="text/javascript">
+                                        $(function () {
+                                            $('#graphpie{{=metric.id}}').highcharts({
+                                                chart: {
+                                                    plotBackgroundColor: null,
+                                                    plotBorderWidth: null,
+                                                    plotShadow: false
+                                                },
+                                                title: {
+                                                    text: '{{=T("Aproved vrs. Failed Students")}}'
+                                                },
+                                                tooltip: {
+                                                    pointFormat: '{series.name}: <b>{point.percentage:.1f}%</b>'
+                                                },
+                                                plotOptions: {
+                                                    pie: {
+                                                        allowPointSelect: true,
+                                                        cursor: 'pointer',
+                                                        dataLabels: {
+                                                            enabled: true,
+                                                            color: '#000000',
+                                                            connectorColor: '#000000',
+                                                            format: '<b>{point.name}</b>: {point.percentage:.1f} %'
+                                                        }
+                                                    }
+                                                },
+                                                series: [{
+                                                    type: 'pie',
+                                                    name: '{{=T("Aproved vrs. Failed Students")}}',
+                                                    data: [
+                                                        ['{{=T("Aproved")}}',   {{=100.0*metric.aprobados/metric.total}}],
+                                                        ['{{=T("Failed")}}',   {{=100.0*metric.reprobados/metric.total}}]
+                                                    ]
+                                                }]
+                                            });
+                                            $('#graphbars{{=metric.id}}').highcharts({
+                                            chart: {
+                                                type: 'column',
+                                                margin: [ 50, 50, 100, 80]
+                                            },
+                                            title: {
+                                                text: '{{=T("Aproved vrs. Failed Students")}}'
+                                            },
+                                            xAxis: {
+                                                categories: [
+                                                    '{{=T("Aproved")}}',
+                                                    '{{=T("Failed")}}'
+                                                ],
+                                                labels: {
+                                                    rotation: -45,
+                                                    align: 'right',
+                                                    style: {
+                                                        fontSize: '13px',
+                                                        fontFamily: 'Verdana, sans-serif'
+                                                    }
+                                                }
+                                            },
+                                            yAxis: {
+                                                min: 0,
+                                                title: {
+                                                    text: '{{=T("Students")}}'
+                                                }
+                                            },
+                                            legend: {
+                                                enabled: false
+                                            },
+                                            tooltip: {
+                                                pointFormat: '{{=T("Students")}}: <b>{point.y:.1f}</b>',
+                                            },
+                                            series: [{
+                                                name: '{{=T("Students")}}',
+                                                data: [{{=metric.aprobados}},
+                                                       {{=metric.reprobados}}],
+                                                dataLabels: {
+                                                    enabled: true,
+                                                    rotation: -90,
+                                                    color: '#FFFFFF',
+                                                    align: 'right',
+                                                    x: 4,
+                                                    y: 10,
+                                                    style: {
+                                                        fontSize: '13px',
+                                                        fontFamily: 'Verdana, sans-serif',
+                                                        textShadow: '0 0 3px black'
+                                                    }
+                                                }
+                                            }]
+                                        });
+                                        });
+                                </script>
+                              {{pass}}
+                              <script type="text/javascript">
+                                $(function () {
+                                        
+                                    });
+                            </script>
+                          </div>
                       </div>
                   </div>
             </div>
