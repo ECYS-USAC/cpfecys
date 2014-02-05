@@ -50,9 +50,9 @@ def students():
               (db.auth_group.role == 'Student')&
               (db.auth_membership.group_id == db.auth_group.id)&
               (db.user_project.assigned_user == db.auth_membership.user_id)).select()
-    current_period_name = T(second_period_name)
-    if currentyear_period.period == first_period.id:
-        current_period_name = T(first_period_name)
+    current_period_name = T(cpfecys.second_period_name)
+    if currentyear_period.period == cpfecys.first_period.id:
+        current_period_name = T(cpfecys.first_period_name)
     start_index = currentyear_period.id - max_display - 1
     if start_index < 1:
         start_index = 0
@@ -81,9 +81,9 @@ def courses():
     current_data = db((db.user_project.period <= currentyear_period.id)&
               ((db.user_project.period + db.user_project.periods) > currentyear_period.id)&
               (db.user_project.assigned_user == auth.user.id)).select()
-    current_period_name = T(second_period_name)
-    if currentyear_period.period == first_period.id:
-        current_period_name = T(first_period_name)
+    current_period_name = T(cpfecys.second_period_name)
+    if currentyear_period.period == cpfecys.first_period.id:
+        current_period_name = T(cpfecys.first_period_name)
     start_index = currentyear_period.id - max_display - 1
     if start_index < 1:
         start_index = 0
@@ -114,10 +114,10 @@ def current_year_period():
     cdate = datetime.datetime.now()
     cyear = cdate.year
     cmonth = cdate.month
-    period = second_period
+    period = cpfecys.second_period
     #current period depends if we are in dates between jan-jun and jul-dec
     if cmonth < 7 :
-        period = first_period
+        period = cpfecys.first_period
     return db.period_year((db.period_year.yearp == cyear)&
                           (db.period_year.period == period))
 
