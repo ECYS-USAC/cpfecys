@@ -478,29 +478,6 @@ def report():
                                    (db.log_entry.report == report.id)).count(),
                     markmin_settings = markmin_settings,
                     report = report)
-    elif (request.args(0) == 'save'):
-        ## get the data & save the report
-        report = request.vars['report']
-        report = db.report(db.report.id == report)
-        ## Validate DB report_restriction to obey TIMING rules
-        valid_rep_restr = cpfecys.student_validation_report_restrictions(report.report_restriction.id)
-        ## Validate that the report status is editable (it is either 'Draft' or 'Recheck')
-        if not(cpfecys.student_validation_report_status(report)):
-            session.flash = T('Selected report can\'t be saved. Select a valid report.')
-            redirect(URL('student','index'))
-        # Validate assignation belongs to this user
-        assign = db.user_project((db.user_project.id == report.assignation)&
-                                (db.user_project.assigned_user == auth.user.id))
-        valid_assignation = assign != None
-        if not(report and valid_assignation and valid_rep_restr):
-            session.flash = T('Invalid selected assignation and report. Select a valid one.')
-            redirect(URL('student','index'))
-        import datetime
-        current_date = datetime.datetime.now()
-        report.update(created = current_date,
-                      status = db.report_status(name = 'Draft'))
-        session.flash = T('Draft Updated.')
-        redirect(URL('student','index'))
     elif (request.args(0) == 'acceptance'):
         #get the data & save the report
         report = request.vars['report']

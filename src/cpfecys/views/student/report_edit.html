@@ -67,6 +67,12 @@
             <small>{{=report.report_restriction['name']}}</small>
         </a>
         <ul class="nav pull-right">
+            <li>
+                <a class="active" href="{{=URL('student','report/acceptance', vars=dict(report = report.id))}}">
+                    <span class="icon-check"></span> {{=T('Send to Grading')}}
+                </a>
+            </li>
+            <li class="divider-vertical"></li>
             <li class="dropdown">
                 <a class="dropdown-toggle"
                    data-toggle="dropdown"
@@ -538,12 +544,6 @@ url = URL('report_footer/delete', vars=dict(report = report.id)))}}
 </div>
 {{pass}}
 </div>
-<a class="btn" href="{{=URL('student','report/save', vars=dict(report = report.id))}}">
-    {{=T('Save Draft')}}
-</a>
-<a class="btn" href="{{=URL('student','report/acceptance', vars=dict(report = report.id))}}">
-    {{=T('Send to Grading')}}
-</a>
 <!-- Enable Markmin in textarea -->
 <script>
 jQuery(document).ready(function() {
