@@ -173,6 +173,130 @@ def download():
 
 @auth.requires_login()
 @auth.requires_membership('Student')
+def report_header():
+    if (request.args(0) == 'create'):
+        report = request.vars['report']
+        content = request.vars['report-content']
+        ## Get the report id
+        report = db.report(db.report.id == report)
+        valid = not(report is None) and not(content is None)
+        ## Validate report TIMING restriction
+        if valid: valid = cpfecys.student_validation_report_restrictions(report.report_restriction.id)
+        ## Validate that the report belongs to user
+        if valid: valid = cpfecys.student_validation_report_owner(report.id)
+        ## Validate that the report status is editable (it is either 'Draft' or 'Recheck')
+        if valid: valid = cpfecys.student_validation_report_status(report)
+        if valid:
+            report.heading = content
+            report.update_record()
+            session.flash = T('Report updated.')
+            redirect(URL('student','report/edit', vars = dict(report = report.id)))
+        else:
+            session.flash = T('Selected report can\'t be edited. Select a valid report.')
+            redirect(URL('student','index'))
+    elif (request.args(0) == 'update'):
+        report = request.vars['report']
+        content = request.vars['report-content']
+        report = db.report(db.report.id == report)
+        valid = not(report is None) and not(content is None)
+        ## Validate report TIMING restriction
+        if valid: valid = cpfecys.student_validation_report_restrictions(report.report_restriction.id)
+        ## Validate that the report belongs to user
+        if valid: valid = cpfecys.student_validation_report_owner(report.id)
+        ## Validate that the report status is editable (it is either 'Draft' or 'Recheck')
+        if valid: valid = cpfecys.student_validation_report_status(report)
+        if valid:
+            report.heading = content
+            report.update_record()
+            session.flash = T('Report updated.')
+            redirect(URL('student','report/edit', vars = dict(report = report.id)))
+        else:
+            session.flash = T('Selected report can\'t be edited. Select a valid report.')
+            redirect(URL('student','index'))
+    elif (request.args(0) == 'delete'):
+        report = request.vars['report']
+        report = db.report(db.report.id == report)
+        valid = not(report is None)
+        ## Validate report TIMING restriction
+        if valid: valid = cpfecys.student_validation_report_restrictions(report.report_restriction.id)
+        ## Validate that the report belongs to user
+        if valid: valid = cpfecys.student_validation_report_owner(report.id)
+        ## Validate that the report status is editable (it is either 'Draft' or 'Recheck')
+        if valid: valid = cpfecys.student_validation_report_status(report)
+        if valid:
+            report.heading = None
+            report.update_record()
+            session.flash = T('Report updated.')
+            redirect(URL('student','report/edit', vars = dict(report = report.id)))
+        else:
+            session.flash = T('Selected report can\'t be edited. Select a valid report.')
+            redirect(URL('student','index'))
+    raise HTTP(404)
+
+@auth.requires_login()
+@auth.requires_membership('Student')
+def report_footer():
+    if (request.args(0) == 'create'):
+        report = request.vars['report']
+        content = request.vars['report-content']
+        ## Get the report id
+        report = db.report(db.report.id == report)
+        valid = not(report is None) and not(content is None)
+        ## Validate report TIMING restriction
+        if valid: valid = cpfecys.student_validation_report_restrictions(report.report_restriction.id)
+        ## Validate that the report belongs to user
+        if valid: valid = cpfecys.student_validation_report_owner(report.id)
+        ## Validate that the report status is editable (it is either 'Draft' or 'Recheck')
+        if valid: valid = cpfecys.student_validation_report_status(report)
+        if valid:
+            report.footer = content
+            report.update_record()
+            session.flash = T('Report updated.')
+            redirect(URL('student','report/edit', vars = dict(report = report.id)))
+        else:
+            session.flash = T('Selected report can\'t be edited. Select a valid report.')
+            redirect(URL('student','index'))
+    elif (request.args(0) == 'update'):
+        report = request.vars['report']
+        content = request.vars['report-content']
+        report = db.report(db.report.id == report)
+        valid = not(report is None) and not(content is None)
+        ## Validate report TIMING restriction
+        if valid: valid = cpfecys.student_validation_report_restrictions(report.report_restriction.id)
+        ## Validate that the report belongs to user
+        if valid: valid = cpfecys.student_validation_report_owner(report.id)
+        ## Validate that the report status is editable (it is either 'Draft' or 'Recheck')
+        if valid: valid = cpfecys.student_validation_report_status(report)
+        if valid:
+            report.footer = content
+            report.update_record()
+            session.flash = T('Report updated.')
+            redirect(URL('student','report/edit', vars = dict(report = report.id)))
+        else:
+            session.flash = T('Selected report can\'t be edited. Select a valid report.')
+            redirect(URL('student','index'))
+    elif (request.args(0) == 'delete'):
+        report = request.vars['report']
+        report = db.report(db.report.id == report)
+        valid = not(report is None)
+        ## Validate report TIMING restriction
+        if valid: valid = cpfecys.student_validation_report_restrictions(report.report_restriction.id)
+        ## Validate that the report belongs to user
+        if valid: valid = cpfecys.student_validation_report_owner(report.id)
+        ## Validate that the report status is editable (it is either 'Draft' or 'Recheck')
+        if valid: valid = cpfecys.student_validation_report_status(report)
+        if valid:
+            report.footer = None
+            report.update_record()
+            session.flash = T('Report updated.')
+            redirect(URL('student','report/edit', vars = dict(report = report.id)))
+        else:
+            session.flash = T('Selected report can\'t be edited. Select a valid report.')
+            redirect(URL('student','index'))
+    raise HTTP(404)
+
+@auth.requires_login()
+@auth.requires_membership('Student')
 def item():
     cyear_period = cpfecys.current_year_period()
     item_restriction = request.vars['restriction']

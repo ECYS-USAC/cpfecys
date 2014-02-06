@@ -1,0 +1,42 @@
+<!-- START->report-header -->
+<div id="{{=inc_vars['id']}}"
+     class="modal hide fade" tabindex="-1"
+     role="dialog"
+     aria-labelledby="aria-{{=inc_vars['id']}}"
+     aria-hidden="true">
+    <form action="{{=inc_vars['url']}}" method="POST">
+        <div class="modal-header">
+            <span class="row-fluid">
+                <span class="row">
+                    <span class="span11">
+                        <h3 id="aria-{{=inc_vars['id']}}">{{=inc_vars['title']}}</h3>
+                    </span>
+                    <span class="span1">
+                        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+                    </span>
+                </span>
+            </span>
+        </div>
+        <div class="modal-body">
+            <div class="alert" style="display:none;" id="report-error-{{=inc_vars['id']}}">
+                <strong>{{=T('Alert')}}!</strong> {{=T('All fields are mandatory, please check and try again.')}}
+            </div>
+            <textarea id="report-content-{{=inc_vars['id']}}" name="report-content" class="text">{{=inc_vars['content']}}</textarea>
+        </div>
+        <div class="modal-footer">
+          <button class="btn"
+                data-dismiss="modal"
+                aria-hidden="true">{{=T('Close')}}</button>
+          <input type="submit"
+          onclick="if ($('#report-content-{{=inc_vars['id']}}').val())
+              return true;
+                   else{
+                       $('#report-error-{{=inc_vars['id']}}').show();
+                       return false;
+                   }"
+              class="btn btn-primary"
+                 value="{{=T('Save Changes')}}"></input>
+        </div>
+    </form>
+</div>
+<!-- END->report-header -->

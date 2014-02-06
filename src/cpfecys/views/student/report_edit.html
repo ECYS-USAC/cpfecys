@@ -46,6 +46,18 @@
                 log_types = log_types,
                 content = '') }}
 {{include 'include/log-activity.html'}}
+<!-- report-head-activity -->
+{{inc_vars = dict(id = 'report-header-new',
+                url = URL('report_header/create', vars=dict(report = report.id)),
+                title = T('Report Header'),
+                content = '') }}
+{{include 'include/report-header.html'}}
+<!-- report-footer-activity -->
+{{inc_vars = dict(id = 'report-footer-new',
+                url = URL('report_footer/create', vars=dict(report = report.id)),
+                title = T('Report Footer'),
+                content = '') }}
+{{include 'include/report-header.html'}}
 <!-- Helpers end here -->
 <div class="row-fluid">
   <div class="navbar">
@@ -62,17 +74,23 @@
                     <span class="icon-plus-sign"></span> {{=T('Add Block')}}
                 </a>
                 <ul class="dropdown-menu">
+                    {{if report.heading is None or report.footer is None:}}
                     <li class="disabled"><a tabindex="-1" href="#">{{=T('Common')}}</a></li>
+                    {{pass}}
+                    {{if report.heading is None:}}
                     <li>
-                        <a data-toggle="modal" href="#">
+                        <a data-toggle="modal" href="#report-header-new">
                             <span class="icon-align-left"></span> {{=T('Heading')}}
                         </a>
                     </li>
+                    {{pass}}
+                    {{if report.footer is None:}}
                     <li>
-                        <a data-toggle="modal" href="#">
+                        <a data-toggle="modal" href="#report-footer-new">
                             <span class="icon-align-left"></span> {{=T('Footer')}}
                         </a>
                     </li>
+                    {{pass}}
                     <li class="divider"></li>
                     <li class="disabled"><a tabindex="-1" href="#">{{=T('General Activities')}}</a></li>
                     <li>
@@ -99,6 +117,42 @@
   </div>
 </div>
 <div class="">
+    {{if not(report.heading is None):}}
+    <!-- report-head-edit-activity -->
+    {{inc_vars = dict(id = 'report-header-edit',
+                    url = URL('report_header/update', vars=dict(report = report.id)),
+                    title = T('Report Header'),
+                    content = report.heading) }}
+    {{include 'include/report-header.html'}}
+    <!-- Helpers for deletion -->
+    {{inc_vars = dict(id = 'report-header-delete',
+    url = URL('report_header/delete', vars=dict(report = report.id)))}}
+    {{include 'include/delete-helper.html'}}
+    <!-- // Helpers for deletion -->
+    <div class="row-fluid">
+        <div class="span12">
+            <div class="span12">
+                <div class="pull-right">
+                    <div class="btn-group">
+                        <a href="#report-header-edit"
+                           data-toggle="modal"
+                           class="btn">
+                            <span class="icon-edit"></span>
+                        </a>
+                        <a href="#report-header-delete"
+                           data-toggle="modal"
+                           class="btn btn-danger">
+                            <span class="icon-remove icon-white"></span>
+                        </a>
+                    </div>
+                </div>
+            </div>
+            <div class="span12">
+                {{=MARKMIN(report.heading, markmin_settings)}}
+            </div>
+        </div>
+    </div>
+    {{pass}}
 <div class="accordion" id="accordion2">
   <div class="accordion-group">
     <div class="accordion-heading">
@@ -125,74 +179,6 @@
                 log_types = log_types,
                 content = log.description) }}
               {{include 'include/log-activity.html'}}
-              <div id="log-edit-activity-{{=log.id}}"
-                 class="modal hide fade" tabindex="-1"
-                 role="dialog"
-                 aria-labelledby="log-edit-activity-{{=log.id}}"
-                 aria-hidden="true">
-                <form action="{{=URL('log/update', vars=dict(log = log.id))}}" method="POST">
-                    <div class="modal-header">
-                        <span class="row-fluid">
-                            <span class="row">
-                                <span class="span3">
-                                    <h3 id="log-edit-activity-{{=log.id}}">{{=T('Log Activity')}}</h3>
-                                </span>
-                                <span class="span8">
-                                    <div class="input-prepend">
-                                        <span class="add-on">{{=T('Log Date')}}
-                                            <span class="icon-calendar"></span>
-                                        </span>
-                                        <input class="span7"
-                                               id="log-date-{{=log.id}}"
-                                               value="{{=log.entry_date}}"
-                                               name="log-date" placeholder="{{=T("YYYY-MM-DD")}}"
-                                               type="date">
-                                    </div>
-                                    <div><small>{{=T("YYYY-MM-DD")}}</small></div>
-                                </span>
-                                <span class="span1">
-                                    <button type="button"
-                                            class="close"
-                                            data-dismiss="modal"
-                                            aria-hidden="true">×
-                                    </button>
-                                </span>
-                            </span>
-                        </span>
-                    </div>
-                    <div class="modal-body">
-                        <div class="alert">
-                          <button type="button" class="close" data-dismiss="alert">&times;</button>
-                          <strong>Information!</strong> 
-                            If there happened something to report to school please select as anomaly.
-                        </div>
-                        <div class="input-prepend">
-                            <span class="add-on">{{=T('Type')}}</span>
-                            <select id="log-type-{{=log.id}}" name="log-type">
-                                {{for log_type in log_types:}}
-                                <option value = "{{=log_type.id}}">{{=T(log_type.name)}}</option>
-                                {{pass}}
-                            </select>
-                        </div>
-                        <textarea id="log-content-{{=log.id}}"
-                                  name="log-content"
-                                  class="text">{{=log.description}}</textarea>
-                    </div>
-                    <div class="modal-footer">
-                      <button class="btn"
-                            data-dismiss="modal"
-                            aria-hidden="true">{{=T('Close')}}</button>
-                      <input type="submit"
-                      onclick="if ($('#log-type-{{=log.id}}').val()&&
-                          $('#log-content-{{=log.id}}').val()&&
-                          $('#log-date-{{=log.id}}').val())
-                          return true;
-                          else return false;"
-                          class="btn btn-primary"
-                             value="{{=T('Save Changes')}} *{{=T('All fields are required.')}}"></input>
-                    </div>
-                </form>
-            </div>
               <!-- // Helpers for Edition -->
               <!-- Helpers for deletion -->
               {{inc_vars = dict(id = 'delete-log-' + str(log.id),
@@ -515,6 +501,42 @@
     </div>
   </div>
 </div>
+{{if not(report.footer is None):}}
+<!-- report-footer-edit-activity -->
+{{inc_vars = dict(id = 'report-footer-edit',
+url = URL('report_footer/update', vars=dict(report = report.id)),
+title = T('Report Footer'),
+content = report.footer) }}
+{{include 'include/report-header.html'}}
+<!-- Helpers for deletion -->
+{{inc_vars = dict(id = 'report-footer-delete',
+url = URL('report_footer/delete', vars=dict(report = report.id)))}}
+{{include 'include/delete-helper.html'}}
+<!-- // Helpers for deletion -->
+<div class="row-fluid">
+    <div class="span12">
+        <div class="span12">
+            <div class="pull-right">
+                <div class="btn-group">
+                    <a href="#report-footer-edit"
+                       data-toggle="modal"
+                       class="btn">
+                        <span class="icon-edit"></span>
+                    </a>
+                    <a href="#report-footer-delete"
+                       data-toggle="modal"
+                       class="btn btn-danger">
+                        <span class="icon-remove icon-white"></span>
+                    </a>
+                </div>
+            </div>
+        </div>
+        <div class="span12">
+            {{=MARKMIN(report.footer, markmin_settings)}}
+        </div>
+    </div>
+</div>
+{{pass}}
 </div>
 <a class="btn" href="{{=URL('student','report/save', vars=dict(report = report.id))}}">
     {{=T('Save Draft')}}
