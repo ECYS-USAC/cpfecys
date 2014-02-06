@@ -17,180 +17,26 @@
                 desertion_continued = '') }}
 {{include 'include/log-desertion-activity.html'}}
 <!-- log-new-metrics-activity -->
-<div id="log-new-metrics-activity"
-     class="modal hide fade" tabindex="-1"
-     role="dialog"
-     aria-labelledby="changos"
-     aria-hidden="true">
-     <!-- metrics-new-activity -->
-    <form action="{{=URL('metrics/save', vars=dict(report = report.id))}}" method="POST">
-        <div class="modal-header">
-            <span class="row-fluid">
-                <span class="row">
-                    <span class="span3">
-                        <h3 id="changos">{{=T('Log Metrics')}}</h3>
-                    </span>
-                    <span class="span8">
-                        <div class="input-prepend">
-                            <span class="add-on">{{=T('Log Date')}} <span class="icon-calendar"></span></span>
-                            <input class="span7" id="log-metrics-date" name="log-date" placeholder="{{=T("YYYY-MM-DD")}}" type="date">
-                        </div>
-                        <div><small>{{=T("YYYY-MM-DD")}}</small></div>
-                    </span>
-                    <span class="span1">
-                        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
-                    </span>
-                </span>
-            </span>
-        </div>
-        <div class="modal-body">
-            <div class="alert" style="display:none;" id="metrics-error">
-              <button type="button" class="close" data-dismiss="alert">&times;</button>
-                <strong>{{=T('Alert')}}!</strong> {{=T('All fields are mandatory, please check and try again.')}}
-            </div>
-            <div class="control-group">
-                <label class="control-label" for="media-metrics">{{=T('Metric Report Type')}}</label>
-                <div class="controls">
-                    <select name="metric-type">
-                      {{for metric in metrics_type:}}
-                        <option value="{{=metric.id}}">{{=metric.name}}</option>
-                      {{pass}}
-                    </select>
-                </div>
-            </div>
-            <div class="control-group">
-                <label class="control-label" for="media-metrics">Media</label>
-                <div class="controls">
-                    <input type="text" id="media-metrics" 
-                    name="media-metrics" placeholder="Media">
-                </div>
-            </div>
-            <div class="control-group">
-                <label class="control-label" for="error-tipico-metrics">Error Típico</label>
-                <div class="controls">
-                    <input type="text" id="error-tipico-metrics"
-                    name="error-tipico-metrics" placeholder="Error Típico">
-                </div>
-            </div>
-            <div class="control-group">
-                <label class="control-label" for="mediana-metrics">Mediana</label>
-                <div class="controls">
-                    <input type="text" id="mediana-metrics" 
-                    name="mediana-metrics" placeholder="Mediana">
-                </div>
-            </div>
-            <div class="control-group">
-                <label class="control-label" for="moda-metrics">Moda</label>
-                <div class="controls">
-                    <input type="text" id="moda-metrics" 
-                    name="moda-metrics" placeholder="Moda">
-                </div>
-            </div>
-            <div class="control-group">
-                <label class="control-label" for="desviacion-estandar-metrics">Desviación Estandar</label>
-                <div class="controls">
-                    <input type="text" id="desviacion-estandar-metrics"
-                    name="desviacion-estandar-metrics" placeholder="Desviación Estandar">
-                </div>
-            </div>
-            <div class="control-group">
-                <label class="control-label" for="varianza-metrics">Varianza de la Muestra</label>
-                <div class="controls">
-                    <input type="text" id="varianza-metrics" 
-                    name="varianza-metrics" placeholder="Varianza de la Muestra">
-                </div>
-            </div>
-            <div class="control-group">
-                <label class="control-label" for="curtosis-metrics">Curtosis</label>
-                <div class="controls">
-                    <input type="text" id="curtosis-metrics" 
-                    name="curtosis-metrics" placeholder="Curtosis">
-                </div>
-            </div>
-            <div class="control-group">
-                <label class="control-label" for="coeficiente-metrics">Coeficiente de asimetría</label>
-                <div class="controls">
-                    <input type="text" id="coeficiente-metrics" 
-                    name="coeficiente-metrics" placeholder="Coeficiente de asimetría">
-                </div>
-            </div>
-            <div class="control-group">
-                <label class="control-label" for="rango-metrics">Rango</label>
-                <div class="controls">
-                    <input type="text" id="rango-metrics" 
-                    name="rango-metrics" placeholder="Rango">
-                </div>
-            </div>
-            <div class="control-group">
-                <label class="control-label" for="minimo-metrics">Mínimo</label>
-                <div class="controls">
-                    <input type="text" id="minimo-metrics" 
-                    name="minimo-metrics" placeholder="Mínimo">
-                </div>
-            </div>
-            <div class="control-group">
-                <label class="control-label" for="maximo-metrics">Máximo</label>
-                <div class="controls">
-                    <input type="text" id="maximo-metrics" 
-                    name="maximo-metrics" placeholder="Máximo">
-                </div>
-            </div>
-            <div class="control-group">
-                <label class="control-label" for="total-metrics">Total de Alumnos</label>
-                <div class="controls">
-                    <input type="text" id="total-metrics" 
-                    name="total-metrics" placeholder="Total de Alumnos">
-                </div>
-            </div>
-            <div class="control-group">
-                <label class="control-label" for="reprobados-metrics">Reprobados</label>
-                <div class="controls">
-                    <input type="text" id="reprobados-metrics" 
-                    name="reprobados-metrics" placeholder="Reprobados">
-                </div>
-            </div>
-            <div class="control-group">
-                <label class="control-label" for="aprobados-metrics">Aprobados</label>
-                <div class="controls">
-                    <input type="text" id="aprobados-metrics" 
-                    name="aprobados-metrics" placeholder="Aprobados">
-                </div>
-            </div>
-        </div>
-        <div class="modal-footer">
-          <button class="btn"
-                data-dismiss="modal"
-                aria-hidden="true">{{=T('Close')}}</button>
-          <input type="submit"
-          onclick="if (
-              $('#media-metrics').val()&&
-              $('#error-tipico-metrics').val()&&
-              $('#mediana-metrics').val()&&
-              $('#moda-metrics').val()&&
-              $('#desviacion-estandar-metrics').val()&&
-              $('#varianza-metrics').val()&&
-              $('#curtosis-metrics').val()&&
-              $('#coeficiente-metrics').val()&&
-              $('#rango-metrics').val()&&
-              $('#minimo-metrics').val()&&
-              $('#maximo-metrics').val()&&
-              $('#aprobados-metrics').val()&&
-              $('#reprobados-metrics').val()&&
-              parseInt($('#total-metrics').val()) > 0&&
-              parseInt($('#total-metrics').val()) ==
-                  parseInt($('#aprobados-metrics').val())
-                  + parseInt($('#reprobados-metrics').val()))
-              return true;
-                   else {
-                       $('#metrics-error').show();
-                       return false;
-                   }
-                "
-              class="btn btn-primary"
-                 value="{{=T('Save Changes')}}"></input>
-        </div>
-    </form>
-</div>
+{{inc_vars = dict(id = 'log-new-metrics-activity',
+                url = URL('metrics/save', vars=dict(report = report.id)),
+                date = '',
+                metrics_type = metrics_type,
+                media = '',
+                error_tipico = '',
+                mediana = '',
+                moda = '',
+                desviacion_estandar = '',
+                varianza = '',
+                curtosis = '',
+                coeficiente = '',
+                rango = '',
+                minimo = '',
+                maximo = '',
+                total = '',
+                reprobados = '',
+                aprobados = ''
+                ) }}
+{{include 'include/log-metrics-activity.html'}}
 <!-- log-new-activity -->
 <div id="log-new-activity"
      class="modal hide fade" tabindex="-1"
@@ -448,176 +294,26 @@
         <div style="container">
           {{for metric in metrics:}}
             <!-- Metric edit Helper-->
-            <div id="metric-edit-activity-{{=metric.id}}"
-             class="modal hide fade" tabindex="-1"
-             role="dialog"
-             aria-labelledby="metric-edit-activity-{{=metric.id}}"
-             aria-hidden="true">
-              <form action="{{=URL('metrics/update', vars=dict(metric = metric.id))}}" method="POST">
-                <div class="modal-header">
-                    <span class="row-fluid">
-                        <span class="row">
-                            <span class="span3">
-                                <h3 id="changos">{{=T('Log Metrics')}}</h3>
-                            </span>
-                            <span class="span8">
-                                <div class="input-prepend">
-                                    <span class="add-on">{{=T('Log Date')}} <span class="icon-calendar"></span></span>
-                                    <input class="span7" id="log-metrics-date" name="log-date" 
-                                    value="{{=metric.created}}" placeholder="{{=T("YYYY-MM-DD")}}" type="date">
-                                </div>
-                                <div><small>{{=T("YYYY-MM-DD")}}</small></div>
-                            </span>
-                            <span class="span1">
-                                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
-                            </span>
-                        </span>
-                    </span>
-                </div>
-                <div class="modal-body">
-                    <div class="control-group">
-                        <label class="control-label" for="media-metrics">{{=T('Metric Report Type')}}</label>
-                        <div class="controls">
-                            <select name="metric-type">
-                              {{for m_type in metrics_type:}}
-                                <option value="{{=m_type.id}}"
-                                {{if m_type.id == metric.metrics_type.id:}}
-                                  selected="selected"
-                                  {{pass}}>{{=m_type.name}}</option>
-                              {{pass}}
-                            </select>
-                        </div>
-                    </div>
-                    <div class="control-group">
-                        <label class="control-label" for="media-metrics">Media</label>
-                        <div class="controls">
-                            <input type="text" id="edit-media-metrics" 
-                            name="media-metrics" placeholder="Media" value="{{=metric.media}}">
-                        </div>
-                    </div>
-                    <div class="control-group">
-                        <label class="control-label" for="error-tipico-metrics">Error Típico</label>
-                        <div class="controls">
-                            <input type="text" id="edit-error-tipico-metrics"
-                            name="error-tipico-metrics" placeholder="Error Típico" value="{{=metric.error}}">
-                        </div>
-                    </div>
-                    <div class="control-group">
-                        <label class="control-label" for="mediana-metrics">Mediana</label>
-                        <div class="controls">
-                            <input type="text" id="edit-mediana-metrics" 
-                            name="mediana-metrics" placeholder="Mediana" value="{{=metric.mediana}}">
-                        </div>
-                    </div>
-                    <div class="control-group">
-                        <label class="control-label" for="moda-metrics">Moda</label>
-                        <div class="controls">
-                            <input type="text" id="edit-moda-metrics" 
-                            name="moda-metrics" placeholder="Moda" value="{{=metric.moda}}">
-                        </div>
-                    </div>
-                    <div class="control-group">
-                        <label class="control-label" for="desviacion-estandar-metrics">Desviación Estandar</label>
-                        <div class="controls">
-                            <input type="text" id="edit-desviacion-estandar-metrics"
-                            name="desviacion-estandar-metrics" placeholder="Desviación Estandar" value="{{=metric.desviacion}}">
-                        </div>
-                    </div>
-                    <div class="control-group">
-                        <label class="control-label" for="varianza-metrics">Varianza de la Muestra</label>
-                        <div class="controls">
-                            <input type="text" id="edit-varianza-metrics" 
-                            name="varianza-metrics" placeholder="Varianza de la Muestra" value="{{=metric.varianza}}">
-                        </div>
-                    </div>
-                    <div class="control-group">
-                        <label class="control-label" for="curtosis-metrics">Curtosis</label>
-                        <div class="controls">
-                            <input type="text" id="edit-curtosis-metrics" 
-                            name="curtosis-metrics" placeholder="Curtosis" value="{{=metric.curtosis}}">
-                        </div>
-                    </div>
-                    <div class="control-group">
-                        <label class="control-label" for="coeficiente-metrics">Coeficiente de asimetría</label>
-                        <div class="controls">
-                            <input type="text" id="edit-coeficiente-metrics" 
-                            name="coeficiente-metrics" placeholder="Coeficiente de asimetría" value="{{=metric.coeficiente}}">
-                        </div>
-                    </div>
-                    <div class="control-group">
-                        <label class="control-label" for="rango-metrics">Rango</label>
-                        <div class="controls">
-                            <input type="text" id="edit-rango-metrics" 
-                            name="rango-metrics" placeholder="Rango" value="{{=metric.rango}}">
-                        </div>
-                    </div>
-                    <div class="control-group">
-                        <label class="control-label" for="minimo-metrics">Mínimo</label>
-                        <div class="controls">
-                            <input type="text" id="edit-minimo-metrics" 
-                            name="minimo-metrics" placeholder="Mínimo" value="{{=metric.minimo}}">
-                        </div>
-                    </div>
-                    <div class="control-group">
-                        <label class="control-label" for="maximo-metrics">Máximo</label>
-                        <div class="controls">
-                            <input type="text" id="edit-maximo-metrics" 
-                            name="maximo-metrics" placeholder="Máximo" value="{{=metric.maximo}}">
-                        </div>
-                    </div>
-                    <div class="control-group">
-                        <label class="control-label" for="total-metrics">Total de Alumnos</label>
-                        <div class="controls">
-                            <input type="text" id="edit-total-metrics" 
-                            name="total-metrics" placeholder="Total de Alumnos" value="{{=metric.total}}">
-                        </div>
-                    </div>
-                    <div class="control-group">
-                        <label class="control-label" for="reprobados-metrics">Reprobados</label>
-                        <div class="controls">
-                            <input type="text" id="edit-reprobados-metrics" 
-                            name="reprobados-metrics" placeholder="Reprobados" value="{{=metric.reprobados}}">
-                        </div>
-                    </div>
-                    <div class="control-group">
-                        <label class="control-label" for="aprobados-metrics">Aprobados</label>
-                        <div class="controls">
-                            <input type="text" id="edit-aprobados-metrics" 
-                            name="aprobados-metrics" placeholder="Aprobados" value="{{=metric.aprobados}}">
-                        </div>
-                    </div>
-                </div>
-                <div class="modal-footer">
-                  <button class="btn"
-                        data-dismiss="modal"
-                        aria-hidden="true">{{=T('Close')}}</button>
-                  <input type="submit"
-                  onclick="if (
-                      $('#edit-media-metrics').val()&&
-                      $('#edit-error-tipico-metrics').val()&&
-                      $('#edit-mediana-metrics').val()&&
-                      $('#edit-moda-metrics').val()&&
-                      $('#edit-desviacion-estandar-metrics').val()&&
-                      $('#edit-varianza-metrics').val()&&
-                      $('#edit-curtosis-metrics').val()&&
-                      $('#edit-coeficiente-metrics').val()&&
-                      $('#edit-rango-metrics').val()&&
-                      $('#edit-minimo-metrics').val()&&
-                      $('#edit-maximo-metrics').val()&&
-                      $('#edit-aprobados-metrics').val()&&
-                      $('#edit-reprobados-metrics').val()&&
-                      parseInt($('#edit-total-metrics').val()) > 0&&
-                      parseInt($('#edit-total-metrics').val()) == 
-                          parseInt($('#edit-aprobados-metrics').val()) 
-                          + parseInt($('#edit-reprobados-metrics').val()))
-                      return true;
-                      else alert('{{=T('Please verify all data is correct')}}'); 
-                        return false;"
-                      class="btn btn-primary"
-                         value="{{=T('Save Changes')}} *{{=T('All fields are required.')}}"></input>
-                </div>
-              </form>
-            </div>
+            {{inc_vars = dict(id = 'metric-edit-activity-' + str(metric.id),
+                url = URL('metrics/update', vars=dict(metric = metric.id)),
+                date = metric.created,
+                metrics_type = metrics_type,
+                media = metric.media,
+                error_tipico = metric.error,
+                mediana = metric.mediana,
+                moda = metric.moda,
+                desviacion_estandar = metric.desviacion,
+                varianza = metric.varianza,
+                curtosis = metric.curtosis,
+                coeficiente = metric.coeficiente,
+                rango = metric.rango,
+                minimo = metric.minimo,
+                maximo = metric.maximo,
+                total = metric.total,
+                reprobados = metric.reprobados,
+                aprobados = metric.aprobados
+                ) }}
+            {{include 'include/log-metrics-activity.html'}}
           <!-- //Metric edit Helper-->
           <!-- Metric delete Helper-->
           {{inc_vars = dict(id = 'delete-metric-' + str(metric.id),
