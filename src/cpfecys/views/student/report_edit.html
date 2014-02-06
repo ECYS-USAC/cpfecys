@@ -20,6 +20,7 @@
 {{inc_vars = dict(id = 'log-new-metrics-activity',
                 url = URL('metrics/save', vars=dict(report = report.id)),
                 date = '',
+                metrics_t = None,
                 metrics_type = metrics_type,
                 media = '',
                 error_tipico = '',
@@ -38,64 +39,13 @@
                 ) }}
 {{include 'include/log-metrics-activity.html'}}
 <!-- log-new-activity -->
-<div id="log-new-activity"
-     class="modal hide fade" tabindex="-1"
-     role="dialog"
-     aria-labelledby="changos"
-     aria-hidden="true">
-    <form action="{{=URL('log/save', vars=dict(report = report.id))}}" method="POST">
-        <div class="modal-header">
-            <span class="row-fluid">
-                <span class="row">
-                    <span class="span3">
-                        <h3 id="changos">{{=T('Log Activity')}}</h3>
-                    </span>
-                    <span class="span8">
-                        <div class="input-prepend">
-                            <span class="add-on">{{=T('Log Date')}} <span class="icon-calendar"></span></span>
-                            <input class="span7" id="log-date" name="log-date" placeholder="{{=T("YYYY-MM-DD")}}" type="date">
-                        </div>
-                        <div><small>{{=T("YYYY-MM-DD")}}</small></div>
-                    </span>
-                    <span class="span1">
-                        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
-                    </span>
-                </span>
-            </span>
-        </div>
-        <div class="modal-body">
-            <div class="alert" style="display:none;" id="log-error">
-              <button type="button" class="close" data-dismiss="alert">&times;</button>
-                <strong>{{=T('Alert')}}!</strong> {{=T('All fields are mandatory, please check and try again.')}}
-            </div>
-            <div class="input-prepend">
-                <span class="add-on">{{=T('Type')}}</span>
-                <select id="log-type" name="log-type">
-                    {{for log_type in log_types:}}
-                    <option value = "{{=log_type.id}}">{{=T(log_type.name)}}</option>
-                    {{pass}}
-                </select>
-            </div>
-            <textarea id="log-content" name="log-content" class="text"></textarea>
-        </div>
-        <div class="modal-footer">
-          <button class="btn"
-                data-dismiss="modal"
-                aria-hidden="true">{{=T('Close')}}</button>
-          <input type="submit"
-          onclick="if ($('#log-type').val()&&
-              $('#log-content').val()&&
-              $('#log-date').val())
-              return true;
-                   else{
-                       $('#log-error').show();
-                       return false;
-                   }"
-              class="btn btn-primary"
-                 value="{{=T('Save Changes')}}"></input>
-        </div>
-    </form>
-</div>
+{{inc_vars = dict(id = 'log-new-activity',
+                url = URL('log/save', vars=dict(report = report.id)),
+                date = '',
+                log_type = None,
+                log_types = log_types,
+                content = '') }}
+{{include 'include/log-activity.html'}}
 <!-- Helpers end here -->
 <div class="row-fluid">
   <div class="navbar">
@@ -168,6 +118,13 @@
           <div style="container">
               {{for log in logs:}}
               <!-- Helpers for Edition -->
+              {{inc_vars = dict(id = 'log-edit-activity-' + str(log.id),
+                url = URL('log/update', vars=dict(log = log.id)),
+                date = log.entry_date,
+                log_type = log.log_type,
+                log_types = log_types,
+                content = log.description) }}
+              {{include 'include/log-activity.html'}}
               <div id="log-edit-activity-{{=log.id}}"
                  class="modal hide fade" tabindex="-1"
                  role="dialog"
@@ -297,6 +254,7 @@
             {{inc_vars = dict(id = 'metric-edit-activity-' + str(metric.id),
                 url = URL('metrics/update', vars=dict(metric = metric.id)),
                 date = metric.created,
+                metrics_t = metric.metrics_type,
                 metrics_type = metrics_type,
                 media = metric.media,
                 error_tipico = metric.error,
@@ -348,7 +306,7 @@
                                     <strong>{{=T('Value')}}</strong>
                                   </td>
                                 </tr>
-                              </thead>                              
+                              </thead>
                             <tbody>
                             <tr>
                               <td><strong>{{=T('Media')}}</strong> </td> <td>{{=metric.media}}</td></tr>
@@ -537,7 +495,7 @@
                                     <strong>{{=T('Value')}}</strong>
                                   </td>
                                 </tr>
-                              </thead>                              
+                              </thead>
                             <tbody>
                             <tr>
                               <td><strong>{{=T('Started')}}</strong> </td> <td>{{=desertion.started}}</td></tr>
@@ -553,7 +511,6 @@
             </div>
           {{pass}}
         </div>
-        
       </div>
     </div>
   </div>

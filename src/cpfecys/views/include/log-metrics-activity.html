@@ -36,7 +36,8 @@
                 <div class="controls">
                     <select name="metric-type">
                       {{for metric_t in inc_vars['metrics_type']:}}
-                        <option value="{{=metric_t.id}}">{{=metric_t.name}}</option>
+                        <option {{if metric_t == inc_vars['metrics_t']:}} selected {{pass}}
+                                value="{{=metric_t.id}}">{{=metric_t.name}}</option>
                       {{pass}}
                     </select>
                 </div>
