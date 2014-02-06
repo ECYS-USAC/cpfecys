@@ -1,0 +1,70 @@
+<!-- START->log-desertion-activity -->
+<div id="{{=inc_vars['id']}}"
+     class="modal hide fade" tabindex="-1"
+     role="dialog"
+     aria-labelledby="aria-{{=inc_vars['id']}}"
+     aria-hidden="true">
+    <form action="{{=inc_vars['url']}}" method="POST">
+        <div class="modal-header">
+            <span class="row-fluid">
+                <span class="row">
+                    <span class="span3">
+                        <h3 id="aria-{{=inc_vars['id']}}">{{=T('Log Desertion')}}</h3>
+                    </span>
+                    <span class="span1">
+                        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+                    </span>
+                </span>
+            </span>
+        </div>
+        <div class="modal-body">
+            <div class="alert" style="display:none;" id="desertion-error-{{=inc_vars['id']}}">
+                <strong>{{=T('Alert')}}!</strong> {{=T('All fields are mandatory, please check and try again.')}}
+            </div>
+            <div class="control-group">
+                <label class="control-label" for="desertion-started">{{=T('students started')}}</label>
+                <div class="controls">
+                    <input type="text" id="desertion-started-{{=inc_vars['id']}}"
+                    name="desertion-started" placeholder="{{=T('students started')}}"
+                    value="{{=inc_vars['desertion_started']}}">
+                </div>
+            </div>
+            <div class="control-group">
+                <label class="control-label" for="desertion-gone">{{=T('students gone')}}</label>
+                <div class="controls">
+                    <input type="text" id="desertion-gone-{{=inc_vars['id']}}"
+                    name="desertion-gone" placeholder="{{=T('students gone')}}"
+                    value="{{=inc_vars['desertion_gone']}}">
+                </div>
+            </div>
+            <div class="control-group">
+                <label class="control-label" for="desertion-continued">{{=T('students continued')}}</label>
+                <div class="controls">
+                    <input type="text" id="desertion-continued-{{=inc_vars['id']}}"
+                    name="desertion-continued" placeholder="{{=T('students continued')}}"
+                    value="{{=inc_vars['desertion_continued']}}">
+                </div>
+            </div>
+        </div>
+        <div class="modal-footer">
+          <button class="btn"
+                data-dismiss="modal"
+                aria-hidden="true">{{=T('Close')}}</button>
+          <input type="submit"
+          onclick="if (
+                   parseInt($('#desertion-started-{{=inc_vars['id']}}').val()) > 0 &&
+                   parseInt($('#desertion-started-{{=inc_vars['id']}}').val()) ==
+                   parseInt($('#desertion-gone-{{=inc_vars['id']}}').val()) +
+                   parseInt($('#desertion-continued-{{=inc_vars['id']}}').val()))
+              return true;
+                   else {
+                       $('#desertion-error-{{=inc_vars['id']}}').show();
+                       return false;
+                   }
+                "
+              class="btn btn-primary"
+                 value="{{=T('Save Changes')}}"></input>
+        </div>
+    </form>
+</div>
+<!-- END->log-desertion-activity -->

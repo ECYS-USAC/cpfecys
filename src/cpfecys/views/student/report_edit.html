@@ -9,71 +9,13 @@
 <link rel="stylesheet" type="text/css" href="{{=URL('static','markitup')}}/sets/markmin/style.css"/>
 <!-- //Additional Scripts for MARKMIN -->
 <!-- This are Helpers -->
-<!-- log-desertion-activity -->
-<div id="log-desertion-activity"
-     class="modal hide fade" tabindex="-1"
-     role="dialog"
-     aria-labelledby="changos"
-     aria-hidden="true">
-    <form action="{{=URL('desertions/save', vars=dict(report = report.id))}}" method="POST">
-        <div class="modal-header">
-            <span class="row-fluid">
-                <span class="row">
-                    <span class="span3">
-                        <h3 id="changos">{{=T('Log Desertion')}}</h3>
-                    </span>
-                    <span class="span1">
-                        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
-                    </span>
-                </span>
-            </span>
-        </div>
-        <div class="modal-body">
-            <div class="alert" style="display:none;" id="desertion-error">
-              <button type="button" class="close" data-dismiss="alert">&times;</button>
-                <strong>{{=T('Alert')}}!</strong> {{=T('All fields are mandatory, please check and try again.')}}
-            </div>
-            <div class="control-group">
-                <label class="control-label" for="desertion-started">{{=T('students started')}}</label>
-                <div class="controls">
-                    <input type="text" id="desertion-started"
-                    name="desertion-started" placeholder="{{=T('students started')}}">
-                </div>
-            </div>
-            <div class="control-group">
-                <label class="control-label" for="desertion-gone">{{=T('students gone')}}</label>
-                <div class="controls">
-                    <input type="text" id="desertion-gone"
-                    name="desertion-gone" placeholder="{{=T('students gone')}}">
-                </div>
-            </div>
-            <div class="control-group">
-                <label class="control-label" for="desertion-continued">{{=T('students continued')}}</label>
-                <div class="controls">
-                    <input type="text" id="desertion-continued"
-                    name="desertion-continued" placeholder="{{=T('students continued')}}">
-                </div>
-            </div>
-        </div>
-        <div class="modal-footer">
-          <button class="btn"
-                data-dismiss="modal"
-                aria-hidden="true">{{=T('Close')}}</button>
-          <input type="submit"
-          onclick="if (
-              parseInt($('#desertion-started').val()) > 0 &&
-              parseInt($('#desertion-continued').val()) > 0)
-              return true;
-                   else {
-                       $('#desertion-error').show();
-                       return false;
-                   }
-                "
-              class="btn btn-primary"
-                 value="{{=T('Save Changes')}}"></input>
-        </div>
-    </form>
-</div>
+<!-- log-new-desertion-activity -->
+{{inc_vars = dict(id = 'log-new-desertion-activity',
+                url = URL('desertions/save', vars=dict(report = report.id)),
+                desertion_started = '',
+                desertion_gone = '',
+                desertion_continued = '') }}
+{{include 'include/log-desertion-activity.html'}}
 <!-- log-new-metrics-activity -->
 <div id="log-new-metrics-activity"
      class="modal hide fade" tabindex="-1"
@@ -350,7 +292,7 @@
                         </a>
                     </li>
                     <li>
-                        <a data-toggle="modal" href="#log-desertion-activity">
+                        <a data-toggle="modal" href="#log-new-desertion-activity">
                             <span class="icon-user"></span> {{=T('Log Desertion')}}
                         </a>
                     </li>
@@ -450,28 +392,9 @@
             </div>
               <!-- // Helpers for Edition -->
               <!-- Helpers for deletion -->
-              <!-- Modal -->
-              <div id="delete-modal-{{=log.id}}"
-                   class="modal hide fade"
-                   tabindex="-1"
-                   role="dialog"
-                   aria-labelledby="DeleteModalLabel{{=log.id}}"
-                   aria-hidden="true">
-                  <div class="modal-header">
-                      <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
-                      <h3 id="DeleteModalLabel{{=log.id}}">{{=T('Confirm Delete')}}</h3>
-                  </div>
-                  <div class="modal-body">
-                      <p>{{=T("Delete operation can't be undone, do you want to continue?")}}</p>
-                  </div>
-                  <div class="modal-footer">
-                      <button class="btn" data-dismiss="modal" aria-hidden="true">{{=T('Cancel')}}</button>
-                      <a class="btn btn-danger"
-                         href="{{=URL('log/delete', vars=dict(log = log.id))}}">
-                          {{=T('Delete')}}
-                      </a>
-                  </div>
-              </div>
+              {{inc_vars = dict(id = 'delete-log-' + str(log.id),
+              url = URL('log/delete', vars=dict(log = log.id)))}}
+              {{include 'include/delete-helper.html'}}
               <!-- // Helpers for deletion -->
               <div class="row-fluid">
                   <div class="well span12">
@@ -492,7 +415,7 @@
                                      class="btn">
                                       <span class="icon-edit"></span>
                                   </a>
-                                  <a href="#delete-modal-{{=log.id}}"
+                                  <a href="#delete-log-{{=log.id}}"
                                      data-toggle="modal"
                                      class="btn btn-danger">
                                       <span class="icon-remove icon-white"></span>
@@ -695,34 +618,14 @@
                 </div>
               </form>
             </div>
-            <!-- //Metric edit Helper-->
-
-            <!-- Metric delete Helper-->
-            <div id="delete-metric-{{=metric.id}}"
-                   class="modal hide fade"
-                   tabindex="-1"
-                   role="dialog"
-                   aria-labelledby="DeleteModalLabel{{=metric.id}}"
-                   aria-hidden="true">
-                  <div class="modal-header">
-                      <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
-                      <h3 id="DeleteModalLabel{{=metric.id}}">{{=T('Confirm Delete')}}</h3>
-                  </div>
-                  <div class="modal-body">
-                      <p>{{=T("Delete operation can't be undone, do you want to continue?")}}</p>
-                  </div>
-                  <div class="modal-footer">
-                      <button class="btn" data-dismiss="modal" aria-hidden="true">{{=T('Cancel')}}</button>
-                      <a class="btn btn-danger"
-                         href="{{=URL('metrics/delete', vars=dict(metric = metric.id))}}">
-                          {{=T('Delete')}}
-                      </a>
-                  </div>
-              </div>
-            <!-- //Metric delete Helper-->
-            <div class="row-fluid">
-                  <div class="well span12">
-                    
+          <!-- //Metric edit Helper-->
+          <!-- Metric delete Helper-->
+          {{inc_vars = dict(id = 'delete-metric-' + str(metric.id),
+          url = URL('metrics/delete', vars=dict(metric = metric.id)))}}
+          {{include 'include/delete-helper.html'}}
+          <!-- //Metric delete Helper-->
+          <div class="row-fluid">
+              <div class="well span12">
                       <div class="span12">
                           <strong>{{=T('Date')}}:</strong> {{=metric.created}}
                           <div class="pull-right">
@@ -874,18 +777,12 @@
                                         });
                                 </script>
                               {{pass}}
-                              <script type="text/javascript">
-                                $(function () {
-                                        
-                                    });
-                            </script>
                           </div>
                       </div>
                   </div>
             </div>
           {{pass}}
         </div>
-        
       </div>
     </div>
   </div>
@@ -903,97 +800,18 @@
       <div class="accordion-inner">
         <div style="container">
           {{for desertion in desertions:}}
-
           <!-- Desertion edit Helper-->
-            <div id="desertion-edit-activity-{{=desertion.id}}"
-             class="modal hide fade" tabindex="-1"
-             role="dialog"
-             aria-labelledby="desertion-edit-activity-{{=desertion.id}}"
-             aria-hidden="true">
-              <form action="{{=URL('desertions/update', vars=dict(desertion = desertion.id))}}" method="POST">
-                <div class="modal-header">
-                    <span class="row-fluid">
-                        <span class="row">
-                            <span class="span3">
-                                <h3 id="changos">{{=T('Log Desertion')}}</h3>
-                            </span>
-                            <span class="span1">
-                                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
-                            </span>
-                        </span>
-                    </span>
-                </div>
-                <div class="modal-body">
-                    <div class="control-group">
-                        <label class="control-label" for="media-desertions">{{=T('Desertion Report Type')}}</label>
-                    </div>
-                    <div class="control-group">
-                        <label class="control-label" for="desertion-started">{{=T('Started')}}</label>
-                        <div class="controls">
-                            <input type="text" id="edit-desertion-started" 
-                            name="edit-desertion-started" placeholder="Reprobados" value="{{=desertion.started}}">
-                        </div>
-                    </div>
-                    <div class="control-group">
-                        <label class="control-label" for="desertion-gone">{{=T('Gone')}}</label>
-                        <div class="controls">
-                            <input type="text" id="edit-desertion-gone" 
-                            name="edit-desertion-gone" placeholder="Aprobados" value="{{=desertion.gone}}">
-                        </div>
-                    </div>
-                    <div class="control-group">
-                        <label class="control-label" for="desertion-continued">{{=T('Continued')}}</label>
-                        <div class="controls">
-                            <input type="text" id="edit-desertion-continued" 
-                            name="edit-desertion-continued" placeholder="Aprobados" value="{{=desertion.continued}}">
-                        </div>
-                    </div>
-                </div>
-                <div class="modal-footer">
-                  <button class="btn"
-                        data-dismiss="modal"
-                        aria-hidden="true">{{=T('Close')}}</button>
-                  <input type="submit"
-                  onclick="if (
-                      $('#edit-desertion-started').val()&&
-                      $('#edit-desertion-gone').val()&&
-                      $('#edit-desertion-continued').val()&&
-                      parseInt($('#edit-desertion-started').val()) > 0 &&
-                      parseInt($('#edit-desertion-started').val()) ==
-                          parseInt($('#edit-desertion-gone').val()) + 
-                          parseInt($('#edit-desertion-continued').val())
-                      )
-                      return true;
-                      else alert('{{=T('Please verify all data is correct, Started = Gone + Continued')}}'); 
-                        return false;"
-                      class="btn btn-primary"
-                         value="{{=T('Save Changes')}} *{{=T('All fields are required.')}}"></input>
-                </div>
-              </form>
-            </div>
+            {{inc_vars = dict(id = 'desertion-edit-activity-' + str(desertion.id),
+                url = URL('desertions/update', vars=dict(desertion = desertion.id)),
+                desertion_started = desertion.started,
+                desertion_gone = desertion.gone,
+                desertion_continued = desertion.continued) }}
+            {{include 'include/log-desertion-activity.html'}}
             <!-- //Desertion edit Helper-->
             <!-- Metric delete Helper-->
-            <div id="delete-desertion-{{=desertion.id}}"
-                   class="modal hide fade"
-                   tabindex="-1"
-                   role="dialog"
-                   aria-labelledby="DeleteModalLabel{{=desertion.id}}"
-                   aria-hidden="true">
-                  <div class="modal-header">
-                      <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
-                      <h3 id="DeleteModalLabel{{=desertion.id}}">{{=T('Confirm Delete')}}</h3>
-                  </div>
-                  <div class="modal-body">
-                      <p>{{=T("Delete operation can't be undone, do you want to continue?")}}</p>
-                  </div>
-                  <div class="modal-footer">
-                      <button class="btn" data-dismiss="modal" aria-hidden="true">{{=T('Cancel')}}</button>
-                      <a class="btn btn-danger"
-                         href="{{=URL('desertions/delete', vars=dict(desertion = desertion.id))}}">
-                          {{=T('Delete')}}
-                      </a>
-                  </div>
-              </div>
+            {{inc_vars = dict(id = 'delete-desertion-' + str(desertion.id),
+                url = URL('desertions/delete', vars=dict(desertion = desertion.id)))}}
+            {{include 'include/delete-helper.html'}}
             <!-- //Metric delete Helper-->
 
             <div class="row-fluid">

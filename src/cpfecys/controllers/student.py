@@ -432,7 +432,7 @@ def report():
             redirect(URL('student', 'index'))
     else:
         redirect(URL('student', 'index'))
-    return dict()
+    raise HTTP(404)
 
 @auth.requires_login()
 @auth.requires_membership('Student')
@@ -510,7 +510,7 @@ def log():
         else:
             session.flash = T('Operation not allowed.')
             redirect(URL('student', 'index'))
-    return dict()
+    raise HTTP(404)
 
 
 @auth.requires_login()
@@ -660,6 +660,7 @@ def metrics():
         else:
             session.flash = T('Operation not allowed.')
             redirect(URL('student', 'index'))
+    raise HTTP(404)
 
 @auth.requires_login()
 @auth.requires_membership('Student')
@@ -707,13 +708,12 @@ def desertions():
         # validate report is 'Draft' or 'Recheck'
         if valid_des: valid_des = cpfecys.student_validation_report_status \
             (db.report(db.report.id == des.report))
-        
-        desertion_started = request.vars['edit-desertion-started']
-        desertion_gone = request.vars['edit-desertion-gone']
-        desertion_continued = request.vars['edit-desertion-continued']
+        desertion_started = request.vars['desertion-started']
+        desertion_gone = request.vars['desertion-gone']
+        desertion_continued = request.vars['desertion-continued']
 
-        if valid_des: valid_des = (desertion_started 
-                                   and desertion_gone 
+        if valid_des: valid_des = (desertion_started
+                                   and desertion_gone
                                    and desertion_continued
                                    and int(desertion_started)== \
                                         int(desertion_gone) + \
@@ -747,4 +747,4 @@ def desertions():
         else:
             session.flash = T('Operation not allowed.')
             redirect(URL('student', 'index'))
-    return dict()
+    raise HTTP(404)

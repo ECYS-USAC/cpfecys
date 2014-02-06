@@ -1,0 +1,23 @@
+<!-- Start->Delete Helper-->
+<div id="{{=inc_vars['id']}}"
+     class="modal hide fade"
+     tabindex="-1"
+     role="dialog"
+     aria-labelledby="DeleteModalLabel{{=inc_vars['id']}}"
+     aria-hidden="true">
+    <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+        <h3 id="DeleteModalLabel{{=inc_vars['id']}}">{{=T('Confirm Delete')}}</h3>
+    </div>
+    <div class="modal-body">
+        <p>{{=T("Delete operation can't be undone, do you want to continue?")}}</p>
+    </div>
+    <div class="modal-footer">
+        <button class="btn" data-dismiss="modal" aria-hidden="true">{{=T('Cancel')}}</button>
+        <a class="btn btn-danger"
+           href="{{=inc_vars['url']}}">
+            {{=T('Delete')}}
+        </a>
+    </div>
+</div>
+<!-- End->Delete Helper-->
