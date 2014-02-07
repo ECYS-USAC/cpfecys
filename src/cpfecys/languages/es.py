@@ -747,6 +747,7 @@
 'Working': 'Laborando',
 'Working...': 'Trabajando...',
 'Working:': 'Estatus Laboral:',
+'XML': 'XML',
 'yearp': 'Año',
 'Yearp': 'Año',
 'YES': 'SÍ',

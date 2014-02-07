@@ -122,7 +122,7 @@
       </div>
   </div>
 </div>
-<div class="">
+<div style="border:solid #ddd 1px;">
     {{if not(report.heading is None):}}
     <!-- report-head-edit-activity -->
     {{inc_vars = dict(id = 'report-header-edit',
@@ -135,29 +135,13 @@
     url = URL('report_header/delete', vars=dict(report = report.id)))}}
     {{include 'include/delete-helper.html'}}
     <!-- // Helpers for deletion -->
-    <div class="row-fluid">
-        <div class="span12">
-            <div class="span12">
-                <div class="pull-right">
-                    <div class="btn-group">
-                        <a href="#report-header-edit"
-                           data-toggle="modal"
-                           class="btn">
-                            <span class="icon-edit"></span>
-                        </a>
-                        <a href="#report-header-delete"
-                           data-toggle="modal"
-                           class="btn btn-danger">
-                            <span class="icon-remove icon-white"></span>
-                        </a>
-                    </div>
-                </div>
-            </div>
-            <div class="span12">
-                {{=MARKMIN(report.heading, markmin_settings)}}
-            </div>
-        </div>
-    </div>
+    <!-- Display Helper -->
+    {{inc_vars = dict(editable = True,
+    edit_action = 'report-header-edit',
+    delete_action = 'report-header-delete',
+    content = MARKMIN(report.heading, markmin_settings))}}
+    {{include 'include/display-report-header.html'}}
+    <!-- //Display Helper -->
     {{pass}}
 <div class="accordion" id="accordion2">
   <div class="accordion-group">
@@ -519,29 +503,13 @@ content = report.footer) }}
 url = URL('report_footer/delete', vars=dict(report = report.id)))}}
 {{include 'include/delete-helper.html'}}
 <!-- // Helpers for deletion -->
-<div class="row-fluid">
-    <div class="span12">
-        <div class="span12">
-            <div class="pull-right">
-                <div class="btn-group">
-                    <a href="#report-footer-edit"
-                       data-toggle="modal"
-                       class="btn">
-                        <span class="icon-edit"></span>
-                    </a>
-                    <a href="#report-footer-delete"
-                       data-toggle="modal"
-                       class="btn btn-danger">
-                        <span class="icon-remove icon-white"></span>
-                    </a>
-                </div>
-            </div>
-        </div>
-        <div class="span12">
-            {{=MARKMIN(report.footer, markmin_settings)}}
-        </div>
-    </div>
-</div>
+<!-- Display Helper -->
+{{inc_vars = dict(editable = True,
+edit_action = 'report-footer-edit',
+delete_action = 'report-footer-delete',
+content = MARKMIN(report.footer, markmin_settings))}}
+{{include 'include/display-report-header.html'}}
+<!-- //Display Helper -->
 {{pass}}
 </div>
 <!-- Enable Markmin in textarea -->
