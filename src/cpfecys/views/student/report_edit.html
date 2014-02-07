@@ -126,9 +126,9 @@
     {{if not(report.heading is None):}}
     <!-- report-head-edit-activity -->
     {{inc_vars = dict(id = 'report-header-edit',
-                    url = URL('report_header/update', vars=dict(report = report.id)),
-                    title = T('Report Header'),
-                    content = report.heading) }}
+    url = URL('report_header/update', vars=dict(report = report.id)),
+    title = T('Report Header'),
+    content = report.heading) }}
     {{include 'include/report-header.html'}}
     <!-- Helpers for deletion -->
     {{inc_vars = dict(id = 'report-header-delete',
@@ -143,374 +143,155 @@
     {{include 'include/display-report-header.html'}}
     <!-- //Display Helper -->
     {{pass}}
-<div class="accordion" id="accordion2">
-  <div class="accordion-group">
-    <div class="accordion-heading">
-      <a class="accordion-toggle" data-toggle="collapse" data-parent="#accordion2" href="#collapseOne">
-          <strong>
-              <span class="icon-tasks"></span>
-              {{=T('Activities Log')}}
-          </strong>
-          <span class="right">
-              <span><strong>{{=T('Total Anomalies')}}:</strong> {{=anomalies}} </span> |
-              <span><strong>{{=T('Total Registered Activities')}}:</strong> {{=len(logs)}} </span>
-          </span>
-      </a>
-    </div>
-    <div id="collapseOne" class="accordion-body collapse">
-      <div class="accordion-inner">
-          <div style="container">
-              {{for log in logs:}}
-              <!-- Helpers for Edition -->
-              {{inc_vars = dict(id = 'log-edit-activity-' + str(log.id),
-                url = URL('log/update', vars=dict(log = log.id)),
-                date = log.entry_date,
-                log_type = log.log_type,
-                log_types = log_types,
-                content = log.description) }}
-              {{include 'include/log-activity.html'}}
-              <!-- // Helpers for Edition -->
-              <!-- Helpers for deletion -->
-              {{inc_vars = dict(id = 'delete-log-' + str(log.id),
-              url = URL('log/delete', vars=dict(log = log.id)))}}
-              {{include 'include/delete-helper.html'}}
-              <!-- // Helpers for deletion -->
-              <div class="row-fluid">
-                  <div class="well span12">
-                      <div class="span12">
-                          {{if log.log_type['name'] == 'Anomaly':}}
-                          <div class="alert">
-                              <strong><span class="icon-warning-sign"></span>
-                                  {{=T('Anomaly')}}
-                              </strong>
-                          </div>
-                          {{pass}}
-                          <strong>Log type:</strong> {{=T(log.log_type['name'])}}
-                          <strong>Date:</strong> {{=log.entry_date}}
-                          <div class="pull-right">
-                              <div class="btn-group">
-                                  <a href="#log-edit-activity-{{=log.id}}"
-                                     data-toggle="modal"
-                                     class="btn">
-                                      <span class="icon-edit"></span>
-                                  </a>
-                                  <a href="#delete-log-{{=log.id}}"
-                                     data-toggle="modal"
-                                     class="btn btn-danger">
-                                      <span class="icon-remove icon-white"></span>
-                                  </a>
-                                </div>
-                          </div>
-                      </div>
-                      <div class="span11">
-                          {{=MARKMIN(log.description, markmin_settings)}}
-                      </div>
-                  </div>
-              </div>
-              {{pass}}
-          </div>
-      </div>
-    </div>
-  </div>
-  <div class="accordion-group">
-    <div class="accordion-heading">
-      <a class="accordion-toggle" data-toggle="collapse" data-parent="#accordion2" href="#collapseTwo">
-          <span class="icon-adjust"></span>
-          <strong>{{=T('Activities Log with metrics')}}</strong>
-          <span class="right">
-            <span><strong>{{=T('Total activity logs with metrics')}}:</strong> {{=len(metrics)}}</span>
-          </span>
-      </a>
-    </div>
-    <div id="collapseTwo" class="accordion-body collapse">
-      <div class="accordion-inner">
-        <div style="container">
-          {{for metric in metrics:}}
+    <div class="container">
+        <div class="row-fluid">
+            <div style="padding:15px;">
+                <h1>
+                    <span class="icon-tasks"></span>
+                    {{=T('Activities Log')}}
+                </h1>
+                <span>
+                    <span><strong>{{=T('Total Anomalies')}}:</strong> {{=anomalies}} </span> |
+                    <span><strong>{{=T('Total Registered Activities')}}:</strong> {{=len(logs)}} </span>
+                </span>
+            </div>
+        </div>
+        <div class="row-fluid">
+            {{for log in logs:}}
+            <!-- Helpers for Edition -->
+            {{inc_vars = dict(id = 'log-edit-activity-' + str(log.id),
+            url = URL('log/update', vars=dict(log = log.id)),
+            date = log.entry_date,
+            log_type = log.log_type,
+            log_types = log_types,
+            content = log.description) }}
+            {{include 'include/log-activity.html'}}
+            <!-- // Helpers for Edition -->
+            <!-- Helpers for deletion -->
+            {{inc_vars = dict(id = 'delete-log-' + str(log.id),
+            url = URL('log/delete', vars=dict(log = log.id)))}}
+            {{include 'include/delete-helper.html'}}
+            <!-- // Helpers for deletion -->
+            <!-- Display Helper -->
+            {{inc_vars = dict(editable = True,
+            anomaly =  (log.log_type['name'] == 'Anomaly'),
+            log_type = T(log.log_type['name']),
+            date = log.entry_date,
+            edit_action = 'log-edit-activity-' + str(log.id),
+            delete_action = 'delete-log-' + str(log.id),
+            content = MARKMIN(log.description, markmin_settings))}}
+            {{include 'include/display-report-log.html'}}
+            <!-- //Display Helper -->
+            {{pass}}
+        </div>
+        <hr />
+        <div class="row-fluid">
+            <div style="padding:15px;">
+                <h1>
+                    <span class="icon-adjust"></span>
+                    <strong>{{=T('Activities Log with metrics')}}</strong>
+                </h1>
+                <span>
+                    <span><strong>{{=T('Total activity logs with metrics')}}:</strong> {{=len(metrics)}}</span>
+                </span>
+            </div>
+        </div>
+        <div class="row-fluid">
+            {{for metric in metrics:}}
             <!-- Metric edit Helper-->
             {{inc_vars = dict(id = 'metric-edit-activity-' + str(metric.id),
-                url = URL('metrics/update', vars=dict(metric = metric.id)),
-                date = metric.created,
-                metrics_t = metric.metrics_type,
-                metrics_type = metrics_type,
-                media = metric.media,
-                error_tipico = metric.error,
-                mediana = metric.mediana,
-                moda = metric.moda,
-                desviacion_estandar = metric.desviacion,
-                varianza = metric.varianza,
-                curtosis = metric.curtosis,
-                coeficiente = metric.coeficiente,
-                rango = metric.rango,
-                minimo = metric.minimo,
-                maximo = metric.maximo,
-                total = metric.total,
-                reprobados = metric.reprobados,
-                aprobados = metric.aprobados
-                ) }}
+            url = URL('metrics/update', vars=dict(metric = metric.id)),
+            date = metric.created,
+            metrics_t = metric.metrics_type,
+            metrics_type = metrics_type,
+            media = metric.media,
+            error_tipico = metric.error,
+            mediana = metric.mediana,
+            moda = metric.moda,
+            desviacion_estandar = metric.desviacion,
+            varianza = metric.varianza,
+            curtosis = metric.curtosis,
+            coeficiente = metric.coeficiente,
+            rango = metric.rango,
+            minimo = metric.minimo,
+            maximo = metric.maximo,
+            total = metric.total,
+            reprobados = metric.reprobados,
+            aprobados = metric.aprobados
+            ) }}
             {{include 'include/log-metrics-activity.html'}}
-          <!-- //Metric edit Helper-->
-          <!-- Metric delete Helper-->
-          {{inc_vars = dict(id = 'delete-metric-' + str(metric.id),
-          url = URL('metrics/delete', vars=dict(metric = metric.id)))}}
-          {{include 'include/delete-helper.html'}}
-          <!-- //Metric delete Helper-->
-          <div class="row-fluid">
-              <div class="well span12">
-                      <div class="span12">
-                          <strong>{{=T('Date')}}:</strong> {{=metric.created}}
-                          <div class="pull-right">
-                              <div class="btn-group">
-                                  <a href="#metric-edit-activity-{{=metric.id}}" data-toggle="modal" class="btn">
-                                      <span class="icon-edit"></span>
-                                  </a>
-                                  <a href="#delete-metric-{{=metric.id}}" data-toggle="modal" class="btn btn-danger">
-                                      <span class="icon-remove icon-white"></span>
-                                  </a>
-                                </div>
-                          </div>
-                      </div>
-                      <div class="span12">
-                          <h2 class="center">{{=metric.metrics_type.name}}</h2>
-                        <div class="span6">
-                          <table class="table table-striped table-bordered">
-                              <thead>
-                                <tr>
-                                  <td>
-                                    <strong>{{=T('Metric')}}</strong>
-                                  </td>
-                                  <td>
-                                    <strong>{{=T('Value')}}</strong>
-                                  </td>
-                                </tr>
-                              </thead>
-                            <tbody>
-                            <tr>
-                              <td><strong>{{=T('Media')}}</strong> </td> <td>{{=metric.media}}</td></tr>
-                              <tr><td><strong>{{=T('Error')}}</strong> </td> <td>{{=metric.error}}</td></tr>
-                              <tr><td><strong>{{=T('Mediana')}}</strong></td> <td> {{=metric.mediana}}</td></tr>
-                              <tr><td><strong>{{=T('Moda')}}</strong> </td> <td>{{=metric.moda}}</td></tr>
-                              <tr><td><strong>{{=T('Desviacion')}}</strong></td> <td> {{=metric.desviacion}}</td></tr>
-                              <tr><td><strong>{{=T('Varianza')}}</strong></td> <td> {{=metric.varianza}}</td></tr>
-                              <tr><td><strong>{{=T('Curtosis')}}</strong></td> <td> {{=metric.curtosis}}</td></tr>
-                              <tr><td><strong>{{=T('Coeficiente')}}</strong></td> <td> {{=metric.coeficiente}}</td></tr>
-                              <tr><td><strong>{{=T('Rango')}}</strong> </td> <td>{{=metric.rango}}</td></tr>
-                              <tr><td><strong>{{=T('Minimo')}}</strong> </td> <td>{{=metric.minimo}}</td></tr>
-                              <tr><td><strong>{{=T('Maximo')}}</strong> </td> <td>{{=metric.maximo}}</td></tr>
-                              <tr><td><strong>{{=T('Total')}}</strong> </td> <td>{{=metric.total}}</td></tr>
-                              <tr><td><strong>{{=T('Reprobados')}}</strong></td> <td> {{=metric.reprobados}}</td></tr>
-                              <tr><td><strong>{{=T('Aprobados')}}</strong></td> <td> {{=metric.aprobados}}</td>
-                            </tr>
-                            </tbody>
-                            </table>
-                        </div>
-                          <div class="span5 center">
-                              <div>
-                                  <h3>
-                                      {{=T('Aproved vrs. Failed Students')}}
-                                  </h3>
-                                  <div style="width:100%; height:300px;"
-                                          width=100% height=300px id="graphpie{{=metric.id}}"></div>
-                              </div>
-                              <div>
-                                  <div style="width:100%; height:300px;"
-                                          width=100% height=300px id="graphbars{{=metric.id}}"></div>
-                              </div>
-                              {{if metric.total > 0:}}
-                              		<script type="text/javascript">
-                                        $(function () {
-                                            $('#graphpie{{=metric.id}}').highcharts({
-                                                chart: {
-                                                    plotBackgroundColor: null,
-                                                    plotBorderWidth: null,
-                                                    plotShadow: false
-                                                },
-                                                title: {
-                                                    text: '{{=T("Aproved vrs. Failed Students")}}'
-                                                },
-                                                tooltip: {
-                                                    pointFormat: '{series.name}: <b>{point.percentage:.1f}%</b>'
-                                                },
-                                                plotOptions: {
-                                                    pie: {
-                                                        allowPointSelect: true,
-                                                        cursor: 'pointer',
-                                                        dataLabels: {
-                                                            enabled: true,
-                                                            color: '#000000',
-                                                            connectorColor: '#000000',
-                                                            format: '<b>{point.name}</b>: {point.percentage:.1f} %'
-                                                        }
-                                                    }
-                                                },
-                                                series: [{
-                                                    type: 'pie',
-                                                    name: '{{=T("Aproved vrs. Failed Students")}}',
-                                                    data: [
-                                                        ['{{=T("Aproved")}}',   {{=100.0*metric.aprobados/metric.total}}],
-                                                        ['{{=T("Failed")}}',   {{=100.0*metric.reprobados/metric.total}}]
-                                                    ]
-                                                }]
-                                            });
-                                            $('#graphbars{{=metric.id}}').highcharts({
-                                            chart: {
-                                                type: 'column',
-                                                margin: [ 50, 50, 100, 80]
-                                            },
-                                            title: {
-                                                text: '{{=T("Aproved vrs. Failed Students")}}'
-                                            },
-                                            xAxis: {
-                                                categories: [
-                                                    '{{=T("Aproved")}}',
-                                                    '{{=T("Failed")}}'
-                                                ],
-                                                labels: {
-                                                    rotation: -45,
-                                                    align: 'right',
-                                                    style: {
-                                                        fontSize: '13px',
-                                                        fontFamily: 'Verdana, sans-serif'
-                                                    }
-                                                }
-                                            },
-                                            yAxis: {
-                                                min: 0,
-                                                title: {
-                                                    text: '{{=T("Students")}}'
-                                                }
-                                            },
-                                            legend: {
-                                                enabled: false
-                                            },
-                                            tooltip: {
-                                                pointFormat: '{{=T("Students")}}: <b>{point.y:.1f}</b>',
-                                            },
-                                            series: [{
-                                                name: '{{=T("Students")}}',
-                                                data: [{{=metric.aprobados}},
-                                                       {{=metric.reprobados}}],
-                                                dataLabels: {
-                                                    enabled: true,
-                                                    rotation: -90,
-                                                    color: '#FFFFFF',
-                                                    align: 'right',
-                                                    x: 4,
-                                                    y: 10,
-                                                    style: {
-                                                        fontSize: '13px',
-                                                        fontFamily: 'Verdana, sans-serif',
-                                                        textShadow: '0 0 3px black'
-                                                    }
-                                                }
-                                            }]
-                                        });
-                                        });
-                                </script>
-                              {{pass}}
-                          </div>
-                      </div>
-                  </div>
-            </div>
-          {{pass}}
+            <!-- //Metric edit Helper-->
+            <!-- Metric delete Helper-->
+            {{inc_vars = dict(id = 'delete-metric-' + str(metric.id),
+            url = URL('metrics/delete', vars=dict(metric = metric.id)))}}
+            {{include 'include/delete-helper.html'}}
+            <!-- //Metric delete Helper-->
+            <!-- Display Helper -->
+            {{inc_vars = dict(editable = True,
+            metric = metric,
+            edit_action = 'metric-edit-activity-' + str(metric.id),
+            delete_action = 'delete-metric-' + str(metric.id))}}
+            {{include 'include/display-report-metric.html'}}
+            <!-- //Display Helper -->
+            {{pass}}
         </div>
-      </div>
-    </div>
-  </div>
-  <div class="accordion-group">
-    <div class="accordion-heading">
-      <a class="accordion-toggle" data-toggle="collapse" data-parent="#accordion2" href="#collapseThree">
-          <span class="icon-user"></span>
-          <strong>{{=T('Desertion logs')}}</strong>
-          <span class="right">
-            <span><strong>{{=T('Total desertion logs')}}:</strong> {{=len(desertions)}}</span>
-          </span>
-      </a>
-    </div>
-    <div id="collapseThree" class="accordion-body collapse">
-      <div class="accordion-inner">
-        <div style="container">
-          {{for desertion in desertions:}}
-          <!-- Desertion edit Helper-->
+        <hr />
+        <div class="row-fluid">
+            <div style="padding:15px;">
+                <h1>
+                    <span class="icon-user"></span>
+                    <strong>{{=T('Desertion logs')}}</strong>
+                </h1>
+                <span>
+                    <span><strong>{{=T('Total desertion logs')}}:</strong> {{=len(desertions)}}</span>
+                </span>
+            </div>
+        </div>
+        <div class="row-fluid">
+            {{for desertion in desertions:}}
+            <!-- Desertion edit Helper-->
             {{inc_vars = dict(id = 'desertion-edit-activity-' + str(desertion.id),
-                url = URL('desertions/update', vars=dict(desertion = desertion.id)),
-                desertion_started = desertion.started,
-                desertion_gone = desertion.gone,
-                desertion_continued = desertion.continued) }}
+            url = URL('desertions/update', vars=dict(desertion = desertion.id)),
+            desertion_started = desertion.started,
+            desertion_gone = desertion.gone,
+            desertion_continued = desertion.continued) }}
             {{include 'include/log-desertion-activity.html'}}
             <!-- //Desertion edit Helper-->
             <!-- Metric delete Helper-->
             {{inc_vars = dict(id = 'delete-desertion-' + str(desertion.id),
-                url = URL('desertions/delete', vars=dict(desertion = desertion.id)))}}
+            url = URL('desertions/delete', vars=dict(desertion = desertion.id)))}}
             {{include 'include/delete-helper.html'}}
             <!-- //Metric delete Helper-->
-
-            <div class="row-fluid">
-                  <div class="well span12">
-                      <div class="span12">
-                          <strong>{{=T('Created')}}:</strong> {{=desertion.created}}
-                          <div class="pull-right">
-                              <div class="btn-group">
-                                  <a href="#desertion-edit-activity-{{=desertion.id}}" data-toggle="modal" class="btn">
-                                      <span class="icon-edit"></span>
-                                  </a>
-                                  <a href="#delete-desertion-{{=desertion.id}}" data-toggle="modal" class="btn btn-danger">
-                                      <span class="icon-remove icon-white"></span>
-                                  </a>
-                                </div>
-                          </div>
-                      </div>
-                      <div class="span11">
-                        <div class="span8">
-                          <table class="table table-striped table-bordered">
-                              <thead>
-                                <tr>
-                                  <td>
-                                    <strong>{{=T('Metric')}}</strong>
-                                  </td>
-                                  <td>
-                                    <strong>{{=T('Value')}}</strong>
-                                  </td>
-                                </tr>
-                              </thead>
-                            <tbody>
-                            <tr>
-                              <td><strong>{{=T('Started')}}</strong> </td> <td>{{=desertion.started}}</td></tr>
-                              <tr><td><strong>{{=T('Gone')}}</strong> </td> <td>{{=desertion.gone}}</td></tr>
-                              <tr><td><strong>{{=T('Continued')}}</strong></td> <td> {{=desertion.continued}}</td></tr>
-                            </tr>
-                            </tbody>
-                            </table>
-                          </ul>
-                        </div>
-                      </div>
-                  </div>
-            </div>
-          {{pass}}
+            <!-- Display Helper -->
+            {{inc_vars = dict(editable = True,
+            desertion = desertion,
+            edit_action = 'desertion-edit-activity-' + str(desertion.id),
+            delete_action = 'delete-desertion-' + str(desertion.id))}}
+            {{include 'include/display-report-desertion.html'}}
+            <!-- //Display Helper -->
+            {{pass}}
         </div>
-      </div>
     </div>
-  </div>
-</div>
-{{if not(report.footer is None):}}
-<!-- report-footer-edit-activity -->
-{{inc_vars = dict(id = 'report-footer-edit',
-url = URL('report_footer/update', vars=dict(report = report.id)),
-title = T('Report Footer'),
-content = report.footer) }}
-{{include 'include/report-header.html'}}
-<!-- Helpers for deletion -->
-{{inc_vars = dict(id = 'report-footer-delete',
-url = URL('report_footer/delete', vars=dict(report = report.id)))}}
-{{include 'include/delete-helper.html'}}
-<!-- // Helpers for deletion -->
-<!-- Display Helper -->
-{{inc_vars = dict(editable = True,
-edit_action = 'report-footer-edit',
-delete_action = 'report-footer-delete',
-content = MARKMIN(report.footer, markmin_settings))}}
-{{include 'include/display-report-header.html'}}
-<!-- //Display Helper -->
-{{pass}}
+    {{if not(report.footer is None):}}
+    <!-- report-footer-edit-activity -->
+    {{inc_vars = dict(id = 'report-footer-edit',
+    url = URL('report_footer/update', vars=dict(report = report.id)),
+    title = T('Report Footer'),
+    content = report.footer) }}
+    {{include 'include/report-header.html'}}
+    <!-- Helpers for deletion -->
+    {{inc_vars = dict(id = 'report-footer-delete',
+    url = URL('report_footer/delete', vars=dict(report = report.id)))}}
+    {{include 'include/delete-helper.html'}}
+    <!-- // Helpers for deletion -->
+    <!-- Display Helper -->
+    {{inc_vars = dict(editable = True,
+    edit_action = 'report-footer-edit',
+    delete_action = 'report-footer-delete',
+    content = MARKMIN(report.footer, markmin_settings))}}
+    {{include 'include/display-report-header.html'}}
+    <!-- //Display Helper -->
+    {{pass}}
 </div>
 <!-- Enable Markmin in textarea -->
 <script>

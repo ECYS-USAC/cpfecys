@@ -394,6 +394,7 @@
 'Log entries': 'Entradas de Actividades',
 'Log Inserted': 'Actividad Ingresada',
 'Log Metrics': 'Registrar Actividad con Métricas',
+'Log type': 'Log type',
 'Log Type': 'Tipo de Actividad',
 'Log Updated': 'Registro Actualizado',
 'log_type': '',

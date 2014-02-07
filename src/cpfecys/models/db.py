@@ -332,7 +332,7 @@ db.define_table('item_restriction',
                 format='%(name)s'
                 )
 
-db.define_table('item_restriction_area', 
+db.define_table('item_restriction_area',
                 Field('area_level', 'reference area_level', \
                     label = T('area_level')),
                 Field('item_restriction', 'reference item_restriction', \
