@@ -240,6 +240,12 @@ db.define_table('report',
                 label = T('heading')),
                 Field('footer', 'text', \
                 label = T('footer')),
+                Field('desertion_started', 'integer', \
+                label=T('started')),
+                Field('desertion_gone', 'integer', \
+                label=T('gone')),
+                Field('desertion_continued', 'integer', \
+                label=T('continued')),
                 Field('status', 'reference report_status', notnull=True, \
                 label = T('status')),
                 )
@@ -296,17 +302,6 @@ db.define_table('log_metrics',
                 Field('created', 'date', notnull=True, label = T('entry_date')),
                 Field('report', 'reference report', label = T('report')),
                 Field('metrics_type', 'reference metrics_type', label = T('type')),
-                format='%(created)s'
-                )
-
-db.define_table('log_desertion',
-                Field('started', 'integer',notnull=True, label=T('started')),
-                Field('gone', 'integer',notnull=True, label=T('gone')),
-                Field('continued', 'integer',notnull=True, label=T('continued')),
-                Field('created', 'date', notnull=True, \
-                    label = T('entry_date')),
-                Field('report', 'reference report', \
-                    label = T('report')),
                 format='%(created)s'
                 )
 #Project item requirements structure

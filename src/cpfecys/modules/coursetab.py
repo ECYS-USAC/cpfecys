@@ -1,2 +1,0 @@
-def tab():
-return dict()

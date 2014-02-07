@@ -1,6 +1,6 @@
 <div class="row-fluid container">
-    <div class="container">
-        <div class="container">
+    <div class="well">
+        <div class="row-fluid">
             <strong>{{=T('Log type')}}:</strong> {{=inc_vars['log_type']}}
             <strong>{{=T('Date')}}:</strong> {{=inc_vars['date']}}
             {{if inc_vars['editable']:}}
@@ -20,7 +20,7 @@
             </div>
             {{pass}}
         </div>
-        <div class="container">
+        <div class="row-fluid">
             {{if inc_vars['anomaly']:}}
             <div class="alert">
                 <strong><span class="icon-warning-sign"></span>

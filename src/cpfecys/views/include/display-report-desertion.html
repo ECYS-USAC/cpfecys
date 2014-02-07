@@ -1,8 +1,6 @@
-{{desertion = inc_vars['desertion']}}
 <div class="row-fluid">
-    <div class="well span12">
-        <div class="span12">
-            <strong>{{=T('Created')}}:</strong> {{=desertion.created}}
+    <div class="well">
+        <div class="row-fluid">
             {{if inc_vars['editable']:}}
             <div class="pull-right">
                 <div class="btn-group">
@@ -16,8 +14,11 @@
             </div>
             {{pass}}
         </div>
-        <div class="span11">
-            <div class="span8">
+        <div class="row-fluid">
+            <div class="span6">
+                <h2 class="center">
+                    {{=T('Current Report Dessertion')}}
+                </h2>
                 <table class="table table-striped table-bordered">
                     <thead>
                         <tr>
@@ -30,11 +31,119 @@
                         </tr>
                     </thead>
                     <tbody>
-                        <tr><td><strong>{{=T('Started')}}</strong> </td> <td>{{=desertion.started}}</td></tr>
-                        <tr><td><strong>{{=T('Gone')}}</strong> </td> <td>{{=desertion.gone}}</td></tr>
-                        <tr><td><strong>{{=T('Continued')}}</strong></td> <td> {{=desertion.continued}}</td></tr>
+                        <tr><td><strong>{{=T('Started')}}</strong> </td>
+                            <td>{{=inc_vars['desertion_started']}}</td></tr>
+                        <tr><td><strong>{{=T('Gone')}}</strong> </td>
+                            <td>{{=inc_vars['desertion_gone']}}</td></tr>
+                        <tr><td><strong>{{=T('Continued')}}</strong></td>
+                            <td> {{=inc_vars['desertion_continued']}}</td></tr>
                     </tbody>
                 </table>
+            </div>
+            <div class="span6">
+                <div>
+                    <h3>
+                        {{=T('Reported Desertion')}}
+                    </h3>
+                    <div style="width:100%; height:300px;" id="graphpie{{=inc_vars["id"]}}"></div>
+                </div>
+                <div>
+                    <div style="width:100%; height:300px;" id="graphbars{{=inc_vars["id"]}}"></div>
+                </div>
+                {{if metric.total > 0:}}
+                <script type="text/javascript">
+                    $(function () {
+                        $('#graphpie{{=inc_vars["id"]}}').highcharts({
+                            chart: {
+                                plotBackgroundColor: null,
+                                plotBorderWidth: null,
+                                plotShadow: false
+                            },
+                            title: {
+                                text: '{{=T("Continued vrs. Gone Students")}}'
+                            },
+                            tooltip: {
+                                pointFormat: '{series.name}: <b>{point.percentage:.1f}%</b>'
+                            },
+                            plotOptions: {
+                                pie: {
+                                    allowPointSelect: true,
+                                    cursor: 'pointer',
+                                    dataLabels: {
+                                        enabled: true,
+                                        color: '#000000',
+                                        connectorColor: '#000000',
+                                        format: '<b>{point.name}</b>: {point.percentage:.1f} %'
+                                    }
+                                }
+                            },
+                            series: [{
+                                type: 'pie',
+                                name: '{{=T("Continued vrs. Gone Students")}}',
+                                data: [
+                                    ['{{=T("Continued")}}',
+                                     {{=100.0*inc_vars['desertion_continued']/inc_vars['desertion_started']}}],
+                                    ['{{=T("Gone")}}',
+                                     {{=100.0*inc_vars['desertion_gone']/inc_vars['desertion_started']}}]
+                                ]
+                            }]
+                        });
+                        $('#graphbars{{=inc_vars["id"]}}').highcharts({
+                            chart: {
+                                type: 'column',
+                                margin: [ 50, 50, 100, 80]
+                            },
+                            title: {
+                                text: '{{=T("Continued vrs. Gone Students")}}'
+                            },
+                            xAxis: {
+                                categories: [
+                                    '{{=T("Continued")}}',
+                                    '{{=T("Gone")}}'
+                                ],
+                                labels: {
+                                    rotation: -45,
+                                    align: 'right',
+                                    style: {
+                                        fontSize: '13px',
+                                        fontFamily: 'Verdana, sans-serif'
+                                    }
+                                }
+                            },
+                            yAxis: {
+                                min: 0,
+                                title: {
+                                    text: '{{=T("Students")}}'
+                                }
+                            },
+                            legend: {
+                                enabled: false
+                            },
+                            tooltip: {
+                                pointFormat: '{{=T("Students")}}: <b>{point.y:.1f}</b>',
+                            },
+                            series: [{
+                                name: '{{=T("Students")}}',
+                                data: [{{=inc_vars['desertion_continued']}},
+                                       {{=inc_vars['desertion_gone']}}],
+                                dataLabels: {
+                                    enabled: true,
+                                    rotation: -90,
+                                    color: '#FFFFFF',
+                                    align: 'right',
+                                    x: 4,
+                                    y: 10,
+                                    style: {
+                                        fontSize: '13px',
+                                        fontFamily: 'Verdana, sans-serif',
+                                        textShadow: '0 0 3px black'
+                                    }
+                                }
+                            }]
+                        });
+                    });
+                </script>
+                {{pass}}
             </div>
         </div>
     </div>

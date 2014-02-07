@@ -58,6 +58,15 @@
                 title = T('Report Footer'),
                 content = '') }}
 {{include 'include/report-header.html'}}
+<!-- Helpers for securement -->
+{{inc_vars = dict(id = 'report-grading-check',
+title = T('Confirm') + ' ' + T('Send to Grading'),
+content = T('This operation can\'t be undone, do you want to continue?'),
+action = T('Confirm'),
+_class = 'btn-primary',
+url = URL('student','report/acceptance', vars=dict(report = report.id)))}}
+{{include 'include/delete-helper.html'}}
+<!-- // Helpers for deletion -->
 <!-- Helpers end here -->
 <div class="row-fluid">
   <div class="navbar">
@@ -68,7 +77,7 @@
         </a>
         <ul class="nav pull-right">
             <li>
-                <a class="active" href="{{=URL('student','report/acceptance', vars=dict(report = report.id))}}">
+                <a data-toggle="modal" href="#report-grading-check">
                     <span class="icon-check"></span> {{=T('Send to Grading')}}
                 </a>
             </li>
@@ -111,11 +120,13 @@
                             <span class="icon-adjust"></span> {{=T('Log Metrics')}}
                         </a>
                     </li>
+                    {{if report.desertion_started is None:}}
                     <li>
                         <a data-toggle="modal" href="#log-new-desertion-activity">
                             <span class="icon-user"></span> {{=T('Log Desertion')}}
                         </a>
                     </li>
+                    {{pass}}
                 </ul>
             </li>
         </ul>
@@ -132,6 +143,10 @@
     {{include 'include/report-header.html'}}
     <!-- Helpers for deletion -->
     {{inc_vars = dict(id = 'report-header-delete',
+    title = T('Confirm') + ' ' + T('Delete'),
+    content = T('Delete operation can\'t be undone, do you want to continue?'),
+    action = T('Delete'),
+    _class = 'btn-danger',
     url = URL('report_header/delete', vars=dict(report = report.id)))}}
     {{include 'include/delete-helper.html'}}
     <!-- // Helpers for deletion -->
@@ -169,6 +184,10 @@
             <!-- // Helpers for Edition -->
             <!-- Helpers for deletion -->
             {{inc_vars = dict(id = 'delete-log-' + str(log.id),
+            title = T('Confirm') + ' ' + T('Delete'),
+            content = T('Delete operation can\'t be undone, do you want to continue?'),
+            action = T('Delete'),
+            _class = 'btn-danger',
             url = URL('log/delete', vars=dict(log = log.id)))}}
             {{include 'include/delete-helper.html'}}
             <!-- // Helpers for deletion -->
@@ -223,6 +242,10 @@
             <!-- //Metric edit Helper-->
             <!-- Metric delete Helper-->
             {{inc_vars = dict(id = 'delete-metric-' + str(metric.id),
+            title = T('Confirm') + ' ' + T('Delete'),
+            content = T('Delete operation can\'t be undone, do you want to continue?'),
+            action = T('Delete'),
+            _class = 'btn-danger',
             url = URL('metrics/delete', vars=dict(metric = metric.id)))}}
             {{include 'include/delete-helper.html'}}
             <!-- //Metric delete Helper-->
@@ -236,41 +259,45 @@
             {{pass}}
         </div>
         <hr />
+        {{if not(report.desertion_started is None):}}
         <div class="row-fluid">
             <div style="padding:15px;">
                 <h1>
                     <span class="icon-user"></span>
                     <strong>{{=T('Desertion logs')}}</strong>
                 </h1>
-                <span>
-                    <span><strong>{{=T('Total desertion logs')}}:</strong> {{=len(desertions)}}</span>
-                </span>
             </div>
         </div>
         <div class="row-fluid">
-            {{for desertion in desertions:}}
             <!-- Desertion edit Helper-->
-            {{inc_vars = dict(id = 'desertion-edit-activity-' + str(desertion.id),
-            url = URL('desertions/update', vars=dict(desertion = desertion.id)),
-            desertion_started = desertion.started,
-            desertion_gone = desertion.gone,
-            desertion_continued = desertion.continued) }}
+            {{inc_vars = dict(id = 'desertion-edit-activity',
+            url = URL('desertions/update', vars=dict(report = report.id)),
+            desertion_started = report.desertion_started,
+            desertion_gone = report.desertion_gone,
+            desertion_continued = report.desertion_continued) }}
             {{include 'include/log-desertion-activity.html'}}
             <!-- //Desertion edit Helper-->
             <!-- Metric delete Helper-->
-            {{inc_vars = dict(id = 'delete-desertion-' + str(desertion.id),
-            url = URL('desertions/delete', vars=dict(desertion = desertion.id)))}}
+            {{inc_vars = dict(id = 'delete-desertion',
+            title = T('Confirm') + ' ' + T('Delete'),
+            content = T('Delete operation can\'t be undone, do you want to continue?'),
+            action = T('Delete'),
+            _class = 'btn-danger',
+            url = URL('desertions/delete', vars=dict(report = report.id)))}}
             {{include 'include/delete-helper.html'}}
             <!-- //Metric delete Helper-->
             <!-- Display Helper -->
             {{inc_vars = dict(editable = True,
-            desertion = desertion,
-            edit_action = 'desertion-edit-activity-' + str(desertion.id),
-            delete_action = 'delete-desertion-' + str(desertion.id))}}
+            id = 'display-desertion',
+            desertion_started = report.desertion_started,
+            desertion_gone = report.desertion_gone,
+            desertion_continued = report.desertion_continued,
+            edit_action = 'desertion-edit-activity',
+            delete_action = 'delete-desertion')}}
             {{include 'include/display-report-desertion.html'}}
             <!-- //Display Helper -->
-            {{pass}}
         </div>
+        {{pass}}
     </div>
     {{if not(report.footer is None):}}
     <!-- report-footer-edit-activity -->
@@ -281,6 +308,10 @@
     {{include 'include/report-header.html'}}
     <!-- Helpers for deletion -->
     {{inc_vars = dict(id = 'report-footer-delete',
+    title = T('Confirm') + ' ' + T('Delete'),
+    content = T('Delete operation can\'t be undone, do you want to continue?'),
+    action = T('Delete'),
+    _class = 'btn-danger',
     url = URL('report_footer/delete', vars=dict(report = report.id)))}}
     {{include 'include/delete-helper.html'}}
     <!-- // Helpers for deletion -->
