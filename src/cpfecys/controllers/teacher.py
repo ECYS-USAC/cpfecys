@@ -19,13 +19,50 @@ def final_practice():
     final_practice = final_practice.first()
     #TODO evaluate if available_periods is really necessary
     available_periods = db((db.period_year.id >= final_practice.user_project.period)&
-                           (db.period_year.id < (final_practice.user_project.period + final_practice.user_project.periods))).select()
+                        (db.period_year.id < \
+                            (final_practice.user_project.period + \
+                            final_practice.user_project.periods))).select()
     #TODO Only show reports with status of != 'Draft'
     #TODO (in view) Only allow to grade the ones with status of Grading
-    reports = db(db.report.assignation == final_practice.user_project.id).select()
+    reports = db((db.report.assignation == final_practice.user_project.id)&
+                        (db.report.status.name!='Grading'))
+    avg = reports.select((db.report.score.sum()/db.report.score.count()).\
+                        with_alias('avg')).first()['avg'] or 0
+    reports = reports.select()
     return dict(final_practice = final_practice,
                 available_periods = available_periods,
-                reports = reports)
+                reports = reports,
+                reports_avg = avg)
+
+@auth.requires_login()
+@auth.requires_membership('Teacher')
+def report():
+    report = request.vars['report']
+    response.view = 'teacher/report_view.html'
+    #If current teacher is related to report's project
+    report = db(db.report.id==report).select().first()
+    valid = cpfecys.teacher_validation_report_access(report.id)
+    if valid:
+        LATEX = '<img src="http://chart.apis.google.com/chart?cht=tx&chl=%s" align="center"/>'
+        markmin_settings = {
+            'latex':lambda code: LATEX % code.replace('"','"'),
+            'code_cpp':lambda text: CODE(text,language='cpp').xml(),
+            'code_java':lambda text: CODE(text,language='java').xml(),
+            'code_python':lambda text: CODE(text,language='python').xml(),
+            'code_html':lambda text: CODE(text,language='html').xml()}
+        return dict(log_types = db(db.log_type.id > 0).select(),
+                    logs = db((db.log_entry.report == report.id)).select(),
+                    metrics = db((db.log_metrics.report == report.id)).select(),
+                    desertions = db((db.log_desertion.report == report.id)).select(),
+                    anomalies = db((db.log_type.name == 'Anomaly')&
+                               (db.log_entry.log_type == db.log_type.id)&
+                               (db.log_entry.report == report.id)).count(),
+                    markmin_settings = markmin_settings,
+                    metrics_type = db(db.metrics_type).select(),
+                    report = report)
+    else:
+        session.flash = T('Error: report not available.')
+        redirect(URL('teacher','final_practice'))
 
 @auth.requires_login()
 @auth.requires_membership('Teacher')

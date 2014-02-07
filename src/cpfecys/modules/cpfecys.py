@@ -72,6 +72,16 @@ def student_validation_report_owner(report):
             (db.user_project.assigned_user == auth.user.id)).select().first()
     return usr_rep != None
 
+def teacher_validation_report_access(report):
+    db = _db
+    auth = _auth
+    if report == None or report.assignation.project == None:
+        return False
+    project = report.assignation.project
+    assignation = db((db.user_project.assigned_user==auth.user.id)&
+                (db.user_project.project==project.id))
+    return assignation != None
+
 #
 # automatically tries to create the next period in may and november respectively
 # Using the following logic:

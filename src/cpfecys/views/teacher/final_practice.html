@@ -28,8 +28,8 @@
             <a class="accordion-toggle" data-toggle="collapse" data-parent="#reports_accordion" href="#r{{=item.id}}">
                 {{=item.yearp}} - {{=T('Semester')}} {{=item.period}}
                 <span class="right">
-                    <span>Average Score: 85</span> |
-                    <span>Delivered Reports: 4/4</span>
+                    <span>{{=T('Average Score')}}: {{=int(reports_avg)}}</span> |
+                    <span>{{=T('Delivered Reports')}}: {{=len(reports)}}/4</span>
                 </span>
             </a>
         </div>
@@ -51,10 +51,11 @@
                             <td>{{=report.report_restriction['name']}}</td>
                             <td>{{=report.created}}</td>
                             <td>{{=report.status['name']}}</td>
-                            <td>80</td>
+                            <td>{{=report.score or 0}}</td>
                             <td>
-                                <a class="btn disabled"> Ver Reporte</a>
-                                <a class="btn disabled"> Calificar Reporte</a>
+                                <a class="btn" 
+                                {{if report.status.name=='Draft':}}disabled{{pass}}
+                                href="{{=URL('teacher', 'report/view', vars=dict(report=report.id))}}"> {{=T('Ver Reporte')}}</a>
                             </td>
                         </tr>
                         {{pass}}
