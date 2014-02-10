@@ -248,6 +248,10 @@ db.define_table('report',
                 label=T('continued')),
                 Field('status', 'reference report_status', notnull=True, \
                 label = T('status')),
+                Field('teacher_comment', 'text', \
+                label = T('teacher_comment')),
+                Field('score_date', 'date', \
+                label = T('score_date')),
                 )
 
 db.define_table('log_type',

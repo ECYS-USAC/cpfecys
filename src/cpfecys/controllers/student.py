@@ -460,13 +460,6 @@ def report():
             session.flash = T('Selected report can\'t be edited. Select a valid report.')
             redirect(URL('student','index'))
         ## Markmin formatting of reports
-        LATEX = '<img src="http://chart.apis.google.com/chart?cht=tx&chl=%s" align="center"/>'
-        markmin_settings = {
-            'latex':lambda code: LATEX % code.replace('"','"'),
-            'code_cpp':lambda text: CODE(text,language='cpp').xml(),
-            'code_java':lambda text: CODE(text,language='java').xml(),
-            'code_python':lambda text: CODE(text,language='python').xml(),
-            'code_html':lambda text: CODE(text,language='html').xml()}
         response.view = 'student/report_edit.html'
         return dict(log_types = db(db.log_type.id > 0).select(),
                     logs = db((db.log_entry.report == report.id)).select(),
@@ -475,7 +468,7 @@ def report():
                     anomalies = db((db.log_type.name == 'Anomaly')&
                                    (db.log_entry.log_type == db.log_type.id)&
                                    (db.log_entry.report == report.id)).count(),
-                    markmin_settings = markmin_settings,
+                    markmin_settings = cpfecys.get_markmin,
                     report = report)
     elif (request.args(0) == 'acceptance'):
         #get the data & save the report
@@ -510,13 +503,6 @@ def report():
         if valid: valid = cpfecys.student_validation_report_owner(report.id)
         if valid:
             ## Markmin formatting of reports
-            LATEX = '<img src="http://chart.apis.google.com/chart?cht=tx&chl=%s" align="center"/>'
-            markmin_settings = {
-                'latex':lambda code: LATEX % code.replace('"','"'),
-                'code_cpp':lambda text: CODE(text,language='cpp').xml(),
-                'code_java':lambda text: CODE(text,language='java').xml(),
-                'code_python':lambda text: CODE(text,language='python').xml(),
-                'code_html':lambda text: CODE(text,language='html').xml()}
             response.view = 'student/report_view.html'
             return dict(log_types = db(db.log_type.id > 0).select(),
                         logs = db((db.log_entry.report == report.id)).select(),
@@ -524,7 +510,7 @@ def report():
                         anomalies = db((db.log_type.name == 'Anomaly')&
                                    (db.log_entry.log_type == db.log_type.id)&
                                    (db.log_entry.report == report.id)).count(),
-                        markmin_settings = markmin_settings,
+                        markmin_settings = cpfecys.get_markmin,
                         report = report)
         else:
             session.flash = T('Selected report can\'t be viewed. Select a valid report.')
