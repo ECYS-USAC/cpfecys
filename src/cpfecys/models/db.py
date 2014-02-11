@@ -225,7 +225,8 @@ db.define_table('report_restriction',
 db.define_table('report_status',
                 Field('name', 'string', notnull=True, label = T('name')),
                 Field('description', 'string', notnull=True), \
-                label = T('description'))
+                label = T('description'),
+                format='%(name)s')
 
 db.define_table('report',
                 Field('created', 'date', \

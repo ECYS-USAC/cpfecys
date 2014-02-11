@@ -75,6 +75,13 @@ def report():
             if score != None:
                 score = int(score)
                 if request.vars['improve'] != None:
+                    if report.score_date!=None and \
+                            report.status.name!='EnabledForTeacher':
+                        session.flash = T('This report can\'t be sent to \
+                            rechecked anymore')
+                        redirect(URL('teacher', 'report/view', \
+                            vars=dict(report=report.id)))
+
                     if comment != None:
                         report.update_record(
                             score=score,

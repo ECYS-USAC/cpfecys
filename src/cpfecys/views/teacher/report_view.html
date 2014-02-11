@@ -7,7 +7,7 @@
 <link rel="stylesheet" type="text/css" href="{{=URL('static','markitup')}}/skins/markitup/style.css"/>
 <link rel="stylesheet" type="text/css" href="{{=URL('static','markitup')}}/sets/markmin/style.css"/>
 
-{{if report.status.name == 'Grading':}}
+{{if report.status.name == 'Grading' or report.status.name == 'EnabledForTeacher':}}
 <div class="row-fluid">
       <div class="well span12">
         <h3>{{=T('Report Grading')}}</h3>
@@ -33,8 +33,10 @@
                 </div>
               </div>
             </div>
+            
             <div class="control-group">
               <div class="controls">
+                {{if report.score_date == None:}}
                 <div class="alert alert-info span8">
                   <label class="checkbox">
                     <input id="improve" name="improve" type="checkbox"> {{=T('Improve')}}
@@ -43,9 +45,17 @@
                    if you want to use this feature you\'ll have to add a comment, so the student \
                    can know what to improve, the student will have a certain time to improve and  \
                    resend their report, you\'ll be notified via email when this happend.')}}</p>
+                   
                 </div>
+                {{else:}}
+                <div class="alert alert-info span8">
+                      {{=T('This report has been already graded once, and resent to recheck, so \
+                      this grading is final.')}}
+                </div>
+                 {{pass}}
               </div>
             </div>
+            
             <div class="control-group">
               <div class="controls">
                 <button type="submit" id="submit-grading" class="btn">{{=T('Grade report')}}</button>
@@ -113,9 +123,9 @@
 {{elif report.status.name == 'Recheck':}}
 <div class="row-fluid">
   <div class="alert alert-info">
-    <h2>{{=T('Report already Graded')}}</h2>
+    <h2>{{=T('Report already graded and waiting for resend')}}</h2>
     <p>
-      {{=T('This report has been graded, and is expected to be re-delivered on')}}
+      {{=T('This report has been graded, and is expected to be re-delivered before')}}
       <strong>{{=next_date}}</strong> 
       {{=T('an email will be sent to you when delivered.')}}
     </p>
@@ -153,8 +163,8 @@
   </div>
 </div>
 {{elif report.status.name == 'Acceptance':}}
-  <div class="alert alert-info">
-    <h2>{{=T('Report already Graded')}}</h2>
+  <div class="alert alert-success">
+    <h2>{{=T('Report already graded')}}</h2>
     <p>
       {{=T('This report has been graded and can\'t be edited anymore')}}
     </p>

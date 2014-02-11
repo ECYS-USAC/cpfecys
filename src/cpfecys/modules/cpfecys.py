@@ -281,6 +281,8 @@ def _report_status_setup():
     db.report_status.insert(name="Grading", description="")
     db.report_status.insert(name="Recheck", description="")
     db.report_status.insert(name="Acceptance", description="")
+    db.report_status.insert(name="EnabledForTeacher", description="")
+    db.report_status.insert(name="EnabledForStudent", description="")
 
 def _module_variables_setup():
     global first_period, second_period

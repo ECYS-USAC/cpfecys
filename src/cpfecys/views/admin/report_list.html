@@ -1,0 +1,38 @@
+{{extend 'template.html'}}
+<div class="row-fluid">
+      <div class="well span12">
+		<table>
+			<tr>
+				<th>
+					{{=T('Semester')}}
+				</th>
+				<th>
+					{{=T('Year')}}
+				</th>
+				{{for status in report_status:}}
+				<th>
+					{{=T(status.name)}}
+				</th>
+				{{pass}}
+				<th>
+					{{=T('All')}}
+				</th>
+			</tr>
+			{{for pyear in period_year:}}
+				<tr>
+					<td>
+						{{=T(pyear.period.name)}}
+					</td>
+					<td>
+						{{=pyear.yearp}}
+					</td>
+					{{for status in report_status:}}
+					<td>
+						{{=T(status.name)}}
+					</td>
+					{{pass}}
+				</tr>
+			{{pass}}	
+		</table>
+	</div>
+</div>
