@@ -20,6 +20,14 @@ def projects():
 
 @auth.requires_login()
 @auth.requires_membership('Super-Administrator')
+def reports():
+    response.view = 'admin/report_list.html'
+    period_year = db(db.period_year).select()
+    report_status = db(db.report_status).select()
+    return dict(period_year=period_year, report_status=report_status)
+
+@auth.requires_login()
+@auth.requires_membership('Super-Administrator')
 def links():
     user = db(db.auth_membership.user_id == auth.user.id).select(db.auth_group.ALL)
     grid = SQLFORM.smartgrid(db.link, linked_tables=['link_access'])

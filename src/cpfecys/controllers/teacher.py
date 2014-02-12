@@ -18,7 +18,8 @@ def final_practice():
     if not final_practice: redirect(URL('courses'))
     final_practice = final_practice.first()
     #TODO evaluate if available_periods is really necessary
-    available_periods = db((db.period_year.id >= final_practice.user_project.period)&
+    available_periods = db((db.period_year.id >= \
+                            final_practice.user_project.period)&
                         (db.period_year.id < \
                             (final_practice.user_project.period + \
                             final_practice.user_project.periods))).select()
@@ -37,32 +38,75 @@ def final_practice():
 @auth.requires_login()
 @auth.requires_membership('Teacher')
 def report():
+    import datetime
+    cdate = datetime.datetime.now()
     report = request.vars['report']
-    response.view = 'teacher/report_view.html'
-    #If current teacher is related to report's project
-    report = db(db.report.id==report).select().first()
-    valid = cpfecys.teacher_validation_report_access(report.id)
-    if valid:
-        LATEX = '<img src="http://chart.apis.google.com/chart?cht=tx&chl=%s" align="center"/>'
-        markmin_settings = {
-            'latex':lambda code: LATEX % code.replace('"','"'),
-            'code_cpp':lambda text: CODE(text,language='cpp').xml(),
-            'code_java':lambda text: CODE(text,language='java').xml(),
-            'code_python':lambda text: CODE(text,language='python').xml(),
-            'code_html':lambda text: CODE(text,language='html').xml()}
-        return dict(log_types = db(db.log_type.id > 0).select(),
-                    logs = db((db.log_entry.report == report.id)).select(),
-                    metrics = db((db.log_metrics.report == report.id)).select(),
-                    desertions = db((db.log_desertion.report == report.id)).select(),
-                    anomalies = db((db.log_type.name == 'Anomaly')&
-                               (db.log_entry.log_type == db.log_type.id)&
-                               (db.log_entry.report == report.id)).count(),
-                    markmin_settings = markmin_settings,
-                    metrics_type = db(db.metrics_type).select(),
-                    report = report)
-    else:
-        session.flash = T('Error: report not available.')
-        redirect(URL('teacher','final_practice'))
+    report = db.report(db.report.id == report)
+    valid = not(report is None)
+    next_date = None
+
+    if (request.args(0) == 'view'):
+        report = request.vars['report']
+        report = db.report(db.report.id == report)
+        valid = not(report is None)
+        if valid: valid = cpfecys.teacher_validation_report_access(report.id)
+        if valid:
+            if report.score_date:
+                next_date = report.score_date + datetime.timedelta(days=7)
+            response.view = 'teacher/report_view.html'
+            return dict(
+                log_types = db(db.log_type.id > 0).select(),
+                logs = db((db.log_entry.report == report.id)).select(),
+                metrics = db((db.log_metrics.report == report.id)).select(),
+                anomalies = db((db.log_type.name == 'Anomaly')&
+                           (db.log_entry.log_type == db.log_type.id)&
+                           (db.log_entry.report == report.id)).count(),
+                markmin_settings = cpfecys.get_markmin,
+                report = report,
+                next_date=next_date)
+        else:
+            session.flash = T('Selected report can\'t be viewed. \
+                                Select a valid report.')
+            redirect(URL('teacher', 'index'))
+    elif (request.args(0) == 'grade'):
+        if valid:
+            score = request.vars['score']
+            comment = request.vars['comment']
+            if score != None:
+                score = int(score)
+                if request.vars['improve'] != None:
+                    if report.score_date!=None and \
+                            report.status.name!='EnabledForTeacher':
+                        session.flash = T('This report can\'t be sent to \
+                            rechecked anymore')
+                        redirect(URL('teacher', 'report/view', \
+                            vars=dict(report=report.id)))
+
+                    if comment != None:
+                        report.update_record(
+                            score=score,
+                            teacher_comment=comment,
+                            status=db.report_status(name='Recheck'),
+                            score_date=cdate)
+                        session.flash = T('The report has been sent to recheck \
+                            you will be notified via email when rechecked')
+                        redirect(URL('teacher', 'report/view', \
+                            vars=dict(report=report.id)))
+                else:
+                    if score >= 0  and score <= 100:
+                        report.update_record(
+                            score=score,
+                            teacher_comment=comment,
+                            status=db.report_status(name='Acceptance'),
+                            score_date=cdate)
+                        session.flash = T('The report has been scored \
+                            successfully')
+                        redirect(URL('teacher', 'report/view', \
+                            vars=dict(report=report.id)))
+
+        session.flash = T('Selected report can\'t be viewed. \
+                            Select a valid report.')
+        redirect(URL('teacher', 'index'))
 
 @auth.requires_login()
 @auth.requires_membership('Teacher')

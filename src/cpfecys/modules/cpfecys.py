@@ -47,6 +47,16 @@ def current_year_period():
     return db.period_year((db.period_year.yearp == cyear)&
                           (db.period_year.period == period))
 
+def get_markmin():
+    LATEX = '<img src="http://chart.apis.google.com/chart?cht=tx&chl=%s" align="center"/>'
+    markmin_settings = {
+            'latex':lambda code: LATEX % code.replace('"','"'),
+            'code_cpp':lambda text: CODE(text,language='cpp').xml(),
+            'code_java':lambda text: CODE(text,language='java').xml(),
+            'code_python':lambda text: CODE(text,language='python').xml(),
+            'code_html':lambda text: CODE(text,language='html').xml()}
+    return markmin_settings
+    
 ## Validate that the report date restriction and is_enabled restriction apply to current date
 def student_validation_report_restrictions(report_restriction):
     db = _db
@@ -75,6 +85,7 @@ def student_validation_report_owner(report):
 def teacher_validation_report_access(report):
     db = _db
     auth = _auth
+    report = db(db.report.id==report).select().first()
     if report == None or report.assignation.project == None:
         return False
     project = report.assignation.project
@@ -270,6 +281,8 @@ def _report_status_setup():
     db.report_status.insert(name="Grading", description="")
     db.report_status.insert(name="Recheck", description="")
     db.report_status.insert(name="Acceptance", description="")
+    db.report_status.insert(name="EnabledForTeacher", description="")
+    db.report_status.insert(name="EnabledForStudent", description="")
 
 def _module_variables_setup():
     global first_period, second_period
