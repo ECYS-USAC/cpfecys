@@ -317,7 +317,7 @@
 'Gone': 'Retirados',
 'gone': 'retirados',
 'Grade report': 'Grade report',
-'Grading': 'Nota',
+'Grading': 'Calificar',
 'Group ID': 'ID de Grupo',
 'Group uniquely assigned to user %(id)s': 'Grupo asignado de forma única a usuario %(id)s',
 'Groups': 'Grupos',
