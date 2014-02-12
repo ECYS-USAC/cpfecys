@@ -225,6 +225,7 @@ db.define_table('report_restriction',
 db.define_table('report_status',
                 Field('name', 'string', notnull=True, label = T('name')),
                 Field('description', 'string', notnull=True), \
+                Field('icon', 'string', notnull=False), \
                 label = T('description'),
                 format='%(name)s')
 
@@ -253,6 +254,8 @@ db.define_table('report',
                 label = T('teacher_comment')),
                 Field('score_date', 'date', \
                 label = T('score_date')),
+                Field('period', 'reference period_year', \
+                    label = T('period')),
                 )
 
 db.define_table('log_type',
@@ -267,6 +270,8 @@ db.define_table('log_entry',
                 Field('description', 'text', notnull=True, \
                     label = T('description')),
                 Field('report', 'reference report', label = T('report')),
+                Field('period', 'reference period_year', \
+                    label = T('period')),
                 format='%(entry_date)s'
                 )
 

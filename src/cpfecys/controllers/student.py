@@ -434,7 +434,8 @@ def report():
         report = db.report.insert(created = current_date,
                              assignation = assignation,
                              report_restriction = report_restriction,
-                             status = db.report_status(name = 'Draft'))
+                             status = db.report_status(name = 'Draft'),
+                             period=cpfecys.current_year_period())
         session.flash = T('Report is now a draft.')
         redirect(URL('student','report/edit', vars = dict(report = report.id)))
     elif (request.args(0) == 'edit'):
@@ -542,7 +543,8 @@ def log():
             db.log_entry.insert(log_type = log_type,
                                 entry_date = log_date,
                                 description = log_content,
-                                report = report.id)
+                                report = report.id,
+                                period=cpfecys.current_year_period())
             session.flash = T('Log added')
             redirect(URL('student', 'report/edit', vars=dict(report=report.id)))
         else:

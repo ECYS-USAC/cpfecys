@@ -107,8 +107,7 @@
                                             {{=T('View Report')}}
                                         </a>
                                         {{if (report.status['name'] == 'Draft' or \
-                                                report.status['name'] == 'Recheck' or \
-                                                report.status['name'] == 'EnabledForStudent') and \
+                                                report.status['name'] == 'Recheck') and \
                                             (restriction.start_date <= current_date and \
                                                 restriction.end_date >= current_date) and \
                                             restriction.is_enabled:}}

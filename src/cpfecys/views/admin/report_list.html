@@ -1,7 +1,7 @@
 {{extend 'template.html'}}
 <div class="row-fluid">
       <div class="well span12">
-		<table>
+		<table class="table table-bordered">
 			<tr>
 				<th>
 					{{=T('Semester')}}
@@ -28,9 +28,18 @@
 					</td>
 					{{for status in report_status:}}
 					<td>
-						{{=T(status.name)}}
+						<a href="{{=URL('admin', 'reports_view', vars=dict(period=pyear.id, \
+																		 status=status.id))}}"> 
+						 	<i class="{{=status.icon or 'icon-star'}}"></i> {{=T(status.name)}}
+						</a>
 					</td>
 					{{pass}}
+					<td>
+						<a href="{{=URL('admin', 'reports_view', vars=dict(period=pyear.id, \
+																		 status='-1'))}}"> 
+						 	<i class="icon-list"></i> {{=T('All')}}
+						</a>
+					</td>
 				</tr>
 			{{pass}}	
 		</table>

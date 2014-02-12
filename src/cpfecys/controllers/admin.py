@@ -25,6 +25,15 @@ def reports():
     period_year = db(db.period_year).select()
     report_status = db(db.report_status).select()
     return dict(period_year=period_year, report_status=report_status)
+                
+
+@auth.requires_login()
+@auth.requires_membership('Super-Administrator')
+def reports_view():
+    status = request.vars['status']
+    period = request.vars['period']
+    grid = SQLFORM.grid((db.report.period==period)&(db.report.status==status))
+    return dict(grid=grid)
 
 @auth.requires_login()
 @auth.requires_membership('Super-Administrator')
