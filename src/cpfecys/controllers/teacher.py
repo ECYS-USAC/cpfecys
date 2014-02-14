@@ -26,6 +26,7 @@ def final_practice():
     items = db((db.item.created==cpfecys.current_year_period())& \
                         (db.item.assignation==final_practice.user_project.id) \
                         ).select()
+    total_items = db((db.item.created==cpfecys.current_year_period())).select()
     reports = db((db.report.assignation == final_practice.user_project.id)&
                         (db.report.status.name!='Grading'))
     avg = reports.select((db.report.score.sum()/db.report.score.count()).\
@@ -35,7 +36,22 @@ def final_practice():
                 available_periods=available_periods,
                 reports=reports,
                 reports_avg=avg,
-                items=items)
+                items=items,
+                total_items=total_items)
+
+@cache.action()
+@auth.requires_login()
+@auth.requires_membership('Teacher')
+def download():
+    item = db(db.item.uploaded_file==request.args[0]).select().first()
+    project =  item.assignation.project
+    t_assignation = db((db.user_project.project==project.id)&
+        (db.user_project.assigned_user==auth.user.id))
+    if item != None and t_assignation != None:
+        return response.download(request, db)
+    else:
+        session.flash = T('Access Forbidden')
+        redirect(URL('default', 'index'))
 
 @auth.requires_login()
 @auth.requires_membership('Teacher')
