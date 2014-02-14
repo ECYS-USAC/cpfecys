@@ -1,16 +1,16 @@
 {{extend 'template.html'}}
-    {{for notification in notifications:}}
-        {{if notification.visible:}}
-            {{if notification.promoted:}}
-                <div class="hero-unit">
-                    <h1>{{=notification.name}}</h1>
-                    <p>{{=notification.content_text}}</p>
-                </div>
-    		{{else:}}
-            	<div class="jumbotron">
-                    <h1>{{=notification.name}}</h1>
-                    <p>{{=notification.content_text}}</p>
-                </div>
-            {{pass}}
+{{for notification in front_notification:}}
+    {{if notification.visible:}}
+        {{if notification.promoted:}}
+            <div class="hero-unit">
+                <h1>{{=notification.name}}</h1>
+                <p>{{=notification.content_text}}</p>
+            </div>
+		{{else:}}
+        	<div class="jumbotron">
+                <h1>{{=notification.name}}</h1>
+                <p>{{=notification.content_text}}</p>
+            </div>
         {{pass}}
     {{pass}}
+{{pass}}

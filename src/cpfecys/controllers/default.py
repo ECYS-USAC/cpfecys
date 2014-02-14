@@ -19,16 +19,17 @@ def index():
     return auth.wiki()
     """
     if auth.user != None:
-        notifications = db(db.front_notification).select()
         groups = db((db.auth_membership.user_id==auth.user.id)& \
                         (db.auth_group.id==db.auth_membership.group_id)). \
                         select(db.auth_group.ALL)
-        front_notification = db((db.front_notification.id == db.notification_access.front_notification)& \
-                   (db.notification_access.user_role.belongs(groups))).select(db.front_notification.ALL)
+        front_notification = db(((db.front_notification.id== \
+                    db.notification_access.front_notification)& \
+                    (db.notification_access.user_role.belongs(groups))) | \
+                    (db.front_notification.is_public == True)
+            ).select(db.front_notification.ALL)
     else:
-        notifications = db(db.front_notification.is_public == True).select()
-    return locals()
-    return dict(message=T('Hello World'), update_data_form=False)
+        front_notification = db(db.front_notification.is_public == True).select()
+    return dict(front_notification=front_notification)
 
 def links():
     """ This url shows all important links published by admin
