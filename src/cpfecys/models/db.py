@@ -248,12 +248,14 @@ db.define_table('report',
                 label=T('gone')),
                 Field('desertion_continued', 'integer', \
                 label=T('continued')),
+                Field('hours', 'integer', \
+                label=T('hours')),
                 Field('status', 'reference report_status', notnull=True, \
                 label = T('status')),
                 Field('teacher_comment', 'text', \
-                label = T('teacher_comment')),
+                label = T('teacher comment')),
                 Field('score_date', 'date', \
-                label = T('score_date')),
+                label = T('score date')),
                 Field('period', 'reference period_year', \
                     label = T('period')),
                 )

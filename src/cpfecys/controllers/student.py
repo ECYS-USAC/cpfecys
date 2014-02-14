@@ -173,6 +173,68 @@ def download():
 
 @auth.requires_login()
 @auth.requires_membership('Student')
+def report_hours():
+    if (request.args(0) == 'create'):
+        report = request.vars['report']
+        hours = request.vars['report-hours']
+        ## Get the report id
+        report = db.report(db.report.id == report)
+        valid = not(report is None) and not(hours is None)
+        ## Validate report TIMING restriction
+        if valid: valid = cpfecys.student_validation_report_restrictions(report.report_restriction.id)
+        ## Validate that the report belongs to user
+        if valid: valid = cpfecys.student_validation_report_owner(report.id)
+        ## Validate that the report status is editable (it is either 'Draft' or 'Recheck')
+        if valid: valid = cpfecys.student_validation_report_status(report)
+        if valid:
+            report.hours = hours
+            report.update_record()
+            session.flash = T('Report updated.')
+            redirect(URL('student','report/edit', vars = dict(report = report.id)))
+        else:
+            session.flash = T('Selected report can\'t be edited. Select a valid report.')
+            redirect(URL('student','index'))
+    elif (request.args(0) == 'update'):
+        report = request.vars['report']
+        hours = request.vars['report-hours']
+        report = db.report(db.report.id == report)
+        valid = not(report is None) and not(hours is None)
+        ## Validate report TIMING restriction
+        if valid: valid = cpfecys.student_validation_report_restrictions(report.report_restriction.id)
+        ## Validate that the report belongs to user
+        if valid: valid = cpfecys.student_validation_report_owner(report.id)
+        ## Validate that the report status is editable (it is either 'Draft' or 'Recheck')
+        if valid: valid = cpfecys.student_validation_report_status(report)
+        if valid:
+            report.hours = hours
+            report.update_record()
+            session.flash = T('Report updated.')
+            redirect(URL('student','report/edit', vars = dict(report = report.id)))
+        else:
+            session.flash = T('Selected report can\'t be edited. Select a valid report.')
+            redirect(URL('student','index'))
+    elif (request.args(0) == 'delete'):
+        report = request.vars['report']
+        report = db.report(db.report.id == report)
+        valid = not(report is None)
+        ## Validate report TIMING restriction
+        if valid: valid = cpfecys.student_validation_report_restrictions(report.report_restriction.id)
+        ## Validate that the report belongs to user
+        if valid: valid = cpfecys.student_validation_report_owner(report.id)
+        ## Validate that the report status is editable (it is either 'Draft' or 'Recheck')
+        if valid: valid = cpfecys.student_validation_report_status(report)
+        if valid:
+            report.hours = None
+            report.update_record()
+            session.flash = T('Report updated.')
+            redirect(URL('student','report/edit', vars = dict(report = report.id)))
+        else:
+            session.flash = T('Selected report can\'t be edited. Select a valid report.')
+            redirect(URL('student','index'))
+    raise HTTP(404)
+
+@auth.requires_login()
+@auth.requires_membership('Student')
 def report_header():
     if (request.args(0) == 'create'):
         report = request.vars['report']
@@ -462,7 +524,9 @@ def report():
             redirect(URL('student','index'))
         ## Markmin formatting of reports
         response.view = 'student/report_edit.html'
+        assignation_reports = db(db.report.assignation == report.assignation).select()
         return dict(log_types = db(db.log_type.id > 0).select(),
+                    assignation_reports = assignation_reports,
                     logs = db((db.log_entry.report == report.id)).select(),
                     metrics = db((db.log_metrics.report == report.id)).select(),
                     metrics_type = db(db.metrics_type).select(),
