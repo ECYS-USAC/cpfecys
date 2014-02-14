@@ -82,7 +82,9 @@
         </div>
         <div id="i{{=item.id}}" class="accordion-body collapse">
             <div class="accordion-inner">
-                Anim pariatur cliche...
+                {{for item in items:}}
+                    {{=item}}
+                {{pass}}
             </div>
         </div>
     {{pass}}
