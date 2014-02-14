@@ -569,7 +569,9 @@ def report():
         if valid:
             ## Markmin formatting of reports
             response.view = 'student/report_view.html'
+            assignation_reports = db(db.report.assignation == report.assignation).select()
             return dict(log_types = db(db.log_type.id > 0).select(),
+                        assignation_reports = assignation_reports,
                         logs = db((db.log_entry.report == report.id)).select(),
                         metrics = db((db.log_metrics.report == report.id)).select(),
                         anomalies = db((db.log_type.name == 'Anomaly')&
