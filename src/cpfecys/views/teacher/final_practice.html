@@ -77,31 +77,57 @@
             data-parent="#deliverable_items_accordion" href="#i{{=item.id}}">
                 {{=item.yearp}} - {{=T('Semester')}} {{=item.period}}
                 <span class="right">
-                    <span>Delivered Requirements: {{=len(items)}}/{{=len(total_items)}}</span>
+                    <span>Delivered Requirements: 
+                        {{=len(items)}}/{{=len(total_items)}}</span>
                 </span>
             </a>
         </div>
         <div id="i{{=item.id}}" class="accordion-body collapse">
             <div class="accordion-inner">
-                {{for item in items:}}
-                    {{if item.item_restriction.item_type.name == 'File':}}
-                        <a class="btn" href="{{=URL('cpfecys/teacher', \
-                         'download',item.uploaded_file)}}">
-                        <span class="icon-eye-open"></span>
-                            {{=T('View Item')}}
-                        </a>
-                    {{elif item.item_restriction.item_type.name == 'Activity':}}
-                        <input type="checkbox" 
-                        {{if item.done_activity:}}
-                        checked
-                        {{pass}}/> {{=item.name}}
-                    {{pass}}
-                {{pass}}
+                <table style="width:100%;">
+                    <thead>
+                        <tr>
+                            <th>Type</th>
+                            <th>Name</th>
+                            <th>Created</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {{for item in items:}}
+                        <tr>
+                            <td>
+                                {{=item.item_restriction.item_type.name}}
+                            </td>
+                            <td>
+                                {{=item.item_restriction.name}}
+                            </td>
+                            <td>
+                                {{=item.created.period.name}} 
+                                {{=item.created.yearp}}
+                            </td>
+                            <td>
+                            {{if item.item_restriction.item_type.name=='File':}}
+                                <a class="btn" href="{{=URL('cpfecys/teacher', \
+                                 'download',item.uploaded_file)}}">
+                                <span class="icon-eye-open"></span>
+                                    {{=T('View Item')}}
+                                </a>
+                            {{elif item.item_restriction.item_type.name== \
+                                    'Activity':}}
+                                <input type="checkbox" 
+                                {{if item.done_activity:}}
+                                checked
+                                {{pass}}/> {{=item.name}}
+                            {{pass}}
+                            </td>
+                        </tr>
+                        {{pass}}
+                    </tbody>
+                </table>
             </div>
         </div>
     {{pass}}
     </div>
 </div>
-<h3>
-    {{=T('Current Status')}}
-</h3>
+
