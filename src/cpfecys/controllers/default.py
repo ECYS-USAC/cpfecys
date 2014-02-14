@@ -22,14 +22,15 @@ def index():
         groups = db((db.auth_membership.user_id==auth.user.id)& \
                         (db.auth_group.id==db.auth_membership.group_id)). \
                         select(db.auth_group.ALL)
-        front_notification = db(((db.front_notification.id== \
-                    db.notification_access.front_notification)& \
-                    (db.notification_access.user_role.belongs(groups))) | \
-                    (db.front_notification.is_public == True)
+        front_notification = db((db.front_notification.id== \
+            db.notification_access.front_notification)& \
+        (db.notification_access.user_role.belongs(groups))
             ).select(db.front_notification.ALL)
+        public_notifications = db(db.front_notification.is_public==True).select()
     else:
         front_notification = db(db.front_notification.is_public == True).select()
-    return dict(front_notification=front_notification)
+    return dict(front_notification=front_notification, 
+        public_notifications=public_notifications)
 
 def links():
     """ This url shows all important links published by admin
