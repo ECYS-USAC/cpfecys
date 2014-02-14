@@ -23,17 +23,19 @@ def final_practice():
                         (db.period_year.id < \
                             (final_practice.user_project.period + \
                             final_practice.user_project.periods))).select()
-    #TODO Only show reports with status of != 'Draft'
-    #TODO (in view) Only allow to grade the ones with status of Grading
+    items = db((db.item.created==cpfecys.current_year_period())& \
+                        (db.item.assignation==final_practice.user_project.id) \
+                        ).select()
     reports = db((db.report.assignation == final_practice.user_project.id)&
                         (db.report.status.name!='Grading'))
     avg = reports.select((db.report.score.sum()/db.report.score.count()).\
                         with_alias('avg')).first()['avg'] or 0
     reports = reports.select()
-    return dict(final_practice = final_practice,
-                available_periods = available_periods,
-                reports = reports,
-                reports_avg = avg)
+    return dict(final_practice=final_practice,
+                available_periods=available_periods,
+                reports=reports,
+                reports_avg=avg,
+                items=items)
 
 @auth.requires_login()
 @auth.requires_membership('Teacher')
@@ -49,20 +51,21 @@ def report():
         report = request.vars['report']
         report = db.report(db.report.id == report)
         valid = not(report is None)
-        if valid: valid = cpfecys.teacher_validation_report_access(report.id)
+        if valid: valid = cpfecys.teacher_validation_report_access(report.id) \
+                and report.status.name != 'Draft'
         if valid:
             if report.score_date:
                 next_date = report.score_date + datetime.timedelta(days=7)
             response.view = 'teacher/report_view.html'
             return dict(
-                log_types = db(db.log_type.id > 0).select(),
-                logs = db((db.log_entry.report == report.id)).select(),
-                metrics = db((db.log_metrics.report == report.id)).select(),
-                anomalies = db((db.log_type.name == 'Anomaly')&
+                log_types=db(db.log_type.id > 0).select(),
+                logs=db((db.log_entry.report == report.id)).select(),
+                metrics=db((db.log_metrics.report == report.id)).select(),
+                anomalies=db((db.log_type.name == 'Anomaly')&
                            (db.log_entry.log_type == db.log_type.id)&
                            (db.log_entry.report == report.id)).count(),
-                markmin_settings = cpfecys.get_markmin,
-                report = report,
+                markmin_settings=cpfecys.get_markmin,
+                report=report,
                 next_date=next_date)
         else:
             session.flash = T('Selected report can\'t be viewed. \
