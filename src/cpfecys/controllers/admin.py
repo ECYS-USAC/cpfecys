@@ -24,7 +24,14 @@ def reports():
     response.view = 'admin/report_list.html'
     period_year = db(db.period_year).select()
     report_status = db(db.report_status).select()
-    return dict(period_year=period_year, report_status=report_status)
+
+    report_total = db().select(
+        db.report_status.ALL, db.report.id.count(), 
+        left=db.report.on(db.report.status==db.report_status.id), 
+        groupby=db.report_status.name)
+
+    return dict(period_year=period_year, report_status=report_status, 
+        report_total=report_total)
                 
 
 @auth.requires_login()

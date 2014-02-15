@@ -26,11 +26,12 @@
 					<td>
 						{{=pyear.yearp}}
 					</td>
-					{{for status in report_status:}}
+
+					{{for status in report_total:}}
 					<td>
 						<a href="{{=URL('admin', 'reports_view', vars=dict(period=pyear.id, \
-																		 status=status.id))}}"> 
-						 	<i class="{{=status.icon or 'icon-star'}}"></i> {{=T(status.name)}}
+																		 status=status.report_status.id))}}"> 
+						 	<i class="{{=status.report_status.icon or 'icon-star'}}"></i> {{=T(status.report_status.name)}}
 						</a>
 					</td>
 					{{pass}}

@@ -273,6 +273,27 @@
             {{pass}}
         </div>
         <hr />
+        {{if not(report.hours is None):}}
+        <div class="row-fluid">
+            <div style="padding:15px;">
+                <h1>
+                    <span class="icon-time"></span>
+                    <strong>{{=T('Accomplished Hours')}}</strong>
+                </h1>
+            </div>
+        </div>
+        <div class="row-fluid">
+            <!-- Accomplished Hours display Helper-->
+            {{inc_vars = dict(editable = False,
+            id = 'display-report-hours',
+            reports = assignation_reports,
+            edit_action = '',
+            delete_action = '')}}
+            {{include 'include/display-report-hours.html'}}
+            <!-- //Accomplished Hours display Helper-->
+        </div>
+        {{pass}}
+        
         {{if not(report.desertion_started is None):}}
         <div class="row-fluid">
             <div style="padding:15px;">
