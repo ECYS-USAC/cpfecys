@@ -4,6 +4,7 @@
 <script type="text/javascript" src="{{=URL('static','markitup')}}/jquery.markitup.pack.js"></script>
 <script type="text/javascript" src="{{=URL('static','markitup')}}/sets/markmin/set.js"></script>
 <script type="text/javascript" src="{{=URL('static','js')}}/highcharts/js/highcharts.js"></script>
+<script type="text/javascript" src="{{=URL('static','js')}}/highcharts/js/modules/data.js"></script>
 <script type="text/javascript" src="{{=URL('static','js')}}/highcharts/js/modules/exporting.js"></script>
 <link rel="stylesheet" type="text/css" href="{{=URL('static','markitup')}}/skins/markitup/style.css"/>
 <link rel="stylesheet" type="text/css" href="{{=URL('static','markitup')}}/sets/markmin/style.css"/>
@@ -64,7 +65,7 @@ hours = '',
 url = URL('report_hours/create', vars=dict(report = report.id)),
 title = T('Report Hours')) }}
 {{include 'include/report-hours-activity.html'}}
-<!-- Helpers for securement -->
+<!-- Helpers for asking something before it happens and may be ireversible -->
 {{inc_vars = dict(id = 'report-grading-check',
 title = T('Confirm') + ' ' + T('Send to Grading'),
 content = T('This operation can\'t be undone, do you want to continue?'),
@@ -292,7 +293,7 @@ url = URL('student','report/acceptance', vars=dict(report = report.id)))}}
             desertion_continued = report.desertion_continued) }}
             {{include 'include/log-desertion-activity.html'}}
             <!-- //Desertion edit Helper-->
-            <!-- Metric delete Helper-->
+            <!-- Desertion delete Helper-->
             {{inc_vars = dict(id = 'delete-desertion',
             title = T('Confirm') + ' ' + T('Delete'),
             content = T('Delete operation can\'t be undone, do you want to continue?'),
@@ -300,17 +301,18 @@ url = URL('student','report/acceptance', vars=dict(report = report.id)))}}
             _class = 'btn-danger',
             url = URL('desertions/delete', vars=dict(report = report.id)))}}
             {{include 'include/delete-helper.html'}}
-            <!-- //Metric delete Helper-->
-            <!-- Display Helper -->
+            <!-- //Desertion delete Helper-->
+            <!-- Desertion Display Helper -->
             {{inc_vars = dict(editable = True,
             id = 'display-desertion',
+            reports = assignation_reports,
             desertion_started = report.desertion_started,
             desertion_gone = report.desertion_gone,
             desertion_continued = report.desertion_continued,
             edit_action = 'desertion-edit-activity',
             delete_action = 'delete-desertion')}}
             {{include 'include/display-report-desertion.html'}}
-            <!-- //Display Helper -->
+            <!-- //Desertion Display Helper -->
         </div>
         {{pass}}
         {{if not(report.hours is None):}}

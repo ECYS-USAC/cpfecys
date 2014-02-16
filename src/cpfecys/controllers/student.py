@@ -65,7 +65,7 @@ def index():
                         days=cpfecys.get_custom_parameters().rescore_max_days)
         return current_date < next_date
 
-    
+
     return dict(assignations = assignations,
                 available_reports = available_reports,
                 current_date = current_date,
@@ -506,7 +506,7 @@ def report():
                              assignation = assignation,
                              report_restriction = report_restriction,
                              status = db.report_status(name = 'Draft'),
-                             period=cpfecys.current_year_period())
+                             period = cpfecys.current_year_period())
         session.flash = T('Report is now a draft.')
         redirect(URL('student','report/edit', vars = dict(report = report.id)))
     elif (request.args(0) == 'edit'):

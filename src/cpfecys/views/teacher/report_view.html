@@ -3,6 +3,7 @@
 <script type="text/javascript" src="{{=URL('static','markitup')}}/jquery.markitup.pack.js"></script>
 <script type="text/javascript" src="{{=URL('static','markitup')}}/sets/markmin/set.js"></script>
 <script type="text/javascript" src="{{=URL('static','js')}}/highcharts/js/highcharts.js"></script>
+<script type="text/javascript" src="{{=URL('static','js')}}/highcharts/js/modules/data.js"></script>
 <script type="text/javascript" src="{{=URL('static','js')}}/highcharts/js/modules/exporting.js"></script>
 <link rel="stylesheet" type="text/css" href="{{=URL('static','markitup')}}/skins/markitup/style.css"/>
 <link rel="stylesheet" type="text/css" href="{{=URL('static','markitup')}}/sets/markmin/style.css"/>
@@ -34,7 +35,7 @@
                 </div>
               </div>
             </div>
-            
+
             <div class="control-group">
               <div class="controls">
                 {{if report.times_graded < parameters.rescore_max_count:}}
@@ -80,7 +81,7 @@
                     </p>
                  {{pass}}
                  </p>
-                   
+
                 </div>
                 {{else:}}
                 <div class="alert alert-info span8">
@@ -377,6 +378,7 @@
             <!-- Display Helper -->
             {{inc_vars = dict(editable = False,
             id = 'display-desertion',
+            reports = assignation_reports,
             desertion_started = report.desertion_started,
             desertion_gone = report.desertion_gone,
             desertion_continued = report.desertion_continued,

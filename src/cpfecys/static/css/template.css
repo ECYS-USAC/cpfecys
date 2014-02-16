@@ -5,31 +5,6 @@ html, body, form, fieldset {
 	padding: 0;
 }
 
-table.normal
-{
-border-collapse:collapse;
-}
-
-table.normal,th.normal, td.normal
-{
-border: 2px solid gray;
-}
-
-th
-{
-background-color: #FFC048;
-color: #FFFFFF;
-    font-size: 1.4em;
-    padding-bottom: 4px;
-    padding-top: 5px;
-    text-align: left;
-}
-
-tr.row_par
-{
-background-color: #E5E3DF;
-}
-
 body {
 	color: #000000;
 	background: #FFFFFF;
@@ -175,12 +150,6 @@ ol li {
 	line-height: 180%;
 }
 
-th {
-	padding: 5px;
-	font-weight: bold;
-	text-align: left;
-}
-
 fieldset {
 	border: none;
 	padding: 10px 5px;
@@ -196,10 +165,6 @@ hr {
 	border-left: 0;
 	border-bottom: 0;
 	height: 1px;
-}
-
-td, div {
-	font-size: 100%;
 }
 
 img {
@@ -490,97 +455,6 @@ table.blog {
 .column_separator {
 	padding: 0 25px;
 }
-
-/* content tables */
-td.sectiontableheader {
-  padding: 4px;
-  border-right: 1px solid #fff;
-}
-
-tr.sectiontableentry0 td,
-tr.sectiontableentry1 td,
-tr.sectiontableentry2 td {
-  padding: 4px;
-}
-
-td.sectiontableentry0,
-td.sectiontableentry1,
-td.sectiontableentry2 {
-  padding: 3px;
-}
-
-table.contentpane {
-	border: none;
-	width: 100%;
-}
-
-table.contentpaneopen {
-	border: none;
-	border-collapse: collapse;
-	border-spacing: 0;
-}
-
-table.contenttoc {
-	margin: 0 0 10px 10px;
-	padding: 0;
-	width: 35%;
-	float: right;
-}
-
-table.contenttoc a {
-	text-decoration: none;
-}
-
-table.contenttoc td {
-	padding: 1px 5px 1px 25px;
-	background: no-repeat 5% 50%;
-}
-
-table.contenttoc th {
-	padding: 0 0 3PX;
-	border-bottom: 1px solid #CCCCCC;
-	text-indent: 5px;
-}
-
-table.poll {
-	padding: 0;
-	width: 100%;
-	border-collapse: collapse;
-}
-
-table.pollstableborder {
-	padding: 0;
-	width: 100%;
-	border: none;
-	text-align: left;
-}
-
-table.pollstableborder img {
-	vertical-align: baseline;
-}
-
-table.pollstableborder td {
-	padding: 4px!important;
-	border-collapse: collapse;
-	border-spacing: 0;
-}
-
-table.pollstableborder tr.sectiontableentry1 td {
-	background: #ECECEC;
-}
-
-table.searchintro {
-	padding: 10px 0;
-	width: 100%;
-}
-
-table.searchintro td {
-	padding: 5px!important;
-}
-
-table.adminform {
-}
-
 .adminform .inputbox {
 }
 
@@ -718,21 +592,6 @@ ul.pagination a:hover, ul.pagination a:active, ul.pagination a:focus {
 
 .sectiontableheader a {
 	color: #FFFFFF;
-}
-
-tr.sectiontableentry1 td {
-	padding: 8px 5px;
-	background:repeat-x bottom;
-}
-
-tr.sectiontableentry2 td {
-	padding: 8px 5px;
-	background:repeat-x bottom #ECECEC;
-}
-
-tr.sectiontableentry1:hover td,
-tr.sectiontableentry2:hover td {
-	background: repeat-x bottom #FFFFCC;
 }
 
 .smalldark {
