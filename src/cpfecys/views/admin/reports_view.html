@@ -1,2 +1,82 @@
 {{extend 'template.html'}}
-{{=grid}}
+<div class="row-fluid">
+  	<div class="well span12">
+  		<a onclick="window.history.back()" class="btn" ><i class="icon-arrow-left"></i> Back</a>
+		<table class="table table-bordered">
+			<thead>
+				<tr>
+					<th>
+						{{=T('Project')}}
+					</th>
+					<th>
+						{{=T('Created')}}
+					</th>
+					<th>
+						{{=T('School id')}}
+					</th>
+					<th>
+						{{=T('User')}}
+					</th>
+					<th>
+						{{=T('Restriction')}}
+					</th>
+					<th>
+						{{=T('Score')}}
+					</th>
+					<th>
+						{{=T('Status')}}
+					</th>
+					<th>
+						{{=T('Activity logs')}}
+					</th>
+					<th>
+						{{=T('Metric logs')}}
+					</th>
+					<th>
+						{{=T('Actions')}}
+					</th>
+				</tr>
+			</thead>
+			<tbody>
+				{{for report_set in reports:}}
+				<tr>
+					<td>
+						{{=report_set.report.assignation.project.name}}	
+					</td>
+					<td>
+						{{=report_set.report.created}}	
+					</td>
+					<td>
+						{{=report_set.report.assignation.assigned_user.username}}	
+					</td>
+					<td>
+						{{=report_set.report.assignation.assigned_user.first_name}}
+						{{=report_set.report.assignation.assigned_user.last_name}}
+					</td>
+					<td>
+						{{=report_set.report.report_restriction.name}}	
+					</td>
+					<td>
+						{{=report_set.report.score}}	
+					</td>
+					<td>
+						{{=T(report_set.report.status.name)}}
+					</td>
+					<td>
+						{{=report_set['COUNT(log_entry.id)']}}
+					</td>
+					<td>
+						{{=report_set['COUNT(log_metrics.id)']}}
+					</td>
+					<td>
+						<a class="" href="">
+		                <span class="icon-eye-open"></span>
+		                    {{=T('Report detail')}}
+		                </a>
+					</td>
+				</tr>
+				{{pass}}	
+			</tbody>
+		</table>
+	</div>
+</div>

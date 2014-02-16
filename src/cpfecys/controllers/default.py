@@ -22,7 +22,7 @@ def index():
         groups = db((db.auth_membership.user_id==auth.user.id)& \
                         (db.auth_group.id==db.auth_membership.group_id)). \
                         select(db.auth_group.ALL)
-        front_notification = 
+        front_notification = \
         db(db.front_notification.is_public==True).select()| \
         db((db.front_notification.id== \
             db.notification_access.front_notification)& \

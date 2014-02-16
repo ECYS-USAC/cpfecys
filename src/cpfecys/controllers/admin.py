@@ -23,15 +23,13 @@ def projects():
 def reports():
     response.view = 'admin/report_list.html'
     period_year = db(db.period_year).select()
-    report_status = db(db.report_status).select()
 
     count = db.report.id.count()
     report_total = db().select(
         db.report_status.ALL, count, 
         left=db.report.on(db.report.status==db.report_status.id), 
         groupby=db.report_status.name)
-    return dict(period_year=period_year, report_status=report_status, 
-        report_total=report_total)
+    return dict(period_year=period_year,report_total=report_total)
                 
 
 @auth.requires_login()
@@ -39,8 +37,17 @@ def reports():
 def reports_view():
     status = request.vars['status']
     period = request.vars['period']
-    grid = SQLFORM.grid((db.report.period==period)&(db.report.status==status))
-    return dict(grid=grid)
+    valid = status and period
+    if not valid:
+        session.flash = T('Incomplete Information')
+        redirect(URL('default', 'index'))
+    reports = db((db.report.period==period)&(db.report.status==status)&
+        (db.report.report_restriction==db.report_restriction.id)&
+        (db.log_entry.report==db.report.id)&
+        (db.log_metrics.report==db.report.id)
+        ).select(db.report.ALL, db.report_restriction.ALL, \
+        db.log_entry.id.count(), db.log_metrics.id.count())
+    return dict(reports=reports)
 
 @auth.requires_login()
 @auth.requires_membership('Super-Administrator')
