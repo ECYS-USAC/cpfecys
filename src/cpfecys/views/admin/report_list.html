@@ -31,7 +31,10 @@
 					<td>
 						<a href="{{=URL('admin', 'reports_view', vars=dict(period=pyear.id, \
 																		 status=status.report_status.id))}}"> 
-						 	<i class="{{=status.report_status.icon or 'icon-star'}}"></i> {{=T(status.report_status.name)}}
+						 	<span class="badge badge-info">{{=status['COUNT(report.id)']}}</span>
+						 	<i class="{{=status.report_status.icon or 'icon-star'}}"></i> 
+						 	<span>{{=T(status.report_status.name)}} </span>
+
 						</a>
 					</td>
 					{{pass}}

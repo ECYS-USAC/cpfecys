@@ -25,8 +25,9 @@ def reports():
     period_year = db(db.period_year).select()
     report_status = db(db.report_status).select()
 
+    count = db.report.id.count()
     report_total = db().select(
-        db.report_status.ALL, db.report.id.count(), 
+        db.report_status.ALL, count, 
         left=db.report.on(db.report.status==db.report_status.id), 
         groupby=db.report_status.name)
     return dict(period_year=period_year, report_status=report_status, 
