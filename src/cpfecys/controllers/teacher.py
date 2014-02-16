@@ -110,6 +110,7 @@ def report():
                     if comment != None:
                         report.update_record(
                             score=score,
+                            min_score=cpfecys.get_custom_parameters().min_score,
                             teacher_comment=comment,
                             status=db.report_status(name='Recheck'),
                             score_date=cdate,
@@ -123,6 +124,7 @@ def report():
                         return report.times_graded|0
                         report.update_record(
                             score=score,
+                            min_score=cpfecys.get_custom_parameters().min_score,
                             teacher_comment=comment,
                             status=db.report_status(name='Acceptance'),
                             score_date=cdate,

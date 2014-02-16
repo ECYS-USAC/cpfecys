@@ -71,6 +71,9 @@
                                         {{=T('Score')}}
                                     </th>
                                     <th>
+                                        {{=T('Information')}}
+                                    </th>
+                                    <th>
                                         {{=T('Actions')}}
                                     </th>
                                 </tr>
@@ -96,6 +99,15 @@
                                     </td>
                                     <td>
                                         {{=report.score}}
+                                    </td>
+                                    <td>
+                                        {{if report.score == report.min_score:}}
+                                            <span class="label label-warning">Aproved with minimum</span>
+                                        {{elif report.score > reoprt.min_score:}}
+                                            <span class="label label-success">Aproved</span>
+                                        {{else:}}
+                                            <span class="label label-important">Failed</span>
+                                        {{pass}}
                                     </td>
                                     {{if report.score: average_report_scoring += report.score}}
                                     <td>

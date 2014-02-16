@@ -238,6 +238,8 @@ db.define_table('report',
                 label = T('report_restriction')),
                 Field('score', 'integer', \
                 label = T('score')),
+                Field('min_score', 'integer', \
+                label = T('min_score')),
                 Field('heading', 'text', \
                 label = T('heading')),
                 Field('footer', 'text', \

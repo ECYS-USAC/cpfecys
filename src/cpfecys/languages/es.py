@@ -514,6 +514,7 @@
 'Powered by': 'Este sitio usa',
 'Preface': 'Prefacio',
 'previous 100 rows': '100 filas anteriores',
+'Previous grading information':'Información de calificación previa',
 'Pro Bono': 'Ad honorem',
 'pro_bono': 'Ad Honorem',
 'Profile': 'Perfil',
