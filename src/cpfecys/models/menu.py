@@ -43,6 +43,9 @@ if auth.has_membership(role="Super-Administrator"):
              (T('Items Manager'), False, URL('admin', 'items_manager'), []),
              (T('Reports by status'), False, URL('admin', 'reports'), []),
              ]),
+         (T('System Configuration'), False, URL(),[
+             (T('Parameters configuration'), False, URL('admin', 'parameters'), []),
+             ]),
     ])
 if auth.has_membership(role="Teacher"):
     response.menu.extend([(T('Courses'), False, URL('teacher', 'courses'), []),

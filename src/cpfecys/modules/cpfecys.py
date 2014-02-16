@@ -137,6 +137,7 @@ def _database_setup():
         _log_type_setup()
         _projects_setup()
         _roles_setup()
+        _setup_parameters()
         db.setup.insert(done = True)
 
 def _roles_setup():
@@ -287,3 +288,12 @@ def _module_variables_setup():
     global first_period, second_period
     first_period = _db.period(name = first_period_name)
     second_period = _db.period(name = second_period_name)
+
+def _setup_parameters():
+    db = _db
+    db.custom_parameters.insert(min_score=65, rescore_max_count=2, \
+        rescore_max_days=7)
+
+def get_custom_parameters():
+    db = _db
+    return db(db.custom_parameters).select().first()

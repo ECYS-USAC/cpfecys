@@ -36,7 +36,7 @@
             
             <div class="control-group">
               <div class="controls">
-                {{if report.score_date == None:}}
+                {{if report.times_graded < parameters.rescore_max_count:}}
                 <div class="alert alert-info span8">
                   <label class="checkbox">
                     <input id="improve" name="improve" type="checkbox"> {{=T('Improve')}}
@@ -49,8 +49,9 @@
                 </div>
                 {{else:}}
                 <div class="alert alert-info span8">
-                      {{=T('This report has been already graded once, and resent to recheck, so \
-                      this grading is final.')}}
+                      <strong>{{=T('Times graded')}}: {{=parameters.rescore_max_count}}</strong>
+                      <p>{{=T('This report has been already graded max times, and resent to recheck, so \
+                      this grading is final.')}}</p>
                 </div>
                  {{pass}}
               </div>
@@ -77,7 +78,7 @@
       $('#score-error').hide('slow');
       $('#comment-error').hide('slow');
     }
-    else if(value < 61)
+    else if(value < {{=parameters.min_score}})
     {
       $('#label-status').attr('class', 'label label-important');
       $('#label-status').html('Reprobado');
@@ -100,7 +101,7 @@
       $('#score-error').show('slow');
       return false;
     }
-    if(value < 61)
+    if(value < {{=parameters.min_score}})
     {
       if(!comment)
       {

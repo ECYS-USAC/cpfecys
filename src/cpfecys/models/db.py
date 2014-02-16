@@ -250,6 +250,8 @@ db.define_table('report',
                 label=T('continued')),
                 Field('hours', 'integer', \
                 label=T('hours')),
+                Field('times_graded', 'integer', \
+                label = T('times_graded')),
                 Field('status', 'reference report_status', notnull=True, \
                 label = T('status')),
                 Field('teacher_comment', 'text', \
@@ -371,6 +373,15 @@ db.define_table('item',
                 Field('assignation', 'reference user_project', \
                     label = T('assignation')),
                 format='%(name)s'
+                )
+
+db.define_table('custom_parameters',
+                Field('min_score', 'integer', notnull=False, \
+                    label = T('min_score')),
+                Field('rescore_max_count', 'integer', notnull=False, \
+                    label = T('rescore_max_count')),
+                Field('rescore_max_days', 'integer', default='', notnull=False, \
+                    label = T('rescore_max_days')),
                 )
 import cpfecys
 cpfecys.setup(db, auth)

@@ -60,6 +60,7 @@ def report():
     cdate = datetime.datetime.now()
     report = request.vars['report']
     report = db.report(db.report.id == report)
+    parameters = cpfecys.get_custom_parameters()
     valid = not(report is None)
     next_date = None
 
@@ -71,13 +72,16 @@ def report():
                 and report.status.name != 'Draft'
         if valid:
             if report.score_date:
-                next_date = report.score_date + datetime.timedelta(days=7)
+                next_date = report.score_date + datetime.timedelta(
+                    days=parameters.rescore_max_days)
             response.view = 'teacher/report_view.html'
-            assignation_reports = db(db.report.assignation == report.assignation).select()
+            assignation_reports = db(db.report.assignation== \
+                report.assignation).select()
             return dict(
                 log_types=db(db.log_type.id > 0).select(),
                 assignation_reports = assignation_reports,
                 logs=db((db.log_entry.report == report.id)).select(),
+                parameters=parameters,
                 metrics=db((db.log_metrics.report == report.id)).select(),
                 anomalies=db((db.log_type.name == 'Anomaly')&
                            (db.log_entry.log_type == db.log_type.id)&
@@ -96,7 +100,7 @@ def report():
             if score != None:
                 score = int(score)
                 if request.vars['improve'] != None:
-                    if report.score_date!=None and \
+                    if report.times_graded >= parameters.rescore_max_count and \
                             report.status.name!='EnabledForTeacher':
                         session.flash = T('This report can\'t be sent to \
                             rechecked anymore')
@@ -108,18 +112,21 @@ def report():
                             score=score,
                             teacher_comment=comment,
                             status=db.report_status(name='Recheck'),
-                            score_date=cdate)
+                            score_date=cdate,
+                            times_graded=(report.times_graded or 0)+1)
                         session.flash = T('The report has been sent to recheck \
                             you will be notified via email when rechecked')
                         redirect(URL('teacher', 'report/view', \
                             vars=dict(report=report.id)))
                 else:
                     if score >= 0  and score <= 100:
+                        return report.times_graded|0
                         report.update_record(
                             score=score,
                             teacher_comment=comment,
                             status=db.report_status(name='Acceptance'),
-                            score_date=cdate)
+                            score_date=cdate,
+                            times_graded=(report.times_graded or 0)+1)
                         session.flash = T('The report has been scored \
                             successfully')
                         redirect(URL('teacher', 'report/view', \

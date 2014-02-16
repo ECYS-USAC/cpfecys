@@ -20,6 +20,12 @@ def projects():
 
 @auth.requires_login()
 @auth.requires_membership('Super-Administrator')
+def parameters():
+    grid = SQLFORM.grid(db.custom_parameters)
+    return dict(grid=grid)
+
+@auth.requires_login()
+@auth.requires_membership('Super-Administrator')
 def reports():
     response.view = 'admin/report_list.html'
     period_year = db(db.period_year).select()

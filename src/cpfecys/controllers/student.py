@@ -3,6 +3,8 @@
 @auth.requires_login()
 @auth.requires_membership('Student')
 def index():
+    import datetime
+    current_date = datetime.datetime.now().date()
     assignations = db((db.user_project.assigned_user == auth.user.id)&
                       (db.user_project.assigned_user == db.auth_user.id)&
                       (db.user_project.project == db.project.id)&
@@ -56,15 +58,22 @@ def index():
                     (db.item.assignation==assignation.user_project.id)&
                     (db.item.is_active==True))
 
-    import datetime
-    current_date = datetime.datetime.now().date()
+    def is_indate_range(report):
+        import datetime
+        current_date = datetime.datetime.now().date()
+        next_date = report.score_date + datetime.timedelta(
+                        days=cpfecys.get_custom_parameters().rescore_max_days)
+        return current_date < next_date
+
+    
     return dict(assignations = assignations,
                 available_reports = available_reports,
                 current_date = current_date,
                 cyear_period = cyear_period,
                 available_item_restriction = available_item_restriction,
                 items_instance = items_instance,
-                restriction_project_exception=restriction_project_exception)
+                restriction_project_exception=restriction_project_exception,
+                is_indate_range=is_indate_range)
 
 @auth.requires_login()
 @auth.requires_membership('Student')
@@ -554,6 +563,14 @@ def report():
             redirect(URL('student','index'))
         import datetime
         current_date = datetime.datetime.now()
+        if(report.status.name=='Recheck'):
+            import datetime
+            dated = datetime.datetime.now().date()
+            next_date = report.score_date + datetime.timedelta(
+                            days=cpfecys.get_custom_parameters().rescore_max_days)
+            if not(dated < next_date):
+                session.flash = T('Selected report can\'t be edited. Select a valid report.')
+                redirect(URL('student','index'))
         report.update_record(created = current_date,
                       status = db.report_status(name = 'Grading'))
         session.flash = T('Report sent to Grading.')
