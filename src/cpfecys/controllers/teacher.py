@@ -121,7 +121,6 @@ def report():
                             vars=dict(report=report.id)))
                 else:
                     if score >= 0  and score <= 100:
-                        return report.times_graded|0
                         report.update_record(
                             score=score,
                             min_score=cpfecys.get_custom_parameters().min_score,
