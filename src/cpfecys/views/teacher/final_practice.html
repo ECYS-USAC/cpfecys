@@ -35,7 +35,7 @@
         </div>
         <div id="r{{=item.id}}" class="accordion-body collapse">
             <div class="accordion-inner">
-                <table style="width:100%;">
+                <table class="table table-striped table-bordered" style="width:100%;">
                     <thead>
                         <tr>
                             <th>ID</th>
@@ -53,9 +53,7 @@
                             <td>{{=report.status['name']}}</td>
                             <td>{{=report.score or 0}}</td>
                             <td>
-                                <a class="btn" 
-                                {{if report.status.name=='Draft':}}disabled{{pass}}
-                                href="{{=URL('teacher', 'report/view', vars=dict(report=report.id))}}"> {{=T('Ver Reporte')}}</a>
+                                <a class="btn" href="{{=URL('teacher', 'report/view', vars=dict(report=report.id))}}"> {{=T('View Report')}}</a>
                             </td>
                         </tr>
                         {{pass}}
@@ -84,7 +82,7 @@
         </div>
         <div id="i{{=item.id}}" class="accordion-body collapse">
             <div class="accordion-inner">
-                <table style="width:100%;">
+                <table class="table table-striped table-bordered" style="width:100%;">
                     <thead>
                         <tr>
                             <th>Type</th>
