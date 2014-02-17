@@ -191,6 +191,14 @@
     }
   });
 </script>
+{{elif report.status.name == 'Draft':}}
+  <div class="row-fluid">
+    <div class="alert alert-info">
+      <p><strong>{{=T('This is a report preview, it can\'t be graded while \
+      the student works on it you\'ll be notified via mail when available to \
+      grade it')}}</strong></p>
+    </div>
+  </div>
 {{elif report.status.name == 'Recheck':}}
 <div class="row-fluid">
   <div class="alert alert-info">

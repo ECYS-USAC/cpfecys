@@ -68,8 +68,7 @@ def report():
         report = request.vars['report']
         report = db.report(db.report.id == report)
         valid = not(report is None)
-        if valid: valid = cpfecys.teacher_validation_report_access(report.id) \
-                and report.status.name != 'Draft'
+        if valid: valid = cpfecys.teacher_validation_report_access(report.id)
         if valid:
             if report.score_date:
                 next_date = report.score_date + datetime.timedelta(
