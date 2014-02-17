@@ -22,6 +22,47 @@ else:
     ## from google.appengine.api.memcache import Client
     ## session.connect(request, response, db = MEMDB(Client()))
 
+# Improvement over web2py core
+import gluon.globals
+def zip(self, request, files, db, chunk_size=gluon.globals.DEFAULT_CHUNK_SIZE, attachment=True):
+    """
+    example of usage in controller::
+        def zip():
+            return response.zip(request, files, db)
+    downloads from http://..../zip/filename
+    """
+    if not files:
+        raise HTTP(404)
+    import zipfile
+    import os
+    import re
+    #print request.args[-1]
+    dst = os.path.join(request.folder,'private',request.args[-1])
+    #print dst
+    zf = zipfile.ZipFile(dst, "w")
+    for name in files:
+        items = re.compile('(?P<table>.*?)\.(?P<field>.*?)\..*')\
+          .match(name)
+        if not items:
+            raise HTTP(404)
+        (t, f) = (items.group('table'), items.group('field'))
+        try:
+            field = db[t][f]
+        except AttributeError:
+            raise HTTP(404)
+        try:
+            (filename, stream) = field.retrieve(name)
+            stream.close()
+            #print filename
+            #print stream.name
+            zf.write(stream.name, filename)
+        except IOError:
+            raise HTTP(404)
+    zf.close()
+    return self.stream(open(dst, 'rb'), chunk_size=chunk_size, request=request)
+
+gluon.globals.Response.zip = zip
+
 #Some weird web2py bug fixed here to avoid overwritting code in core
 from gluon.dal import BaseAdapter
 def ADD(self, first, second):

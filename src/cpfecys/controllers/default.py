@@ -113,3 +113,7 @@ def data():
       LOAD('default','data.load',args='tables',ajax=True,user_signature=True)
     """
     return dict(form=crud())
+
+def zip():
+    files = ['item.uploaded_file.bd4592bbb798c7c6.3235363035372e706466.pdf']
+    return response.zip(request, files, db)
