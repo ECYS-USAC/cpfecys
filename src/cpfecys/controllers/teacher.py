@@ -8,6 +8,11 @@ def index():
 @auth.requires_login()
 @auth.requires_membership('Teacher')
 def final_practice():
+    def get_items():
+        restrictions = db((db.item_restriction.id== \
+            db.item_restriction_exception.item_restriction)& \
+            (db.item_restriction_exception.project==final_practice.project.id) \
+            ).select(db.item_restriction.ALL)
     assignation = request.vars['assignation']
     if not assignation: redirect(URL('courses'))
     final_practice = db((db.user_project.id == assignation)&
@@ -23,6 +28,7 @@ def final_practice():
                         (db.period_year.id < \
                             (final_practice.user_project.period + \
                             final_practice.user_project.periods))).select()
+
     items = db((db.item.created==cpfecys.current_year_period())& \
                         (db.item.assignation==final_practice.user_project.id) \
                         ).select()
@@ -37,7 +43,8 @@ def final_practice():
                 reports=reports,
                 reports_avg=avg,
                 items=items,
-                total_items=total_items)
+                total_items=total_items,
+                get_items=get_items)
 
 @cache.action()
 @auth.requires_login()

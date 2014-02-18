@@ -48,10 +48,11 @@ def index():
                     user_project.project.area_level.id)&
                 (db.item_restriction.item_type!=2))
 
-    def restriction_project_exception(item_restriction, assignation):
+    def restriction_project_exception(item_restriction_id, assignation_id):
         return db((db.item_restriction_exception.project== \
-                    assignation.project.id)&
-                    (db.item_restriction.id==item_restriction))
+                    assignation_id)&
+                    (db.item_restriction_exception.item_restriction \
+                        ==item_restriction_id))
 
     def items_instance(item_restriction, assignation):
         return db((db.item.item_restriction==item_restriction.id)&
