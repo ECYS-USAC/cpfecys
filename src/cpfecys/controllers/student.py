@@ -578,9 +578,9 @@ def report():
         # Notification Message
         me_the_user = db.auth_user(db.auth_user.id == auth.user.id)
         message = '<html>' + T('The report') + ' ' \
-        + '<b>' + report.report_restriction['name'] + '</b><br/>' \
-        + T('sent by student: ') + me_the_user.username + ' ' \
-        + me_the_user.first_name + ' ' + me_the_user.last_name \
+        + '<b>' + XML(report.report_restriction['name']) + '</b><br/>' \
+        + T('sent by student: ') + XML(me_the_user.username) + ' ' \
+        + XML(me_the_user.first_name) + ' ' + XML(me_the_user.last_name) \
         + '<br/>' \
         + T('was sent to be checked.') + '<br/>' + T('Checking can be done in:') \
         + ' http://omnomyumi.com/dtt/' + '</html>'
