@@ -8,11 +8,17 @@ def index():
 @auth.requires_login()
 @auth.requires_membership('Teacher')
 def final_practice():
-    def get_items():
+    def get_items(period, assignation):
         restrictions = db((db.item_restriction.id== \
             db.item_restriction_exception.item_restriction)& \
             (db.item_restriction_exception.project==final_practice.project.id) \
             ).select(db.item_restriction.ALL)
+        items = db((db.item.created==period.id)&
+            (db.item.assignation==assignation.id)&
+            (~db.item.item_restriction.belongs(restrictions)))
+        return items.select(db.item.ALL)
+
+        
     assignation = request.vars['assignation']
     if not assignation: redirect(URL('courses'))
     final_practice = db((db.user_project.id == assignation)&

@@ -92,7 +92,7 @@
                         </tr>
                     </thead>
                     <tbody>
-                        {{for item in items:}}
+                        {{for item in get_items(period, final_practice.user_project):}}
                         <tr>
                             <td>
                                 {{=item.item_restriction.item_type.name}}
