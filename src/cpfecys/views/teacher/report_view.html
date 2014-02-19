@@ -21,6 +21,7 @@
               <div class="controls">
                 <input class="span3" type="text" id="score" name="score" placeholder="{{=T('Score')}}">
                 <span id="label-status" class="label">{{=T('Not graded')}}</span>
+                <span class="label label-info">{{=T('Minimum value to aprove')}}: {{=parameters.min_score}}</span>
                 <div id="score-error" class="alert alert-error input-xlarge" hidden>
                   {{=T('Please use only numeric values from zero to one hundred to score this report.')}}
                 </div>
@@ -144,7 +145,7 @@
     if(isNaN(value) || value < 0 || value > 100)
     {
       $('#label-status').attr('class', 'label label');
-      $('#label-status').html('Valor no válido');
+      $('#label-status').html('No calificado');
       $('#score-error').hide('slow');
       $('#comment-error').hide('slow');
     }
@@ -153,6 +154,12 @@
       $('#label-status').attr('class', 'label label-important');
       $('#label-status').html('Reprobado');
       $('#revision-alert').show('slow');
+    }
+    else if (value == {{=parameters.min_score}})
+    {
+      $('#label-status').attr('class', 'label label-warning');
+      $('#label-status').html('Aprobado con nota mínima');
+      $('#revision-alert').hide('slow');
     }
     else
     {
