@@ -434,3 +434,5 @@ cpfecys.force_student_data_update(request.env.path_info,
 
 ## after defining tables, uncomment below to enable auditing
     # auth.enable_record_versioning(db)
+# automatic forcing spanish language
+T.force('es')
