@@ -575,6 +575,34 @@ def report():
         report.update_record(created = current_date,
                       status = db.report_status(name = 'Grading'))
         session.flash = T('Report sent to Grading.')
+        # Notification Message
+        me_the_user = db.auth_user(db.auth_user.id == auth.user.id)
+        message = '<html>' + T('The report') + ' ' \
+        + '<b>' + XML(report.report_restriction['name']) + '</b><br/>' \
+        + T('sent by student: ') + XML(me_the_user.username) + ' ' \
+        + XML(me_the_user.first_name) + ' ' + XML(me_the_user.last_name) \
+        + '<br/>' \
+        + T('was sent to be checked.') + '<br/>' + T('Checking can be done in:') \
+        + ' http://omnomyumi.com/dtt/' + '</html>'
+        # send mail to teacher and student notifying change.
+        mails = []
+        # retrieve teacher's email
+        teachers = db((db.project.id == assign.project)&
+                      (db.user_project.project == db.project.id)&
+                      (db.user_project.assigned_user == db.auth_user.id)&
+                      (db.auth_membership.user_id == db.auth_user.id)&
+                      (db.auth_membership.group_id == db.auth_group.id)&
+                      (db.auth_group.role == 'Teacher')).select()
+        for teacher in teachers:
+            mails.append(teacher.auth_user.email)
+        # retrieve student's email
+        student_mail = me_the_user.email
+        mails.append(student_mail)
+        mail.send(to=mails,
+                  subject=T('[DTT]Automatic Notification - Report ready to be checked.'),
+                  # If reply_to is omitted, then mail.settings.sender is used
+                  reply_to = student_mail,
+                  message=message)
         redirect(URL('student','index'))
     elif (request.args(0) == 'view'):
         #Get the report id

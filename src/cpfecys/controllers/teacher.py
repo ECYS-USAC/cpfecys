@@ -129,6 +129,37 @@ def report():
                             times_graded=(report.times_graded or 0)+1)
                         session.flash = T('The report has been sent to recheck \
                             you will be notified via email when rechecked')
+                        # Notification Message
+                        me_the_user = db.auth_user(db.auth_user.id == auth.user.id)
+                        row = db.user_project(db.user_project.id == report.assignation)
+                        message = '<html>' + T('The report') + ' ' \
+                        + '<b>' + XML(report.report_restriction['name']) + '</b><br/>' \
+                        + T('sent by student: ') + XML(row.assigned_user['username']) + ' ' \
+                        + XML(row.assigned_user['first_name']) + ' ' + XML(row.assigned_user['last_name']) \
+                        + '<br/>' \
+                        + T('Score: ') + XML(report.score) + ' ' \
+                        + '<br/>' \
+                        + T('Scored by: ') + XML(me_the_user.username) + ' ' \
+                        + XML(me_the_user.first_name) + ' ' + XML(me_the_user.last_name) \
+                        + '<br/>' \
+                        + T('Comment: ') + XML(comment) + ' ' \
+                        + '<br/>' \
+                        + T('Was checked, but sent back to be fixed.') + '<br/>' \
+                        + T('Fix the report on:') \
+                        + ' http://omnomyumi.com/dtt/' + '</html>'
+                        # send mail to teacher and student notifying change.
+                        mails = []
+                        # retrieve teacher's email
+                        teacher = me_the_user.email
+                        mails.append(teacher)
+                        # retrieve student's email
+                        student_mail = row.assigned_user['email']
+                        mails.append(student_mail)
+                        mail.send(to=mails,
+                                  subject=T('[DTT]Automatic Notification - Report needs improvement.'),
+                                  # If reply_to is omitted, then mail.settings.sender is used
+                                  reply_to = teacher,
+                                  message=message)
                         redirect(URL('teacher', 'report/view', \
                             vars=dict(report=report.id)))
                 else:
@@ -142,6 +173,37 @@ def report():
                             times_graded=(report.times_graded or 0)+1)
                         session.flash = T('The report has been scored \
                             successfully')
+                        # Notification Message
+                        me_the_user = db.auth_user(db.auth_user.id == auth.user.id)
+                        row = db.user_project(db.user_project.id == report.assignation)
+                        message = '<html>' + T('The report') + ' ' \
+                        + '<b>' + XML(report.report_restriction['name']) + '</b><br/>' \
+                        + T('sent by student: ') + XML(row.assigned_user['username']) + ' ' \
+                        + XML(row.assigned_user['first_name']) + ' ' + XML(row.assigned_user['last_name']) \
+                        + '<br/>' \
+                        + T('Score: ') + XML(report.score) + ' ' \
+                        + '<br/>' \
+                        + T('Scored by: ') + XML(me_the_user.username) + ' ' \
+                        + XML(me_the_user.first_name) + ' ' + XML(me_the_user.last_name) \
+                        + '<br/>' \
+                        + T('Comment: ') + XML(comment) + ' ' \
+                        + '<br/>' \
+                        + T('Was checked. No further actions are needed.') + '<br/>' \
+                        + T('DTT-ECYS') \
+                        + ' http://omnomyumi.com/dtt/' + '</html>'
+                        # send mail to teacher and student notifying change.
+                        mails = []
+                        # retrieve teacher's email
+                        teacher = me_the_user.email
+                        mails.append(teacher)
+                        # retrieve student's email
+                        student_mail = row.assigned_user['email']
+                        mails.append(student_mail)
+                        mail.send(to=mails,
+                                  subject=T('[DTT]Automatic Notification - Report Done.'),
+                                  # If reply_to is omitted, then mail.settings.sender is used
+                                  reply_to = teacher,
+                                  message=message)
                         redirect(URL('teacher', 'report/view', \
                             vars=dict(report=report.id)))
 

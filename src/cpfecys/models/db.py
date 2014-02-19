@@ -114,9 +114,9 @@ auth.define_tables(username=True, signature=False, migrate=True)
 
 ## configure email
 mail = auth.settings.mailer
-mail.settings.server = 'logging' or 'smtp.gmail.com:587'
-mail.settings.sender = 'you@gmail.com'
-mail.settings.login = 'username:password'
+mail.settings.server = 'smtp.gmail.com:587'
+mail.settings.sender = 'dtt.ecys@gmail.com'
+mail.settings.login = 'dtt.ecys@gmail.com:supercontrase;a'
 
 ## configure auth policy
 auth.settings.registration_requires_verification = False
@@ -187,7 +187,7 @@ db.define_table('user_project',
                 Field('period', 'reference period_year', label = T('period')),
                 Field('pro_bono', 'boolean', length=255, notnull=False, \
                     label = T('pro_bono')),
-                Field ('periods', 'integer', notnull=False, \
+                Field ('periods', 'integer', notnull=True, \
                     label = T('periods')))
 
 # This are the tables that store important links and uploaded
@@ -434,3 +434,5 @@ cpfecys.force_student_data_update(request.env.path_info,
 
 ## after defining tables, uncomment below to enable auditing
     # auth.enable_record_versioning(db)
+# automatic forcing spanish language
+T.force('es')
