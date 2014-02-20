@@ -26,7 +26,46 @@ def parameters():
 
 @auth.requires_login()
 @auth.requires_membership('Super-Administrator')
-def reports():
+def report():
+    import datetime
+    cdate = datetime.datetime.now()
+    report = request.vars['report']
+    report = db.report(db.report.id == report)
+    parameters = cpfecys.get_custom_parameters()
+    valid = not(report is None)
+    next_date = None
+
+    if (request.args(0) == 'view'):
+        report = request.vars['report']
+        report = db.report(db.report.id == report)
+        valid = not(report is None)
+        if valid:
+            if report.score_date:
+                next_date = report.score_date + datetime.timedelta(
+                    days=parameters.rescore_max_days)
+            response.view = 'admin/report_view.html'
+            assignation_reports = db(db.report.assignation== \
+                report.assignation).select()
+            return dict(
+                log_types=db(db.log_type.id > 0).select(),
+                assignation_reports = assignation_reports,
+                logs=db((db.log_entry.report == report.id)).select(),
+                parameters=parameters,
+                metrics=db((db.log_metrics.report == report.id)).select(),
+                anomalies=db((db.log_type.name == 'Anomaly')&
+                           (db.log_entry.log_type == db.log_type.id)&
+                           (db.log_entry.report == report.id)).count(),
+                markmin_settings=cpfecys.get_markmin,
+                report=report,
+                next_date=next_date)
+        else:
+            session.flash = T('Selected report can\'t be viewed. \
+                                Select a valid report.')
+            redirect(URL('teacher', 'index'))
+
+@auth.requires_login()
+@auth.requires_membership('Super-Administrator')
+def report_list():
     response.view = 'admin/report_list.html'
     period_year = db(db.period_year).select()
 
@@ -40,7 +79,7 @@ def reports():
 
 @auth.requires_login()
 @auth.requires_membership('Super-Administrator')
-def report_view():
+def report_filter():
     status = request.vars['status']
     period = request.vars['period']
     valid = status and period
