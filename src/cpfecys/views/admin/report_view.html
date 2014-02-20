@@ -33,40 +33,54 @@
 						{{=T('Metric logs')}}
 					</th>
 					<th>
+						{{=T('Hours')}}
+					</th>
+					<th>
+						{{=T('Pending Hours')}}
+					</th>
+					<th>
 						{{=T('Actions')}}
 					</th>
 				</tr>
 			</thead>
 			<tbody>
-				{{for report_set in reports:}}
+				{{for report in reports:}}
+				{{hours_left = 400}}
+				{{hours_left = hours_left - (report.hours or 0)}}
 				<tr>
 					<td>
-						{{=report_set.report.assignation.project.name}}	
+						{{=report.assignation.project.name}}	
 					</td>
 					<td>
-						{{=report_set.report.created}}	
+						{{=report.created}}	
 					</td>
 					<td>
-						{{=report_set.report.assignation.assigned_user.username}}	
+						{{=report.assignation.assigned_user.username}}	
 					</td>
 					<td>
-						{{=report_set.report.assignation.assigned_user.first_name}}
-						{{=report_set.report.assignation.assigned_user.last_name}}
+						{{=report.assignation.assigned_user.first_name}}
+						{{=report.assignation.assigned_user.last_name}}
 					</td>
 					<td>
-						{{=report_set.report.report_restriction.name}}	
+						{{=report.report_restriction.name}}	
 					</td>
 					<td>
-						{{=report_set.report.score}}	
+						{{=report.score or 0}}	
 					</td>
 					<td>
-						{{=T(report_set.report.status.name)}}
+						{{=T(report.status.name)}}
 					</td>
 					<td>
-						{{=report_set['COUNT(log_entry.id)']}}
+						{{=count_log_entries(report)[0]['COUNT(log_entry.id)']}}
 					</td>
 					<td>
-						{{=report_set['COUNT(log_metrics.id)']}}
+						{{=count_metrics_report(report)[0]['COUNT(log_metrics.id)']}}
+					</td>
+					<td>
+						{{=report.hours or 0}}
+					</td>
+					<td>
+						{{=hours_left}}
 					</td>
 					<td>
 						<a class="" href="">

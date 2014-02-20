@@ -40,25 +40,32 @@ def reports():
 
 @auth.requires_login()
 @auth.requires_membership('Super-Administrator')
-def reports_view():
+def report_view():
     status = request.vars['status']
     period = request.vars['period']
     valid = status and period
+    def count_log_entries(report):
+        log_entries = db((db.log_entry.report== \
+            report.id)).select(db.log_entry.id.count())
+        return log_entries
+    def count_metrics_report(report):
+        log_metrics = db((db.log_metrics.report== \
+            report.id)).select(db.log_metrics.id.count())
+        return log_metrics
     if not valid:
         session.flash = T('Incomplete Information')
         redirect(URL('default', 'index'))
-    reports = db((db.report.period==period)&(db.report.status==status)&
-        (db.report.report_restriction==db.report_restriction.id)&
-        (db.log_entry.report==db.report.id)&
-        (db.log_metrics.report==db.report.id)
-        ).select(db.report.ALL, db.report_restriction.ALL, \
-        db.log_entry.id.count(), db.log_metrics.id.count())
-    return dict(reports=reports)
+    reports = db((db.report.period==period)&
+        (db.report.status==status)).select(db.report.ALL)
+    return dict(reports=reports,
+        count_log_entries=count_log_entries,
+        count_metrics_report=count_metrics_report,)
 
 @auth.requires_login()
 @auth.requires_membership('Super-Administrator')
 def links():
-    user = db(db.auth_membership.user_id == auth.user.id).select(db.auth_group.ALL)
+    user = db(db.auth_membership.user_id== \
+        auth.user.id).select(db.auth_group.ALL)
     grid = SQLFORM.smartgrid(db.link, linked_tables=['link_access'])
     return locals()
 
