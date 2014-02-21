@@ -263,6 +263,15 @@ db.define_table('report_restriction',
                     label = T('is_enabled')),
                 )
 
+db.define_table('report_requirement',
+                Field('name', 'string', label = T('name')),
+                format = '%(name)s')
+
+db.define_table('area_report_requirement',
+                Field('report_requirement', 'reference report_requirement', label = T('report requirement')),
+                Field('area_level', 'reference area_level', label = T('area level')),
+                format = '%(report_requirement)s %(area_level)s')
+
 db.define_table('report_status',
                 Field('name', 'string', notnull=True, label = T('name')),
                 Field('description', 'string', notnull=True), \

@@ -66,6 +66,7 @@ url = URL('report_hours/create', vars=dict(report = report.id)),
 title = T('Report Hours')) }}
 {{include 'include/report-hours-activity.html'}}
 <!-- Helpers for asking something before it happens and may be ireversible -->
+{{if minimal_requirements:}}
 {{inc_vars = dict(id = 'report-grading-check',
 title = T('Confirm') + ' ' + T('Send to Grading'),
 content = T('This operation can\'t be undone, do you want to continue?'),
@@ -73,6 +74,15 @@ action = T('Confirm'),
 _class = 'btn-primary',
 url = URL('student','report/acceptance', vars=dict(report = report.id)))}}
 {{include 'include/delete-helper.html'}}
+{{else:}}
+{{inc_vars = dict(id = 'report-grading-check',
+title = T('Can\'t Send to Grading'),
+    content = T('Not all mandatory blocks for your report are inserted. Please make sure you\'ve the following blocks:') + ' ' + mandatory_requirements,
+action = T('Send to Grading'),
+_class = 'btn-primary disabled',
+url = '#')}}
+{{include 'include/delete-helper.html'}}
+{{pass}}
 <!-- // Helpers for deletion -->
 <!-- Helpers end here -->
 <div class="row-fluid">
