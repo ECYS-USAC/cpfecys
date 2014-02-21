@@ -39,6 +39,9 @@
 						{{=T('Pending Hours')}}
 					</th>
 					<th>
+						{{=T('Anomalies')}}
+					</th>
+					<th>
 						{{=T('Actions')}}
 					</th>
 				</tr>
@@ -81,6 +84,9 @@
 					</td>
 					<td>
 						{{=hours_left}}
+					</td>
+					<td>
+						{{=count_anomalies(report)[0]['COUNT(log_entry.id)']}}
 					</td>
 					<td>
 						<a class="" href="{{=URL('admin','report/view', vars=dict(report=report.id))}}">

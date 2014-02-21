@@ -9,12 +9,24 @@
 <link rel="stylesheet" type="text/css" href="{{=URL('static','markitup')}}/sets/markmin/style.css"/>
 
 <p><a onclick="window.history.back()" class="btn" ><i class="icon-arrow-left"></i> Back</a></p>
-{{if report.status.name == 'Grading' or report.status.name == 'EnabledForTeacher':}}
 <div class="row-fluid">
       <div class="well span12">
         <h3>{{=T('Report Grading')}}</h3>
         <div id="grading-notification"></div>
-          <form class="form-horizontal" action="{{=URL('teacher', 'report/grade')}}">
+          <form class="form-horizontal" action="{{=URL('admin', 'report/grade')}}" method="POST">
+            <div class="control-group">
+              <label class="control-label" for="status-drop">{{=T('Status')}}</label>
+              <div class="controls">
+                <select name="status" id="status-drop">
+                  {{for status in status_list:}}
+                    <option value="{{=status.id}}"
+                    {{if status.id==report.status.id:}}selected{{pass}}>
+                    {{=T(status.name)}}
+                    </option>
+                  {{pass}}
+                </select>
+              </div>
+            </div>
             <div class="control-group">
               <input type="hidden" name="report" value="{{=report.id}}"/>
               <label class="control-label" for="score">{{=T('Score')}}</label>
@@ -39,7 +51,6 @@
 
             <div class="control-group">
               <div class="controls">
-                {{if report.times_graded < parameters.rescore_max_count:}}
                 <div class="alert alert-info span8">
                   <label class="checkbox">
                     <input id="improve" name="improve" type="checkbox"> {{=T('Improve')}}
@@ -48,7 +59,6 @@
                    if you want to use this feature you\'ll have to add a comment, so the student \
                    can know what to improve, the student will have a certain time to improve and  \
                    resend their report, you\'ll be notified via email when this happend.')}}
-                   {{ if report.times_graded > 0:}}
                     <h3>
                       {{=T('Previous grading information')}}:
                     </h3>
@@ -80,50 +90,9 @@
                         </tr>
                       </table>
                     </p>
-                 {{pass}}
                  </p>
 
                 </div>
-                {{else:}}
-                <div class="alert alert-info span8">
-                      <strong>{{=T('Times graded')}}: {{=parameters.rescore_max_count}}</strong>
-                      <p>{{=T('This report has been already graded max times, and resent to recheck, so \
-                      this grading is final.')}}
-                      {{ if report.times_graded > 0:}}
-                      <h3>
-                        {{=T('Previous grading information')}}:
-                      </h3>
-                      <p>
-                        <table class="table">
-                          <tr>
-                            <td>
-                              {{=T('Score')}}
-                            </td>
-                            <td>
-                              {{=report.score or 0}}
-                            </td>
-                          </tr>
-                          <tr>
-                            <td>
-                              {{=T('Comment')}}
-                            </td>
-                            <td>
-                              {{=report.teacher_comment or T('No comment')}}
-                            </td>
-                          </tr>
-                          <tr>
-                            <td>
-                              {{=T('Score date')}}
-                            </td>
-                            <td>
-                              {{=report.score_date}}
-                            </td>
-                          </tr>
-                        </table>
-                    </p>
-                 {{pass}}</p>
-                </div>
-                 {{pass}}
                  
               </div>
             </div>
@@ -173,7 +142,7 @@
     value = parseInt($('#score').val());
     comment = $('#comment').val()
     checked = $('#improve').is(':checked');
-    if(isNaN(value) || value < 0 || value > 100)
+    if(value < 0 || value > 100)
     {
       $('#score-error').show('slow');
       return false;
@@ -183,8 +152,6 @@
       if(!comment)
       {
         $('#score-error').hide('slow');
-        $('#comment-error').show('slow');
-        return false;
       }
     }
     else
@@ -198,95 +165,6 @@
     }
   });
 </script>
-{{elif report.status.name == 'Draft':}}
-  <div class="row-fluid">
-    <div class="alert alert-info">
-      <p><strong>{{=T('This is a report preview, it can\'t be graded while \
-      the student works on it you\'ll be notified via mail when available to \
-      grade it')}}</strong></p>
-    </div>
-  </div>
-{{elif report.status.name == 'Recheck':}}
-<div class="row-fluid">
-  <div class="alert alert-info">
-    <h2>{{=T('Report already graded and waiting for resend')}}</h2>
-    <p>
-      {{=T('This report has been graded, and is expected to be re-delivered before')}}
-      <strong>{{=next_date}}</strong> 
-      {{=T('an email will be sent to you when delivered.')}}
-    </p>
-    <h3>
-      {{=T('Grading information')}}:
-    </h3>
-    <p>
-      <table class="table">
-        <tr>
-          <td>
-            {{=T('Score')}}
-          </td>
-          <td>
-            {{=report.score or 0}}
-          </td>
-        </tr>
-        <tr>
-          <td>
-            {{=T('Comment')}}
-          </td>
-          <td>
-            {{=report.teacher_comment or T('No comment')}}
-          </td>
-        </tr>
-        <tr>
-          <td>
-            {{=T('Score date')}}
-          </td>
-          <td>
-            {{=report.score_date}}
-          </td>
-        </tr>
-      </table>
-    </p>
-  </div>
-</div>
-{{elif report.status.name == 'Acceptance':}}
-  <div class="alert alert-success">
-    <h2>{{=T('Report already graded')}}</h2>
-    <p>
-      {{=T('This report has been graded and can\'t be edited anymore')}}
-    </p>
-    <h3>
-      {{=T('Grading information')}}:
-    </h3>
-    <p>
-      <table class="table">
-        <tr>
-          <td>
-            {{=T('Score')}}
-          </td>
-          <td>
-            {{=report.score or 0}}
-          </td>
-        </tr>
-        <tr>
-          <td>
-            {{=T('Comment')}}
-          </td>
-          <td>
-            {{=report.teacher_comment or T('No comment')}}
-          </td>
-        </tr>
-        <tr>
-          <td>
-            {{=T('Score date')}}
-          </td>
-          <td>
-            {{=report.score_date}}
-          </td>
-        </tr>
-      </table>
-    </p>
-  </div>
-{{pass}}
 
 <div class="row-fluid">
   <div class="navbar">

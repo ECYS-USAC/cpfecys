@@ -34,7 +34,6 @@ def report():
     parameters = cpfecys.get_custom_parameters()
     valid = not(report is None)
     next_date = None
-
     if (request.args(0) == 'view'):
         report = request.vars['report']
         report = db.report(db.report.id == report)
@@ -57,11 +56,50 @@ def report():
                            (db.log_entry.report == report.id)).count(),
                 markmin_settings=cpfecys.get_markmin,
                 report=report,
-                next_date=next_date)
+                next_date=next_date,
+                status_list=db(db.report_status).select())
         else:
             session.flash = T('Selected report can\'t be viewed. \
                                 Select a valid report.')
-            redirect(URL('teacher', 'index'))
+            redirect(URL('admin', 'index'))
+    elif (request.args(0) == 'grade'):
+        if valid:
+            score = request.vars['score']
+            comment = request.vars['comment']
+            status = request.vars['status']
+            if score != '': score = int(score)
+            else: score = report.score
+            if comment == '': comment = report.teacher_comment
+            status =db.report_status(id=status)
+            if status.id != report.status:
+                report.update_record(
+                    score=score,
+                    min_score=cpfecys.get_custom_parameters().min_score,
+                    teacher_comment=comment,
+                    score_date=cdate,
+                    status=status.id,
+                    times_graded=(report.times_graded or 0)+1)
+                session.flash = T('The report has been scored \
+                    successfully')
+                redirect(URL('admin', 'report/view', \
+                    vars=dict(report=report.id)))
+            elif score >= 0  and score <= 100:
+                report.update_record(
+                    score=score,
+                    min_score=cpfecys.get_custom_parameters().min_score,
+                    teacher_comment=comment,
+                    score_date=cdate,
+                    status=db.report_status(name='Acceptance'),
+                    times_graded=(report.times_graded or 0)+1)
+                session.flash = T('The report has been scored \
+                    successfully')
+                redirect(URL('admin', 'report/view', \
+                    vars=dict(report=report.id)))
+                
+
+        session.flash = T('Selected report can\'t be viewed. \
+                            Select a valid report.')
+        redirect(URL('teacher', 'index'))
 
 @auth.requires_login()
 @auth.requires_membership('Super-Administrator')
@@ -91,6 +129,12 @@ def report_filter():
         log_metrics = db((db.log_metrics.report== \
             report.id)).select(db.log_metrics.id.count())
         return log_metrics
+    def count_anomalies(report):
+        log_entries = db((db.log_entry.report== \
+            report.id)&
+        (db.log_entry.log_type==db.log_type(name='Anomaly')) \
+        ).select(db.log_entry.id.count())
+        return log_entries
     if not valid:
         session.flash = T('Incomplete Information')
         redirect(URL('default', 'index'))
@@ -98,7 +142,8 @@ def report_filter():
         (db.report.status==status)).select(db.report.ALL)
     return dict(reports=reports,
         count_log_entries=count_log_entries,
-        count_metrics_report=count_metrics_report,)
+        count_metrics_report=count_metrics_report,
+        count_anomalies=count_anomalies)
 
 @auth.requires_login()
 @auth.requires_membership('Super-Administrator')
