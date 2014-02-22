@@ -535,7 +535,36 @@ def report():
         ## Markmin formatting of reports
         response.view = 'student/report_edit.html'
         assignation_reports = db(db.report.assignation == report.assignation).select()
+        #TODO check minimun requirements
+        reqs = db(db.area_report_requirement.area_level == report.assignation.project.area_level).select()
+        minimal_requirements = True
+        activities_count = db(db.log_entry.report == report.id).count()
+        metrics_count = db(db.log_metrics.report == report.id).count()
+        for req in reqs:
+            if (req.report_requirement.name == 'Encabezado') and (report.heading is None):
+                minimal_requirements = False
+                break
+            if (req.report_requirement.name == 'Pie de Reporte') and (report.footer is None):
+                minimal_requirements = False
+                break
+            if (req.report_requirement.name == 'Registrar Actividad') and (activities_count == 0):
+                minimal_requirements = False
+                break
+            if (req.report_requirement.name == 'Registrar Actividad con Metricas') and (metrics_count == 0):
+                minimal_requirements = False
+                break
+            if (req.report_requirement.name == 'Registrar Deserciones') and (report.desertion_started is None):
+                minimal_requirements = False
+                break
+            if (req.report_requirement.name == 'Registrar Horas Completadas') and (report.hours is None):
+                minimal_requirements = False
+                break
+        mandatory_requirements = ''
+        for req in reqs:
+            mandatory_requirements += req.report_requirement.name  + ', '
         return dict(log_types = db(db.log_type.id > 0).select(),
+                    mandatory_requirements = mandatory_requirements,
+                    minimal_requirements = minimal_requirements,
                     assignation_reports = assignation_reports,
                     logs = db((db.log_entry.report == report.id)).select(),
                     metrics = db((db.log_metrics.report == report.id)).select(),
@@ -549,6 +578,33 @@ def report():
         #get the data & save the report
         report = request.vars['report']
         report = db.report(db.report.id == report)
+        # TODO Check minimun requirements
+        reqs = db(db.area_report_requirement.area_level == report.assignation.project.area_level).select()
+        minimal_requirements = True
+        activities_count = db(db.log_entry.report == report.id).count()
+        metrics_count = db(db.log_metrics.report == report.id).count()
+        for req in reqs:
+            if (req.report_requirement.name == 'Encabezado') and (report.heading is None):
+                minimal_requirements = False
+                break
+            if (req.report_requirement.name == 'Pie de Reporte') and (report.footer is None):
+                minimal_requirements = False
+                break
+            if (req.report_requirement.name == 'Registrar Actividad') and (activities_count == 0):
+                minimal_requirements = False
+                break
+            if (req.report_requirement.name == 'Registrar Actividad con Metricas') and (metrics_count == 0):
+                minimal_requirements = False
+                break
+            if (req.report_requirement.name == 'Registrar Deserciones') and (report.desertion_started is None):
+                minimal_requirements = False
+                break
+            if (req.report_requirement.name == 'Registrar Horas Completadas') and (report.hours is None):
+                minimal_requirements = False
+                break
+        if not minimal_requirements:
+            session.flash = T('Selected report can\'t be accepted, it lacks mandatory blocks.')
+            redirect(URL('student','index'))
         # Validate DB report_restriction to obey TIMING rules
         valid_rep_restr = cpfecys.student_validation_report_restrictions(report.report_restriction.id)
         ## Validate that the report status is editable (it is either 'Draft' or 'Recheck')

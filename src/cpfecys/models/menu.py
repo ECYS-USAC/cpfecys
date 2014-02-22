@@ -39,6 +39,7 @@ if auth.has_membership(role="Super-Administrator"):
              (T('Notifications Manager'), False, URL('admin', 'notifications_manager'), []),
              ]),
          (T('Reports Administration'), False, URL(),[
+             (T('Report Mandatory Blocks'), False, URL('admin', 'report_requirements'), []),
              (T('Reports and Restrictions'), False, URL('admin', 'report_restrictions'), []),
              (T('Items Manager'), False, URL('admin', 'items_manager'), []),
              (T('Reports by status'), False, URL('admin', 'report_list'), []),

@@ -138,7 +138,52 @@ def _database_setup():
         _projects_setup()
         _roles_setup()
         _setup_parameters()
+        _report_requirements()
         db.setup.insert(done = True)
+
+def _report_requirements():
+    db = _db
+    #default requirements
+    heading = db.report_requirement.insert(name = 'Encabezado')
+    footer = db.report_requirement.insert(name = 'Pie de Reporte')
+    activity = db.report_requirement.insert(name = 'Registrar Actividad')
+    metrics = db.report_requirement.insert(name = 'Registrar Actividad con Metricas')
+    desertions = db.report_requirement.insert(name = 'Registrar Deserciones')
+    hours = db.report_requirement.insert(name = 'Registrar Horas Completadas')
+    #levels
+    lvl_1 = db.area_level(name = "DTT Tutor Académico")
+    lvl_2 = db.area_level(name = "DTT Tutor de Comunicación")
+    lvl_3 = db.area_level(name = "DTT Tutor de Desarrollo")
+    lvl_4 = db.area_level(name = "DTT Tutor de Innovación")
+    lvl_5 = db.area_level(name = "DTT Tutor de Investigación")
+    lvl_6 = db.area_level(name = "DTT Tutor de Infraestructura")
+    #area_report_requirement
+    db.area_report_requirement.insert(report_requirement = heading, area_level = lvl_1)
+    db.area_report_requirement.insert(report_requirement = heading, area_level = lvl_2)
+    db.area_report_requirement.insert(report_requirement = heading, area_level = lvl_3)
+    db.area_report_requirement.insert(report_requirement = heading, area_level = lvl_4)
+    db.area_report_requirement.insert(report_requirement = heading, area_level = lvl_5)
+    db.area_report_requirement.insert(report_requirement = heading, area_level = lvl_6)
+    db.area_report_requirement.insert(report_requirement = footer, area_level = lvl_1)
+    db.area_report_requirement.insert(report_requirement = footer, area_level = lvl_2)
+    db.area_report_requirement.insert(report_requirement = footer, area_level = lvl_3)
+    db.area_report_requirement.insert(report_requirement = footer, area_level = lvl_4)
+    db.area_report_requirement.insert(report_requirement = footer, area_level = lvl_5)
+    db.area_report_requirement.insert(report_requirement = footer, area_level = lvl_6)
+    db.area_report_requirement.insert(report_requirement = activity, area_level = lvl_1)
+    db.area_report_requirement.insert(report_requirement = activity, area_level = lvl_2)
+    db.area_report_requirement.insert(report_requirement = activity, area_level = lvl_3)
+    db.area_report_requirement.insert(report_requirement = activity, area_level = lvl_4)
+    db.area_report_requirement.insert(report_requirement = activity, area_level = lvl_5)
+    db.area_report_requirement.insert(report_requirement = activity, area_level = lvl_6)
+    db.area_report_requirement.insert(report_requirement = metrics, area_level = lvl_1)
+    db.area_report_requirement.insert(report_requirement = desertions, area_level = lvl_1)
+    db.area_report_requirement.insert(report_requirement = hours, area_level = lvl_2)
+    db.area_report_requirement.insert(report_requirement = hours, area_level = lvl_3)
+    db.area_report_requirement.insert(report_requirement = hours, area_level = lvl_4)
+    db.area_report_requirement.insert(report_requirement = hours, area_level = lvl_5)
+    db.area_report_requirement.insert(report_requirement = hours, area_level = lvl_6)
+    return
 
 def _roles_setup():
     db = _db

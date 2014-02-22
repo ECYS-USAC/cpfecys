@@ -8,6 +8,12 @@ def periods():
 
 @auth.requires_login()
 @auth.requires_membership('Super-Administrator')
+def report_requirements():
+    grid = SQLFORM.grid(db.area_report_requirement)
+    return locals()
+
+@auth.requires_login()
+@auth.requires_membership('Super-Administrator')
 def report_restrictions():
     grid = SQLFORM.grid(db.report_restriction)
     return locals()
