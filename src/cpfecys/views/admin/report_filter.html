@@ -42,6 +42,12 @@
 						{{=T('Anomalies')}}
 					</th>
 					<th>
+						{{=T('Started')}}
+					</th>
+					<th>
+						{{=T('Ends')}}
+					</th>
+					<th>
 						{{=T('Actions')}}
 					</th>
 				</tr>
@@ -87,6 +93,12 @@
 					</td>
 					<td>
 						{{=count_anomalies(report)[0]['COUNT(log_entry.id)']}}
+					</td>
+					<td>
+						{{=report.assignation.period.yearp}} - {{=report.assignation.period.period.name}}
+					</td>
+					<td>
+						{{=calculate_ending_date(report)}}
 					</td>
 					<td>
 						<a class="" href="{{=URL('admin','report/view', vars=dict(report=report.id))}}">

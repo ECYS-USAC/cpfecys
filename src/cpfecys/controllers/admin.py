@@ -135,6 +135,22 @@ def report_filter():
         (db.log_entry.log_type==db.log_type(name='Anomaly')) \
         ).select(db.log_entry.id.count())
         return log_entries
+    def calculate_ending_date(report):
+        from datetime import date, datetime, timedelta
+        someday = date.today()
+        otherday = someday + timedelta(days=8)
+        date = datetime.strptime(str(report.assignation.period.yearp) + \
+                '-01-01', "%Y-%m-%d")
+        date += timedelta(days=(30*6)*report.assignation.periods)
+        semester =''
+        if report.assignation.period.period.id == 1:
+
+            if report.assignation.periods % 2 == 0:
+                semester = T('Second semester')
+        else:
+            if report.assignation.periods % 2 == 0:
+                semester = T('First semester')
+        return str(date.year) + '-' + str(semester)
     if not valid:
         session.flash = T('Incomplete Information')
         redirect(URL('default', 'index'))
@@ -143,7 +159,8 @@ def report_filter():
     return dict(reports=reports,
         count_log_entries=count_log_entries,
         count_metrics_report=count_metrics_report,
-        count_anomalies=count_anomalies)
+        count_anomalies=count_anomalies,
+        calculate_ending_date=calculate_ending_date)
 
 @auth.requires_login()
 @auth.requires_membership('Super-Administrator')
