@@ -274,7 +274,18 @@ def items_manager():
 @auth.requires_login()
 @auth.requires_membership('Super-Administrator')
 def manage_items():
-    return dict()
+    if (request.args(0) == 'periods'):
+        response.view = 'admin/manage_items_periods.html'
+        periods = db(db.period_year).select()
+        return dict(periods=periods)
+    elif (request.args(0) == 'area'):
+        period = request.vars['period']
+        areas = db(db.area_level).select()
+        response.view = 'admin/manage_items_areas.html'
+        return dict(areas=areas,
+            period=period)
+    else:
+        return 'foo'
 
 @auth.requires_login()
 @auth.requires_membership('Super-Administrator')

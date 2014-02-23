@@ -1,5 +1,5 @@
 {{extend 'template.html'}}
-<h1>{{=T('Anomalies per periods')}}</h1>
+<h1>{{=T('Items management')}}</h1>
 <div class="row-fluid">
     <div class="well span12">
     	<a onclick="window.history.back()" class="btn" ><i class="icon-arrow-left"></i>{{=T('Back')}}</a>
@@ -26,7 +26,7 @@
 						{{=period.yearp}}
 					</td>
 					<td>
-						<a class="btn" href="{{=URL('admin', 'anomalies_list/view', \
+						<a class="btn" href="{{=URL('admin', 'manage_items/area', \
 						 vars=dict(period=period.id))}}"><i class="icon-eye-open"></i>{{=T('View')}}</a>
 					</td>
 				</tr>
