@@ -76,12 +76,13 @@ def report():
     parameters = cpfecys.get_custom_parameters()
     valid = not(report is None)
     next_date = None
+    if valid: 
+        valid = cpfecys.teacher_validation_report_access(report.id)
 
     if (request.args(0) == 'view'):
         report = request.vars['report']
         report = db.report(db.report.id == report)
         valid = not(report is None)
-        if valid: valid = cpfecys.teacher_validation_report_access(report.id)
         if valid:
             if report.score_date:
                 next_date = report.score_date + datetime.timedelta(

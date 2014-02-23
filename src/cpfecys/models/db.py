@@ -316,7 +316,7 @@ db.define_table('report',
 
 db.define_table('log_type',
                 Field('name', 'string', notnull=True, label = T('name')),
-                format='%(entry_date)s'
+                format='%(name)s'
                 )
 
 db.define_table('log_entry',
@@ -333,7 +333,7 @@ db.define_table('log_entry',
 
 db.define_table('metrics_type',
                 Field('name', 'string', notnull=True, label = T('name')),
-                format='%(entry_date)s'
+                format='%(name)s'
                 )
 
 db.define_table('log_metrics',

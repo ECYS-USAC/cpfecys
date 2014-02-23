@@ -1,0 +1,44 @@
+{{extend 'template.html'}}
+<div class="row-fluid">
+    <div class="well span12">
+    	<a onclick="window.history.back()" class="btn" ><i class="icon-arrow-left"></i>{{=T('Back')}}</a>
+		<table class="table table-striped table-bordered">
+			<tr>
+				<th>
+					{{=T('Project name')}}
+				</th>
+				<th>
+					{{=T('Anomalies')}}
+				</th>
+				<th>
+					{{=T('Month')}}
+				</th>
+				<th>
+					{{=T('View')}}
+				</th>
+			</tr>
+			<tbody>
+				{{for anomaly in anomalies:}}
+				<tr>
+					
+					<td>
+						{{=anomaly.project.name}}
+					</td>
+					<td>
+						{{=anomaly['COUNT(log_entry.id)']}}
+					</td>
+					<td>
+						{{=T(get_month_name(anomaly.log_entry.entry_date))}}
+					</td>
+					<td>
+						<a class="btn" href="{{=URL('admin', 'anomalies_list/show', \
+						vars=dict(project=anomaly.project.id, period=period))}}">
+						<i class="icon-eye-open"></i> {{=T('View')}}</a>
+					</td>
+				</tr>
+				{{pass}}
+			</tbody>
+		</table>
+	</div>
+</div>
+

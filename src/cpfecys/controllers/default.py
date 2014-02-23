@@ -30,7 +30,8 @@ def index():
             ).select(db.front_notification.ALL) 
     else:
         front_notification = db(db.front_notification.is_public == True).select()
-    return dict(front_notification=front_notification)
+    return dict(front_notification=front_notification,
+        markmin_settings = cpfecys.get_markmin,)
 
 def links():
     """ This url shows all important links published by admin

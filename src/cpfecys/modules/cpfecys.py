@@ -323,11 +323,17 @@ def _item_type_setup():
 def _report_status_setup():
     db = _db
     ## Report Status Types
-    db.report_status.insert(name="Draft", description="", icon="icon-pencil")
-    db.report_status.insert(name="Grading", description="", icon="icon-inbox")
-    db.report_status.insert(name="Recheck", description="", icon="icon-time")
-    db.report_status.insert(name="Acceptance", description="", icon="icon-ok")
-    db.report_status.insert(name="EnabledForTeacher", description="", icon="icon-repeat")
+    db.report_status.insert(name="Draft", \
+        description="Student is working on report, can be viewed by teacher \
+        but can't be graded", icon="icon-pencil")
+    db.report_status.insert(name="Grading", description="Report is ready \
+        to be graded by teacher", icon="icon-inbox")
+    db.report_status.insert(name="Recheck", description="Report has been sent \
+        to be improved by student", icon="icon-time")
+    db.report_status.insert(name="Acceptance", description="This report has \
+        been already graded", icon="icon-edit")
+    db.report_status.insert(name="EnabledForTeacher", description="This report \
+        has been reactivated for teacher to grade", icon="icon-repeat")
 
 def _module_variables_setup():
     global first_period, second_period

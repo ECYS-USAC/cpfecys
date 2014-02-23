@@ -1,0 +1,50 @@
+{{extend 'template.html'}}
+<div class="row-fluid">
+    <div class="well span12">
+    	<a onclick="window.history.back()" class="btn" ><i class="icon-arrow-left"></i>{{=T('Back')}}</a>
+    	<table class="table table-bordered ">
+    		<thead>
+    			<tr>
+    				<th width="120px">
+    					{{=T('Date')}}
+    				</th>
+    				<th>
+    					{{=T('Description')}}
+    				</th>
+    			</tr>
+    		</thead>
+    		<tbody>
+    			{{for anomaly in anomalies:}}
+    			<tr>
+    				<td>{{=anomaly.log_entry.entry_date}}</td>
+    				<td>
+    					<div>
+    						<table class="table-striped">
+    							<tr>
+    								<td>{{=T('Student')}}:</td>
+    								<td>
+    									{{=anomaly.user_project.assigned_user.first_name}}
+	    								{{=anomaly.user_project.assigned_user.last_name}}
+	    							</td>
+    							</tr>
+    							<tr>
+    								<td>{{=T('Section')}}:</td>
+    								<td>
+    									{{=anomaly.user_project.project.name}}	
+	    							</td>
+    							</tr>
+    							<tr>
+    								<td>{{=T('Description')}}:</td>
+    								<td>
+    									{{=anomaly.log_entry.description}}	
+	    							</td>
+    							</tr>
+    						</table>
+    					</div>
+    				</td>
+    			</tr>
+    			{{pass}}
+    		</tbody>
+    	</table>
+    </div>
+</div>

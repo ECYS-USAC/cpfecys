@@ -107,18 +107,85 @@ def report():
                             Select a valid report.')
         redirect(URL('teacher', 'index'))
 
+
+@auth.requires_login()
+@auth.requires_membership('Super-Administrator')
+def anomalies_list():
+    def get_month_name(date):
+        import datetime
+        return date.strftime("%B")
+    count = db.log_entry.id.count()
+    if (request.args(0) == 'view'):
+        period = request.vars['period']
+        valid = period != None
+        if not valid:
+            session.flash = T('Incomplete Information')
+            redirect(URL('default', 'index'))
+        anomalies = db((db.log_entry.report==db.report.id)&
+            (db.log_entry.log_type==db.log_type(name='Anomaly'))&
+            (db.report.period==period)&
+            (db.report.assignation==db.user_project.id)&
+            (db.user_project.project==db.project.id) \
+            ).select(db.log_entry.entry_date, \
+            count, db.log_entry.log_type, \
+            db.project.ALL, groupby=db.project.name)
+        return dict(anomalies=anomalies,
+            get_month_name=get_month_name,
+            period=period)
+
+    elif (request.args(0) == 'periods'):
+        response.view = 'admin/anomaly_periods.html'
+        periods = db(db.period_year).select()
+        return dict(periods=periods)
+
+    elif (request.args(0) == 'show'):
+        project = request.vars['project']
+        period = request.vars['period']
+        valid = project != None
+        if not valid:
+            session.flash = T('Incomplete Information')
+            redirect(URL('default', 'index'))
+        project = db(db.project.id==project).select().first()
+        anomalies = db((db.log_entry.report==db.report.id)&
+            (db.log_entry.log_type==db.log_type(name='Anomaly'))&
+            (db.report.period==period)&
+            (db.report.assignation==db.user_project.id)&
+            (db.user_project.project==db.project.id)&
+            (db.project.id==project) \
+            ).select(db.log_entry.ALL, \
+            db.user_project.ALL,
+            db.project.ALL)
+        response.view = 'admin/anomaly_show.html'
+        return dict(anomalies=anomalies)
+
 @auth.requires_login()
 @auth.requires_membership('Super-Administrator')
 def report_list():
     response.view = 'admin/report_list.html'
     period_year = db(db.period_year).select()
+    def count_reproved(pyear):
+        reports = db((db.report.period==pyear)&
+            (db.report.score < db.report.min_score))
+        return reports.count()
+    def count_approved(pyear):
+        reports = db((db.report.period==pyear)&
+            (db.report.score>=db.report.min_score)&
+            (db.report.min_score!=None)&
+            (db.report.min_score!=0))
+        return reports.count()
+    def count_no_created(pyear):
 
+        return -100
     count = db.report.id.count()
     report_total = db().select(
         db.report_status.ALL, count, 
-        left=db.report.on(db.report.status==db.report_status.id), 
+        left=db.report.on((db.report.status==db.report_status.id)), 
         groupby=db.report_status.name)
-    return dict(period_year=period_year,report_total=report_total)
+    return dict(period_year=period_year,
+        report_total=report_total,
+        count_reproved=count_reproved,
+        count_approved=count_approved,
+        count_no_created=count_no_created)
                 
 
 @auth.requires_login()

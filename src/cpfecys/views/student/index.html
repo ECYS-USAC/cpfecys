@@ -111,6 +111,15 @@
                                         {{else:}}
                                             <span class="label label-info">{{=T('Grade pending')}}</span>
                                         {{pass}}
+                                        {{if len(report.teacher_comment) > 0:}}
+                                            <span id="teacher-content" data-toggle="popover" data-placement="top" 
+                                            data-content="{{=report.teacher_comment}}" 
+                                            title="{{=T('Teacher comment')}}">
+                                                <i id="teacher-comment" class="icon-exclamation-sign" 
+                                                data-placement="top" 
+                                                title="{{=T('Click to see teacher comment')}}"></i>
+                                            </span>
+                                        {{pass}}
                                     </td>
                                     {{if report.score: average_report_scoring += report.score}}
                                     <td>
@@ -253,6 +262,12 @@
         {{pass}}
     </div>
 </div>
+<script type="text/javascript">
+    $(function(){
+        $('#teacher-comment').tooltip();
+        $('#teacher-content').popover();
+    })
+</script>
 {{if request.is_local:}}
 {{=response.toolbar()}}
 {{pass}}

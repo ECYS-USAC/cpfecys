@@ -1,0 +1,36 @@
+{{extend 'template.html'}}
+<div class="row-fluid">
+    <div class="well span12">
+    	<a onclick="window.history.back()" class="btn" ><i class="icon-arrow-left"></i>{{=T('Back')}}</a>
+		<table class="table table-striped table-bordered">
+			<tr>
+				<th>
+					{{=T('Period')}}
+				</th>
+				<th>
+					{{=T('Year')}}
+				</th>
+				<th>
+					{{=T('View')}}
+				</th>
+			</tr>
+			<tbody>
+			{{for period in periods:}}
+				<tr>
+					
+					<td>
+						{{=period.period.name}}
+					</td>
+					<td>
+						{{=period.yearp}}
+					</td>
+					<td>
+						<a class="btn" href="{{=URL('admin', 'anomalies_list/view', \
+						 vars=dict(period=period.id))}}"><i class="icon-eye-open"></i>{{=T('View')}}</a>
+					</td>
+				</tr>
+			{{pass}}
+			</tbody>
+		</table>
+	</div>
+</div>
