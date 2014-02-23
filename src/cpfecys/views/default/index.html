@@ -1,15 +1,21 @@
 {{extend 'template.html'}}
+<script type="text/javascript" src="{{=URL('static','markitup')}}/sets/markmin/set.js"></script>
+<link rel="stylesheet" type="text/css" href="{{=URL('static','markitup')}}/sets/markmin/style.css"/>
 {{for notification in front_notification:}}
     {{if notification.visible:}}
         {{if notification.promoted:}}
             <div class="hero-unit">
+                <hr />
                 <h1>{{=notification.name}}</h1>
-                <p>{{=notification.content_text}}</p>
+                <hr />
+                <div>{{=MARKMIN(notification.content_text, markmin_settings)}}</div>
             </div>
 		{{else:}}
         	<div class="jumbotron">
+                <hr />
                 <h1>{{=notification.name}}</h1>
-                <p>{{=notification.content_text}}</p>
+                <hr />
+                <div>{{=MARKMIN(notification.content_text, markmin_settings)}}</div>
             </div>
         {{pass}}
     {{pass}}
