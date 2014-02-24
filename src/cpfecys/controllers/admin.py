@@ -292,11 +292,11 @@ def manage_items():
             (db.auth_user.id==db.user_project.assigned_user)&
             (db.auth_user.id==db.auth_membership.user_id)&
             (db.auth_membership.group_id==db.auth_group.id)&
-            (db.auth_group.role!='Teacher')).select(db.user_project.id)
-        #response.view = 'admin/manage_items_detail.html'
-        #grid = SQLFORM.grid(db.item.assignation.belongs(assignations))
-        grid = SQLFORM.grid(db.item)
-        return grid
+            (db.auth_group.role!='Teacher')).select(db.user_project.ALL)
+        response.view = 'admin/manage_items_detail.html'
+        request.args.pop()
+        grid = SQLFORM.grid(db.item.assignation.belongs(assignations))
+        #grid = SQLFORM.grid(db.item)
         return dict(grid=grid)
 
 @auth.requires_login()
