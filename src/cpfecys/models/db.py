@@ -424,7 +424,7 @@ db.define_table('item',
                     label = T('item_restriction')),
                 Field('assignation', 'reference user_project', \
                     label = T('assignation')),
-                format='%(name)s'
+                format='%(description)s'
                 )
 
 db.define_table('custom_parameters',
