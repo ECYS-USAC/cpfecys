@@ -111,6 +111,7 @@
                                         {{else:}}
                                             <span class="label label-info">{{=T('Grade pending')}}</span>
                                         {{pass}}
+                                        {{if not report.teacher_comment is None:}}
                                         {{if len(report.teacher_comment) > 0:}}
                                             <span id="teacher-content" data-toggle="popover" data-placement="top" 
                                             data-content="{{=report.teacher_comment}}" 
@@ -119,6 +120,7 @@
                                                 data-placement="top" 
                                                 title="{{=T('Click to see teacher comment')}}"></i>
                                             </span>
+                                        {{pass}}
                                         {{pass}}
                                     </td>
                                     {{if report.score: average_report_scoring += report.score}}
