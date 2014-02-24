@@ -284,8 +284,20 @@ def manage_items():
         response.view = 'admin/manage_items_areas.html'
         return dict(areas=areas,
             period=period)
-    else:
-        return 'foo'
+    elif (request.args(0) == 'grid'):
+        period = request.vars['period']
+        area = request.vars['area']
+        projects = db(db.project.area_level==area).select()
+        assignations = db((db.user_project.project.belongs(projects))&
+            (db.auth_user.id==db.user_project.assigned_user)&
+            (db.auth_user.id==db.auth_membership.user_id)&
+            (db.auth_membership.group_id==db.auth_group.id)&
+            (db.auth_group.role!='Teacher')).select(db.user_project.id)
+        #response.view = 'admin/manage_items_detail.html'
+        #grid = SQLFORM.grid(db.item.assignation.belongs(assignations))
+        grid = SQLFORM.grid(db.item)
+        return grid
+        return dict(grid=grid)
 
 @auth.requires_login()
 @auth.requires_membership('Super-Administrator')
