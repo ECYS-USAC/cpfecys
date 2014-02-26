@@ -390,6 +390,8 @@ db.define_table('item_restriction',
                     label = T('item_type')),
                 Field('period', 'reference period_year', \
                     label = T('period')),
+                Field('limit_days', 'integer', notnull=False,\
+                    label="limit_days"),
                 format='%(name)s'
                 )
 

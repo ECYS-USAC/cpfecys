@@ -111,16 +111,16 @@
                                         {{else:}}
                                             <span class="label label-info">{{=T('Grade pending')}}</span>
                                         {{pass}}
-                                        {{if not report.teacher_comment is None:}}
-                                        {{if len(report.teacher_comment) > 0:}}
-                                            <span id="teacher-content" data-toggle="popover" data-placement="top" 
-                                            data-content="{{=report.teacher_comment}}" 
-                                            title="{{=T('Teacher comment')}}">
-                                                <i id="teacher-comment" class="icon-exclamation-sign" 
-                                                data-placement="top" 
-                                                title="{{=T('Click to see teacher comment')}}"></i>
-                                            </span>
-                                        {{pass}}
+                                        {{if report.teacher_comment != None:}}
+                                            {{if len(report.teacher_comment) > 0:}}
+                                                <span id="teacher-content" data-toggle="popover" data-placement="top" 
+                                                data-content="{{=report.teacher_comment}}" 
+                                                title="{{=T('Teacher comment')}}">
+                                                    <i id="teacher-comment" class="icon-exclamation-sign" 
+                                                    data-placement="top" 
+                                                    title="{{=T('Click to see teacher comment')}}"></i>
+                                                </span>
+                                            {{pass}}
                                         {{pass}}
                                     </td>
                                     {{if report.score: average_report_scoring += report.score}}
@@ -236,14 +236,15 @@
                             </tbody>
                         </table>
                         <div class="row-fluid right">
-                            {{for item_restriction in \
-                                    available_item_restriction(cyear_period, item).select():}}
+                        {{for item_restriction in \
+                                available_item_restriction(cyear_period, item).select():}}
                             {{if items_instance(
                                         item_restriction.item_restriction,
                                         item).count() == 0 and \
-                                        restriction_project_exception(
-                                        item_restriction.item_restriction,
-                                        item).count() == 0:}}
+                                    restriction_project_exception( \
+                                            item_restriction.item_restriction.id, \
+                                            item.user_project.project.id).count() == 0 and \
+                                    restriction_in_limit_days(item_restriction.item_restriction):}}
                             <a href="{{=URL('student',
                                      'item/create',
                                      vars=dict(
@@ -255,7 +256,7 @@
                                 <small>{{=item_restriction.item_restriction.name}}</small>
                             </a>
                             {{pass}}
-                            {{pass}}
+                        {{pass}}
                         </div>
                     </div>
                 </div>

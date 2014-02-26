@@ -48,9 +48,9 @@ def index():
                     user_project.project.area_level.id)&
                 (db.item_restriction.item_type!=2))
 
-    def restriction_project_exception(item_restriction_id, assignation_id):
+    def restriction_project_exception(item_restriction_id, project_id):
         return db((db.item_restriction_exception.project== \
-                    assignation_id)&
+                    project_id)&
                     (db.item_restriction_exception.item_restriction \
                         ==item_restriction_id))
 
@@ -59,6 +59,19 @@ def index():
                     (db.item.assignation==assignation.user_project.id)&
                     (db.item.is_active==True))
 
+    def restriction_in_limit_days(item_restriction):
+        import datetime
+        return True
+        #cdate = datetime.datetime.now().date()
+        #cyear_period = cpfecys.current_year_period()
+        #cperiod = cyear_period.period.id
+        #if cperiod == 1: start = '1'
+        #else: start = ''
+        #last_date = start + datetime.timedelta(days=item_restriction.limit_days)
+            #return True
+        #return False
+#
+        #return False
     def is_indate_range(report):
         import datetime
         current_date = datetime.datetime.now().date()
@@ -74,7 +87,8 @@ def index():
                 available_item_restriction = available_item_restriction,
                 items_instance = items_instance,
                 restriction_project_exception=restriction_project_exception,
-                is_indate_range=is_indate_range)
+                is_indate_range=is_indate_range,
+                restriction_in_limit_days=restriction_in_limit_days)
 
 @auth.requires_login()
 @auth.requires_membership('Student')
