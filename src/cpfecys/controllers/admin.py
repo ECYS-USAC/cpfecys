@@ -331,8 +331,8 @@ def items_grid():
         (db.auth_membership.group_id==db.auth_group.id)&
         (db.auth_group.role!='Teacher')).select(db.user_project.ALL)
     response.view = 'admin/manage_items_detail.html'
-    grid = SQLFORM.grid(db.item.assignation.belongs(assignations))
-    return dict(grid=grid)
+    items = db(db.item.assignation.belongs(assignations)).select()
+    return dict(items=items)
 
 @auth.requires_login()
 @auth.requires_membership('Super-Administrator')
@@ -432,6 +432,20 @@ def assignation_upload():
     return dict(success = False,
                 file = False,
                 periods = periods)
+
+@cache.action()
+@auth.requires_login()
+@auth.requires_membership('Super-Administrator')
+def download():
+    item = db(db.item.uploaded_file==request.args[0]).select().first()
+    project =  item.assignation.project
+    t_assignation = db((db.user_project.project==project.id)&
+        (db.user_project.assigned_user==auth.user.id))
+    if item != None and t_assignation != None:
+        return response.download(request, db)
+    else:
+        session.flash = T('Access Forbidden')
+        redirect(URL('default', 'index'))
 
 @auth.requires_login()
 @auth.requires_membership('Super-Administrator')

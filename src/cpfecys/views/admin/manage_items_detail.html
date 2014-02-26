@@ -8,6 +8,67 @@
 			{{=T('Back')}}
 			</a>
 		</p>
-    	{{=grid}}
+		<table class="table table-striped table-bordered">
+			<thead>
+				<tr>
+					<th>
+						{{=T('Created')}}
+					</th>
+					<th>
+						{{=T('Is Active')}}
+					</th>
+					<th>
+						{{=T('Uploaded File')}}
+					</th>
+					<th>
+						{{=T('User')}}
+					</th>
+					<th>
+						{{=T('Project')}}
+					</th>
+					<th>
+						{{=T('Done Activity')}}
+					</th>
+				</tr>
+			</thead>
+			<tbody>
+				<tr>
+					{{for item in items:}}
+					<td>
+						{{=T(item.created.period.name)}}
+						{{=item.created.yearp}}
+					</td>
+					<td>
+						{{if item.is_active:}}
+							<a href="" class="btn btn-success">{{=T('Active')}}</a>
+						{{pass}}
+					</td>
+					<td>
+						<a class="btn" href="{{=URL('cpfecys/admin', \
+						     'download',item.uploaded_file)}}">
+						    <span class="icon-eye-open"></span>
+						        {{=T('View Item')}}
+					    </a>
+					</td>
+					<td>
+						{{=item.assignation.assigned_user.username}}
+						-
+						{{=item.assignation.assigned_user.first_name}}
+						{{=item.assignation.assigned_user.last_name}}
+					</td>
+					<td>
+						{{=item.assignation.project.area_level.name}}
+						-
+						{{=item.assignation.project.name}}
+					</td>
+					<td>
+						{{=item.done_activity}}
+					</td>
+					{{pass}}
+				</tr>
+			</tbody>
+			
+		</table>
+    	
     </div>
 </div>
