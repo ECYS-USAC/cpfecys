@@ -5,15 +5,19 @@ from gluon import *
 #Variable Definitions
 _db = None
 _auth = None
+_scheduler = None
+_auto_daily = None
 first_period = None
 second_period = None
 first_period_name = None
 second_period_name = None
 
-def setup(db, auth):
-    global _db, _auth
+def setup(db, auth, scheduler, auto_daily):
+    global _db, _auth, _scheduler, _auto_daily
     _db = db
     _auth = auth
+    _auto_daily = auto_daily
+    _scheduler = scheduler
     _database_setup()
     _module_variables_setup()
     _period_setup()
@@ -56,7 +60,7 @@ def get_markmin():
             'code_python':lambda text: CODE(text,language='python').xml(),
             'code_html':lambda text: CODE(text,language='html').xml()}
     return markmin_settings
-    
+
 ## Validate that the report date restriction and is_enabled restriction apply to current date
 def student_validation_report_restrictions(report_restriction):
     db = _db
@@ -139,7 +143,17 @@ def _database_setup():
         _roles_setup()
         _setup_parameters()
         _report_requirements()
+        _start_scheduler()
         db.setup.insert(done = True)
+
+# Scheduler automatically triggered when setting up the system. Daily at midnight
+def _start_scheduler():
+    scheduler = _scheduler
+    auto_daily = _auto_daily
+    import datetime
+    tomorrow = datetime.date.today() + datetime.timedelta(days=1)
+    tomorrow = datetime.datetime(tomorrow.year, tomorrow.month, tomorrow.day)
+    scheduler.queue_task(auto_daily, start_time = tomorrow, period = (3600)*24, repeats = 0)
 
 def _report_requirements():
     db = _db

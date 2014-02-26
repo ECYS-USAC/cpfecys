@@ -217,6 +217,59 @@ echo "WSGISocketPrefix run/wsgi" >> /etc/httpd/conf.d/wsgi.conf
 # Restart Apache to pick up changes
 /etc/init.d/httpd restart
 
+# Create Scheduler script to run on startup
+cat > /etc/init.d/web2py-scheduler-cpfecys << EOF
+#!/bin/sh
+
+DAEMON=/opt/bin/python2.7
+PARAMETERS="/opt/web-apps/web2py/web2py.py -K cpfecys"
+LOGFILE=/var/log/web2py-scheduler-cpfecys.log
+
+start() {
+    echo -n "starting up $DAEMON"
+    RUN=`$DAEMON $PARAMETERS > $LOGFILE 2>&1`
+    if [ "$?" -eq 0 ]; then
+        echo " Done."
+    else
+        echo " FAILED."
+    fi
+}
+stop() {
+    killall $DAEMON
+}
+status() {
+    killall -0 $DAEMON
+    if [ "$?" -eq 0 ]; then
+        echo "Running."
+    else
+        echo "Not Running."
+    fi
+}
+case "$1" in
+    start)
+    start
+    ;;
+    restart)
+    stop
+    sleep 2
+    start
+    ;;
+    stop)
+    stop
+    ;;
+    status)
+    status
+    ;;
+    *)
+    echo "usage : $0 start|restart|stop|status"
+    ;;
+esac
+exit 0
+# chkconfig: 2345 90 10
+# description: web2py-scheduler
+
+EOF
+
 ###
 ### Phase 5 - Setup web2py admin password
 ###

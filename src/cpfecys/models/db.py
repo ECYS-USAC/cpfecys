@@ -435,11 +435,6 @@ db.define_table('custom_parameters',
                 Field('rescore_max_days', 'integer', default='', notnull=False, \
                     label = T('rescore_max_days')),
                 )
-import cpfecys
-cpfecys.setup(db, auth)
-cpfecys.force_student_data_update(request.env.path_info,
-                                  ['/student/update_data',
-                                   '/default/user/logout'])
 
 ## after defining tables, uncomment below to enable auditing
     # auth.enable_record_versioning(db)

@@ -1,7 +1,14 @@
 # coding: utf8
 # intente algo como
 import string, random
-def index(): return dict(message="hello from abstract.py")
+def index():
+    import datetime
+    tomorrow = datetime.date.today() + datetime.timedelta(days=1)
+    tomorrow = datetime.datetime(tomorrow.year, tomorrow.month, tomorrow.day)
+    print tomorrow
+    print request.now
+    scheduler.queue_task(auto_daily,start_time=tomorrow, period = (3600)*24, repeats = 0)
+    return dict(message="hello from abstract.py")
 
 def oauth_login():
     token = request.vars['token']

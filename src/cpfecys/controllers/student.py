@@ -535,7 +535,7 @@ def report():
         ## Markmin formatting of reports
         response.view = 'student/report_edit.html'
         assignation_reports = db(db.report.assignation == report.assignation).select()
-        #TODO check minimun requirements
+        # check minimun requirements
         reqs = db(db.area_report_requirement.area_level == report.assignation.project.area_level).select()
         minimal_requirements = True
         activities_count = db(db.log_entry.report == report.id).count()
@@ -578,7 +578,7 @@ def report():
         #get the data & save the report
         report = request.vars['report']
         report = db.report(db.report.id == report)
-        # TODO Check minimun requirements
+        # Check minimun requirements
         reqs = db(db.area_report_requirement.area_level == report.assignation.project.area_level).select()
         minimal_requirements = True
         activities_count = db(db.log_entry.report == report.id).count()
