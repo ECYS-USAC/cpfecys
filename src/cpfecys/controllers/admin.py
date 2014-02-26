@@ -174,18 +174,44 @@ def report_list():
             (db.report.min_score!=0))
         return reports.count()
     def count_no_created(pyear):
+        return -1
+        from datetime import datetime
+        year = str(pyear.yearp)
+        if pyear.period == 1:
+            start = datetime.strptime(year + '-01-01', "%Y-%m-%d")
+            end = datetime.strptime(year + '-07-01', "%Y-%m-%d")
+            restrictions = db((db.report_restriction.start_date>=start)&
+                (db.report_restriction.end_date<=end))
+            return restrictions
+        else:
+            start = datetime.strptime(year + '-07-01', "%Y-%m-%d")
+            end = datetime.strptime(year + '-12-31', "%Y-%m-%d")
+            restrictions = db((db.report_restriction.start_date>=start)&
+                (db.report_restriction.end_date<=end))
+            return restrictions
 
-        return -100
+    def count_reports(pyear):
+        count = db.report.id.count()
+        report_total = db().select(
+            db.report_status.ALL, count, 
+            left=db.report.on((db.report.status==db.report_status.id)&
+                (db.report.period)&
+                (db.report.period==pyear.id)), 
+            groupby=db.report_status.name)
+        return report_total
+
     count = db.report.id.count()
     report_total = db().select(
         db.report_status.ALL, count, 
-        left=db.report.on((db.report.status==db.report_status.id)), 
+        left=db.report.on((db.report.status==db.report_status.id)&
+            (db.report.period)), 
         groupby=db.report_status.name)
     return dict(period_year=period_year,
         report_total=report_total,
         count_reproved=count_reproved,
         count_approved=count_approved,
-        count_no_created=count_no_created)
+        count_no_created=count_no_created,
+        count_reports=count_reports)
                 
 
 @auth.requires_login()
@@ -193,7 +219,7 @@ def report_list():
 def report_filter():
     status = request.vars['status']
     period = request.vars['period']
-    valid = status and period
+    valid = period != None
     def count_log_entries(report):
         log_entries = db((db.log_entry.report== \
             report.id)).select(db.log_entry.id.count())
@@ -227,8 +253,16 @@ def report_filter():
     if not valid:
         session.flash = T('Incomplete Information')
         redirect(URL('default', 'index'))
-    reports = db((db.report.period==period)&
-        (db.report.status==status)).select(db.report.ALL)
+    if not status:
+        reports = db((db.report.period==period)).select(db.report.ALL)
+    elif int(status) == -1:
+        reports = db((db.report.period==period)&
+            (db.report.score>=db.report.min_score)&
+            (db.report.min_score!=None)&
+            (db.report.min_score!=0)).select()
+    else:
+        reports = db((db.report.period==period)&
+            (db.report.status==status)).select(db.report.ALL)
     return dict(reports=reports,
         count_log_entries=count_log_entries,
         count_metrics_report=count_metrics_report,
@@ -283,21 +317,22 @@ def manage_items():
         areas = db(db.area_level).select()
         response.view = 'admin/manage_items_areas.html'
         return dict(areas=areas,
-            period=period)
-    elif (request.args(0) == 'grid'):
-        period = request.vars['period']
-        area = request.vars['area']
-        projects = db(db.project.area_level==area).select()
-        assignations = db((db.user_project.project.belongs(projects))&
-            (db.auth_user.id==db.user_project.assigned_user)&
-            (db.auth_user.id==db.auth_membership.user_id)&
-            (db.auth_membership.group_id==db.auth_group.id)&
-            (db.auth_group.role!='Teacher')).select(db.user_project.ALL)
-        response.view = 'admin/manage_items_detail.html'
-        request.args.pop()
-        grid = SQLFORM.grid(db.item.assignation.belongs(assignations))
-        #grid = SQLFORM.grid(db.item)
-        return dict(grid=grid)
+            period=period)        
+
+@auth.requires_login()
+@auth.requires_membership('Super-Administrator')
+def items_grid():
+    period = request.vars['period']
+    area = request.vars['area']
+    projects = db(db.project.area_level==area).select()
+    assignations = db((db.user_project.project.belongs(projects))&
+        (db.auth_user.id==db.user_project.assigned_user)&
+        (db.auth_user.id==db.auth_membership.user_id)&
+        (db.auth_membership.group_id==db.auth_group.id)&
+        (db.auth_group.role!='Teacher')).select(db.user_project.ALL)
+    response.view = 'admin/manage_items_detail.html'
+    grid = SQLFORM.grid(db.item.assignation.belongs(assignations))
+    return dict(grid=grid)
 
 @auth.requires_login()
 @auth.requires_membership('Super-Administrator')

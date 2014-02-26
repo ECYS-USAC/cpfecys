@@ -59,14 +59,14 @@
 					</td>
 					<td>
 						<a href="{{=URL('admin', 'report_filter', vars=dict(period=pyear.id, \
-																		 status=status.report_status.id))}}"> 
+																		 status=-1))}}"> 
 						 	<span class="badge badge-info">{{=count_approved(pyear)}}</span>
 						 	<span>{{=T('Approved')}} </span>
 
 						</a>
 					</td>
 					{{count = 0}}
-					{{for status in report_total:}}
+					{{for status in count_reports(pyear):}}
 					<td>
 						<a href="{{=URL('admin', 'report_filter', vars=dict(period=pyear.id, \
 																		 status=status.report_status.id))}}"> 
@@ -95,8 +95,7 @@
 						</a>
 					</td>
 					<td>
-						<a href="{{=URL('admin', 'report_filter', vars=dict(period=pyear.id, \
-																		 status='-1'))}}"> 
+						<a href="{{=URL('admin', 'report_filter', vars=dict(period=pyear.id))}}"> 
 						 	<span class="badge badge-info">{{=count}}</span><span>{{=T('All')}}</span>
 						</a>
 					</td>
