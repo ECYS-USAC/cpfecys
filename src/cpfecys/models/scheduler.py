@@ -141,7 +141,7 @@ def auto_daily():
             T('Reports Never Delivered: ') + str(missed_reports)
 
 from gluon.scheduler import Scheduler
-scheduler = Scheduler(db3, dict(auto_daily = auto_daily), heartbeat = 1800)
+scheduler = Scheduler(db3, dict(auto_daily = auto_daily), heartbeat = 60)
 
 import cpfecys
 cpfecys.setup(db, auth, scheduler, auto_daily)
