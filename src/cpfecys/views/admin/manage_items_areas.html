@@ -9,6 +9,9 @@
 					{{=T('Area')}}
 				</th>
 				<th>
+					{{=T('Total')}}
+				</th>
+				<th>
 					{{=T('View')}}
 				</th>
 			</tr>
@@ -18,6 +21,9 @@
 					
 					<td>
 						{{=area.name}}
+					</td>
+					<td>
+						{{=count_items(area.id, period).count()}}
 					</td>
 					<td>
 						<a class="btn" href="{{=URL('admin', 'items_grid', \
@@ -30,7 +36,11 @@
 							{{=T('All')}}
 						</td>
 						<td>
-							<a class="btn" href="{{=URL('admin', 'items_grid')}}">
+							{{=count_items(False, False).count()}}
+						</td>
+						<td>
+							<a class="btn" href="{{=URL('admin', 'items_grid' ,
+							vars=dict(period=period))}}">
 								<i class="icon-eye-open"></i> {{=T('View')}}</a>
 						</td>
 					</tr>
