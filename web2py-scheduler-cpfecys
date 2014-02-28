@@ -5,8 +5,8 @@ PARAMETERS="/opt/web-apps/web2py/web2py.py -K cpfecys"
 LOGFILE=/var/log/web2py-scheduler.log
 
 start() {
-    echo -n "starting up $DAEMON"
-    RUN=`$DAEMON $PARAMETERS > $LOGFILE 2>&1`
+    echo -n "starting up $DAEMON $PARAMETERS"
+    nohup $DAEMON $PARAMETERS > $LOGFILE 2>&1 &
     if [ "$?" -eq 0 ]; then
         echo " Done."
     else
@@ -14,10 +14,11 @@ start() {
     fi
 }
 stop() {
-    killall $DAEMON
+    echo "This Process takes 1 minute to finish..."
+    kill `ps -ef | grep "web2py.py -K cpfecys" | grep -v grep | awk '{ print $2 }'` > /dev/null 2>&1
 }
 status() {
-    killall -0 $DAEMON
+    kill -0 `ps -ef | grep "web2py.py -K cpfecys" | grep -v grep | awk '{ print $2 }'` > /dev/null 2>&1
     if [ "$?" -eq 0 ]; then
         echo "Running."
     else
@@ -30,7 +31,7 @@ case "$1" in
     ;;
     restart)
     stop
-    sleep 2
+    sleep 60
     start
     ;;
     stop)
@@ -45,4 +46,4 @@ case "$1" in
 esac
 exit 0
 # chkconfig: 2345 90 10
-# description: web2py-scheduler
+# description: web2py-scheduler-cpecys
