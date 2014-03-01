@@ -11,7 +11,8 @@
 
 if not request.env.web2py_runtime_gae:
     ## if NOT running on Google App Engine use SQLite or other DB
-    db = DAL('mysql://root@localhost/cpfecys',pool_size=1,check_reserved=['all'])
+    db = DAL('mysql://root@localhost/cpfecys', \
+        pool_size=1,check_reserved=['all'])
 else:
     ## connect to Google BigTable (optional 'google:datastore://namespace')
     db = DAL('google:datastore')
@@ -24,7 +25,8 @@ else:
 
 # Improvement over web2py core
 import gluon.globals
-def zip(self, request, files, db, chunk_size=gluon.globals.DEFAULT_CHUNK_SIZE, attachment=True):
+def zip(self, request, files, db, chunk_size= \
+    gluon.globals.DEFAULT_CHUNK_SIZE, attachment=True):
     """
     example of usage in controller::
         def zip():
@@ -160,7 +162,8 @@ db.define_table('project',
                 Field ('project_id', 'string', unique = True, length = 255, \
                     label = T('project_id')),
                 Field ('name', 'string', label = T('name')),
-                Field ('area_level', 'reference area_level', label = T('area_level')),
+                Field ('area_level', 'reference area_level', label =  \
+                    T('area_level')),
                 Field ('description', 'text', label = T('description')),
                 Field ('physical_location', 'text', \
                     label = T('physical_location')),
@@ -268,8 +271,10 @@ db.define_table('report_requirement',
                 format = '%(name)s')
 
 db.define_table('area_report_requirement',
-                Field('report_requirement', 'reference report_requirement', label = T('report requirement')),
-                Field('area_level', 'reference area_level', label = T('area level')),
+                Field('report_requirement', 'reference report_requirement', \
+                    label = T('report requirement')),
+                Field('area_level', 'reference area_level', label = \
+                    T('area level')),
                 format = '%(report_requirement)s %(area_level)s')
 
 db.define_table('report_status',
@@ -365,9 +370,11 @@ db.define_table('log_metrics',
                     label = T('reprobados')),
                 Field('aprobados', 'integer', notnull=True, \
                     label = T('aprobados')),
-                Field('created', 'date', notnull=True, label = T('entry_date')),
+                Field('created', 'date', notnull=True, \
+                    label = T('entry_date')),
                 Field('report', 'reference report', label = T('report')),
-                Field('metrics_type', 'reference metrics_type', label = T('type')),
+                Field('metrics_type', 'reference metrics_type', \
+                    label = T('type')),
                 format='%(created)s'
                 )
 #Project item requirements structure
@@ -391,7 +398,7 @@ db.define_table('item_restriction',
                 Field('period', 'reference period_year', \
                     label = T('period')),
                 Field('limit_days', 'integer', notnull=False,\
-                    label="limit_days"),
+                    label="limitdays"),
                 format='%(name)s'
                 )
 
@@ -434,8 +441,8 @@ db.define_table('custom_parameters',
                     label = T('min_score')),
                 Field('rescore_max_count', 'integer', notnull=False, \
                     label = T('rescore_max_count')),
-                Field('rescore_max_days', 'integer', default='', notnull=False, \
-                    label = T('rescore_max_days')),
+                Field('rescore_max_days', 'integer', default='', \
+                    notnull=False, label = T('rescore_max_days')),
                 )
 
 ## after defining tables, uncomment below to enable auditing
