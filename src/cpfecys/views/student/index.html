@@ -113,13 +113,24 @@
                                         {{pass}}
                                         {{if report.teacher_comment != None:}}
                                             {{if len(report.teacher_comment) > 0:}}
-                                                <span id="teacher-content" data-toggle="popover" data-placement="top" 
-                                                data-content="{{=report.teacher_comment}}" 
-                                                title="{{=T('Teacher comment')}}">
-                                                    <i id="teacher-comment" class="icon-exclamation-sign" 
+                                                <div class="modal hide fade" id="modal-comment">
+                                                  <div class="modal-header">
+                                                    <button type="button" class="close" 
+                                                    data-dismiss="modal" aria-hidden="true">
+                                                    &times;</button>
+                                                    <h3>{{=T('Teacher comment')}}</h3>
+                                                  </div>
+                                                  <div class="modal-body">
+                                                    <p>{{=report.teacher_comment}}</p>
+                                                  </div>
+                                                  <div class="modal-footer">
+                                                    <a class="btn" data-dismiss="modal" 
+                                                    aria-hidden="true">{{=T('Close')}}</a>
+                                                  </div>
+                                                </div>
+                                                <i id="teacher-comment" class="icon-exclamation-sign" 
                                                     data-placement="top" 
                                                     title="{{=T('Click to see teacher comment')}}"></i>
-                                                </span>
                                             {{pass}}
                                         {{pass}}
                                     </td>
@@ -268,7 +279,10 @@
 <script type="text/javascript">
     $(function(){
         $('#teacher-comment').tooltip();
-        $('#teacher-content').popover();
+        $('#teacher-comment').click(function(){
+            $('#modal-comment').modal();
+        });
+        
     })
 </script>
 {{if request.is_local:}}
