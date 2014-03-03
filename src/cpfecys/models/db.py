@@ -176,6 +176,11 @@ db.define_table('period_year',
                 Field('period', 'reference period', label = T('period')),
                 format = '%(yearp)s - %(period)s')
 
+
+# The only valid assignation_status are: Failed, Sucessful
+db.define_table('assignation_status',
+                Field('name', 'string', unique = True, label = T('name'), length = 255))
+
 # The relationship between a user and a subproject contains
 # the history of the final practice,
 # it has the starting cycle and the ending cycle
@@ -197,10 +202,6 @@ db.define_table('user_project',
                     label = T('pro_bono')),
                 Field ('periods', 'integer', notnull=True, \
                     label = T('periods')))
-
-# The only valid assignation_status are: Failed, Sucessful
-db.define_table('assignation_status',
-                Field('name', 'string', unique = True, label = T('name')))
 
 # This are the tables that store important links and uploaded
 # files by admin.
