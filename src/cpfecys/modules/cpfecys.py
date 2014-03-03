@@ -61,6 +61,10 @@ def get_markmin():
             'code_html':lambda text: CODE(text,language='html').xml()}
     return markmin_settings
 
+## Validate the assignation is unlocked and accepts modifications or not
+def assignation_is_locked(assignation):
+    return not assignation.assignation_status is None
+
 ## Validate that the report date restriction and is_enabled restriction apply to current date
 def student_validation_report_restrictions(report_restriction):
     db = _db
@@ -143,8 +147,14 @@ def _database_setup():
         _roles_setup()
         _setup_parameters()
         _report_requirements()
+        _assignation_status()
         _start_scheduler()
         db.setup.insert(done = True)
+
+def _assignation_status():
+    db = _db
+    db.assignation_status.insert(name = 'Failed')
+    db.assignation_status.insert(name = 'Successful')
 
 # Scheduler automatically triggered when setting up the system. Daily at midnight
 def _start_scheduler():
@@ -153,7 +163,7 @@ def _start_scheduler():
     import datetime
     tomorrow = datetime.date.today() + datetime.timedelta(days=1)
     tomorrow = datetime.datetime(tomorrow.year, tomorrow.month, tomorrow.day)
-    scheduler.queue_task(auto_daily, start_time = tomorrow, period = (3600)*24, repeats = 0)
+    scheduler.queue_task(auto_daily, start_time = tomorrow, period = (3600)*24, repeats = 0, timeout=600)
 
 def _report_requirements():
     db = _db
@@ -325,6 +335,8 @@ def _log_type_setup():
     db.metrics_type.insert(name="PRACTICA")
     db.metrics_type.insert(name="PROYECTO 1")
     db.metrics_type.insert(name="PROYECTO 2")
+    db.metrics_type.insert(name="ESTADISTICA FINAL DE CURSO")
+    db.metrics_type.insert(name="ESTADISTICA FINAL DE LABORATORIO")
     
 
 def _item_type_setup():
