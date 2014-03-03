@@ -2,11 +2,18 @@
 <h1>{{=T('Items management')}}</h1>
 <div class="row-fluid">
     <div class="well span12">
-    	<a onclick="window.history.back()" class="btn" ><i class="icon-arrow-left"></i>{{=T('Back')}}</a>
+    	<a onclick="window.history.back()" class="btn" >
+    		<i class="icon-arrow-left"></i>{{=T('Back')}}</a>
 		<table class="table table-striped table-bordered">
 			<tr>
 				<th>
 					{{=T('Area')}}
+				</th>
+				<th>
+					{{=T('Enabled')}}
+				</th>
+				<th>
+					{{=T('Disabled')}}
 				</th>
 				<th>
 					{{=T('Total')}}
@@ -23,17 +30,30 @@
 						{{=area.name}}
 					</td>
 					<td>
+						{{=count_items(area.id, period, False, True).count()}}
+					</td>
+					<td>
+						{{=count_items(area.id, period, True, False).count()}}
+					</td>
+					<td>
 						{{=count_items(area.id, period).count()}}
 					</td>
 					<td>
 						<a class="btn" href="{{=URL('admin', 'items_grid', \
-						 vars=dict(period=period, area=area.id))}}"><i class="icon-eye-open"></i> {{=T('View')}}</a>
+						 vars=dict(period=period, area=area.id))}}">
+						 <i class="icon-eye-open"></i> {{=T('View')}}</a>
 					</td>
 				</tr>
 			{{pass}}
 				<tr>
 						<td>
 							{{=T('All')}}
+						</td>
+						<td>
+							{{=count_items(False, False, False, True).count()}}
+						</td>
+						<td>
+							{{=count_items(False, False, True, False).count()}}
 						</td>
 						<td>
 							{{=count_items(False, False).count()}}

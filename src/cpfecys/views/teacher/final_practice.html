@@ -25,7 +25,8 @@
     <div class="accordion-group">
     {{for item in available_periods:}}
         <div class="accordion-heading">
-            <a class="accordion-toggle" data-toggle="collapse" data-parent="#reports_accordion" href="#r{{=item.id}}">
+            <a class="accordion-toggle" data-toggle="collapse" 
+            data-parent="#reports_accordion" href="#r{{=item.id}}">
                 {{=item.yearp}} - {{=T('Semester')}} {{=item.period}}
                 <span class="right">
                     <span>{{=T('Average Score')}}: {{=int(reports_avg)}}</span> |
@@ -35,7 +36,8 @@
         </div>
         <div id="r{{=item.id}}" class="accordion-body collapse">
             <div class="accordion-inner">
-                <table class="table table-striped table-bordered" style="width:100%;">
+                <table class="table table-striped table-bordered" 
+                style="width:100%;">
                     <thead>
                         <tr>
                             <th>ID</th>
@@ -53,7 +55,9 @@
                             <td>{{=report.status['name']}}</td>
                             <td>{{=report.score or 0}}</td>
                             <td>
-                                <a class="btn" href="{{=URL('teacher', 'report/view', vars=dict(report=report.id))}}"> {{=T('View Report')}}</a>
+                                <a class="btn" href="{{=URL('teacher', \
+                                'report/view', vars=dict(report=report.id))}}"> 
+                                {{=T('View Report')}}</a>
                             </td>
                         </tr>
                         {{pass}}
@@ -85,17 +89,22 @@
                 <table class="table table-striped table-bordered" style="width:100%;">
                     <thead>
                         <tr>
-                            <th>Type</th>
-                            <th>Name</th>
-                            <th>Created</th>
-                            <th>Actions</th>
+                            <th>{{=T('Type')}}</th>
+                            <th>{{=T('Name')}}</th>
+                            <th>{{=T('Created')}}</th>
+                            <th>{{=T('Actions')}}</th>
                         </tr>
                     </thead>
                     <tbody>
-                        {{for item in get_items(period, final_practice.user_project):}}
+                        {{for item in get_items(period, \
+                        final_practice.user_project):}}
+                        {{if item.is_active:}}
                         <tr>
+                        {{else:}}
+                        <tr class="error">
+                        {{pass}}
                             <td>
-                                {{=item.item_restriction.item_type.name}}
+                                {{=T(item.item_restriction.item_type.name)}}
                             </td>
                             <td>
                                 {{=item.item_restriction.name}}
@@ -111,6 +120,11 @@
                                 <span class="icon-eye-open"></span>
                                     {{=T('View Item')}}
                                 </a>
+                                {{if not item.is_active:}}
+                                <span class="label label-important">
+                                    {{=T('Disabled by admin')}}
+                                </span>
+                                {{pass}}
                             {{elif item.item_restriction.item_type.name== \
                                     'Activity':}}
                                 <input type="checkbox" 

@@ -162,7 +162,7 @@ def anomalies_list():
 @auth.requires_membership('Super-Administrator')
 def report_list():
     response.view = 'admin/report_list.html'
-    period_year = db(db.period_year).select()
+    period_year = db(db.period_year).select(orderby=~db.period_year.id)
     def count_reproved(pyear):
         reports = db((db.report.period==pyear)&
             (db.report.score < db.report.min_score))
@@ -317,14 +317,16 @@ def manage_items():
         periods = db(db.period_year).select()
         return dict(periods=periods)
     elif (request.args(0) == 'area'):
-        def count_items(area, period):
+        def count_items(area, period, disabled=False, enabled=False):
             if not(area and period):
                 assignations = db(
                     (db.auth_user.id==db.user_project.assigned_user)&
                     (db.auth_user.id==db.auth_membership.user_id)&
                     (db.auth_membership.group_id==db.auth_group.id)&
                     (db.auth_group.role!='Teacher')).select(db.user_project.ALL)
-                items = db((db.item.assignation.belongs(assignations)))
+                items = db((db.item.assignation.belongs(assignations))&
+                    ((disabled==False)or(db.item.is_active==False))&
+                    ((enabled==False)or(db.item.is_active==True)))
                 return items
             else:
                 projects = db(db.project.area_level==area).select()
@@ -334,7 +336,9 @@ def manage_items():
                     (db.auth_membership.group_id==db.auth_group.id)&
                     (db.auth_group.role!='Teacher')).select(db.user_project.ALL)
                 items = db((db.item.assignation.belongs(assignations))&
-                    (db.item.created==period))
+                    (db.item.created==period)&
+                    ((disabled==False)or(db.item.is_active==False))&
+                    ((enabled==False)or(db.item.is_active==True)))
                 return items
         period = request.vars['period']
         areas = db(db.area_level).select()
