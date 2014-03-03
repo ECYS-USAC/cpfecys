@@ -54,7 +54,8 @@ def auto_daily():
                          (db.report.report_restriction == restriction.id)).count()
             if not(reports > 0):
                 missed_reports += 1
-                print db.report.insert(assignation = assignation.id,
+                db.report.insert(assignation = assignation.id,
+                                 min_score = cpfecys.get_custom_parameters().min_score,
                                  report_restriction = restriction.id,
                                  created = current_date,
                                  score = 0,
@@ -67,6 +68,7 @@ def auto_daily():
     total_drafties = len(drafties)
     for d in drafties:
         d.report.status = db.report_status(name = 'Grading')
+        d.report.min_score = cpfecys.get_custom_parameters().min_score
         d.update_record()
         ## TODO: Send Email according to assignation
         # Notification Message
