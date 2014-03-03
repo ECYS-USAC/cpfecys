@@ -128,8 +128,10 @@
                                                     aria-hidden="true">{{=T('Close')}}</a>
                                                   </div>
                                                 </div>
-                                                <i class="teacher-comment icon-exclamation-sign" 
-                                                    data-placement="top" 
+                                                <i class="teacher-comment icon-exclamation-sign"
+                                                   data-toggle="modal"
+                                                   data-target="#modal-comment-{{=report.id}}"
+                                                    data-placement="top"
                                                     title="{{=T('Click to see teacher comment')}}"></i>
                                             {{pass}}
                                         {{pass}}
