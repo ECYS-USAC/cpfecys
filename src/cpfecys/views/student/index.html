@@ -113,10 +113,10 @@
                                         {{pass}}
                                         {{if report.teacher_comment != None:}}
                                             {{if len(report.teacher_comment) > 0:}}
-                                                <span id="teacher-content" data-toggle="popover" data-placement="top" 
+                                        <span class="teacher-content" data-toggle="popover" data-placement="top" 
                                                 data-content="{{=report.teacher_comment}}" 
                                                 title="{{=T('Teacher comment')}}">
-                                                    <i id="teacher-comment" class="icon-exclamation-sign" 
+                                            <i class="teacher-comment icon-exclamation-sign" 
                                                     data-placement="top" 
                                                     title="{{=T('Click to see teacher comment')}}"></i>
                                                 </span>
@@ -267,8 +267,8 @@
 </div>
 <script type="text/javascript">
     $(function(){
-        $('#teacher-comment').tooltip();
-        $('#teacher-content').popover();
+        $('.teacher-comment').tooltip();
+        $('.teacher-content').popover();
     })
 </script>
 {{if request.is_local:}}
