@@ -86,7 +86,7 @@ url = '#')}}
 <!-- // Helpers for deletion -->
 <!-- Helpers end here -->
 <div class="row-fluid">
-  <div class="navbar">
+  <div class="navbar navbar-fixed-bottom navbar-inverse">
       <div class="navbar-inner">
         <a class="brand" href="#">
             {{=T('Edit Report:')}}
@@ -94,13 +94,13 @@ url = '#')}}
         </a>
         <ul class="nav pull-right">
             <li>
-                <a data-toggle="modal" href="#report-grading-check">
+                <a style="color:white;text-shadow:none;" class="btn-warning" data-toggle="modal" href="#report-grading-check">
                     <span class="icon-check"></span> {{=T('Send to Grading')}}
                 </a>
             </li>
             <li class="divider-vertical"></li>
-            <li class="dropdown">
-                <a class="dropdown-toggle"
+            <li class="dropdown btn-success">
+                <a style="color:white;text-shadow:none;" class="dropdown-toggle"
                    data-toggle="dropdown"
                    href="">
                     <span class="icon-plus-sign"></span> {{=T('Add Block')}}
