@@ -162,7 +162,7 @@ def anomalies_list():
 @auth.requires_membership('Super-Administrator')
 def report_list():
     response.view = 'admin/report_list.html'
-    period_year = db(db.period_year).select()
+    period_year = db(db.period_year).select(orderby=~db.period_year.id)
     def count_reproved(pyear):
         reports = db((db.report.period==pyear)&
             (db.report.score < db.report.min_score))
@@ -286,15 +286,18 @@ def areas():
 @auth.requires_login()
 @auth.requires_membership('Super-Administrator')
 def files_manager():
-    user = db(db.auth_membership.user_id == auth.user.id).select(db.auth_group.ALL)
+    user = db(db.auth_membership.user_id==auth.user.id \
+        ).select(db.auth_group.ALL)
     grid = SQLFORM.smartgrid(db.uploaded_file, linked_tables=['file_access'])
     return locals()
 
 @auth.requires_login()
 @auth.requires_membership('Super-Administrator')
 def notifications_manager():
-    user = db(db.auth_membership.user_id == auth.user.id).select(db.auth_group.ALL)
-    grid = SQLFORM.smartgrid(db.front_notification, linked_tables=['notification_access'])
+    user = db(db.auth_membership.user_id == auth.user.id \
+        ).select(db.auth_group.ALL)
+    grid = SQLFORM.smartgrid(db.front_notification,  \
+        linked_tables=['notification_access'])
     return locals()
 
 @auth.requires_login()
@@ -302,7 +305,8 @@ def notifications_manager():
 def items_manager():
     if request.function == 'new':
         db.item.created.writable=db.item.created.readable=False
-    grid = SQLFORM.smartgrid(db.item_restriction, linked_tables=['item_restriction_area', 'item_restriction_exception'])
+    grid = SQLFORM.smartgrid(db.item_restriction,  \
+        linked_tables=['item_restriction_area', 'item_restriction_exception'])
     return dict(grid=grid)
 
 @auth.requires_login()
@@ -313,26 +317,76 @@ def manage_items():
         periods = db(db.period_year).select()
         return dict(periods=periods)
     elif (request.args(0) == 'area'):
+        def count_items(area, period, disabled=False, enabled=False):
+            if not(area and period):
+                assignations = db(
+                    (db.auth_user.id==db.user_project.assigned_user)&
+                    (db.auth_user.id==db.auth_membership.user_id)&
+                    (db.auth_membership.group_id==db.auth_group.id)&
+                    (db.auth_group.role!='Teacher')).select(db.user_project.ALL)
+                items = db((db.item.assignation.belongs(assignations))&
+                    ((disabled==False)or(db.item.is_active==False))&
+                    ((enabled==False)or(db.item.is_active==True)))
+                return items
+            else:
+                projects = db(db.project.area_level==area).select()
+                assignations = db((db.user_project.project.belongs(projects))&
+                    (db.auth_user.id==db.user_project.assigned_user)&
+                    (db.auth_user.id==db.auth_membership.user_id)&
+                    (db.auth_membership.group_id==db.auth_group.id)&
+                    (db.auth_group.role!='Teacher')).select(db.user_project.ALL)
+                items = db((db.item.assignation.belongs(assignations))&
+                    (db.item.created==period)&
+                    ((disabled==False)or(db.item.is_active==False))&
+                    ((enabled==False)or(db.item.is_active==True)))
+                return items
         period = request.vars['period']
         areas = db(db.area_level).select()
         response.view = 'admin/manage_items_areas.html'
         return dict(areas=areas,
-            period=period)        
+            period=period,
+            count_items=count_items)        
 
 @auth.requires_login()
 @auth.requires_membership('Super-Administrator')
 def items_grid():
     period = request.vars['period']
     area = request.vars['area']
-    projects = db(db.project.area_level==area).select()
+    context_string = T('All')
+    period_entity = db(db.period_year.id==period).select().first()
+    if period_entity:
+        context_string = T(str(period_entity.period.name)) + \
+        ' ' + str(period_entity.yearp)
+    school_id = request.vars['school-id']
+    if not(area=='' or area==None):
+        projects = db(db.project.area_level==area).select()    
+    else:
+        projects = db(db.project).select()
     assignations = db((db.user_project.project.belongs(projects))&
-        (db.auth_user.id==db.user_project.assigned_user)&
-        (db.auth_user.id==db.auth_membership.user_id)&
-        (db.auth_membership.group_id==db.auth_group.id)&
-        (db.auth_group.role!='Teacher')).select(db.user_project.ALL)
+            (db.auth_user.id==db.user_project.assigned_user)&
+            (db.auth_user.id==db.auth_membership.user_id)&
+            ((school_id=='' or school_id==None) or \
+                (db.auth_user.username==school_id))&
+            (db.auth_membership.group_id==db.auth_group.id)&
+            (db.auth_group.role!='Teacher')).select(db.user_project.ALL)
+    items = db((db.item.assignation.belongs(assignations))&
+        ((period=='' or period==None) or (db.item.created==period))).select()
     response.view = 'admin/manage_items_detail.html'
-    items = db(db.item.assignation.belongs(assignations)).select()
-    return dict(items=items)
+    return dict(items=items,
+        area=area,
+        period=period,
+        context_string=context_string)
+
+@auth.requires_login()
+@auth.requires_membership('Super-Administrator')
+def toggle_active_item():
+    item = request.vars['item']    
+    if item != None:
+        item = db(db.item.id==item).select().first()
+    if item != None:
+        item.update_record(
+            is_active = not item.is_active)
+    return True
 
 @auth.requires_login()
 @auth.requires_membership('Super-Administrator')
