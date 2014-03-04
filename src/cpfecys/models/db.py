@@ -182,7 +182,8 @@ db.define_table('period_year',
 
 # The only valid assignation_status are: Failed, Sucessful
 db.define_table('assignation_status',
-                Field('name', 'string', unique = True, label = T('name'), length = 255))
+                Field('name', 'string', unique = True, label = T('name'), length = 255),
+                format = '%(name)s')
 
 # The relationship between a user and a subproject contains
 # the history of the final practice,
