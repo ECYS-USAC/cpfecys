@@ -1493,3 +1493,19 @@ ul li{
 #ja-mainnav ul ul.dropdown-menu {
     left:auto;
 }
+
+.border-report {
+    border:solid #ddd 1px;
+}
+
+@media print {
+    #ja-headerwrap, #ja-mainnavwrap, .navbar, .btn-group {
+        display:none;
+    }
+.container, #main {
+    width:100%;
+}
+.border-report {
+    border:none;
+}
+}

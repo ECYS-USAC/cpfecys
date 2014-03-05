@@ -2,12 +2,12 @@
 # intente algo como
 import string, random
 def index():
-    import datetime
-    tomorrow = datetime.date.today() + datetime.timedelta(days=1)
-    tomorrow = datetime.datetime(tomorrow.year, tomorrow.month, tomorrow.day)
-    print tomorrow
-    print request.now
-    scheduler.queue_task(auto_daily,start_time=tomorrow, period = (3600)*24, repeats = 0)
+    #import datetime
+    #tomorrow = datetime.date.today() + datetime.timedelta(days=1)
+    #tomorrow = datetime.datetime(tomorrow.year, tomorrow.month, tomorrow.day)
+    #print tomorrow
+    #print request.now
+    scheduler.queue_task(auto_daily,start_time=request.now, repeats = 1)
     return dict(message="hello from abstract.py")
 
 def oauth_login():

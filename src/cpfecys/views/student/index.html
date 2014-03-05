@@ -40,6 +40,17 @@
                             <strong>{{=T('Length')}}:</strong>
                             {{=item.user_project.periods}} {{=T('Semesters')}}
                         </div>
+                        <div>
+                            {{import cpfecys}}
+                            <strong>{{=T('Status')}}:</strong>
+                            {{if cpfecys.assignation_is_locked(item.user_project):}}
+                            <span class="label">
+                                {{=T(str(item.user_project.assignation_status.name))}}
+                            </span>
+                            {{else:}}
+                            <span class="label label-success">{{=T('Active')}}</span>
+                            {{pass}}
+                        </div>
                     </span>
                 </a>
             </div>
@@ -113,7 +124,7 @@
                                         {{pass}}
                                         {{if report.teacher_comment != None:}}
                                             {{if len(report.teacher_comment) > 0:}}
-                                                <div class="modal hide fade" id="modal-comment">
+                                                <div id="modal-comment-{{=report.id}}" class="modal hide fade modal-comment">
                                                   <div class="modal-header">
                                                     <button type="button" class="close" 
                                                     data-dismiss="modal" aria-hidden="true">
@@ -128,8 +139,10 @@
                                                     aria-hidden="true">{{=T('Close')}}</a>
                                                   </div>
                                                 </div>
-                                                <i id="teacher-comment" class="icon-exclamation-sign" 
-                                                    data-placement="top" 
+                                                <i class="teacher-comment icon-exclamation-sign"
+                                                   data-toggle="modal"
+                                                   data-target="#modal-comment-{{=report.id}}"
+                                                    data-placement="top"
                                                     title="{{=T('Click to see teacher comment')}}"></i>
                                             {{pass}}
                                         {{pass}}
@@ -143,6 +156,7 @@
                                             <span class="icon-eye-open"></span>
                                             {{=T('View Report')}}
                                         </a>
+                                        {{if not cpfecys.assignation_is_locked(item.user_project):}}
                                         {{if (report.status['name'] == 'Draft' or \
                                                 (report.status['name'] == 'Recheck' and \
                                                 is_indate_range(report))) \
@@ -156,6 +170,7 @@
                                             <span class="icon-edit"></span>
                                             {{=T('Edit Report')}}
                                         </a>
+                                        {{pass}}
                                         {{pass}}
                                     </td>
                                 </tr>
@@ -230,7 +245,7 @@
                                             <span class="icon-eye-open"></span>
                                             {{=T('View Item')}}
                                             </a>
-
+                                            {{if not cpfecys.assignation_is_locked(item.user_project):}}
                                             {{if items.created == cyear_period:}}
                                             <a href="{{=URL('student',
                                                      'item/edit',
@@ -240,12 +255,14 @@
                                                 {{=T('Edit Item')}}
                                             </a>
                                             {{pass}}
+                                            {{pass}}
                                         </td>
                                     {{pass}}
                                     </tr>
                                 {{pass}}
                             </tbody>
                         </table>
+                        {{if not cpfecys.assignation_is_locked(item.user_project):}}
                         <div class="row-fluid right">
                         {{for item_restriction in \
                                 available_item_restriction(cyear_period, item).select():}}
@@ -269,8 +286,22 @@
                             {{pass}}
                         {{pass}}
                         </div>
+                        {{pass}}
                     </div>
                 </div>
+                {{if cpfecys.assignation_is_locked(item.user_project):}}
+                <div class="row-fluid">
+                    <div class="span12 well">
+                        <h3>
+                            {{=T('Assignation Status')}}
+                            <span class="label">
+                                {{=T(str(item.user_project.assignation_status.name))}}
+                            </span>
+                        </h3>
+                        {{=item.user_project.assignation_comment}}
+                    </div>
+                </div>
+                {{pass}}
             </div>
         </div>
         {{pass}}
@@ -278,11 +309,7 @@
 </div>
 <script type="text/javascript">
     $(function(){
-        $('#teacher-comment').tooltip();
-        $('#teacher-comment').click(function(){
-            $('#modal-comment').modal();
-        });
-        
+        $('.teacher-comment').tooltip();
     })
 </script>
 {{if request.is_local:}}

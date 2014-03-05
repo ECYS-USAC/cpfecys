@@ -103,7 +103,7 @@ auth.settings.extra_fields['auth_user']= [
                   Field('work_address', 'string',length=255, notnull=False),
                   Field('uv_token', 'string', length=64, notnull=False, \
                     writable=False, readable=False),
-                  Field('data_updated', 'boolean', notnull=False),]
+                  Field('data_updated', 'boolean', notnull=False, writable=False, readable=False),]
 
 crud, service, plugins = Crud(db), Service(), PluginManager()
 
@@ -179,11 +179,25 @@ db.define_table('period_year',
                 Field('period', 'reference period', label = T('period')),
                 format = '%(yearp)s - %(period)s')
 
+
+# The only valid assignation_status are: Failed, Sucessful
+db.define_table('assignation_status',
+                Field('name', 'string', unique = True, label = T('name'), length = 255),
+                format = '%(name)s')
+
 # The relationship between a user and a subproject contains
 # the history of the final practice,
 # it has the starting cycle and the ending cycle
 # it also is the central key for all operations with interesting data
 db.define_table('user_project',
+                Field('assignation_comment', 'text', notnull=False),
+                Field('assignation_ignored', 'boolean', notnull = True, default = False),
+                # The None value in assignation_status means that it is currently not blocked
+                # any other value than None means that is locked and no further changes
+                # it can have.
+                # - (cpfecys module) method assignation_is_locked(assignation)
+                # - was created to check if this assignation can have modifications
+                Field('assignation_status', 'reference assignation_status', notnull = False),
                 Field('assigned_user', 'reference auth_user', \
                     label = T('assigned_user')),
                 Field('project', 'reference project', label = T('project')),
