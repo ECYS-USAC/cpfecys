@@ -1,5 +1,44 @@
 # coding: utf8
 # intente algo como
+
+@auth.requires_login()
+@auth.requires_membership('Super-Administrator')
+def assignations():
+    #requires parameter year_period if no one is provided then it is automatically detected
+    #and shows the current period
+    year_period = request.vars['year_period']
+    max_display = 1
+    import cpfecys
+    currentyear_period = db.period_year(db.period_year.id == year_period)
+    if not currentyear_period:
+        currentyear_period = cpfecys.current_year_period()
+        changid = currentyear_period.id
+    q_selected_period_assignations = ((db.user_project.period <= currentyear_period.id)&
+              ((db.user_project.period + db.user_project.periods) > currentyear_period.id))
+    q2 = (db.user_project.assigned_user == db.auth_user.id)
+    q3 = (db.user_project.project == db.project.id)
+    q4 = (db.user_project.period == db.period_year.id)
+    orderby = db.auth_user.last_name
+    orderby2 = db.auth_user.first_name
+    orderby3 = db.auth_user.username
+    data = db(q_selected_period_assignations&q2&q3&q4).select(orderby=orderby|orderby2|orderby3)
+    current_period_name = T(cpfecys.second_period.name)
+    if currentyear_period.period == cpfecys.first_period.id:
+        current_period_name = T(cpfecys.first_period.name)
+    start_index = currentyear_period.id - max_display - 1
+    if start_index < 1:
+        start_index = 0
+    end_index = currentyear_period.id + max_display
+    periods_before = db(db.period_year).select(limitby=(start_index, currentyear_period.id - 1))
+    periods_after = db(db.period_year).select(limitby=(currentyear_period.id, end_index))
+    other_periods = db(db.period_year).select()
+    return dict(data = data,
+                currentyear_period = currentyear_period,
+                current_period_name = current_period_name,
+                periods_before = periods_before,
+                periods_after = periods_after,
+                other_periods = other_periods)
+
 @auth.requires_login()
 @auth.requires_membership('Super-Administrator')
 def periods():

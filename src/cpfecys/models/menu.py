@@ -29,6 +29,9 @@ if auth.has_membership(role="Super-Administrator"):
              (T('Final Practice Admin'), False, URL('admin', 'assignation'), []),
              (T('Users'), False, URL('admin', 'users'), []),
              ]),
+        (T('Assignation Administration'), False, URL(),[
+             (T('Assignation By Semester'), False, URL('admin', 'assignations'), []),
+             ]),
          (T('Projects Administration'), False, URL(),[
             (T('Areas'), False, URL('admin', 'areas'), []),
             (T('Projects'), False, URL('admin', 'projects'), []),

@@ -18,7 +18,6 @@ def final_practice():
             (~db.item.item_restriction.belongs(restrictions)))
         return items.select(db.item.ALL)
 
-        
     assignation = request.vars['assignation']
     if not assignation: redirect(URL('courses'))
     final_practice = db((db.user_project.id == assignation)&
@@ -76,7 +75,7 @@ def report():
     parameters = cpfecys.get_custom_parameters()
     valid = not(report is None)
     next_date = None
-    if valid: 
+    if valid:
         valid = cpfecys.teacher_validation_report_access(report.id)
 
     if (request.args(0) == 'view'):

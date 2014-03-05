@@ -1,0 +1,153 @@
+{{extend 'template.html'}}
+<h2>
+    {{=T('Final Practice Administration')}}
+    <a href="#myModal" role="button" class="btn btn-primary" data-toggle="modal">
+        <span class="icon-white icon-question-sign"></span>
+    </a>
+</h2>
+<div id="myModal" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+  <div class="modal-header">
+    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+      <h3 id="myModalLabel">
+          <span class="icon-question-sign"></span>
+          {{=T('Final Practice Administration Help')}}
+      </h3>
+  </div>
+  <div class="modal-body">
+    <div class="well">
+        <p>
+            {{=T('This List represents the current assignation of final practice projects for each user. You can enroll any user or delete its enrollment here. The type of enrollment (Student or Teacher) depends on each user Membership to a group.')}}
+        </p>
+        <p>
+            {{=T('So, for example if you want to enroll a student with carnet 200010101 to a project, first the student should be created as a user here. Then its membership should be added to a Student type. Then in this area he should be assigned to the project and automatically he can participate in the enrollment as the role he belongs (Student in this case).')}}
+        </p>
+        <p>
+            {{=T('Bulk uploads automatically assigns the role Student if not defined before.')}}
+        </p>
+    </div>
+  </div>
+  <div class="modal-footer">
+      <button class="btn" data-dismiss="modal" aria-hidden="true">{{=T('Close')}}</button>
+  </div>
+</div>
+
+<div class="tabbable"> <!-- Only required for left/right tabs -->
+  <ul class="nav nav-tabs">
+      <li><a href="#setuptab" data-toggle="tab">{{=T('Other Periods')}}</a></li>
+    {{for item in periods_before:}}
+      <li><a href="{{=URL(vars=dict(year_period=item.id))}}">
+          {{if item.period == cpfecys.first_period.id:}}
+          {{=str(item.yearp) + ' - ' + T(cpfecys.first_period_name)}}
+          {{else:}}
+          {{=str(item.yearp) + ' - ' + T(cpfecys.second_period_name)}}
+          {{pass}}
+      </a></li>
+    {{pass}}
+      <li class="active"><a href="#data{{=currentyear_period.id}}" data-toggle="tab">
+          {{=str(currentyear_period.yearp) + ' - ' + current_period_name }}
+      </a></li>
+    {{for item in periods_after:}}
+      <li><a href="{{=URL(vars=dict(year_period=item.id))}}">
+          {{if item.period == cpfecys.first_period.id:}}
+          {{=str(item.yearp) + ' - ' + T(cpfecys.first_period.name)}}
+          {{else:}}
+          {{=str(item.yearp) + ' - ' + T(cpfecys.second_period.name)}}
+          {{pass}}
+      </a></li>
+    {{pass}}
+  </ul>
+  <div class="tab-content">
+      <div class="tab-pane" id="setuptab">
+          <form>
+              <select name="year_period">
+                  {{for item in other_periods:}}
+                  {{if item.period == cpfecys.first_period.id:}}
+                  <option value="{{=item.id}}">{{=str(item.yearp) + ' - ' + T(cpfecys.first_period.name) }}</option>
+                  {{else:}}
+                  <option value="{{=item.id}}">{{=str(item.yearp) + ' - ' + T(cpfecys.second_period.name) }}</option>
+                  {{pass}}
+                  {{pass}}
+              </select>
+              <input type="submit" value="{{=T('go')}}" >
+          </form>
+      </div>
+      <div class="tab-pane active" id="data{{=currentyear_period.id}}">
+          <table class="table table-bordered table-hover table-striped">
+              <thead>
+                  <tr>
+                      <th>{{=T('Last Name')}}</th>
+                      <th>{{=T('First Name')}}</th>
+                      <th>{{=T('Carnet')}}</th>
+                      <th>{{=T('Area')}}</th>
+                      <th>{{=T('Proyecto')}}</th>
+                      <th>{{=T('Assignation Start')}}</th>
+                      <th>{{=T('Assignation Length')}}</th>
+                      <th>{{=T('Assignation State')}}</th>
+                      <th>{{=T('Assignation Validity')}}</th>
+                  </tr>
+              </thead>
+              <tbody>
+                  {{for row in data:}}
+                  <tr>
+                      <td>{{=row.auth_user.last_name}}</td>
+                      <td>{{=row.auth_user.first_name}}</td>
+                      <td>{{=row.auth_user.username}}</td>
+                      <td>{{=row.project.area_level.name}}</td>
+                      <td>{{=row.project.name}}</td>
+                      <td>{{=row.period_year.yearp}} - {{=T(row.period_year.period.name)}}</td>
+                      <td>{{=row.user_project.periods}}</td>
+                      <td><div>
+                          <span class='btn pop' data-title='{{=T("Force Status")}}' data-html=true data-content='<div>
+                                                                                                                             <a href="{{=URL('admin','force_assignation_active')}}" class="btn btn-success">
+                                  <i class="icon-refresh icon-white"></i>
+                                  {{=T('Active')}}
+                              </a>
+                          </div>
+                          <div>
+                              <a href="{{=URL('admin','force_assignation_failed')}}" class="btn btn-danger">
+                                  <i class="icon-remove icon-white"></i>
+                                  {{=T('Failed')}}
+                              </a>
+                          </div>
+                          <div>
+                              <a href="{{=URL('admin','force_assignation_successful')}}" class="btn btn-info">
+                                  <i class="icon-ok icon-white"></i>
+                                  {{=T('Successful')}}
+                              </a>
+                          </div>'>
+                              {{import cpfecys}}
+                              {{if cpfecys.assignation_is_locked(row.user_project):}}
+                              {{=T('row.user_project.assignation_status')}}
+                              {{else:}}
+                              <i class="icon-refresh icon-white"></i>
+                              {{=T('Active')}}
+                              {{pass}}
+                          </span>
+                          </div>
+                      </td>
+                      <td>
+                          <span class="btn
+                                       {{if not row.user_project.assignation_ignored:}}btn-success{{pass}}">
+                              {{if row.user_project.assignation_ignored:}}
+                              {{=T('Ignored')}}
+                              {{else:}}
+                              {{=T('Valid')}}
+                              {{pass}}
+                          </span>
+                      </td>
+                  </tr>
+                  {{pass}}
+              </tbody>
+          </table>
+      </div>
+  </div>
+</div>
+<hr />
+<script>
+    $(function(){
+        $('.pop').popover();
+    });
+</script>
+{{if request.is_local:}}
+{{=response.toolbar()}}
+{{pass}}
