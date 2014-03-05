@@ -1,0 +1,28 @@
+{{extend 'template.html'}}
+<table class="table table-striped table-bordered">
+	<thead>
+		<tr>
+			<th>
+				{{=T('Item name')}}
+			</th>
+			<th>
+				{{=T('Actions')}}
+			</th>
+		</tr>
+	</thead>
+	<tbody>
+		{{for restriction in restrictions:}}
+		<tr>
+			<td>
+				{{=restriction.name}}
+			</td>
+			<td>
+				<a class="btn" href="{{=URL('dsi','item_detail', \
+				vars=dict(restriction=restriction.id))}}">
+					<i class="icon-eye-open"></i> {{=T('View Items')}}
+				</a>
+			</td>
+		</tr>
+		{{pass}}
+	</tbody>
+</table>

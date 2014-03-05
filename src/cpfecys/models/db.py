@@ -393,6 +393,8 @@ db.define_table('item_restriction',
                     label = T('teacher_only')),
                 Field('admin_only', 'boolean', notnull=True, \
                     label = T('admin_only')),
+                Field('dsi_visible', 'boolean', notnull=False,\
+                    label="dsi_visible"),
                 Field('item_type', 'reference item_type', \
                     label = T('item_type')),
                 Field('period', 'reference period_year', \

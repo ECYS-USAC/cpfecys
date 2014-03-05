@@ -535,5 +535,6 @@ def assignation():
 @auth.requires_login()
 @auth.requires_membership('Super-Administrator')
 def users():
-    grid = SQLFORM.smartgrid(db.auth_user)
+    grid = SQLFORM.smartgrid(db.auth_user, orderby=[db.auth_user.first_name, \
+            db.auth_user.username])
     return dict(grid = grid)
