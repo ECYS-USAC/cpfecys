@@ -3,6 +3,70 @@
 
 @auth.requires_login()
 @auth.requires_membership('Super-Administrator')
+def assignation_ignore_toggle():
+    # get assignation id
+    assignation = request.vars['id']
+    # get the assignation
+    assignation = db.user_project(id = assignation)
+    # toggle assignation_ignored flag
+    assignation.assignation_ignored = not assignation.assignation_ignored
+    assignation.update_record()
+    if request.env.http_referrer:
+        redirect(request.env.http_referrer)
+    else:
+        redirect(URL('admin','assignations'))
+    return
+
+@auth.requires_login()
+@auth.requires_membership('Super-Administrator')
+def force_assignation_active():
+    # get assignation id
+    assignation = request.vars['id']
+    # get the assignation
+    assignation = db.user_project(id = assignation)
+    # set the assignation as active
+    assignation.assignation_status = None
+    assignation.update_record()
+    if request.env.http_referrer:
+        redirect(request.env.http_referrer)
+    else:
+        redirect(URL('admin','assignations'))
+    return
+
+@auth.requires_login()
+@auth.requires_membership('Super-Administrator')
+def force_assignation_failed():
+    # get assignation id
+    assignation = request.vars['id']
+    # get the assignation
+    assignation = db.user_project(id = assignation)
+    # set the assignation as failed
+    assignation.assignation_status = db.assignation_status(name="Failed")
+    assignation.update_record()
+    if request.env.http_referrer:
+        redirect(request.env.http_referrer)
+    else:
+        redirect(URL('admin','assignations'))
+    return
+
+@auth.requires_login()
+@auth.requires_membership('Super-Administrator')
+def force_assignation_successful():
+    # get assignation id
+    assignation = request.vars['id']
+    # get the assignation
+    assignation = db.user_project(id = assignation)
+    # set the assignation as successful
+    assignation.assignation_status = db.assignation_status(name="Successful")
+    assignation.update_record()
+    if request.env.http_referrer:
+        redirect(request.env.http_referrer)
+    else:
+        redirect(URL('admin','assignations'))
+    return
+
+@auth.requires_login()
+@auth.requires_membership('Super-Administrator')
 def assignations():
     #requires parameter year_period if no one is provided then it is automatically detected
     #and shows the current period

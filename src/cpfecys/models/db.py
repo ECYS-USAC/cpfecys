@@ -180,7 +180,7 @@ db.define_table('period_year',
                 format = '%(yearp)s - %(period)s')
 
 
-# The only valid assignation_status are: Failed, Sucessful
+# The only valid assignation_status are: Failed, Successful
 db.define_table('assignation_status',
                 Field('name', 'string', unique = True, label = T('name'), length = 255),
                 format = '%(name)s')
