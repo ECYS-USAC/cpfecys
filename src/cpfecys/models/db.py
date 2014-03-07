@@ -174,6 +174,15 @@ db.define_table('period',
                     label = T('name')),
                 format = '%(name)s')
 
+db.define_table('assignation_freeze',
+                Field('pmonth', 'string', length = 255, label = T('month')),
+                Field('period', 'reference period', label = T('period'), unique = True),
+                format = '%(pmonth)s - %(period)s')
+db.assignation_freeze.pmonth.requires = IS_IN_SET((T('January'),T('February'),T('March'),
+                                                   T('April'),T('May'),T('June'),
+                                                   T('July'),T('August'),T('September'),
+                                                   T('October'),T('November'),T('December')))
+
 db.define_table('period_year',
                 Field('yearp', 'integer', label = T('yearp')),
                 Field('period', 'reference period', label = T('period')),

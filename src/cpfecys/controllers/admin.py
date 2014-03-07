@@ -3,6 +3,12 @@
 
 @auth.requires_login()
 @auth.requires_membership('Super-Administrator')
+def assignation_freeze():
+    grid = SQLFORM.grid(db.assignation_freeze)
+    return dict(grid = grid)
+
+@auth.requires_login()
+@auth.requires_membership('Super-Administrator')
 def assignation_ignore_toggle():
     # get assignation id
     assignation = request.vars['id']
