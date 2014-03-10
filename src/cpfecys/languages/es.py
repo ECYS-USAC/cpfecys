@@ -73,6 +73,7 @@
 'application "%s" uninstalled': 'aplicación "%s" desinstalada',
 'application compiled': 'aplicación compilada',
 'application is compiled and cannot be designed': 'la aplicación está compilada y no puede ser modificada',
+'Application to manage Final Practice in USAC': 'Application to manage Final Practice in USAC',
 'Apply changes': 'Aplicar cambios',
 'Approved': 'Aprobado',
 'April': 'Abril',
