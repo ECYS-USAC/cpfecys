@@ -354,10 +354,14 @@ def report_filter():
         if report.assignation.period.period.id == 1:
 
             if report.assignation.periods % 2 == 0:
-                semester = T('Second semester')
+                semester = T('Second Semester')
+            else:
+                semester = T('First Semester')
         else:
             if report.assignation.periods % 2 == 0:
-                semester = T('First semester')
+                semester = T('First Semester')
+            else:
+                semester = T('Second Semester')
         return str(date.year) + '-' + str(semester)
     if not valid:
         session.flash = T('Incomplete Information')
