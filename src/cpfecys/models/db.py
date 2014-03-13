@@ -338,6 +338,10 @@ db.define_table('report',
                 label = T('teacher comment')),
                 Field('score_date', 'date', \
                 label = T('score date')),
+                # DTT Approval can be None, thus means that still hasn't been approved by DTT Admin
+                # Approval is true when approved and false when failed
+                Field('dtt_approval', 'boolean',
+                      label = T('dtt approval')),
                 Field('period', 'reference period_year', \
                     label = T('period')),
                 )

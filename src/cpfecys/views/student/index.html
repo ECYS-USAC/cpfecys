@@ -81,8 +81,11 @@
                                     <th>
                                         {{=T('Score')}}
                                     </th>
-                                    <th>
-                                        {{=T('Information')}}
+                                    <th colspan="2">
+                                        {{=T('Approval')}}:
+                                        {{=T('Teacher')}}
+                                        /
+                                        {{=T('DTT')}}
                                     </th>
                                     <th>
                                         {{=T('Actions')}}
@@ -145,6 +148,15 @@
                                                     data-placement="top"
                                                     title="{{=T('Click to see teacher comment')}}"></i>
                                             {{pass}}
+                                        {{pass}}
+                                    </td>
+                                    <td>
+                                        {{if report.dtt_approval is None:}}
+                                        <span class="label">{{=T('Approval Pending')}}</span>
+                                        {{elif report.dtt_approval is true:}}
+                                        <span class="label label-success">{{=T('Approved')}}</span>
+                                        {{else:}}
+                                        <span class="label label-important">{{=T('Not Approved')}}</span>
                                         {{pass}}
                                     </td>
                                     {{if report.score: average_report_scoring += report.score}}
