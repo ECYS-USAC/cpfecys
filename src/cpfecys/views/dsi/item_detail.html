@@ -1,7 +1,7 @@
 {{extend 'template.html'}}
 <div class="row-fluid">
   <div class="well span12">
-	{{for restriction in restrictions.select():}}
+	{{for restriction in restrictions:}}
 	<h1>{{=restriction.name}}</h1>
 		{{for area in get_areas(restriction).select(db.area_level.ALL):}}
 			<h2>{{=area.name}}</h2>
@@ -11,21 +11,63 @@
 						<h3>{{=project.name}}</h3>
 						<table class="table table-striped table-bordered">
 						{{for assignation in get_students(project):}}
-						<tr>
-							<td>
-							{{=assignation.assigned_user.username}}
-							{{=assignation.assigned_user.first_name}}
-							{{=assignation.assigned_user.last_name}}
-							</td>
-							<td>
-
-								<label for="score">{{=T('Score')}}</label>
-								<input id="score" type="text">
-							</td>
-							<td>
-								<label for="done">{{=T('Done')}}</label>
-								<input id="done" type="checkbox">
-							</td>
+						{{item = get_item(restriction, assignation)}}
+						{{score = 0}}
+						{{checked = ''}}
+						{{button_message = T('Save')}}
+						{{button_class = 'btn-info'}}
+						{{if item:}}
+							{{score = item.score or 0}}
+							{{button_message = T('Update')}}
+							{{button_class = 'btn-success'}}
+							{{if item.done_activity:}}
+								{{checked = 'checked'}}
+							{{pass}}
+						{{pass}}
+						<tr class="form-inline">
+							<form class="save-form" 
+							action="{{=URL('dsi','item_detail/update')}}">
+								<td>
+								{{=assignation.assigned_user.username}}
+								{{=assignation.assigned_user.first_name}}
+								{{=assignation.assigned_user.last_name}}
+								</td>
+								{{if restriction.item_type.name!= \
+								'Grade Activity':}}
+								<td>
+									<input id="done" type="checkbox" 
+									{{=checked}} name="done">
+									<label for="done">{{=T('Done')}}</label>
+								</td>
+								{{else:}}
+								<td>
+									<label for="score">{{=T('Score')}}</label>
+									<input type="text" id="score" name="score" 
+									value="{{=score}}">
+								</td>
+								<td>
+									<span class="label label-info">
+										{{=T('Minimum value to aprove')}}:
+										{{=restriction.min_score}}
+									</span>
+								</td>
+								{{pass}}
+								<td>
+									<input 
+									class="btn submit-grade {{=button_class}}" 
+									type="submit" value="{{=button_message}}">
+								</td>
+								<input type="hidden" 
+								name="user"
+								value="{{=assignation.assigned_user.id}}">
+								<input type="hidden" 
+								name="project"
+								value="{{=assignation.project.id}}">
+								<input type="hidden" 
+								name="restriction"
+								value="{{=restriction.id}}">
+							</form>
+							
 						</tr>
 						{{pass}}
 						</table>

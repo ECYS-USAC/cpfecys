@@ -329,8 +329,6 @@ db.define_table('report',
                 label = T('teacher comment')),
                 Field('score_date', 'date', \
                 label = T('score date')),
-                Field('period', 'reference period_year', \
-                    label = T('period')),
                 )
 
 db.define_table('log_type',
@@ -415,6 +413,8 @@ db.define_table('item_restriction',
                     label = T('period')),
                 Field('limit_days', 'integer', notnull=False,\
                     label="limitdays"),
+                Field('min_score', 'integer', notnull=False,\
+                    label="minscore"),
                 format='%(name)s'
                 )
 
@@ -434,6 +434,17 @@ db.define_table('item_restriction_exception',
                     label = T('item_restriction')),
                 )
 
+db.define_table('mail_log', 
+                Field('sent_message', 'text', notnull=False, \
+                    label = T('sent_message')),
+                Field('roles', 'text', notnull=False, \
+                    label = T('roles')),
+                Field('projects', 'text', notnull=False, \
+                    label = T('projects')),
+                Field('sent', 'date', notnull=False, \
+                    label = T('sent')),
+                )
+
 db.define_table('item',
                 Field('is_active', 'boolean', notnull=False, \
                     label = T('is_active')),
@@ -449,6 +460,10 @@ db.define_table('item',
                     label = T('item_restriction')),
                 Field('assignation', 'reference user_project', \
                     label = T('assignation')),
+                Field('score', 'integer', notnull=False, \
+                    label = T('score')),
+                Field('min_score', 'integer', notnull=False, \
+                    label = T('minscore')),
                 format='%(description)s'
                 )
 

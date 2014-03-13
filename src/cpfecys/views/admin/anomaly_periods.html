@@ -12,6 +12,9 @@
 					{{=T('Year')}}
 				</th>
 				<th>
+					{{=T('Total')}}
+				</th>
+				<th>
 					{{=T('View')}}
 				</th>
 			</tr>
@@ -24,6 +27,9 @@
 					</td>
 					<td>
 						{{=period.yearp}}
+					</td>
+					<td>
+						{{=count_by_period(period)}}
 					</td>
 					<td>
 						<a class="btn" href="{{=URL('admin', 'anomalies_list/view', \

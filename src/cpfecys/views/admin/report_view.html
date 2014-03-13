@@ -21,7 +21,7 @@
                   {{for status in status_list:}}
                     <option value="{{=status.id}}"
                     {{if status.id==report.status.id:}}selected{{pass}}>
-                    {{=T(status.name)}}
+                    {{=T(add_timing(status.name))}}
                     </option>
                   {{pass}}
                 </select>

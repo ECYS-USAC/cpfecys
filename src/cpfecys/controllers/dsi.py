@@ -6,11 +6,75 @@ def index():
 	period = cpfecys.current_year_period()
 	restrictions = db(
 		(db.item_restriction.item_type==db.item_type(name='Activity'))& \
+		(db.item_restriction.period==period.id)).select()| \
+	 db((db.item_restriction.item_type==db.item_type(name='Grade Activity'))& \
 		(db.item_restriction.period==period.id)).select()
 	return dict(restrictions=restrictions)
 
+@auth.requires_login()
+@auth.requires_membership('DSI')
 def item_detail():
 	period = cpfecys.current_year_period()
+	if (request.args(0) == 'update'):
+		valid = False
+		score = request.vars['score']
+		done = request.vars['done'] or False
+		user = request.vars['user']
+		project = request.vars['project']
+		restriction = request.vars['restriction']
+		done_activity = (done=='on' or None)
+		restriction = db(db.item_restriction.id==restriction).select().first()
+		if restriction.item_type.name == 'Grade Activity':
+			valid = not(score and user and restriction)
+		else:
+			valid = not(user and restriction)
+		if valid:
+			session.flash = T('Not permited action.')
+			redirect(URL('dsi', 'index'))
+		#Validate if current user assignation is active
+		assignations = db(
+	                    (db.auth_user.id==db.user_project.assigned_user)&
+	                    (db.auth_user.id==db.auth_membership.user_id)&
+	                    (db.auth_user.id==user)&
+	                    (db.auth_membership.group_id==db.auth_group.id)&
+	                    (db.auth_group.role=='Student')&
+	                    (db.user_project.project==project)&
+	                    (db.user_project.period==db.period_year.id)&
+	                    ((db.user_project.period <= period.id)&
+	              		((db.user_project.period + db.user_project.periods) > \
+	              		 period.id))
+	                    )
+		if assignations.count() != 1:
+			session.flash = T('Not permited action.')
+			redirect(URL('dsi', 'index'))
+		assignation = assignations.select(db.user_project.ALL).first()
+		item = db((db.item.created==period.id)&
+			(db.item.item_restriction==restriction.id)&
+			(db.item.item_restriction==db.item_restriction.id)&
+			(db.item_restriction.is_enabled==True)&
+			(db.item.assignation==assignation.id)).select(db.item.ALL).first()
+
+		if item == None:
+			import datetime
+			cdate = datetime.datetime.now()
+			db.item.insert(is_active=True,
+				done_activity=done_activity,
+				created=period.id,
+				item_restriction=restriction.id,
+				assignation=assignation.id,
+				score=score,
+				min_score=restriction.min_score)
+		else:
+			item.update_record(is_active=True,
+				done_activity=done_activity,
+				created=period.id,
+				item_restriction=restriction.id,
+				assignation=assignation.id,
+				score=score,
+				min_score=restriction.min_score)
+
+		redirect(URL('dsi','item_detail', vars=dict(restriction=restriction.id)))
+	
 	restriction = request.vars['restriction']
 	valid = restriction != None and restriction != ''
 	if not valid:
@@ -19,7 +83,12 @@ def item_detail():
 	restrictions = db(
 		(db.item_restriction.item_type==db.item_type(name='Activity'))& \
 		(db.item_restriction.period==period.id)&
-		(db.item_restriction.id==restriction))
+		(db.item_restriction.id==restriction)&
+		(db.item_restriction.is_enabled==True)).select() | \
+	db((db.item_restriction.item_type==db.item_type(name='Grade Activity'))& \
+		(db.item_restriction.period==period.id)&
+		(db.item_restriction.id==restriction)&
+		(db.item_restriction.is_enabled==True)).select()
 	def get_areas(restriction):
 		areas = db((db.item_restriction_area.item_restriction==restriction.id)&
 			(db.area_level.id==db.item_restriction_area.area_level))
@@ -40,7 +109,6 @@ def item_detail():
 				restriction.id))
 		return restriction.count() != 0
 	def get_students(project):
-		target_period = period.id + 1
 		assignations = db(
                     (db.auth_user.id==db.user_project.assigned_user)&
                     (db.auth_user.id==db.auth_membership.user_id)&
@@ -53,9 +121,16 @@ def item_detail():
               		 period.id))
                     ).select(db.user_project.ALL)
 		return assignations
-		return 'uno'
+	def get_item(restriction, assignation):
+		item = db((db.item.assignation==assignation.id)&
+			(db.item.item_restriction==restriction.id)&
+			(db.item.item_restriction==db.item_restriction.id)&
+			(db.item_restriction.is_enabled==True)&
+			(db.item.created==period.id)).select(db.item.ALL).first()
+		return item
 	return dict(restrictions=restrictions,
 		get_areas=get_areas,
 		get_projects=get_projects,
 		is_exception=is_exception,
-		get_students=get_students)
+		get_students=get_students,
+		get_item=get_item)

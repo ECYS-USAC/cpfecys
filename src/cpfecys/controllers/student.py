@@ -540,8 +540,7 @@ def report():
         report = db.report.insert(created = current_date,
                              assignation = assignation,
                              report_restriction = report_restriction,
-                             status = db.report_status(name = 'Draft'),
-                             period = cpfecys.current_year_period())
+                             status = db.report_status(name = 'Draft'))
         session.flash = T('Report is now a draft.')
         redirect(URL('student','report/edit', vars = dict(report = report.id)))
     elif (request.args(0) == 'edit'):

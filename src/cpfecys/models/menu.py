@@ -40,6 +40,9 @@ if auth.has_membership(role="Super-Administrator"):
              (T('Links Manager'), False, URL('admin', 'links'), []),
              (T('Files Manager'), False, URL('admin', 'files_manager'), []),
              (T('Notifications Manager'), False, URL('admin', 'notifications_manager'), []),
+             (T('Mail Notifications Manager'), False, URL(), [
+                (T('Send Mail'), False, URL('admin', 'mail_notifications'), []),
+                (T('Mail Log'), False, URL('admin', 'mail_log'), []),]),
              ]),
          (T('Reports Administration'), False, URL(),[
              (T('Report Mandatory Blocks'), False, URL('admin', 'report_requirements'), []),

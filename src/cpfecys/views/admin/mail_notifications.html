@@ -1,0 +1,78 @@
+{{extend 'template.html'}}
+<div class="row-fluid">
+    <div class="well span12">
+    	<a onclick="window.history.back()" class="btn" ><i class="icon-arrow-left"></i>{{=T('Back')}}</a>
+	<form action="{{=URL('admin', 'mail_notifications/send')}}">
+	  <fieldset>
+	  	<label for="subject">{{=T('Subject')}}</label>
+	    <input type="text" id="subject" name="subject">
+	    <label for="message">{{=T('Message')}}</label>
+	    <textarea id="message" name="message"></textarea>
+	    <button type="submit" class="btn">{{=T('Send')}}</button>
+	  </fieldset>
+	  <table>
+		<tr>
+			<td>
+			  <table class="table-striped table-bordered">
+			   	  {{for group in groups:}}
+			   	  	<tr>
+		   	  		  <td>
+		   	  			<input type="checkbox" name="role"
+		   	  			value="{{=group.id}}">	
+		   	  		  </td>
+		   	  		  <td>
+		   	  		    {{=group.role}} 
+		   	  		  </td>
+			   	  	</tr>
+			   	  {{pass}}
+			  </table>
+			</td>
+			<td>
+			  <table class="table-striped table-bordered">
+			   	  {{for area in areas:}}
+			   	  	<tr>
+		   	  		  <td>
+		   	  			<input type="checkbox" class="area_trigger" 
+		   	  			target="{{=prepare_name(area.name)}}" >	
+		   	  		  </td>
+		   	  		  <td>
+		   	  		    {{=area.name}} 
+		   	  		  </td>
+			   	  	</tr>
+			   	  {{pass}}
+			  </table>
+			</td>
+			<td>
+			   	{{for area in areas:}}
+			   	<table class="table-striped table-bordered">
+				  	{{for project in get_projects(area).select():}}
+				  	<tr>
+				  	  <td>
+					    <input type="checkbox" 
+					    class="{{=prepare_name(area.name)}}" name="project" 
+					    value="{{=project.id}}">
+					  </td>
+					  <td>
+					  	{{=project.name}}
+					  </td>
+					</tr>
+				  	{{pass}}
+			  	</table>
+				{{pass}}
+			</td>
+		</tr>
+	  </table>
+	   
+	  
+	</form>
+
+	</div>
+</div>
+<script type="text/javascript">
+	$(document).ready(function(){
+		$('.area_trigger').click(function(event){
+			target = $(this).attr('target');
+			$('.'+target).trigger('click');
+		})
+	});
+</script>

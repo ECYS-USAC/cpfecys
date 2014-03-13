@@ -347,6 +347,7 @@ def _item_type_setup():
     #Default item types
     db.item_type.insert(name='File')
     db.item_type.insert(name='Activity')
+    db.log_type.insert(name='Grade Activity')
 
 
 def _report_status_setup():

@@ -13,15 +13,18 @@ def assignations():
     if not currentyear_period:
         currentyear_period = cpfecys.current_year_period()
         changid = currentyear_period.id
-    q_selected_period_assignations = ((db.user_project.period <= currentyear_period.id)&
-              ((db.user_project.period + db.user_project.periods) > currentyear_period.id))
+    q_selected_period_assignations = ((db.user_project.period <= \
+        currentyear_period.id)&
+              ((db.user_project.period + db.user_project.periods) > \
+                currentyear_period.id))
     q2 = (db.user_project.assigned_user == db.auth_user.id)
     q3 = (db.user_project.project == db.project.id)
     q4 = (db.user_project.period == db.period_year.id)
     orderby = db.auth_user.last_name
     orderby2 = db.auth_user.first_name
     orderby3 = db.auth_user.username
-    data = db(q_selected_period_assignations&q2&q3&q4).select(orderby=orderby|orderby2|orderby3)
+    data = db(q_selected_period_assignations&q2&q3&q4\
+        ).select(orderby=orderby|orderby2|orderby3)
     current_period_name = T(cpfecys.second_period.name)
     if currentyear_period.period == cpfecys.first_period.id:
         current_period_name = T(cpfecys.first_period.name)
@@ -29,8 +32,10 @@ def assignations():
     if start_index < 1:
         start_index = 0
     end_index = currentyear_period.id + max_display
-    periods_before = db(db.period_year).select(limitby=(start_index, currentyear_period.id - 1))
-    periods_after = db(db.period_year).select(limitby=(currentyear_period.id, end_index))
+    periods_before = db(db.period_year \
+        ).select(limitby=(start_index, currentyear_period.id - 1))
+    periods_after = db(db.period_year \
+        ).select(limitby=(currentyear_period.id, end_index))
     other_periods = db(db.period_year).select()
     return dict(data = data,
                 currentyear_period = currentyear_period,
@@ -84,6 +89,14 @@ def report():
         report = db.report(db.report.id == report)
         valid = not(report is None)
         if valid:
+            def add_timing(status):
+                if status == 'Acceptance':
+                    return status
+                elif status == 'Recheck':
+                    return status + ' (' + str(parameters.rescore_max_days) + \
+                        ' days)'
+                else:
+                    return status + ' (24 hours)'
             if report.score_date:
                 next_date = report.score_date + datetime.timedelta(
                     days=parameters.rescore_max_days)
@@ -102,7 +115,8 @@ def report():
                 markmin_settings=cpfecys.get_markmin,
                 report=report,
                 next_date=next_date,
-                status_list=db(db.report_status).select())
+                status_list=db(db.report_status).select(),
+                add_timing=add_timing)
         else:
             session.flash = T('Selected report can\'t be viewed. \
                                 Select a valid report.')
@@ -146,10 +160,106 @@ def report():
                             Select a valid report.')
         redirect(URL('teacher', 'index'))
 
+@auth.requires_login()
+@auth.requires_membership('Super-Administrator')
+def mail_notifications():
+    period = cpfecys.current_year_period()
+    if (request.args(0) == 'send'):
+        roles = request.vars['role']
+        projects = request.vars['project']
+        message = request.vars['message']
+        subject = request.vars['subject']
+        if projects  != None  and roles != None:
+            assignations = None
+            for role in request.vars['role']:
+                role = db(db.auth_group.id==role).select().first()
+                if role.role == 'DSI':
+                    users = db(
+                        (db.auth_user.id==db.auth_membership.user_id)&
+                        (db.auth_membership.group_id==db.auth_group.id)&
+                        (db.auth_group.role=='DSI'))
+                    dsi_role = [users.select().first().auth_group.id]
+                    send_mail_to_users(users.select(db.auth_user.ALL), 
+                        message, dsi_role, projects,
+                        subject)
+            users = db(
+                    (db.auth_user.id==db.user_project.assigned_user)&
+                    (db.auth_user.id==db.auth_membership.user_id)&
+                    (db.auth_membership.group_id==db.auth_group.id)&
+                    (db.auth_group.id.belongs(roles))&
+                    (db.user_project.project.belongs(projects))&
+                    (db.user_project.period==db.period_year.id)&
+                    ((db.user_project.period <= period.id)&
+                    ((db.user_project.period + db.user_project.periods) > \
+                     period.id))
+                    ).select(db.auth_user.ALL, distinct=True)
+
+            send_mail_to_users(users, message, roles, projects, subject, True)
+            session.flash = T('Mail successfully sent')
+            redirect(URL('admin', 'mail_notifications'))
+        else:
+            session.flash = T('At least a project and a role must be selected')
+            redirect(URL('admin', 'mail_notifications'))
+
+    groups = db(db.auth_group.role!='Super-Administrator').select()
+    areas = db(db.area_level).select()
+    def get_projects(area):
+        courses = db(db.project.area_level==area.id)
+        return courses
+    def prepare_name(name):
+        name = name.lower()
+        name = name.replace(' ', '-')
+        return name
+    return dict(groups=groups,
+        areas=areas,
+        get_projects=get_projects,
+        prepare_name=prepare_name)
+
+@auth.requires_login()
+@auth.requires_membership('Super-Administrator')
+def mail_log():
+    logs = db(db.mail_log).select()
+    return dict(logs=logs)
+
+@auth.requires_login()
+@auth.requires_membership('Super-Administrator')
+def send_mail_to_users(users, message, roles, projects, subject, log=False):
+    if log:
+        import datetime
+        cdate = datetime.datetime.now()
+        roles = db(db.auth_group.id.belongs(roles)).select()
+        projects = db(db.project.id.belongs(projects)).select()
+        roles_text = ''
+        projects_text = ''
+        for role in roles:
+            roles_text = roles_text + ',' + role.role
+            pass
+        for project in projects:
+            projects_text = projects_text + '|' + project.name + '|'
+            pass
+        db.mail_log.insert(sent_message=message,
+            roles=roles_text[1:],
+            projects=projects_text[1:],
+            sent=cdate)
+    for user in users:
+        print user.email
+        if user.email != None and user.email != '':
+            mail.send(to=user.email,
+              subject=T(subject),
+              message=message)
 
 @auth.requires_login()
 @auth.requires_membership('Super-Administrator')
 def anomalies_list():
+    from datetime import datetime
+    cperiod = cpfecys.current_year_period()
+    year = str(cperiod.yearp)
+    if cperiod.period == 1:
+        start = datetime.strptime(year + '-01-01', "%Y-%m-%d")
+        end = datetime.strptime(year + '-07-01', "%Y-%m-%d")
+    else:
+        start = datetime.strptime(year + '-07-01', "%Y-%m-%d")
+        end = datetime.strptime(year + '-12-31', "%Y-%m-%d")
     def get_month_name(date):
         import datetime
         return date.strftime("%B")
@@ -162,7 +272,8 @@ def anomalies_list():
             redirect(URL('default', 'index'))
         anomalies = db((db.log_entry.report==db.report.id)&
             (db.log_entry.log_type==db.log_type(name='Anomaly'))&
-            (db.report.period==period)&
+            (db.report.created>start)&
+            (db.report.created<end)&
             (db.report.assignation==db.user_project.id)&
             (db.user_project.project==db.project.id) \
             ).select(db.log_entry.entry_date, \
@@ -175,7 +286,17 @@ def anomalies_list():
     elif (request.args(0) == 'periods'):
         response.view = 'admin/anomaly_periods.html'
         periods = db(db.period_year).select()
-        return dict(periods=periods)
+        def count_by_period(period):
+            anomalies_total = db((db.log_entry.report==db.report.id)&
+            (db.log_entry.log_type==db.log_type(name='Anomaly'))&
+            (db.report.created>start)&
+            (db.report.created<end)&
+            (db.report.assignation==db.user_project.id)&
+            (db.user_project.project==db.project.id) \
+            ).count()
+            return anomalies_total
+        return dict(periods=periods,
+            count_by_period=count_by_period)
 
     elif (request.args(0) == 'show'):
         project = request.vars['project']
@@ -187,7 +308,8 @@ def anomalies_list():
         project = db(db.project.id==project).select().first()
         anomalies = db((db.log_entry.report==db.report.id)&
             (db.log_entry.log_type==db.log_type(name='Anomaly'))&
-            (db.report.period==period)&
+            (db.report.created>start)&
+            (db.report.created<end)&
             (db.report.assignation==db.user_project.id)&
             (db.user_project.project==db.project.id)&
             (db.project.id==project) \
@@ -203,11 +325,29 @@ def report_list():
     response.view = 'admin/report_list.html'
     period_year = db(db.period_year).select(orderby=~db.period_year.id)
     def count_reproved(pyear):
-        reports = db((db.report.period==pyear)&
+        from datetime import datetime
+        year = str(pyear.yearp)
+        if pyear.period == 1:
+            start = datetime.strptime(year + '-01-01', "%Y-%m-%d")
+            end = datetime.strptime(year + '-07-01', "%Y-%m-%d")
+        else:
+            start = datetime.strptime(year + '-07-01', "%Y-%m-%d")
+            end = datetime.strptime(year + '-12-31', "%Y-%m-%d")
+        reports = db((db.report.created>start)&
+            (db.report.created<end)&
             (db.report.score < db.report.min_score))
         return reports.count()
     def count_approved(pyear):
-        reports = db((db.report.period==pyear)&
+        from datetime import datetime
+        year = str(pyear.yearp)
+        if pyear.period == 1:
+            start = datetime.strptime(year + '-01-01', "%Y-%m-%d")
+            end = datetime.strptime(year + '-07-01', "%Y-%m-%d")
+        else:
+            start = datetime.strptime(year + '-07-01', "%Y-%m-%d")
+            end = datetime.strptime(year + '-12-31', "%Y-%m-%d")
+        reports = db((db.report.created<end)&
+            (db.report.created>start)&
             (db.report.score>=db.report.min_score)&
             (db.report.min_score!=None)&
             (db.report.min_score!=0))
@@ -230,20 +370,27 @@ def report_list():
             return restrictions
 
     def count_reports(pyear):
+        from datetime import datetime
+        year = str(pyear.yearp)
+        if pyear.period == 1:
+            start = datetime.strptime(year + '-01-01', "%Y-%m-%d")
+            end = datetime.strptime(year + '-07-01', "%Y-%m-%d")
+        else:
+            start = datetime.strptime(year + '-07-01', "%Y-%m-%d")
+            end = datetime.strptime(year + '-12-31', "%Y-%m-%d")
         count = db.report.id.count()
         report_total = db().select(
             db.report_status.ALL, count, 
             left=db.report.on((db.report.status==db.report_status.id)&
-                (db.report.period)&
-                (db.report.period==pyear.id)), 
+                (db.report.created < end)&
+                (db.report.created > start)), 
             groupby=db.report_status.name)
         return report_total
 
     count = db.report.id.count()
     report_total = db().select(
         db.report_status.ALL, count, 
-        left=db.report.on((db.report.status==db.report_status.id)&
-            (db.report.period)), 
+        left=db.report.on((db.report.status==db.report_status.id)), 
         groupby=db.report_status.name)
     return dict(period_year=period_year,
         report_total=report_total,
@@ -256,6 +403,15 @@ def report_list():
 @auth.requires_login()
 @auth.requires_membership('Super-Administrator')
 def report_filter():
+    from datetime import datetime
+    cperiod = cpfecys.current_year_period()
+    year = str(cperiod.yearp)
+    if cperiod.period == 1:
+        start = datetime.strptime(year + '-01-01', "%Y-%m-%d")
+        end = datetime.strptime(year + '-07-01', "%Y-%m-%d")
+    else:
+        start = datetime.strptime(year + '-07-01', "%Y-%m-%d")
+        end = datetime.strptime(year + '-12-31', "%Y-%m-%d")
     status = request.vars['status']
     period = request.vars['period']
     valid = period != None
@@ -293,14 +449,17 @@ def report_filter():
         session.flash = T('Incomplete Information')
         redirect(URL('default', 'index'))
     if not status:
-        reports = db((db.report.period==period)).select(db.report.ALL)
+        reports = db((db.report.created>start)&
+            (db.report.created<end)).select(db.report.ALL)
     elif int(status) == -1:
-        reports = db((db.report.period==period)&
+        reports = db((db.report.created>start)&
+            (db.report.created<end)&
             (db.report.score>=db.report.min_score)&
             (db.report.min_score!=None)&
             (db.report.min_score!=0)).select()
     else:
-        reports = db((db.report.period==period)&
+        reports = db((db.report.created>start)&
+            (db.report.created<end)&
             (db.report.status==status)).select(db.report.ALL)
     return dict(reports=reports,
         count_log_entries=count_log_entries,
@@ -480,7 +639,8 @@ def assignation_upload():
                     usr = db2.user_user(db2.user_user.username == rusername)
                     if usr is None:
                         # report error and get on to next row
-                        row.append(T('Error: ') + T('User is not valid. User doesn\'t exist in UV.'))
+                        row.append(T('Error: ') + T('User is not valid. \
+                            User doesn\'t exist in UV.'))
                         error_users.append(row)
                         continue
                     else:
@@ -493,13 +653,17 @@ def assignation_upload():
                         #add user to role 'student'
                         auth.add_membership('Student', usr)
                 else:
-                    assignation = db.user_project((db.user_project.assigned_user == usr.id)&
-                                                  (db.user_project.project == project)&
-                                                  (db.user_project.period == current_period))
+                    assignation = db.user_project(
+                        (db.user_project.assigned_user == usr.id)&
+                        (db.user_project.project == project)&
+                        (db.user_project.period == current_period))
                     if assignation != None:
-                        row.append(T('Warning: ') + T('User was already assigned, Updating Data.'))
+                        row.append(T('Warning: ') + T('User \
+                         was already assigned, Updating Data.'))
                         warning_users.append(row)
-                        assignation.update_record(periods = rassignation_length, pro_bono = rpro_bono)
+                        assignation.update_record(periods = \
+                            rassignation_length, pro_bono = \
+                            rpro_bono)
                         continue
                 if project != None:
                     db.user_project.insert(assigned_user = usr,
@@ -509,7 +673,8 @@ def assignation_upload():
                                             pro_bono = rpro_bono)
                 else:
                     # project_id is not valid
-                    row.append('Error: ' + T('Project code is not valid. Check please.'))
+                    row.append('Error: ' + T('Project code is not valid. \
+                     Check please.'))
                     error_users.append(row)
                     continue
         except csv.Error:
@@ -543,7 +708,8 @@ def download():
 @auth.requires_login()
 @auth.requires_membership('Super-Administrator')
 def assignation():
-    #requires parameter year_period if no one is provided then it is automatically detected
+    #requires parameter year_period if no one is provided then it is 
+    #automatically detected
     #and shows the current period
     year_period = request.vars['year_period']
     max_display = 1
@@ -553,7 +719,8 @@ def assignation():
         currentyear_period = cpfecys.current_year_period()
         changid = currentyear_period.id
     grid = SQLFORM.grid((db.user_project.period <= currentyear_period.id)&
-              ((db.user_project.period + db.user_project.periods) > currentyear_period.id))
+              ((db.user_project.period + db.user_project.periods) >  \
+                currentyear_period.id))
     current_period_name = T(cpfecys.second_period.name)
     if currentyear_period.period == cpfecys.first_period.id:
         current_period_name = T(cpfecys.first_period.name)
@@ -561,8 +728,10 @@ def assignation():
     if start_index < 1:
         start_index = 0
     end_index = currentyear_period.id + max_display
-    periods_before = db(db.period_year).select(limitby=(start_index, currentyear_period.id - 1))
-    periods_after = db(db.period_year).select(limitby=(currentyear_period.id, end_index))
+    periods_before = db(db.period_year).select(limitby=(start_index,  \
+        currentyear_period.id - 1))
+    periods_after = db(db.period_year).select(limitby=(currentyear_period.id, \
+     end_index))
     other_periods = db(db.period_year).select()
     return dict(grid = grid,
                 currentyear_period = currentyear_period,
@@ -574,6 +743,7 @@ def assignation():
 @auth.requires_login()
 @auth.requires_membership('Super-Administrator')
 def users():
-    grid = SQLFORM.smartgrid(db.auth_user, orderby=[db.auth_user.first_name, \
-            db.auth_user.username])
+    orderby = dict(auth_user=[db.auth_user.first_name, \
+                db.auth_user.username])
+    grid = SQLFORM.smartgrid(db.auth_user, orderby=orderby)
     return dict(grid = grid)
