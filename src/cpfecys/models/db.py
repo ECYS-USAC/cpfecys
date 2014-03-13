@@ -174,13 +174,22 @@ db.define_table('period',
                     label = T('name')),
                 format = '%(name)s')
 
+db.define_table('assignation_freeze',
+                Field('pmonth', 'string', length = 255, label = T('month')),
+                Field('period', 'reference period', label = T('period'), unique = True),
+                format = '%(pmonth)s - %(period)s')
+db.assignation_freeze.pmonth.requires = IS_IN_SET((T('January'),T('February'),T('March'),
+                                                   T('April'),T('May'),T('June'),
+                                                   T('July'),T('August'),T('September'),
+                                                   T('October'),T('November'),T('December')))
+
 db.define_table('period_year',
                 Field('yearp', 'integer', label = T('yearp')),
                 Field('period', 'reference period', label = T('period')),
                 format = '%(yearp)s - %(period)s')
 
 
-# The only valid assignation_status are: Failed, Sucessful
+# The only valid assignation_status are: Failed, Successful
 db.define_table('assignation_status',
                 Field('name', 'string', unique = True, label = T('name'), length = 255),
                 format = '%(name)s')
@@ -329,6 +338,12 @@ db.define_table('report',
                 label = T('teacher comment')),
                 Field('score_date', 'date', \
                 label = T('score date')),
+                # DTT Approval can be None, thus means that still hasn't been approved by DTT Admin
+                # Approval is true when approved and false when failed
+                Field('dtt_approval', 'boolean',
+                      label = T('dtt approval')),
+                Field('period', 'reference period_year', \
+                    label = T('period')),
                 )
 
 db.define_table('log_type',

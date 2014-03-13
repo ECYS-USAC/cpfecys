@@ -98,26 +98,26 @@
                       <td>{{=row.user_project.periods}}</td>
                       <td><div>
                           <span class='btn pop' data-title='{{=T("Force Status")}}' data-html=true data-content='<div>
-                                                                                                                             <a href="{{=URL('admin','force_assignation_active')}}" class="btn btn-success">
+                                                                                                                             <a href="{{=URL('admin','force_assignation_active',vars=dict(id=row.user_project.id))}}" class="btn btn-success">
                                   <i class="icon-refresh icon-white"></i>
                                   {{=T('Active')}}
                               </a>
                           </div>
                           <div>
-                              <a href="{{=URL('admin','force_assignation_failed')}}" class="btn btn-danger">
+                              <a href="{{=URL('admin','force_assignation_failed',vars=dict(id=row.user_project.id))}}" class="btn btn-danger">
                                   <i class="icon-remove icon-white"></i>
                                   {{=T('Failed')}}
                               </a>
                           </div>
                           <div>
-                              <a href="{{=URL('admin','force_assignation_successful')}}" class="btn btn-info">
+                              <a href="{{=URL('admin','force_assignation_successful',vars=dict(id=row.user_project.id))}}" class="btn btn-info">
                                   <i class="icon-ok icon-white"></i>
                                   {{=T('Successful')}}
                               </a>
                           </div>'>
                               {{import cpfecys}}
                               {{if cpfecys.assignation_is_locked(row.user_project):}}
-                              {{=T('row.user_project.assignation_status')}}
+                              {{=T(row.user_project.assignation_status.name)}}
                               {{else:}}
                               <i class="icon-refresh icon-white"></i>
                               {{=T('Active')}}
@@ -126,14 +126,15 @@
                           </div>
                       </td>
                       <td>
-                          <span class="btn
-                                       {{if not row.user_project.assignation_ignored:}}btn-success{{pass}}">
+                          <a class="btn
+                                       {{if not row.user_project.assignation_ignored:}}btn-success{{pass}}"
+                             href="{{=URL('admin','assignation_ignore_toggle', vars=dict(id=row.user_project.id))}}">
                               {{if row.user_project.assignation_ignored:}}
                               {{=T('Ignored')}}
                               {{else:}}
                               {{=T('Valid')}}
                               {{pass}}
-                          </span>
+                          </a>
                       </td>
                   </tr>
                   {{pass}}

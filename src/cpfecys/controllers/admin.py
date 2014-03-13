@@ -3,6 +3,76 @@
 
 @auth.requires_login()
 @auth.requires_membership('Super-Administrator')
+def assignation_freeze():
+    grid = SQLFORM.grid(db.assignation_freeze)
+    return dict(grid = grid)
+
+@auth.requires_login()
+@auth.requires_membership('Super-Administrator')
+def assignation_ignore_toggle():
+    # get assignation id
+    assignation = request.vars['id']
+    # get the assignation
+    assignation = db.user_project(id = assignation)
+    # toggle assignation_ignored flag
+    assignation.assignation_ignored = not assignation.assignation_ignored
+    assignation.update_record()
+    if request.env.http_referrer:
+        redirect(request.env.http_referrer)
+    else:
+        redirect(URL('admin','assignations'))
+    return
+
+@auth.requires_login()
+@auth.requires_membership('Super-Administrator')
+def force_assignation_active():
+    # get assignation id
+    assignation = request.vars['id']
+    # get the assignation
+    assignation = db.user_project(id = assignation)
+    # set the assignation as active
+    assignation.assignation_status = None
+    assignation.update_record()
+    if request.env.http_referrer:
+        redirect(request.env.http_referrer)
+    else:
+        redirect(URL('admin','assignations'))
+    return
+
+@auth.requires_login()
+@auth.requires_membership('Super-Administrator')
+def force_assignation_failed():
+    # get assignation id
+    assignation = request.vars['id']
+    # get the assignation
+    assignation = db.user_project(id = assignation)
+    # set the assignation as failed
+    assignation.assignation_status = db.assignation_status(name="Failed")
+    assignation.update_record()
+    if request.env.http_referrer:
+        redirect(request.env.http_referrer)
+    else:
+        redirect(URL('admin','assignations'))
+    return
+
+@auth.requires_login()
+@auth.requires_membership('Super-Administrator')
+def force_assignation_successful():
+    # get assignation id
+    assignation = request.vars['id']
+    # get the assignation
+    assignation = db.user_project(id = assignation)
+    # set the assignation as successful
+    assignation.assignation_status = db.assignation_status(name="Successful")
+    assignation.update_record()
+    if request.env.http_referrer:
+        redirect(request.env.http_referrer)
+    else:
+        redirect(URL('admin','assignations'))
+    return
+
+@auth.requires_login()
+@auth.requires_membership('Super-Administrator')
 def assignations():
     #requires parameter year_period if no one is provided then it is automatically detected
     #and shows the current period
@@ -440,10 +510,14 @@ def report_filter():
         if report.assignation.period.period.id == 1:
 
             if report.assignation.periods % 2 == 0:
-                semester = T('Second semester')
+                semester = T('Second Semester')
+            else:
+                semester = T('First Semester')
         else:
             if report.assignation.periods % 2 == 0:
-                semester = T('First semester')
+                semester = T('First Semester')
+            else:
+                semester = T('Second Semester')
         return str(date.year) + '-' + str(semester)
     if not valid:
         session.flash = T('Incomplete Information')

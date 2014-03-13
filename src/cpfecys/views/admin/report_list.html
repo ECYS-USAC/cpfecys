@@ -4,6 +4,12 @@
       <div class="well span12">
       	<a onclick="window.history.back()" class="btn" ><i class="icon-arrow-left"></i>{{=T('Back')}}</a>
 		<table class="table table-striped table-bordered">
+            <tr>
+                <th colspan="2"></th>
+                <th colspan="3">{{=T('Finished')}}</th>
+                <th colspan="4">{{=T('Action Pending')}}</th>
+                <th></th>
+            </tr>
 			<tr>
 				<th>
 					<span>
@@ -21,6 +27,12 @@
 					</span>
 					<i class="icon-ok"></i> 
 				</th>
+                <th>
+					<span>
+						{{=T('Reproved')}}
+					</span>
+					<i class="icon-remove"></i> 
+				</th>
 				{{for status in report_total:}}
 				<th>
 					<span class="tooltiped" data-content="{{=T(status.report_status.description)}}" 
@@ -30,12 +42,6 @@
 					<i class="{{=status.report_status.icon or 'icon-star'}}"></i> 
 				</th>
 				{{pass}}
-				<th>
-					<span>
-						{{=T('Reproved')}}
-					</span>
-					<i class="icon-remove"></i> 
-				</th>
 				<th>
 					<span>
 						{{=T('All')}}
@@ -59,6 +65,14 @@
 
 						</a>
 					</td>
+                    <td>
+						<a href="{{=URL('admin', 'report_filter', vars=dict(period=pyear.id, \
+																		 status=status.report_status.id))}}"> 
+						 	<span class="badge badge-info">{{=count_reproved(pyear)}}</span>
+						 	<span>{{=T('Reproved')}} </span>
+
+						</a>
+					</td>
 					{{count = 0}}
 					{{for status in count_reports(pyear):}}
 					<td>
@@ -72,14 +86,6 @@
 					</td>
 					{{count = count + status['COUNT(report.id)']}}
 					{{pass}}
-					<td>
-						<a href="{{=URL('admin', 'report_filter', vars=dict(period=pyear.id, \
-																		 status=status.report_status.id))}}"> 
-						 	<span class="badge badge-info">{{=count_reproved(pyear)}}</span>
-						 	<span>{{=T('Reproved')}} </span>
-
-						</a>
-					</td>
 					<td>
 						<a href="{{=URL('admin', 'report_filter', vars=dict(period=pyear.id))}}"> 
 						 	<span class="badge badge-info">{{=count}}</span><span>{{=T('All')}}</span>
