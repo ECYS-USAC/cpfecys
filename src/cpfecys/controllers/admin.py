@@ -3,6 +3,24 @@
 
 @auth.requires_login()
 @auth.requires_membership('Super-Administrator')
+def dtt_approval():
+    # get report id
+    report = request.vars['report']
+    # get the approval value
+    approve = request.vars['approve']
+    # get the report
+    report = db.report(id = report)
+    # toggle report dtt_approval flag
+    report.dtt_approval = approve
+    report.update_record()
+    if request.env.http_referer is None:
+        redirect(URL('admin','assignations'))
+    else:
+        redirect(request.env.http_referer)
+    return
+
+@auth.requires_login()
+@auth.requires_membership('Super-Administrator')
 def assignation_freeze():
     grid = SQLFORM.grid(db.assignation_freeze)
     return dict(grid = grid)
@@ -17,8 +35,8 @@ def assignation_ignore_toggle():
     # toggle assignation_ignored flag
     assignation.assignation_ignored = not assignation.assignation_ignored
     assignation.update_record()
-    if request.env.http_referrer:
-        redirect(request.env.http_referrer)
+    if request.env.http_referer:
+        redirect(request.env.http_referer)
     else:
         redirect(URL('admin','assignations'))
     return
@@ -33,8 +51,8 @@ def force_assignation_active():
     # set the assignation as active
     assignation.assignation_status = None
     assignation.update_record()
-    if request.env.http_referrer:
-        redirect(request.env.http_referrer)
+    if request.env.http_referer:
+        redirect(request.env.http_referer)
     else:
         redirect(URL('admin','assignations'))
     return
@@ -49,8 +67,8 @@ def force_assignation_failed():
     # set the assignation as failed
     assignation.assignation_status = db.assignation_status(name="Failed")
     assignation.update_record()
-    if request.env.http_referrer:
-        redirect(request.env.http_referrer)
+    if request.env.http_referer:
+        redirect(request.env.http_referer)
     else:
         redirect(URL('admin','assignations'))
     return
@@ -65,8 +83,8 @@ def force_assignation_successful():
     # set the assignation as successful
     assignation.assignation_status = db.assignation_status(name="Successful")
     assignation.update_record()
-    if request.env.http_referrer:
-        redirect(request.env.http_referrer)
+    if request.env.http_referer:
+        redirect(request.env.http_referer)
     else:
         redirect(URL('admin','assignations'))
     return
