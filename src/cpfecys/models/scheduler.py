@@ -12,6 +12,70 @@ else:
     ## from google.appengine.api.memcache import Client
     ## session.connect(request, response, db = MEMDB(Client()))
 
+def assignation_done_succesful(assignation):
+    ## Validate Reports
+    # Get all report restrictions that apply up to now
+    # Start date to get them depends on assignation start
+    # End date that apply to reports is current date
+    #import cpfecys
+    #import datetime
+    #current_date = datetime.datetime.now()
+    #start_date = datetime.date(assignation.period.yearp, 1, 1)
+    #if assignation.period.period == cpfecys.second_period:
+    #    start_date = datetime.date(assignation.period.yearp, 7, 1)
+    #r_restrictions = db((db.report_restriction.start_date >= start_date)&
+    #                    (db.report_restriction.end_date < current_date)&
+    #                    (db.report_restriction.is_enabled == True)).select()
+    # Check if they where delivered
+    # Get all the reports of this assignation
+    average_report = 0
+    status = true
+    message = ''
+    total_reports = assignation.report.count()
+    for report in assignation.report.select():
+        #save for average grading
+        average_report += (float(report.score)/float(total_reports))
+    min_score = db(db.custom_parameters.id>0).select().first().min_score
+    if average_report < min_score:
+        #he lost the practice due to reports
+        status = false
+        message += T('To consider assignation to be valid, report grades should be above: ') + min_score
+        message += ' '
+        message += T('Reports Grade is below minimun note; that sets this assignation as lost.')
+    else:
+        #he has above the average report grade
+        pass
+    # Check the grade (average) to be beyond the expected minimal grade in current settings
+    ## Validate Items
+    # Get all item restrictions that apply up to now
+    # Check if they where delivered
+    return {'status':true, 'message':''}
+
+def auto_freeze():
+    # Get the current month and year
+    import datetime
+    current_date = datetime.datetime.now()
+    current_month = T(current_date.strftime("%B"))
+    current_year = current_date.year
+    # Get every period that has to be autoasigned within current month
+    periods_to_work = db(db.assignation_freeze.pmonth == current_month).select()
+    # For each assignation_freeze
+    for period in periods_to_work:
+        # Get the period year
+        p_y = db((db.period_year.period == period.period)&
+               (db.period_year.yearp == current_year)).select()
+        # Get all the assignations of period_year
+        assignations = db(db.user_project.period == p_y.id).select()
+        # Validate each assignation
+        for assignation in assignations:
+            validation = assignation_done_succesful(assignation)
+            if validation['status']:
+                assignation.assignation_status = db.assignation_status(name = 'Successful')
+            else:
+                assignation.assignation_comment = validation['comment']
+                assignation.assignation_status = db.assignation_status(name = 'Failed')
+            assignation.update_record()
+
 def auto_daily():
     ## Get current year period
     import cpfecys
