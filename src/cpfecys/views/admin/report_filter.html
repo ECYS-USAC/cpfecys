@@ -4,6 +4,10 @@
   		<a onclick="window.history.back()" class="btn" ><i class="icon-arrow-left"></i> Back</a>
 		<table class="table table-bordered">
 			<thead>
+                <tr>
+                    <th colspan="10"></th>
+                    <th colspan="2">{{=T('Actions')}}</th>
+                </tr>
 				<tr>
 					<th>
 						{{=T('Project')}}
@@ -35,9 +39,12 @@
 					<th>
 						{{=T('Ends')}}
 					</th>
+                    <th>
+                        {{=T('DTT Approval')}}
+                    </th>
 					<th>
-						{{=T('Actions')}}
-					</th>
+						{{=T('Report')}}
+                    </th>
 				</tr>
 			</thead>
 			<tbody>
@@ -89,6 +96,33 @@
 					<td>
 						{{=calculate_ending_date(report)}}
 					</td>
+                    <td>
+                        {{if report.dtt_approval is None:}}
+                        <span class="label">
+                            {{=T('Pending Approval')}}
+                        </span>
+                        {{elif report.dtt_approval is True:}}
+                        <span class="label label-success">
+                            {{=T('Approved')}}
+                        </span>
+                        {{else:}}
+                        <span class="label label-warning">
+                            {{=T('Failed')}}
+                        </span>
+                        {{pass}}
+                        <a class="btn btn-success"
+                           href="{{=URL('admin','dtt_approval', vars=dict(report=report.id, approve=True))}}">
+		                <span class="icon-check"></span>
+		                </a>
+                        <a class="btn btn-danger"
+                           href="{{=URL('admin','dtt_approval', vars=dict(report=report.id, approve=False))}}">
+		                <span class="icon-remove"></span>
+		                </a>
+                        <a class="btn"
+                           href="{{=URL('admin','dtt_approval', vars=dict(report=report.id))}}">
+		                <span class="icon-time"></span>
+		                </a>
+                    </td>
 					<td>
 						<a class="btn " href="{{=URL('admin','report/view', vars=dict(report=report.id))}}">
 		                <span class="icon-eye-open"></span>
@@ -97,6 +131,24 @@
 					</td>
 				</tr>
                 {{pass}}
+                <tr>
+                    <td colspan="10"></td>
+                    <td>
+                        <div><b>{{=T('Actions')}}:</b></div>
+                        <a class="btn btn-success"
+                           href="{{=URL('admin','dtt_approval', vars=dict(report=report.id, approve=True))}}">
+		                <span class="icon-check"></span>
+		                </a>
+                        <a class="btn btn-danger"
+                           href="{{=URL('admin','dtt_approval', vars=dict(report=report.id, approve=False))}}">
+		                <span class="icon-remove"></span>
+		                </a>
+                        <a class="btn"
+                           href="{{=URL('admin','dtt_approval', vars=dict(report=report.id))}}">
+		                <span class="icon-time"></span>
+		                </a></td>
+                    <td>hola</td>
+                </tr>
 			</tbody>
 		</table>
 	</div>
