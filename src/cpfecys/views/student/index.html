@@ -153,13 +153,13 @@
                                     <td>
                                         {{if report.dtt_approval is None:}}
                                         <span class="label">{{=T('Approval Pending')}}</span>
-                                        {{elif report.dtt_approval is true:}}
+                                        {{elif report.dtt_approval is True:}}
                                         <span class="label label-success">{{=T('Approved')}}</span>
                                         {{else:}}
                                         <span class="label label-important">{{=T('Not Approved')}}</span>
                                         {{pass}}
                                     </td>
-                                    {{if report.score: average_report_scoring += report.score}}
+                                    {{if report.score and report.dtt_approval: average_report_scoring += report.score}}
                                     <td>
                                         <a class="btn"
                                            href="{{=URL('student',

@@ -284,6 +284,7 @@
 'Draft Updated.': 'Borrador Actualizado.',
 'dsi_visible': 'Visible para DSI?',
 'dsivisible': 'Visible para DSI?',
+'DTT': 'DTT',
 'DTT Approval': 'Aprobación DTT',
 'dtt approval': 'Aprobación DTT',
 'DTT aproval': 'Aprobación DTT',
