@@ -53,12 +53,9 @@
               <div class="controls">
                 <div class="alert alert-info span8">
                   <label class="checkbox">
-                    <input id="improve" name="improve" type="checkbox"> {{=T('Improve')}}
+                    <input id="send_mail" name="send_mail" type="checkbox"> {{=T('Send Mail')}}
                   </label>
-                  <p>{{=T('The Improve option allows the student to do a review of their report, \
-                   if you want to use this feature you\'ll have to add a comment, so the student \
-                   can know what to improve, the student will have a certain time to improve and  \
-                   resend their report, you\'ll be notified via email when this happend.')}}
+                  <p>
                     <h3>
                       {{=T('Previous grading information')}}:
                     </h3>
@@ -74,10 +71,42 @@
                         </tr>
                         <tr>
                           <td>
-                            {{=T('Comment')}}
+                            {{=T('Admin Score')}}
                           </td>
                           <td>
-                            {{=report.teacher_comment or T('No comment')}}
+                            {{=report.admin_score or 0}}
+                          </td>
+                        </tr>
+                        <tr>
+                          <td>
+                            {{=T('DTT aproval')}}
+                          </td>
+                          <td>
+                            {{if report.dtt_approval:}}
+                              <span class="label label-success">
+                                {{=T('Approved')}}</span>
+                            {{elif report.dtt_approval == False:}}
+                              <span class="label label-important">
+                                {{=T('Failed')}}</span>
+                            {{else:}}
+                              <span class="label">{{=T('Pending')}}</span>
+                            {{pass}}
+                          </td>
+                        </tr>
+                        <tr>
+                          <td>
+                            {{=T('Teacher comment')}}
+                          </td>
+                          <td>
+                            {{=report.teacher_comment or '-'}}
+                          </td>
+                        </tr>
+                        <tr>
+                          <td>
+                            {{=T('Admin comment')}}
+                          </td>
+                          <td>
+                            {{=report.admin_comment or '-'}}
                           </td>
                         </tr>
                         <tr>
@@ -103,6 +132,24 @@
               </div>
             </div>
           </form>
+          <table>
+            <tr>
+              <td>
+                <form action="{{=URL('admin', 'report/approve')}}">
+                  <input type="hidden" name="report" value="{{=report.id}}"/>
+                  <button type="submit" id="submit-grading" class="btn btn-success">
+                    {{=T('Approve report by DTT')}}</button>
+                </form>
+              </td>
+              <td>
+                <form action="{{=URL('admin', 'report/fail')}}">
+                  <input type="hidden" name="report" value="{{=report.id}}"/>
+                  <button type="submit" id="submit-grading" class="btn btn-danger">
+                    {{=T('Fail report by DTT')}}</button>
+                </form>
+              </td>
+            </tr>
+          </table>
       </div>
 </div>
 

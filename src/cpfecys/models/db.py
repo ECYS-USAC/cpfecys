@@ -316,6 +316,8 @@ db.define_table('report',
                 label = T('report_restriction')),
                 Field('score', 'integer', \
                 label = T('score')),
+                Field('admin_score', 'integer', \
+                label = T('admin_score')),
                 Field('min_score', 'integer', \
                 label = T('min_score')),
                 Field('heading', 'text', \
@@ -336,6 +338,8 @@ db.define_table('report',
                 label = T('status')),
                 Field('teacher_comment', 'text', \
                 label = T('teacher comment')),
+                Field('admin_comment', 'text', \
+                label = T('admin comment')),
                 Field('score_date', 'date', \
                 label = T('score date')),
                 # DTT Approval can be None, thus means that still hasn't been approved by DTT Admin

@@ -191,44 +191,76 @@ def report():
             session.flash = T('Selected report can\'t be viewed. \
                                 Select a valid report.')
             redirect(URL('admin', 'index'))
+    elif (request.args(0) == 'approve'):
+        report.update_record(dtt_approval=True)
+        session.flash = T('The report has been approved')
+        redirect(URL('admin', 'report/view', \
+            vars=dict(report=report.id)))
+    elif (request.args(0) == 'fail'):
+        report.update_record(dtt_approval=False)
+        session.flash = T('The report has been failed')
+        redirect(URL('admin', 'report/view', \
+            vars=dict(report=report.id)))
     elif (request.args(0) == 'grade'):
         if valid:
             score = request.vars['score']
             comment = request.vars['comment']
             status = request.vars['status']
+            sendmail = request.vars['send_mail']
+            if sendmail != None: sendmail = True
+            else: sendmail = False
             if score != '': score = int(score)
             else: score = report.score
             if comment == '': comment = report.teacher_comment
             status =db.report_status(id=status)
             if status.id != report.status:
                 report.update_record(
-                    score=score,
+                    admin_score=score,
                     min_score=cpfecys.get_custom_parameters().min_score,
-                    teacher_comment=comment,
+                    admin_comment=comment,
                     score_date=cdate,
                     status=status.id,
-                    times_graded=(report.times_graded or 0)+1)
-                session.flash = T('The report has been scored \
-                    successfully')
-                redirect(URL('admin', 'report/view', \
-                    vars=dict(report=report.id)))
+                    dtt_approval=True)
             elif score >= 0  and score <= 100:
                 report.update_record(
-                    score=score,
+                    admin_score=score,
                     min_score=cpfecys.get_custom_parameters().min_score,
-                    teacher_comment=comment,
+                    admin_comment=comment,
                     score_date=cdate,
                     status=db.report_status(name='Acceptance'),
-                    times_graded=(report.times_graded or 0)+1)
+                    dtt_approval=True)
+
+            if sendmail:
+                user = report.assignation.assigned_user
+                subject = T('[DTT]Automatic Notification - Report graded ') \
+                +T('BY ADMIN USER')
+                message = '<html>' + T('The report') + ' ' \
+                + '<b>' + XML(report.report_restriction.name) + '</b><br/>' \
+                + T('sent by student: ') + XML(user.username) + ' ' \
+                + XML(user.first_name) + ' ' \
+                + XML(user.last_name) \
+                + '<br/>' \
+                + T('Score: ') + XML(report.admin_score) + ' ' \
+                + '<br/>' \
+                + T('Scored by: ') + XML('Admin User') + ' ' \
+                + '<br/>' \
+                + T('Comment: ') + XML(comment) + ' ' \
+                + '<br/>' \
+                + T('Current status is: ') \
+                + XML(T(report.status.name)) +'<br/>' \
+                + T('DTT-ECYS') \
+                + ' http://omnomyumi.com/dtt/' + '</html>'
+                mail.send(to=user.email,
+                  subject=subject,
+                  message=message)
                 session.flash = T('The report has been scored \
                     successfully')
                 redirect(URL('admin', 'report/view', \
                     vars=dict(report=report.id)))
-                
 
-        session.flash = T('Selected report can\'t be viewed. \
-                            Select a valid report.')
-        redirect(URL('teacher', 'index'))
+        session.flash = T('Invalid Action.')
+        redirect(URL('admin', 'report/view', \
+                    vars=dict(report=report.id)))
 
 @auth.requires_login()
 @auth.requires_membership('Super-Administrator')
