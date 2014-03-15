@@ -3,6 +3,41 @@
 
 @auth.requires_login()
 @auth.requires_membership('Super-Administrator')
+def dtt_general_approval():
+    from datetime import datetime
+    cperiod = cpfecys.current_year_period()
+    year = str(cperiod.yearp)
+    if cperiod.period == 1:
+        start = datetime.strptime(year + '-01-01', "%Y-%m-%d")
+        end = datetime.strptime(year + '-07-01', "%Y-%m-%d")
+    else:
+        start = datetime.strptime(year + '-07-01', "%Y-%m-%d")
+        end = datetime.strptime(year + '-12-31', "%Y-%m-%d")
+    status = request.vars['status']
+    period = request.vars['period']
+    approve = request.vars['approve']
+    # Get the coincident reports
+    if not status:
+        reports = db((db.report.created>start)&
+                     (db.report.created<end)).update(dtt_approval = approve)
+    elif int(status) == -1:
+        reports = db((db.report.created>start)&
+            (db.report.created<end)&
+            (db.report.score>=db.report.min_score)&
+            (db.report.min_score!=None)&
+            (db.report.min_score!=0)).update(dtt_approval = approve)
+    else:
+        reports = db((db.report.created>start)&
+            (db.report.created<end)&
+            (db.report.status==status)).update(dtt_approval = approve)
+    if request.env.http_referer is None:
+        redirect(URL('admin','report_filter'))
+    else:
+        redirect(request.env.http_referer)
+    return
+
+@auth.requires_login()
+@auth.requires_membership('Super-Administrator')
 def dtt_approval():
     # get report id
     report = request.vars['report']
@@ -14,7 +49,7 @@ def dtt_approval():
     report.dtt_approval = approve
     report.update_record()
     if request.env.http_referer is None:
-        redirect(URL('admin','assignations'))
+        redirect(URL('admin','report_filter'))
     else:
         redirect(request.env.http_referer)
     return
@@ -589,7 +624,9 @@ def report_filter():
         count_log_entries=count_log_entries,
         count_metrics_report=count_metrics_report,
         count_anomalies=count_anomalies,
-        calculate_ending_date=calculate_ending_date)
+        calculate_ending_date=calculate_ending_date,
+        status = status,
+        period = period)
 
 @auth.requires_login()
 @auth.requires_membership('Super-Administrator')

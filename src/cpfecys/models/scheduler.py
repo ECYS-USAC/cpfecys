@@ -33,23 +33,32 @@ def assignation_done_succesful(assignation):
     message = ''
     total_reports = assignation.report.count()
     for report in assignation.report.select():
-        #save for average grading
-        average_report += (float(report.score)/float(total_reports))
+        # Check DTT Approval
+        if report.dtt_approval is None:
+            # I don't think status has to change since by average the student can win
+            # status = False
+            message += T('A report was not checked by DTT Admin. Contact Admin.')
+            message += ' '
+        elif report.dtt_approval is False:
+            # I don't think status has to change since by average the student can win
+            # status = False
+            message += T('A report was not approved by DTT Admin. Thus considered failed.')
+            message += ' '
+        else:
+            # Save for average grading
+            average_report += (float(report.score)/float(total_reports))
+    # Check the grade (average) to be beyond the expected minimal grade in current settings
     min_score = db(db.custom_parameters.id>0).select().first().min_score
     if average_report < min_score:
         #he lost the practice due to reports
-        status = false
+        status = False
         message += T('To consider assignation to be valid, report grades should be above: ') + min_score
         message += ' '
         message += T('Reports Grade is below minimun note; that sets this assignation as lost.')
-    else:
-        #he has above the average report grade
-        pass
-    # Check the grade (average) to be beyond the expected minimal grade in current settings
     ## Validate Items
     # Get all item restrictions that apply up to now
     # Check if they where delivered
-    return {'status':true, 'message':''}
+    return {'status':status, 'message':message}
 
 def auto_freeze():
     # Get the current month and year
@@ -70,6 +79,7 @@ def auto_freeze():
         for assignation in assignations:
             validation = assignation_done_succesful(assignation)
             if validation['status']:
+                assignation.assignation_comment = validation['comment']
                 assignation.assignation_status = db.assignation_status(name = 'Successful')
             else:
                 assignation.assignation_comment = validation['comment']
