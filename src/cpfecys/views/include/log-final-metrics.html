@@ -1,0 +1,270 @@
+<!-- START->log-final-metrics -->
+<div id="{{=inc_vars['id']}}"
+     class="modal hide fade" tabindex="-1"
+     role="dialog"
+     aria-labelledby="aria-{{=inc_vars['id']}}"
+     aria-hidden="true">
+     <!-- final-metrics-new-activity -->
+    <form action="{{=inc_vars['url']}}" method="POST">
+        <div class="modal-header">
+            <span class="row-fluid">
+                <span class="row">
+                    <span class="span3">
+                        <h3 id="aria-{{=inc_vars['id']}}">{{=T('Log Metrics')}}</h3>
+                    </span>
+                    <span class="span8">
+                        <div class="input-prepend">
+                            <span class="add-on">{{=T('Log Date')}} <span class="icon-calendar"></span></span>
+                            <input class="span7" id="log-metrics-date-{{=inc_vars['id']}}"
+                                   name="log-date" placeholder="{{=T("YYYY-MM-DD")}}" type="date"
+                                   value = "{{=inc_vars['date']}}">
+                        </div>
+                        <div><small>{{=T("YYYY-MM-DD")}}</small></div>
+                    </span>
+                    <span class="span1">
+                        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+                    </span>
+                </span>
+            </span>
+        </div>
+        <div class="modal-body">
+            <div class="alert" style="display:none;" id="metrics-error-{{=inc_vars['id']}}">
+                <strong>{{=T('Alert')}}!</strong> {{=T('All fields are mandatory, please check and try again.')}}
+            </div>
+            <h2>
+                Asistencia y Deserción de Examenes
+            </h2>
+            <div class="control-group">
+                <label class="control-label" for="curso-asignados-actas">Alumnos Asignados en Actas</label>
+                <div class="controls">
+                    <input type="text" id="curso-asignados-actas-{{=inc_vars['id']}}"
+                    name="curso-asignados-actas" placeholder="Alumnos en Actas"
+                           value="{{=inc_vars['alumnos_actas']}}">
+                </div>
+            </div>
+            <div class="control-group">
+                <label class="control-label" for="curso-en-parciales">Alumnos en Parciales</label>
+                <div class="controls">
+                    <input type="text" id="curso-en-parciales-{{=inc_vars['id']}}"
+                    name="curso-en-parciales" placeholder="Alumnos en Parciales"
+                           value="{{=inc_vars['alumnos_parciales']}}">
+                </div>
+            </div>
+            <div class="control-group">
+                <label class="control-label" for="curso-en-final">Alumnos en Examen Final</label>
+                <div class="controls">
+                    <input type="text" id="curso-en-final-{{=inc_vars['id']}}"
+                    name="curso-en-final" placeholder="Alumnos en Final"
+                           value="{{=inc_vars['alumnos_final']}}">
+                </div>
+            </div>
+            <div class="control-group">
+                <label class="control-label" for="curso-en-primera-retrasada">Alumnos en 1era Retrasada</label>
+                <div class="controls">
+                    <input type="text" id="curso-en-primera-retrasada-{{=inc_vars['id']}}"
+                    name="curso-en-primera-retrasada" placeholder="Alumnos en 1era Retrasada"
+                           value="{{=inc_vars['alumnos_retrasada_1']}}">
+                </div>
+            </div>
+            <div class="control-group">
+                <label class="control-label" for="curso-en-segunda-retrasada">Alumnos en 2da Retrasada</label>
+                <div class="controls">
+                    <input type="text" id="curso-en-segunda-retrasada-{{=inc_vars['id']}}"
+                    name="curso-en-segunda-retrasada" placeholder="Alumnos en 2da Retrasada"
+                           value="{{=inc_vars['alumnos_retrasada_2']}}">
+                </div>
+            </div>
+            <h2>
+                Resultados Finales de Laboratorio
+            </h2>
+            <div class="control-group">
+                <label class="control-label" for="lab-aprobados">Aprobados</label>
+                <div class="controls">
+                    <input type="text" id="lab-aprobados-{{=inc_vars['id']}}"
+                    name="lab-aprobados" placeholder="Aprobados"
+                           value="{{=inc_vars['lab_aprobados']}}">
+                </div>
+            </div>
+            <div class="control-group">
+                <label class="control-label" for="lab-reprobados">Reprobados</label>
+                <div class="controls">
+                    <input type="text" id="lab-reprobados-{{=inc_vars['id']}}"
+                    name="lab-reprobados" placeholder="Reprobados"
+                           value="{{=inc_vars['lab_reprobados']}}">
+                </div>
+            </div>
+            <div class="control-group">
+                <label class="control-label" for="lab-media">Media</label>
+                <div class="controls">
+                    <input type="text" id="lab-media-{{=inc_vars['id']}}"
+                    name="lab-media" placeholder="Media"
+                           value="{{=inc_vars['lab_media']}}">
+                </div>
+            </div>
+            <div class="control-group">
+                <label class="control-label" for="lab-promedio">Promedio</label>
+                <div class="controls">
+                    <input type="text" id="lab-promedio-{{=inc_vars['id']}}"
+                    name="lab-promedio" placeholder="Promedio"
+                           value="{{=inc_vars['lab_promedio']}}">
+                </div>
+            </div>
+            <h2>
+                Resultados Finales de Clase
+            </h2>
+            <div class="control-group">
+                <label class="control-label" for="media-metrics">Media</label>
+                <div class="controls">
+                    <input type="text" id="media-metrics-{{=inc_vars['id']}}"
+                    name="media-metrics" placeholder="Media" value="{{=inc_vars['media']}}">
+                </div>
+            </div>
+            <div class="control-group">
+                <label class="control-label" for="error-tipico-metrics">Error Típico</label>
+                <div class="controls">
+                    <input type="text" id="error-tipico-metrics-{{=inc_vars['id']}}"
+                    name="error-tipico-metrics" placeholder="Error Típico"
+                    value="{{=inc_vars['error_tipico']}}">
+                </div>
+            </div>
+            <div class="control-group">
+                <label class="control-label" for="mediana-metrics">Mediana</label>
+                <div class="controls">
+                    <input type="text" id="mediana-metrics-{{=inc_vars['id']}}"
+                    value = "{{=inc_vars['mediana']}}" name="mediana-metrics" placeholder="Mediana">
+                </div>
+            </div>
+            <div class="control-group">
+                <label class="control-label" for="moda-metrics">Moda</label>
+                <div class="controls">
+                    <input type="text" id="moda-metrics-{{=inc_vars['id']}}"
+                    value = "{{=inc_vars['moda']}}" name="moda-metrics" placeholder="Moda">
+                </div>
+            </div>
+            <div class="control-group">
+                <label class="control-label" for="desviacion-estandar-metrics">Desviación Estandar</label>
+                <div class="controls">
+                    <input type="text" id="desviacion-estandar-metrics-{{=inc_vars['id']}}"
+                    value = "{{=inc_vars['desviacion_estandar']}}"
+                    name="desviacion-estandar-metrics" placeholder="Desviación Estandar">
+                </div>
+            </div>
+            <div class="control-group">
+                <label class="control-label" for="varianza-metrics">Varianza de la Muestra</label>
+                <div class="controls">
+                    <input type="text" id="varianza-metrics-{{=inc_vars['id']}}"
+                    value = "{{=inc_vars['varianza']}}"
+                    name="varianza-metrics" placeholder="Varianza de la Muestra">
+                </div>
+            </div>
+            <div class="control-group">
+                <label class="control-label" for="curtosis-metrics">Curtosis</label>
+                <div class="controls">
+                    <input type="text" id="curtosis-metrics-{{=inc_vars['id']}}"
+                    value = "{{=inc_vars['curtosis']}}" name="curtosis-metrics" placeholder="Curtosis">
+                </div>
+            </div>
+            <div class="control-group">
+                <label class="control-label" for="coeficiente-metrics">Coeficiente de asimetría</label>
+                <div class="controls">
+                    <input type="text" id="coeficiente-metrics-{{=inc_vars['id']}}"
+                    value = "{{=inc_vars['coeficiente']}}"
+                    name="coeficiente-metrics" placeholder="Coeficiente de asimetría">
+                </div>
+            </div>
+            <div class="control-group">
+                <label class="control-label" for="rango-metrics">Rango</label>
+                <div class="controls">
+                    <input type="text" id="rango-metrics-{{=inc_vars['id']}}"
+                    value = "{{=inc_vars['rango']}}"
+                    name="rango-metrics" placeholder="Rango">
+                </div>
+            </div>
+            <div class="control-group">
+                <label class="control-label" for="minimo-metrics">Mínimo</label>
+                <div class="controls">
+                    <input type="text" id="minimo-metrics-{{=inc_vars['id']}}"
+                    value = "{{=inc_vars['minimo']}}"
+                    name="minimo-metrics" placeholder="Mínimo">
+                </div>
+            </div>
+            <div class="control-group">
+                <label class="control-label" for="maximo-metrics">Máximo</label>
+                <div class="controls">
+                    <input type="text" id="maximo-metrics-{{=inc_vars['id']}}"
+                    value = "{{=inc_vars['maximo']}}" name="maximo-metrics" placeholder="Máximo">
+                </div>
+            </div>
+            <div class="control-group">
+                <label class="control-label" for="total-metrics">Total de Alumnos</label>
+                <div class="controls">
+                    <input type="text" id="total-metrics-{{=inc_vars['id']}}"
+                    value = "{{=inc_vars['total']}}" name="total-metrics" placeholder="Total de Alumnos">
+                </div>
+            </div>
+            <div class="control-group">
+                <label class="control-label" for="reprobados-metrics">Reprobados</label>
+                <div class="controls">
+                    <input type="text" id="reprobados-metrics-{{=inc_vars['id']}}"
+                           value="{{=inc_vars['reprobados']}}"
+                           name="reprobados-metrics" placeholder="Reprobados">
+                </div>
+            </div>
+            <div class="control-group">
+                <label class="control-label" for="aprobados-metrics">Aprobados</label>
+                <div class="controls">
+                    <input type="text" id="aprobados-metrics-{{=inc_vars['id']}}"
+                           value = "{{=inc_vars['aprobados']}}"
+                           name="aprobados-metrics" placeholder="Aprobados">
+                </div>
+            </div>
+            <div class="control-group">
+                <label class="control-label" for="promedio-metrics">Promedio</label>
+                <div class="controls">
+                    <input type="text" id="promedio-metrics-{{=inc_vars['id']}}"
+                           value="{{=inc_vars['promedio']}}"
+                           name="promedio-metrics" placeholder="Promedio">
+                </div>
+            </div>
+        </div>
+        <div class="modal-footer">
+          <button class="btn"
+                data-dismiss="modal"
+                aria-hidden="true">{{=T('Close')}}</button>
+          <input type="submit"
+          onclick="if (
+              $('#curso-en-segunda-retrasada-{{=inc_vars['id']}}').val()&&
+              $('#curso-en-primera-retrasada-{{=inc_vars['id']}}').val()&&
+              $('#curso-en-final-{{=inc_vars['id']}}').val()&&
+              $('#curso-en-parciales-{{=inc_vars['id']}}').val()&&
+              $('#curso-asignados-actas-{{=inc_vars['id']}}').val()&&
+              $('#lab-aprobados-{{=inc_vars['id']}}').val()&&
+              $('#lab-reprobados-{{=inc_vars['id']}}').val()&&
+              $('#lab-media-{{=inc_vars['id']}}').val()&&
+              $('#lab-promedio-{{=inc_vars['id']}}').val()&&
+              $('#log-metrics-date-{{=inc_vars['id']}}').val()&&
+              $('#media-metrics-{{=inc_vars['id']}}').val()&&
+              $('#error-tipico-metrics-{{=inc_vars['id']}}').val()&&
+              $('#mediana-metrics-{{=inc_vars['id']}}').val()&&
+              $('#moda-metrics-{{=inc_vars['id']}}').val()&&
+              $('#desviacion-estandar-metrics-{{=inc_vars['id']}}').val()&&
+              $('#varianza-metrics-{{=inc_vars['id']}}').val()&&
+              $('#curtosis-metrics-{{=inc_vars['id']}}').val()&&
+              $('#coeficiente-metrics-{{=inc_vars['id']}}').val()&&
+              $('#rango-metrics-{{=inc_vars['id']}}').val()&&
+              $('#minimo-metrics-{{=inc_vars['id']}}').val()&&
+              $('#maximo-metrics-{{=inc_vars['id']}}').val()&&
+              $('#aprobados-metrics-{{=inc_vars['id']}}').val()&&
+              $('#promedio-metrics-{{=inc_vars['id']}}').val()&&
+              $('#reprobados-metrics-{{=inc_vars['id']}}').val())
+              return true;
+                   else {
+                       $('#metrics-error-{{=inc_vars['id']}}').show();
+                       return false;
+                   }
+                "
+              class="btn btn-primary"
+                 value="{{=T('Save Changes')}}"></input>
+        </div>
+    </form>
+</div>

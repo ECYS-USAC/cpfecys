@@ -512,6 +512,200 @@ def item():
 
 @auth.requires_login()
 @auth.requires_membership('Student')
+def final():
+    if(request.args(0) == 'save'):
+        # validate the user owns this report
+        report = request.vars['report']
+        report = db.report(db.report.id == report)
+        valid_report = report != None
+        ## Validate assignation
+        if valid_report: valid_report = not cpfecys.assignation_is_locked(report.assignation)
+        if valid_report: valid_report = cpfecys.student_validation_report_owner(report.id)
+        # validate report is editable
+        if valid_report: valid_report = cpfecys.student_validation_report_restrictions \
+            (report.report_restriction)
+        # validate report is 'Draft' or 'Recheck'
+        if valid_report: valid_report = cpfecys.student_validation_report_status(report)
+        # validate we receive log-date, log-type, log-content
+        aprobados_metrics = request.vars['aprobados-metrics']
+        coeficiente_metrics = request.vars['coeficiente-metrics']
+        curso_asignados_actas = request.vars['curso-asignados-actas']
+        curso_en_final = request.vars['curso-en-final']
+        curso_en_parciales = request.vars['curso-en-parciales']
+        curso_en_primera_retrasada = request.vars['curso-en-primera-retrasada']
+        curso_en_segunda_retrasada = request.vars['curso-en-segunda-retrasada']
+        curtosis_metrics = request.vars['curtosis-metrics']
+        desviacion_estandar_metrics = request.vars['desviacion-estandar-metrics']
+        error_tipico_metrics = request.vars['error-tipico-metrics']
+        lab_aprobados = request.vars['lab-aprobados']
+        lab_media = request.vars['lab-media']
+        lab_promedios = request.vars['lab-promedio']
+        lab_reprobados = request.vars['lab-reprobados']
+        log_date = request.vars['log-date']
+        maximo_metrics = request.vars['maximo-metrics']
+        media_metrics = request.vars['media-metrics']
+        mediana_metrics = request.vars['mediana-metrics']
+        minimo_metrics = request.vars['minimo-metrics']
+        moda_metrics = request.vars['moda-metrics']
+        promedio_metrics = request.vars['promedio-metrics']
+        rango_metrics = request.vars['rango-metrics']
+        reprobados_metrics = request.vars['reprobados-metrics']
+        total_metrics = request.vars['total-metrics']
+        varianza_metrics = request.vars['varianza-metrics']
+        if valid_report:
+            valid_report = (aprobados_metrics and coeficiente_metrics and curso_asignados_actas \
+                                         and curso_en_final and curso_en_parciales  
+                                         and curso_en_primera_retrasada and curso_en_segunda_retrasada \
+                                         and curtosis_metrics and desviacion_estandar_metrics \
+                                         and error_tipico_metrics and lab_aprobados and lab_media \
+                                         and lab_promedios and lab_reprobados \
+                                         and media_metrics and mediana_metrics \
+                                         and minimo_metrics and moda_metrics \
+                                         and promedio_metrics and rango_metrics \
+                                         and reprobados_metrics and total_metrics \
+                                         and varianza_metrics \
+                                         and log_date and maximo_metrics)
+
+        if valid_report:
+            db.log_final.insert(curso_asignados_actas = curso_asignados_actas,
+                                curso_en_parciales = curso_en_parciales,
+                                curso_en_final = curso_en_final,
+                                curso_en_primera_restrasada = curso_en_primera_retrasada,
+                                curso_en_segunda_restrasada = curso_en_segunda_retrasada,
+                                lab_aprobados = lab_aprobados,
+                                lab_reprobados = lab_reprobados,
+                                lab_media = lab_media,
+                                lab_promedio = lab_promedios,
+                                curso_media = media_metrics,
+                                curso_error = error_tipico_metrics,
+                                curso_mediana = mediana_metrics,
+                                curso_moda = moda_metrics,
+                                curso_desviacion = desviacion_estandar_metrics,
+                                curso_varianza = varianza_metrics,
+                                curso_curtosis = curtosis_metrics,
+                                curso_coeficiente = coeficiente_metrics,
+                                curso_rango = rango_metrics,
+                                curso_minimo = minimo_metrics,
+                                curso_maximo = maximo_metrics,
+                                curso_total = total_metrics,
+                                curso_reprobados = reprobados_metrics,
+                                curso_aprobados = aprobados_metrics,
+                                curso_promedio = promedio_metrics,
+                                curso_created = log_date,
+                                report = report)
+            session.flash = T('Log added')
+            redirect(URL('student', 'report/edit', vars=dict(report=report.id)))
+    elif(request.args(0) == 'update'):
+        # validate the requested metric
+        final = request.vars['final']
+        final = db.log_final(db.log_final.id == final)
+        valid_final = final != None
+        ## Validate assignation
+        if valid_final: valid_final = not cpfecys.assignation_is_locked(final.report.assignation)
+        # validate metric report owner is valid
+        if valid_final: valid_final = cpfecys.student_validation_report_owner(final.report)
+        # validate report is editable
+        if valid_final: valid_final = cpfecys.student_validation_report_restrictions \
+            (final.report['report_restriction'])
+        # validate report is 'Draft' or 'Recheck'
+        if valid_final: valid_final = cpfecys.student_validation_report_status \
+            (db.report(db.report.id == final.report))
+        # validate we receive log-date, log-type, log-content
+
+        aprobados_metrics = request.vars['aprobados-metrics']
+        coeficiente_metrics = request.vars['coeficiente-metrics']
+        curso_asignados_actas = request.vars['curso-asignados-actas']
+        curso_en_final = request.vars['curso-en-final']
+        curso_en_parciales = request.vars['curso-en-parciales']
+        curso_en_primera_retrasada = request.vars['curso-en-primera-retrasada']
+        curso_en_segunda_retrasada = request.vars['curso-en-segunda-retrasada']
+        curtosis_metrics = request.vars['curtosis-metrics']
+        desviacion_estandar_metrics = request.vars['desviacion-estandar-metrics']
+        error_tipico_metrics = request.vars['error-tipico-metrics']
+        lab_aprobados = request.vars['lab-aprobados']
+        lab_media = request.vars['lab-media']
+        lab_promedios = request.vars['lab-promedio']
+        lab_reprobados = request.vars['lab-reprobados']
+        log_date = request.vars['log-date']
+        maximo_metrics = request.vars['maximo-metrics']
+        media_metrics = request.vars['media-metrics']
+        mediana_metrics = request.vars['mediana-metrics']
+        minimo_metrics = request.vars['minimo-metrics']
+        moda_metrics = request.vars['moda-metrics']
+        promedio_metrics = request.vars['promedio-metrics']
+        rango_metrics = request.vars['rango-metrics']
+        reprobados_metrics = request.vars['reprobados-metrics']
+        total_metrics = request.vars['total-metrics']
+        varianza_metrics = request.vars['varianza-metrics']
+        if valid_final:
+            valid_final = (aprobados_metrics and coeficiente_metrics and curso_asignados_actas \
+                                         and curso_en_final and curso_en_parciales  
+                                         and curso_en_primera_retrasada and curso_en_segunda_retrasada \
+                                         and curtosis_metrics and desviacion_estandar_metrics \
+                                         and error_tipico_metrics and lab_aprobados and lab_media \
+                                         and lab_promedios and lab_reprobados \
+                                         and media_metrics and mediana_metrics \
+                                         and minimo_metrics and moda_metrics \
+                                         and promedio_metrics and rango_metrics \
+                                         and reprobados_metrics and total_metrics \
+                                         and varianza_metrics \
+                                         and log_date and maximo_metrics)
+        if valid_final:
+            final.update_record(curso_asignados_actas = curso_asignados_actas,
+                                curso_en_parciales = curso_en_parciales,
+                                curso_en_final = curso_en_final,
+                                curso_en_primera_restrasada = curso_en_primera_retrasada,
+                                curso_en_segunda_restrasada = curso_en_segunda_retrasada,
+                                lab_aprobados = lab_aprobados,
+                                lab_reprobados = lab_reprobados,
+                                lab_media = lab_media,
+                                lab_promedio = lab_promedios,
+                                curso_media = media_metrics,
+                                curso_error = error_tipico_metrics,
+                                curso_mediana = mediana_metrics,
+                                curso_moda = moda_metrics,
+                                curso_desviacion = desviacion_estandar_metrics,
+                                curso_varianza = varianza_metrics,
+                                curso_curtosis = curtosis_metrics,
+                                curso_coeficiente = coeficiente_metrics,
+                                curso_rango = rango_metrics,
+                                curso_minimo = minimo_metrics,
+                                curso_maximo = maximo_metrics,
+                                curso_total = total_metrics,
+                                curso_reprobados = reprobados_metrics,
+                                curso_aprobados = aprobados_metrics,
+                                curso_promedio = promedio_metrics,
+                                curso_created = log_date)
+            session.flash = T('Updated')
+            redirect(URL('student', 'report/edit', vars=dict(report=final.report)))
+    elif(request.args(0) == 'delete'):
+        # validate the requested log
+        final = request.vars['final']
+        final = db.log_final(db.log_final.id == final)
+        valid_final = final != None
+        # validate log report owner is valid
+        if valid_final: valid_final = cpfecys.student_validation_report_owner(final.report)
+        ## Validate assignation
+        if valid_final: valid_final = not cpfecys.assignation_is_locked(final.report.assignation)
+        # validate report is editable
+        if valid_final: valid_final = cpfecys.student_validation_report_restrictions \
+            (final.report['report_restriction'])
+        # validate report is 'Draft' or 'Recheck'
+        if valid_final: valid_final = cpfecys.student_validation_report_status \
+            (db.report(db.report.id == final.report))
+        if valid_final:
+            final.delete_record()
+            session.flash = T('Log Deleted')
+            redirect(URL('student', 'report/edit', vars=dict(report=final.report)))
+        else:
+            session.flash = T('Operation not allowed.')
+            redirect(URL('student', 'index'))
+    #session.flash = T('Error')
+    #redirect(URL('student', 'index'))
+    return
+
+@auth.requires_login()
+@auth.requires_membership('Student')
 def report():
     if (request.args(0) == 'create'):
         #get the data & save the report
@@ -577,7 +771,13 @@ def report():
         minimal_requirements = True
         activities_count = db(db.log_entry.report == report.id).count()
         metrics_count = db(db.log_metrics.report == report.id).count()
+        final_stats = db(db.log_final.report == report.id).count()
         for req in reqs:
+            if (req.report_requirement.name == 'Registrar Estadisticas Finales de Curso') \
+            and (report.report_restriction.is_final) \
+            and (final_stats == 0):
+                minimal_requirements = False
+                break
             if (req.report_requirement.name == 'Encabezado') and (report.heading is None):
                 minimal_requirements = False
                 break
@@ -605,6 +805,7 @@ def report():
                     assignation_reports = assignation_reports,
                     logs = db((db.log_entry.report == report.id)).select(),
                     metrics = db((db.log_metrics.report == report.id)).select(),
+                    final_r = db(db.log_final.report == report.id).select(),
                     metrics_type = db(db.metrics_type).select(),
                     anomalies = db((db.log_type.name == 'Anomaly')&
                                    (db.log_entry.log_type == db.log_type.id)&
@@ -620,7 +821,13 @@ def report():
         minimal_requirements = True
         activities_count = db(db.log_entry.report == report.id).count()
         metrics_count = db(db.log_metrics.report == report.id).count()
+        final_stats = db(db.log_final.report == report.id).count()
         for req in reqs:
+            if (req.report_requirement.name == 'Registrar Estadisticas Finales de Curso') \
+            and (report.report_restriction.is_final) \
+            and (final_stats == 0):
+                minimal_requirements = False
+                break
             if (req.report_requirement.name == 'Encabezado') and (report.heading is None):
                 minimal_requirements = False
                 break
@@ -719,6 +926,7 @@ def report():
                         assignation_reports = assignation_reports,
                         logs = db((db.log_entry.report == report.id)).select(),
                         metrics = db((db.log_metrics.report == report.id)).select(),
+                        final_r = db(db.log_final.report == report.id).select(),
                         anomalies = db((db.log_type.name == 'Anomaly')&
                                    (db.log_entry.log_type == db.log_type.id)&
                                    (db.log_entry.report == report.id)).count(),
