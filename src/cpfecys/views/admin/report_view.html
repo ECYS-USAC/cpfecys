@@ -138,14 +138,21 @@
                 <form action="{{=URL('admin', 'report/approve')}}">
                   <input type="hidden" name="report" value="{{=report.id}}"/>
                   <button type="submit" id="submit-grading" class="btn btn-success">
-                    {{=T('Approve report by DTT')}}</button>
+                    {{=T('DTT approval')}}</button>
                 </form>
               </td>
               <td>
                 <form action="{{=URL('admin', 'report/fail')}}">
                   <input type="hidden" name="report" value="{{=report.id}}"/>
                   <button type="submit" id="submit-grading" class="btn btn-danger">
-                    {{=T('Fail report by DTT')}}</button>
+                    {{=T('DTT failing')}}</button>
+                </form>
+              </td>
+              <td>
+                <form action="{{=URL('admin', 'report/pending')}}">
+                  <input type="hidden" name="report" value="{{=report.id}}"/>
+                  <button type="submit" id="submit-grading" class="btn">
+                    {{=T('DTT pending')}}</button>
                 </form>
               </td>
             </tr>
