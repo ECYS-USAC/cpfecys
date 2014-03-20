@@ -78,6 +78,15 @@
             {{include 'include/display-report-metric.html'}}
             <!-- //Display Helper -->
             {{pass}}
+            {{for final in final_r:}}
+            <!-- Display Helper -->
+            {{inc_vars = dict(editable = False,
+            final = final,
+            edit_action = 'final-edit-activity-' + str(final.id),
+            delete_action = 'delete-final-' + str(final.id))}}
+            {{include 'include/display-final-report.html'}}
+            <!-- //Display Helper -->
+            {{pass}}
         </div>
         {{if not(report.hours is None):}}
         <div class="row-fluid">

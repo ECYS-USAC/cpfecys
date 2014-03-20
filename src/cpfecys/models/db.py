@@ -282,11 +282,13 @@ db.define_table('report_restriction',
                 Field('name', 'string', notnull=False, \
                     label = T('name')),
                 Field('start_date', 'date', notnull=False, \
-                    label = T('start_date')),
+                    label = T('start date')),
                 Field('end_date', 'date', notnull=False, \
-                    label = T('end_date')),
+                    label = T('end date')),
                 Field('is_enabled', 'boolean', notnull=False, \
-                    label = T('is_enabled')),
+                    label = T('is enabled')),
+                Field('is_final', 'boolean', notnull=False, \
+                    label = T('is final')),
                 )
 
 db.define_table('report_requirement',
@@ -370,6 +372,61 @@ db.define_table('log_entry',
 db.define_table('metrics_type',
                 Field('name', 'string', notnull=True, label = T('name')),
                 format='%(name)s'
+                )
+
+## End of semester details of report
+db.define_table('log_final',
+                Field('curso_asignados_actas', 'integer', notnull = True, \
+                    label = T('Asignados en Actas')),
+                Field('curso_en_parciales', 'integer', notnull = True, \
+                    label = T('Alumnos en Parciales')),
+                Field('curso_en_final', 'integer', notnull = True, \
+                    label = T('Alumnos en Examen Final')),
+                Field('curso_en_primera_restrasada', 'integer', notnull = True, \
+                    label = T('Alumnos en Primera Retrasada')),
+                Field('curso_en_segunda_restrasada', 'integer', notnull = True, \
+                    label = T('Alumnos en Segunda Retrasada')),
+                Field('lab_aprobados', 'integer', notnull = True, \
+                    label = T('Aprobados Laboratorio')),
+                Field('lab_reprobados', 'integer', notnull = True, \
+                    label = T('Reprobados Laboratorio')),
+                Field('lab_media', 'integer', notnull = True, \
+                    label = T('Media Laboratorio')),
+                Field('lab_promedio', 'integer', notnull = True, \
+                    label = T('Promedio Laboratorio')),
+                Field('curso_media', 'decimal(8,2)', notnull = True, \
+                    label = T('media')),
+                Field('curso_error', 'decimal(8,2)', notnull = True, \
+                    label = T('error')),
+                Field('curso_mediana', 'decimal(8,2)', notnull = True, \
+                    label = T('mediana')),
+                Field('curso_moda', 'decimal(8,2)', notnull = True, \
+                    label = T('moda')),
+                Field('curso_desviacion', 'decimal(8,2)', notnull = True, \
+                    label = T('desviacion')),
+                Field('curso_varianza', 'decimal(8,2)', notnull = True, \
+                    label = T('varianza')),
+                Field('curso_curtosis', 'decimal(8,2)', notnull = True, \
+                    label = T('curtosis')),
+                Field('curso_coeficiente', 'decimal(8,2)', notnull = True, \
+                    label = T('coeficiente')),
+                Field('curso_rango', 'decimal(8,2)', notnull = True, \
+                    label = T('rango')),
+                Field('curso_minimo', 'decimal(8,2)', notnull = True, \
+                    label = T('minimo')),
+                Field('curso_maximo', 'decimal(8,2)', notnull = True, \
+                    label = T('maximo')),
+                Field('curso_total', 'integer', notnull = True, \
+                    label = T('total')),
+                Field('curso_reprobados', 'integer', notnull = True, \
+                    label = T('reprobados')),
+                Field('curso_aprobados', 'integer', notnull = True, \
+                    label = T('aprobados')),
+                Field('curso_promedio', 'decimal(8,2)', notnull = True, \
+                    label = T('Promedio')),
+                Field('curso_created', 'date', notnull = True, \
+                    label = T('entry_date')),
+                Field('report', 'reference report', label = T('report')),
                 )
 
 db.define_table('log_metrics',

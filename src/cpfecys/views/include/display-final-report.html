@@ -1,0 +1,308 @@
+{{final = inc_vars['final']}}
+<div class="row-fluid">
+    <div class="well span12">
+        <div class="span12">
+            <strong>{{=T('Date')}}:</strong> {{=final.curso_created}}
+            {{if inc_vars['editable']:}}
+            <div class="pull-right">
+                <div class="btn-group">
+                    <a href="#{{=inc_vars['edit_action']}}"
+                       data-toggle="modal" class="btn">
+                        <span class="icon-edit"></span>
+                    </a>
+                    <a href="#{{=inc_vars['delete_action']}}"
+                       data-toggle="modal" class="btn btn-danger">
+                        <span class="icon-remove icon-white"></span>
+                    </a>
+                </div>
+            </div>
+            {{pass}}
+        </div>
+        <div class="span12">
+            <h2 class="center">{{=T('Semester Final Report')}}</h2>
+            <div class="span6">
+                <table class="table table-striped table-bordered">
+                    <thead>
+                        <tr>
+                            <td>
+                                <strong>{{=T('Metric')}}</strong>
+                            </td>
+                            <td>
+                                <strong>{{=T('Value')}}</strong>
+                            </td>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>
+                                <h3>
+                                    {{=T('Dessertion')}}
+                                </h3>
+                                <strong>{{=T('Asignados En Actas')}}</strong>
+                            </td>
+                            <td>{{=final.curso_asignados_actas}}</td></tr>
+                        <tr><td><strong>{{=T('Asistencia Parciales')}}</strong> </td>
+                            <td>{{=final.curso_en_parciales}}</td></tr>
+                        <tr><td><strong>{{=T('Asistencia Final')}}</strong></td>
+                            <td> {{=final.curso_en_final}}</td></tr>
+                        <tr><td><strong>{{=T('Asistencia Primera Retrasada')}}</strong> </td>
+                            <td>{{=final.curso_en_primera_restrasada}}</td></tr>
+                        <tr><td><strong>{{=T('Asistencia Segunda Retrasda')}}</strong></td>
+                            <td> {{=final.curso_en_segunda_restrasada}}</td></tr>
+                        <tr>
+                            <td>
+                                <h3>
+                                    {{=T('Lab Final Statistics')}}
+                                </h3>
+                                <strong>{{=T('Aprobaron Laboratorio')}}</strong>
+                            </td>
+                            <td> {{=final.lab_aprobados}}</td></tr>
+                        <tr><td><strong>{{=T('Reprobaron Laboratorio')}}</strong></td>
+                            <td> {{=final.lab_reprobados}}</td></tr>
+                        <tr><td><strong>{{=T('Nota Media')}}</strong></td>
+                            <td> {{=final.lab_media}}</td></tr>
+                        <tr><td><strong>{{=T('Nota Promedio')}}</strong> </td>
+                            <td>{{=final.lab_promedio}}</td></tr>
+                        <tr>
+                            <td>
+                                <h3>
+                                    {{=T('Class Statistics')}}
+                                </h3>
+                                <strong>{{=T('Media')}}</strong>
+                            </td>
+                            <td>{{=final.curso_media}}</td></tr>
+                        <tr><td><strong>{{=T('Error')}}</strong> </td>
+                            <td>{{=final.curso_error}}</td></tr>
+                        <tr><td><strong>{{=T('Mediana')}}</strong> </td>
+                            <td>{{=final.curso_mediana}}</td></tr>
+                        <tr><td><strong>{{=T('Moda')}}</strong></td>
+                            <td> {{=final.curso_moda}}</td></tr>
+                        <tr><td><strong>{{=T('Desviación')}}</strong></td>
+                            <td> {{=final.curso_desviacion}}</td></tr>
+                        <tr><td><strong>{{=T('Varianza')}}</strong></td>
+                            <td> {{=final.curso_varianza}}</td></tr>
+                        <tr><td><strong>{{=T('Curtosis')}}</strong></td>
+                            <td> {{=final.curso_curtosis}}</td></tr>
+                        <tr><td><strong>{{=T('Coeficiente')}}</strong></td>
+                            <td> {{=final.curso_coeficiente}}</td></tr>
+                        <tr><td><strong>{{=T('Rango')}}</strong></td>
+                            <td> {{=final.curso_rango}}</td></tr>
+                        <tr><td><strong>{{=T('Mínimo')}}</strong></td>
+                            <td> {{=final.curso_minimo}}</td></tr>
+                        <tr><td><strong>{{=T('Máximo')}}</strong></td>
+                            <td> {{=final.curso_maximo}}</td></tr>
+                        <tr><td><strong>{{=T('Total')}}</strong></td>
+                            <td> {{=final.curso_total}}</td></tr>
+                        <tr><td><strong>{{=T('Reprobados')}}</strong></td>
+                            <td> {{=final.curso_reprobados}}</td></tr>
+                        <tr><td><strong>{{=T('Aprobados')}}</strong></td>
+                            <td> {{=final.curso_aprobados}}</td></tr>
+                        <tr><td><strong>{{=T('Promedio')}}</strong></td>
+                            <td> {{=final.curso_promedio}}</td></tr>
+                    </tbody>
+                </table>
+            </div>
+            <div class="span5 center">
+                <div>
+                    <h3>
+                        {{=T('Aproved vrs. Failed Students (Class)')}}
+                    </h3>
+                    <div style="width:100%; height:300px;" id="graphpie-class{{=final.id}}"></div>
+                </div>
+                <div>
+                    <div style="width:100%; height:300px;" id="graphbars-class{{=final.id}}"></div>
+                </div>
+                <div>
+                    <h3>
+                        {{=T('Aproved vrs. Failed Students (Lab)')}}
+                    </h3>
+                    <div style="width:100%; height:300px;" id="graphpie-lab{{=final.id}}"></div>
+                </div>
+                <div>
+                    <div style="width:100%; height:300px;" id="graphbars-lab{{=final.id}}"></div>
+                </div>
+                <script type="text/javascript">
+                    $(function () {
+                        {{if final.curso_total > 0:}}
+                        $('#graphpie-class{{=final.id}}').highcharts({
+                            chart: {
+                                plotBackgroundColor: null,
+                                plotBorderWidth: null,
+                                plotShadow: false
+                            },
+                            title: {
+                                text: '{{=T("Aproved vrs. Failed Students (Class)")}}'
+                            },
+                            tooltip: {
+                                pointFormat: '{series.name}: <b>{point.percentage:.1f}%</b>'
+                            },
+                            plotOptions: {
+                                pie: {
+                                    allowPointSelect: true,
+                                    cursor: 'pointer',
+                                    dataLabels: {
+                                        enabled: true,
+                                        color: '#000000',
+                                        connectorColor: '#000000',
+                                        format: '<b>{point.name}</b>: {point.percentage:.1f} %'
+                                    }
+                                }
+                            },
+                            series: [{
+                                type: 'pie',
+                                name: '{{=T("Aproved vrs. Failed Students (Class)")}}',
+                                data: [
+                                    ['{{=T("Aproved")}}',   {{=100.0*final.curso_aprobados/final.curso_total}}],
+                                    ['{{=T("Failed")}}',   {{=100.0*final.curso_reprobados/final.curso_total}}]
+                                ]
+                            }]
+                        });
+                        $('#graphbars-class{{=final.id}}').highcharts({
+                            chart: {
+                                type: 'column',
+                                margin: [ 50, 50, 100, 80]
+                            },
+                            title: {
+                                text: '{{=T("Aproved vrs. Failed Students (Class)")}}'
+                            },
+                            xAxis: {
+                                categories: [
+                                    '{{=T("Aproved")}}',
+                                    '{{=T("Failed")}}'
+                                ],
+                                labels: {
+                                    rotation: -45,
+                                    align: 'right',
+                                    style: {
+                                        fontSize: '13px',
+                                        fontFamily: 'Verdana, sans-serif'
+                                    }
+                                }
+                            },
+                            yAxis: {
+                                min: 0,
+                                title: {
+                                    text: '{{=T("Students")}}'
+                                }
+                            },
+                            legend: {
+                                enabled: false
+                            },
+                            tooltip: {
+                                pointFormat: '{{=T("Students")}}: <b>{point.y:.1f}</b>',
+                            },
+                            series: [{
+                                name: '{{=T("Students")}}',
+                                data: [{{=final.curso_aprobados}},
+                                       {{=final.curso_reprobados}}],
+                                dataLabels: {
+                                    enabled: true,
+                                    rotation: -90,
+                                    color: '#FFFFFF',
+                                    align: 'right',
+                                    x: 4,
+                                    y: 10,
+                                    style: {
+                                        fontSize: '13px',
+                                        fontFamily: 'Verdana, sans-serif',
+                                        textShadow: '0 0 3px black'
+                                    }
+                                }
+                            }]
+                        });
+                        {{pass}}
+                        {{ltotal = final.lab_aprobados + final.lab_reprobados}}
+                        {{if ltotal > 0:}}
+                        $('#graphpie-lab{{=final.id}}').highcharts({
+                            chart: {
+                                plotBackgroundColor: null,
+                                plotBorderWidth: null,
+                                plotShadow: false
+                            },
+                            title: {
+                                text: '{{=T("Aproved vrs. Failed Students (Lab)")}}'
+                            },
+                            tooltip: {
+                                pointFormat: '{series.name}: <b>{point.percentage:.1f}%</b>'
+                            },
+                            plotOptions: {
+                                pie: {
+                                    allowPointSelect: true,
+                                    cursor: 'pointer',
+                                    dataLabels: {
+                                        enabled: true,
+                                        color: '#000000',
+                                        connectorColor: '#000000',
+                                        format: '<b>{point.name}</b>: {point.percentage:.1f} %'
+                                    }
+                                }
+                            },
+                            series: [{
+                                type: 'pie',
+                                name: '{{=T("Aproved vrs. Failed Students (Lab)")}}',
+                                data: [
+                                    ['{{=T("Aproved")}}',   {{=100.0*final.lab_aprobados/ltotal}}],
+                                    ['{{=T("Failed")}}',   {{=100.0*final.lab_reprobados/ltotal}}]
+                                ]
+                            }]
+                        });
+                        $('#graphbars-lab{{=final.id}}').highcharts({
+                            chart: {
+                                type: 'column',
+                                margin: [ 50, 50, 100, 80]
+                            },
+                            title: {
+                                text: '{{=T("Aproved vrs. Failed Students (Lab)")}}'
+                            },
+                            xAxis: {
+                                categories: [
+                                    '{{=T("Aproved")}}',
+                                    '{{=T("Failed")}}'
+                                ],
+                                labels: {
+                                    rotation: -45,
+                                    align: 'right',
+                                    style: {
+                                        fontSize: '13px',
+                                        fontFamily: 'Verdana, sans-serif'
+                                    }
+                                }
+                            },
+                            yAxis: {
+                                min: 0,
+                                title: {
+                                    text: '{{=T("Students")}}'
+                                }
+                            },
+                            legend: {
+                                enabled: false
+                            },
+                            tooltip: {
+                                pointFormat: '{{=T("Students")}}: <b>{point.y:.1f}</b>',
+                            },
+                            series: [{
+                                name: '{{=T("Students")}}',
+                                data: [{{=final.lab_aprobados}},
+                                       {{=final.lab_reprobados}}],
+                                dataLabels: {
+                                    enabled: true,
+                                    rotation: -90,
+                                    color: '#FFFFFF',
+                                    align: 'right',
+                                    x: 4,
+                                    y: 10,
+                                    style: {
+                                        fontSize: '13px',
+                                        fontFamily: 'Verdana, sans-serif',
+                                        textShadow: '0 0 3px black'
+                                    }
+                                }
+                            }]
+                        });
+                        {{pass}}
+                    });
+                </script>
+            </div>
+        </div>
+    </div>
+</div>

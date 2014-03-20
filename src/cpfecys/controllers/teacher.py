@@ -95,6 +95,7 @@ def report():
                 logs=db((db.log_entry.report == report.id)).select(),
                 parameters=parameters,
                 metrics=db((db.log_metrics.report == report.id)).select(),
+                final_r = db(db.log_final.report == report.id).select(),
                 anomalies=db((db.log_type.name == 'Anomaly')&
                            (db.log_entry.log_type == db.log_type.id)&
                            (db.log_entry.report == report.id)).count(),

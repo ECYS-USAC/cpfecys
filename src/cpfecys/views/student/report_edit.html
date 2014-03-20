@@ -10,6 +10,35 @@
 <link rel="stylesheet" type="text/css" href="{{=URL('static','markitup')}}/sets/markmin/style.css"/>
 <!-- //Additional Scripts for MARKMIN -->
 <!-- This are Helpers -->
+<!-- log-final-metrics-activity -->
+{{inc_vars = dict(id = 'log-final-statistics',
+                url = URL('final/save', vars=dict(report = report.id)),
+                date = '',
+                alumnos_actas = '',
+                alumnos_parciales = '',
+                alumnos_final = '',
+                alumnos_retrasada_1 = '',
+                alumnos_retrasada_2 = '',
+                lab_aprobados = '',
+                lab_reprobados = '',
+                lab_media = '',
+                lab_promedio = '',
+                media = '',
+                error_tipico = '',
+                mediana = '',
+                moda = '',
+                desviacion_estandar = '',
+                varianza = '',
+                curtosis = '',
+                coeficiente = '',
+                rango = '',
+                minimo = '',
+                maximo = '',
+                total = '',
+                reprobados = '',
+                aprobados = '',
+                promedio = '') }}
+{{include 'include/log-final-metrics.html'}}
 <!-- log-new-desertion-activity -->
 {{inc_vars = dict(id = 'log-new-desertion-activity',
                 url = URL('desertions/save', vars=dict(report = report.id)),
@@ -141,6 +170,14 @@ url = '#')}}
                     <li>
                         <a data-toggle="modal" href="#log-new-desertion-activity">
                             <span class="icon-user"></span> {{=T('Log Desertion')}}
+                        </a>
+                    </li>
+                    {{pass}}
+                    {{if report.report_restriction.is_final and db(db.log_final.report == report.id).count() == 0:}}
+                    <li class="disabled"><a tabindex="-1" href="#">{{=T('Final Report')}}</a></li>
+                    <li>
+                        <a data-toggle="modal" href="#log-final-statistics">
+                            <span class="icon-flag"></span> {{=T('Log Final Statistics')}}
                         </a>
                     </li>
                     {{pass}}
@@ -281,6 +318,54 @@ url = '#')}}
             edit_action = 'metric-edit-activity-' + str(metric.id),
             delete_action = 'delete-metric-' + str(metric.id))}}
             {{include 'include/display-report-metric.html'}}
+            <!-- //Display Helper -->
+            {{pass}}
+            {{for final in final_r:}}
+            <!-- Final Report edit Helper-->
+            {{inc_vars = dict(id = 'final-edit-activity-' + str(final.id),
+            url = URL('final/update', vars=dict(final = final.id)),
+            date = final.curso_created,
+            alumnos_actas = final.curso_asignados_actas,
+            alumnos_parciales = final.curso_en_parciales,
+            alumnos_final = final.curso_en_final,
+            alumnos_retrasada_1 = final.curso_en_primera_restrasada,
+            alumnos_retrasada_2 = final.curso_en_segunda_restrasada,
+            lab_aprobados = final.lab_aprobados,
+            lab_reprobados = final.lab_reprobados,
+            lab_media = final.lab_media,
+            lab_promedio = final.lab_promedio,
+            media = final.curso_media,
+            error_tipico = final.curso_error,
+            mediana = final.curso_mediana,
+            moda = final.curso_moda,
+            desviacion_estandar = final.curso_desviacion,
+            varianza = final.curso_varianza,
+            curtosis = final.curso_curtosis,
+            coeficiente = final.curso_coeficiente,
+            rango = final.curso_rango,
+            minimo = final.curso_minimo,
+            maximo = final.curso_maximo,
+            total = final.curso_total,
+            reprobados = final.curso_reprobados,
+            aprobados = final.curso_aprobados,
+            promedio = final.curso_promedio) }}
+            {{include 'include/log-final-metrics.html'}}
+            <!-- //Final Report edit Helper-->
+            <!-- Final Report delete Helper-->
+            {{inc_vars = dict(id = 'delete-final-' + str(final.id),
+            title = T('Confirm') + ' ' + T('Delete'),
+            content = T('Delete operation can\'t be undone, do you want to continue?'),
+            action = T('Delete'),
+            _class = 'btn-danger',
+            url = URL('final/delete', vars=dict(final = final.id)))}}
+            {{include 'include/delete-helper.html'}}
+            <!-- //Final Report delete Helper-->
+            <!-- Display Helper -->
+            {{inc_vars = dict(editable = True,
+            final = final,
+            edit_action = 'final-edit-activity-' + str(final.id),
+            delete_action = 'delete-final-' + str(final.id))}}
+            {{include 'include/display-final-report.html'}}
             <!-- //Display Helper -->
             {{pass}}
         </div>

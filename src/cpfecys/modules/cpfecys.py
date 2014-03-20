@@ -174,6 +174,7 @@ def _report_requirements():
     metrics = db.report_requirement.insert(name = 'Registrar Actividad con Metricas')
     desertions = db.report_requirement.insert(name = 'Registrar Deserciones')
     hours = db.report_requirement.insert(name = 'Registrar Horas Completadas')
+    final_r = db.report_requirement.insert(name = 'Registrar Estadisticas Finales de Curso')
     #levels
     lvl_1 = db.area_level(name = "DTT Tutor Académico")
     lvl_2 = db.area_level(name = "DTT Tutor de Comunicación")
@@ -202,6 +203,7 @@ def _report_requirements():
     db.area_report_requirement.insert(report_requirement = activity, area_level = lvl_6)
     db.area_report_requirement.insert(report_requirement = metrics, area_level = lvl_1)
     db.area_report_requirement.insert(report_requirement = desertions, area_level = lvl_1)
+    db.area_report_requirement.insert(report_requirement = final_r, area_level = lvl_1)
     db.area_report_requirement.insert(report_requirement = hours, area_level = lvl_2)
     db.area_report_requirement.insert(report_requirement = hours, area_level = lvl_3)
     db.area_report_requirement.insert(report_requirement = hours, area_level = lvl_4)
