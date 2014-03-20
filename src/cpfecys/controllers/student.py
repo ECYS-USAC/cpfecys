@@ -46,7 +46,10 @@ def index():
                     db.item_restriction.id)&
                 (db.item_restriction_area.area_level==\
                     user_project.project.area_level.id)&
-                (db.item_restriction.item_type!=2))
+                (db.item_restriction.item_type!= \
+                	db.item_type(name='Activity'))&
+                (db.item_restriction.item_type!= \
+                	db.item_type(name='Grade Activity')))
 
     def restriction_project_exception(item_restriction_id, project_id):
         return db((db.item_restriction_exception.project== \
@@ -60,18 +63,22 @@ def index():
                     (db.item.is_active==True))
 
     def restriction_in_limit_days(item_restriction):
-        import datetime
+    	import datetime
+        cdate = datetime.datetime.now()
+    	cperiod = cpfecys.current_year_period()
+    	year = str(cperiod.yearp)
+
+    	if cperiod.period == 1: month = '-01-01'
+    	else: month = '-07-01'
+        start = datetime.datetime.strptime(year + month, "%Y-%m-%d")
+        if item_restriction.limit_days != None:
+            last_date = start + datetime.timedelta( \
+                days=item_restriction.limit_days)
+            if cdate > last_date:
+                return False
+            return True
         return True
-        #cdate = datetime.datetime.now().date()
-        #cyear_period = cpfecys.current_year_period()
-        #cperiod = cyear_period.period.id
-        #if cperiod == 1: start = '1'
-        #else: start = ''
-        #last_date = start + datetime.timedelta(days=item_restriction.limit_days)
-            #return True
-        #return False
-#
-        #return False
+
     def is_indate_range(report):
         import datetime
         current_date = datetime.datetime.now().date()

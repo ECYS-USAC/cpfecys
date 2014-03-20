@@ -284,6 +284,8 @@
 'DESIGN': 'DISEÑO',
 'Design for': 'Diseño por',
 'Dessertion': 'Deserción',
+'desviacion': 'desviacion',
+'Desviacion': 'Desviacion',
 'Desviación': 'Desviación',
 'Disabled': 'Disabled',
 'DISK': 'DISCO',

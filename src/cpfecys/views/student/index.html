@@ -283,18 +283,20 @@
                                         item).count() == 0 and \
                                     restriction_project_exception( \
                                             item_restriction.item_restriction.id, \
-                                            item.user_project.project.id).count() == 0 and \
-                                    restriction_in_limit_days(item_restriction.item_restriction):}}
-                            <a href="{{=URL('student',
-                                     'item/create',
-                                     vars=dict(
-                                     restriction=item_restriction.item_restriction.id,
-                                     assignation=item.user_project.id))}}"
-                               class="btn">
-                                <span class="icon-plus"></span>
-                                {{=T('Create Item')}}
-                                <small>{{=item_restriction.item_restriction.name}}</small>
-                            </a>
+                                            item.user_project.project.id).count() == 0:}}
+                                {{if restriction_in_limit_days(
+                                item_restriction.item_restriction):}}
+                                <a href="{{=URL('student',
+	                                     'item/create',
+	                                     vars=dict(
+	                                     restriction=item_restriction.item_restriction.id,
+	                                     assignation=item.user_project.id))}}"
+	                               class="btn">
+	                                <span class="icon-plus"></span>
+	                                {{=T('Create Item')}}
+	                                <small>{{=item_restriction.item_restriction.name}}</small>
+	                            </a>
+                                {{pass}}
                             {{pass}}
                         {{pass}}
                         </div>
