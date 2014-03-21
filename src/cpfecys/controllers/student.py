@@ -62,6 +62,14 @@ def index():
                     (db.item.assignation==assignation.user_project.id)&
                     (db.item.is_active==True))
 
+    def get_item(item_restriction, assignation):
+        cperiod = cpfecys.current_year_period()
+        if item_restriction.period.id < cperiod.id:
+            item = db((db.item.item_restriction==item_restriction.id)&
+                (db.item.assignation==assignation.id))
+            return item
+        return True
+
     def restriction_in_limit_days(item_restriction):
     	import datetime
         cdate = datetime.datetime.now()
@@ -79,6 +87,33 @@ def index():
             return True
         return True
 
+    def calculate_last_day(item_restriction):
+        import datetime
+        cperiod = cpfecys.current_year_period()
+        year = str(cperiod.yearp)
+        if cperiod.period == 1: 
+            month = '-01-01'
+            last = '-07-01'
+        else: 
+            month = '-07-01'
+            last = '-01-01'
+        start = datetime.datetime.strptime(year + month, "%Y-%m-%d")
+        if item_restriction.limit_days != None:
+            last_date = start + datetime.timedelta( \
+                days=item_restriction.limit_days)
+        else:
+            last_date = datetime.datetime.strptime(year + last, "%Y-%m-%d")
+        return last_date
+
+
+    def assignation_range(assignation):
+        cperiod = cpfecys.current_year_period()
+        ends = assignation.period_year.id + assignation.user_project.periods
+        period_range = db((db.period_year.id >= assignation.period_year.id)&
+            (db.period_year.id < ends)&
+            (db.period_year.id <= cperiod.id)).select()
+        return period_range
+
     def is_indate_range(report):
         import datetime
         current_date = datetime.datetime.now().date()
@@ -95,7 +130,10 @@ def index():
                 items_instance = items_instance,
                 restriction_project_exception=restriction_project_exception,
                 is_indate_range=is_indate_range,
-                restriction_in_limit_days=restriction_in_limit_days)
+                restriction_in_limit_days=restriction_in_limit_days,
+                assignation_range=assignation_range,
+                get_item=get_item,
+                calculate_last_day=calculate_last_day)
 
 @auth.requires_login()
 @auth.requires_membership('Student')

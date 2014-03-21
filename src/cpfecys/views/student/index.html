@@ -222,84 +222,159 @@
                     <h3>
                         {{=T('Deliverable Items')}}
                     </h3>
-                        <table style="width:100%;" class="table table-striped table-bordered">
-                            <thead>
-                                <tr>
-                                    <th>
-                                        {{=T('Name')}}
-                                    </th>
-                                    <th>
-                                        {{=T('Created')}}
-                                    </th>
-                                    <th>
-                                        {{=T('Actions')}}
-                                    </th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {{for item_restriction in \
-                                    available_item_restriction(cyear_period, item).select():}}
-                                    <tr>
-                                    {{if items_instance( \
-                                        item_restriction.item_restriction, \
-                                        item).count() != 0 and \
-                                        restriction_project_exception( \
-                                            item_restriction.item_restriction.id, \
-                                            item.user_project.project.id).count() == 0:}}
-                                        {{items = items_instance(item_restriction.item_restriction,
-                                            item).select().first()}}
-                                        <td>{{=item_restriction.item_restriction.name}}</td>
-                                        <td>
-                                            {{=items.created.period.name}} {{=items.created.yearp}}
-                                        </td>
-                                        <td>
-                                            <a class="btn" href="{{=URL('cpfecys/student', 'download', items.uploaded_file)}}">
-                                            <span class="icon-eye-open"></span>
-                                            {{=T('View Item')}}
-                                            </a>
-                                            {{if not cpfecys.assignation_is_locked(item.user_project):}}
-                                            {{if items.created == cyear_period:}}
-                                            <a href="{{=URL('student',
-                                                     'item/edit',
-                                                vars=dict(restriction=item_restriction.item_restriction.id,
-                                                     assignation=item.user_project.id, file=items.uploaded_file))}}" class="btn">
-                                                <span class="icon-edit"></span>
-                                                {{=T('Edit Item')}}
-                                            </a>
-                                            {{pass}}
-                                            {{pass}}
-                                        </td>
+                        {{for pyear in assignation_range(item):}}
+                         <h5>{{=T(pyear.period.name)}} - {{=pyear.yearp}}</h5>
+                         <table style="width:100%;" class="table table-striped table-bordered">
+                          <thead>
+                              <tr>
+                                  <th>
+                                      {{=T('Name')}}
+                                  </th>
+                                  <th>
+                                      {{=T('Created')}}
+                                  </th>
+                                  <th>
+                                      {{=T('Actions')}}
+                                  </th>
+                              </tr>
+                          </thead>
+                          <tbody>
+                          {{for item_restriction in \
+                          available_item_restriction(pyear, item
+                          ).select():}}
+
+                            {{if cpfecys.current_year_period().id == \
+                             pyear.id:}}
+                             {{instance = items_instance( \
+                             item_restriction.item_restriction, \
+                             item)}}
+
+                             {{if instance.count() > 0:}}
+                                {{instance = instance.select().first()}}
+                              <tr>
+                                <td>
+                                {{=item_restriction.item_restriction.name}}
+                                </td>
+                                <td>
+                                {{=T(instance.created.period.name)}} {{=instance.created.yearp}}
+                                </td>
+                                <td>
+                                <a class="btn" href="{{=URL('cpfecys/student', 'download', instance.uploaded_file)}}">
+                                <span class="icon-eye-open"></span>
+                                {{=T('View Item')}}
+                                </a>
+                                {{if not cpfecys.assignation_is_locked(item.user_project):}}
+                                    {{if instance.created == cyear_period:}}
+                                    <a href="{{=URL('student',
+                                             'item/edit',
+                                        vars=dict(restriction=item_restriction.item_restriction.id,
+                                             assignation=item.user_project.id, file=instance.uploaded_file))}}" class="btn">
+                                        <span class="icon-edit"></span>
+                                        {{=T('Edit Item')}}
+                                    </a>
                                     {{pass}}
-                                    </tr>
                                 {{pass}}
-                            </tbody>
-                        </table>
-                        {{if not cpfecys.assignation_is_locked(item.user_project):}}
-                        <div class="row-fluid right">
-                        {{for item_restriction in \
-                                available_item_restriction(cyear_period, item).select():}}
-                            {{if items_instance(
-                                        item_restriction.item_restriction,
-                                        item).count() == 0 and \
-                                    restriction_project_exception( \
-                                            item_restriction.item_restriction.id, \
-                                            item.user_project.project.id).count() == 0:}}
-                                {{if restriction_in_limit_days(
+                                </td>
+                              </tr>
+                             {{else:}}
+                                {{if not \ 
+                                cpfecys.assignation_is_locked( \
+                                item.user_project) and \
+                                restriction_in_limit_days(
                                 item_restriction.item_restriction):}}
-                                <a href="{{=URL('student',
-	                                     'item/create',
-	                                     vars=dict(
-	                                     restriction=item_restriction.item_restriction.id,
-	                                     assignation=item.user_project.id))}}"
-	                               class="btn">
-	                                <span class="icon-plus"></span>
-	                                {{=T('Create Item')}}
-	                                <small>{{=item_restriction.item_restriction.name}}</small>
-	                            </a>
+                                <tr>
+                                  <td>
+                                  {{=item_restriction.item_restriction.name}}
+                                  </td>
+                                  <td>
+                                    <div class="label label-info">
+                                    {{=T('Pending')}}, {{=T('Last day')}}:
+                                    {{=calculate_last_day( \
+                                    item_restriction.item_restriction)}}
+                                    </div>
+                                  </td>
+                                  <td>
+                                  <a href="{{=URL('student',
+                                         'item/create',
+                                         vars=dict(
+                                         restriction=item_restriction.item_restriction.id,
+                                         assignation=item.user_project.id))}}"
+                                   class="btn">
+                                    <span class="icon-plus"></span>
+                                    {{=T('Create Item')}}
+                                    <small>{{=item_restriction.item_restriction.name}}</small>
+                                  </a>
+                                  </td>
+                                </tr>
+                                {{else:}}
+                                <tr>
+                                  <td>
+                                  {{=item_restriction.item_restriction.name}}
+                                  </td>
+                                  <td>
+                                    <div class="label label-important">
+                                    {{=T('Missing')}}, {{=T('Last day was')}}:
+                                    {{=calculate_last_day( \
+                                    item_restriction.item_restriction)}}
+                                    </div>
+                                  </td>
+                                  <td>
+                                  <div class="label label-important">
+                                  {{=T('No actions available')}}
+                                  </div>
+                                  </td>
+                                </tr>
+                                {{pass}}
+                             {{pass}}
+                             Miramos si hay instancia del item, si hay 
+                             lo mostramos, si no, verificamos si esta 
+                             en el rango de tiempo para crear y si no 
+                             esta aun congelada
+                             la asignacion
+                             
+                            {{else:}}
+                                {{instance = \
+                                get_item(item_restriction.item_restriction, \
+                                item)}}
+                                {{if instance.count() > 0:}}
+                                {{instance = instance.select().first()}}
+                                <tr>
+                                    <td>
+                                    {{=item_restriction.item_restriction.name}}
+                                    </td>
+                                    <td>
+                                    {{=T(instance.created.period.name)}} {{=instance.created.yearp}}
+                                    </td>
+                                    <td>
+                                    <a class="btn" href="{{=URL('cpfecys/student', 'download', instance.uploaded_file)}}">
+                                    <span class="icon-eye-open"></span>
+                                    {{=T('View Item')}}
+                                    </a>
+                                    </td>
+                                </tr>
+                                {{else:}}
+                                <tr>
+                                    <td>
+                                    {{=item_restriction.item_restriction.name}}
+                                    </td>
+                                    <td>
+                                        <div class='label label-important'>
+                                            {{=T('Missing Item')}}
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <div class='label label-important'>
+                                            {{=T('No actions available')}}
+                                        </div>
+                                    </a>
+                                    
+                                    </td>
+                                </tr>
                                 {{pass}}
                             {{pass}}
-                        {{pass}}
-                        </div>
+                          {{pass}}
+                          </tbody>
+                        </table>
                         {{pass}}
                     </div>
                 </div>
