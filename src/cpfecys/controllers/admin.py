@@ -255,6 +255,11 @@ def report():
         session.flash = T('The report has been failed')
         redirect(URL('admin', 'report/view', \
             vars=dict(report=report.id)))
+    elif (request.args(0) == 'pending'):
+        report.update_record(dtt_approval=None)
+        session.flash = T('The report has been set to pending')
+        redirect(URL('admin', 'report/view', \
+            vars=dict(report=report.id)))
     elif (request.args(0) == 'grade'):
         if valid:
             score = request.vars['score']

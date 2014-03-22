@@ -472,7 +472,7 @@ db.define_table('item_type',
                 )
 
 db.define_table('item_restriction',
-                Field('name', 'string', notnull=False, label = T('name')),
+                Field('name', 'string', notnull=False, label = T('Name')),
                 Field('is_enabled', 'boolean', notnull=False, \
                     label = T('is_enabled')),
                 Field('permanent', 'boolean', notnull=False, \
@@ -482,15 +482,15 @@ db.define_table('item_restriction',
                 Field('admin_only', 'boolean', notnull=True, \
                     label = T('admin_only')),
                 Field('dsi_visible', 'boolean', notnull=False,\
-                    label="dsi_visible"),
+                    label= T('dsi visible')),
                 Field('item_type', 'reference item_type', \
                     label = T('item_type')),
                 Field('period', 'reference period_year', \
                     label = T('period')),
                 Field('limit_days', 'integer', notnull=False,\
-                    label="limitdays"),
+                    label=T('limitdays')),
                 Field('min_score', 'integer', notnull=False,\
-                    label="minscore"),
+                    label=T('minscore')),
                 format='%(name)s'
                 )
 
