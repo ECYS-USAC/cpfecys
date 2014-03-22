@@ -1,0 +1,38 @@
+<div id = "highcharts{{=inc_vars["id"]}}"></div>
+<script>
+    $(function () {
+        $('#highcharts{{=inc_vars["id"]}}').highcharts({
+            title: {
+                text: '{{=inc_vars["categories_title"]}}',
+                x: -20 //center
+            },
+            subtitle: {
+                text: '{{=inc_vars["categories_subtitle"]}}',
+                x: -20
+            },
+            xAxis: {
+                categories: [{{for category in inc_vars["categories"]:}}'{{=inc_vars["category_display"](category)}}',{{pass}}]
+            },
+            yAxis: {
+                title: {
+                    text: '{{=inc_vars["values_title"]}}'
+                },
+                plotLines: [{
+                    value: 0,
+                    width: 1,
+                    color: '#808080'
+                }]
+            },
+            tooltip: {
+                valueSuffix: ''
+            },
+            legend: {
+                layout: 'vertical',
+                align: 'right',
+                verticalAlign: 'middle',
+                borderWidth: 0
+            },
+            series:{{=inc_vars["values_display"](inc_vars["values"])}}
+        });
+    });
+</script>

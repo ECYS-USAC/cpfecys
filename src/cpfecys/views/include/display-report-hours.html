@@ -43,8 +43,8 @@
                         {{for report in inc_vars['reports']:}}
                         <tr>
                         <td>{{=report.report_restriction['name']}}</td>
-                        <td>{{=report.hours}}</td>
-                        {{hours_left = hours_left - report.hours}}
+                        <td>{{=report.hours or 0}}</td>
+                        {{hours_left = hours_left - (report.hours or 0)}}
                         <td>{{=hours_left}}</td>
                         </tr>
                         {{pass}}

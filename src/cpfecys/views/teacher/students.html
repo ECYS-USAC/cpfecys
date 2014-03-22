@@ -3,6 +3,7 @@
 <h2>
     Final Practice Students <small>"{{=current_project.project.name}}"</small>
 </h2>
+
 <div class="tabbable"> <!-- Only required for left/right tabs -->
   <ul class="nav nav-tabs">
       <li><a href="#setuptab" data-toggle="tab">{{=T('Other Periods')}}</a></li>
@@ -46,6 +47,31 @@
           </form>
       </div>
       <div class="tab-pane active" id="data{{=currentyear_period.id}}">
+          <h2>
+              {{=T('Course Progress')}}
+          </h2>
+          <!-- I need All reports that belong to this semester and course. Arrange them by owner. Display them -->
+          {{categories = set()}}
+          {{for item in current_reports:}}
+          {{categories.add(item.report.report_restriction)}}
+          {{pass}}
+          <div id="course-progress">
+              <script type="text/javascript" src="{{=URL('static','js')}}/highcharts/js/highcharts.js">
+              </script>
+              <script type="text/javascript" src="{{=URL('static','js')}}/highcharts/js/modules/data.js">
+              </script>
+              <script type="text/javascript" src="{{=URL('static','js')}}/highcharts/js/modules/exporting.js">
+              </script>
+              {{inc_vars = dict(id = 'chart01',
+              categories_title = T('Students In Course'),
+              categories_subtitle = current_project.project.name,
+              categories = categories,
+              category_display = lambda x: x.name,
+              values = current_reports,
+              values_display = values_display,
+              values_title = T('Students')) }}
+              {{include 'include/display-line-chart.html'}}
+          </div>
           <table>
               <thead>
                   <tr>
@@ -62,7 +88,7 @@
                       <td>
                           <a class="btn" href="{{=URL('final_practice',
                                                vars=dict(assignation=item.user_project.id))}}">
-                              <i class="icon-list"></i> Final Practice Progress
+                              <i class="icon-list"></i> {{=T('Final Practice Progress')}}
                           </a>
                       </td>
                   </tr>
