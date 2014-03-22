@@ -254,6 +254,15 @@ def students():
               (db.user_project.assigned_user == db.auth_membership.user_id)&
               (db.report_restriction.start_date >= start_date)&
               (db.report_restriction.start_date <= end_date)).select(db.report.ALL, db.report_restriction.ALL, db.user_project.ALL, db.auth_group.ALL, db.auth_membership.ALL, orderby=db.user_project.assigned_user|db.report_restriction.start_date|db.report_restriction.name, left=[db.report.on(db.user_project.id == db.report.assignation), db.report_restriction.on(db.report.report_restriction == db.report_restriction.id)])
+    report_activities = db((db.user_project.period <= currentyear_period.id)&
+              ((db.user_project.period + db.user_project.periods) > currentyear_period.id)&
+              (db.user_project.project == current_project.project.id)&
+              (db.auth_group.role == 'Student')&
+              (db.auth_membership.group_id == db.auth_group.id)&
+              (db.user_project.assigned_user == db.auth_membership.user_id)&
+              (db.report_restriction.start_date >= start_date)&
+              (db.report_restriction.start_date <= end_date)&
+              (db.report.id == db.log_metrics.report)).select(db.log_metrics.ALL, db.report.ALL, db.report_restriction.ALL, db.user_project.ALL, db.auth_group.ALL, db.auth_membership.ALL, orderby=db.user_project.assigned_user|db.report_restriction.start_date|db.report_restriction.name, left=[db.report.on(db.user_project.id == db.report.assignation), db.report_restriction.on(db.report.report_restriction == db.report_restriction.id)])
     # A helper to display this code within js stuff
     def values_display(values):
         result = "["
@@ -269,6 +278,21 @@ def students():
             result += str(item.report.desertion_continued or 0) + ','
         result += "]}]"
         return XML(result)
+    # A helper to display this code within js stuff
+    def values_display_activities(values):
+        result = "["
+        old_user = None
+        for item in values:
+            if old_user != item.user_project.assigned_user.username:
+                if old_user is not None:
+                    result += "]},"
+                old_user = item.user_project.assigned_user.username
+                result += "{ name: '" + item.user_project.assigned_user.username + " - " + item.user_project.assigned_user.first_name +"',"
+                result += "data: ["
+            #categories.add(item.report.report_restriction)
+            result += str(item.log_metrics.mediana or 0) + ','
+        result += "]}]"
+        return XML(result)
     start_index = currentyear_period.id - max_display - 1
     if start_index < 1:
         start_index = 0
@@ -282,6 +306,8 @@ def students():
                 current_period_name = current_period_name,
                 current_reports = reports,
                 values_display = values_display,
+                values_display_activities = values_display_activities,
+                report_activities = report_activities,
                 periods_before = periods_before,
                 periods_after = periods_after,
                 other_periods = other_periods)

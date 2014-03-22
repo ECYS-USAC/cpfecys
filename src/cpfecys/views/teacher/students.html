@@ -71,6 +71,21 @@
               values_display = values_display,
               values_title = T('Students')) }}
               {{include 'include/display-line-chart.html'}}
+              <!-- -->
+              {{categories = set()}}
+              {{for item in report_activities:}}
+              {{categories.add(item.log_metrics.metrics_type)}}
+              {{pass}}
+              <!-- -->
+               {{inc_vars = dict(id = 'chart02',
+              categories_title = T('Activities in Course'),
+              categories_subtitle = current_project.project.name,
+              categories = categories,
+              category_display = lambda x: x.name,
+              values = report_activities,
+              values_display = values_display_activities,
+              values_title = T('Average Score')) }}
+              {{include 'include/display-line-chart.html'}}
           </div>
           <table>
               <thead>
