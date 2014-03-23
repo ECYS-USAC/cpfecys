@@ -227,8 +227,9 @@ def _roles_setup():
     teachers = auth.add_group('Teacher',
                               'User that evaluates students in some courses. When final practice is teaching.')
     ##  DSI User:
-    teachers = auth.add_group('DSI',
+    dsi = auth.add_group('DSI',
                               'User that has some responsabilities related to some control over student activities.')
+    auth.add_membership(dsi, supersu)
 
 def _projects_setup():
     db = _db
