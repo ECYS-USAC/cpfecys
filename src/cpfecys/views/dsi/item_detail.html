@@ -1,8 +1,54 @@
 {{extend 'template.html'}}
 <div class="row-fluid">
   <div class="well span12">
+  {{if admin:}}
+    <table class="table-striped table-bordered" style="align:0 auto;">
+    <tr>
+      <td>
+      <form class="form-inline" action="{{=URL('dsi','item_detail')}}" 
+        method='get'>
+          <input name="restriction" type="hidden" 
+            value="{{=restrictions[0].id}}">
+             <select name="period">
+                {{for cperiod in periods:}}
+                  <option value="{{=period.id}}">
+                  {{=T(cperiod.period.name)}}-{{=cperiod.yearp}}
+                  </option>
+                {{pass}}
+              </select>
+            <input class="btn" type="submit" value="{{=T('Filter')}}">
+      </form>
+      </td>
+      <td>
+        <a class="btn btn-success" href="#myModal" data-toggle="modal">
+          {{=T('Approve All')}}
+        </a>  
+      </td>
+    </tr>
+    </table>
+    <div id="myModal" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+        <h3 id="myModalLabel">{{=T('Confirm action')}}</h3>
+      </div>
+      <div class="modal-body">
+        <p>{{=T('Appove all items? this action can\'t be undone')}}</p>
+      </div>
+      <div class="modal-footer">
+        <button class="btn" data-dismiss="modal" aria-hidden="true">
+        {{=T('Cancel')}}
+        </button>
+        <a class="btn btn-primary" href="{{=URL('dsi','approve_all', \
+                vars=dict(restrictions=restrictions[0].id))}}">
+          {{=T('Ok')}}
+        </a>
+      </div>
+    </div>
+  {{pass}}
 	{{for restriction in restrictions:}}
-	<h1>{{=restriction.name}}</h1>
+	<h1>{{=restriction.name}} 
+      <small>{{=T(period.period.name)}}-{{=period.yearp}}</small>
+    </h1>
 		{{for area in get_areas(restriction).select(db.area_level.ALL):}}
 			<h2>{{=area.name}}</h2>
 			{{for project in get_projects(area,restriction \
