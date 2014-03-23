@@ -183,7 +183,7 @@
                                             {{=T('Edit Report')}}
                                         </a>
                                         {{pass}}
-                                        {{pass}}
+                                    {{pass}}
                                     </td>
                                 </tr>
                                 {{pass}}
@@ -242,7 +242,7 @@
                           {{for item_restriction in \
                           available_item_restriction(pyear, item
                           ).select():}}
-
+                            <!--Iterated period is same as current-->
                             {{if cpfecys.current_year_period().id == \
                              pyear.id:}}
                              {{instance = items_instance( \
@@ -259,19 +259,42 @@
                                 {{=T(instance.created.period.name)}} {{=instance.created.yearp}}
                                 </td>
                                 <td>
+                                {{if \
+                                instance.item_restriction.item_type.name == \
+                                "Activity":}}
+                                {{if instance.done_activity:}}
+                                    <div class="label label-info">
+                                        {{=T('Done')}}
+                                    </div>
+                                {{pass}}
+                                {{elif \
+                                instance.item_restriction.item_type.name == \
+                                "Grade Activity":}}
+                                {{label = 'important'}}
+                                {{graded_info = T('Failed')}}
+                                {{if instance.score >= instance.min_score:}}
+                                    {{label = 'success'}}
+                                    {{graded_info = T('Approved')}}
+                                {{pass}}
+                                <div class="label label-{{=label}}">
+                                    {{=T('Score')}}: {{=instance.score or 0}}, 
+                                    {{=graded_info}}
+                                </div>
+                                {{else:}}
                                 <a class="btn" href="{{=URL('cpfecys/student', 'download', instance.uploaded_file)}}">
                                 <span class="icon-eye-open"></span>
                                 {{=T('View Item')}}
                                 </a>
-                                {{if not cpfecys.assignation_is_locked(item.user_project):}}
-                                    {{if instance.created == cyear_period:}}
-                                    <a href="{{=URL('student',
-                                             'item/edit',
-                                        vars=dict(restriction=item_restriction.item_restriction.id,
-                                             assignation=item.user_project.id, file=instance.uploaded_file))}}" class="btn">
-                                        <span class="icon-edit"></span>
-                                        {{=T('Edit Item')}}
-                                    </a>
+                                    {{if not cpfecys.assignation_is_locked(item.user_project):}}
+                                        {{if instance.created == cyear_period:}}
+                                        <a href="{{=URL('student',
+                                                 'item/edit',
+                                            vars=dict(restriction=item_restriction.item_restriction.id,
+                                                 assignation=item.user_project.id, file=instance.uploaded_file))}}" class="btn">
+                                            <span class="icon-edit"></span>
+                                            {{=T('Edit Item')}}
+                                        </a>
+                                        {{pass}}
                                     {{pass}}
                                 {{pass}}
                                 </td>
@@ -286,6 +309,20 @@
                                   <td>
                                   {{=item_restriction.item_restriction.name}}
                                   </td>
+                                  {{if \
+                                  item_restriction.item_restriction.item_type.name == \
+                                  "Activity" or \
+                                  item_restriction.item_restriction.item_type.name == \
+                                  "Grade Activity":}}
+                                  <td>
+                                  {{=T('Grading Pending')}}
+                                  </td>
+                                  <td>
+                                  {{=T('None, the grading is in process, if \
+                                  you meet the criteria, your grade will apear \
+                                  here')}}
+                                  </td>
+                                  {{else:}}
                                   <td>
                                     <div class="label label-info">
                                     {{=T('Pending')}}, {{=T('Last day')}}:
@@ -305,6 +342,7 @@
                                     <small>{{=item_restriction.item_restriction.name}}</small>
                                   </a>
                                   </td>
+                                  {{pass}}
                                 </tr>
                                 {{else:}}
                                 <tr>
@@ -326,13 +364,8 @@
                                 </tr>
                                 {{pass}}
                              {{pass}}
-                             Miramos si hay instancia del item, si hay 
-                             lo mostramos, si no, verificamos si esta 
-                             en el rango de tiempo para crear y si no 
-                             esta aun congelada
-                             la asignacion
-                             
                             {{else:}}
+                            <!--Iterated period is different as current-->
                                 {{instance = \
                                 get_item(item_restriction.item_restriction, \
                                 item)}}

@@ -45,11 +45,7 @@ def index():
                 (db.item_restriction_area.item_restriction==\
                     db.item_restriction.id)&
                 (db.item_restriction_area.area_level==\
-                    user_project.project.area_level.id)&
-                (db.item_restriction.item_type!= \
-                	db.item_type(name='Activity'))&
-                (db.item_restriction.item_type!= \
-                	db.item_type(name='Grade Activity')))
+                    user_project.project.area_level.id))
 
     def restriction_project_exception(item_restriction_id, project_id):
         return db((db.item_restriction_exception.project== \
