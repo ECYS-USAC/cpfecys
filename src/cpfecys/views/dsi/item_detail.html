@@ -39,7 +39,8 @@
         {{=T('Cancel')}}
         </button>
         <a class="btn btn-primary" href="{{=URL('dsi','approve_all', \
-                vars=dict(restrictions=restrictions[0].id))}}">
+                vars=dict(restrictions=restrictions[0].id, \
+                period=period.id))}}">
           {{=T('Ok')}}
         </a>
       </div>

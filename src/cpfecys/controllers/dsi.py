@@ -16,11 +16,64 @@ def index():
 @auth.requires_membership('Super-Administrator')
 def approve_all():
     restriction = request.vars['restrictions']
-    return 'Aca tenemos que validar, primero el ciclo \
-    en el que se encuentra, entonces primero metemos el combobox \
-    luego vamos a traer todos los estudiantes asignados \
-    que aun cumplen con estar en este ciclo asignados\
-    asldkfjasdf'
+    period = request.vars['period']
+    grade_all(restriction, period)
+    redirect(URL('item_detail', vars=dict(restriction=restriction)))
+
+@auth.requires_login()
+@auth.requires_membership('Super-Administrator')
+def grade_all(restriction,period):
+  areas = db( \
+    (db.item_restriction_area.item_restriction==restriction)&
+    (db.area_level.id==db.item_restriction_area.area_level)
+    ).select(db.area_level.ALL)
+  for area in areas:
+    projects = db((db.project.area_level==db.area_level.id)&
+         (db.area_level.id==area.id)&
+         (db.item_restriction.id==restriction)&
+         (db.item_restriction_area.area_level==area.id)&
+         (db.item_restriction_area.item_restriction==restriction)&
+         (db.item_restriction_area.item_restriction==db.item_restriction.id)&
+         (db.item_restriction_area.area_level==db.area_level.id)&
+         (db.item_restriction_area.is_enabled==True)).select(db.project.ALL)
+    for project in projects:
+      exception = db((db.item_restriction_exception.project==project.id)&
+         (db.item_restriction_exception.item_restriction== \
+          restriction))
+      if exception.count() == 0:
+        assignations = db(
+                    (db.auth_user.id==db.user_project.assigned_user)&
+                    (db.auth_user.id==db.auth_membership.user_id)&
+                    (db.auth_membership.group_id==db.auth_group.id)&
+                    (db.auth_group.role=='Student')&
+                    (db.user_project.project==project.id)&
+                    (db.user_project.period == db.period_year.id)&
+                    ((db.user_project.period <= period)&
+                 ((db.user_project.period + db.user_project.periods) > \
+                  period))
+                    ).select(db.user_project.ALL)
+        for assignation in assignations:
+          item = db((db.item.assignation==assignation.id)&
+         (db.item.item_restriction==restriction)&
+         (db.item.item_restriction==db.item_restriction.id)&
+         (db.item_restriction.is_enabled==True)&
+         (db.item.created==period)).select(db.item.ALL).first()
+          if item == None:
+            restrictionInstance = db(
+              db.item_restriction.id==restriction).select().first()
+            db.item.insert(is_active=True,
+            done_activity=True,
+            created=period,
+            item_restriction=restriction,
+            assignation=assignation.id,
+            score=restrictionInstance.min_score,
+            min_score=restrictionInstance.min_score)
+          else:
+            if item.score != None:
+              item.update_record(score=item.min_score)
+            if item.done_activity == None:
+              item.update_record(done_activity=True)
+  return assignations
 
 @auth.requires_login()
 @auth.requires_membership('DSI')
