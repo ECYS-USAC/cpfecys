@@ -486,13 +486,13 @@ def item():
                         session.flash = T('Item created!')
                         redirect(URL('student', 'index'))
                     else:
-                        session.flash = form.errors
+                        session.flash = T('Form Errors')
                         redirect(URL('student', 'index'))
-                elif form.errors:
-                    session.flash = T('Errors')
-                    redirect(URL('student', 'index'))
-                else:
-                    session.flash = T('please fill the form')
+                #elif form.errors:
+                    #session.flash = form.errors
+                    #redirect(URL('student', 'index'))
+                #else:
+                    #session.flash = T('please fill the form')
                 return  dict(form=form, action='create')
         else:
             session.flash = T('Action not allowed')
