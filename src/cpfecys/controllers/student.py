@@ -454,7 +454,7 @@ def item():
     if(request.args(0) == 'create'):
         if item_query.select().first() == None:
             if item_restriction.item_type.name == 'File' and \
-                item_restriction.teacher_only != True:
+                item_restriction.hidden_from_teacher != True:
 
                 form = FORM(
                             DIV(LABEL(T('Upload '+item_restriction.name+' \
