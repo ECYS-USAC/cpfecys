@@ -61,9 +61,28 @@
 						{{item = get_item(restriction, assignation)}}
 						{{score = 0}}
 						{{checked = ''}}
+                        {{status = T('Pending')}}
+                        {{status_label = 'info'}}
 						{{button_message = T('Save')}}
 						{{button_class = 'btn-info'}}
 						{{if item:}}
+                            {{if item.item_restriction.item_type.name == \
+                            'Activity':}}
+                                {{if item.done_activity == True:}}
+                                    {{status = T('Done')}}
+                                    {{status_label = 'success'}}
+                                {{pass}}
+                            {{elif item.item_restriction.item_type.name == \
+                            'Grade Activity':}}
+                                {{if item.score >= item.min_score:}}
+                                    {{status = T('Approved')}}
+                                    {{status_label = 'success'}}
+                                {{else:}}
+                                    {{status = T('Failed')}}
+                                    {{status_label = 'important'}}
+                                {{pass}}
+                            {{pass}}
+
 							{{score = item.score or 0}}
 							{{button_message = T('Update')}}
 							{{button_class = 'btn-success'}}
@@ -74,6 +93,11 @@
 						<tr class="form-inline">
 							<form class="save-form" 
 							action="{{=URL('dsi','item_detail/update')}}">
+                                <td>
+                                    <div class="label label-{{=status_label}}">
+                                        {{=status}}
+                                    </div>
+                                </td>
 								<td>
 								{{=assignation.assigned_user.username}}
 								{{=assignation.assigned_user.first_name}}

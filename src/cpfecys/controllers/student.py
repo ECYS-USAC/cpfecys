@@ -101,7 +101,6 @@ def index():
             last_date = datetime.datetime.strptime(year + last, "%Y-%m-%d")
         return last_date
 
-
     def assignation_range(assignation):
         cperiod = cpfecys.current_year_period()
         ends = assignation.period_year.id + assignation.user_project.periods

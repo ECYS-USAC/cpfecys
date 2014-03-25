@@ -68,78 +68,122 @@
     {{pass}}
     </div>
 </div>
-<h3>
-    {{=T('Deliverable Items')}}
-</h3>
-<div class="accordion" id="deliverable_items_accordion">
-    <div class="accordion-group">
-    {{for period in available_periods:}}
-        <div class="accordion-heading">
-            <a class="accordion-toggle" data-toggle="collapse" 
-            data-parent="#deliverable_items_accordion" href="#i{{=period.id}}">
-                {{=period.yearp}} - {{=T('Semester')}} {{=period.period}}
-                <span class="right">
-                    <span>Delivered Requirements: 
-                        {{=len(items)}}/{{=len(total_items)}}</span>
-                </span>
-            </a>
-        </div>
-        <div id="i{{=period.id}}" class="accordion-body collapse">
-            <div class="accordion-inner">
-                <table class="table table-striped table-bordered" style="width:100%;">
-                    <thead>
-                        <tr>
-                            <th>{{=T('Type')}}</th>
-                            <th>{{=T('Name')}}</th>
-                            <th>{{=T('Created')}}</th>
-                            <th>{{=T('Actions')}}</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {{for item in get_items(period, \
-                        final_practice.user_project):}}
-                        {{if item.is_active:}}
-                        <tr>
-                        {{else:}}
-                        <tr class="error">
-                        {{pass}}
-                            <td>
-                                {{=T(item.item_restriction.item_type.name)}}
-                            </td>
-                            <td>
-                                {{=item.item_restriction.name}}
-                            </td>
-                            <td>
-                                {{=item.created.period.name}} 
-                                {{=item.created.yearp}}
-                            </td>
-                            <td>
-                            {{if item.item_restriction.item_type.name=='File':}}
-                                <a class="btn" href="{{=URL('cpfecys/teacher', \
-                                 'download',item.uploaded_file)}}">
-                                <span class="icon-eye-open"></span>
-                                    {{=T('View Item')}}
-                                </a>
-                                {{if not item.is_active:}}
-                                <span class="label label-important">
-                                    {{=T('Disabled by admin')}}
-                                </span>
-                                {{pass}}
-                            {{elif item.item_restriction.item_type.name== \
-                                    'Activity':}}
-                                <input type="checkbox" 
-                                {{if item.done_activity:}}
-                                checked
-                                {{pass}}/> {{=item.name}}
-                            {{pass}}
-                            </td>
-                        </tr>
-                        {{pass}}
-                    </tbody>
-                </table>
-            </div>
-        </div>
+<div class="row-fluid">
+    <div class="span12 well">
+    <h3>
+        {{=T('Deliverable Items')}}
+    </h3>
+
+    {{for pyear in assignation_range(final_practice.user_project):}}
+        <h5>{{=T(pyear.period.name)}} - {{=pyear.yearp}}</h5>
+        <table style="width:100%;" class="table table-striped table-bordered">
+          <thead>
+              <tr>
+                  <th>
+                      {{=T('Name')}}
+                  </th>
+                  <th>
+                      {{=T('Created')}}
+                  </th>
+                  <th>
+                      {{=T('Actions')}}
+                  </th>
+              </tr>
+          </thead>
+          <tbody>
+            {{for item_restriction in available_item_restriction(pyear, 
+            final_practice.user_project).select():}}
+             {{if restriction_project_exception(\
+                           item_restriction.item_restriction, \
+                           assignation.project.id).count() == 0:}}
+               {{if cpfecys.current_year_period().id == \
+                             pyear.id:}}
+                 {{instance = items_instance(item_restriction.item_restriction,\
+                    final_practice.user_project)}}
+                    {{instance = instance.select(db.item.ALL).first()}}
+                    {{=instance.item_restriction}}
+                    Me falta nada mas recorrer estos items y mostrarlos
+                    segun las siguientes condiciones:
+                    Con el formato que corresponde al tipo de item_restriction
+                    que tienen, pero antes que eso debo validar la bandera
+                    hidden_to_teacher, si esta bandera es True, no lo mostramos.
+               {{pass}}
+             {{pass}}
+            {{pass}}
+          </tbody>
+        </table>
     {{pass}}
+
+    <div class="accordion" id="deliverable_items_accordion">
+        <div class="accordion-group">
+        {{for period in available_periods:}}
+            <div class="accordion-heading">
+                <a class="accordion-toggle" data-toggle="collapse" 
+                data-parent="#deliverable_items_accordion" href="#i{{=period.id}}">
+                    {{=period.yearp}} - {{=T('Semester')}} {{=period.period}}
+                    <span class="right">
+                        <span>Delivered Requirements: 
+                            {{=len(items)}}/{{=len(total_items)}}</span>
+                    </span>
+                </a>
+            </div>
+            <div id="i{{=period.id}}" class="accordion-body collapse">
+                <div class="accordion-inner">
+                    <table class="table table-striped table-bordered" style="width:100%;">
+                        <thead>
+                            <tr>
+                                <th>{{=T('Type')}}</th>
+                                <th>{{=T('Name')}}</th>
+                                <th>{{=T('Created')}}</th>
+                                <th>{{=T('Actions')}}</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {{for item in get_items(period, \
+                            final_practice.user_project):}}
+                            {{if item.is_active:}}
+                            <tr>
+                            {{else:}}
+                            <tr class="error">
+                            {{pass}}
+                                <td>
+                                    {{=T(item.item_restriction.item_type.name)}}
+                                </td>
+                                <td>
+                                    {{=item.item_restriction.name}}
+                                </td>
+                                <td>
+                                    {{=item.created.period.name}} 
+                                    {{=item.created.yearp}}
+                                </td>
+                                <td>
+                                {{if item.item_restriction.item_type.name=='File':}}
+                                    <a class="btn" href="{{=URL('cpfecys/teacher', \
+                                     'download',item.uploaded_file)}}">
+                                    <span class="icon-eye-open"></span>
+                                        {{=T('View Item')}}
+                                    </a>
+                                    {{if not item.is_active:}}
+                                    <span class="label label-important">
+                                        {{=T('Disabled by admin')}}
+                                    </span>
+                                    {{pass}}
+                                {{elif item.item_restriction.item_type.name== \
+                                        'Activity':}}
+                                    <input type="checkbox" 
+                                    {{if item.done_activity:}}
+                                    checked
+                                    {{pass}}/> {{=item.name}}
+                                {{pass}}
+                                </td>
+                            </tr>
+                            {{pass}}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        {{pass}}
+        </div>
+    </div>
     </div>
 </div>
-

@@ -239,9 +239,13 @@
                               </tr>
                           </thead>
                           <tbody>
+
                           {{for item_restriction in \
                           available_item_restriction(pyear, item
                           ).select():}}
+                           {{if restriction_project_exception(\
+                           item_restriction.item_restriction, \
+                           item.project).count() == 0:}}
                             <!--Iterated period is same as current-->
                             {{if cpfecys.current_year_period().id == \
                              pyear.id:}}
@@ -405,6 +409,7 @@
                                 </tr>
                                 {{pass}}
                             {{pass}}
+                           {{pass}}
                           {{pass}}
                           </tbody>
                         </table>

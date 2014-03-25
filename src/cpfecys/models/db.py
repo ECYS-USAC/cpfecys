@@ -481,6 +481,8 @@ db.define_table('item_restriction',
                     label = T('item_type')),
                 Field('period', 'reference period_year', \
                     label = T('period')),
+                Field('hidden_from_teacher', 'boolean', notnull=False,
+                    label=T('Hidden from teacher')),
                 Field('limit_days', 'integer', notnull=False,\
                     label=T('limitdays')),
                 Field('min_score', 'integer', notnull=False,\

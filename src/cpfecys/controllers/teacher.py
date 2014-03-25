@@ -8,6 +8,34 @@ def index():
 @auth.requires_login()
 @auth.requires_membership('Teacher')
 def final_practice():
+    def assignation_range(assignation):
+        cperiod = cpfecys.current_year_period()
+        ends = assignation.period.id + assignation.periods
+        period_range = db((db.period_year.id >= assignation.period.id)&
+            (db.period_year.id < ends)&
+            (db.period_year.id <= cperiod.id)).select()
+        return period_range
+
+    def available_item_restriction(period_year, user_project):
+        return db(((db.item_restriction.period==period_year) |
+                    (db.item_restriction.permanent==True))&
+                (db.item_restriction.is_enabled==True)&
+                (db.item_restriction_area.item_restriction==\
+                    db.item_restriction.id)&
+                (db.item_restriction_area.area_level==\
+                    user_project.project.area_level.id))
+
+    def restriction_project_exception(item_restriction_id, project_id):
+        return db((db.item_restriction_exception.project== \
+                    project_id)&
+                    (db.item_restriction_exception.item_restriction \
+                        ==item_restriction_id))
+
+    def items_instance(item_restriction, assignation):
+        return db((db.item.item_restriction==item_restriction.id)&
+                    (db.item.assignation==assignation.id)&
+                    (db.item.is_active==True))
+
     def get_items(period, assignation):
         restrictions = db((db.item_restriction.id== \
             db.item_restriction_exception.item_restriction)& \
@@ -20,6 +48,7 @@ def final_practice():
 
     assignation = request.vars['assignation']
     if not assignation: redirect(URL('courses'))
+    assignation = db(db.user_project.id==assignation).select().first()
     final_practice = db((db.user_project.id == assignation)&
                         (db.user_project.assigned_user == db.auth_user.id)&
                         (db.user_project.project == db.project.id)&
@@ -49,7 +78,12 @@ def final_practice():
                 reports_avg=avg,
                 items=items,
                 total_items=total_items,
-                get_items=get_items)
+                get_items=get_items,
+                assignation_range=assignation_range,
+                available_item_restriction=available_item_restriction,
+                assignation=assignation,
+                restriction_project_exception=restriction_project_exception,
+                items_instance=items_instance)
 
 @cache.action()
 @auth.requires_login()
