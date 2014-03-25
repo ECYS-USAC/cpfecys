@@ -486,7 +486,7 @@ def item():
                         session.flash = T('Item created!')
                         redirect(URL('student', 'index'))
                     else:
-                        session.flash = T('Error')
+                        session.flash = form.errors
                         redirect(URL('student', 'index'))
                 elif form.errors:
                     session.flash = T('Errors')
@@ -515,7 +515,7 @@ def item():
         item = db((db.item.created==cyear_period)&
             (db.item.item_restriction==item_restriction)&
             (db.item.assignation==user_project)).select().first()
-        if item == None or item_restriction.teacher_only == True \
+        if item == None or item_restriction.hidden_from_teacher == True \
                 or item.is_active != True:
             redirect(URL('student', 'index'))
         form = FORM(
