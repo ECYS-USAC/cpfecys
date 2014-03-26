@@ -71,8 +71,7 @@ def index():
         cdate = datetime.datetime.now()
     	cperiod = cpfecys.current_year_period()
     	year = str(cperiod.yearp)
-
-    	if cperiod.period == 1: month = '-01-01'
+    	if cperiod.period == cpfecys.first_period.id: month = '-01-01'
     	else: month = '-07-01'
         start = datetime.datetime.strptime(year + month, "%Y-%m-%d")
         if item_restriction.limit_days != None:
@@ -87,7 +86,7 @@ def index():
         import datetime
         cperiod = cpfecys.current_year_period()
         year = str(cperiod.yearp)
-        if cperiod.period == 1: 
+        if cperiod.period == cpfecys.first_period.id: 
             month = '-01-01'
             last = '-07-01'
         else: 
