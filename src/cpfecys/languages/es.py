@@ -623,7 +623,7 @@
 'new record inserted': 'nuevo registro insertado',
 'New Report:': 'Nuevo Reporte:',
 'next 100 rows': '100 filas siguientes',
-'No actions available': 'No actions available',
+'No actions available': 'No hay acciones disponibles',
 'No Active': 'No Active',
 'No comment': 'Sin Comentario',
 'No created': 'No creado',
