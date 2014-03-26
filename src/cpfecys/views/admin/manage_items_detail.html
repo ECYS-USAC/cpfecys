@@ -23,6 +23,12 @@
 						{{=T('Created')}}
 					</th>
 					<th>
+						{{=T('Item Type')}}
+					</th>
+					<th>
+						{{=T('Item Name')}}
+					</th>
+					<th>
 						{{=T('Is Active')}}
 					</th>
 					<th>
@@ -40,42 +46,52 @@
 				</tr>
 			</thead>
 			<tbody>
-				<tr>
-					{{for item in items:}}
-					<td>
-						{{=T(item.created.period.name)}}
-						{{=item.created.yearp}}
-					</td>
-					<td>
-						{{if item.is_active:}}
-							<a href="" content="{{=item.id}}" class="btn btn-success active-toggle">{{=T('Active')}}</a>
-						{{else:}}
-							<a href="" content="{{=item.id}}" class="btn btn-danger active-toggle">{{=T('No Active')}}</a>
-						{{pass}}
-					</td>
-					<td>
-						<a class="btn" href="{{=URL('cpfecys/admin', \
-						     'download',item.uploaded_file)}}">
-						    <span class="icon-eye-open"></span>
-						        {{=T('View Item')}}
-					    </a>
-					</td>
-					<td>
-						{{=item.assignation.assigned_user.username}}
-						-
-						{{=item.assignation.assigned_user.first_name}}
-						{{=item.assignation.assigned_user.last_name}}
-					</td>
-					<td>
-						{{=item.assignation.project.area_level.name}}
-						-
-						{{=item.assignation.project.name}}
-					</td>
-					<td>
-						{{=item.done_activity}}
-					</td>
+			{{for item in items:}}
+			<tr>
+				<td>
+					{{=T(item.created.period.name)}}
+					{{=item.created.yearp}}
+				</td>
+				<td>
+					{{=T(item.item_restriction.item_type.name)}}
+				</td>
+				<td>
+					{{=T(item.item_restriction.name)}}
+				</td>
+				<td>
+					{{if item.is_active:}}
+						<a href="" content="{{=item.id}}" class="btn btn-success active-toggle">{{=T('Active')}}</a>
+					{{else:}}
+						<a href="" content="{{=item.id}}" class="btn btn-danger active-toggle">{{=T('No Active')}}</a>
 					{{pass}}
-				</tr>
+				</td>
+				<td>
+				{{if item.item_restriction.item_type.name != 'File':}}
+					N/A
+				{{else:}}
+					<a class="btn" href="{{=URL('cpfecys/admin', \
+					     'download',item.uploaded_file)}}">
+					    <span class="icon-eye-open"></span>
+					        {{=T('View Item')}}
+				    </a>
+				{{pass}}
+				</td>
+				<td>
+					{{=item.assignation.assigned_user.username}}
+					-
+					{{=item.assignation.assigned_user.first_name}}
+					{{=item.assignation.assigned_user.last_name}}
+				</td>
+				<td>
+					{{=item.assignation.project.area_level.name}}
+					-
+					{{=item.assignation.project.name}}
+				</td>
+				<td>
+					{{=item.done_activity}}
+				</td>
+			</tr>
+			{{pass}}
 			</tbody>
 			
 		</table>
