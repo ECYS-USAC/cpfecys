@@ -565,7 +565,7 @@ def item():
             db.item_schedule.item.writable = False
             db.item_schedule.item.default = item.id
             response.view = 'student/schedule.html'
-            grid = SQLFORM.grid(db.item_schedule, args=request.args)
+            grid = SQLFORM.grid((db.item_schedule.item == item.id), args=request.args)
             return dict(schedule_name = item.item_restriction.name, grid = grid)
     else:
         response.view = 'student/schedule.html'

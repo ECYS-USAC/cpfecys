@@ -1,4 +1,4 @@
-# coding: utf-8
+# -*- coding: utf-8 -*-
 {
 '': '',
 '!=': '!=',
@@ -366,6 +366,7 @@
 'enter a number between %(min)g and %(max)g': 'ingresa un número entre %(min)g y %(max)g',
 'Enter a number between %(min)g and %(max)g': 'Enter a number between %(min)g and %(max)g',
 'enter a value': 'ingrese un valor',
+'Enter a value': 'Enter a value',
 'Enter an integer between %(min)g and %(max)g': 'Enter an integer between %(min)g and %(max)g',
 'enter an integer between %(min)g and %(max)g': 'Ingrese un entero entre %(min)g y %(max)g',
 'enter an integer greater than or equal to %(min)g': 'ingrese un entero mayor o igual a %(min)g',
@@ -564,6 +565,7 @@
 'Links Manager': 'Admin de Enlaces',
 'Live Chat': 'Chat en vivo',
 'loading...': 'cargando...',
+'Location': 'Location',
 'Log Accomplished Hours': 'Registrar de Horas Completadas',
 'Log Activity': 'Registrar Actividad',
 'Log added': 'Registro añadido',
