@@ -1,4 +1,4 @@
-# -*- coding: utf-8 -*-
+# coding: utf-8
 {
 '': '',
 '!=': '!=',
@@ -307,6 +307,7 @@
 'Desviacion': 'Desviacion',
 'Desviación': 'Desviación',
 'Disabled': 'Disabled',
+'Disabled by admin': 'Disabled by admin',
 'DISK': 'DISCO',
 'Disk Cache Keys': 'Llaves de Cache en Disco',
 'Disk Cleared': 'Disco limpiado',
@@ -656,7 +657,7 @@
 'Nombre de Usuario': 'Nombre de Usuario',
 'None': 'Ninguno',
 'None, the grading is in process': 'Ninguna, la calificación esta en proceso',
-'None, the grading is in process, if                                 you meet the criteria, your grade will apear                                 here': 'None, the grading is in process, if                                 you meet the criteria, your grade will apear                                 here',
+'None, the grading is in process, if                                 you meet the criteria, your grade will apear                                 here': 'Ninguna, la calificación esta en proceso, si usted cumple/cumplió con esta actividad su nota aparecerá aquí',
 'None, the grading is in process, if                             you meet the criteria, your grade will apear                             here': 'Ninguna, la calificación esta en proceso, si usted cumple/cumplió con esta actividad su nota aparecerá aquí',
 "Not all mandatory blocks for your report are inserted. Please make sure you've the following blocks:": 'No todos los bloques obligatorios de su reporte han sido ingresados. Verifique que posea los siguientes bloques como minimo:',
 'Not Approved': 'No Aprobado',
