@@ -131,11 +131,6 @@ def index():
 
 @auth.requires_login()
 @auth.requires_membership('Student')
-def schedule():
-    pass
-
-@auth.requires_login()
-@auth.requires_membership('Student')
 def update_data():
     update_data_form = False
     if auth.user != None:
