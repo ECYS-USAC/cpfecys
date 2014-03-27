@@ -33,8 +33,7 @@
                     <span class="span6 right">
                         <div>
                             <strong>{{=T('Start')}}:</strong>
-                            {{=item.period_year.yearp}} - {{=T('Semester')}}
-                            {{=item.period_year.period}}
+                            {{=item.period_year.yearp}} - {{=T(item.period_year.period.name)}}
                         </div>
                         <div>
                             <strong>{{=T('Length')}}:</strong>
@@ -283,14 +282,16 @@
                                     {{graded_info = T('Approved')}}
                                 {{pass}}
                                 <div class="label label-{{=label}}">
-                                    {{=T('Score')}}: {{=instance.score or 0}}, 
+                                    {{=T('Score')}}: {{=instance.score or 0}},
                                     {{=graded_info}}
                                 </div>
                                 {{else:}}
+                                    {{if instance.uploaded_file:}}
                                 <a class="btn" href="{{=URL('cpfecys/student', 'download', instance.uploaded_file)}}">
                                 <span class="icon-eye-open"></span>
                                 {{=T('View Item')}}
                                 </a>
+                                    {{pass}}
                                     {{if not cpfecys.assignation_is_locked(item.user_project):}}
                                         {{if instance.created == cyear_period:}}
                                         <a href="{{=URL('student',

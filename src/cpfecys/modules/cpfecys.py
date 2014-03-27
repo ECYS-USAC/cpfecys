@@ -351,9 +351,6 @@ def _log_type_setup():
     db.metrics_type.insert(name="PRACTICA")
     db.metrics_type.insert(name="PROYECTO 1")
     db.metrics_type.insert(name="PROYECTO 2")
-    db.metrics_type.insert(name="ESTADISTICA FINAL DE CURSO")
-    db.metrics_type.insert(name="ESTADISTICA FINAL DE LABORATORIO")
-    
 
 def _item_type_setup():
     db = _db
@@ -361,6 +358,7 @@ def _item_type_setup():
     db.item_type.insert(name='File')
     db.item_type.insert(name='Activity')
     db.item_type.insert(name='Grade Activity')
+    db.item_type.insert(name='Schedule')
 
 
 def _report_status_setup():

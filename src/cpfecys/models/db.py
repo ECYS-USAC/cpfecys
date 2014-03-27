@@ -467,7 +467,7 @@ db.define_table('log_metrics',
                 )
 #Project item requirements structure
 db.define_table('item_type',
-                Field('name', 'string', notnull=True, label = T('name')),
+                Field('name', 'string', length=255, notnull=True, label = T('name')),
                 format='%(name)s'
                 )
 
@@ -536,7 +536,7 @@ db.define_table('item',
                     label = T('score')),
                 Field('min_score', 'integer', notnull=False, \
                     label = T('minscore')),
-                format='%(description)s'
+                format='%(item_restriction)s'
                 )
 
 db.define_table('day_of_week',
@@ -548,8 +548,6 @@ db.define_table('item_schedule',
                 Field('day_of_week', 'reference day_of_week', label=T('Day'), notnull = True),
                 Field('start_time', 'time', label=T('Start Time'), notnull = True),
                 Field('end_time', 'time', label=T('End Time'), notnull = True))
-
-db.item_schedule.item.writable = False
 
 db.define_table('custom_parameters',
                 Field('min_score', 'integer', notnull=False, \

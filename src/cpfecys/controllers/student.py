@@ -132,13 +132,7 @@ def index():
 @auth.requires_login()
 @auth.requires_membership('Student')
 def schedule():
-    # TODO: Finish up schedule views and controller
-    #this thing is meant to allow students to create an item that is a schedule for something
-    #schedule? yep like the hours where they are busy somewhere
-    #Example: Course Schedule: Mon (0900-0930) Tue (1500-1530)
-    #or DSI Attention: Tue (1000 - 1230)
-    #or basically anything :P
-    return dict(schedule_name = 'Horario de Curso', grid = SQLFORM.grid(db.item_schedule))
+    pass
 
 @auth.requires_login()
 @auth.requires_membership('Student')
@@ -504,10 +498,24 @@ def item():
                 #else:
                     #session.flash = T('please fill the form')
                 return  dict(form=form, action='create')
+            elif item_restriction.item_type.name == 'Schedule':
+                # TODO: Finish up schedule views and controller
+                #this thing is meant to allow students to create an item that is a schedule for something
+                #schedule? yep like the hours where they are busy somewhere
+                #Example: Course Schedule: Mon (0900-0930) Tue (1500-1530)
+                #or DSI Attention: Tue (1000 - 1230)
+                #or basically anything :P
+                #we need the id of the created deliverable item
+                item = db.item.insert(is_active=True,
+                                      created=cyear_period,
+                                      item_restriction=item_restriction.id,
+                                      assignation=user_project)
+                session.flash = T('Item Created')
+                redirect(URL('student', 'item', args = ['edit'], vars = dict(restriction=item_restriction.id, assignation = user_project)))
+                #return
         else:
             session.flash = T('Action not allowed')
             redirect(URL('student', 'index'))
-
     elif(request.args(0) == 'view'):
         item_upload = request.vars['file']
         item = db((db.item.item_restriction==item_restriction)&
@@ -528,7 +536,8 @@ def item():
         if item == None or item_restriction.hidden_from_teacher == True \
                 or item.is_active != True:
             redirect(URL('student', 'index'))
-        form = FORM(
+        if item.item_restriction.item_type.name == 'File':
+            form = FORM(
                     DIV(LABEL(T('Upload '+item_restriction.name+' \
                         File:')),
                                 INPUT(_name="upload", 
@@ -544,21 +553,31 @@ def item():
                         _value=T('Upload File'),
                         _class="btn-primary")),
                         _class="form-horizontal",)
-        if form.process().accepted:
-            if request.vars.upload != None:
-                uploaded = db.item.uploaded_file.store(request.vars.upload.file, request.vars.upload.filename)
-                item = db((db.item.created==cyear_period)&
+            if form.process().accepted:
+                if request.vars.upload != None:
+                    uploaded = db.item.uploaded_file.store(request.vars.upload.file, request.vars.upload.filename)
+                    item = db((db.item.created==cyear_period)&
                     (db.item.item_restriction==item_restriction)&
                     (db.item.assignation==user_project)).select().first()
-                if item != None:
-                    item.update_record(uploaded_file = uploaded)
-                    db.commit()
-                    redirect(URL('student', 'index'))
-                elif form.errors:
-                    response.flash = "Errors"
-                else:
-                    response.flash = "please fill the form"
-        return  dict(form=form, action='edit')
+                    if item != None:
+                        item.update_record(uploaded_file = uploaded)
+                        db.commit()
+                        redirect(URL('student', 'index'))
+                    elif form.errors:
+                        response.flash = "Errors"
+                    else:
+                        response.flash = "please fill the form"
+            return  dict(form=form, action='edit')
+        elif item.item_restriction.item_type.name == 'Schedule':
+            db.item_schedule.item.writable = False
+            db.item_schedule.item.default = item.id
+            response.view = 'student/schedule.html'
+            grid = SQLFORM.grid(db.item_schedule, args=request.args)
+            return dict(schedule_name = item.item_restriction.name, grid = grid)
+    else:
+        response.view = 'student/schedule.html'
+        grid = SQLFORM.grid(db.item_schedule)
+        return dict(schedule_name = 'Horario de Curso', grid = grid)
 
 @auth.requires_login()
 @auth.requires_membership('Student')
