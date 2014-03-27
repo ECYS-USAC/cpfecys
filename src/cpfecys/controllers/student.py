@@ -453,8 +453,7 @@ def item():
 
     if(request.args(0) == 'create'):
         if item_query.select().first() == None:
-            if item_restriction.item_type.name == 'File' and \
-                item_restriction.hidden_from_teacher != True:
+            if item_restriction.item_type.name == 'File':
                 form = FORM(
                             DIV(LABEL(T('Upload '+item_restriction.name+' \
                             File:')),
@@ -528,8 +527,7 @@ def item():
         item = db((db.item.created==cyear_period)&
             (db.item.item_restriction==item_restriction)&
             (db.item.assignation==user_project)).select().first()
-        if item == None or item_restriction.hidden_from_teacher == True \
-                or item.is_active != True:
+        if item == None or item.is_active != True:
             redirect(URL('student', 'index'))
         if item.item_restriction.item_type.name == 'File':
             form = FORM(
