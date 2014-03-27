@@ -140,6 +140,7 @@ def _database_setup():
     ## Super-Administrator:
     setup = db.setup(done = True)
     if setup is None:
+        _days_of_week_setup()
         _report_status_setup()
         _item_type_setup()
         _log_type_setup()
@@ -150,6 +151,15 @@ def _database_setup():
         _assignation_status()
         _start_scheduler()
         db.setup.insert(done = True)
+
+def _days_of_week_setup():
+    db.day_of_week.insert(name = T('Monday'))
+    db.day_of_week.insert(name = T('Tuesday'))
+    db.day_of_week.insert(name = T('Wednesday'))
+    db.day_of_week.insert(name = T('Thursday'))
+    db.day_of_week.insert(name = T('Friday'))
+    db.day_of_week.insert(name = T('Saturday'))
+    db.day_of_week.insert(name = T('Sunday'))
 
 def _assignation_status():
     db = _db

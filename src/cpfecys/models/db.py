@@ -539,6 +539,18 @@ db.define_table('item',
                 format='%(description)s'
                 )
 
+db.define_table('day_of_week',
+                Field('name', 'string', notnull = True, unique = True, length = 255),
+                format='%(name)s')
+
+db.define_table('item_schedule',
+                Field('item', 'reference item', notnull = True),
+                Field('day_of_week', 'reference day_of_week', label=T('Day'), notnull = True),
+                Field('start_time', 'time', label=T('Start Time'), notnull = True),
+                Field('end_time', 'time', label=T('End Time'), notnull = True))
+
+db.item_schedule.item.writable = False
+
 db.define_table('custom_parameters',
                 Field('min_score', 'integer', notnull=False, \
                     label = T('min_score')),

@@ -131,6 +131,17 @@ def index():
 
 @auth.requires_login()
 @auth.requires_membership('Student')
+def schedule():
+    # TODO: Finish up schedule views and controller
+    #this thing is meant to allow students to create an item that is a schedule for something
+    #schedule? yep like the hours where they are busy somewhere
+    #Example: Course Schedule: Mon (0900-0930) Tue (1500-1530)
+    #or DSI Attention: Tue (1000 - 1230)
+    #or basically anything :P
+    return dict(schedule_name = 'Horario de Curso', grid = SQLFORM.grid(db.item_schedule))
+
+@auth.requires_login()
+@auth.requires_membership('Student')
 def update_data():
     update_data_form = False
     if auth.user != None:
@@ -447,10 +458,10 @@ def item():
     item_query = db((db.item.created==cyear_period)&
                 (db.item.item_restriction==item_restriction)&
                 (db.item.assignation==user_project)&
-                (db.item.is_active!=False))
+                (db.item.is_active==True))
     item_restriction = db(db.item_restriction.id==\
             item_restriction).select().first()
-    
+
     if(request.args(0) == 'create'):
         if item_query.select().first() == None:
             if item_restriction.item_type.name == 'File' and \
