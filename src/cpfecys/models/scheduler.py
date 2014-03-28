@@ -224,3 +224,13 @@ cpfecys.setup(db, auth, scheduler, auto_daily)
 cpfecys.force_student_data_update(request.env.path_info,
                                   ['/student/update_data',
                                    '/default/user/logout'])
+
+#resources menu
+#import cpfecys
+period = cpfecys.current_year_period()
+data = db((db.item_restriction.is_public == True)&
+          (db.item_restriction.period == period)).select()
+mnu = []
+for d in data:
+    mnu.append((T(d.name), False, URL('default', 'resources', vars=dict(r=d.id))))
+response.menu.extend([(T('Resources & Schedules'), False, URL(), mnu)])

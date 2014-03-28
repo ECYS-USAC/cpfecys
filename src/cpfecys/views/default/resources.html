@@ -1,0 +1,40 @@
+{{extend 'template.html'}}
+{{if data.first() is not None:}}
+<h1>{{=data.first().item_restriction.name}} -
+    <small>
+    {{=semester.yearp}}, {{=T(db.period(id = semester.period).name)}}
+    </small>
+</h1>
+{{pass}}
+<table class="table table-striped table-bordered">
+    <thead>
+        <th></th>
+        <th>{{=T('Course Name')}}</th>
+        <th>{{=T('Details')}}</th>
+    </thead>
+    {{counter = 1}}
+    <tbody>
+        {{for element in data:}}
+        <tr>
+            <td>{{=counter}}</td>
+            <td>{{=element.project.name}}</td>
+            {{if element.item_restriction.item_type.name == 'File':}}
+            <td>
+                <a href="{{=URL('default','download', args=element.item.uploaded_file)}}"
+                   class="btn">
+                    {{=T('Download')}}
+                </a>
+            </td>
+            {{elif element.item_restriction.item_type.name == 'Schedule':}}
+            <td>
+                {{schedule = db(db.item_schedule.item == element.item.id).select()}}
+                {{for s in schedule:}}
+                    {{=T(s.day_of_week.name)}}: {{=s.start_time}} - {{=s.end_time}}, {{=s.physical_location}} <br />
+                {{pass}}
+            </td>
+            {{pass}}
+            {{counter += 1}}
+        </tr>
+        {{pass}}
+    </tbody>
+</table>

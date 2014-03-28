@@ -118,3 +118,18 @@ def data():
 def zip():
     files = ['item.uploaded_file.bd4592bbb798c7c6.3235363035372e706466.pdf']
     return response.zip(request, files, db)
+
+def resources():
+    #Get the selected item_restriction id from parameter
+    item_restriction_id = request.vars['r']
+    #Get the items that belong to current semester
+    import cpfecys
+    period = cpfecys.current_year_period()
+    return dict(semester = period,
+                data = db((db.item.item_restriction == item_restriction_id)&
+                          (db.item.item_restriction == db.item_restriction.id)&
+                          (db.item_restriction.is_public == True)&
+                          (db.item_restriction.period == period)&
+                          (db.item.assignation == db.user_project.id)&
+                          (db.user_project.project == db.project.id)&
+                          (db.item.id > 0)).select(groupby=db.project.name, orderby=db.project.name))

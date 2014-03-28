@@ -473,12 +473,14 @@ db.define_table('item_type',
 
 db.define_table('item_restriction',
                 Field('name', 'string', notnull=False, label = T('Name')),
+                Field('is_public', 'boolean', default = False, notnull = True, \
+                    label = T('is public')),
                 Field('is_enabled', 'boolean', notnull=False, \
-                    label = T('is_enabled')),
+                    label = T('is enabled')),
                 Field('permanent', 'boolean', notnull=False, \
                     label = T('permanent')),
                 Field('item_type', 'reference item_type', \
-                    label = T('item_type')),
+                    label = T('item type')),
                 Field('period', 'reference period_year', \
                     label = T('period')),
                 Field('hidden_from_teacher', 'boolean', notnull=False,
@@ -519,7 +521,7 @@ db.define_table('mail_log',
 
 db.define_table('item',
                 Field('is_active', 'boolean', notnull=False, \
-                    label = T('is_active')),
+                    label = T('is active')),
                 Field('description', 'text', notnull=False, \
                     label = T('description')),
                 Field('uploaded_file', 'upload', default='', notnull=False, \
@@ -529,7 +531,7 @@ db.define_table('item',
                 Field('created', 'reference period_year', \
                     label = T('created')),
                 Field('item_restriction', 'reference item_restriction', \
-                    label = T('item_restriction')),
+                    label = T('item restriction')),
                 Field('assignation', 'reference user_project', \
                     label = T('assignation')),
                 Field('score', 'integer', notnull=False, \
@@ -558,6 +560,8 @@ db.define_table('custom_parameters',
                 Field('rescore_max_days', 'integer', default='', \
                     notnull=False, label = T('rescore_max_days')),
                 )
+
+
 
 ## after defining tables, uncomment below to enable auditing
     # auth.enable_record_versioning(db)
