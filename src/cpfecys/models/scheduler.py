@@ -234,3 +234,12 @@ mnu = []
 for d in data:
     mnu.append((T(d.name), False, URL('default', 'resources', vars=dict(r=d.id))))
 response.menu.extend([(T('Resources & Schedules'), False, URL(), mnu)])
+
+#any user should be able to see this menu
+#resources menu
+response.menu.extend([
+(T('Activities Schedules'), False, URL('default','events'), []),
+(T('Help'), False, URL(), [
+   (T('Links'), False, URL('default', 'links'), []),
+   (T('Files'), False, URL('default', 'files'), []),
+])])

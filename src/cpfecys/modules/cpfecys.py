@@ -48,8 +48,8 @@ def current_year_period():
     #current period depends if we are in dates between jan-jun and jul-dec
     if cmonth < 7 :
         period = first_period
-    return db.period_year((db.period_year.yearp == cyear)&
-                          (db.period_year.period == period))
+    return db((db.period_year.yearp == cyear)&
+                          (db.period_year.period == period)).select().first()
 
 def get_markmin():
     LATEX = '<img src="http://chart.apis.google.com/chart?cht=tx&chl=%s" align="center"/>'
@@ -153,13 +153,14 @@ def _database_setup():
         db.setup.insert(done = True)
 
 def _days_of_week_setup():
-    db.day_of_week.insert(name = T('Monday'))
-    db.day_of_week.insert(name = T('Tuesday'))
-    db.day_of_week.insert(name = T('Wednesday'))
-    db.day_of_week.insert(name = T('Thursday'))
-    db.day_of_week.insert(name = T('Friday'))
-    db.day_of_week.insert(name = T('Saturday'))
-    db.day_of_week.insert(name = T('Sunday'))
+    db = _db
+    db.day_of_week.insert(name = 'Lunes')
+    db.day_of_week.insert(name = 'Martes')
+    db.day_of_week.insert(name = 'Miercoles')
+    db.day_of_week.insert(name = 'Jueves')
+    db.day_of_week.insert(name = 'Viernes')
+    db.day_of_week.insert(name = 'Sabado')
+    db.day_of_week.insert(name = 'Domingo')
 
 def _assignation_status():
     db = _db

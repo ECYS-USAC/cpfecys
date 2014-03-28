@@ -170,7 +170,7 @@ db.define_table('project',
                 format='%(name)s')
 
 db.define_table('period',
-                Field ('name', 'string', unique = True, length = 255, \
+                Field ('name', 'string', length = 255, \
                     label = T('name')),
                 format = '%(name)s')
 
@@ -215,7 +215,8 @@ db.define_table('user_project',
                     label = T('pro_bono')),
                 Field('hours', 'integer', label = T('Assignation Hours'), notnull = True),
                 Field ('periods', 'integer', notnull=True, \
-                    label = T('periods')))
+                    label = T('periods')),
+                format = '%(project)s - %(assigned_user)s')
 
 # This are the tables that store important links and uploaded
 # files by admin.
@@ -562,7 +563,17 @@ db.define_table('custom_parameters',
                     notnull=False, label = T('rescore_max_days')),
                 )
 
+db.define_table('public_event',
+                Field('name', 'string', label=T('Event Name'), unique=True, length=255, notnull=True),
+                Field('semester', 'reference period_year', notnull=True),
+                Field('assignation', 'reference user_project', notnull=True),
+                format='%(name)s')
 
+db.define_table('public_event_schedule',
+                Field('public_event', 'reference public_event', notnull=True),
+                Field('physical_location', 'string', notnull = True, label = T('Location')),
+                Field('start_date', 'datetime', label=T('Start'), notnull = True),
+                Field('end_date', 'datetime', label=T('End'), notnull = True))
 
 ## after defining tables, uncomment below to enable auditing
     # auth.enable_record_versioning(db)
