@@ -213,6 +213,7 @@ db.define_table('user_project',
                 Field('period', 'reference period_year', label = T('period')),
                 Field('pro_bono', 'boolean', length=255, notnull=False, \
                     label = T('pro_bono')),
+                Field('hours', 'integer', label = T('Assignation Hours'), notnull = True),
                 Field ('periods', 'integer', notnull=True, \
                     label = T('periods')))
 

@@ -35,7 +35,7 @@
                     </thead>
                     <tbody>
                         <tr>
-                        {{hours_left = 400}}
+                        {{hours_left = inc_vars['reports'].first().assignation.hours}}
                         <td>{{=T('Start Amount')}}</td>
                         <td></td>
                         <td>{{=hours_left}}</td>
