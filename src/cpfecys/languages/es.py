@@ -977,6 +977,7 @@
 'Ticket': 'Tiquete',
 'Time in Cache (h:m:s)': 'Tiempo en Cache (h:m:s)',
 'Timeless Items': 'Elementos persistentes.',
+'Times Graded': 'Veces Calificado',
 'Times graded': 'Veces calificado',
 'times_graded': 'Cantidad de Veces calificado',
 'Timestamp': 'Marca de tiempo',

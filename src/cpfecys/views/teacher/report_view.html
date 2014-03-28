@@ -21,6 +21,7 @@
               <div class="controls">
                 <input class="span3" type="text" id="score" name="score" placeholder="{{=T('Score')}}">
                 <span id="label-status" class="label">{{=T('Not graded')}}</span>
+                  <span class="label label-inverse">{{=T('Times Graded')}}: {{=report.times_graded or 0}}</span>
                 <span class="label label-info">{{=T('Minimum value to aprove')}}: {{=parameters.min_score}}</span>
                 <div id="score-error" class="alert alert-error input-xlarge" hidden>
                   {{=T('Please use only numeric values from zero to one hundred to score this report.')}}
