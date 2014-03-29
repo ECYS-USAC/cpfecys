@@ -10,6 +10,7 @@
     <thead>
         <th></th>
         <th>{{=T('Course Name')}}</th>
+        <th>{{=T('Teacher')}}</th>
         <th>{{=T('Details')}}</th>
     </thead>
     {{counter = 1}}
@@ -18,6 +19,12 @@
         <tr>
             <td>{{=counter}}</td>
             <td>{{=element.project.name}}</td>
+            <td>
+                {{teachers = teachers_on_project(element.project.id)}}
+                {{for teacher in teachers:}}
+                {{=teacher.auth_user.last_name}}, {{=teacher.auth_user.first_name}}
+                {{pass}}
+            </td>
             {{if element.item_restriction.item_type.name == 'File':}}
             <td>
                 <a href="{{=URL('default','download', args=element.item.uploaded_file)}}"

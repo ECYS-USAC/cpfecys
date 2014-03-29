@@ -167,7 +167,15 @@ def resources():
     #Get the items that belong to current semester
     import cpfecys
     period = cpfecys.current_year_period()
-    return dict(semester = period,
+    def teachers_on_project(project_id):
+        return db((db.project.id == project_id)&\
+                (db.user_project.project == db.project.id)&\
+                (db.auth_user.id == db.user_project.assigned_user)&\
+                (db.auth_membership.user_id == db.auth_user.id)&\
+                (db.auth_membership.group_id == db.auth_group.id)&\
+                (db.auth_group.role == 'Teacher')).select()
+    return dict(teachers_on_project = teachers_on_project,
+                semester = period,
                 data = db((db.item.item_restriction == item_restriction_id)&
                           (db.item.item_restriction == db.item_restriction.id)&
                           (db.item_restriction.is_public == True)&
