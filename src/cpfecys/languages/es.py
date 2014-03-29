@@ -1,4 +1,4 @@
-# coding: utf-8
+# -*- coding: utf-8 -*-
 {
 '': '',
 '!=': '!=',
@@ -500,6 +500,7 @@
 'ID de Usuario': 'ID de Usuario',
 'If report is not fixed within given time, then last valid score is taken.': 'Si el reporte no se mejora en el tiempo proporcionado, la última nota se toma como valor.',
 'Ignored': 'Ignorado',
+'Immediate Boss': 'Jefe Inmediato',
 'import': 'importar',
 'Import/Export': 'Importar/Exportar',
 'Important Links': 'Links Importantes',
