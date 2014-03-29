@@ -9,6 +9,35 @@
 <link rel="stylesheet" type="text/css" href="{{=URL('static','markitup')}}/sets/markmin/style.css"/>
 
 <p><a onclick="window.history.back()" class="btn" ><i class="icon-arrow-left"></i> Back</a></p>
+
+<table class="table table-bordered">
+<thead>
+    <th>{{=T('Student school id')}}</th>
+    <th>{{=T('Student name')}}</th>
+    <th>{{=T('Project')}}</th>
+    <th>{{=T('Time range')}}</th>
+    <th>{{=T('Teacher name')}}</th>
+</thead>
+<tbody>
+  <td>
+    {{=report.assignation.assigned_user.username}}
+  </td>
+  <td>
+  {{=report.assignation.assigned_user.first_name}} 
+  {{=report.assignation.assigned_user.last_name}}
+  </td>
+  <td>
+    {{=report.assignation.assigned_user.username}}
+  </td>
+  <td>
+    {{=report.assignation.project.name}}
+  </td>
+  <td>
+    {{=teacher.first_name}} {{=teacher.last_name}}
+  </td>
+</tbody>
+</table>
+
 {{if report.status.name == 'Grading' or report.status.name == 'EnabledForTeacher':}}
 <div class="row-fluid">
       <div class="well span12">

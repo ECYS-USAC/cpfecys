@@ -123,6 +123,7 @@ def report():
             response.view = 'teacher/report_view.html'
             assignation_reports = db(db.report.assignation== \
                 report.assignation).select()
+            teacher = db(db.auth_user.id==auth.user.id).select().first()
             return dict(
                 log_types=db(db.log_type.id > 0).select(),
                 assignation_reports = assignation_reports,
@@ -135,7 +136,8 @@ def report():
                            (db.log_entry.report == report.id)).count(),
                 markmin_settings=cpfecys.get_markmin,
                 report=report,
-                next_date=next_date)
+                next_date=next_date,
+                teacher=teacher)
         else:
             session.flash = T('Selected report can\'t be viewed. \
                                 Select a valid report.')

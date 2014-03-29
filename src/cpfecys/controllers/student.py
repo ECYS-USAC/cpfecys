@@ -981,22 +981,23 @@ def report():
         # Validate that the report belongs to user
         if valid: valid = cpfecys.student_validation_report_owner(report.id)
         if valid:
-            ## Markmin formatting of reports
-            assignation = request.vars['assignation']
-            assign = db.user_project((db.user_project.id == assignation)&
-                                (db.user_project.assigned_user == auth.user.id))
-            #teacher = db(
-                        #(db.auth_user.id==db.user_project.assigned_user)&
-                        #(db.auth_user.id==db.auth_membership.user_id)&
-                        #(db.auth_membership.group_id==db.auth_group.id)&
-                        #(db.auth_group.role=='Teacher')&
-                        #(db.user_project.project==assign.project)&
-                        #(db.user_project.period==db.period_year.id)&
-                        ##TODO: EN LA LINEA DE ABAJO VA EL ID DEL PERIODO
-                        ##((db.user_project.period <= period.id)&
-                       #((db.user_project.period + db.user_project.periods) > \
-                       # period.id))
-                        #)
+            semester = cpfecys.first_period.id
+            if report.created.month > 7:
+                semester = cpfecys.second_period.id
+
+            period = db((db.period_year.yearp==int(report.created.year))&
+                (db.period_year.period==semester)).select().first()
+            teacher = db(
+                        (db.auth_user.id==db.user_project.assigned_user)&
+                        (db.auth_user.id==db.auth_membership.user_id)&
+                        (db.auth_membership.group_id==db.auth_group.id)&
+                        (db.auth_group.role=='Teacher')&
+                        (db.user_project.project==report.assignation.project)&
+                        (db.user_project.period==db.period_year.id)&
+                        ((db.user_project.period <= period.id)&
+                       ((db.user_project.period + db.user_project.periods) > \
+                        period.id))
+                        ).select(db.auth_user.ALL).first()
             student = db(db.auth_user.id==auth.user.id).select().first()
             response.view = 'student/report_view.html'
             assignation_reports = db(db.report.assignation == report.assignation).select()
@@ -1010,7 +1011,8 @@ def report():
                                    (db.log_entry.report == report.id)).count(),
                         markmin_settings = cpfecys.get_markmin,
                         report = report,
-                        student = student)
+                        student = student,
+                        teacher = teacher)
         else:
             session.flash = T('Selected report can\'t be viewed. Select a valid report.')
             redirect(URL('student', 'index'))

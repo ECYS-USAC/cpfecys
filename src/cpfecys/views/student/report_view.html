@@ -12,16 +12,21 @@
 <div class="row-fluid">
   <div class="navbar">
     <div>
-    <table class="table table-striped table-bordered">
+    <table class="table table-bordered">
         <tr>
+        <thead>
+            <th>{{=T('Student school id')}}</th>
+            <th>{{=T('Student name')}}</th>
+            <th>{{=T('Project')}}</th>
+            <th>{{=T('Time range')}}</th>
+            <th>{{=T('Teacher name')}}</th>
+        </thead>
+        <tbody>
             <td>
             {{=student.username}}        
             </td>
             <td>
-            {{=student.first_name}}        
-            </td>
-            <td>
-            {{=student.last_name}}        
+            {{=student.first_name}} {{=student.last_name}}
             </td>
             <td>
             {{=report.assignation.project.name}}        
@@ -30,6 +35,10 @@
             {{=T(report.assignation.period.period.name)}} - 
             {{=report.assignation.period.yearp}}
             </td>
+            <td>
+            {{=teacher.first_name}} {{=teacher.last_name}}
+            </td>
+        </tbody>
         </tr>
     </table>
         
