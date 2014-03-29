@@ -340,6 +340,7 @@
 'dsivisible': 'Visible para DSI?',
 'DTT': 'DTT',
 'DTT Approval': 'Aprobación DTT',
+'DTT approval': 'DTT approval',
 'dtt approval': 'Aprobación DTT',
 'DTT aproval': 'Aprobación de DTT',
 'DTT failing': 'Reprobación DTT',

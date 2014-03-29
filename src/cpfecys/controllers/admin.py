@@ -212,6 +212,23 @@ def report():
         report = db.report(db.report.id == report)
         valid = not(report is None)
         if valid:
+            semester = cpfecys.first_period.id
+            if report.created.month > 7:
+                semester = cpfecys.second_period.id
+
+            period = db((db.period_year.yearp==int(report.created.year))&
+                (db.period_year.period==semester)).select().first()
+            teacher = db(
+                        (db.auth_user.id==db.user_project.assigned_user)&
+                        (db.auth_user.id==db.auth_membership.user_id)&
+                        (db.auth_membership.group_id==db.auth_group.id)&
+                        (db.auth_group.role=='Teacher')&
+                        (db.user_project.project==report.assignation.project)&
+                        (db.user_project.period==db.period_year.id)&
+                        ((db.user_project.period <= period.id)&
+                       ((db.user_project.period + db.user_project.periods) > \
+                        period.id))
+                        ).select(db.auth_user.ALL).first()
             def add_timing(status):
                 if status == 'Acceptance':
                     return status
@@ -240,7 +257,8 @@ def report():
                 report=report,
                 next_date=next_date,
                 status_list=db(db.report_status).select(),
-                add_timing=add_timing)
+                add_timing=add_timing,
+                teacher=teacher)
         else:
             session.flash = T('Selected report can\'t be viewed. \
                                 Select a valid report.')
