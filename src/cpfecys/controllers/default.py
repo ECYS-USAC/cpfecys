@@ -9,6 +9,48 @@
 ## - call exposes all registered services (none by default)
 #########################################################################
 
+def events():
+    cyearperiod = cpfecys.current_year_period()
+    return dict(year = cyearperiod.yearp, semester = cyearperiod.period.name,
+                thing = db((db.public_event.semester == cyearperiod)&
+                           (db.public_event.assignation == db.user_project.id)&
+                           (db.user_project.project == db.project.id)&
+                           (db.public_event_schedule.public_event == \
+                            db.public_event.id)).select(orderby=db.project.name))
+
+@auth.requires_login()
+def event_edition():
+    #show all assignations of current user
+    return dict(assignations = db(db.user_project.assigned_user == auth.user.id).select())
+
+@auth.requires_login()
+def event_editor():
+    assignation = request.vars['assignation']
+    #check assignation belongs to this user
+    import cpfecys
+    check = db.user_project(id = assignation, assigned_user = auth.user.id)
+    if (check is None):
+        #check if there is no assignation of it is locked (shouldn't be touched)
+        if (session.last_assignation is None):
+            redirect(URL('default','index'))
+            return
+        else:
+            check = db.user_project(id = session.last_assignation)
+            if cpfecys.assignation_is_locked(check):
+                redirect(URL('default','index'))
+                return
+    else:
+        session.last_assignation = check.id
+    cyearperiod = cpfecys.current_year_period()
+    db.public_event.semester.default = cyearperiod.id
+    db.public_event.semester.writable = False
+    db.public_event.semester.readable = False
+    db.public_event.assignation.default = assignation
+    db.public_event.assignation.writable = False
+    db.public_event.assignation.readable = False
+    db.public_event_schedule.public_event.readable = False
+    db.public_event_schedule.public_event.writable = False
+    return dict(year = cyearperiod.yearp, semester = cyearperiod.period.name,name = check.project.name,grid = SQLFORM.smartgrid(db.public_event))
 
 def index():
     """
@@ -118,3 +160,18 @@ def data():
 def zip():
     files = ['item.uploaded_file.bd4592bbb798c7c6.3235363035372e706466.pdf']
     return response.zip(request, files, db)
+
+def resources():
+    #Get the selected item_restriction id from parameter
+    item_restriction_id = request.vars['r']
+    #Get the items that belong to current semester
+    import cpfecys
+    period = cpfecys.current_year_period()
+    return dict(semester = period,
+                data = db((db.item.item_restriction == item_restriction_id)&
+                          (db.item.item_restriction == db.item_restriction.id)&
+                          (db.item_restriction.is_public == True)&
+                          (db.item_restriction.period == period)&
+                          (db.item.assignation == db.user_project.id)&
+                          (db.user_project.project == db.project.id)&
+                          (db.item.id > 0)).select(groupby=db.project.name, orderby=db.project.name))

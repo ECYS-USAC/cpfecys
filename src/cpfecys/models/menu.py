@@ -64,13 +64,11 @@ if auth.has_membership(role="Student"):
     response.menu.extend([(T('Final Practice'), False, URL('student', 'index'), [])])
 if auth.has_membership(role="DSI"):
     response.menu.extend([(T('Delivered Items'), False, URL('dsi', 'index'), [])])
-#any user should be able to see this menu
-response.menu.extend([
-(T('Help'), False, URL(), [
-   (T('Links'), False, URL('default', 'links'), []),
-   (T('Files'), False, URL('default', 'files'), []),
-])])
 
+if auth.is_logged_in():
+    user_menu = []
+    user_menu.append((T('Edit Schedules'), False, URL('default', 'event_edition'), []))
+    response.menu.extend(user_menu)
 DEVELOPMENT_MENU = False
 
 #########################################################################

@@ -180,6 +180,8 @@ def report():
                         + T('Comment: ') + XML(comment) + ' ' \
                         + '<br/>' \
                         + T('Was checked, but sent back to be fixed.') + '<br/>' \
+                        + T('You have:') + ' ' + str(db(db.custom_parameters.id > 0).select().first().rescore_max_days) + ' '  + T('days to fix the report.') + '<br/>' \
+                        + T('If report is not fixed within given time, then last valid score is taken.') + '<br/>' \
                         + T('Fix the report on:') \
                         + ' http://omnomyumi.com/dtt/' + '</html>'
                         # send mail to teacher and student notifying change.

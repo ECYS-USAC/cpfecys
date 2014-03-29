@@ -170,7 +170,7 @@ db.define_table('project',
                 format='%(name)s')
 
 db.define_table('period',
-                Field ('name', 'string', unique = True, length = 255, \
+                Field ('name', 'string', length = 255, \
                     label = T('name')),
                 format = '%(name)s')
 
@@ -213,8 +213,10 @@ db.define_table('user_project',
                 Field('period', 'reference period_year', label = T('period')),
                 Field('pro_bono', 'boolean', length=255, notnull=False, \
                     label = T('pro_bono')),
+                Field('hours', 'integer', label = T('Assignation Hours'), notnull = True),
                 Field ('periods', 'integer', notnull=True, \
-                    label = T('periods')))
+                    label = T('periods')),
+                format = '%(project)s - %(assigned_user)s')
 
 # This are the tables that store important links and uploaded
 # files by admin.
@@ -473,12 +475,14 @@ db.define_table('item_type',
 
 db.define_table('item_restriction',
                 Field('name', 'string', notnull=False, label = T('Name')),
+                Field('is_public', 'boolean', default = False, notnull = True, \
+                    label = T('is public')),
                 Field('is_enabled', 'boolean', notnull=False, \
-                    label = T('is_enabled')),
+                    label = T('is enabled')),
                 Field('permanent', 'boolean', notnull=False, \
                     label = T('permanent')),
                 Field('item_type', 'reference item_type', \
-                    label = T('item_type')),
+                    label = T('item type')),
                 Field('period', 'reference period_year', \
                     label = T('period')),
                 Field('hidden_from_teacher', 'boolean', notnull=False,
@@ -519,7 +523,7 @@ db.define_table('mail_log',
 
 db.define_table('item',
                 Field('is_active', 'boolean', notnull=False, \
-                    label = T('is_active')),
+                    label = T('is active')),
                 Field('description', 'text', notnull=False, \
                     label = T('description')),
                 Field('uploaded_file', 'upload', default='', notnull=False, \
@@ -529,7 +533,7 @@ db.define_table('item',
                 Field('created', 'reference period_year', \
                     label = T('created')),
                 Field('item_restriction', 'reference item_restriction', \
-                    label = T('item_restriction')),
+                    label = T('item restriction')),
                 Field('assignation', 'reference user_project', \
                     label = T('assignation')),
                 Field('score', 'integer', notnull=False, \
@@ -558,6 +562,18 @@ db.define_table('custom_parameters',
                 Field('rescore_max_days', 'integer', default='', \
                     notnull=False, label = T('rescore_max_days')),
                 )
+
+db.define_table('public_event',
+                Field('name', 'string', label=T('Event Name'), unique=True, length=255, notnull=True),
+                Field('semester', 'reference period_year', notnull=True),
+                Field('assignation', 'reference user_project', notnull=True),
+                format='%(name)s')
+
+db.define_table('public_event_schedule',
+                Field('public_event', 'reference public_event', notnull=True),
+                Field('physical_location', 'string', notnull = True, label = T('Location')),
+                Field('start_date', 'datetime', label=T('Start'), notnull = True),
+                Field('end_date', 'datetime', label=T('End'), notnull = True))
 
 ## after defining tables, uncomment below to enable auditing
     # auth.enable_record_versioning(db)

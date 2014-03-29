@@ -796,6 +796,7 @@ def assignation_upload():
                 rproject = row[3]
                 rassignation_length = row[4]
                 rpro_bono = (row[5] == 'Si') or (row[5] == 'si')
+                rhours = row[6]
                 ## check if user exists
                 usr = db.auth_user(db.auth_user.username == rusername)
                 project = db.project(db.project.project_id == rproject)
@@ -837,7 +838,8 @@ def assignation_upload():
                                             project = project,
                                             period = current_period,
                                             periods = rassignation_length,
-                                            pro_bono = rpro_bono)
+                                            pro_bono = rpro_bono,
+                                            hours = rhours)
                 else:
                     # project_id is not valid
                     row.append('Error: ' + T('Project code is not valid. \
