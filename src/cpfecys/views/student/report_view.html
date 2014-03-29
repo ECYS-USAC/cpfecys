@@ -11,7 +11,31 @@
 <!-- //Additional Scripts for MARKMIN -->
 <div class="row-fluid">
   <div class="navbar">
+    <div>
+    <table class="table table-striped table-bordered">
+        <tr>
+            <td>
+            {{=student.username}}        
+            </td>
+            <td>
+            {{=student.first_name}}        
+            </td>
+            <td>
+            {{=student.last_name}}        
+            </td>
+            <td>
+            {{=report.assignation.project.name}}        
+            </td>
+            <td>
+            {{=T(report.assignation.period.period.name)}} - 
+            {{=report.assignation.period.yearp}}
+            </td>
+        </tr>
+    </table>
+        
+    </div>
       <div class="navbar-inner">
+        
         <a class="brand" href="#">
             {{=T('View Report:')}}
             <small>{{=report.report_restriction['name']}}</small>

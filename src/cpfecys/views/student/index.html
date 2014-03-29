@@ -187,6 +187,56 @@
                                     </td>
                                 </tr>
                                 {{pass}}
+
+                                {{for available_report in  \
+                                available_reports(item.period_year).select():}}
+                                    {{if db((db.report.report_restriction ==  \
+                                    available_report.id)&
+                                          (db.user_project.id == \
+                                          db.report.assignation)&
+                                        (db.user_project.assigned_user == \
+                                        auth.user.id)).count() < 1:}}
+                                    <tr class="info">
+                                        <td>
+                                          {{=available_report.name}}
+                                        </td>
+                                        <td>
+                                          {{=T('Pending')}}
+                                        </td>
+                                        <td>
+                                          {{=str(available_report.start_date) \
+                                            + ' - ' + \
+                                                str(available_report.end_date)}}
+                                        </td>
+                                        <td>
+                                          {{=T('Pending')}}
+                                        </td>
+                                        <td>
+                                          0
+                                        </td>
+                                        <td>
+                                          <div class="label label-info">
+                                            {{=T('Grade pending')}}
+                                          </div>
+                                        </td>
+                                        <td>
+                                          <div class="label">
+                                            {{=T('Pending')}}
+                                          </div>
+                                        </td>
+                                        <td>
+                                          <a class="btn btn-info" 
+                                          href="{{=URL('student','report/create', \
+                                          vars=dict(assignation = \
+                                          item.user_project.id, report_restriction = \
+                                          available_report.id))}}">
+                                            <span class="icon-plus"></span>
+                                            {{=T('Create Report')}}
+                                          </a>
+                                        </td>
+                                    </tr>
+                                    {{pass}}
+                                {{pass}}
                             </tbody>
                         </table>
                         <div class="span12">
@@ -199,20 +249,7 @@
                                 {{pass}}
                             </div>
                             <div class="span6">
-                                {{for available_report in available_reports(item.period_year).select():}}
-                                {{if db((db.report.report_restriction == available_report.id)&
-                                      (db.user_project.id == db.report.assignation)&
-                                    (db.user_project.assigned_user == auth.user.id)).count() < 1:}}
-                                <a class="pull-right btn" href="{{=URL('student','report/create', vars=dict(assignation = item.user_project.id, report_restriction = available_report.id))}}">
-                                    <span class="icon-plus"></span>{{=available_report.name}}
-                                    <small>
-                                        {{=T('Available:') + ' ' +
-                                        str(available_report.start_date) + ' - ' +
-                                        str(available_report.end_date)}}
-                                    </small>
-                                </a>
-                                {{pass}}
-                                {{pass}}
+                                
                             </div>
                         </div>
                     </div>

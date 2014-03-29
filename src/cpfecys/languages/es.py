@@ -1,4 +1,4 @@
-# -*- coding: utf-8 -*-
+# coding: utf-8
 {
 '': '',
 '!=': '!=',
@@ -233,12 +233,15 @@
 'Count': 'Total',
 'Course Progress': 'Course Progress',
 'Courses': 'Cursos',
+'Create': 'Create',
 'create file with filename:': 'cree archivo con nombre:',
 'Create Item': 'Crear',
 'Create new application': 'Cree una nueva aplicación',
 'create new application:': 'nombre de la nueva aplicación:',
 'Create New Page': 'Crear Nueva Página',
 'Create Project': 'Crear Proyecto',
+'Create Report': 'Crear Reporte',
+'Create report': 'Crear reporte',
 'Created': 'Creado',
 'created': 'creado',
 'Created By': 'Creado Por',
