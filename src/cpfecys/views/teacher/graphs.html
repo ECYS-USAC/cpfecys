@@ -87,29 +87,6 @@
               values_title = T('Average Score')) }}
               {{include 'include/display-line-chart.html'}}
           </div>
-          <table>
-              <thead>
-                  <tr>
-                      <th>{{=T('Carnet')}}</th>
-                      <th>{{=T('Name')}}</th>
-                      <th>{{=T('Actions')}}</th>
-                  </tr>
-              </thead>
-              <tbody>
-                  {{for item in current_data:}}
-                  <tr>
-                      <td>{{=item.user_project.assigned_user['username']}}</td>
-                      <td>{{=item.user_project.assigned_user['first_name'] + ' ' + item.user_project.assigned_user['last_name']}}</td>
-                      <td>
-                          <a class="btn" href="{{=URL('final_practice',
-                                               vars=dict(assignation=item.user_project.id))}}">
-                              <i class="icon-list"></i> {{=T('Final Practice Progress')}}
-                          </a>
-                      </td>
-                  </tr>
-                  {{pass}}
-              </tbody>
-          </table>
       </div>
   </div>
 </div>
