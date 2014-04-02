@@ -844,12 +844,12 @@ def assignation_upload():
                         (db.user_project.project == project)&
                         (db.user_project.period == current_period))
                     if assignation != None:
-                        row.append(T('Warning: ') + T('User \
-                         was already assigned, Updating Data.'))
-                        warning_users.append(row)
-                        assignation.update_record(periods = \
-                            rassignation_length, pro_bono = \
-                            rpro_bono)
+                        row.append(T('Error: ') + T('User \
+                         was already assigned, Please Manually Assign Him.'))
+                        error_users.append(row)
+                        #assignation.update_record(periods = \
+                            #rassignation_length, pro_bono = \
+                            #rpro_bono)
                         continue
                 if project != None:
                     db.user_project.insert(assigned_user = usr,
