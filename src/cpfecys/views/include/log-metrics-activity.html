@@ -16,7 +16,7 @@
                         <div class="input-prepend">
                             <span class="add-on">{{=T('Log Date')}} <span class="icon-calendar"></span></span>
                             <input class="span7" id="log-metrics-date-{{=inc_vars['id']}}"
-                                   name="log-date" placeholder="{{=T("YYYY-MM-DD")}}" type="date"
+                                   name="log-date" placeholder="{{=T('YYYY-MM-DD')}}" type="date"
                                    value = "{{=inc_vars['date']}}">
                         </div>
                         <div><small>{{=T("YYYY-MM-DD")}}</small></div>
@@ -30,6 +30,14 @@
         <div class="modal-body">
             <div class="alert" style="display:none;" id="metrics-error-{{=inc_vars['id']}}">
                 <strong>{{=T('Alert')}}!</strong> {{=T('All fields are mandatory, please check and try again.')}}
+            </div>
+            <div class="control-group">
+                <label class="control-label" for="media-description">{{=T('Description')}}</label>
+                <div class="controls">
+                    <textarea type="text" id="media-description-{{=inc_vars['id']}}"
+                    name="description"
+                           placeholder="{{=T('Description')}}">{{=inc_vars['description']}}</textarea>
+                </div>
             </div>
             <div class="control-group">
                 <label class="control-label" for="media-metrics">{{=T('Metric Report Type')}}</label>
@@ -156,6 +164,7 @@
           <input type="submit"
           onclick="if (
               $('#log-metrics-date-{{=inc_vars['id']}}').val()&&
+              $('#media-description-{{=inc_vars['id']}}').val()&&
               $('#media-metrics-{{=inc_vars['id']}}').val()&&
               $('#error-tipico-metrics-{{=inc_vars['id']}}').val()&&
               $('#mediana-metrics-{{=inc_vars['id']}}').val()&&

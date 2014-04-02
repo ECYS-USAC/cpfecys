@@ -434,6 +434,8 @@ db.define_table('log_final',
                 )
 
 db.define_table('log_metrics',
+                Field('description', 'text', notnull=True, \
+                    label = T('description')),
                 Field('media', 'decimal(8,2)', notnull=True, \
                     label = T('media')),
                 Field('error', 'decimal(8,2)', notnull=True, \

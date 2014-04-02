@@ -20,6 +20,9 @@
         </div>
         <div class="span12">
             <h2 class="center">{{=metric.metrics_type.name}}</h2>
+            <p>
+                {{=MARKMIN(metric.description, markmin_settings)}}
+            </p>
             <div class="span6">
                 <table class="table table-striped table-bordered">
                     <thead>

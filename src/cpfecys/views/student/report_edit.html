@@ -49,6 +49,7 @@
 <!-- log-new-metrics-activity -->
 {{inc_vars = dict(id = 'log-new-metrics-activity',
                 url = URL('metrics/save', vars=dict(report = report.id)),
+                description = '',
                 date = '',
                 metrics_t = None,
                 metrics_type = metrics_type,
@@ -283,6 +284,7 @@ url = '#')}}
             <!-- Metric edit Helper-->
             {{inc_vars = dict(id = 'metric-edit-activity-' + str(metric.id),
             url = URL('metrics/update', vars=dict(metric = metric.id)),
+            description = metric.description,
             date = metric.created,
             metrics_t = metric.metrics_type,
             metrics_type = metrics_type,

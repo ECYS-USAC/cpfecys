@@ -512,6 +512,7 @@
 'Incomplete Information': 'Información Incompleta',
 'Index': 'Índice',
 'Information': 'Información',
+'Inicio de sesión': 'Inicio de sesión',
 'insert new': 'inserte nuevo',
 'insert new %s': 'inserte nuevo %s',
 'Inserted users:': 'Usuarios Ingresados:',
