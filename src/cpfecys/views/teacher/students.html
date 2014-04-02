@@ -47,46 +47,6 @@
           </form>
       </div>
       <div class="tab-pane active" id="data{{=currentyear_period.id}}">
-          <h2>
-              {{=T('Course Progress')}}
-          </h2>
-          <!-- I need All reports that belong to this semester and course. Arrange them by owner. Display them -->
-          {{categories = set()}}
-          {{for item in current_reports:}}
-          {{categories.add(item.report.report_restriction)}}
-          {{pass}}
-          <div id="course-progress">
-              <script type="text/javascript" src="{{=URL('static','js')}}/highcharts/js/highcharts.js">
-              </script>
-              <script type="text/javascript" src="{{=URL('static','js')}}/highcharts/js/modules/data.js">
-              </script>
-              <script type="text/javascript" src="{{=URL('static','js')}}/highcharts/js/modules/exporting.js">
-              </script>
-              {{inc_vars = dict(id = 'chart01',
-              categories_title = T('Students In Course'),
-              categories_subtitle = current_project.project.name,
-              categories = categories,
-              category_display = lambda x: x.name,
-              values = current_reports,
-              values_display = values_display,
-              values_title = T('Students')) }}
-              {{include 'include/display-line-chart.html'}}
-              <!-- -->
-              {{categories = set()}}
-              {{for item in report_activities:}}
-              {{categories.add(item.log_metrics.metrics_type)}}
-              {{pass}}
-              <!-- -->
-               {{inc_vars = dict(id = 'chart02',
-              categories_title = T('Activities in Course'),
-              categories_subtitle = current_project.project.name,
-              categories = categories,
-              category_display = lambda x: x.name,
-              values = report_activities,
-              values_display = values_display_activities,
-              values_title = T('Average Score')) }}
-              {{include 'include/display-line-chart.html'}}
-          </div>
           <table>
               <thead>
                   <tr>
