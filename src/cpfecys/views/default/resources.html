@@ -11,6 +11,7 @@
         <th></th>
         <th>{{=T('Course Name')}}</th>
         <th>{{=T('Teacher')}}</th>
+        <th>{{=T('Final Practice Student')}}</th>
         <th>{{=T('Details')}}</th>
     </thead>
     {{counter = 1}}
@@ -20,10 +21,20 @@
             <td>{{=counter}}</td>
             <td>{{=element.project.name}}</td>
             <td>
+                <ul>
                 {{teachers = teachers_on_project(element.project.id)}}
                 {{for teacher in teachers:}}
-                {{=teacher.auth_user.last_name}}, {{=teacher.auth_user.first_name}}
+                <li>{{=teacher.auth_user.last_name}}, {{=teacher.auth_user.first_name}}</li>
                 {{pass}}
+                </ul>
+            </td>
+            <td>
+                <ul>
+                {{final_practice_students = aux_in_courses(element.project.id)}}
+                {{for aux in final_practice_students:}}
+                <li>{{=aux.auth_user.last_name}}, {{=aux.auth_user.first_name}}</li>
+                {{pass}}
+                </ul>
             </td>
             {{if element.item_restriction.item_type.name == 'File':}}
             <td>
@@ -35,9 +46,11 @@
             {{elif element.item_restriction.item_type.name == 'Schedule':}}
             <td>
                 {{schedule = db(db.item_schedule.item == element.item.id).select()}}
+                <ul>
                 {{for s in schedule:}}
-                    {{=T(s.day_of_week.name)}}: {{=s.start_time}} - {{=s.end_time}}, {{=s.physical_location}} <br />
+                    <li>{{=T(s.day_of_week.name)}}: {{=s.start_time}} - {{=s.end_time}}, {{=s.physical_location}}</li>
                 {{pass}}
+                </ul>
             </td>
             {{pass}}
             {{counter += 1}}

@@ -171,10 +171,20 @@ def resources():
         return db((db.project.id == project_id)&\
                 (db.user_project.project == db.project.id)&\
                 (db.auth_user.id == db.user_project.assigned_user)&\
+                (db.user_project.assignation_status == None)&\
                 (db.auth_membership.user_id == db.auth_user.id)&\
                 (db.auth_membership.group_id == db.auth_group.id)&\
                 (db.auth_group.role == 'Teacher')).select()
+    def aux_in_courses(project_id):
+        return db((db.project.id == project_id)&\
+                (db.user_project.project == db.project.id)&\
+                (db.auth_user.id == db.user_project.assigned_user)&\
+                (db.user_project.assignation_status == None)&\
+                (db.auth_membership.user_id == db.auth_user.id)&\
+                (db.auth_membership.group_id == db.auth_group.id)&\
+                (db.auth_group.role == 'Student')).select()
     return dict(teachers_on_project = teachers_on_project,
+                aux_in_courses = aux_in_courses,
                 semester = period,
                 data = db((db.item.item_restriction == item_restriction_id)&
                           (db.item.item_restriction == db.item_restriction.id)&
