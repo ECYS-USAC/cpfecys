@@ -842,7 +842,7 @@ def assignation_upload():
                     assignation = db.user_project(
                         (db.user_project.assigned_user == usr.id)&
                         (db.user_project.project == project)&
-                        (db.user_project.period == current_period))
+                        (db.user_project.assignation_status == None))
                     if assignation != None:
                         row.append(T('Error: ') + T('User \
                          was already assigned, Please Manually Assign Him.'))
