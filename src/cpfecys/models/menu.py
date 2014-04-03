@@ -59,6 +59,7 @@ if auth.has_membership(role="Super-Administrator"):
     ])
 if auth.has_membership(role="Teacher"):
     response.menu.extend([(T('Courses'), False, URL('teacher', 'courses'), []),
+    (T('Reports Pending Grading'), False, URL('teacher', 'todo_reports'), []),
     ])
 if auth.has_membership(role="Student"):
     response.menu.extend([(T('Final Practice'), False, URL('student', 'index'), [])])

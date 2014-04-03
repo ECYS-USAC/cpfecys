@@ -1,0 +1,40 @@
+{{extend 'template.html'}}
+<h1>{{=T('Grade Pending Reports')}}</h1>
+<table class="table table-striped table-bordered">
+    <thead>
+        <th>{{=T("Carnet")}}</th>
+        <th>{{=T("First Name")}}</th>
+        <th>{{=T("Last Name")}}</th>
+        <th>{{=T("Project")}}</th>
+        <th>{{=T("Report")}}</th>
+        <th>{{=T("Delivery Date")}}</th>
+        <th>{{=T("Times Graded")}}</th>
+        <th>{{=T("Date Last Grading")}}</th>
+        <th>{{=T("Actions")}}</th>
+    </thead>
+    <tbody>
+{{for project in my_projects:}}
+{{for assignation in project.project.user_project.select():}}
+{{q=((assignation.report((db.report.status == db.report_status.id)&((db.report_status.name == 'Grading')|(db.report_status.name == 'EnabledForTeacher')))))}}
+
+        {{for report in q.select():}}
+        <tr>
+            <td>{{=assignation.assigned_user.username}}</td>
+            <td>{{=assignation.assigned_user.first_name}}</td>
+            <td>{{=assignation.assigned_user.last_name}}</td>
+            <td>{{=assignation.project.name}}</td>
+            <td>{{=report.report.report_restriction.name}}</td>
+            <td>{{=report.report.created}}</td>
+            <td>{{=report.report.times_graded or 0}}</td>
+            <td>{{=report.report.score_date or T('Never')}}</td>
+            <td><a href="{{=URL('teacher','report/view',vars = dict(report=report.report.id))}}" class="btn">
+                <i class="icon-eye-open"></i>
+                {{=T('View Report')}}
+                </a>
+            </td>
+        </tr>
+        {{pass}}
+{{pass}}
+{{pass}}
+    </tbody>
+</table>

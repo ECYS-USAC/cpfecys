@@ -7,6 +7,17 @@ def index():
 
 @auth.requires_login()
 @auth.requires_membership('Teacher')
+def todo_reports():
+    #show the reports that haven't already been checked based on current assignations of the teacher
+    data = db((db.report.status == db.report_status.id)&
+       ((db.report_status.name == 'Grading')|(db.report_status.name == 'EnabledForTeacher'))&
+       (db.report.assignation == db.user_project.id)&
+       (db.user_project.assigned_user == auth.user.id)).select()
+    return dict(my_projects = db((db.user_project.assigned_user == auth.user.id)&
+                                 (db.project.id == db.user_project.project)).select())
+
+@auth.requires_login()
+@auth.requires_membership('Teacher')
 def final_practice():
     def assignation_range(assignation):
         cperiod = cpfecys.current_year_period()
