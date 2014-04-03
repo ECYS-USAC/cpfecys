@@ -64,6 +64,11 @@
                                                project=item.project['id']))}}">
                               <i class="icon-user"></i> {{=T('Show Students')}}
                           </a>
+                          <a class="btn" href="{{=URL('graphs',
+                                               vars=dict(year_period=currentyear_period.id,
+                                               project=item.project['id']))}}">
+                              <i class="icon-tasks"></i> {{=T('Show Statistics')}}
+                          </a>
                       </td>
                   </tr>
                   {{pass}}

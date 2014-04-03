@@ -795,6 +795,7 @@ def assignation_upload():
     import csv
     error_users = []
     warning_users = []
+    uv_off = request.vars['uv_off'] or False
     success = False
     if request.vars.csvfile != None:
         try:
@@ -815,6 +816,7 @@ def assignation_upload():
                 rassignation_length = row[4]
                 rpro_bono = (row[5] == 'Si') or (row[5] == 'si')
                 rhours = row[6]
+                remail = row[7]
                 ## check if user exists
                 usr = db.auth_user(db.auth_user.username == rusername)
                 project = db.project(db.project.project_id == rproject)
@@ -822,34 +824,42 @@ def assignation_upload():
                 current_period = cpfecys.current_year_period()
                 if usr is None:
                     ## find it on chamilo (db2)
-                    usr = db2.user_user(db2.user_user.username == rusername)
-                    if usr is None:
-                        # report error and get on to next row
-                        row.append(T('Error: ') + T('User is not valid. \
-                            User doesn\'t exist in UV.'))
-                        error_users.append(row)
-                        continue
+                    if not uv_off:
+                        usr = db2.user_user(db2.user_user.username == rusername)
+                        if usr is None:
+                            # report error and get on to next row
+                            row.append(T('Error: ') + T('User is not valid. \
+                                User doesn\'t exist in UV.'))
+                            error_users.append(row)
+                            continue
+                        else:
+                            # insert the new user
+                            usr = db.auth_user.insert(username = usr.username,
+                                                    password = usr.password,
+                                                    phone = usr.phone,
+                                                    last_name = usr.lastname,
+                                                    first_name = usr.firstname,
+                                                    email = usr.email)
+                            #add user to role 'student'
+                            auth.add_membership('Student', usr)
                     else:
-                        # insert the new user
-                        usr = db.auth_user.insert(username = usr.username,
-                                            password = usr.password,
-                                            phone = usr.phone,
-                                            last_name = usr.lastname,
-                                            first_name = usr.firstname)
+                        #insert a new user with csv data
+                        usr = db.auth_user.insert(username = rusername,
+                                                  email = remail)
                         #add user to role 'student'
                         auth.add_membership('Student', usr)
                 else:
                     assignation = db.user_project(
                         (db.user_project.assigned_user == usr.id)&
                         (db.user_project.project == project)&
-                        (db.user_project.period == current_period))
+                        (db.user_project.assignation_status == None))
                     if assignation != None:
-                        row.append(T('Warning: ') + T('User \
-                         was already assigned, Updating Data.'))
-                        warning_users.append(row)
-                        assignation.update_record(periods = \
-                            rassignation_length, pro_bono = \
-                            rpro_bono)
+                        row.append(T('Error: ') + T('User \
+                         was already assigned, Please Manually Assign Him.'))
+                        error_users.append(row)
+                        #assignation.update_record(periods = \
+                            #rassignation_length, pro_bono = \
+                            #rpro_bono)
                         continue
                 if project != None:
                     db.user_project.insert(assigned_user = usr,

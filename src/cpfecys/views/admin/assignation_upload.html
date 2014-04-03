@@ -54,6 +54,9 @@
 </div>
 {{else:}}
 <div class="well">
-    {{=FORM(INPUT(_type='file',_name='csvfile'),INPUT(_type='submit',_value='Upload'))}}
+    {{=FORM(INPUT(_type='file',_name='csvfile'),
+    SPAN(T('Force upload without checking on UV')),
+    INPUT(_type='checkbox', _name='uv_off', value='off'),
+    INPUT(_type='submit',_value='Upload'))}}
 </div>
 {{ pass }}

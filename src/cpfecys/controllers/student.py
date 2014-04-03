@@ -1125,7 +1125,7 @@ def metrics():
         # validate report is 'Draft' or 'Recheck'
         if valid_report: valid_report = cpfecys.student_validation_report_status(report)
         # validate we receive log-date, log-type, log-content
-
+        description = request.vars['description']
         media = request.vars['media-metrics']
         error_tipico = request.vars['error-tipico-metrics']
         mediana = request.vars['mediana-metrics']
@@ -1149,10 +1149,12 @@ def metrics():
                                          and coeficiente and rango \
                                          and minimo and maximo and total \
                                          and reprobados and aprobados \
-                                         and metric_type and log_date)
+                                         and metric_type and log_date
+                                         and description)
 
         if valid_report:
             db.log_metrics.insert(report = report.id,
+                                  description = description,
                                 media = media,
                                 error = error_tipico,
                                 mediana = mediana,
@@ -1190,7 +1192,7 @@ def metrics():
         if valid_metric: valid_metric = cpfecys.student_validation_report_status \
             (db.report(db.report.id == metric.report))
         # validate we receive log-date, log-type, log-content
-        
+        description = request.vars['description']
         media = request.vars['media-metrics']
         error_tipico = request.vars['error-tipico-metrics']
         mediana = request.vars['mediana-metrics']
@@ -1208,14 +1210,15 @@ def metrics():
         metric_type = request.vars['metric-type']
         log_date = request.vars['log-date']
         if valid_metric: valid_metric = (media and error_tipico and mediana \
-                                         and moda and desviacion_estandar  
+                                         and moda and desviacion_estandar \
                                          and varianza and curtosis \
                                          and coeficiente and rango \
                                          and minimo and maximo and total \
                                          and reprobados and aprobados \
-                                         and metric_type and log_date)
+                                         and metric_type and log_date and description)
         if valid_metric:
             metric.update_record(report = metric.report.id,
+                                 description = description,
                                 media = media,
                                 error = error_tipico,
                                 mediana = mediana,

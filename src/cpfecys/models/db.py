@@ -206,7 +206,9 @@ db.define_table('user_project',
                 # it can have.
                 # - (cpfecys module) method assignation_is_locked(assignation)
                 # - was created to check if this assignation can have modifications
-                Field('assignation_status', 'reference assignation_status', notnull = False),
+                Field('assignation_status', 'reference assignation_status', notnull = False,
+                      requires=IS_EMPTY_OR(IS_IN_DB(db, 'assignation_status.id', '%(name)s',
+                                                    zero = T('Active')))),
                 Field('assigned_user', 'reference auth_user', \
                     label = T('assigned_user')),
                 Field('project', 'reference project', label = T('project')),
@@ -432,6 +434,8 @@ db.define_table('log_final',
                 )
 
 db.define_table('log_metrics',
+                Field('description', 'text', notnull=True, \
+                    label = T('description')),
                 Field('media', 'decimal(8,2)', notnull=True, \
                     label = T('media')),
                 Field('error', 'decimal(8,2)', notnull=True, \
