@@ -290,7 +290,6 @@
                              {{instance = items_instance( \
                              item_restriction.item_restriction, \
                              item)}}
-
                              {{if instance.count() > 0:}}
                                 {{instance = instance.select().first()}}
                               <tr>
@@ -340,6 +339,11 @@
                                         </a>
                                         {{pass}}
                                     {{pass}}
+                                {{pass}}
+                                {{if instance.is_active != True:}}
+                                <div class="label label-important">
+                                {{=T('Rejected by DTT')}}
+                                </div>
                                 {{pass}}
                                 </td>
                               </tr>
