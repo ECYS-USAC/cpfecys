@@ -771,6 +771,7 @@
 'Preface': 'Prefacio',
 'previous 100 rows': '100 filas anteriores',
 'Previous grading information': 'Información de calificación previa',
+'Previously anulated': 'Anulados previamente',
 'Pro Bono': 'Ad honorem',
 'pro_bono': 'Ad Honorem',
 'Profile': 'Perfil',
