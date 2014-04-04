@@ -40,11 +40,11 @@
                 style="width:100%;">
                     <thead>
                         <tr>
-                            <th>ID</th>
-                            <th>Delivery Date</th>
-                            <th>Status</th>
-                            <th>Score</th>
-                            <th>Actions</th>
+                            <th>{{=T('Report name')}}</th>
+                            <th>{{=T('Delivery Date')}}</th>
+                            <th>{{=T('Status')}}</th>
+                            <th>{{=T('Score')}}</th>
+                            <th>{{=T('Actions')}}</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -52,7 +52,7 @@
                         <tr>
                             <td>{{=report.report_restriction['name']}}</td>
                             <td>{{=report.created}}</td>
-                            <td>{{=report.status['name']}}</td>
+                            <td>{{=T(report.status['name'])}}</td>
                             <td>{{=report.score or 0}}</td>
                             <td>
                                 <a class="btn" href="{{=URL('teacher', \
@@ -124,6 +124,20 @@
                                     <span class="icon-eye-open"></span>
                                         {{=T('View Item')}}
                                     </a>
+                            {{elif instance.item_restriction.item_type.name == \
+                            'Activity':}}
+                                {{if instance.done_activity == True:}}
+                                    <div class="label label-success">
+                                        {{=T('Completed')}}    
+                                    </div>
+                                {{else:}}
+                                    <div class="label label-important">
+                                        {{=T('Failed')}}    
+                                    </div>
+                                {{pass}}
+                            {{elif instance.item_restriction.item_type.name == \
+                            'Grade Activity':}}
+                            ;lkj;
                             {{pass}}
                         </td>
                     </tr>
@@ -134,10 +148,14 @@
                            {{=item_restriction.item_restriction.name}} 
                         </td>
                         <td>
+                        <div class="label label-info">
                             {{=T('Pending')}}
+                        </div>
                         </td>
                         <td>
+                        <div class="label label-info">
                             {{=T('Pending')}}
+                        </div>
                         </td>
                     </tr>
                     {{pass}}

@@ -97,7 +97,7 @@ def item_detail():
        user = request.vars['user']
        project = request.vars['project']
        restriction = request.vars['restriction']
-       done_activity = (done=='on' or None)
+       done_activity = (done=='on' or False)
        restriction = db(db.item_restriction.id==restriction).select().first()
        if restriction.item_type.name == 'Grade Activity':
          valid = not(score and user and restriction)

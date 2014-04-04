@@ -494,7 +494,8 @@ def item():
                 return  dict(form=form, action='create')
             elif item_restriction.item_type.name == 'Schedule':
                 # TODO: Finish up schedule views and controller
-                #this thing is meant to allow students to create an item that is a schedule for something
+                #this thing is meant to allow students to create an item that 
+                #is a schedule for something
                 #schedule? yep like the hours where they are busy somewhere
                 #Example: Course Schedule: Mon (0900-0930) Tue (1500-1530)
                 #or DSI Attention: Tue (1000 - 1230)
