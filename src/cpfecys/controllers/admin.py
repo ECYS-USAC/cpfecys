@@ -81,10 +81,13 @@ def assignation_ignore_toggle():
 def force_assignation_active():
     # get assignation id
     assignation = request.vars['id']
+    # get assignation comment
+    comment = request.vars['comment']
     # get the assignation
     assignation = db.user_project(id = assignation)
     # set the assignation as active
     assignation.assignation_status = None
+    assignation.assignation_status_comment = comment
     assignation.update_record()
     if request.env.http_referer:
         redirect(request.env.http_referer)
@@ -97,10 +100,13 @@ def force_assignation_active():
 def force_assignation_failed():
     # get assignation id
     assignation = request.vars['id']
+    # get assignation comment
+    comment = request.vars['comment']
     # get the assignation
     assignation = db.user_project(id = assignation)
     # set the assignation as failed
     assignation.assignation_status = db.assignation_status(name="Failed")
+    assignation.assignation_status_comment = comment
     assignation.update_record()
     if request.env.http_referer:
         redirect(request.env.http_referer)
@@ -113,10 +119,13 @@ def force_assignation_failed():
 def force_assignation_successful():
     # get assignation id
     assignation = request.vars['id']
+    # get assignation comment
+    comment = request.vars['comment']
     # get the assignation
     assignation = db.user_project(id = assignation)
     # set the assignation as successful
     assignation.assignation_status = db.assignation_status(name="Successful")
+    assignation.assignation_status_comment = comment
     assignation.update_record()
     if request.env.http_referer:
         redirect(request.env.http_referer)

@@ -199,6 +199,7 @@ db.define_table('assignation_status',
 # it has the starting cycle and the ending cycle
 # it also is the central key for all operations with interesting data
 db.define_table('user_project',
+                Field('assignation_status_comment', 'text', notnull=False),
                 Field('assignation_comment', 'text', notnull=False),
                 Field('assignation_ignored', 'boolean', notnull = True, default = False),
                 # The None value in assignation_status means that it is currently not blocked
