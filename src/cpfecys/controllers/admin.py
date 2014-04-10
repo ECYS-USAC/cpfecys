@@ -749,7 +749,7 @@ def items_grid():
     if period_entity:
         context_string = T(str(period_entity.period.name)) + \
         ' ' + str(period_entity.yearp)
-    school_id = request.vars['school-id']
+    school_id = request.vars['school_id']
     if not(area=='' or area==None):
         projects = db(db.project.area_level==area).select()    
     else:
@@ -772,12 +772,14 @@ def items_grid():
 @auth.requires_login()
 @auth.requires_membership('Super-Administrator')
 def toggle_active_item():
-    item = request.vars['item']    
+    item = request.vars['item']
+    comment = request.vars['comment'] or None
     if item != None:
         item = db(db.item.id==item).select().first()
     if item != None:
         item.update_record(
-            is_active = not item.is_active)
+            is_active = not item.is_active,
+            admin_comment=comment)
     return True
 
 @auth.requires_login()

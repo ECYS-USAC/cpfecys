@@ -289,6 +289,9 @@
                                       ({{=T('Year-Month-Day')}})
                                   </th>
                                   <th>
+                                  {{=T('Previously anulated')}}
+                                  </th>
+                                  <th>
                                       {{=T('Actions')}}
                                   </th>
                               </tr>
@@ -307,7 +310,6 @@
                              {{instance = items_instance( \
                              item_restriction.item_restriction, \
                              item)}}
-
                              {{if instance.count() > 0:}}
                                 {{instance = instance.select().first()}}
                               <tr>
@@ -316,6 +318,37 @@
                                 </td>
                                 <td>
                                 {{=T(instance.created.period.name)}} {{=instance.created.yearp}}
+                                </td>
+                                <td>
+                                {{for disabled in has_disabled_items(pyear, \
+                                  item_restriction.item_restriction, \
+                                  item).select():}}
+                                  <div id="modal-disabled-{{disabled.id}}" class="modal hide fade modal-comment">
+                                                  <div class="modal-header">
+                                                    <button type="button" class="close" 
+                                                    data-dismiss="modal" aria-hidden="true">
+                                                    &times;</button>
+                                                    <h3>{{=T('Admin comment')}}</h3>
+                                                  </div>
+                                                  <div class="modal-body">
+                                                    <p>
+                                                    {{=T(disabled.created.period.name)}} 
+                                                    {{=disabled.created.yearp}}
+                                                    </p>
+                                                    <p>{{=disabled.admin_comment \
+                                                    or T('No comment')}}</p>
+                                                  </div>
+                                                  <div class="modal-footer">
+                                                    <a class="btn" data-dismiss="modal" 
+                                                    aria-hidden="true">{{=T('Close')}}</a>
+                                                  </div>
+                                                </div>
+                                                <i class="teacher-comment icon-exclamation-sign"
+                                                   data-toggle="modal"
+                                                   data-target="#modal-disabled-{{=disabled.id}}"
+                                                    data-placement="top"
+                                                    title="{{=T('Click to see teacher comment')}}"></i>
+                                {{pass}}
                                 </td>
                                 <td>
                                 {{if \
@@ -358,6 +391,11 @@
                                         {{pass}}
                                     {{pass}}
                                 {{pass}}
+                                {{if instance.is_active != True:}}
+                                <div class="label label-important">
+                                {{=T('Rejected by DTT')}}
+                                </div>
+                                {{pass}}
                                 </td>
                               </tr>
                              {{else:}}
@@ -390,6 +428,37 @@
                                     {{=calculate_last_day( \
                                     item_restriction.item_restriction)}}
                                     </div>
+                                  </td>
+                                  <td>
+                                    {{for disabled in has_disabled_items(pyear, \
+                                      item_restriction.item_restriction, \
+                                      item).select():}}
+                                      <div id="modal-disabled-{{=disabled.id}}" class="modal hide fade modal-comment">
+                                                  <div class="modal-header">
+                                                    <button type="button" class="close" 
+                                                    data-dismiss="modal" aria-hidden="true">
+                                                    &times;</button>
+                                                    <h3>{{=T('Admin comment')}}</h3>
+                                                  </div>
+                                                  <div class="modal-body">
+                                                    <p>
+                                                    {{=T(disabled.created.period.name)}} 
+                                                    {{=disabled.created.yearp}}
+                                                    </p>
+                                                    <p>{{=disabled.admin_comment \
+                                                    or T('No comment')}}</p>
+                                                  </div>
+                                                  <div class="modal-footer">
+                                                    <a class="btn" data-dismiss="modal" 
+                                                    aria-hidden="true">{{=T('Close')}}</a>
+                                                  </div>
+                                                </div>
+                                                <i class="teacher-comment icon-exclamation-sign"
+                                                   data-toggle="modal"
+                                                   data-target="#modal-disabled-{{=disabled.id}}"
+                                                    data-placement="top"
+                                                    title="{{=T('Click to see teacher comment')}}"></i>
+                                    {{pass}}
                                   </td>
                                   <td>
                                   <a href="{{=URL('student',

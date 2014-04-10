@@ -71,6 +71,9 @@
                                 {{if item.done_activity == True:}}
                                     {{status = T('Done')}}
                                     {{status_label = 'success'}}
+                                {{elif item.done_activity == False:}}
+                                    {{status = T('Failed')}}
+                                    {{status_label = 'important'}}
                                 {{pass}}
                             {{elif item.item_restriction.item_type.name == \
                             'Grade Activity':}}

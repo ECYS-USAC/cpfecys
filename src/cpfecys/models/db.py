@@ -531,6 +531,8 @@ db.define_table('item',
                     label = T('is active')),
                 Field('description', 'text', notnull=False, \
                     label = T('description')),
+                Field('admin_comment', 'text', notnull=False, \
+                    label = T('admin_comment')),
                 Field('uploaded_file', 'upload', default='', notnull=False, \
                     label = T('uploaded_file')),
                 Field('done_activity', 'boolean', notnull=False, \

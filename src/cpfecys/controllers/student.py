@@ -47,6 +47,13 @@ def index():
                 (db.item_restriction_area.area_level==\
                     user_project.project.area_level.id))
 
+    def has_disabled_items(period_year, item_restriction, assignation):
+        items = db((db.item.created==period_year.id)&
+            (db.item.item_restriction==item_restriction.id)&
+            (db.item.assignation==assignation.user_project.id)&
+            (db.item.is_active!=True))
+        return items
+
     def restriction_project_exception(item_restriction_id, project_id):
         return db((db.item_restriction_exception.project== \
                     project_id)&
@@ -127,7 +134,8 @@ def index():
                 restriction_in_limit_days=restriction_in_limit_days,
                 assignation_range=assignation_range,
                 get_item=get_item,
-                calculate_last_day=calculate_last_day)
+                calculate_last_day=calculate_last_day,
+                has_disabled_items=has_disabled_items)
 
 @auth.requires_login()
 @auth.requires_membership('Student')
@@ -494,7 +502,8 @@ def item():
                 return  dict(form=form, action='create')
             elif item_restriction.item_type.name == 'Schedule':
                 # TODO: Finish up schedule views and controller
-                #this thing is meant to allow students to create an item that is a schedule for something
+                #this thing is meant to allow students to create an item that 
+                #is a schedule for something
                 #schedule? yep like the hours where they are busy somewhere
                 #Example: Course Schedule: Mon (0900-0930) Tue (1500-1530)
                 #or DSI Attention: Tue (1000 - 1230)
