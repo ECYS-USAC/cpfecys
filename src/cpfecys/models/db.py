@@ -533,6 +533,8 @@ db.define_table('item',
                     label = T('description')),
                 Field('admin_comment', 'text', notnull=False, \
                     label = T('admin_comment')),
+                Field('notified_mail', 'boolean', notnull=False, \
+                    label = T('notified mail')),
                 Field('uploaded_file', 'upload', default='', notnull=False, \
                     label = T('uploaded_file')),
                 Field('done_activity', 'boolean', notnull=False, \

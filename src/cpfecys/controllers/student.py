@@ -452,6 +452,11 @@ def item():
     cyear_period = cpfecys.current_year_period()
     item_restriction = request.vars['restriction']
     user_project = request.vars['assignation']
+    period = int(request.vars['period'])
+    area = request.vars['area']
+    assignation = db((db.user_project.id==user_project)&
+            (db.user_project.assigned_user==auth.user.id)
+            ).select().first()
     item_query = db((db.item.created==cyear_period)&
                 (db.item.item_restriction==item_restriction)&
                 (db.item.assignation==user_project)&
@@ -460,6 +465,50 @@ def item():
             item_restriction).select().first()
 
     if(request.args(0) == 'create'):
+        if assignation == None:
+            session.flash = T('This item can\'t be\
+                edited, permissions problem')
+            redirect(URL('student', 'index'))
+
+        if cpfecys.assignation_is_locked(assignation):
+            session.flash = T('This item can\'t be\
+                edited, its assignation is locked')
+            redirect(URL('student', 'index'))
+        if cyear_period.id != period:
+            session.flash = T('This item can\'t be\
+                edited, item edition for this item is out of time')
+            redirect(URL('student', 'index'))
+
+        itm_res_area = db(
+            (db.item_restriction_area.area_level==area)&
+            (db.item_restriction_area.item_restriction== \
+                item_restriction)&
+            (db.item_restriction_area.is_enabled==True)
+            )._select()
+
+        if itm_res_area == None:
+            session.flash = T('This item can\'t be\
+                edited, doesn\'t belongs to this project')
+            redirect(URL('student', 'index'))
+        if item_restriction.limit_days != None:
+            import datetime
+            cdate = datetime.datetime.now()
+            cperiod = cpfecys.current_year_period()
+            year = str(cperiod.yearp)
+            if cperiod.period == cpfecys.first_period.id: 
+                month = '-01-01'
+            else: 
+                month = '-07-01'
+            start = \
+                datetime.datetime.strptime(year + month, "%Y-%m-%d")
+            if item_restriction.limit_days != None:
+                last_date = start + datetime.timedelta( \
+                    days=item_restriction.limit_days)
+                if cdate > last_date:
+                    session.flash = T('This item can\'t be\
+                    edited, doesn\'t out of date, last date was' +\
+                    last_date)
+                    redirect(URL('student', 'index'))
         if item_query.select().first() == None:
             if item_restriction.item_type.name == 'File':
                 form = FORM(
@@ -533,6 +582,51 @@ def item():
             redirect(URL('student', 'index'))
 
     elif(request.args(0) == 'edit'):
+        if assignation == None:
+            session.flash = T('This item can\'t be\
+                edited, permissions problem')
+            redirect(URL('student', 'index'))
+
+        if cpfecys.assignation_is_locked(assignation):
+            session.flash = T('This item can\'t be\
+                edited, its assignation is locked')
+            redirect(URL('student', 'index'))
+        if cyear_period.id != period:
+            session.flash = T('This item can\'t be\
+                edited, item edition for this item is out of time')
+            redirect(URL('student', 'index'))
+
+        itm_res_area = db(
+            (db.item_restriction_area.area_level==area)&
+            (db.item_restriction_area.item_restriction== \
+                item_restriction)&
+            (db.item_restriction_area.is_enabled==True)
+            )._select()
+
+        if itm_res_area == None:
+            session.flash = T('This item can\'t be\
+                edited, doesn\'t belongs to this project')
+            redirect(URL('student', 'index'))
+        if item_restriction.limit_days != None:
+            import datetime
+            cdate = datetime.datetime.now()
+            cperiod = cpfecys.current_year_period()
+            year = str(cperiod.yearp)
+            if cperiod.period == cpfecys.first_period.id: 
+                month = '-01-01'
+            else: 
+                month = '-07-01'
+            start = \
+                datetime.datetime.strptime(year + month, "%Y-%m-%d")
+            if item_restriction.limit_days != None:
+                last_date = start + datetime.timedelta( \
+                    days=item_restriction.limit_days)
+                if cdate > last_date:
+                    session.flash = T('This item can\'t be\
+                    edited, doesn\'t out of date, last date was' +\
+                    last_date)
+                    redirect(URL('student', 'index'))
+
         item = db((db.item.created==cyear_period)&
             (db.item.item_restriction==item_restriction)&
             (db.item.assignation==user_project)).select().first()
