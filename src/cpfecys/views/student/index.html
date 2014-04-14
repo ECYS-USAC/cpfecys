@@ -465,7 +465,9 @@
                                          'item/create',
                                          vars=dict(
                                          restriction=item_restriction.item_restriction.id,
-                                         assignation=item.user_project.id))}}"
+                                         assignation=item.user_project.id,
+                                         period=pyear.id, 
+                                         proyect=item.project.area_level))}}"
                                    class="btn">
                                     <span class="icon-plus"></span>
                                     {{=T('Create Item')}}
@@ -485,6 +487,37 @@
                                     {{=calculate_last_day( \
                                     item_restriction.item_restriction)}}
                                     </div>
+                                  </td>
+                                  <td>
+                                      {{for disabled in has_disabled_items(pyear, \
+                                      item_restriction.item_restriction, \
+                                      item).select():}}
+                                      <div id="modal-disabled-{{disabled.id}}" class="modal hide fade modal-comment">
+                                                      <div class="modal-header">
+                                                        <button type="button" class="close" 
+                                                        data-dismiss="modal" aria-hidden="true">
+                                                        &times;</button>
+                                                        <h3>{{=T('Admin comment')}}</h3>
+                                                      </div>
+                                                      <div class="modal-body">
+                                                        <p>
+                                                        {{=T(disabled.created.period.name)}} 
+                                                        {{=disabled.created.yearp}}
+                                                        </p>
+                                                        <p>{{=disabled.admin_comment \
+                                                        or T('No comment')}}</p>
+                                                      </div>
+                                                      <div class="modal-footer">
+                                                        <a class="btn" data-dismiss="modal" 
+                                                        aria-hidden="true">{{=T('Close')}}</a>
+                                                      </div>
+                                                    </div>
+                                                    <i class="teacher-comment icon-exclamation-sign"
+                                                       data-toggle="modal"
+                                                       data-target="#modal-disabled-{{=disabled.id}}"
+                                                        data-placement="top"
+                                                        title="{{=T('Click to see teacher comment')}}"></i>
+                                    {{pass}}
                                   </td>
                                   <td>
                                   <div class="label label-important">

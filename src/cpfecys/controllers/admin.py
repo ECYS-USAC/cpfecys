@@ -741,6 +741,28 @@ def manage_items():
 
 @auth.requires_login()
 @auth.requires_membership('Super-Administrator')
+def send_item_mail():
+    user = request.vars['user']
+    item = request.vars['item']
+    success = False
+    if not (not item and not user):
+        user = db(db.auth_user.id==user).select().first()
+        item = db(db.item.id==item).select().first()
+        comment = item.admin_comment or T('No comment')
+        subject = T('Item rejected by admin, please take action.')
+        message = T('An item you created has been rejected by admin,') \
+            + T('the reason is ') + comment \
+            + T('please proceed to replace the item, if you don\'t take\
+                any action the item will remain disabled.')
+        mail.send(to='omarvides@gmail.com',
+                  subject=subject,
+                  message=message)
+        item.update_record(
+            notified_mail = True)
+        success = True
+    return success
+@auth.requires_login()
+@auth.requires_membership('Super-Administrator')
 def items_grid():
     period = request.vars['period']
     area = request.vars['area']
@@ -763,7 +785,6 @@ def items_grid():
             (db.auth_group.role!='Teacher')).select(db.user_project.ALL)
     items = db((db.item.assignation.belongs(assignations))&
         ((period=='' or period==None) or (db.item.created==period))).select()
-    response.view = 'admin/manage_items_detail.html'
     return dict(items=items,
         area=area,
         period=period,
