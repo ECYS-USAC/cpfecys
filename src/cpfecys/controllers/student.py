@@ -623,8 +623,8 @@ def item():
                     days=item_restriction.limit_days)
                 if cdate > last_date:
                     session.flash = T('This item can\'t be\
-                    edited, doesn\'t out of date, last date was' +\
-                    last_date)
+                    edited, doesn\'t out of date, last date was: ')  +\
+                    str(last_date)
                     redirect(URL('student', 'index'))
 
         item = db((db.item.created==cyear_period)&

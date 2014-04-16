@@ -323,7 +323,7 @@
                                 {{for disabled in has_disabled_items(pyear, \
                                   item_restriction.item_restriction, \
                                   item).select():}}
-                                  <div id="modal-disabled-{{disabled.id}}" class="modal hide fade modal-comment">
+                                  <div id="modal-disabled-{{=disabled.id}}" class="modal hide fade modal-comment">
                                                   <div class="modal-header">
                                                     <button type="button" class="close" 
                                                     data-dismiss="modal" aria-hidden="true">
@@ -383,7 +383,7 @@
                                         {{if instance.created == cyear_period:}}
                                         <a href="{{=URL('student',
                                                  'item/edit',
-                                            vars=dict(restriction=item_restriction.item_restriction.id,
+                                            vars=dict(period = cyear_period.id,restriction=item_restriction.item_restriction.id,
                                                  assignation=item.user_project.id, file=instance.uploaded_file))}}" class="btn">
                                             <span class="icon-edit"></span>
                                             {{=T('Edit Item')}}
@@ -492,7 +492,7 @@
                                       {{for disabled in has_disabled_items(pyear, \
                                       item_restriction.item_restriction, \
                                       item).select():}}
-                                      <div id="modal-disabled-{{disabled.id}}" class="modal hide fade modal-comment">
+                                      <div id="modal-disabled-{{=disabled.id}}" class="modal hide fade modal-comment">
                                                       <div class="modal-header">
                                                         <button type="button" class="close" 
                                                         data-dismiss="modal" aria-hidden="true">
