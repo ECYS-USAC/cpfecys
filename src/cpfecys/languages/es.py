@@ -730,6 +730,7 @@
 'Old password': 'Contraseña anterior',
 'Online examples': 'Ejemplos en línea',
 'Operation not allowed.': 'Operación no permitida.',
+'Optional': 'Opcional',
 'Or': 'O',
 'or import from csv file': 'o importar desde archivo CSV',
 'or provide application url:': 'o provea URL de la aplicación:',
