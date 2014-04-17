@@ -57,9 +57,57 @@ def assignation_done_succesful(assignation):
         message += T('Reports Grade is below minimun note; that sets this assignation as lost.')
     ## Validate Items
     # Get all item restrictions that apply up to now
+    # Ok, ive the assignation, it has my starting period of final practice and the length
+    # assignation.period Holds the starting period, assignation.periods holds the ammount of them
+    period = assignation.period
+    import cpfecys
+    for x in range (0, assignation.periods):
+        # Get the item_restrictions for this period, for the area of the assignation,
+        # removing the ones that don't belong to this assignation since are exceptions
+        # and not allowing optionals
+        rows = db((db.item_restriction.period == period.id)&
+                  (db.item_restriction_area.area_level == assignation.project.area_level)&
+                  (db.item_restriction_area.item_restriction == db.item_restriction.id)&
+                  (db.item_restriction_exception.project == assignation.project.id)&
+                  (db.item_restriction_exception.item_restriction != db.item_restriction.id)&
+                  (db.item_restriction.optional == False)).select()
+        for row in rows:
+            items = row.item_restriction.item(db.item.is_active != False).select()
+            if not items:
+                status = False
+                message += T('There is a missing deliverable item: ') + row.item_restriction.name + '.'
+            if (row.item_restriction.item_type.name == 'File'):
+                #check there is an uploaded file
+                if not items.first().uploaded_file:
+                    status = False
+                    message += T('There is not an uploaded file for: ') + row.item_restriction.name + ' item.'
+            elif (row.item_restriction.item_type.name == 'Activity'):
+                #check there is an activity
+                if not items.first().done_activity:
+                    status = False
+                    message += T('Activity not completed: ') + row.item_restriction.name + '.'
+            elif (row.item_restriction.item_type.name == 'Grade Activity'):
+                #check there is an activity with minimun grade
+                if items.first().score < items.first().min_score:
+                    status = False
+                    message += T('Activity: ') + row.item_restriction.name + ' ' + T('has not met minimal score of: ') + str(items.first().min_score) + '.'
+            elif (row.item_restriction.item_type.name == 'Schedule'):
+                #check there is an activity
+                if not items.first().item_schedule.count():
+                    status = False
+                    message += T('Schedule is missing: ') + row.item_restriction.name + '.'
+        if (period.period == cpfecys.first_period):
+            #this means the next one is second period of the same year
+            period = db.period_year(yearp = period.yearp, period = cpfecys.second_period)
+        else:
+            #this means the next one is first period of the next year
+            period = db.period_year(yearp = period.yearp + 1, period = cpfecys.first_period)
     # Check if they where delivered
     return {'status':status, 'message':message}
 
+# Auto Freeze happens automatically, it FREEZES the assignation when it ends.
+# Successful means all needed reports and items where delivered
+# Failed means something was not good :( too bad jimmy
 def auto_freeze():
     # Get the current month and year
     import datetime
@@ -86,6 +134,7 @@ def auto_freeze():
                 assignation.assignation_status = db.assignation_status(name = 'Failed')
             assignation.update_record()
 
+#This thing kills reports that where never done to an empty report with score 0
 def auto_daily():
     ## Get current year period
     import cpfecys

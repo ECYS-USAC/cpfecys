@@ -530,8 +530,9 @@ db.define_table('mail_log',
                 )
 
 db.define_table('item',
+                # AFAIK this is_active is for disabled items, true means enabled, false means disabled
                 Field('is_active', 'boolean', notnull=False, \
-                    label = T('is active')),
+                    label = T('is active'), default = True),
                 Field('description', 'text', notnull=False, \
                     label = T('description')),
                 Field('admin_comment', 'text', notnull=False, \
@@ -540,7 +541,7 @@ db.define_table('item',
                     label = T('notified mail')),
                 Field('uploaded_file', 'upload', default='', notnull=False, \
                     label = T('uploaded_file')),
-                Field('done_activity', 'boolean', notnull=False, \
+                Field('done_activity', 'boolean', notnull = False, \
                     label = T('done_activity')),
                 Field('created', 'reference period_year', \
                     label = T('created')),
