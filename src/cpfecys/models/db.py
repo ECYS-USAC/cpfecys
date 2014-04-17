@@ -355,6 +355,7 @@ db.define_table('report',
                       label = T('dtt approval')),
                 Field('period', 'reference period_year', \
                     label = T('period')),
+                Field('never_delivered', 'boolean', label = T('Never was delivered?')),
                 )
 
 db.define_table('log_type',

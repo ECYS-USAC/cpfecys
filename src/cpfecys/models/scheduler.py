@@ -134,6 +134,7 @@ def auto_daily():
                                  created = current_date,
                                  score = 0,
                                  status = status_acceptance,
+                                 never_delivered = True,
                                  teacher_comment =  T('The period of time to create the report finished and it was never completed; so automatically it is considered as failed.'))
     ## This makes all 'Draft' reports that expired get to 'Grading'
     drafties = db((db.report.status == db.report_status(name = 'Draft'))&
