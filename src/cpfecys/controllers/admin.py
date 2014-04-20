@@ -350,6 +350,139 @@ def report():
 
 @auth.requires_login()
 @auth.requires_membership('Super-Administrator')
+def courses_report():
+    period = cpfecys.current_year_period()
+    periods = db(db.period_year).select()
+    area = None
+    if request.vars['period'] != None:
+        period = request.vars['period']
+        period = db(db.period_year.id==period).select().first()
+        if not period:
+            session.flash = T('Invalid Action.')
+            redirect(URL('default', 'index'))
+    if request.args(0) == 'areas':
+        areas = db(db.area_level).select()
+        return dict(areas=areas)
+    elif request.args(0) == 'list':
+        area = request.vars['area']
+        response.view = 'admin/courses_list.html'
+        projects = db(db.project.area_level==area).select()
+        def count_assigned(project):
+            assignations = get_assignations(project, period, 'Student' \
+                ).count()
+            return assignations
+
+        def count_assigned_students(project):
+            assigned = []
+            desertion = []
+            assignations = get_assignations(project, period, 'Student' \
+                ).select(db.user_project.ALL)
+            for assignation in assignations:
+                reports = db(db.report.assignation==assignation.id
+                    ).select()
+                for report in reports:
+                    assigned.append(report.desertion_started)
+            if assignations.first() != None:
+                desertion_assignation = assignations.first()
+                desertion_reports = db(
+                    db.report.assignation==desertion_assignation.id).select()
+                for report in desertion_reports:
+                    desertion.append(report.desertion_gone)
+
+            if len(assigned) > 0:
+                assigned = max(assigned)
+            else:
+                assigned = T('Pending')
+
+            if len(desertion) > 0:
+                desertion = sum(desertion)
+            else:
+                desertion = T('Pending')
+            return desertion, assigned
+        def count_student_hours(project):
+            resp = []
+            assignations = get_assignations(project, period, 'Student' \
+                ).select(db.user_project.ALL)
+            for assignation in assignations:
+                hours = 0
+                reports = db(db.report.assignation==assignation.id
+                    ).select()
+                for report in reports:
+                    hours += report.hours
+                sub_response = [assignation.assigned_user.first_name +\
+                    ' ' + assignation.assigned_user.last_name + \
+                    ', ' + assignation.assigned_user.username, hours]
+                resp.append(sub_response)
+            return resp
+
+        def current_teacher(project):
+            teacher = get_assignations(project, period, 'Teacher'
+                ).select(db.auth_user.ALL).first()
+            name = T('Pending')
+            if teacher != None:
+                name = teacher.first_name + ' ' + teacher.last_name
+            return name
+
+        return dict(projects=projects, count_assigned=count_assigned,
+            current_teacher=current_teacher, 
+            count_assigned_students=count_assigned_students,
+            count_student_hours=count_student_hours,
+            periods=periods,
+            area=area)
+    else:
+        session.flash = "Action not allowed"
+        redirect(URL('default','index'))
+
+@auth.requires_login()
+@auth.requires_membership('Super-Administrator')
+def active_teachers():
+    return 'foo'
+
+@auth.requires_login()
+@auth.requires_membership('Super-Administrator')
+def get_assignations(project, period, role):
+    assignations = db(
+                    (db.auth_user.id==db.user_project.assigned_user)&
+                    (db.auth_user.id==db.auth_membership.user_id)&
+                    (db.auth_membership.group_id==db.auth_group.id)&
+                    (db.auth_group.role==role)&
+                    (db.user_project.project==project)&
+                    (db.user_project.period == db.period_year.id)&
+                    ((db.user_project.period <= period.id)&
+                 ((db.user_project.period + db.user_project.periods) > \
+                  period.id))
+                    )
+    return assignations
+
+@auth.requires_login()
+@auth.requires_membership('Super-Administrator')
+def courses_report_detail():
+    period = cpfecys.current_year_period()
+    periods = db(db.period_year).select()
+    if request.vars['period'] != None:
+        period = request.vars['period']
+        period = db(db.year_period.id==period).select().first()
+    if request.vars['project'] == None:
+        session.flash = "Action not allowed"
+        redirect(URL('admin','courses_report/areas'))
+    project = request.vars['project']
+    assignations = db(
+                    (db.auth_user.id==db.user_project.assigned_user)&
+                    (db.auth_user.id==db.auth_membership.user_id)&
+                    (db.auth_membership.group_id==db.auth_group.id)&
+                    (db.auth_group.role=='Student')&
+                    (db.user_project.project==project)&
+                    (db.user_project.period == db.period_year.id)&
+                    ((db.user_project.period <= period)&
+                 ((db.user_project.period + db.user_project.periods) > \
+                  period))
+                    )._select()
+    return assignations
+    return dict(periods=periods, project=project,
+        period=period)
+
+@auth.requires_login()
+@auth.requires_membership('Super-Administrator')
 def mail_notifications():
     period = cpfecys.current_year_period()
     if (request.args(0) == 'send'):
@@ -357,10 +490,15 @@ def mail_notifications():
         projects = request.vars['project']
         message = request.vars['message']
         subject = request.vars['subject']
+        if len(roles) == 1:
+            pointless_var = [roles]
+        else:
+            pointless_var = roles
         if projects  != None  and roles != None:
             assignations = None
             for role in request.vars['role']:
                 role = db(db.auth_group.id==role).select().first()
+
                 if role.role == 'DSI':
                     users = db(
                         (db.auth_user.id==db.auth_membership.user_id)&
@@ -370,19 +508,21 @@ def mail_notifications():
                     send_mail_to_users(users.select(db.auth_user.ALL), 
                         message, dsi_role, projects,
                         subject)
-            users = db(
-                    (db.auth_user.id==db.user_project.assigned_user)&
-                    (db.auth_user.id==db.auth_membership.user_id)&
-                    (db.auth_membership.group_id==db.auth_group.id)&
-                    (db.auth_group.id.belongs(roles))&
-                    (db.user_project.project.belongs(projects))&
-                    (db.user_project.period==db.period_year.id)&
-                    ((db.user_project.period <= period.id)&
-                    ((db.user_project.period + db.user_project.periods) > \
-                     period.id))
-                    ).select(db.auth_user.ALL, distinct=True)
+                else:    
+                    users = db(
+                        (db.auth_user.id==db.auth_membership.user_id)&
+                        (db.auth_membership.group_id==db.auth_group.id)&
+                        (db.auth_group.id.belongs(pointless_var))&
+                        (db.user_project.project.belongs(projects))&
+                        (db.auth_user.id==db.user_project.assigned_user)&
+                        (db.user_project.period==db.period_year.id)&
+                        ((db.user_project.period <= period.id)&
+                        ((db.user_project.period + db.user_project.periods) > \
+                         period.id))
+                        ).select(db.auth_user.ALL, distinct=True)
+                    send_mail_to_users(users, message, \
+                        pointless_var, projects, subject, True)
 
-            send_mail_to_users(users, message, roles, projects, subject, True)
             session.flash = T('Mail successfully sent')
             redirect(URL('admin', 'mail_notifications'))
         else:
@@ -423,7 +563,7 @@ def send_mail_to_users(users, message, roles, projects, subject, log=False):
             roles_text = roles_text + ',' + role.role
             pass
         for project in projects:
-            projects_text = projects_text + '|' + project.name + '|'
+            projects_text = projects_text + ', ' + project.name
             pass
         db.mail_log.insert(sent_message=message,
             roles=roles_text[1:],

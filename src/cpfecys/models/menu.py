@@ -56,6 +56,10 @@ if auth.has_membership(role="Super-Administrator"):
          (T('System Configuration'), False, URL(),[
              (T('Parameters configuration'), False, URL('admin', 'parameters'), []),
              ]),
+         (T('Reports'), False, URL(),[
+             (T('Courses reports'), False, URL('admin', 'courses_report/areas'), []),
+             (T('Active Teachers'), False, URL('admin', 'active_teachers'), []),
+             ]),
     ])
 if auth.has_membership(role="Teacher"):
     response.menu.extend([(T('Courses'), False, URL('teacher', 'courses'), []),
