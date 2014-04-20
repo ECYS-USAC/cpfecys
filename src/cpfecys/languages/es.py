@@ -696,6 +696,7 @@
 'name': 'nombre',
 'Name': 'Nombre',
 'Never': 'Nunca',
+'Never was delivered?': 'Never was delivered?',
 'New': 'Nuevo',
 'New %(entity)s': 'Nuevo %(entity)s',
 'new application "%s" created': 'nueva aplicación "%s" creada',

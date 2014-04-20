@@ -436,7 +436,17 @@ def courses_report():
 @auth.requires_login()
 @auth.requires_membership('Super-Administrator')
 def active_teachers():
-    return 'foo'
+    period = cpfecys.current_year_period()
+    if request.vars['period'] != None:
+            period = request.vars['period']
+            period = db(db.period_year.id==period).select().first()
+            if not period:
+                session.flash = T('Invalid Action.')
+                redirect(URL('default', 'index'))
+    assignations = get_assignations(False, period, 'Teacher' \
+                ).select(db.user_project.ALL)
+    periods = db(db.period_year).select()
+    return dict(periods=periods, assignations=assignations)
 
 @auth.requires_login()
 @auth.requires_membership('Super-Administrator')
@@ -446,7 +456,7 @@ def get_assignations(project, period, role):
                     (db.auth_user.id==db.auth_membership.user_id)&
                     (db.auth_membership.group_id==db.auth_group.id)&
                     (db.auth_group.role==role)&
-                    (db.user_project.project==project)&
+                    (project==False or (db.user_project.project==project))&
                     (db.user_project.period == db.period_year.id)&
                     ((db.user_project.period <= period.id)&
                  ((db.user_project.period + db.user_project.periods) > \
