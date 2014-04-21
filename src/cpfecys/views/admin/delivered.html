@@ -1,0 +1,83 @@
+{{extend 'template.html'}}
+<div class="row-fluid reports">
+    <div class="well span12">
+    <table class="table-striped table-bordered" style="align:0 auto;">
+        <tr>
+          <td>
+          <form class="form-inline" action="{{=URL('admin','delivered')}}" 
+            method='get'>
+              <input name="restriction" type="hidden" 
+                value="{{=restrictions[0].id}}">
+                 <select name="period">
+                    {{for cperiod in periods:}}
+                      <option value="{{=period.id}}">
+                      {{=T(cperiod.period.name)}}-{{=cperiod.yearp}}
+                      </option>
+                    {{pass}}
+                  </select>
+                <input class="btn" type="submit" value="{{=T('Filter')}}">
+          </form>
+          </td>
+        </tr>
+    </table>
+    <table class="table table-striped table-bordered">
+        <thead>
+            <tr>
+                <th>
+                    {{=T('Item name')}}
+                </th>
+                <th>
+                    {{=T('Actions')}}
+                </th>
+                <th>
+                    {{=T('Pending')}}
+                </th>
+                <th>
+                    {{=T('Graded')}}
+                </th>
+                <th>
+                    {{=T('Total')}}
+                </th>
+                <th class='success'>
+                    {{=T('Approved')}}
+                </th>
+                <th class='success'>
+                    {{=T('Failed')}}
+                </th>
+            </tr>
+        </thead>
+        <tbody>
+            {{for restriction in restrictions:}}
+            <tr>
+                <td>
+                    {{=restriction.name}}
+                </td>
+                <td>
+                    <a class="btn" href="{{=URL('dsi','item_detail', \
+                    vars=dict(restriction=restriction.id))}}">
+                        <i class="icon-eye-open"></i> {{=T('View Items')}}
+                    </a>
+                </td>
+                {{ pending, graded, total, approved, failed = \
+                    calculate_by_restriction(restriction.id)}}
+                <td>
+                   {{=pending}} 
+                </td>
+                <td>
+                    {{=graded}}
+                </td>
+                <td>
+                    {{=total}}
+                </td>
+                <td>
+                    {{=approved}}
+                </td>
+                <td>
+                    {{=failed}}
+                </td>
+            </tr>
+            {{pass}}
+        </tbody>
+    </table>
+    </div>
+</div>

@@ -1,0 +1,49 @@
+{{extend 'template.html'}}
+<div class="row-fluid">
+    <div class="well span12">
+        <a onclick="window.history.back()" class="btn" ><i class="icon-arrow-left"></i>{{=T('Back')}}</a>
+    <table class="table-striped table-bordered" style="align:0 auto;">
+    <tr>
+      <td>
+      <form class="form-inline" 
+      action="{{=URL('admin','active_teachers')}}" 
+        method='get'>
+         <select name="period">
+            {{for period in periods:}}
+              <option value="{{=period.id}}">
+              {{=T(period.period.name)}}-{{=period.yearp}}
+              </option>
+            {{pass}}
+        </select>
+        <input class="btn" type="submit" value="{{=T('Filter')}}">
+      </form>
+      </td>
+    </tr>
+    </table>
+    <table class="table table-striped table-bordered">
+    {{for assignation in assignations:}}
+    <thead>
+        <tr>
+            <td>{{=T('Name')}}</td>
+            <td>{{=T('Project')}}</td>
+            <td>{{=T('Area')}}</td>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td>
+                {{=assignation.assigned_user.first_name}} 
+                {{=assignation.assigned_user.last_name}} 
+            </td>
+            <td>
+                {{=assignation.project.name}} 
+            </td>
+            <td>
+                {{=assignation.project.area_level.name}} 
+            </td>
+        </tr>
+    </tbody>
+    {{pass}}
+    </table>
+    </div>
+</div>

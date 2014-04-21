@@ -1,0 +1,90 @@
+{{extend 'template.html'}}
+<div class="row-fluid">
+    <div class="well span12">
+        <a onclick="window.history.back()" class="btn" ><i class="icon-arrow-left"></i>{{=T('Back')}}</a>
+        <table class="table-striped table-bordered" style="align:0 auto;">
+        <tr>
+          <td>
+          <form class="form-inline" 
+          action="{{=URL('admin','courses_report/list')}}" 
+            method='get'>
+            <input type="hidden" name="area" value="{{=area}}">
+                 <select name="period">
+                    {{for period in periods:}}
+                      <option value="{{=period.id}}">
+                      {{=T(period.period.name)}}-{{=period.yearp}}
+                      </option>
+                    {{pass}}
+                </select>
+                <input class="btn" type="submit" value="{{=T('Filter')}}">
+          </form>
+          </td>
+        </tr>
+        </table>
+        {{for project in projects:}}
+        <table class="table table-striped table-bordered">
+        <thead>
+        <tr class="info">
+            <th colspan="2">{{=project.name}}</th>
+        </tr>
+        <tr>
+            <th>
+                {{=T('Metric')}}
+            </th>
+            <th>
+                {{=T('Value')}}
+            </th>
+        </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>
+                {{=T('Assigned practising')}}
+                </td>
+                <td>
+                {{=count_assigned(project.id) or 0}}    
+                </td>
+            </tr>
+            <tr>
+                <td>
+                {{=T('Current Teacher')}}
+                </td>
+                <td>
+                    {{=current_teacher(project.id)}}
+                </td>
+            </tr>
+            {{if project.area_level.name == 'DTT Tutor Académico':}}
+            {{desertion, assigned = count_assigned_students(project.id)}}
+            <tr>
+                <td>
+                    {{=T('Assigned Students')}}
+                </td>
+                <td>
+                    {{=assigned}}
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    {{=T('Desertion')}}
+                </td>
+                <td>
+                    {{=desertion}}
+                </td>
+            </tr>
+            {{else:}}
+            {{for row in count_student_hours(project.id):}}
+            <tr>
+                <td>
+                    {{=row[0]}} <strong>{{=T('Hours')}}</strong>
+                </td>
+                <td>
+                    {{=row[1]}}
+                </td>
+            </tr>
+            {{pass}}
+            {{pass}}
+        </tbody>
+        </table>
+        {{pass}}
+    </div>
+</div>
