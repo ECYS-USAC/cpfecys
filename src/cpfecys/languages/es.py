@@ -489,6 +489,7 @@
 'Grade pending': 'Pendiente de calificación',
 'Grade Pending Reports': 'Reportes Pendiente de Calificación',
 'Grade report': 'Calificar Reporte',
+'Graded': 'Calificado',
 'Graded pending': 'Calificación Pendiente',
 'Grading': 'Calificar',
 'Grading (24 hours)': 'Grading (24 hours)',

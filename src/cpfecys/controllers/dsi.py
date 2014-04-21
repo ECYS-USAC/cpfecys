@@ -179,10 +179,10 @@ def item_detail():
          (db.item_restriction_area.is_enabled==True))
        return projects
     def is_exception(project, restriction):
-       restriction = db((db.item_restriction_exception.project==project.id)&
+       exception = db((db.item_restriction_exception.project==project.id)&
          (db.item_restriction_exception.item_restriction== \
           restriction.id))
-       return restriction.count() != 0
+       return exception.count() != 0
     def get_students(project):
        assignations = db(
                     (db.auth_user.id==db.user_project.assigned_user)&
@@ -201,6 +201,7 @@ def item_detail():
          (db.item.item_restriction==restriction.id)&
          (db.item.item_restriction==db.item_restriction.id)&
          (db.item_restriction.is_enabled==True)&
+         (db.item.is_active==True)&
          (db.item.created==period.id)).select(db.item.ALL).first()
        return item
     return dict(restrictions=restrictions,

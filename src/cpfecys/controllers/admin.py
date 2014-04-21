@@ -38,6 +38,106 @@ def dtt_general_approval():
 
 @auth.requires_login()
 @auth.requires_membership('Super-Administrator')
+def delivered():
+    periods = db(db.period_year).select()
+    period = cpfecys.current_year_period()
+    area_list = []
+    if request.vars['period'] != None:
+        period = request.vars['period']
+        period = db.period_year(db.period_year.id==period)
+    admin = False
+    restrictions = db(
+       (db.item_restriction.item_type==db.item_type(name='Activity'))& \
+       (db.item_restriction.period==period.id)).select()| \
+    db((db.item_restriction.item_type==db.item_type(name='Grade Activity'))& \
+       (db.item_restriction.period==period.id)).select()
+    def calculate_by_restriction(restriction):
+        pending = 0
+        graded = 0
+        total = 0
+        approved = 0
+        failed = 0
+        restriction_instance = db(
+           (db.item_restriction.item_type==db.item_type(name='Activity'))& \
+           (db.item_restriction.period==period.id)&
+           (db.item_restriction.id==restriction)&
+           (db.item_restriction.is_enabled==True)).select() | \
+            db((db.item_restriction.item_type==db.item_type( \
+                name='Grade Activity'))& \
+           (db.item_restriction.period==period.id)&
+           (db.item_restriction.id==restriction)&
+           (db.item_restriction.is_enabled==True)
+                ).select(db.item_restriction.ALL)
+
+        areas = db((db.item_restriction_area.item_restriction== \
+            restriction_instance[0].id)&
+            (db.area_level.id==db.item_restriction_area.area_level)
+                ).select(db.area_level.ALL)
+        for area in areas:
+            area_list.append(area.id)
+        projects = db((db.project.area_level==db.area_level.id)&
+         (db.area_level.id==area.id)&
+         (db.item_restriction.id==restriction)&
+         (db.item_restriction_area.area_level.belongs(area_list))&
+         (db.item_restriction_area.item_restriction==restriction)&
+         (db.item_restriction_area.item_restriction==db.item_restriction.id)&
+         (db.item_restriction_area.area_level==db.area_level.id)&
+         (db.item_restriction_area.is_enabled==True)).select(db.project.ALL)
+
+        for project in projects:
+            exception = db((db.item_restriction_exception.project== \
+                project.id)&
+                (db.item_restriction_exception.item_restriction== \
+                restriction))
+            if exception.count() == 0:
+                assignations = db(
+                    (db.auth_user.id==db.user_project.assigned_user)&
+                    (db.auth_user.id==db.auth_membership.user_id)&
+                    (db.auth_membership.group_id==db.auth_group.id)&
+                    (db.auth_group.role=='Student')&
+                    (db.user_project.project==project.id)&
+                    (db.user_project.period == db.period_year.id)&
+                    ((db.user_project.period <= period.id)&
+                 ((db.user_project.period + db.user_project.periods) > \
+                  period.id))
+                    ).select(db.user_project.ALL)
+                for assignation in assignations:
+                    item = db((db.item.assignation==assignation.id)&
+                     (db.item.item_restriction==restriction)&
+                     (db.item.item_restriction==db.item_restriction.id)&
+                     (db.item_restriction.is_enabled==True)&
+                     (db.item.is_active==True)&
+                     (db.item.created==period.id)).select(db.item.ALL).first()
+                    if item == None:
+                        pending += 1
+                        total += 1
+                    elif item.item_restriction.item_type.name=='Grade Activity':
+                        if item.min_score == None:
+                            pending += 1
+                            total += 1
+                        elif item.score >= item.min_score:
+                            graded += 1
+                            approved += 1
+                            total += 1
+                    elif item.item_restriction.item_type.name=='Activity':
+                        if item.done_activity == None:
+                            pending += 1
+                            total += 1
+                        elif item.done_activity == True:
+                            graded += 1
+                            approved += 1
+                            total += 1
+                        elif item.done_activity == False:
+                            graded += 1
+                            failed += 1
+                            total += 1
+
+        return pending, graded, total, approved, failed
+    return dict(restrictions=restrictions, periods=periods,
+        calculate_by_restriction=calculate_by_restriction)
+
+@auth.requires_login()
+@auth.requires_membership('Super-Administrator')
 def dtt_approval():
     # get report id
     report = request.vars['report']

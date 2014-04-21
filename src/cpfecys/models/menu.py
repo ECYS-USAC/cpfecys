@@ -67,8 +67,11 @@ if auth.has_membership(role="Teacher"):
     ])
 if auth.has_membership(role="Student"):
     response.menu.extend([(T('Final Practice'), False, URL('student', 'index'), [])])
-if auth.has_membership(role="DSI"):
+if auth.has_membership(role="DSI") and \
+ not auth.has_membership(role="Super-Administrator"):
     response.menu.extend([(T('Delivered Items'), False, URL('dsi', 'index'), [])])
+else:
+    response.menu.extend([(T('Delivered Items'), False, URL('admin', 'delivered'), [])])
 
 if auth.is_logged_in():
     user_menu = []
