@@ -17,8 +17,8 @@ def assignation_done_succesful(assignation):
     # Get all report restrictions that apply up to now
     # Start date to get them depends on assignation start
     # End date that apply to reports is current date
-    #import cpfecys
-    #import datetime
+    # import cpfecys
+    # import datetime
     #current_date = datetime.datetime.now()
     #start_date = datetime.date(assignation.period.yearp, 1, 1)
     #if assignation.period.period == cpfecys.second_period:
@@ -29,7 +29,7 @@ def assignation_done_succesful(assignation):
     # Check if they where delivered
     # Get all the reports of this assignation
     average_report = 0
-    status = true
+    status = True
     message = ''
     total_reports = assignation.report.count()
     for report in assignation.report.select():
@@ -65,7 +65,7 @@ def assignation_done_succesful(assignation):
         # Get the item_restrictions for this period, for the area of the assignation,
         # removing the ones that don't belong to this assignation since are exceptions
         # and not allowing optionals
-        rows = db((db.item_restriction.period == period.id)&
+        rows = db((db.item_restriction.period == period)&
                   (db.item_restriction_area.area_level == assignation.project.area_level)&
                   (db.item_restriction_area.item_restriction == db.item_restriction.id)&
                   (db.item_restriction_exception.project == assignation.project.id)&
@@ -102,12 +102,14 @@ def assignation_done_succesful(assignation):
         else:
             #this means the next one is first period of the next year
             period = db.period_year(yearp = period.yearp + 1, period = cpfecys.first_period)
+        if period == None:
+            break
     # Check if they where delivered
     return {'status':status, 'message':message}
 
 # Auto Freeze happens automatically, it FREEZES the assignation when it ends.
 # Successful means all needed reports and items where delivered
-# Failed means something was not good :( too bad jimmy
+# Failed means something was not good :( too bad
 def auto_freeze():
     # Get the current month and year
     import datetime
@@ -118,21 +120,29 @@ def auto_freeze():
     periods_to_work = db(db.assignation_freeze.pmonth == current_month).select()
     # For each assignation_freeze
     for period in periods_to_work:
-        # Get the period year
-        p_y = db((db.period_year.period == period.period)&
-               (db.period_year.yearp == current_year)).select()
-        # Get all the assignations of period_year
-        assignations = db(db.user_project.period == p_y.id).select()
+        # Get all the assignations still active
+        assignations = db(db.user_project.assignation_status == None).select()
         # Validate each assignation
         for assignation in assignations:
-            validation = assignation_done_succesful(assignation)
-            if validation['status']:
-                assignation.assignation_comment = validation['comment']
-                assignation.assignation_status = db.assignation_status(name = 'Successful')
-            else:
-                assignation.assignation_comment = validation['comment']
-                assignation.assignation_status = db.assignation_status(name = 'Failed')
-            assignation.update_record()
+            # Calculate the amount of time passed of the assignation in semesters
+            difference = (current_year - assignation.period.yearp) + 1
+            difference = difference * 2
+            import cpfecys
+            if assignation.period.period == cpfecys.second_period:
+                difference = difference - 1
+            if period == cpfecys.first_period:
+                difference = difference - 1
+            # If the amount of time in semesters happends to be >= then we should check it :)
+            if difference >= assignation.periods:
+                validation = assignation_done_succesful(assignation)
+                if validation['status']:
+                    assignation.assignation_comment = validation['message']
+                    assignation.assignation_status = db.assignation_status(name = 'Successful')
+                else:
+                    assignation.assignation_comment = validation['message']
+                    assignation.assignation_status = db.assignation_status(name = 'Failed')
+                assignation.update_record()
+    db.commit()
 
 #This thing kills reports that where never done to an empty report with score 0
 def auto_daily():
@@ -261,6 +271,7 @@ def auto_daily():
                   reply_to = student_mail,
                   message = message)
     db.commit()
+    auto_freeze()
     return T('Total Updated Reports: ') + str(total_recheckies + total_drafties + missed_reports) + ' ' + \
             T('Automatically Updated Draft Reports: ') + str(total_drafties) + ' ' + \
             T('Automatically Updated Recheck Reports: ') + str(total_recheckies) + ' ' + \

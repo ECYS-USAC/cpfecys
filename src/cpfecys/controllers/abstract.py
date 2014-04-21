@@ -7,7 +7,7 @@ def index():
     #tomorrow = datetime.datetime(tomorrow.year, tomorrow.month, tomorrow.day)
     #print tomorrow
     #print request.now
-    scheduler.queue_task(auto_daily,start_time=request.now, repeats = 1)
+    #scheduler.queue_task(auto_daily,start_time=request.now)
     return dict(message="hello from abstract.py")
 
 def oauth_login():
