@@ -5,9 +5,9 @@
       	<a onclick="window.history.back()" class="btn" ><i class="icon-arrow-left"></i>{{=T('Back')}}</a>
 		<table class="table table-striped table-bordered">
             <tr>
-                <th colspan="2"></th>
+                <th colspan="2">{{=T('Period')}}</th>
                 <th colspan="3">{{=T('Finished')}}</th>
-                <th colspan="4">{{=T('Action Pending')}}</th>
+                <th colspan="5">{{=T('Action Pending')}}</th>
                 <th></th>
             </tr>
 			<tr>
@@ -42,6 +42,12 @@
 					<i class="{{=status.report_status.icon or 'icon-star'}}"></i> 
 				</th>
 				{{pass}}
+				<th>
+					<span>
+						{{=T('Pending')}}
+					</span>
+					<i class="icon-warning-sign"></i> 
+				</th>
 				<th>
 					<span>
 						{{=T('All')}}
@@ -86,6 +92,10 @@
 					</td>
 					{{count = count + status['COUNT(report.id)']}}
 					{{pass}}
+					<td>
+						<span class="badge badge-info">{{=count_no_created(pyear)}}</span>
+						{{=T('Pending')}}
+					</td>
 					<td>
 						<a href="{{=URL('admin', 'report_filter', vars=dict(period=pyear.id))}}"> 
 						 	<span class="badge badge-info">{{=count}}</span><span>{{=T('All')}}</span>
