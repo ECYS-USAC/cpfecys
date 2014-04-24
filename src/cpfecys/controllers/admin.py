@@ -791,22 +791,25 @@ def report_list():
             (db.report.min_score!=0))
         return reports.count()
     def count_no_created(pyear):
-        return -1
         from datetime import datetime
+        cdate = datetime.now()
         year = str(pyear.yearp)
-        if pyear.period == 1:
-            start = datetime.strptime(year + '-01-01', "%Y-%m-%d")
-            end = datetime.strptime(year + '-07-01', "%Y-%m-%d")
-            restrictions = db((db.report_restriction.start_date>=start)&
-                (db.report_restriction.end_date<=end))
-            return restrictions
-        else:
-            start = datetime.strptime(year + '-07-01', "%Y-%m-%d")
-            end = datetime.strptime(year + '-12-31', "%Y-%m-%d")
-            restrictions = db((db.report_restriction.start_date>=start)&
-                (db.report_restriction.end_date<=end))
-            return restrictions
-
+        cperiod = cpfecys.current_year_period()
+        restrictions = db((db.report_restriction.start_date<=cdate)&
+            (db.report_restriction.end_date>=cdate)&
+            (db.report_restriction.is_enabled==True)).select()
+        pending = 0
+        assignations = get_assignations(False, cperiod, 'Student').select()
+        for assigantion in assignations:
+            for restriction in restrictions:
+                report = db(
+                    (db.report.assignation==assigantion.user_project.id)&
+                    (db.report.report_restriction==restriction.id)
+                    ).select().first()
+                if report == None:
+                    pending += 1
+                    
+        return pending
     def count_reports(pyear):
         from datetime import datetime
         year = str(pyear.yearp)
