@@ -13,7 +13,14 @@
 </h3>
 <div class="accordion" id="practice_assignation_accordion">
     <div class="accordion-group">
+        {{assignation_finished = True}}
         {{for item in assignations:}}
+        {{if not item.user_project.assignation_ignored:}}
+        {{if (item.user_project.assignation_status == None) or \
+             (item.user_project.assignation_status.name == 'Failed'):}}
+          {{assignation_finished = False}}
+        {{pass}}
+        {{pass}}
         <div class="accordion-heading">
             <div class="row-fluid">
                 <a class="accordion-toggle"
@@ -592,6 +599,14 @@
         </div>
         {{pass}}
     </div>
+    {{if assignation_finished:}}
+        <div>
+            <h2>
+            {{=T('Generate Final Practice Certification')}}
+            </h2>
+            <a class="btn btn-success" href="{{=URL('certificate', 'index.pdf')}}">{{=T('Generate Certification')}}</a>
+        </div>
+    {{pass}}
 </div>
 <script type="text/javascript">
     $(function(){

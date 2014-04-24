@@ -574,6 +574,10 @@ db.define_table('custom_parameters',
                     label = T('rescore_max_count')),
                 Field('rescore_max_days', 'integer', default='', \
                     notnull=False, label = T('rescore_max_days')),
+                Field('coordinator_name', 'string', default='', \
+                    notnull=False, label = T('Coordinator Name')),
+                Field('coordinator_title', 'string', default='', \
+                    notnull=False, label = T('Coordinator Title')),
                 )
 
 db.define_table('public_event',

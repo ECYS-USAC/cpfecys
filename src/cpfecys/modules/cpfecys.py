@@ -385,7 +385,7 @@ def _module_variables_setup():
 def _setup_parameters():
     db = _db
     db.custom_parameters.insert(min_score=65, rescore_max_count=2, \
-        rescore_max_days=7)
+        rescore_max_days=7, coordinator_name = 'Ing(a) Miguel Marín de León', coordinator_title = 'Coordinador de Auxiliares')
 
 def get_custom_parameters():
     db = _db
