@@ -1052,7 +1052,7 @@ def report():
         + XML(me_the_user.first_name) + ' ' + XML(me_the_user.last_name) \
         + '<br/>' \
         + T('was sent to be checked.') + '<br/>' + T('Checking can be done in:') \
-        + ' http://omnomyumi.com/dtt/' + '</html>'
+        + ' ' + cpfecys.get_domain() + '</html>'
         # send mail to teacher and student notifying change.
         mails = []
         # retrieve teacher's email

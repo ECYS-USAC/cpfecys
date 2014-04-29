@@ -435,7 +435,7 @@ def report():
                 + T('Current status is: ') \
                 + XML(T(report.status.name)) +'<br/>' \
                 + T('DTT-ECYS') \
-                + ' http://omnomyumi.com/dtt/' + '</html>'
+                + ' ' + cpfecys.get_domain() + '</html>'
                 mail.send(to=user.email,
                   subject=subject,
                   message=message)

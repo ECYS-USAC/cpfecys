@@ -196,7 +196,7 @@ def report():
                         + T('You have:') + ' ' + str(db(db.custom_parameters.id > 0).select().first().rescore_max_days) + ' '  + T('days to fix the report.') + '<br/>' \
                         + T('If report is not fixed within given time, then last valid score is taken.') + '<br/>' \
                         + T('Fix the report on:') \
-                        + ' http://omnomyumi.com/dtt/' + '</html>'
+                        + ' ' + cpfecys.get_domain() + '</html>'
                         # send mail to teacher and student notifying change.
                         mails = []
                         # retrieve teacher's email
@@ -240,7 +240,7 @@ def report():
                         + '<br/>' \
                         + T('Was checked. No further actions are needed.') + '<br/>' \
                         + T('DTT-ECYS') \
-                        + ' http://omnomyumi.com/dtt/' + '</html>'
+                        + ' ' + cpfecys.get_domain() + '</html>'
                         # send mail to teacher and student notifying change.
                         mails = []
                         # retrieve teacher's email
