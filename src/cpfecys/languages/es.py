@@ -1,4 +1,4 @@
-# -*- coding: utf-8 -*-
+# coding: utf-8
 {
 '': '',
 '!=': '!=',
@@ -242,6 +242,8 @@
 'Controller': 'Controlador',
 'Controllers': 'Controladores',
 'controllers': 'controladores',
+'Coordinator Name': 'Coordinator Name',
+'Coordinator Title': 'Coordinator Title',
 'Copyright': 'Copyright',
 'Correo electrónico': 'Correo electrónico',
 'Correo electrónico inválido': 'Correo electrónico inválido',
@@ -669,6 +671,7 @@
 'Media Laboratorio': 'Media Laboratorio',
 'mediana': '',
 'Mediana': 'Mediana',
+'Mensaje para todos en el tutor academico': 'Mensaje para todos en el tutor academico',
 'Menu Model': 'Modelo "menu"',
 'merge': 'combinar',
 'Message': 'Mensaje',
@@ -1121,6 +1124,7 @@
 'Upload File': 'Subir Archivo',
 'upload file:': 'suba archivo:',
 'Upload Horario de Curso                         File:': 'Subir Horario de Curso                         Archivo:',
+'Upload Programa de curso                             File:': 'Upload Programa de curso                             File:',
 'Upload Programa de Curso                         File:': 'Subir Programa de curso:',
 'Uploaded File': 'Archivo Ingresado',
 'Uploaded files': 'Archivos Ingresados',

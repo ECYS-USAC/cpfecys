@@ -390,3 +390,6 @@ def _setup_parameters():
 def get_custom_parameters():
     db = _db
     return db(db.custom_parameters).select().first()
+
+def get_domain():
+    return 'http://dtt-ecys.tk/'
