@@ -17,7 +17,7 @@ response.meta.keywords = 'usac'
 #response.meta.generator = ''
 
 ## your http://google.com/analytics id
-response.google_analytics_id = None
+response.google_analytics_id = 'UA-50474874-1'
 
 #########################################################################
 ## this is the main application menu add/remove items as required
