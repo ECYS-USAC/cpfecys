@@ -36,7 +36,9 @@
             {{=report.assignation.period.yearp}}
             </td>
             <td>
+            {{if teacher:}}
             {{=teacher.first_name}} {{=teacher.last_name}}
+            {{pass}}
             </td>
         </tbody>
         </tr>
