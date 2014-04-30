@@ -12,12 +12,10 @@
 def events():
     cyearperiod = cpfecys.current_year_period()
     return dict(year = cyearperiod.yearp, semester = cyearperiod.period.name,
-                thing = db((db.public_event.semester == cyearperiod)&
-                           (db.public_event.assignation == db.user_project.id)&
-                           (db.user_project.project == db.project.id)&
-                           (db.public_event_schedule.public_event == \
-                            db.public_event.id)).select(orderby=db.project.name))
-
+                 thing = db((db.public_event.semester == cyearperiod.id)&
+                            (db.public_event.assignation != None)&
+                            (db.public_event.assignation == db.user_project.id)&
+                            (db.user_project.project == db.project.id)).select(orderby=db.project.name))
 @auth.requires_login()
 def event_edition():
     #show all assignations of current user
@@ -30,7 +28,7 @@ def event_editor():
     import cpfecys
     check = db.user_project(id = assignation, assigned_user = auth.user.id)
     if (check is None):
-        #check if there is no assignation of it is locked (shouldn't be touched)
+        #check if there is no assignation or if it is locked (shouldn't be touched)
         if (session.last_assignation is None):
             redirect(URL('default','index'))
             return
@@ -45,12 +43,13 @@ def event_editor():
     db.public_event.semester.default = cyearperiod.id
     db.public_event.semester.writable = False
     db.public_event.semester.readable = False
-    db.public_event.assignation.default = assignation
+    db.public_event.assignation.default = check.id
     db.public_event.assignation.writable = False
     db.public_event.assignation.readable = False
     db.public_event_schedule.public_event.readable = False
     db.public_event_schedule.public_event.writable = False
-    return dict(year = cyearperiod.yearp, semester = cyearperiod.period.name,name = check.project.name,grid = SQLFORM.smartgrid(db.public_event))
+    query = (db.public_event.assignation == check.id)
+    return dict(year = cyearperiod.yearp, semester = cyearperiod.period.name,name = check.project.name,grid = SQLFORM.smartgrid(db.public_event, constraints = {'public_event' : query}))
 
 def index():
     """

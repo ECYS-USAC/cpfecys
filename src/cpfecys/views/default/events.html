@@ -11,15 +11,18 @@
     </thead>
     <tbody>
         {{counter = 1}}
-        {{for r in thing:}}
+        {{for r in thing2:}}
         <tr>
             <td>{{=counter}}</td>
             <td>{{=r.project.name}}</td>
             <td>{{=r.public_event.name}}</td>
-            <td>
-                <b>{{=T('Location')}}:</b> {{=r.public_event_schedule.physical_location}} <br />
-                <b>{{=T('Start')}}:</b> {{=r.public_event_schedule.start_date}} <br />
-                <b>{{=T('End')}}:</b> {{=r.public_event_schedule.end_date}} <br />
+	    <td>
+	    {{for s in r.public_event.public_event_schedule.select():}}
+                <b>{{=T('Location')}}:</b> {{=s.physical_location}} <br />
+                <b>{{=T('Start')}}:</b> {{=s.start_date}} <br />
+                <b>{{=T('End')}}:</b> {{=s.end_date}} <br />
+                <hr />
+            {{pass}}
             </td>
         </tr>
         {{counter += 1}}
