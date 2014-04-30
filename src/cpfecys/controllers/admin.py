@@ -76,7 +76,6 @@ def delivered():
         for area in areas:
             area_list.append(area.id)
         projects = db((db.project.area_level==db.area_level.id)&
-         (db.area_level.id==area.id)&
          (db.item_restriction.id==restriction)&
          (db.item_restriction_area.area_level.belongs(area_list))&
          (db.item_restriction_area.item_restriction==restriction)&
