@@ -7,7 +7,8 @@
           <form class="form-inline" action="{{=URL('admin','delivered')}}" 
             method='get'>
               <input name="restriction" type="hidden" 
-                value="{{=restrictions[0].id}}">
+		{{if restrictions:}}
+                value="{{=restrictions[0].id}}"{{pass}}>
                  <select name="period">
                     {{for cperiod in periods:}}
                       <option value="{{=period.id}}">

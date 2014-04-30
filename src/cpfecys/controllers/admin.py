@@ -600,6 +600,10 @@ def mail_notifications():
         projects = request.vars['project']
         message = request.vars['message']
         subject = request.vars['subject']
+        if not roles:
+            session.flash = T('At least a project and a role must be selected')
+            redirect(URL('admin', 'mail_notifications'))
+            return
         if len(roles) == 1:
             pointless_var = [roles]
         else:
