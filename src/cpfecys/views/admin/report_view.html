@@ -33,7 +33,12 @@
     {{=report.assignation.project.name}}
   </td>
   <td>
-    {{=teacher.first_name}} {{=teacher.last_name}}
+    {{if teacher != None:}}
+      {{=teacher.first_name}} {{=teacher.last_name}}
+    {{else:}}
+      {{=T('Teacher pending')}}
+    {{pass}}
+    }
   </td>
 </tbody>
 </table>
@@ -118,7 +123,7 @@
                                 {{=T('Failed')}}</span>
                             {{else:}}
                               <span class="label">{{=T('Pending')}}</span>
-                            {{pass}}
+                              {{pass}}
                           </td>
                         </tr>
                         <tr>
