@@ -122,6 +122,13 @@ def index():
                         days=cpfecys.get_custom_parameters().rescore_max_days)
         return current_date < next_date
 
+    def to_be_created(available_report, assignation):
+        report = db((db.report.report_restriction==available_report.id)&
+            (db.user_project.id==db.report.assignation)&
+            (db.user_project.id==assignation.id)&
+            (db.user_project.assigned_user==auth.user.id))
+        return report.count() < 1
+
 
     return dict(assignations = assignations,
                 available_reports = available_reports,
@@ -135,7 +142,8 @@ def index():
                 assignation_range=assignation_range,
                 get_item=get_item,
                 calculate_last_day=calculate_last_day,
-                has_disabled_items=has_disabled_items)
+                has_disabled_items=has_disabled_items,
+                to_be_created=to_be_created)
 
 @auth.requires_login()
 @auth.requires_membership('Student')

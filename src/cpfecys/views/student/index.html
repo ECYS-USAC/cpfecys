@@ -214,12 +214,8 @@
 
                                 {{for available_report in  \
                                 available_reports(item.period_year).select():}}
-                                    {{if db((db.report.report_restriction ==  \
-                                    available_report.id)&
-                                          (db.user_project.id == \
-                                          db.report.assignation)&
-                                        (db.user_project.assigned_user == \
-                                        auth.user.id)).count() < 1:}}
+                                    {{if to_be_created(available_report, \
+                                    item.user_project):}}
                                     <tr class="info">
                                         <td>
                                           {{=available_report.name}}
