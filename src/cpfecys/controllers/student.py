@@ -452,7 +452,11 @@ def item():
     cyear_period = cpfecys.current_year_period()
     item_restriction = request.vars['restriction']
     user_project = request.vars['assignation']
-    period = int(request.vars['period'])
+    period = request.vars['period']
+    if period == None:
+        session.flash = T('Action not allowed')
+        redirect(URL('student', 'index'))
+    period = int(period)
     area = request.vars['area']
     assignation = db((db.user_project.id==user_project)&
             (db.user_project.assigned_user==auth.user.id)
