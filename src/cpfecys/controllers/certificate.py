@@ -43,7 +43,7 @@ def index():
                 score = (report.score or '0') + ', pendiente DTT.'
                 acum_score += 0
             if not report.admin_score is None:
-                score_date = 'Calificado por DTT: ' + report.admin_score
+                score_date = 'Calificado por DTT: ' + str(report.admin_score)
                 acum_score += (report.admin_score or 0)
             else:
                 acum_score += (report.score or 0)

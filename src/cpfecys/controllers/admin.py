@@ -17,24 +17,87 @@ def dtt_general_approval():
     period = request.vars['period']
     approve = request.vars['approve']
     # Get the coincident reports
-    if not status:
+    if status == 'None':
         reports = db((db.report.created>start)&
-                     (db.report.created<end)).update(dtt_approval = approve)
+                     (db.report.created<end)).select()
+        for report in reports:
+            entries = count_log_entries(report.id)[0]['COUNT(log_entry.id)']
+            metrics = count_metrics_report(report.id)[0]['COUNT(log_metrics.id)']
+            anomalies = count_anomalies(report)[0]['COUNT(log_entry.id)']
+            if entries != 0 or metrics!= 0 or anomalies != 0:
+                report.update_record(dtt_approval = approve)
+
     elif int(status) == -1:
         reports = db((db.report.created>start)&
             (db.report.created<end)&
             (db.report.score>=db.report.min_score)&
             (db.report.min_score!=None)&
-            (db.report.min_score!=0)).update(dtt_approval = approve)
+            (db.report.min_score!=0)).select()
+        for report in reports:
+            entries = count_log_entries(report.id)[0]['COUNT(log_entry.id)']
+            metrics = count_metrics_report(report.id)[0]['COUNT(log_metrics.id)']
+            anomalies = count_anomalies(report)[0]['COUNT(log_entry.id)']
+            if entries != 0 or metrics!= 0 or anomalies != 0:
+                report.update_record(dtt_approval = approve)
     else:
         reports = db((db.report.created>start)&
             (db.report.created<end)&
-            (db.report.status==status)).update(dtt_approval = approve)
+            (db.report.status==status)).select()
+        for report in reports:
+            entries = count_log_entries(report.id)[0]['COUNT(log_entry.id)']
+            metrics = count_metrics_report(report.id)[0]['COUNT(log_metrics.id)']
+            anomalies = count_anomalies(report)[0]['COUNT(log_entry.id)']
+            if entries != 0 or metrics!= 0 or anomalies != 0:
+                report.update_record(dtt_approval = approve)
     if request.env.http_referer is None:
         redirect(URL('admin','report_filter'))
     else:
         redirect(request.env.http_referer)
     return
+
+@auth.requires_login()
+@auth.requires_membership('Super-Administrator')
+def general_report():
+    period = cpfecys.current_year_period()
+    if request.vars['period'] != None:
+        period = request.vars['period']
+        period = db(db.period_year.id==period).select().first()
+        if not period:
+            session.flash = T('Invalid Action.')
+            redirect(URL('default', 'index'))
+    periods = db(db.period_year).select()
+    areas = db(db.area_level).select()
+    def get_projects(area):
+        projects = db(db.project.area_level==area).select()
+        return projects
+    def get_teacher(project):
+        assignations = get_assignations(project, period, 'Teacher' \
+                ).select(db.user_project.ALL)
+    return dict(areas=areas, get_projects=get_projects, 
+        get_teacher=get_teacher)
+
+@auth.requires_login()
+@auth.requires_membership('Super-Administrator')
+def count_log_entries(report):
+    log_entries = db((db.log_entry.report== \
+        report)).select(db.log_entry.id.count())
+    return log_entries
+
+@auth.requires_login()
+@auth.requires_membership('Super-Administrator')
+def count_metrics_report(report):
+    log_metrics = db((db.log_metrics.report== \
+        report)).select(db.log_metrics.id.count())
+    return log_metrics
+
+@auth.requires_login()
+@auth.requires_membership('Super-Administrator')
+def count_anomalies(report):
+    log_entries = db((db.log_entry.report== \
+        report)&
+    (db.log_entry.log_type==db.log_type(name='Anomaly')) \
+    ).select(db.log_entry.id.count())
+    return log_entries
 
 @auth.requires_login()
 @auth.requires_membership('Super-Administrator')
@@ -950,11 +1013,27 @@ def notifications_manager():
 @auth.requires_login()
 @auth.requires_membership('Super-Administrator')
 def items_manager():
+    from datetime import datetime
+    cperiod = cpfecys.current_year_period()
+    year = str(cperiod.yearp)
+    start = datetime.strptime(year + '-01-01', "%Y-%m-%d")
+    end = datetime.strptime(year + '-07-01', "%Y-%m-%d")
+        
     if request.function == 'new':
         db.item.created.writable=db.item.created.readable=False
     grid = SQLFORM.smartgrid(db.item_restriction,  \
         linked_tables=['item_restriction_area', 'item_restriction_exception'])
-    return dict(grid=grid)
+    grid.element(_name='limit_days')['_onkeyup'] = \
+    "start = new Date('"+str(start)+"');\
+    start = start.setDate(start.getDate()+\
+        $('#item_restriction_limit_days').val());\
+    start = new Date('2131564654')\
+    $('#start').html(start);\
+    end = new Date('"+str(end)+"');\
+    end = end.setDate(end.getDate()+\
+        $('#item_restriction_limit_days').val());\
+    $('#end').html(end);"
+    return dict(grid=grid, start=start, end=end)
 
 @auth.requires_login()
 @auth.requires_membership('Super-Administrator')

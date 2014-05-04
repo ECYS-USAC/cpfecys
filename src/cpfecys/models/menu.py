@@ -59,6 +59,7 @@ if auth.has_membership(role="Super-Administrator"):
          (T('Reports'), False, URL(),[
              (T('Courses reports'), False, URL('admin', 'courses_report/areas'), []),
              (T('Active Teachers'), False, URL('admin', 'active_teachers'), []),
+             (T('General Report'), False, URL('admin', 'general_report'), []),
              ]),
     ])
 if auth.has_membership(role="Teacher"):
@@ -75,7 +76,10 @@ else:
 
 if auth.is_logged_in():
     user_menu = []
-    user_menu.append((T('Edit Schedules'), False, URL('default', 'event_edition'), []))
+    user_menu.append((T('Events'), False, URL(), [
+        (T('Insert Events'), False, URL('default', 'event_edition'), []),
+        (T('View Events'), False, URL('default','events'), []),
+        ]))
     response.menu.extend(user_menu)
 DEVELOPMENT_MENU = False
 

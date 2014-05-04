@@ -65,87 +65,107 @@
 				{{for report in reports:}}
 				{{hours_left = 400}}
 				{{hours_left = hours_left - (report.hours or 0)}}
-				<tr>
-					<td>
-						{{=report.assignation.project.name}}	
-					</td>
-					<td>
-						{{=report.created}}	
-					</td>
-					<td>
-						{{=report.assignation.assigned_user.username}}	
-					</td>
-					<td>
-						{{=report.assignation.assigned_user.first_name}}
-						{{=report.assignation.assigned_user.last_name}}
-					</td>
-					<td>
-						{{=report.report_restriction.name}}	
-					</td>
-					<td>
-						{{=report.score or 0}}	
-					</td>
-					<td>
-						{{=T(report.status.name)}}
-					</td>
-					<td>
-                        <b>{{=T('Activity logs')}}:</b>
-						{{=count_log_entries(report)[0]['COUNT(log_entry.id)']}}
-                        <br />
-                        <b>{{=T('Metric logs')}}:</b>
-                        {{=count_metrics_report(report)[0]['COUNT(log_metrics.id)']}}
-                        <br />
-                        <b>{{=T('Hours')}}:</b>
-                        {{=report.hours or 0}}
-                        <br />
-                        <b>{{=T('Pending Hours')}}:</b>
-                        {{=hours_left}}
-                        <br />
-                        <b>{{=T('Anomalies')}}:</b>
-                        {{=count_anomalies(report)[0]['COUNT(log_entry.id)']}}
-					</td>
-					<td>
-						{{=report.assignation.period.yearp}} - {{=T(report.assignation.period.period.name)}}
-					</td>
-					<td>
-						{{=calculate_ending_date(report)}}
-					</td>
-                    <td>
-                        {{if report.dtt_approval is None:}}
-                        <span class="label">
-                            {{=T('Pending Approval')}}
-                        </span>
-                        {{elif report.dtt_approval is True:}}
-                        <span class="label label-success">
-                            {{=T('Approved')}}
-                        </span>
-                        {{else:}}
-                        <span class="label label-warning">
-                            {{=T('Failed')}}
-                        </span>
-                        {{pass}}
-                        <div class="pull-right right">
-                            <a class="btn btn-success"
-                           href="{{=URL('admin','dtt_approval', vars=dict(report=report.id, approve=True))}}">
-                            <span class="icon-check"></span>
-                            </a>
-                            <a class="btn btn-danger"
-                               href="{{=URL('admin','dtt_approval', vars=dict(report=report.id, approve=False))}}">
-                            <span class="icon-remove"></span>
-                            </a>
-                            <a class="btn"
-                               href="{{=URL('admin','dtt_approval', vars=dict(report=report.id))}}">
-                            <span class="icon-time"></span>
-                            </a>
-                        </div>
-                    </td>
-					<td>
-						<a class="btn " href="{{=URL('admin','report/view', vars=dict(report=report.id))}}">
-		                <span class="icon-eye-open"></span>
-		                    {{=T('Report detail')}}
-		                </a>
-					</td>
-				</tr>
+                {{hours = report.hours}}
+                {{show = False}}
+                {{entries = \
+                    count_log_entries(report)[0]['COUNT(log_entry.id)']}}
+                {{metrics = \
+                    count_metrics_report(report)[0]['COUNT(log_metrics.id)']}}
+                {{anomalies = \
+                    count_anomalies(report)[0]['COUNT(log_entry.id)']}}
+                {{if report.assignation.project.area_level.name==\
+                    'DTT Tutor Académico':}}
+                    {{if metrics != 0 or entries != 0 or anomalies != 0:}}
+                        {{show = True}}
+                    {{pass}}
+                {{else:}}
+                    {{if hours != 0 and hours != None:}}
+                        {{show = True}}
+                    {{pass}}
+                {{pass}}
+                    {{if show:}}
+    				<tr>
+    					<td>
+    						{{=report.assignation.project.name}}	
+    					</td>
+    					<td>
+    						{{=report.created}}	
+    					</td>
+    					<td>
+    						{{=report.assignation.assigned_user.username}}	
+    					</td>
+    					<td>
+    						{{=report.assignation.assigned_user.first_name}}
+    						{{=report.assignation.assigned_user.last_name}}
+    					</td>
+    					<td>
+    						{{=report.report_restriction.name}}	
+    					</td>
+    					<td>
+    						{{=report.score or 0}}	
+    					</td>
+    					<td>
+    						{{=T(report.status.name)}}
+    					</td>
+    					<td>
+                            <b>{{=T('Activity logs')}}:</b>
+    						{{=entries}}
+                            <br />
+                            <b>{{=T('Metric logs')}}:</b>
+                            {{=metrics}}
+                            <br />
+                            <b>{{=T('Hours')}}:</b>
+                            {{=hours or 0}}
+                            <br />
+                            <b>{{=T('Pending Hours')}}:</b>
+                            {{=hours_left}}
+                            <br />
+                            <b>{{=T('Anomalies')}}:</b>
+                            {{=anomalies}}
+    					</td>
+    					<td>
+    						{{=report.assignation.period.yearp}} - {{=T(report.assignation.period.period.name)}}
+    					</td>
+    					<td>
+    						{{=calculate_ending_date(report)}}
+    					</td>
+                        <td>
+                            {{if report.dtt_approval is None:}}
+                            <span class="label">
+                                {{=T('Pending Approval')}}
+                            </span>
+                            {{elif report.dtt_approval is True:}}
+                            <span class="label label-success">
+                                {{=T('Approved')}}
+                            </span>
+                            {{else:}}
+                            <span class="label label-warning">
+                                {{=T('Failed')}}
+                            </span>
+                            {{pass}}
+                            <div class="pull-right right">
+                                <a class="btn btn-success"
+                               href="{{=URL('admin','dtt_approval', vars=dict(report=report.id, approve=True))}}">
+                                <span class="icon-check"></span>
+                                </a>
+                                <a class="btn btn-danger"
+                                   href="{{=URL('admin','dtt_approval', vars=dict(report=report.id, approve=False))}}">
+                                <span class="icon-remove"></span>
+                                </a>
+                                <a class="btn"
+                                   href="{{=URL('admin','dtt_approval', vars=dict(report=report.id))}}">
+                                <span class="icon-time"></span>
+                                </a>
+                            </div>
+                        </td>
+    					<td>
+    						<a class="btn " href="{{=URL('admin','report/view', vars=dict(report=report.id))}}">
+    		                <span class="icon-eye-open"></span>
+    		                    {{=T('Report detail')}}
+    		                </a>
+    					</td>
+    				</tr>
+                    {{pass}}
                 {{pass}}
                 <tr>
                     <td colspan="10"></td>

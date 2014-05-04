@@ -1,5 +1,5 @@
 {{extend 'template.html'}}
-<h1>{{=T('Edit Events')}}</h1>
+<h1>{{=T('Insert Events')}}</h1>
 {{for assignation in assignations:}}
 <a class="btn" href="{{=URL('default', 'event_editor', vars=dict(assignation = assignation.id))}}">{{=assignation.project.name}}</a><br />
 {{pass}}
