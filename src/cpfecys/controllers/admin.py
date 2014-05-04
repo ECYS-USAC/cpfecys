@@ -550,7 +550,8 @@ def courses_report():
                     db.report.assignation==desertion_assignation.id).select()
                 for report in desertion_reports:
                     if report.desertion_gone != None:
-                        desertion.append(report.desertion_gone)
+                        if report.desertion_gone:
+                            desertion.append(report.desertion_gone)
             if len(assigned) > 0:
                 assigned = max(assigned)
             else:
