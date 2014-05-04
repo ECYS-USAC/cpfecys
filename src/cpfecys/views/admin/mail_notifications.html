@@ -1,4 +1,14 @@
 {{extend 'template.html'}}
+<!-- Additional Scripts for MARKMIN -->
+<script src="http://code.jquery.com/jquery-migrate-1.2.1.js"></script>
+<script type="text/javascript" src="{{=URL('static','markitup')}}/jquery.markitup.pack.js"></script>
+<script type="text/javascript" src="{{=URL('static','markitup')}}/sets/markmin/set.js"></script>
+<script type="text/javascript" src="{{=URL('static','js')}}/highcharts/js/highcharts.js"></script>
+<script type="text/javascript" src="{{=URL('static','js')}}/highcharts/js/modules/data.js"></script>
+<script type="text/javascript" src="{{=URL('static','js')}}/highcharts/js/modules/exporting.js"></script>
+<link rel="stylesheet" type="text/css" href="{{=URL('static','markitup')}}/skins/markitup/style.css"/>
+<link rel="stylesheet" type="text/css" href="{{=URL('static','markitup')}}/sets/markmin/style.css"/>
+<!-- //Additional Scripts for MARKMIN -->
 <div class="row-fluid">
     <div class="well span12">
     	<a onclick="window.history.back()" class="btn" ><i class="icon-arrow-left"></i>{{=T('Back')}}</a>
@@ -7,7 +17,8 @@
 	  	<label for="subject">{{=T('Subject')}}</label>
 	    <input type="text" id="subject" name="subject">
 	    <label for="message">{{=T('Message')}}</label>
-	    <textarea id="message" name="message"></textarea>
+	    <textarea id="message" name="message" 
+	    style="width:100%;"></textarea>
 	    <button type="submit" class="btn btn-success">{{=T('Send')}}</button>
 	  </fieldset>
 	  <table>
@@ -74,5 +85,10 @@
 			target = $(this).attr('target');
 			$('.'+target).trigger('click');
 		})
+		jQuery(document).ready(function() {
+		  jQuery('textarea').css('padding','20px'
+		  	).css('max-width','1024px').markItUp(mySettings);
+		});
 	});
+
 </script>

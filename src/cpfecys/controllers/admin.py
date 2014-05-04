@@ -717,7 +717,8 @@ def mail_notifications():
     return dict(groups=groups,
         areas=areas,
         get_projects=get_projects,
-        prepare_name=prepare_name)
+        prepare_name=prepare_name,
+        markmin_settings = cpfecys.get_markmin)
 
 @auth.requires_login()
 @auth.requires_membership('Super-Administrator')
