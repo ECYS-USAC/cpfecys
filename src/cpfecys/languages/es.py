@@ -752,6 +752,7 @@
 'Not Approved': 'No Aprobado',
 'Not authorized': 'Sin permisos',
 'not authorized': 'no autorizado',
+'Not created': 'No creado',
 'Not graded': 'No Calificado',
 'not in': 'no esta en',
 'Not valid item list select a valid item list.': 'Lista de entregables no válida elija una lista válida.',

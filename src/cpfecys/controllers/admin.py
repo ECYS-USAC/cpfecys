@@ -842,6 +842,7 @@ def report_list():
             (db.report.created<end)&
             (db.report.score < db.report.min_score))
         return reports.count()
+
     def count_approved(pyear):
         from datetime import datetime
         year = str(pyear.yearp)
@@ -858,26 +859,48 @@ def report_list():
             (db.report.min_score!=None)&
             (db.report.min_score!=0))
         return reports.count()
+
     def count_no_created(pyear):
         from datetime import datetime
-        cdate = datetime.now()
         year = str(pyear.yearp)
+        if pyear.period == 1:
+            start = datetime.strptime(year + '-01-01', "%Y-%m-%d")
+            end = datetime.strptime(year + '-07-01', "%Y-%m-%d")
+        else:
+            start = datetime.strptime(year + '-07-01', "%Y-%m-%d")
+            end = datetime.strptime(year + '-12-31', "%Y-%m-%d")
         cperiod = cpfecys.current_year_period()
-        restrictions = db((db.report_restriction.start_date<=cdate)&
-            (db.report_restriction.end_date>=cdate)&
+        restrictions = db((db.report_restriction.start_date>=start)&
+            (db.report_restriction.end_date<=end)&
             (db.report_restriction.is_enabled==True)).select()
         pending = 0
         assignations = get_assignations(False, cperiod, 'Student').select()
-        for assigantion in assignations:
+        for assignation in assignations:
             for restriction in restrictions:
                 report = db(
-                    (db.report.assignation==assigantion.user_project.id)&
+                    (db.report.assignation==assignation.user_project.id)&
                     (db.report.report_restriction==restriction.id)
                     ).select().first()
                 if report == None:
                     pending += 1
-                    
+                else:
+                    hours = report.hours
+                    entries = count_log_entries(\
+                        report.id)[0]['COUNT(log_entry.id)']
+                    metrics = count_metrics_report(\
+                        report.id)[0]['COUNT(log_metrics.id)']
+                    anomalies = count_anomalies(\
+                        report)[0]['COUNT(log_entry.id)']
+                    if assignation.user_project.project.area_level.name == \
+                            'DTT Tutor Académico':
+                        if entries == 0 or metrics == 0 or anomalies == 0:
+                            pending += 1
+                    else:
+                        if hours == None:
+                            pending += 1
+
         return pending
+
     def count_reports(pyear, status, exclude):
         from datetime import datetime
         year = str(pyear.yearp)
@@ -917,6 +940,9 @@ def report_list():
 def report_filter():
     from datetime import datetime
     cperiod = cpfecys.current_year_period()
+    if request.vars['period'] != None:
+        cperiod = db(db.period_year.id==\
+            request.vars['period']).select().first()
     year = str(cperiod.yearp)
     if cperiod.period == 1:
         start = datetime.strptime(year + '-01-01', "%Y-%m-%d")
@@ -967,22 +993,76 @@ def report_filter():
     if not status:
         reports = db((db.report.created>start)&
             (db.report.created<end)).select(db.report.ALL)
+        status_instance = False
     elif int(status) == -1:
         reports = db((db.report.created>start)&
             (db.report.created<end)&
             (db.report.score>=db.report.min_score)&
             (db.report.min_score!=None)&
             (db.report.min_score!=0)).select()
+        status_instance = db(db.report_status.id==status).select().first()
+    elif int(status) == -2:
+        reports = db((db.report.created>start)&
+            (db.report.created<end)&
+            (db.report.score<=db.report.min_score)&
+            (db.report.min_score!=None)&
+            (db.report.min_score!=0)).select()
+        status_instance = db(db.report_status.id==status).select().first()
+    elif int(status) == -3:
+        result = []
+        existing = []
+        restrictions = db((db.report_restriction.start_date>=start)&
+            (db.report_restriction.end_date<=end)&
+            (db.report_restriction.is_enabled==True)).select()
+        pending = 0
+        assignations = get_assignations(False, cperiod, 'Student').select()
+        for assignation in assignations:
+            for restriction in restrictions:
+                report = db(
+                    (db.report.assignation==assignation.user_project.id)&
+                    (db.report.report_restriction==restriction.id)&
+                    (db.report.report_restriction==db.report_restriction.id)
+                    ).select(db.report.ALL).first()
+                if report == None:
+                    temp = dict(assignation=assignation, 
+                        restriction=restriction)
+                    result.append(temp)
+                else:
+                    hours = report.hours
+                    entries = count_log_entries(\
+                        report)[0]['COUNT(log_entry.id)']
+                    metrics = count_metrics_report(\
+                        report)[0]['COUNT(log_metrics.id)']
+                    anomalies = count_anomalies(\
+                        report)[0]['COUNT(log_entry.id)']
+                    temp = dict(assignation=assignation, 
+                            restriction=restriction,
+                            report=report)
+                    if assignation.user_project.project.area_level.name == \
+                            'DTT Tutor Académico':
+                        if entries == 0 or metrics == 0 or anomalies == 0:
+                            existing.append(temp)
+                    else:
+                        if hours == None:
+                            existing.append(temp)
+              
+        response.view = 'admin/report_filter_pending.html'      
+        return dict(result=result, existing=existing,
+            count_log_entries=count_log_entries,
+            count_metrics_report=count_metrics_report,
+            count_anomalies=count_anomalies,)
     else:
         reports = db((db.report.created>start)&
             (db.report.created<end)&
             (db.report.status==status)).select(db.report.ALL)
+        status_instance = db(db.report_status.id==status).select().first()
     return dict(reports=reports,
         count_log_entries=count_log_entries,
         count_metrics_report=count_metrics_report,
         count_anomalies=count_anomalies,
         calculate_ending_date=calculate_ending_date,
         status = status,
+        status_instance = status_instance,
         period = period)
 
 @auth.requires_login()

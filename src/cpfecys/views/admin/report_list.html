@@ -66,6 +66,8 @@
 						{{=pyear.yearp}}
 					</td>
 					<td>
+						<a href="{{=URL('admin', 'report_filter', vars=dict(period=pyear.id, \
+																		 status=-3))}}"> 
 						<span class="badge badge-info">{{=count_no_created(pyear)}}</span>
 						{{=T('Pending')}}
 					</td>
@@ -79,9 +81,9 @@
 					</td>
                     <td>
 						<a href="{{=URL('admin', 'report_filter', vars=dict(period=pyear.id, \
-																		 status=status.report_status.id))}}"> 
+																		 status=-2))}}"> 
 						 	<span class="badge badge-info">{{=count_reproved(pyear)}}</span>
-						 	<span>{{=T('Reproved')}} </span>
+						 	<span>{{=T('Failed')}} </span>
 
 						</a>
 					</td>

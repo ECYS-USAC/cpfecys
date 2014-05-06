@@ -2,6 +2,14 @@
 <div class="row-fluid">
     <div class="well span12" style="overflow:auto;">
   		<a onclick="window.history.back()" class="btn" ><i class="icon-arrow-left"></i> Back</a>
+        {{if not status_instance:}}
+            <h1>{{=T('All')}}</h1>
+        {{else:}}
+            <h1>
+            <i class="{{=status_instance.icon or icon-star}}"></i>
+            {{=T(status_instance.name)}}
+            </h1>
+        {{pass}}
 		<table class="table table-bordered">
 			<thead>
                 <tr>
