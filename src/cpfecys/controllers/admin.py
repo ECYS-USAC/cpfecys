@@ -853,7 +853,8 @@ def report_list():
             end = datetime.strptime(year + '-12-31', "%Y-%m-%d")
         reports = db((db.report.created<end)&
             (db.report.created>start)&
-            (db.report.score>=db.report.min_score)&
+            ((db.report.score>=db.report.min_score) |
+                (db.report.admin_score>=db.report.min_score))&
             (db.report.min_score!=None)&
             (db.report.min_score!=0))
         return reports.count()
@@ -877,7 +878,7 @@ def report_list():
                     pending += 1
                     
         return pending
-    def count_reports(pyear):
+    def count_reports(pyear, status, exclude):
         from datetime import datetime
         year = str(pyear.yearp)
         if pyear.period == 1:
@@ -891,15 +892,18 @@ def report_list():
             db.report_status.ALL, count, 
             left=db.report.on((db.report.status==db.report_status.id)&
                 (db.report.created < end)&
-                (db.report.created > start)), 
-            groupby=db.report_status.name)
+                (db.report.created > start)&
+                ((status==False) or (db.report_status.name==status))), 
+            groupby=db.report_status.name,
+            orderby=db.report_status.order_number)
         return report_total
 
     count = db.report.id.count()
     report_total = db().select(
         db.report_status.ALL, count, 
         left=db.report.on((db.report.status==db.report_status.id)), 
-        groupby=db.report_status.name)
+        groupby=db.report_status.name,
+        orderby=db.report_status.order_number)
     return dict(period_year=period_year,
         report_total=report_total,
         count_reproved=count_reproved,

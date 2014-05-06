@@ -17,8 +17,7 @@
 	  	<label for="subject">{{=T('Subject')}}</label>
 	    <input type="text" id="subject" name="subject">
 	    <label for="message">{{=T('Message')}}</label>
-	    <textarea id="message" name="message" 
-	    style="width:100%;"></textarea>
+	    <textarea id="message" name="message" rows="25"></textarea>
 	    <button type="submit" class="btn btn-success">{{=T('Send')}}</button>
 	  </fieldset>
 	  <table>
@@ -85,10 +84,6 @@
 			target = $(this).attr('target');
 			$('.'+target).trigger('click');
 		})
-		jQuery(document).ready(function() {
-		  jQuery('textarea').css('padding','20px'
-		  	).css('max-width','1024px').markItUp(mySettings);
-		});
 	});
 
 </script>

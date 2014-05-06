@@ -310,6 +310,8 @@ db.define_table('area_report_requirement',
 db.define_table('report_status',
                 Field('name', 'string', notnull=True, label = T('name')),
                 Field('description', 'string', notnull=True), \
+                Field('order_number', 'integer', notnull=False, \
+                    label=T('Order Number')),
                 Field('icon', 'string', notnull=False), \
                 label = T('description'),
                 format='%(name)s')
