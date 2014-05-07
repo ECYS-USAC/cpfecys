@@ -879,8 +879,9 @@ def report_list():
             for restriction in restrictions:
                 report = db(
                     (db.report.assignation==assignation.user_project.id)&
-                    (db.report.report_restriction==restriction.id)
-                    ).select().first()
+                    (db.report.report_restriction==restriction.id)&
+                    (db.report.report_restriction==db.report_restriction.id)
+                    ).select(db.report.ALL).first()
                 if report == None:
                     pending += 1
                 else:
@@ -893,13 +894,45 @@ def report_list():
                         report)[0]['COUNT(log_entry.id)']
                     if assignation.user_project.project.area_level.name == \
                             'DTT Tutor Académico':
-                        if entries == 0 or metrics == 0 or anomalies == 0:
+                        if entries == 0 and metrics == 0 and anomalies == 0:
                             pending += 1
                     else:
-                        if hours == None:
+                        if hours == None and hours == 0:
                             pending += 1
 
         return pending
+
+    def count_draft(pyear):
+        from datetime import datetime
+        year = str(pyear.yearp)
+        total = 0
+        string = ''
+        if pyear.period == 1:
+            start = datetime.strptime(year + '-01-01', "%Y-%m-%d")
+            end = datetime.strptime(year + '-07-01', "%Y-%m-%d")
+        else:
+            start = datetime.strptime(year + '-07-01', "%Y-%m-%d")
+            end = datetime.strptime(year + '-12-31', "%Y-%m-%d")
+        reports = db((db.report.created>= start)&
+            (db.report.created<=end)&
+            (db.report.status==db.report_status(name='Draft'))).select()
+        for report in reports:
+            hours = report.hours
+            entries = count_log_entries(\
+                report)[0]['COUNT(log_entry.id)']
+            metrics = count_metrics_report(\
+                report)[0]['COUNT(log_metrics.id)']
+            anomalies = count_anomalies(\
+                report)[0]['COUNT(log_entry.id)']
+            string = string + str(entries) + ' ' + str(metrics) + ' ' +str(anomalies) + '<br/>'
+            if report.assignation.project.area_level.name == \
+                    'DTT Tutor Académico':
+                if entries == 0 and metrics == 0 and anomalies == 0:
+                            total += 1
+                else:
+                        if hours == None and hours == 0:
+                            total += 1
+        return total
 
     def count_reports(pyear, status, exclude):
         from datetime import datetime
@@ -932,7 +965,8 @@ def report_list():
         count_reproved=count_reproved,
         count_approved=count_approved,
         count_no_created=count_no_created,
-        count_reports=count_reports)
+        count_reports=count_reports,
+        count_draft=count_draft)
                 
 
 @auth.requires_login()
@@ -1040,7 +1074,7 @@ def report_filter():
                             report=report)
                     if assignation.user_project.project.area_level.name == \
                             'DTT Tutor Académico':
-                        if entries == 0 or metrics == 0 or anomalies == 0:
+                        if entries == 0 and metrics == 0 and anomalies == 0:
                             existing.append(temp)
                     else:
                         if hours == None:
@@ -1109,16 +1143,16 @@ def items_manager():
         db.item.created.writable=db.item.created.readable=False
     grid = SQLFORM.smartgrid(db.item_restriction,  \
         linked_tables=['item_restriction_area', 'item_restriction_exception'])
-    grid.element(_name='limit_days')['_onkeyup'] = \
-    "start = new Date('"+str(start)+"');\
-    start = start.setDate(start.getDate()+\
-        $('#item_restriction_limit_days').val());\
-    start = new Date('2131564654')\
-    $('#start').html(start);\
-    end = new Date('"+str(end)+"');\
-    end = end.setDate(end.getDate()+\
-        $('#item_restriction_limit_days').val());\
-    $('#end').html(end);"
+    #grid.element(_name='limit_days')['_onkeyup'] = \
+    #"start = new Date('"+str(start)+"');\
+    #start = start.setDate(start.getDate()+\
+    #    $('#item_restriction_limit_days').val());\
+    #start = new Date('2131564654')\
+    #$('#start').html(start);\
+    #end = new Date('"+str(end)+"');\
+    #end = end.setDate(end.getDate()+\
+    #    $('#item_restriction_limit_days').val());\
+    #$('#end').html(end);"
     return dict(grid=grid, start=start, end=end)
 
 @auth.requires_login()

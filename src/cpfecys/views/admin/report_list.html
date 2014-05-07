@@ -89,16 +89,30 @@
 					</td>
 					{{count = 0}}
 					{{for status in count_reports(pyear, False, 'Acceptance'):}}
+					{{if status.report_status.name == 'Draft':}}
 					<td>
-						<a href="{{=URL('admin', 'report_filter', vars=dict(period=pyear.id, \
-																		 status=status.report_status.id))}}"> 
-						 	<span class="badge badge-info">{{=status['COUNT(report.id)']}}</span>
-						 	
-						 	<span>{{=T(status.report_status.name)}} </span>
-
-						</a>
+					<a href="{{=URL('admin', 'report_filter', \
+					vars=dict(period=pyear.id,status=status.report_status.id))}}"> 
+					 <span class="badge badge-info">
+					 {{ value = count_draft(pyear)}}
+					 {{=value}}
+					 </span>
+					 <span>{{=T(status.report_status.name)}} </span>
+					 </a>
 					</td>
-					{{count = count + status['COUNT(report.id)']}}
+					{{count = count + value}}
+					{{else:}}
+						<td>
+							<a href="{{=URL('admin', 'report_filter', vars=dict(period=pyear.id, \
+																			 status=status.report_status.id))}}"> 
+							 	<span class="badge badge-info">{{=status['COUNT(report.id)']}}</span>
+							 	
+							 	<span>{{=T(status.report_status.name)}} </span>
+
+							</a>
+						</td>
+						{{count = count + status['COUNT(report.id)']}}
+					{{pass}}
 					{{pass}}
 					<td>
 						<a href="{{=URL('admin', 'report_filter', vars=dict(period=pyear.id))}}"> 
