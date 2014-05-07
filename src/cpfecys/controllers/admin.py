@@ -606,7 +606,8 @@ def active_teachers():
                 session.flash = T('Invalid Action.')
                 redirect(URL('default', 'index'))
     assignations = get_assignations(False, period, 'Teacher' \
-                ).select(db.user_project.ALL)
+                ).select(db.user_project.ALL, 
+                orderby=~db.user_project.project)
     periods = db(db.period_year).select()
     return dict(periods=periods, assignations=assignations)
 
