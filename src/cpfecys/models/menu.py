@@ -67,7 +67,7 @@ if auth.has_membership(role="Teacher"):
     (T('Reports Pending Grading'), False, URL('teacher', 'todo_reports'), []),
     ])
 if auth.has_membership(role="Student"):
-    response.menu.extend([(T('Final Practice'), False, URL('student', 'index'), [])])
+    response.menu.extend([(T('My Final Practice'), False, URL('student', 'index'), [])])
 if auth.has_membership(role="DSI") and \
  not auth.has_membership(role="Super-Administrator"):
     response.menu.extend([(T('Delivered Items'), False, URL('dsi', 'index'), [])])
