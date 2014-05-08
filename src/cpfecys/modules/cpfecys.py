@@ -378,15 +378,20 @@ def _report_status_setup():
     ## Report Status Types
     db.report_status.insert(name="Draft", \
         description="Student is working on report, can be viewed by teacher \
-        but can't be graded", icon="icon-pencil")
+        but can't be graded", icon="icon-pencil", \
+        order_number=1)
     db.report_status.insert(name="Grading", description="Report is ready \
-        to be graded by teacher", icon="icon-inbox")
+        to be graded by teacher", icon="icon-inbox", \
+        order_number=2)
     db.report_status.insert(name="Recheck", description="Report has been sent \
-        to be improved by student", icon="icon-time")
+        to be improved by student", icon="icon-time", \
+        order_number=3)
     db.report_status.insert(name="Acceptance", description="This report has \
-        been already graded", icon="icon-edit")
+        been already graded", icon="icon-edit", \
+        order_number=0)
     db.report_status.insert(name="EnabledForTeacher", description="This report \
-        has been reactivated for teacher to grade", icon="icon-repeat")
+        has been reactivated for teacher to grade", icon="icon-repeat", \
+        order_number=4)
 
 def _module_variables_setup():
     global first_period, second_period

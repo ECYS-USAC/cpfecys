@@ -2,6 +2,14 @@
 <div class="row-fluid">
     <div class="well span12" style="overflow:auto;">
   		<a onclick="window.history.back()" class="btn" ><i class="icon-arrow-left"></i> Back</a>
+        {{if not status_instance:}}
+            <h1>{{=T('All')}}</h1>
+        {{else:}}
+            <h1>
+            <i class="{{=status_instance.icon or icon-star}}"></i>
+            {{=T(status_instance.name)}}
+            </h1>
+        {{pass}}
 		<table class="table table-bordered">
 			<thead>
                 <tr>
@@ -63,7 +71,7 @@
 			</thead>
 			<tbody>
 				{{for report in reports:}}
-				{{hours_left = 400}}
+				{{hours_left = report.assignation.hours}}
 				{{hours_left = hours_left - (report.hours or 0)}}
                 {{hours = report.hours}}
                 {{show = False}}
@@ -132,17 +140,32 @@
                         <td>
                             {{if report.dtt_approval is None:}}
                             <span class="label">
-                                {{=T('Pending Approval')}}
+                                {{=T('DTT Approval Pending')}}
                             </span>
                             {{elif report.dtt_approval is True:}}
                             <span class="label label-success">
-                                {{=T('Approved')}}
+                                {{=T('DTT Approved')}}
                             </span>
                             {{else:}}
                             <span class="label label-warning">
-                                {{=T('Failed')}}
+                                {{=T('DTT faling')}}
                             </span>
                             {{pass}}
+                            <p>
+                            {{if report.score is None:}}
+                            <span class="label">
+                                {{=T('Teacher Approval Pending')}}
+                            </span>
+                            {{elif report.score >= report.min_score:}}
+                            <span class="label label-success">
+                                {{=T('Teacher Approved')}}
+                            </span>
+                            {{elif report.score < report.min_score:}}
+                            <span class="label label-warning">
+                                {{=T('Teacher Failed')}}
+                            </span>
+                            {{pass}}
+                            </p>
                             <div class="pull-right right">
                                 <a class="btn btn-success"
                                href="{{=URL('admin','dtt_approval', vars=dict(report=report.id, approve=True))}}">

@@ -98,12 +98,22 @@ auth = Auth(db)
 # NOTE: length=255 is needed because a bug in mysql
 # as describede here: http://goo.gl/NBG5JM
 auth.settings.extra_fields['auth_user']= [
-                  Field('phone', 'string', length=16, notnull=False),
-                  Field('working', 'boolean', notnull=False),
-                  Field('work_address', 'string',length=255, notnull=False),
+                  Field('phone', 'string', length=16, notnull=False, \
+                    label="Phone"),
+                  Field('working', 'boolean', notnull=False, \
+                    label="Working"),
+                  Field('company_name', 'string', length=200, notnull=False, \
+                    label="Company name"),
+                  Field('work_address', 'string',length=500, notnull=False, \
+                    label="Work address"),
+                  Field('work_phone', 'string',length=500, notnull=False, \
+                    label="Work phone"),
+                  Field('home_address', 'string',length=500, notnull=False, \
+                    label="Home address"),
                   Field('uv_token', 'string', length=64, notnull=False, \
                     writable=False, readable=False),
-                  Field('data_updated', 'boolean', notnull=False, writable=False, readable=False),]
+                  Field('data_updated', 'boolean', notnull=False, \
+                    writable=False, readable=False),]
 
 crud, service, plugins = Crud(db), Service(), PluginManager()
 
@@ -310,6 +320,8 @@ db.define_table('area_report_requirement',
 db.define_table('report_status',
                 Field('name', 'string', notnull=True, label = T('name')),
                 Field('description', 'string', notnull=True), \
+                Field('order_number', 'integer', notnull=False, \
+                    label=T('Order Number')),
                 Field('icon', 'string', notnull=False), \
                 label = T('description'),
                 format='%(name)s')

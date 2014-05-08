@@ -187,7 +187,6 @@ def update_data():
                                         _id="phone", _value=cuser.phone,
                                         requires=IS_LENGTH(minsize=8,
                                                         maxsize=12))),
-
                         DIV(LABEL(T('Working')),
                                       INPUT(_name="working",
                                         _type="checkbox", _id="working",
@@ -197,8 +196,21 @@ def update_data():
                                       INPUT(_name="work_address",
                                         _type="text", _id="work_address",
                                         _value=cuser.work_address)),
+                        DIV(LABEL(T('Company Name')),
+                                      INPUT(_name="company_name",
+                                        _type="text", _id="company_name",
+                                        _value=cuser.company_name)),
+                        DIV(LABEL(T('Work phone')),
+                                      INPUT(_name="work_phone",
+                                        _type="text", _id="work_phone",
+                                        _value=cuser.work_phone)),
+                        DIV(LABEL(T('Home Address')),
+                                      INPUT(_name="home_address",
+                                        _type="text", _id="home_address",
+                                        _value=cuser.home_address)),
                         BR(),
                         DIV(INPUT(_type='submit',
+                            _id="update_data",
                             _value=T('Update Profile'),
                             _class="btn-primary")),
                             _class="form-horizontal",)
@@ -211,6 +223,9 @@ def update_data():
             phone = request.vars['phone']
             working = request.vars['working']
             work_address = request.vars['work_address']
+            company_name = request.vars['company_name']
+            work_phone = request.vars['work_phone']
+            home_address = request.vars['home_address']
 
             #TODO analyze for aditional security steps
             cuser=db(db.auth_user.id==auth.user.id).select().first()
@@ -219,6 +234,9 @@ def update_data():
                 cuser.last_name = last_name
                 cuser.email = email
                 cuser.phone = phone
+                cuser.company_name = company_name
+                cuser.work_phone = work_phone
+                cuser.home_address = home_address
                 cuser.data_updated = True
                 if password == repass and len(repass) > 0:
                     #TODO Fix password update

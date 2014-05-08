@@ -608,7 +608,8 @@ def active_teachers():
                 session.flash = T('Invalid Action.')
                 redirect(URL('default', 'index'))
     assignations = get_assignations(False, period, 'Teacher' \
-                ).select(db.user_project.ALL)
+                ).select(db.user_project.ALL, 
+                orderby=~db.user_project.project)
     periods = db(db.period_year).select()
     return dict(periods=periods, assignations=assignations)
 
@@ -719,7 +720,8 @@ def mail_notifications():
     return dict(groups=groups,
         areas=areas,
         get_projects=get_projects,
-        prepare_name=prepare_name)
+        prepare_name=prepare_name,
+        markmin_settings = cpfecys.get_markmin)
 
 @auth.requires_login()
 @auth.requires_membership('Super-Administrator')
@@ -843,6 +845,7 @@ def report_list():
             (db.report.created<end)&
             (db.report.score < db.report.min_score))
         return reports.count()
+
     def count_approved(pyear):
         from datetime import datetime
         year = str(pyear.yearp)
@@ -854,31 +857,87 @@ def report_list():
             end = datetime.strptime(year + '-12-31', "%Y-%m-%d")
         reports = db((db.report.created<end)&
             (db.report.created>start)&
-            (db.report.score>=db.report.min_score)&
+            ((db.report.score>=db.report.min_score) |
+                (db.report.admin_score>=db.report.min_score))&
             (db.report.min_score!=None)&
             (db.report.min_score!=0))
         return reports.count()
+
     def count_no_created(pyear):
         from datetime import datetime
-        cdate = datetime.now()
         year = str(pyear.yearp)
+        if pyear.period == 1:
+            start = datetime.strptime(year + '-01-01', "%Y-%m-%d")
+            end = datetime.strptime(year + '-07-01', "%Y-%m-%d")
+        else:
+            start = datetime.strptime(year + '-07-01', "%Y-%m-%d")
+            end = datetime.strptime(year + '-12-31', "%Y-%m-%d")
         cperiod = cpfecys.current_year_period()
-        restrictions = db((db.report_restriction.start_date<=cdate)&
-            (db.report_restriction.end_date>=cdate)&
+        restrictions = db((db.report_restriction.start_date>=start)&
+            (db.report_restriction.end_date<=end)&
             (db.report_restriction.is_enabled==True)).select()
         pending = 0
         assignations = get_assignations(False, cperiod, 'Student').select()
-        for assigantion in assignations:
+        for assignation in assignations:
             for restriction in restrictions:
                 report = db(
-                    (db.report.assignation==assigantion.user_project.id)&
-                    (db.report.report_restriction==restriction.id)
-                    ).select().first()
+                    (db.report.assignation==assignation.user_project.id)&
+                    (db.report.report_restriction==restriction.id)&
+                    (db.report.report_restriction==db.report_restriction.id)
+                    ).select(db.report.ALL).first()
                 if report == None:
                     pending += 1
-                    
+                else:
+                    hours = report.hours
+                    entries = count_log_entries(\
+                        report.id)[0]['COUNT(log_entry.id)']
+                    metrics = count_metrics_report(\
+                        report.id)[0]['COUNT(log_metrics.id)']
+                    anomalies = count_anomalies(\
+                        report)[0]['COUNT(log_entry.id)']
+                    if assignation.user_project.project.area_level.name == \
+                            'DTT Tutor Académico':
+                        if entries == 0 and metrics == 0 and anomalies == 0:
+                            pending += 1
+                    else:
+                        if hours == None and hours == 0:
+                            pending += 1
+
         return pending
-    def count_reports(pyear):
+
+    def count_draft(pyear):
+        from datetime import datetime
+        year = str(pyear.yearp)
+        total = 0
+        string = ''
+        if pyear.period == 1:
+            start = datetime.strptime(year + '-01-01', "%Y-%m-%d")
+            end = datetime.strptime(year + '-07-01', "%Y-%m-%d")
+        else:
+            start = datetime.strptime(year + '-07-01', "%Y-%m-%d")
+            end = datetime.strptime(year + '-12-31', "%Y-%m-%d")
+        reports = db((db.report.created>= start)&
+            (db.report.created<=end)&
+            (db.report.status==db.report_status(name='Draft'))).select()
+        for report in reports:
+            hours = report.hours
+            entries = count_log_entries(\
+                report)[0]['COUNT(log_entry.id)']
+            metrics = count_metrics_report(\
+                report)[0]['COUNT(log_metrics.id)']
+            anomalies = count_anomalies(\
+                report)[0]['COUNT(log_entry.id)']
+            string = string + str(entries) + ' ' + str(metrics) + ' ' +str(anomalies) + '<br/>'
+            if report.assignation.project.area_level.name == \
+                    'DTT Tutor Académico':
+                if entries == 0 and metrics == 0 and anomalies == 0:
+                            total += 1
+                else:
+                        if hours == None and hours == 0:
+                            total += 1
+        return total
+
+    def count_reports(pyear, status, exclude):
         from datetime import datetime
         year = str(pyear.yearp)
         if pyear.period == 1:
@@ -892,21 +951,25 @@ def report_list():
             db.report_status.ALL, count, 
             left=db.report.on((db.report.status==db.report_status.id)&
                 (db.report.created < end)&
-                (db.report.created > start)), 
-            groupby=db.report_status.name)
+                (db.report.created > start)&
+                ((status==False) or (db.report_status.name==status))), 
+            groupby=db.report_status.name,
+            orderby=db.report_status.order_number)
         return report_total
 
     count = db.report.id.count()
     report_total = db().select(
         db.report_status.ALL, count, 
         left=db.report.on((db.report.status==db.report_status.id)), 
-        groupby=db.report_status.name)
+        groupby=db.report_status.name,
+        orderby=db.report_status.order_number)
     return dict(period_year=period_year,
         report_total=report_total,
         count_reproved=count_reproved,
         count_approved=count_approved,
         count_no_created=count_no_created,
-        count_reports=count_reports)
+        count_reports=count_reports,
+        count_draft=count_draft)
                 
 
 @auth.requires_login()
@@ -914,6 +977,9 @@ def report_list():
 def report_filter():
     from datetime import datetime
     cperiod = cpfecys.current_year_period()
+    if request.vars['period'] != None:
+        cperiod = db(db.period_year.id==\
+            request.vars['period']).select().first()
     year = str(cperiod.yearp)
     if cperiod.period == 1:
         start = datetime.strptime(year + '-01-01', "%Y-%m-%d")
@@ -964,22 +1030,76 @@ def report_filter():
     if not status:
         reports = db((db.report.created>start)&
             (db.report.created<end)).select(db.report.ALL)
+        status_instance = False
     elif int(status) == -1:
         reports = db((db.report.created>start)&
             (db.report.created<end)&
             (db.report.score>=db.report.min_score)&
             (db.report.min_score!=None)&
             (db.report.min_score!=0)).select()
+        status_instance = db(db.report_status.id==status).select().first()
+    elif int(status) == -2:
+        reports = db((db.report.created>start)&
+            (db.report.created<end)&
+            (db.report.score<=db.report.min_score)&
+            (db.report.min_score!=None)&
+            (db.report.min_score!=0)).select()
+        status_instance = db(db.report_status.id==status).select().first()
+    elif int(status) == -3:
+        result = []
+        existing = []
+        restrictions = db((db.report_restriction.start_date>=start)&
+            (db.report_restriction.end_date<=end)&
+            (db.report_restriction.is_enabled==True)).select()
+        pending = 0
+        assignations = get_assignations(False, cperiod, 'Student').select()
+        for assignation in assignations:
+            for restriction in restrictions:
+                report = db(
+                    (db.report.assignation==assignation.user_project.id)&
+                    (db.report.report_restriction==restriction.id)&
+                    (db.report.report_restriction==db.report_restriction.id)
+                    ).select(db.report.ALL).first()
+                if report == None:
+                    temp = dict(assignation=assignation, 
+                        restriction=restriction)
+                    result.append(temp)
+                else:
+                    hours = report.hours
+                    entries = count_log_entries(\
+                        report)[0]['COUNT(log_entry.id)']
+                    metrics = count_metrics_report(\
+                        report)[0]['COUNT(log_metrics.id)']
+                    anomalies = count_anomalies(\
+                        report)[0]['COUNT(log_entry.id)']
+                    temp = dict(assignation=assignation, 
+                            restriction=restriction,
+                            report=report)
+                    if assignation.user_project.project.area_level.name == \
+                            'DTT Tutor Académico':
+                        if entries == 0 and metrics == 0 and anomalies == 0:
+                            existing.append(temp)
+                    else:
+                        if hours == None:
+                            existing.append(temp)
+              
+        response.view = 'admin/report_filter_pending.html'      
+        return dict(result=result, existing=existing,
+            count_log_entries=count_log_entries,
+            count_metrics_report=count_metrics_report,
+            count_anomalies=count_anomalies,)
     else:
         reports = db((db.report.created>start)&
             (db.report.created<end)&
             (db.report.status==status)).select(db.report.ALL)
+        status_instance = db(db.report_status.id==status).select().first()
     return dict(reports=reports,
         count_log_entries=count_log_entries,
         count_metrics_report=count_metrics_report,
         count_anomalies=count_anomalies,
         calculate_ending_date=calculate_ending_date,
         status = status,
+        status_instance = status_instance,
         period = period)
 
 @auth.requires_login()
@@ -1026,16 +1146,16 @@ def items_manager():
         db.item.created.writable=db.item.created.readable=False
     grid = SQLFORM.smartgrid(db.item_restriction,  \
         linked_tables=['item_restriction_area', 'item_restriction_exception'])
-    grid.element(_name='limit_days')['_onkeyup'] = \
-    "start = new Date('"+str(start)+"');\
-    start = start.setDate(start.getDate()+\
-        $('#item_restriction_limit_days').val());\
-    start = new Date('2131564654')\
-    $('#start').html(start);\
-    end = new Date('"+str(end)+"');\
-    end = end.setDate(end.getDate()+\
-        $('#item_restriction_limit_days').val());\
-    $('#end').html(end);"
+    #grid.element(_name='limit_days')['_onkeyup'] = \
+    #"start = new Date('"+str(start)+"');\
+    #start = start.setDate(start.getDate()+\
+    #    $('#item_restriction_limit_days').val());\
+    #start = new Date('2131564654')\
+    #$('#start').html(start);\
+    #end = new Date('"+str(end)+"');\
+    #end = end.setDate(end.getDate()+\
+    #    $('#item_restriction_limit_days').val());\
+    #$('#end').html(end);"
     return dict(grid=grid, start=start, end=end)
 
 @auth.requires_login()

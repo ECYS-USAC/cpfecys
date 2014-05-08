@@ -1,0 +1,84 @@
+{{extend 'template.html'}}
+<div class="row-fluid">
+    <div class="well span12" style="overflow:auto;">
+  		<a onclick="window.history.back()" class="btn" ><i class="icon-arrow-left"></i> Back</a>
+		<table class="table table-bordered">
+			<thead>
+				<tr>
+					<th rowspan="2">
+						{{=T('Course Name')}}
+					</th>
+					<th rowspan="2">
+                        {{=T('Teacher')}}
+                    </th>
+                    <th colspan="3">
+                        {{=T('Course Results')}}
+                    </th>
+                    <th colspan="3">
+                        {{=T('Laboratory Results')}}
+                    </th>
+                    <th colspan="5">
+                        {{=T('Mid terms')}}
+                    </th>
+                    <th rowspan="2">
+                        {{=T('Final')}}
+                    </th>
+                    <th colspan="2">
+                        {{=T('Recovery')}}
+                    </th>
+                    <th colspan="3">
+                        {{=T('Desertion')}}
+                    </th>
+				</tr>
+                <tr>
+                    <th>{{=T('Approved')}}</th>
+                    <th>{{=T('Failed')}}</th>
+                    <th>{{=T('Mean')}}</th>
+                    <th>{{=T('Approved')}}</th>
+                    <th>{{=T('Failed')}}</th>
+                    <th>{{=T('Mean')}}</th>
+                    <th>{{=T('Assigned')}}</th>
+                    <th>{{=T('Mid term')}} 1</th>
+                    <th>{{=T('Mid term')}} 2</th>
+                    <th>{{=T('Mid term')}} 3</th>
+                    <th>{{=T('Assistance')}}</th>
+                    <th>{{=T('Recovery term')}} 1</th>
+                    <th>{{=T('Recovery term')}} 2</th>
+                    <th>{{=T('Started')}}</th>
+                    <th>{{=T('Gone')}}</th>
+                    <th>{{=T('Stayed')}}</th>
+
+                </tr>
+			</thead>
+            <tbody>
+            {{for area in areas:}}
+            <tr>
+                <td colspan="2">
+                {{=area.name}}
+                </td>
+                <td></td><td></td><td></td><td></td><td></td><td></td><td></td>
+                <td></td><td></td><td></td><td></td><td></td><td></td><td></td>
+                <td></td><td></td><td></td>
+
+            </tr>
+            {{for project in get_projects(area.id):}}
+                <tr>
+                    <td>{{=project.name}}</td>
+                    {{teacher = get_teacher(project.id)}}
+                    {{if teacher  != None:}}
+                        <td>
+                        {{teacher.first().first_name}} 
+                        {{teacher.first().last_name}}
+                        </td>
+                    {{else:}}
+                        <td>{{=T('Pending')}}</td>
+                    {{pass}}
+                    
+                </tr>
+            {{pass}}
+            {{pass}}
+            </tbody>
+			
+		</table>
+	</div>
+</div>

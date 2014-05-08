@@ -71,14 +71,18 @@ if auth.has_membership(role="Student"):
 if auth.has_membership(role="DSI") and \
  not auth.has_membership(role="Super-Administrator"):
     response.menu.extend([(T('Delivered Items'), False, URL('dsi', 'index'), [])])
-else:
+elif auth.has_membership(role="Super-Administrator"):
     response.menu.extend([(T('Delivered Items'), False, URL('admin', 'delivered'), [])])
 
 if auth.is_logged_in():
     user_menu = []
     user_menu.append((T('Events'), False, URL(), [
-        (T('Insert Events'), False, URL('default', 'event_edition'), []),
         (T('View Events'), False, URL('default','events'), []),
+        ]))
+    if not auth.has_membership(role="Teacher") and \
+    auth.has_membership(role="Super-Administrator"):
+        user_menu.append((T('Events'), False, URL(), [
+        (T('Insert Events'), False, URL('default', 'event_edition'), []),
         ]))
     response.menu.extend(user_menu)
 DEVELOPMENT_MENU = False

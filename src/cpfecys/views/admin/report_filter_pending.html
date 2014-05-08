@@ -1,0 +1,118 @@
+{{extend 'template.html'}}
+<div class="row-fluid">
+    <div class="well span12" style="overflow:auto;">
+  		<a onclick="window.history.back()" class="btn" ><i class="icon-arrow-left"></i> Back</a>
+        
+		<table class="table table-bordered">
+			<thead>
+                <tr>
+                    <th colspan="10"></th>
+                    <th colspan="2">{{=T('Actions')}}</th>
+                </tr>
+				<tr>
+					<th>
+						{{=T('Project')}}
+					</th>
+					<th>
+						{{=T('Created')}}
+					</th>
+					<th>
+						{{=T('School id')}}
+					</th>
+					<th>
+						{{=T('User')}}
+					</th>
+					<th>
+						{{=T('Restriction')}}
+					</th>
+					<th>
+						{{=T('Score')}}
+					</th>
+					<th>
+						{{=T('Status')}}
+					</th>
+					<th>
+                        {{=T('Report Summary')}}
+					</th>
+					<th>
+						{{=T('Started')}}
+					</th>
+					<th>
+						{{=T('Ends')}}
+					</th>
+                    <th>
+                        
+                    </th>
+					<th>
+						{{=T('Report')}}
+                    </th>
+				</tr>
+			</thead>
+			<tbody>
+            {{for record in result:}}
+            <tr>
+                <td>{{=record['assignation'].user_project.project.name}}</td>
+                <td>{{=T('Pending')}}</td>
+                <td>{{=record['assignation'].auth_user.username}}</td>
+                <td>
+                {{=record['assignation'].auth_user.first_name}}
+                {{=record['assignation'].auth_user.last_name}}
+                </td>
+                <td>{{=record['restriction'].name}}</td>
+                <td>{{=T('Pending')}}</td>
+                <td>{{=T('Not created')}}</td>
+                <td>-</td>
+                <td>{{=record['restriction'].start_date}}</td>
+                <td>{{=record['restriction'].end_date}}</td>
+                <td></td>
+                <td></td>
+            </tr>
+            {{pass}}
+            {{for record in existing:}}
+            <tr>
+                {{report = record['report']}}
+                {{hours_left = 400}}
+                {{hours_left = hours_left - (report.hours or 0)}}
+                {{hours = report.hours}}
+                {{entries = \
+                    count_log_entries(report)[0]['COUNT(log_entry.id)']}}
+                {{metrics = \
+                    count_metrics_report(report)[0]['COUNT(log_metrics.id)']}}
+                {{anomalies = \
+                    count_anomalies(report)[0]['COUNT(log_entry.id)']}}
+                <td>{{=record['assignation'].user_project.project.name}}</td>
+                <td>{{=T('Pending')}}</td>
+                <td>{{=record['assignation'].auth_user.username}}</td>
+                <td>
+                {{=record['assignation'].auth_user.first_name}}
+                {{=record['assignation'].auth_user.last_name}}
+                </td>
+                <td>{{=record['restriction'].name}}</td>
+                <td>{{=T('Pending')}}</td>
+                <td>{{=T(report.status.name)}}</td>
+                <td>
+                    <b>{{=T('Activity logs')}}:</b>
+                    {{=entries}}
+                    <br />
+                    <b>{{=T('Metric logs')}}:</b>
+                    {{=metrics}}
+                    <br />
+                    <b>{{=T('Hours')}}:</b>
+                    {{=hours or 0}}
+                    <br />
+                    <b>{{=T('Pending Hours')}}:</b>
+                    {{=hours_left}}
+                    <br />
+                    <b>{{=T('Anomalies')}}:</b>
+                    {{=anomalies}}
+                </td>
+                <td>{{=record['restriction'].start_date}}</td>
+                <td>{{=record['restriction'].end_date}}</td>
+                <td></td>
+                <td></td>
+            </tr>
+            {{pass}}
+			</tbody>
+		</table>
+	</div>
+</div>

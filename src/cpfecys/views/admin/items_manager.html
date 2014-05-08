@@ -8,9 +8,19 @@
 		$('#item_restriction_limit_days__row').append('<div id="gen_content">\
 			<div class=\"label label-info\" id="start"></div>\
 			<div class=\"label label-info\" id="end"></div></div>');
+		$('#item_restriction_min_score__row').append(
+			'<div class="label label-info">Ingrese valor entre 1 y 100</div>');
 		$('#start').html('<div>\
 			Primer Semestre: {{=T("Insert days to calculate")}}</div>');
 		$('#end').html('<div>\
 			Segundo Semestre: {{=T("Insert days to calculate")}}</div>');
+		$('#item_restriction_item_type').change(function(){
+			if($('#item_restriction_item_type option:selected'
+				).text()=="Activity")
+				$('#item_restriction_min_score').css('visibility', 'hidden');
+			else
+			$('#item_restriction_min_score').css('visibility', 'visible');
+			
+		});
 	});
 </script>
