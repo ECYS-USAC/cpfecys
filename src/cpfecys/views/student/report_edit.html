@@ -77,6 +77,13 @@
                 log_types = log_types,
                 content = '') }}
 {{include 'include/log-activity.html'}}
+<!-- log-new-future-activity -->
+{{inc_vars = dict(id = 'log-new-future-activity',
+                url = URL('log_future/save', vars=dict(report = report.id)),
+                date = '',
+                log_type = None,
+                content = '') }}
+{{include 'include/log-future-activity.html'}}
 <!-- report-head-activity -->
 {{inc_vars = dict(id = 'report-header-new',
                 url = URL('report_header/create', vars=dict(report = report.id)),
@@ -158,6 +165,11 @@ url = '#')}}
                     <li>
                         <a data-toggle="modal" href="#log-new-activity">
                             <span class="icon-tasks"></span> {{=T('Log Activity')}}
+                        </a>
+                    </li>
+                    <li>
+                        <a data-toggle="modal" href="#log-new-future-activity">
+                            <span class="icon-time"></span> {{=T('Log Future Activities')}}
                         </a>
                     </li>
                     <li class="divider"></li>
@@ -448,6 +460,43 @@ url = '#')}}
             <!-- //Accomplished Hours display Helper-->
         </div>
         {{pass}}
+        <div class="row-fluid">
+            <div style="padding:15px;">
+                <h1>
+                    <span class="icon-time"></span>
+                    {{=T('Future Activities Log')}}
+                </h1>
+            </div>
+        </div>
+        <div class="row-fluid">
+            {{for log in report.log_future.select():}}
+            <!-- Helpers for Edition -->
+            {{inc_vars = dict(id = 'log-future-edit-activity-' + str(log.id),
+            url = URL('log_future/update', vars=dict(log = log.id)),
+            date = log.entry_date,
+            content = log.description) }}
+            {{include 'include/log-future-activity.html'}}
+            <!-- // Helpers for Edition -->
+            <!-- Helpers for deletion -->
+            {{inc_vars = dict(id = 'delete-log-future-' + str(log.id),
+            title = T('Confirm') + ' ' + T('Delete'),
+            content = T('Delete operation can\'t be undone, do you want to continue?'),
+            action = T('Delete'),
+            _class = 'btn-danger',
+            url = URL('log_future/delete', vars=dict(log = log.id)))}}
+            {{include 'include/delete-helper.html'}}
+            <!-- // Helpers for deletion -->
+            <!-- Display Helper -->
+            {{inc_vars = dict(editable = True,
+            date = log.entry_date,
+            edit_action = 'log-future-edit-activity-' + str(log.id),
+            delete_action = 'delete-log-future-' + str(log.id),
+            content = MARKMIN(log.description, markmin_settings))}}
+            {{include 'include/display-report-log-future.html'}}
+            <!-- //Display Helper -->
+            {{pass}}
+        </div>
+        
     </div>
     {{if not(report.footer is None):}}
     <!-- report-footer-edit-activity -->

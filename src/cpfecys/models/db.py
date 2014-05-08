@@ -375,6 +375,17 @@ db.define_table('log_type',
                 format='%(name)s'
                 )
 
+db.define_table('log_future',
+                Field('entry_date', 'date', notnull=True, \
+                    label = T('entry_date')),
+                Field('description', 'text', notnull=True, \
+                    label = T('description')),
+                Field('report', 'reference report', label = T('report')),
+                Field('period', 'reference period_year', \
+                    label = T('period')),
+                format='%(entry_date)s'
+                )
+
 db.define_table('log_entry',
                 Field('log_type', 'reference log_type', label = T('log_type')),
                 Field('entry_date', 'date', notnull=True, \

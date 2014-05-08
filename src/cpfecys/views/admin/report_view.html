@@ -359,6 +359,26 @@
             <!-- //Display Helper -->
         </div>
         {{pass}}
+        <div class="row-fluid">
+            <div style="padding:15px;">
+                <h1>
+                    <span class="icon-time"></span>
+                    {{=T('Future Activities Log')}}
+                </h1>
+            </div>
+        </div>
+        <div class="row-fluid">
+            {{for log in report.log_future.select():}}
+            <!-- Display Helper -->
+            {{inc_vars = dict(editable = False,
+            date = log.entry_date,
+            edit_action = '',
+            delete_action = '',
+            content = MARKMIN(log.description, markmin_settings))}}
+            {{include 'include/display-report-log-future.html'}}
+            <!-- //Display Helper -->
+            {{pass}}
+        </div>
     </div>
     {{if not(report.footer is None):}}
     <!-- Display Helper -->
