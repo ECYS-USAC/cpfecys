@@ -9,36 +9,6 @@
 <link rel="stylesheet" type="text/css" href="{{=URL('static','markitup')}}/sets/markmin/style.css"/>
 
 <p><a onclick="window.history.back()" class="btn" ><i class="icon-arrow-left"></i> Back</a></p>
-
-<table class="table table-bordered">
-<thead>
-    <th>{{=T('Student school id')}}</th>
-    <th>{{=T('Student name')}}</th>
-    <th>{{=T('Project')}}</th>
-    <th>{{=T('Time range')}}</th>
-    <th>{{=T('Teacher name')}}</th>
-</thead>
-<tbody>
-  <td>
-    {{=report.assignation.assigned_user.username}}
-  </td>
-  <td>
-  {{=report.assignation.assigned_user.first_name}} 
-  {{=report.assignation.assigned_user.last_name}}
-  </td>
-  <td>
-    {{=report.assignation.assigned_user.username}}
-  </td>
-  <td>
-    {{=report.assignation.project.name}}
-  </td>
-  <td>
-    {{if teacher:}}
-    {{=teacher.first_name}} {{=teacher.last_name}}
-    {{pass}}
-  </td>
-</tbody>
-</table>
 <div class="row-fluid">
       <div class="well span12">
         <h3>{{=T('Report Grading')}}</h3>
@@ -256,11 +226,26 @@
         <a class="brand" href="#">
             {{=T('View Report:')}}
             <small>{{=report.report_restriction['name']}}</small>
+            <a class="btn pull-right" onclick="window.print();"><i class="icon-print"></i></a>
         </a>
       </div>
   </div>
 </div>
 <div style="border:solid #ddd 1px;">
+    <h1 style="text-align:center;">
+        {{=report.report_restriction['name']}}
+    </h1>
+    <div style="padding:3px;">
+        <strong>{{=T('Student')}}: </strong> {{=report.assignation.assigned_user.username}} -  {{=report.assignation.assigned_user.last_name}}, {{=report.assignation.assigned_user.first_name}}<br />
+        <strong>{{=T('Project')}}: </strong> {{=report.assignation.project.name}} <br />
+        <strong>{{=T('Project Leader')}}:</strong> {{if teacher:}}
+            {{=teacher.username}} - {{=teacher.first_name}} {{=teacher.last_name}}
+            {{else:}} {{=T('Unassigned')}} {{pass}}<br />
+        <strong>{{=T('Area')}}: </strong> {{=report.assignation.project.area_level.name}} <br />
+        <strong>{{=T('Period')}}: </strong> {{=T(report.assignation.period.period.name)}} - 
+           {{=report.assignation.period.yearp}} <br />
+    </div>
+    <hr />
     {{if not(report.heading is None):}}
     <!-- Display Helper -->
     {{inc_vars = dict(editable = False,

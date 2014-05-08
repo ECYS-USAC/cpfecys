@@ -104,33 +104,41 @@ def teacher_validation_report_access(report):
 #
 # automatically tries to create the next period in may and november respectively
 # Using the following logic:
-# - In May..Dec the second period of current year is created.
-# - In Nov the first period of next year is created.
-# - In Jan..Apr the first period of current year is created.
+# - In Jan..May the first period of current year is created
+# - In Jun..Dec the second period of current year is created.
+# - In Dec the first period of next year is created
+# - in Jun the second period of current year is created
 #
 def _period_setup():
     db = _db
     import datetime
     now = datetime.datetime.now()
     year = now.year
-    if now.month >= 5:
+    ##### We create the current period
+    if now.month < 6:
+        #check and create the first semester of current year
+        pery = db.period_year((db.period_year.yearp == year)&
+                              (db.period_year.period == first_period))
+        if not pery:
+            db.period_year.insert(yearp = year, period = first_period)
+    if now.month > 6:
         #check and create second semester of current year
         pery = db.period_year((db.period_year.yearp == year)&
                               (db.period_year.period == second_period))
         if not pery:
             db.period_year.insert(yearp = year, period = second_period)
-    else:
-        #check and create first semester of current year
-        pery = db.period_year((db.period_year.yearp == year)&
-                              (db.period_year.period == first_period))
-        if not pery:
-            db.period_year.insert(yearp = year, period = first_period)
-    if now.month >= 11:
+    if now.month == 12:
         #check and create first semester of next year
         pery = db.period_year((db.period_year.yearp == (year + 1))&
                               (db.period_year.period == first_period))
         if not pery:
             db.period_year.insert(yearp = (year + 1), period = first_period)
+    if now.month == 6:
+        #check and create second semester of current year
+        pery = db.period_year((db.period_year.yearp == year)&
+                              (db.period_year.period == second_period))
+        if not pery:
+            db.period_year.insert(yearp = year, period = second_period)
 
 def _database_setup():
     global first_period_name, second_period_name

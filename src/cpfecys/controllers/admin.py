@@ -314,11 +314,13 @@ def assignations():
     q2 = (db.user_project.assigned_user == db.auth_user.id)
     q3 = (db.user_project.project == db.project.id)
     q4 = (db.user_project.period == db.period_year.id)
-    orderby = db.auth_user.last_name
-    orderby2 = db.auth_user.first_name
+    q5 = (db.project.area_level == db.area_level.id)
+    orderby =  db.area_level.name
+    orderby2 = db.project.name
     orderby3 = db.auth_user.username
-    data = db(q_selected_period_assignations&q2&q3&q4\
-        ).select(orderby=orderby|orderby2|orderby3)
+    orderby4 = db.auth_user.first_name
+    data = db(q_selected_period_assignations&q2&q3&q4&q5\
+        ).select(orderby=orderby|orderby2|orderby3|orderby4)
     current_period_name = T(cpfecys.second_period.name)
     if currentyear_period.period == cpfecys.first_period.id:
         current_period_name = T(cpfecys.first_period.name)
