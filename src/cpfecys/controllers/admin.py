@@ -1255,7 +1255,7 @@ def send_item_mail():
                 any action the item will remain disabled.')
         import cpfecys
         message += (cpfecys.get_custom_parameters().email_signature or '')
-        mail.send(to=user.mail,
+        mail.send(to=user.email,
                   subject=subject,
                   message=message)
         item.update_record(
