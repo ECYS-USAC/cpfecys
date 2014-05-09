@@ -139,7 +139,7 @@ def index():
                 self.cell(35) # padding
                 self.cell(155,8,u"Escuela de Ciencias y Sistemas",0,1,'L')
                 self.cell(35) # padding
-                self.cell(155,7,u"Desarrollo de Transferencia Tecnológica",0,1,'L')
+                self.cell(155,7,u"Desarrollo de Transferencia Tecnológica (DTT)",0,1,'L')
                 self.ln(5)
                 self.cell(190,0,'',1,1,'L')
                 self.ln(5)

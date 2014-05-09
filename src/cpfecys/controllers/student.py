@@ -1075,6 +1075,8 @@ def report():
                       status = db.report_status(name = 'Grading'))
         session.flash = T('Report sent to Grading.')
         # Notification Message
+        import cpfecys
+        signature = (cpfecys.get_custom_parameters().email_signature or '')
         me_the_user = db.auth_user(db.auth_user.id == auth.user.id)
         message = '<html>' + T('The report') + ' ' \
         + '<b>' + XML(report.report_restriction['name']) + '</b><br/>' \
@@ -1082,7 +1084,7 @@ def report():
         + XML(me_the_user.first_name) + ' ' + XML(me_the_user.last_name) \
         + '<br/>' \
         + T('was sent to be checked.') + '<br/>' + T('Checking can be done in:') \
-        + ' ' + cpfecys.get_domain() + '</html>'
+        + ' ' + cpfecys.get_domain() + '<br />' + signature + '</html>'
         # send mail to teacher and student notifying change.
         mails = []
         # retrieve teacher's email

@@ -602,7 +602,9 @@ db.define_table('custom_parameters',
                 Field('coordinator_title', 'string', default='', \
                     notnull=False, label = T('Coordinator Title')),
                 Field('clearance_logo', 'upload', \
-                      label = T('Clearance Logo'))
+                      label = T('Clearance Logo')),
+                Field('email_signature', 'text', \
+                      label = T('Email Signature')),
                 )
 
 db.define_table('public_event',

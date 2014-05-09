@@ -178,6 +178,8 @@ def report():
                         session.flash = T('The report has been sent to recheck \
                             you will be notified via email when rechecked')
                         # Notification Message
+                        import cpfecys
+                        signature = (cpfecys.get_custom_parameters().email_signature or '')
                         me_the_user = db.auth_user(db.auth_user.id == auth.user.id)
                         row = db.user_project(db.user_project.id == report.assignation)
                         message = '<html>' + T('The report') + ' ' \
@@ -196,7 +198,7 @@ def report():
                         + T('You have:') + ' ' + str(db(db.custom_parameters.id > 0).select().first().rescore_max_days) + ' '  + T('days to fix the report.') + '<br/>' \
                         + T('If report is not fixed within given time, then last valid score is taken.') + '<br/>' \
                         + T('Fix the report on:') \
-                        + ' ' + cpfecys.get_domain() + '</html>'
+                        + ' ' + cpfecys.get_domain() + '<br />' + signature + '</html>'
                         # send mail to teacher and student notifying change.
                         mails = []
                         # retrieve teacher's email
@@ -224,6 +226,8 @@ def report():
                         session.flash = T('The report has been scored \
                             successfully')
                         # Notification Message
+                        import cpfecys
+                        singature = (cpfecys.get_custom_parameters().email_signature or '')
                         me_the_user = db.auth_user(db.auth_user.id == auth.user.id)
                         row = db.user_project(db.user_project.id == report.assignation)
                         message = '<html>' + T('The report') + ' ' \
@@ -240,7 +244,7 @@ def report():
                         + '<br/>' \
                         + T('Was checked. No further actions are needed.') + '<br/>' \
                         + T('DTT-ECYS') \
-                        + ' ' + cpfecys.get_domain() + '</html>'
+                        + ' ' + cpfecys.get_domain() + '<br />' + signature + '</html>'
                         # send mail to teacher and student notifying change.
                         mails = []
                         # retrieve teacher's email
