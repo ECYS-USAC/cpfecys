@@ -601,6 +601,8 @@ db.define_table('custom_parameters',
                     notnull=False, label = T('Coordinator Name')),
                 Field('coordinator_title', 'string', default='', \
                     notnull=False, label = T('Coordinator Title')),
+                Field('clearance_logo', 'upload', \
+                      label = T('Clearance Logo'))
                 )
 
 db.define_table('public_event',

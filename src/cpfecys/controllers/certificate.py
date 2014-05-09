@@ -123,7 +123,12 @@ def index():
             def header(self):
                 "hook to draw custom page header (logo and title)"
                 import os
-                logo=os.path.join(request.folder,'static/logo-usac.png')
+                import cpfecys
+                logo = cpfecys.get_custom_parameters().clearance_logo
+                if (logo is None) or (logo == ' ') or (logo == ''):
+                    logo=os.path.join(request.folder,'static/logo-usac.png')
+                else:
+                    logo = os.path.join(request.folder, 'uploads', logo)
                 self.image(logo,10,8,33)
                 self.set_font('Times','B',18)
                 self.cell(35) # padding
