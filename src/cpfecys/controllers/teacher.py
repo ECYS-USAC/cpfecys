@@ -117,6 +117,7 @@ def report():
     cdate = datetime.datetime.now()
     report = request.vars['report']
     report = db.report(db.report.id == report)
+    import cpfecys
     parameters = cpfecys.get_custom_parameters()
     valid = not(report is None)
     next_date = None
@@ -227,7 +228,7 @@ def report():
                             successfully')
                         # Notification Message
                         import cpfecys
-                        singature = (cpfecys.get_custom_parameters().email_signature or '')
+                        signature = (cpfecys.get_custom_parameters().email_signature or '')
                         me_the_user = db.auth_user(db.auth_user.id == auth.user.id)
                         row = db.user_project(db.user_project.id == report.assignation)
                         message = '<html>' + T('The report') + ' ' \

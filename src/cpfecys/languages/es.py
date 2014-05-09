@@ -398,6 +398,7 @@
 'Email': 'Email',
 'Email and SMS': 'Correo electrónico y SMS',
 'Email sent': 'Email enviado',
+'Email Signature': 'Email Signature',
 'Enabled': 'Hablitado',
 'Enabled Date': 'Fecha de Activación',
 'EnabledForTeacher': 'Recalificar maestro',

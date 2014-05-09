@@ -941,6 +941,7 @@ def report():
             session.flash = T('Selected report can\'t be edited. Select a valid report.')
             redirect(URL('student','index'))
         ## Validate assignation
+        import cpfecys
         if cpfecys.assignation_is_locked(report.assignation):
             session.flash = T('Selected report can\'t be edited. Select a valid report.')
             redirect(URL('student','index'))
@@ -1045,6 +1046,7 @@ def report():
             session.flash = T('Selected report can\'t be accepted, it lacks mandatory blocks.')
             redirect(URL('student','index'))
         # Validate DB report_restriction to obey TIMING rules
+        import cpfecys
         valid_rep_restr = cpfecys.student_validation_report_restrictions(report.report_restriction.id)
         ## Validate that the report status is editable (it is either 'Draft' or 'Recheck')
         if not(cpfecys.student_validation_report_status(report)):
@@ -1112,6 +1114,7 @@ def report():
         report = db.report(db.report.id == report)
         valid = not(report is None)
         ## Validate assignation
+        import cpfecys
         if valid: valid = not cpfecys.assignation_is_locked(report.assignation)
         # Validate that the report belongs to user
         if valid: valid = cpfecys.student_validation_report_owner(report.id)
