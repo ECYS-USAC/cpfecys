@@ -14,7 +14,9 @@
 <div class="accordion" id="practice_assignation_accordion">
     <div class="accordion-group">
         {{assignation_finished = True}}
+        {{total_assignations = 0}}
         {{for item in assignations:}}
+        {{total_assignations += 1}}
         {{if not item.user_project.assignation_ignored:}}
         {{if (item.user_project.assignation_status == None) or \
              (item.user_project.assignation_status.name == 'Failed'):}}
@@ -595,7 +597,7 @@
         </div>
         {{pass}}
     </div>
-    {{if assignation_finished:}}
+    {{if assignation_finished and (total_assignations>0):}}
         <div>
             <h2>
             {{=T('Generate Final Practice Certification')}}

@@ -1155,6 +1155,87 @@ def report():
 
 @auth.requires_login()
 @auth.requires_membership('Student')
+def log_future():
+    if (request.args(0) == 'save'):
+        # validate the user owns this report
+        report = request.vars['report']
+        report = db.report(db.report.id == report)
+        valid_report = report != None
+        ## Validate assignation
+        if valid_report: valid_report = not cpfecys.assignation_is_locked(report.assignation)
+        if valid_report: valid_report = cpfecys.student_validation_report_owner(report.id)
+        # validate report is editable
+        if valid_report: valid_report = cpfecys.student_validation_report_restrictions \
+            (report.report_restriction)
+        # validate report is 'Draft' or 'Recheck'
+        if valid_report: valid_report = cpfecys.student_validation_report_status(report)
+        # validate we receive log-date, log-type, log-content
+        log_date = request.vars['log-date']
+        log_content = request.vars['log-content']
+        if valid_report: valid_report = (log_date and log_content)
+        if valid_report:
+            db.log_future.insert(entry_date = log_date,
+                                description = log_content,
+                                report = report.id,
+                                period=cpfecys.current_year_period())
+            session.flash = T('Log added')
+            redirect(URL('student', 'report/edit', vars=dict(report=report.id)))
+        else:
+            session.flash = T('Operation not allowed.')
+            redirect(URL('student', 'index'))
+    elif (request.args(0) == 'update'):
+        # validate the requested log
+        log = request.vars['log']
+        log = db.log_future(db.log_future.id == log)
+        valid_log = log != None
+        # validate log report owner is valid
+        if valid_log: valid_log = cpfecys.student_validation_report_owner(log.report)
+        ## Validate assignation
+        if valid_log: valid_log = not cpfecys.assignation_is_locked(log.report.assignation)
+        # validate report is editable
+        if valid_log: valid_log = cpfecys.student_validation_report_restrictions \
+            (log.report['report_restriction'])
+        # validate report is 'Draft' or 'Recheck'
+        if valid_log: valid_log = cpfecys.student_validation_report_status \
+            (db.report(db.report.id == log.report))
+        # validate we receive log-date, log-type, log-content
+        log_date = request.vars['log-date']
+        log_content = request.vars['log-content']
+        if valid_log: valid_log = (log_date and log_content)
+        if valid_log:
+            log.update_record(entry_date = log_date,
+                              description = log_content)
+            session.flash = T('Log Updated')
+            redirect(URL('student', 'report/edit', vars=dict(report=log.report)))
+        else:
+            session.flash = T('Operation not allowed.')
+            redirect(URL('student', 'index'))
+    elif (request.args(0) == 'delete'):
+        # validate the requested log
+        log = request.vars['log']
+        log = db.log_future(db.log_future.id == log)
+        valid_log = log != None
+        # validate log report owner is valid
+        if valid_log: valid_log = cpfecys.student_validation_report_owner(log.report)
+        ## Validate assignation
+        if valid_log: valid_log = not cpfecys.assignation_is_locked(log.report.assignation)
+        # validate report is editable
+        if valid_log: valid_log = cpfecys.student_validation_report_restrictions \
+            (log.report['report_restriction'])
+        # validate report is 'Draft' or 'Recheck'
+        if valid_log: valid_log = cpfecys.student_validation_report_status \
+            (db.report(db.report.id == log.report))
+        if valid_log:
+            log.delete_record()
+            session.flash = T('Log Deleted')
+            redirect(URL('student', 'report/edit', vars=dict(report=log.report)))
+        else:
+            session.flash = T('Operation not allowed.')
+            redirect(URL('student', 'index'))
+    raise HTTP(404)
+
+@auth.requires_login()
+@auth.requires_membership('Student')
 def log():
     if (request.args(0) == 'save'):
         # validate the user owns this report

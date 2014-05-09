@@ -1,0 +1,50 @@
+<!-- START->log-activity -->
+<div id="{{=inc_vars['id']}}"
+     class="modal hide fade" tabindex="-1"
+     role="dialog"
+     aria-labelledby="aria-{{=inc_vars['id']}}"
+     aria-hidden="true">
+    <form action="{{=inc_vars['url']}}" method="POST">
+        <div class="modal-header">
+            <span class="row-fluid">
+                <span class="row">
+                    <span class="span3">
+                        <h3 id="aria-{{=inc_vars['id']}}">{{=T('Log Future Activity')}}</h3>
+                    </span>
+                    <span class="span8">
+                        <div class="input-prepend">
+                            <span class="add-on">{{=T('Log Date')}} <span class="icon-calendar"></span></span>
+                            <input class="span7" value="{{=inc_vars['date']}}" id="log-date-{{=inc_vars['id']}}" name="log-date" placeholder="{{=T("YYYY-MM-DD")}}" type="date">
+                        </div>
+                        <div><small>{{=T("YYYY-MM-DD")}}</small></div>
+                    </span>
+                    <span class="span1">
+                        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+                    </span>
+                </span>
+            </span>
+        </div>
+        <div class="modal-body">
+            <div class="alert" style="display:none;" id="log-error-{{=inc_vars['id']}}">
+                <strong>{{=T('Alert')}}!</strong> {{=T('All fields are mandatory, please check and try again.')}}
+            </div>
+            <textarea id="log-content-{{=inc_vars['id']}}" name="log-content" class="text">{{=inc_vars['content']}}</textarea>
+        </div>
+        <div class="modal-footer">
+          <button class="btn"
+                data-dismiss="modal"
+                aria-hidden="true">{{=T('Close')}}</button>
+          <input type="submit"
+          onclick="if ($('#log-content-{{=inc_vars['id']}}').val()&&
+              $('#log-date-{{=inc_vars['id']}}').val())
+              return true;
+                   else{
+                       $('#log-error-{{=inc_vars['id']}}').show();
+                       return false;
+                   }"
+              class="btn btn-primary"
+                 value="{{=T('Save Changes')}}"></input>
+        </div>
+    </form>
+</div>
+<!-- END->log-activity -->

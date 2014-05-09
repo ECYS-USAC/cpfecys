@@ -112,7 +112,7 @@ def index():
                          TD(B(u"Promedio de Reportes:")),TD(report_average)),
                       TR(TD(B(u"Total de Entregables:")),TD(items_total)))]
         table_assignation = TABLE(*rows, _border="0", _align="center", _width="100%")
-        assignations_html.append(SPAN(H3('Resumen de Asignación'),table_assignation,reports,items,
+        assignations_html.append(SPAN(H3('Resumen de Asignación'),table_assignation,reports,
                                 HR(),
                                 HR()))
     placeholder = DIV(H2(u'Asignaciones a Proyectos'),assignations_html)
@@ -123,7 +123,12 @@ def index():
             def header(self):
                 "hook to draw custom page header (logo and title)"
                 import os
-                logo=os.path.join(request.folder,'static/logo-usac.png')
+                import cpfecys
+                logo = cpfecys.get_custom_parameters().clearance_logo
+                if (logo is None) or (logo == ' ') or (logo == ''):
+                    logo=os.path.join(request.folder,'static/logo-usac.png')
+                else:
+                    logo = os.path.join(request.folder, 'uploads', logo)
                 self.image(logo,10,8,33)
                 self.set_font('Times','B',18)
                 self.cell(35) # padding
@@ -164,7 +169,7 @@ def index():
         pdf=MyFPDF()
         # create a page and serialize/render HTML objects
         pdf.add_page()
-        pdf.write_html(unicode(str(XML(SPAN(B(CENTER('Constancia de Entrega de Reportes y Cumplimiento ')),B(CENTER("de")),B(CENTER("Requisitos de Práctica Final")),DIV(placeholder)),
+        pdf.write_html(unicode(str(XML(SPAN(B(CENTER('Solvencia de Entrega de Reportes y Cumplimiento ')),B(CENTER("de")),B(CENTER("Requisitos de Práctica Final")),DIV(placeholder)),
                                        sanitize=False)), "utf-8"))
         #pdf.write_html(str(XML(CENTER(chart), sanitize=False)))
         # prepare PDF to download:

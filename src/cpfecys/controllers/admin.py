@@ -314,11 +314,13 @@ def assignations():
     q2 = (db.user_project.assigned_user == db.auth_user.id)
     q3 = (db.user_project.project == db.project.id)
     q4 = (db.user_project.period == db.period_year.id)
-    orderby = db.auth_user.last_name
-    orderby2 = db.auth_user.first_name
+    q5 = (db.project.area_level == db.area_level.id)
+    orderby =  db.area_level.name
+    orderby2 = db.project.name
     orderby3 = db.auth_user.username
-    data = db(q_selected_period_assignations&q2&q3&q4\
-        ).select(orderby=orderby|orderby2|orderby3)
+    orderby4 = db.auth_user.first_name
+    data = db(q_selected_period_assignations&q2&q3&q4&q5\
+        ).select(orderby=orderby|orderby2|orderby3|orderby4)
     current_period_name = T(cpfecys.second_period.name)
     if currentyear_period.period == cpfecys.first_period.id:
         current_period_name = T(cpfecys.first_period.name)
@@ -1070,7 +1072,8 @@ def report_filter():
     elif int(status) == -1:
         reports = db((db.report.created>start)&
             (db.report.created<end)&
-            (db.report.score>=db.report.min_score)&
+            ((db.report.admin_score>=db.report.min_score) |\
+             (db.report.score>=db.report.min_score))&
             (db.report.min_score!=None)&
             (db.report.min_score!=0)).select()
         status_instance = db(db.report_status.id==status).select().first()
@@ -1247,7 +1250,7 @@ def send_item_mail():
             + T('the reason is ') + comment \
             + T('please proceed to replace the item, if you don\'t take\
                 any action the item will remain disabled.')
-        mail.send(to='omarvides@gmail.com',
+        mail.send(to=user.email,
                   subject=subject,
                   message=message)
         item.update_record(
@@ -1324,6 +1327,106 @@ def assign_items():
     for row in rows:
         dct[row.item.name].append(row)
     return locals()
+
+@auth.requires_login()
+@auth.requires_membership('Super-Administrator')
+def teacher_assignation_upload():
+    import csv
+    error_users = []
+    warning_users = []
+    uv_off = request.vars['uv_off'] or False
+    success = False
+    if request.vars.csvfile != None:
+        try:
+            file = request.vars.csvfile.file
+        except AttributeError:
+            response.flash = T('Please upload a file.')
+            return dict(success = False,
+                file = False,
+                periods = periods)
+        try:
+            cr = csv.reader(file, delimiter=',', quotechar='"')
+            success = True
+            header = next(cr)
+            for row in cr:
+                ## parameters
+                rusername = row[1]
+                rproject = row[3]
+                rassignation_length = row[4]
+                rpro_bono = (row[5] == 'Si') or (row[5] == 'si')
+                rhours = row[6]
+                remail = row[7]
+                ## check if user exists
+                usr = db.auth_user(db.auth_user.username == rusername)
+                project = db.project(db.project.project_id == rproject)
+                import cpfecys
+                current_period = cpfecys.current_year_period()
+                if usr is None:
+                    ## find it on chamilo (db2)
+                    if not uv_off:
+                        usr = db2.user_user(db2.user_user.username == rusername)
+                        if usr is None:
+                            # report error and get on to next row
+                            row.append(T('Error: ') + T('User is not valid. \
+                                User doesn\'t exist in UV.'))
+                            error_users.append(row)
+                            continue
+                        else:
+                            # insert the new user
+                            usr = db.auth_user.insert(username = usr.username,
+                                                    password = usr.password,
+                                                    phone = usr.phone,
+                                                    last_name = usr.lastname,
+                                                    first_name = usr.firstname,
+                                                    email = usr.email)
+                            #add user to role 'student'
+                            auth.add_membership('Student', usr)
+                    else:
+                        #insert a new user with csv data
+                        usr = db.auth_user.insert(username = rusername,
+                                                  email = remail)
+                        #add user to role 'student'
+                        auth.add_membership('Student', usr)
+                else:
+                    assignation = db.user_project(
+                        (db.user_project.assigned_user == usr.id)&
+                        (db.user_project.project == project)&
+                        (db.user_project.assignation_status == None))
+                    if assignation != None:
+                        row.append(T('Error: ') + T('User \
+                         was already assigned, Please Manually Assign Him.'))
+                        error_users.append(row)
+                        #assignation.update_record(periods = \
+                            #rassignation_length, pro_bono = \
+                            #rpro_bono)
+                        continue
+                if project != None:
+                    db.user_project.insert(assigned_user = usr,
+                                            project = project,
+                                            period = current_period,
+                                            periods = rassignation_length,
+                                            pro_bono = rpro_bono,
+                                            hours = rhours)
+                else:
+                    # project_id is not valid
+                    row.append('Error: ' + T('Project code is not valid. \
+                     Check please.'))
+                    error_users.append(row)
+                    continue
+        except csv.Error:
+            response.flash = T('File doesn\'t seem properly encoded.')
+            return dict(success = False,
+                file = False,
+                periods = periods)
+        response.flash = T('Data uploaded')
+        return dict(success = success,
+                    errors = error_users,
+                    warnings = warning_users,
+                    periods = periods)
+    return dict(success = False,
+                file = False,
+                periods = periods)
+
 
 @auth.requires_login()
 @auth.requires_membership('Super-Administrator')

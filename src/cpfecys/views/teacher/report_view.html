@@ -324,11 +324,26 @@
         <a class="brand" href="#">
             {{=T('View Report:')}}
             <small>{{=report.report_restriction['name']}}</small>
+            <a class="btn pull-right" onclick="window.print();"><i class="icon-print"></i></a>
         </a>
       </div>
   </div>
 </div>
 <div style="border:solid #ddd 1px;">
+    <h1 style="text-align:center;">
+        {{=report.report_restriction['name']}}
+    </h1>
+    <div style="padding:3px;">
+        <strong>{{=T('Student')}}: </strong> {{=report.assignation.assigned_user.username}} -  {{=report.assignation.assigned_user.last_name}}, {{=report.assignation.assigned_user.first_name}}<br />
+        <strong>{{=T('Project')}}: </strong> {{=report.assignation.project.name}} <br />
+        <strong>{{=T('Project Leader')}}:</strong> {{if teacher:}}
+            {{=teacher.username}} - {{=teacher.first_name}} {{=teacher.last_name}}
+            {{else:}} {{=T('Unassigned')}} {{pass}}<br />
+        <strong>{{=T('Area')}}: </strong> {{=report.assignation.project.area_level.name}} <br />
+        <strong>{{=T('Period')}}: </strong> {{=T(report.assignation.period.period.name)}} - 
+           {{=report.assignation.period.yearp}} <br />
+    </div>
+    <hr />
     {{if not(report.heading is None):}}
     <!-- Display Helper -->
     {{inc_vars = dict(editable = False,
@@ -441,6 +456,26 @@
             <!-- //Display Helper -->
         </div>
         {{pass}}
+        <div class="row-fluid">
+            <div style="padding:15px;">
+                <h1>
+                    <span class="icon-time"></span>
+                    {{=T('Future Activities Log')}}
+                </h1>
+            </div>
+        </div>
+        <div class="row-fluid">
+            {{for log in report.log_future.select():}}
+            <!-- Display Helper -->
+            {{inc_vars = dict(editable = False,
+            date = log.entry_date,
+            edit_action = '',
+            delete_action = '',
+            content = MARKMIN(log.description, markmin_settings))}}
+            {{include 'include/display-report-log-future.html'}}
+            <!-- //Display Helper -->
+            {{pass}}
+        </div>
     </div>
     {{if not(report.footer is None):}}
     <!-- Display Helper -->

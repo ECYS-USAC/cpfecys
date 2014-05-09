@@ -113,6 +113,8 @@ auth.settings.extra_fields['auth_user']= [
                   Field('uv_token', 'string', length=64, notnull=False, \
                     writable=False, readable=False),
                   Field('data_updated', 'boolean', notnull=False, \
+                    writable=False, readable=False),
+                  Field('load_alerted', 'boolean', notnull=False, \
                     writable=False, readable=False),]
 
 crud, service, plugins = Crud(db), Service(), PluginManager()
@@ -375,6 +377,17 @@ db.define_table('log_type',
                 format='%(name)s'
                 )
 
+db.define_table('log_future',
+                Field('entry_date', 'date', notnull=True, \
+                    label = T('entry_date')),
+                Field('description', 'text', notnull=True, \
+                    label = T('description')),
+                Field('report', 'reference report', label = T('report')),
+                Field('period', 'reference period_year', \
+                    label = T('period')),
+                format='%(entry_date)s'
+                )
+
 db.define_table('log_entry',
                 Field('log_type', 'reference log_type', label = T('log_type')),
                 Field('entry_date', 'date', notnull=True, \
@@ -590,6 +603,8 @@ db.define_table('custom_parameters',
                     notnull=False, label = T('Coordinator Name')),
                 Field('coordinator_title', 'string', default='', \
                     notnull=False, label = T('Coordinator Title')),
+                Field('clearance_logo', 'upload', \
+                      label = T('Clearance Logo'))
                 )
 
 db.define_table('public_event',

@@ -1499,7 +1499,7 @@ ul li{
 }
 
 @media print {
-    #ja-headerwrap, #ja-mainnavwrap, .navbar, .btn-group {
+    #ja-headerwrap, #ja-mainnavwrap, .navbar, .btn-group,#ja-footerwrap {
         display:none;
     }
 .container, #main {

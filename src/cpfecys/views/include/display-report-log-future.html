@@ -1,0 +1,26 @@
+<div class="row-fluid container">
+    <div class="well">
+        <div class="row-fluid">
+            <strong>{{=T('Date')}}:</strong> {{=inc_vars['date']}}
+            {{if inc_vars['editable']:}}
+            <div class="pull-right">
+                <div class="btn-group">
+                    <a href="#{{=inc_vars['edit_action']}}"
+                       data-toggle="modal"
+                       class="btn">
+                        <span class="icon-edit"></span>
+                    </a>
+                    <a href="#{{=inc_vars['delete_action']}}"
+                       data-toggle="modal"
+                       class="btn btn-danger">
+                        <span class="icon-remove icon-white"></span>
+                    </a>
+                </div>
+            </div>
+            {{pass}}
+        </div>
+        <div class="row-fluid">
+            {{=inc_vars['content']}}
+        </div>
+    </div>
+</div>

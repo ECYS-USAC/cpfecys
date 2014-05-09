@@ -195,6 +195,26 @@ def auto_daily():
                                  status = status_acceptance,
                                  never_delivered = True,
                                  teacher_comment =  T('The period of time to create the report finished and it was never completed; so automatically it is considered as failed.'))
+    ## This makes all 'Draft' reports that have no delivered anything to be set to failed!
+    drafties = db((db.report.status == db.report_status(name = 'Draft'))&
+               (db.report_restriction.end_date < current_date)&
+               (db.report.report_restriction == db.report_restriction.id)&
+               (db.report.heading == None)&
+               (db.report.footer == None)&
+               (db.report.desertion_started == None)&
+               (db.report.desertion_gone == None)&
+               (db.report.desertion_continued == None)&
+               (db.report.hours == None)).select()
+    total_drafties_empty = len(drafties)
+    for d in drafties:
+        d.report.score = 0
+        d.report.status = db.report_status(name = 'Acceptance')
+        d.report.teacher_comment =  T('The period of time to create the report finished and it was never completed; so automatically it is considered as failed.')
+        d.report.never_delivered = True
+        d.report.min_score = cpfecys.get_custom_parameters().min_score
+        d.update_record()
+##
+
     ## This makes all 'Draft' reports that expired get to 'Grading'
     drafties = db((db.report.status == db.report_status(name = 'Draft'))&
                (db.report_restriction.end_date < current_date)&
@@ -275,7 +295,7 @@ def auto_daily():
     return T('Total Updated Reports: ') + str(total_recheckies + total_drafties + missed_reports) + ' ' + \
             T('Automatically Updated Draft Reports: ') + str(total_drafties) + ' ' + \
             T('Automatically Updated Recheck Reports: ') + str(total_recheckies) + ' ' + \
-            T('Reports Never Delivered: ') + str(missed_reports)
+            T('Reports Never Delivered: ') + str(missed_reports + total_drafties_empty)
 
 from gluon.scheduler import Scheduler
 scheduler = Scheduler(db3, dict(auto_daily = auto_daily), heartbeat = 60)
