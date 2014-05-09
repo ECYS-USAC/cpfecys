@@ -504,6 +504,7 @@ def report():
                 user = report.assignation.assigned_user
                 subject = T('[DTT]Automatic Notification - Report graded ') \
                 +T('BY ADMIN USER')
+                signat = cpfecys.get_custom_parameters().email_signature
                 message = '<html>' + T('The report') + ' ' \
                 + '<b>' + XML(report.report_restriction.name) + '</b><br/>' \
                 + T('sent by student: ') + XML(user.username) + ' ' \
@@ -519,7 +520,7 @@ def report():
                 + T('Current status is: ') \
                 + XML(T(report.status.name)) +'<br/>' \
                 + T('DTT-ECYS') \
-                + ' ' + cpfecys.get_domain() + '</html>'
+                + ' ' + cpfecys.get_domain() + '<br />' + signat + '</html>'
                 mail.send(to=user.email,
                   subject=subject,
                   message=message)
@@ -790,6 +791,8 @@ def send_mail_to_users(users, message, roles, projects, subject, log=False):
     for user in users:
         print user.email
         if user.email != None and user.email != '':
+            import cpfecys
+            message += (cpfecys.get_custom_parameters().email_signature or '')
             mail.send(to=user.email,
               subject=T(subject),
               message=message)
@@ -1250,7 +1253,9 @@ def send_item_mail():
             + T('the reason is ') + comment \
             + T('please proceed to replace the item, if you don\'t take\
                 any action the item will remain disabled.')
-        mail.send(to=user.email,
+        import cpfecys
+        message += (cpfecys.get_custom_parameters().email_signature or '')
+        mail.send(to=user.mail,
                   subject=subject,
                   message=message)
         item.update_record(

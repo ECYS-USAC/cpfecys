@@ -403,6 +403,7 @@
 'Email and SMS': 'Correo electrónico y SMS',
 'Email sent': 'Email enviado',
 'Enable': 'Habilitar',
+'Email Signature': 'Email Signature',
 'Enabled': 'Hablitado',
 'Enabled Date': 'Fecha de Activación',
 'EnabledForTeacher': 'Recalificar maestro',

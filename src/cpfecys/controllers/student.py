@@ -941,6 +941,7 @@ def report():
             session.flash = T('Selected report can\'t be edited. Select a valid report.')
             redirect(URL('student','index'))
         ## Validate assignation
+        import cpfecys
         if cpfecys.assignation_is_locked(report.assignation):
             session.flash = T('Selected report can\'t be edited. Select a valid report.')
             redirect(URL('student','index'))
@@ -1045,6 +1046,7 @@ def report():
             session.flash = T('Selected report can\'t be accepted, it lacks mandatory blocks.')
             redirect(URL('student','index'))
         # Validate DB report_restriction to obey TIMING rules
+        import cpfecys
         valid_rep_restr = cpfecys.student_validation_report_restrictions(report.report_restriction.id)
         ## Validate that the report status is editable (it is either 'Draft' or 'Recheck')
         if not(cpfecys.student_validation_report_status(report)):
@@ -1075,6 +1077,8 @@ def report():
                       status = db.report_status(name = 'Grading'))
         session.flash = T('Report sent to Grading.')
         # Notification Message
+        import cpfecys
+        signature = (cpfecys.get_custom_parameters().email_signature or '')
         me_the_user = db.auth_user(db.auth_user.id == auth.user.id)
         message = '<html>' + T('The report') + ' ' \
         + '<b>' + XML(report.report_restriction['name']) + '</b><br/>' \
@@ -1082,7 +1086,7 @@ def report():
         + XML(me_the_user.first_name) + ' ' + XML(me_the_user.last_name) \
         + '<br/>' \
         + T('was sent to be checked.') + '<br/>' + T('Checking can be done in:') \
-        + ' ' + cpfecys.get_domain() + '</html>'
+        + ' ' + cpfecys.get_domain() + '<br />' + signature + '</html>'
         # send mail to teacher and student notifying change.
         mails = []
         # retrieve teacher's email
@@ -1110,6 +1114,7 @@ def report():
         report = db.report(db.report.id == report)
         valid = not(report is None)
         ## Validate assignation
+        import cpfecys
         if valid: valid = not cpfecys.assignation_is_locked(report.assignation)
         # Validate that the report belongs to user
         if valid: valid = cpfecys.student_validation_report_owner(report.id)

@@ -220,6 +220,8 @@ def auto_daily():
                (db.report_restriction.end_date < current_date)&
                (db.report.report_restriction == db.report_restriction.id)).select()
     total_drafties = len(drafties)
+    import cpfecys
+    signature = (cpfecys.get_custom_parameters().email_signature or '')
     for d in drafties:
         d.report.status = db.report_status(name = 'Grading')
         d.report.min_score = cpfecys.get_custom_parameters().min_score
@@ -233,7 +235,7 @@ def auto_daily():
         + XML(me_the_user.first_name) + ' ' + XML(me_the_user.last_name) \
         + '<br/>' \
         + T('was sent to be checked.') + '<br/>' + T('Checking can be done in:') \
-        + ' http://omnomyumi.com/dtt/' + '</html>'
+        + ' http://omnomyumi.com/dtt/' + '<br />' + signature + '</html>'
         # send mail to teacher and student notifying change.
         mails = []
         # retrieve teacher's email
@@ -259,6 +261,8 @@ def auto_daily():
                     (db.report.status == db.report_status(name='Recheck'))&
                     (db.report.score_date <= (current_date - datetime.timedelta(days = cpfecys.get_custom_parameters().rescore_max_days)))).select()
     total_recheckies = len(recheckies)
+    import cpfecys
+    signature = cpfecys.get_custom_parameters().email_signature
     for rech in recheckies:
         rech.report.status = db.report_status(name = 'Grading')
         rech.update_record()
@@ -270,7 +274,7 @@ def auto_daily():
         + XML(me_the_user.first_name) + ' ' + XML(me_the_user.last_name) \
         + '<br/>' \
         + T('was sent to be checked.') + '<br/>' + T('Checking can be done in:') \
-        + ' http://omnomyumi.com/dtt/' + '</html>'
+        + ' http://omnomyumi.com/dtt/' + '<br />' + signature + '</html>'
         # send mail to teacher and student notifying change.
         mails = []
         # retrieve teacher's email
