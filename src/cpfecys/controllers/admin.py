@@ -331,6 +331,26 @@ def assignations():
     periods_after = db(db.period_year \
         ).select(limitby=(currentyear_period.id, end_index))
     other_periods = db(db.period_year).select()
+
+    if request.args(0) == 'toggle':
+        enabled = ''
+        user = request.vars['user']
+        user = db(db.auth_user.id==user).select().first()
+        if user == None:
+            session.flash = T("No existing user")
+            redirect(URL('admin','active_teachers'))
+        if user.registration_key != 'blocked':
+            enabled = 'blocked'
+        user.update_record(
+                registration_key=enabled)
+        redirect(URL('admin', 'assignations', \
+            vars=dict(data = data,
+                currentyear_period = currentyear_period,
+                current_period_name = current_period_name,
+                periods_before = periods_before,
+                periods_after = periods_after,
+                other_periods = other_periods)))
+        
     return dict(data = data,
                 currentyear_period = currentyear_period,
                 current_period_name = current_period_name,
@@ -598,6 +618,18 @@ def courses_report():
 @auth.requires_login()
 @auth.requires_membership('Super-Administrator')
 def active_teachers():
+    if (request.args(0) == 'toggle'):
+        enabled = ''
+        user = request.vars['user']
+        user = db(db.auth_user.id==user).select().first()
+        if user == None:
+            session.flash = T("No existing user")
+            redirect(URL('admin','active_teachers'))
+        if user.registration_key != 'blocked':
+            enabled = 'blocked'
+        user.update_record(
+                registration_key=enabled)
+
     period = cpfecys.current_year_period()
     if request.vars['period'] != None:
             period = request.vars['period']
@@ -606,10 +638,14 @@ def active_teachers():
                 session.flash = T('Invalid Action.')
                 redirect(URL('default', 'index'))
     assignations = get_assignations(False, period, 'Teacher' \
-                ).select(db.user_project.ALL, 
-                orderby=~db.user_project.project)
+                ).select(db.user_project.ALL,
+                orderby=db.area_level.name|\
+                db.user_project.project|\
+                db.auth_user.last_name|\
+                db.auth_user.first_name)
     periods = db(db.period_year).select()
-    return dict(periods=periods, assignations=assignations)
+    return dict(periods=periods, assignations=assignations,
+        actual_period=period)
 
 @auth.requires_login()
 @auth.requires_membership('Super-Administrator')
@@ -620,6 +656,8 @@ def get_assignations(project, period, role):
                     (db.auth_membership.group_id==db.auth_group.id)&
                     (db.auth_group.role==role)&
                     (project==False or (db.user_project.project==project))&
+                    (db.project.area_level==db.area_level.id)&
+                    (db.user_project.project==db.project.id)&
                     (db.user_project.period == db.period_year.id)&
                     ((db.user_project.period <= period.id)&
                  ((db.user_project.period + db.user_project.periods) > \
@@ -1219,6 +1257,8 @@ def send_item_mail():
 @auth.requires_login()
 @auth.requires_membership('Super-Administrator')
 def items_grid():
+    import datetime
+    cdate = datetime.datetime.now().date()
     period = request.vars['period']
     area = request.vars['area']
     context_string = T('All')
@@ -1239,11 +1279,20 @@ def items_grid():
             (db.auth_membership.group_id==db.auth_group.id)&
             (db.auth_group.role!='Teacher')).select(db.user_project.ALL)
     items = db((db.item.assignation.belongs(assignations))&
-        ((period=='' or period==None) or (db.item.created==period))).select()
+        ((period=='' or period==None) or (db.item.created==period))
+        ).select(orderby=db.item.item_restriction.name)
+    if request.args(0) == 'zip':
+        files = []
+        for item in items:
+            files.append(item.uploaded_file)
+        if len(files) > 0:
+            return response.zip(request, files, db)
+        response.flash = T('No files to download.')
     return dict(items=items,
         area=area,
         period=period,
-        context_string=context_string)
+        context_string=context_string,
+        cdate=str(cdate))
 
 @auth.requires_login()
 @auth.requires_membership('Super-Administrator')

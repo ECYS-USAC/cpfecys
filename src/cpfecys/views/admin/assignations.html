@@ -75,6 +75,7 @@
           <table class="table table-bordered table-hover table-striped">
               <thead>
                   <tr>
+                      <th>{{=T('Status')}}/{{=T('Actions')}}</th>
                       <th>{{=T('Last Name')}}</th>
                       <th>{{=T('First Name')}}</th>
                       <th>{{=T('Carnet')}}</th>
@@ -94,6 +95,27 @@
                   {{idd = 1}}
                   {{for row in data:}}
                   <tr>
+                      <td>
+                      {{if row.auth_user.registration_key != 'blocked':}}
+                        <span class="badge badge-success">
+                        {{=T('Enabled')}}
+                        </span>
+                        <a href="
+                          {{=URL('admin', 'assignations/toggle', \
+                          vars=dict(user=row.auth_user.id, \
+                          year_period=currentyear_period.id))}}" 
+                          class="btn btn-info">{{=T('Disable')}}</a>
+                      {{else:}}
+                        <span class="badge badge-important">
+                            {{=T('Disabled')}}
+                        </span>
+                        <a href="
+                            {{=URL('admin', 'assignations/toggle', \
+                            vars=dict(user=row.auth_user.id, \
+                            year_period=currentyear_period.id))}}" 
+                            class="btn btn-important">{{=T('Enable')}}</a>
+                      {{pass}}
+                      </td>
                       <td>{{=row.auth_user.last_name}}</td>
                       <td>{{=row.auth_user.first_name}}</td>
                       <td>{{=row.auth_user.username}}</td>
