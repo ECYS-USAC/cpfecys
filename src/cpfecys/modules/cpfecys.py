@@ -388,7 +388,7 @@ def _report_status_setup():
         order_number=3)
     db.report_status.insert(name="Acceptance", description="This report has \
         been already graded", icon="icon-edit", \
-        order_number=0)
+        order_number=5)
     db.report_status.insert(name="EnabledForTeacher", description="This report \
         has been reactivated for teacher to grade", icon="icon-repeat", \
         order_number=4)

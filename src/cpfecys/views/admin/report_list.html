@@ -7,9 +7,9 @@
             <tr>
                 <th colspan="2">{{=T('Period')}}</th>
                 <th>{{=T('Pending')}}</th>
-                <th colspan="2">{{=T('Finished')}}</th>
-                <th>{{=T('Sum graded')}}</th>
                 <th colspan="4">{{=T('Action Pending')}}</th>
+                <th colspan="3">{{=T('Finished')}}</th>
+                <th>{{=T('No delivered')}}</th>
                 <th>{{=T('All')}}</th>
             </tr>
 			<tr>
@@ -29,6 +29,15 @@
 					</span>
 					<i class="icon-warning-sign"></i> 
 				</th>
+				{{for status in report_total:}}
+				<th>
+					<span class="tooltiped" data-content="{{=T(status.report_status.description)}}" 
+					title="{{=T(status.report_status.name)}}" >
+						{{=T(status.report_status.name)}}
+					</span>
+					<i class="{{=status.report_status.icon or 'icon-star'}}"></i> 
+				</th>
+				{{pass}}
 				<th>
 					<span>
 						{{=T('Approved')}}
@@ -41,15 +50,11 @@
 					</span>
 					<i class="icon-remove"></i> 
 				</th>
-				{{for status in report_total:}}
 				<th>
-					<span class="tooltiped" data-content="{{=T(status.report_status.description)}}" 
-					title="{{=T(status.report_status.name)}}" >
-						{{=T(status.report_status.name)}}
+					<span>
+						{{=T('No delivered')}}
 					</span>
-					<i class="{{=status.report_status.icon or 'icon-star'}}"></i> 
 				</th>
-				{{pass}}
 				<th>
 					<span>
 						{{=T('All')}}
@@ -70,22 +75,6 @@
 																		 status=-3))}}"> 
 						<span class="badge badge-info">{{=count_no_created(pyear)}}</span>
 						{{=T('Pending')}}
-					</td>
-					<td>
-						<a href="{{=URL('admin', 'report_filter', vars=dict(period=pyear.id, \
-																		 status=-1))}}"> 
-						 	<span class="badge badge-info">{{=count_approved(pyear)}}</span>
-						 	<span>{{=T('Approved')}} </span>
-
-						</a>
-					</td>
-                    <td>
-						<a href="{{=URL('admin', 'report_filter', vars=dict(period=pyear.id, \
-																		 status=-2))}}"> 
-						 	<span class="badge badge-info">{{=count_reproved(pyear)}}</span>
-						 	<span>{{=T('Failed')}} </span>
-
-						</a>
 					</td>
 					{{count = 0}}
 					{{for status in count_reports(pyear, False, 'Acceptance'):}}
@@ -114,6 +103,29 @@
 						{{count = count + status['COUNT(report.id)']}}
 					{{pass}}
 					{{pass}}
+					<td>
+						<a href="{{=URL('admin', 'report_filter', vars=dict(period=pyear.id, \
+																		 status=-1))}}"> 
+						 	<span class="badge badge-success">{{=count_approved(pyear)}}</span>
+						 	<span>{{=T('Approved')}} </span>
+
+						</a>
+					</td>
+                    <td>
+						<a href="{{=URL('admin', 'report_filter', vars=dict(period=pyear.id, \
+																		 status=-2))}}"> 
+						 	<span class="badge badge-important">{{=count_reproved(pyear)}}</span>
+						 	<span>{{=T('Failed')}} </span>
+
+						</a>
+					</td>
+					<td>
+						{{no_delivered = count_no_delivered(pyear)}}
+						<span class="badge badge-important">{{=no_delivered}}</span>
+					 	<span>{{=T('No delivered')}} </span>
+					 	{{count = count + no_delivered}}
+						
+					</td>
 					<td>
 						<a href="{{=URL('admin', 'report_filter', vars=dict(period=pyear.id))}}"> 
 						 	<span class="badge badge-info">{{=count}}</span><span>{{=T('All')}}</span>

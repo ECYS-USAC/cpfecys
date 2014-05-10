@@ -3,7 +3,7 @@
     <div class="well span12">
     <h1>{{=T(actual_period.period.name)}} - {{=actual_period.yearp}}</h1>
         <a onclick="window.history.back()" class="btn" ><i class="icon-arrow-left"></i>{{=T('Back')}}</a>
-    <table class="table-striped table-bordered" style="align:0 auto;">
+    <table class="table-striped table-hover table-bordered" style="align:0 auto;">
     <tr>
       <td>
       <form class="form-inline" 
@@ -24,6 +24,7 @@
     <table class="table table-striped table-bordered">
     <thead>
         <tr>
+            <td>{{=T('Actions')}}</td>
             <td>{{=T('Name')}}</td>
             <td>{{=T('Email')}}</td>
             <td>{{=T('Phone')}}</td>
@@ -31,12 +32,26 @@
             <td>{{=T('User code')}}</td>
             <td>{{=T('Project')}}</td>
             <td>{{=T('Area')}}</td>
-            <td>{{=T('Actions')}}</td>
         </tr>
     </thead>
     {{for assignation in assignations:}}
     <tbody>
         <tr>
+            <td>
+            {{if assignation.assigned_user.registration_key != 'blocked':}}
+                <a href="
+                    {{=URL('admin', 'active_teachers/toggle', \
+                    vars=dict(user=assignation.assigned_user.id, \
+                    period=actual_period.id))}}" 
+                class="btn btn-info">{{=T('Disable')}}</a>
+            {{else:}}
+                <a href="
+                    {{=URL('admin', 'active_teachers/toggle', \
+                    vars=dict(user=assignation.assigned_user.id, \
+                    period=actual_period.id))}}" 
+                class="btn btn-important">Enable</a>
+            {{pass}}
+            </td>
             <td>
                 {{=assignation.assigned_user.first_name}} 
                 {{=assignation.assigned_user.last_name}} 
@@ -66,21 +81,6 @@
             </td>
             <td>
                 {{=assignation.project.area_level.name}} 
-            </td>
-            <td>
-            {{if assignation.assigned_user.registration_key != 'blocked':}}
-                <a href="
-                    {{=URL('admin', 'active_teachers/toggle', \
-                    vars=dict(user=assignation.assigned_user.id, \
-                    period=actual_period.id))}}" 
-                class="btn btn-info">Disable</a>
-            {{else:}}
-                <a href="
-                    {{=URL('admin', 'active_teachers/toggle', \
-                    vars=dict(user=assignation.assigned_user.id, \
-                    period=actual_period.id))}}" 
-                class="btn btn-important">Enable</a>
-            {{pass}}
             </td>
         </tr>
     </tbody>

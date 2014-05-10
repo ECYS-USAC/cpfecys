@@ -978,6 +978,21 @@ def report_list():
                             total += 1
         return total
 
+    def count_no_delivered(pyear):
+        from datetime import datetime
+        year = str(pyear.yearp)
+        if pyear.period == 1:
+            start = datetime.strptime(year + '-01-01', "%Y-%m-%d")
+            end = datetime.strptime(year + '-07-01', "%Y-%m-%d")
+        else:
+            start = datetime.strptime(year + '-07-01', "%Y-%m-%d")
+            end = datetime.strptime(year + '-12-31', "%Y-%m-%d")
+        reports = db((db.report.created<end)&
+            (db.report.created>start)&
+            (db.report.never_delivered == True)&
+            (db.report.min_score!=None)&
+            (db.report.min_score!=0))
+        return reports.count()
     def count_reports(pyear, status, exclude):
         from datetime import datetime
         year = str(pyear.yearp)
@@ -1010,7 +1025,8 @@ def report_list():
         count_approved=count_approved,
         count_no_created=count_no_created,
         count_reports=count_reports,
-        count_draft=count_draft)
+        count_draft=count_draft,
+        count_no_delivered=count_no_delivered)
                 
 
 @auth.requires_login()
@@ -1355,12 +1371,14 @@ def teacher_assignation_upload():
             header = next(cr)
             for row in cr:
                 ## parameters
-                rusername = row[1]
-                rproject = row[3]
-                rassignation_length = row[4]
-                rpro_bono = (row[5] == 'Si') or (row[5] == 'si')
-                rhours = row[6]
-                remail = row[7]
+                rusername = row[2] or ''
+                rproject = row[0]
+                rassignation_length = row[7]
+                rpro_bono = (row[8] == 'Si') or (row[8] == 'si')
+                rhours = row[9]
+                remail = row[5]
+                rlast_name = row[3]
+                rfirst_name = row[4]
                 ## check if user exists
                 usr = db.auth_user(db.auth_user.username == rusername)
                 project = db.project(db.project.project_id == rproject)
@@ -1384,14 +1402,16 @@ def teacher_assignation_upload():
                                                     last_name = usr.lastname,
                                                     first_name = usr.firstname,
                                                     email = usr.email)
-                            #add user to role 'student'
-                            auth.add_membership('Student', usr)
+                            #add user to role 'Teacher'
+                            auth.add_membership('Teacher', usr)
                     else:
                         #insert a new user with csv data
                         usr = db.auth_user.insert(username = rusername,
-                                                  email = remail)
-                        #add user to role 'student'
-                        auth.add_membership('Student', usr)
+                                                  email = remail,
+                                                  first_name=rfirst_name,
+                                                  last_name=rlast_name)
+                        #add user to role 'Teacher'
+                        auth.add_membership('Teacher', usr)
                 else:
                     assignation = db.user_project(
                         (db.user_project.assigned_user == usr.id)&
