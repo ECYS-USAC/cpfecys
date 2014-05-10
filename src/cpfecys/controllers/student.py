@@ -1101,11 +1101,16 @@ def report():
         # retrieve student's email
         student_mail = me_the_user.email
         mails.append(student_mail)
-        mail.send(to=mails,
+        was_sent = mail.send(to=mails,
                   subject=T('[DTT]Automatic Notification - Report ready to be checked.'),
                   # If reply_to is omitted, then mail.settings.sender is used
                   reply_to = student_mail,
                   message=message)
+        #MAILER LOG
+        db.mailer_log.insert(sent_message = message,
+                             destination = ','.join(mails),
+                             result_log = str(mail.error or '') + ':' + str(mail.result),
+                             success = was_sent)
         redirect(URL('student','index'))
     elif (request.args(0) == 'view'):
         #Get the report id

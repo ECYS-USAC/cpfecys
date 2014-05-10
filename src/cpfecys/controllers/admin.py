@@ -521,9 +521,14 @@ def report():
                 + XML(T(report.status.name)) +'<br/>' \
                 + T('DTT-ECYS') \
                 + ' ' + cpfecys.get_domain() + '<br />' + signat + '</html>'
-                mail.send(to=user.email,
+                was_sent = mail.send(to=user.email,
                   subject=subject,
                   message=message)
+                #MAILER LOG
+                db.mailer_log.insert(sent_message = message,
+                             destination = str(user.email),
+                             result_log = str(mail.error or '') + ':' + str(mail.result),
+                             success = was_sent)
                 session.flash = T('The report has been scored \
                     successfully')
                 redirect(URL('admin', 'report/view', \
@@ -793,9 +798,14 @@ def send_mail_to_users(users, message, roles, projects, subject, log=False):
         if user.email != None and user.email != '':
             import cpfecys
             message += (cpfecys.get_custom_parameters().email_signature or '')
-            mail.send(to=user.email,
+            was_sent = mail.send(to=user.email,
               subject=T(subject),
               message=message)
+            #MAILER LOG
+            db.mailer_log.insert(sent_message = message,
+                             destination = str(user.email),
+                             result_log = str(mail.error or '') + ':' + str(mail.result),
+                             success = was_sent)
 
 @auth.requires_login()
 @auth.requires_membership('Super-Administrator')
@@ -1271,9 +1281,14 @@ def send_item_mail():
                 any action the item will remain disabled.')
         import cpfecys
         message += (cpfecys.get_custom_parameters().email_signature or '')
-        mail.send(to=user.email,
+        was_sent = mail.send(to=user.email,
                   subject=subject,
                   message=message)
+        #MAILER LOG
+        db.mailer_log.insert(sent_message = message,
+                             destination = str(user.email),
+                             result_log = str(mail.error or '') + ':' + str(mail.result),
+                             success = was_sent)
         item.update_record(
             notified_mail = True)
         success = True

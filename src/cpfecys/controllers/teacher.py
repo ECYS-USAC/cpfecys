@@ -208,11 +208,16 @@ def report():
                         # retrieve student's email
                         student_mail = row.assigned_user['email']
                         mails.append(student_mail)
-                        mail.send(to=mails,
+                        was_sent = mail.send(to=mails,
                                   subject=T('[DTT]Automatic Notification - Report needs improvement.'),
                                   # If reply_to is omitted, then mail.settings.sender is used
                                   reply_to = teacher,
                                   message=message)
+                        #MAILER LOG
+                        db.mailer_log.insert(sent_message = message,
+                             destination = ','.join(mails),
+                             result_log = str(mail.error or '') + ':' + str(mail.result),
+                             success = was_sent)
                         redirect(URL('teacher', 'report/view', \
                             vars=dict(report=report.id)))
                 else:
@@ -254,11 +259,16 @@ def report():
                         # retrieve student's email
                         student_mail = row.assigned_user['email']
                         mails.append(student_mail)
-                        mail.send(to=mails,
+                        was_sent = mail.send(to=mails,
                                   subject=T('[DTT]Automatic Notification - Report Done.'),
                                   # If reply_to is omitted, then mail.settings.sender is used
                                   reply_to = teacher,
                                   message=message)
+                        #MAILER LOG
+                        db.mailer_log.insert(sent_message = message,
+                             destination = ','.join(mails),
+                             result_log = str(mail.error or '') + ':' + str(mail.result),
+                             success = was_sent)
                         redirect(URL('teacher', 'report/view', \
                             vars=dict(report=report.id)))
 
