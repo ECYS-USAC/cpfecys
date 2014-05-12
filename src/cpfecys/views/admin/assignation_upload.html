@@ -1,6 +1,7 @@
 {{extend 'template.html'}}
 <a href="{{=URL('assignation')}}" class="btn" ><i class="icon-arrow-left"></i> {{=T('Back to Assignation')}}</a>
-<h2>{{=T('Bulk Final Practice Assignation')}}</h2>
+<h2>{{=T('Bulk Final Practice Assignation')}} </h2>
+<h3>{{=T(current_period.period.name)}} - {{=current_period.yearp}}</h3>
 <p>
     {{=T('Any previously non-created project needs to be created first. You can check and update the available projects clicking here.')}}
 </p>
