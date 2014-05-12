@@ -234,7 +234,7 @@ def _roles_setup():
     db = _db
     auth = _auth
     ## User Roles Setup:
-    supersu = db.auth_user.insert(email = 'admin@admin.com', first_name = 'Super',
+    supersu = db.auth_user.insert(email = 'dtt.ecys@gmail.com', first_name = 'Super',
                                          last_name = 'Administrator', username = 'admin',
                                          password = db.auth_user.password.validate('superadmin')[0])
     superadmins = auth.add_group(role = 'Super-Administrator',description = 'In charge of the whole system administration.')
