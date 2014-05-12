@@ -99,17 +99,17 @@ auth = Auth(db)
 # as describede here: http://goo.gl/NBG5JM
 auth.settings.extra_fields['auth_user']= [
                   Field('phone', 'string', length=16, notnull=False, \
-                    label="Phone"),
+                    label=T("Phone")),
                   Field('working', 'boolean', notnull=False, \
-                    label="Working"),
+                    label=T("is Working")),
                   Field('company_name', 'string', length=200, notnull=False, \
-                    label="Company name"),
+                    label=T("Company name")),
                   Field('work_address', 'string',length=500, notnull=False, \
-                    label="Work address"),
+                    label=T("Work address")),
                   Field('work_phone', 'string',length=500, notnull=False, \
-                    label="Work phone"),
+                    label=T("Work phone")),
                   Field('home_address', 'string',length=500, notnull=False, \
-                    label="Home address"),
+                    label=T("Home address")),
                   Field('uv_token', 'string', length=64, notnull=False, \
                     writable=False, readable=False),
                   Field('data_updated', 'boolean', notnull=False, \

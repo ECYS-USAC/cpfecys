@@ -797,7 +797,7 @@ def send_mail_to_users(users, message, roles, projects, subject, log=False):
         print user.email
         if user.email != None and user.email != '':
             import cpfecys
-            message += '<html>' + (cpfecys.get_custom_parameters().email_signature or '') + '</html>'
+            message = '<html>' + message + (cpfecys.get_custom_parameters().email_signature or '') + '</html>'
             was_sent = mail.send(to=user.email,
               subject=T(subject),
               message=message)
