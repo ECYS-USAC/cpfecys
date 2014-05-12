@@ -536,14 +536,14 @@ db.define_table('item_restriction_area',
                     label = T('is_enabled')),
                 )
 
-db.define_table('item_restriction_exception', 
+db.define_table('item_restriction_exception',
                 Field('project', 'reference project', \
                     label = T('project')),
                 Field('item_restriction', 'reference item_restriction', \
                     label = T('item_restriction')),
                 )
 
-db.define_table('mail_log', 
+db.define_table('mail_log',
                 Field('sent_message', 'text', notnull=False, \
                     label = T('sent_message')),
                 Field('roles', 'text', notnull=False, \
