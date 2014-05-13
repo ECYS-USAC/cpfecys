@@ -907,6 +907,7 @@ def report():
         assignation = request.vars['assignation']
         report_restriction = request.vars['report_restriction']
         # Validate DB report_restriction to obey TIMING rules
+        import cpfecys
         valid_rep_restr = cpfecys.student_validation_report_restrictions(report_restriction)
         # Validate report_restriction
         report_restrict = db.report_restriction(db.report_restriction.id == report_restriction)
