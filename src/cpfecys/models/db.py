@@ -98,18 +98,18 @@ auth = Auth(db)
 # NOTE: length=255 is needed because a bug in mysql
 # as describede here: http://goo.gl/NBG5JM
 auth.settings.extra_fields['auth_user']= [
-                  Field('phone', 'string', length=16, notnull=False, \
+                  Field('phone', 'string', length=16, notnull=True, \
                     label=T("Phone")),
+                  Field('home_address', 'string',length=500, notnull=True, \
+                    label=T("Home address")),
                   Field('working', 'boolean', notnull=False, \
-                    label=T("is Working")),
+                    label=T("is Working"), writable=False, readable=False),
                   Field('company_name', 'string', length=200, notnull=False, \
                     label=T("Company name")),
                   Field('work_address', 'string',length=500, notnull=False, \
                     label=T("Work address")),
                   Field('work_phone', 'string',length=500, notnull=False, \
                     label=T("Work phone")),
-                  Field('home_address', 'string',length=500, notnull=False, \
-                    label=T("Home address")),
                   Field('uv_token', 'string', length=64, notnull=False, \
                     writable=False, readable=False),
                   Field('data_updated', 'boolean', notnull=False, \

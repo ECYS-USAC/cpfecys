@@ -426,6 +426,7 @@
 'enter an integer between %(min)g and %(max)g': 'Ingrese un entero entre %(min)g y %(max)g',
 'enter an integer greater than or equal to %(min)g': 'ingrese un entero mayor o igual a %(min)g',
 'Enter an integer greater than or equal to %(min)g': 'Ingrese un entero mas grande que o igual a %(min)g',
+'Enter date and time as %(format)s': 'Enter date and time as %(format)s',
 'enter from %(min)g to %(max)g characters': 'ingrese de %(min)g a %(max)g caracteres',
 'Enter from %(min)g to %(max)g characters': 'Ingresa desde %(min)g hasta %(max)g caracteres',
 'Entrega de pañales': 'Entrega de pañales',
