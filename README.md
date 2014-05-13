@@ -13,3 +13,4 @@ Omar Vides (omarvides@gmail.com)
 ## License
 
 LGPLv3
+See LICENSE
