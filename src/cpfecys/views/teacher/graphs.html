@@ -51,9 +51,12 @@
               {{=T('Course Progress')}}
           </h2>
           <!-- I need All reports that belong to this semester and course. Arrange them by owner. Display them -->
-          {{categories = set()}}
+          {{categories = []}}
           {{for item in current_reports:}}
-          {{categories.add(item.report.report_restriction)}}
+          {{itm = item.report.report_restriction}}
+          {{if not itm in categories:}}
+          {{categories.append(itm)}}
+          {{pass}}
           {{pass}}
           <div id="course-progress">
               <script type="text/javascript" src="{{=URL('static','js')}}/highcharts/js/highcharts.js">
@@ -72,9 +75,12 @@
               values_title = T('Students')) }}
               {{include 'include/display-line-chart.html'}}
               <!-- -->
-              {{categories = set()}}
+              {{categories = []}}
               {{for item in report_activities:}}
-              {{categories.add(str(item.log_metrics.metrics_type.name) + ":" + str(item.log_metrics.created))}}
+              {{itm = str(item.log_metrics.metrics_type.name) + ":" + str(item.log_metrics.created) }}
+              {{if not itm in categories:}}
+              {{categories.append(itm)}}
+              {{pass}}
               {{pass}}
               <!-- -->
                {{inc_vars = dict(id = 'chart02',
