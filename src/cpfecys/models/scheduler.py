@@ -212,7 +212,7 @@ def auto_daily():
         d.report.teacher_comment =  T('The period of time to create the report finished and it was never completed; so automatically it is considered as failed.')
         d.report.never_delivered = True
         d.report.min_score = cpfecys.get_custom_parameters().min_score
-        d.update_record()
+        d.report.update_record()
 ##
 
     ## This makes all 'Draft' reports that expired get to 'Grading'
@@ -225,7 +225,7 @@ def auto_daily():
     for d in drafties:
         d.report.status = db.report_status(name = 'Grading')
         d.report.min_score = cpfecys.get_custom_parameters().min_score
-        d.update_record()
+        d.report.update_record()
         ## TODO: Send Email according to assignation
         # Notification Message
         me_the_user = d.report.assignation.assigned_user

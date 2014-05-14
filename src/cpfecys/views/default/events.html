@@ -10,11 +10,17 @@
         <th>{{=T('Details')}}</th>
     </thead>
     <tbody>
+        {{old_project_name = None}}
         {{counter = 1}}
         {{for r in thing:}}
         <tr>
             <td>{{=counter}}</td>
+            {{if not old_project_name == r.project.name:}}
             <td>{{=r.project.name}}</td>
+            {{else:}}
+            <td></td>
+            {{pass}}
+            {{old_project_name = r.project.name}}
             <td>{{=r.public_event.name}}</td>
 	    <td>
 	    {{for s in r.public_event.public_event_schedule.select():}}

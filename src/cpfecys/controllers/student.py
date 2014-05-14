@@ -116,6 +116,8 @@ def index():
         return period_range
 
     def is_indate_range(report):
+        if report.score_date == None:
+            return False
         import datetime
         current_date = datetime.datetime.now().date()
         next_date = report.score_date + datetime.timedelta(
@@ -278,7 +280,7 @@ def report_hours():
         report = db.report(db.report.id == report)
         valid = not(report is None) and not(hours is None)
         ## Validate report TIMING restriction
-        if valid: valid = cpfecys.student_validation_report_restrictions(report.report_restriction.id)
+        #if valid: valid = cpfecys.student_validation_report_restrictions(report.report_restriction.id)
         ## Validate assignation
         if valid: valid = not cpfecys.assignation_is_locked(report.assignation)
         ## Validate that the report belongs to user
@@ -299,7 +301,7 @@ def report_hours():
         report = db.report(db.report.id == report)
         valid = not(report is None) and not(hours is None)
         ## Validate report TIMING restriction
-        if valid: valid = cpfecys.student_validation_report_restrictions(report.report_restriction.id)
+        #if valid: valid = cpfecys.student_validation_report_restrictions(report.report_restriction.id)
         ## Validate assignation
         if valid: valid = not cpfecys.assignation_is_locked(report.assignation)
         ## Validate that the report belongs to user
@@ -319,7 +321,7 @@ def report_hours():
         report = db.report(db.report.id == report)
         valid = not(report is None)
         ## Validate report TIMING restriction
-        if valid: valid = cpfecys.student_validation_report_restrictions(report.report_restriction.id)
+        #if valid: valid = cpfecys.student_validation_report_restrictions(report.report_restriction.id)
         ## Validate assignation
         if valid: valid = not cpfecys.assignation_is_locked(report.assignation)
         ## Validate that the report belongs to user
@@ -346,7 +348,7 @@ def report_header():
         report = db.report(db.report.id == report)
         valid = not(report is None) and not(content is None)
         ## Validate report TIMING restriction
-        if valid: valid = cpfecys.student_validation_report_restrictions(report.report_restriction.id)
+        #if valid: valid = cpfecys.student_validation_report_restrictions(report.report_restriction.id)
         ## Validate assignation
         if valid: valid = not cpfecys.assignation_is_locked(report.assignation)
         ## Validate that the report belongs to user
@@ -367,7 +369,7 @@ def report_header():
         report = db.report(db.report.id == report)
         valid = not(report is None) and not(content is None)
         ## Validate report TIMING restriction
-        if valid: valid = cpfecys.student_validation_report_restrictions(report.report_restriction.id)
+        #if valid: valid = cpfecys.student_validation_report_restrictions(report.report_restriction.id)
         ## Validate assignation
         if valid: valid = not cpfecys.assignation_is_locked(report.assignation)
         ## Validate that the report belongs to user
@@ -387,7 +389,7 @@ def report_header():
         report = db.report(db.report.id == report)
         valid = not(report is None)
         ## Validate report TIMING restriction
-        if valid: valid = cpfecys.student_validation_report_restrictions(report.report_restriction.id)
+        #if valid: valid = cpfecys.student_validation_report_restrictions(report.report_restriction.id)
         ## Validate assignation
         if valid: valid = cpfecys.assignation_is_locked(report.assignation)
         ## Validate that the report belongs to user
@@ -414,7 +416,7 @@ def report_footer():
         report = db.report(db.report.id == report)
         valid = not(report is None) and not(content is None)
         ## Validate report TIMING restriction
-        if valid: valid = cpfecys.student_validation_report_restrictions(report.report_restriction.id)
+        #if valid: valid = cpfecys.student_validation_report_restrictions(report.report_restriction.id)
         ## Validate assignation
         if valid: valid = not cpfecys.assignation_is_locked(report.assignation)
         ## Validate that the report belongs to user
@@ -435,7 +437,7 @@ def report_footer():
         report = db.report(db.report.id == report)
         valid = not(report is None) and not(content is None)
         ## Validate report TIMING restriction
-        if valid: valid = cpfecys.student_validation_report_restrictions(report.report_restriction.id)
+        #if valid: valid = cpfecys.student_validation_report_restrictions(report.report_restriction.id)
         ## Validate assignation
         if valid: valid = not cpfecys.assignation_is_locked(report.assignation)
         ## Validate that the report belongs to user
@@ -455,7 +457,7 @@ def report_footer():
         report = db.report(db.report.id == report)
         valid = not(report is None)
         ## Validate report TIMING restriction
-        if valid: valid = cpfecys.student_validation_report_restrictions(report.report_restriction.id)
+        #if valid: valid = cpfecys.student_validation_report_restrictions(report.report_restriction.id)
         ## Validate assignation
         if valid: valid = not cpfecys.assignation_is_locked(report.assignation)
         ## Validate that the report belongs to user
@@ -719,8 +721,8 @@ def final():
         if valid_report: valid_report = not cpfecys.assignation_is_locked(report.assignation)
         if valid_report: valid_report = cpfecys.student_validation_report_owner(report.id)
         # validate report is editable
-        if valid_report: valid_report = cpfecys.student_validation_report_restrictions \
-            (report.report_restriction)
+        #if valid_report: valid_report = cpfecys.student_validation_report_restrictions \
+            #(report.report_restriction)
         # validate report is 'Draft' or 'Recheck'
         if valid_report: valid_report = cpfecys.student_validation_report_status(report)
         # validate we receive log-date, log-type, log-content
@@ -802,8 +804,8 @@ def final():
         # validate metric report owner is valid
         if valid_final: valid_final = cpfecys.student_validation_report_owner(final.report)
         # validate report is editable
-        if valid_final: valid_final = cpfecys.student_validation_report_restrictions \
-            (final.report['report_restriction'])
+        #if valid_final: valid_final = cpfecys.student_validation_report_restrictions \
+        #    (final.report['report_restriction'])
         # validate report is 'Draft' or 'Recheck'
         if valid_final: valid_final = cpfecys.student_validation_report_status \
             (db.report(db.report.id == final.report))
@@ -885,8 +887,8 @@ def final():
         ## Validate assignation
         if valid_final: valid_final = not cpfecys.assignation_is_locked(final.report.assignation)
         # validate report is editable
-        if valid_final: valid_final = cpfecys.student_validation_report_restrictions \
-            (final.report['report_restriction'])
+        #if valid_final: valid_final = cpfecys.student_validation_report_restrictions \
+        #    (final.report['report_restriction'])
         # validate report is 'Draft' or 'Recheck'
         if valid_final: valid_final = cpfecys.student_validation_report_status \
             (db.report(db.report.id == final.report))
@@ -910,7 +912,8 @@ def report():
         assignation = request.vars['assignation']
         report_restriction = request.vars['report_restriction']
         # Validate DB report_restriction to obey TIMING rules
-        valid_rep_restr = cpfecys.student_validation_report_restrictions(report_restriction)
+        import cpfecys
+        #valid_rep_restr = cpfecys.student_validation_report_restrictions(report_restriction)
         # Validate report_restriction
         report_restrict = db.report_restriction(db.report_restriction.id == report_restriction)
         valid_report = report_restrict != None
@@ -949,10 +952,10 @@ def report():
             session.flash = T('Selected report can\'t be edited. Select a valid report.')
             redirect(URL('student','index'))
         ## Validate report TIMING restriction
-        valid_rep_restr = cpfecys.student_validation_report_restrictions(report.report_restriction.id)
-        if not(valid_rep_restr):
-            session.flash = T('Selected report can\'t be edited. Select a valid report.')
-            redirect(URL('student','index'))
+        #valid_rep_restr = cpfecys.student_validation_report_restrictions(report.report_restriction.id)
+        #if not(valid_rep_restr):
+        #    session.flash = T('Selected report can\'t be edited. Select a valid report.')
+        #    redirect(URL('student','index'))
         ## Validate that the report belongs to user
         valid_report_owner = cpfecys.student_validation_report_owner(report.id)
         if not(valid_report_owner):
@@ -1050,7 +1053,7 @@ def report():
             redirect(URL('student','index'))
         # Validate DB report_restriction to obey TIMING rules
         import cpfecys
-        valid_rep_restr = cpfecys.student_validation_report_restrictions(report.report_restriction.id)
+        #valid_rep_restr = cpfecys.student_validation_report_restrictions(report.report_restriction.id)
         ## Validate that the report status is editable (it is either 'Draft' or 'Recheck')
         if not(cpfecys.student_validation_report_status(report)):
             session.flash = T('Invalid selected assignation and report. Select a valid one.')
@@ -1178,8 +1181,8 @@ def log_future():
         if valid_report: valid_report = not cpfecys.assignation_is_locked(report.assignation)
         if valid_report: valid_report = cpfecys.student_validation_report_owner(report.id)
         # validate report is editable
-        if valid_report: valid_report = cpfecys.student_validation_report_restrictions \
-            (report.report_restriction)
+        #if valid_report: valid_report = cpfecys.student_validation_report_restrictions \
+        #    (report.report_restriction)
         # validate report is 'Draft' or 'Recheck'
         if valid_report: valid_report = cpfecys.student_validation_report_status(report)
         # validate we receive log-date, log-type, log-content
@@ -1206,8 +1209,8 @@ def log_future():
         ## Validate assignation
         if valid_log: valid_log = not cpfecys.assignation_is_locked(log.report.assignation)
         # validate report is editable
-        if valid_log: valid_log = cpfecys.student_validation_report_restrictions \
-            (log.report['report_restriction'])
+        #if valid_log: valid_log = cpfecys.student_validation_report_restrictions \
+        #    (log.report['report_restriction'])
         # validate report is 'Draft' or 'Recheck'
         if valid_log: valid_log = cpfecys.student_validation_report_status \
             (db.report(db.report.id == log.report))
@@ -1233,8 +1236,8 @@ def log_future():
         ## Validate assignation
         if valid_log: valid_log = not cpfecys.assignation_is_locked(log.report.assignation)
         # validate report is editable
-        if valid_log: valid_log = cpfecys.student_validation_report_restrictions \
-            (log.report['report_restriction'])
+        #if valid_log: valid_log = cpfecys.student_validation_report_restrictions \
+        #    (log.report['report_restriction'])
         # validate report is 'Draft' or 'Recheck'
         if valid_log: valid_log = cpfecys.student_validation_report_status \
             (db.report(db.report.id == log.report))
@@ -1259,8 +1262,8 @@ def log():
         if valid_report: valid_report = not cpfecys.assignation_is_locked(report.assignation)
         if valid_report: valid_report = cpfecys.student_validation_report_owner(report.id)
         # validate report is editable
-        if valid_report: valid_report = cpfecys.student_validation_report_restrictions \
-            (report.report_restriction)
+        #if valid_report: valid_report = cpfecys.student_validation_report_restrictions \
+        #    (report.report_restriction)
         # validate report is 'Draft' or 'Recheck'
         if valid_report: valid_report = cpfecys.student_validation_report_status(report)
         # validate we receive log-date, log-type, log-content
@@ -1289,8 +1292,8 @@ def log():
         ## Validate assignation
         if valid_log: valid_log = not cpfecys.assignation_is_locked(log.report.assignation)
         # validate report is editable
-        if valid_log: valid_log = cpfecys.student_validation_report_restrictions \
-            (log.report['report_restriction'])
+        #if valid_log: valid_log = cpfecys.student_validation_report_restrictions \
+        #    (log.report['report_restriction'])
         # validate report is 'Draft' or 'Recheck'
         if valid_log: valid_log = cpfecys.student_validation_report_status \
             (db.report(db.report.id == log.report))
@@ -1318,8 +1321,8 @@ def log():
         ## Validate assignation
         if valid_log: valid_log = not cpfecys.assignation_is_locked(log.report.assignation)
         # validate report is editable
-        if valid_log: valid_log = cpfecys.student_validation_report_restrictions \
-            (log.report['report_restriction'])
+        #if valid_log: valid_log = cpfecys.student_validation_report_restrictions \
+        #    (log.report['report_restriction'])
         # validate report is 'Draft' or 'Recheck'
         if valid_log: valid_log = cpfecys.student_validation_report_status \
             (db.report(db.report.id == log.report))
@@ -1347,8 +1350,8 @@ def metrics():
         if valid_report: valid_report = not cpfecys.assignation_is_locked(report.assignation)
         if valid_report: valid_report = cpfecys.student_validation_report_owner(report.id)
         # validate report is editable
-        if valid_report: valid_report = cpfecys.student_validation_report_restrictions \
-            (report.report_restriction)
+        #if valid_report: valid_report = cpfecys.student_validation_report_restrictions \
+        #    (report.report_restriction)
         # validate report is 'Draft' or 'Recheck'
         if valid_report: valid_report = cpfecys.student_validation_report_status(report)
         # validate we receive log-date, log-type, log-content
@@ -1413,8 +1416,8 @@ def metrics():
         # validate metric report owner is valid
         if valid_metric: valid_metric = cpfecys.student_validation_report_owner(metric.report)
         # validate report is editable
-        if valid_metric: valid_metric = cpfecys.student_validation_report_restrictions \
-            (metric.report['report_restriction'])
+        #if valid_metric: valid_metric = cpfecys.student_validation_report_restrictions \
+        #    (metric.report['report_restriction'])
         # validate report is 'Draft' or 'Recheck'
         if valid_metric: valid_metric = cpfecys.student_validation_report_status \
             (db.report(db.report.id == metric.report))
@@ -1477,8 +1480,8 @@ def metrics():
         # validate metric report owner is valid
         if valid_metric: valid_metric = cpfecys.student_validation_report_owner(metric.report)
         # validate report is editable
-        if valid_metric: valid_metric = cpfecys.student_validation_report_restrictions \
-            (metric.report['report_restriction'])
+        #if valid_metric: valid_metric = cpfecys.student_validation_report_restrictions \
+        #    (metric.report['report_restriction'])
         # validate report is 'Draft' or 'Recheck'
         if valid_metric: valid_metric = cpfecys.student_validation_report_status \
             (db.report(db.report.id == metric.report))
@@ -1503,8 +1506,8 @@ def desertions():
         if valid_report: valid_report = not cpfecys.assignation_is_locked(report.assignation)
         if valid_report: valid_report = cpfecys.student_validation_report_owner(report.id)
         # validate report is editable
-        if valid_report: valid_report = cpfecys.student_validation_report_restrictions \
-            (report.report_restriction)
+        #if valid_report: valid_report = cpfecys.student_validation_report_restrictions \
+        #    (report.report_restriction)
         # validate report is 'Draft' or 'Recheck'
         if valid_report: valid_report = cpfecys.student_validation_report_status(report)
         # validate we receive log-date, log-type, log-content
@@ -1532,8 +1535,8 @@ def desertions():
         if valid_report: valid_report = not cpfecys.assignation_is_locked(report.assignation)
         if valid_report: valid_report = cpfecys.student_validation_report_owner(report.id)
         # validate report is editable
-        if valid_report: valid_report = cpfecys.student_validation_report_restrictions \
-            (report.report_restriction)
+        #if valid_report: valid_report = cpfecys.student_validation_report_restrictions \
+        #    (report.report_restriction)
         # validate report is 'Draft' or 'Recheck'
         if valid_report: valid_report = cpfecys.student_validation_report_status(report)
         # validate we receive log-date, log-type, log-content
@@ -1561,8 +1564,8 @@ def desertions():
         if valid_report: valid_report = not cpfecys.assignation_is_locked(report.assignation)
         if valid_report: valid_report = cpfecys.student_validation_report_owner(report.id)
         # validate report is editable
-        if valid_report: valid_report = cpfecys.student_validation_report_restrictions \
-            (report.report_restriction)
+        #if valid_report: valid_report = cpfecys.student_validation_report_restrictions \
+        #    (report.report_restriction)
         # validate report is 'Draft' or 'Recheck'
         if valid_report: valid_report = cpfecys.student_validation_report_status(report)
         # validate we receive log-date, log-type, log-content

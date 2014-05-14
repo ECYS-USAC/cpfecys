@@ -37,11 +37,11 @@
                         </tr>
                     </thead>
                     <tbody>
-                        {{for report in inc_vars['reports']:}}
-                        <tr><th>{{=report.report_restriction['name']}}</th>
-                        <td>{{=report.desertion_continued}}</td>
-                        <td>{{=report.desertion_gone}}</td>
-                        <td>{{=report.desertion_started}}</td></tr>
+                        {{for _report in inc_vars['reports']:}}
+                        <tr><th>{{=_report.report_restriction['name']}}</th>
+                        <td>{{=_report.desertion_continued}}</td>
+                        <td>{{=_report.desertion_gone}}</td>
+                        <td>{{=_report.desertion_started}}</td></tr>
                         {{pass}}
                     </tbody>
                 </table>

@@ -327,7 +327,7 @@ def graphs():
               (db.user_project.assigned_user == db.auth_membership.user_id)&
               (db.report_restriction.start_date >= start_date)&
               (db.report_restriction.start_date <= end_date)&
-              (db.report.id == db.log_metrics.report)).select(db.log_metrics.ALL, db.report.ALL, db.report_restriction.ALL, db.user_project.ALL, db.auth_group.ALL, db.auth_membership.ALL, orderby=db.user_project.assigned_user|db.report_restriction.start_date|db.report_restriction.name, left=[db.report.on(db.user_project.id == db.report.assignation), db.report_restriction.on(db.report.report_restriction == db.report_restriction.id)])
+              (db.report.id == db.log_metrics.report)).select(db.log_metrics.ALL, db.report.ALL, db.report_restriction.ALL, db.user_project.ALL, db.auth_group.ALL, db.auth_membership.ALL, orderby=db.user_project.assigned_user|db.report_restriction.start_date|db.report_restriction.name|db.log_metrics.created, left=[db.report.on(db.user_project.id == db.report.assignation), db.report_restriction.on(db.report.report_restriction == db.report_restriction.id)])
     # A helper to display this code within js stuff
     def values_display(values):
         result = "["

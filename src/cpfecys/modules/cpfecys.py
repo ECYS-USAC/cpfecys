@@ -79,8 +79,22 @@ def student_validation_report_restrictions(report_restriction):
 ## Validate that the report status is editable (it is either 'Draft' or 'Recheck')
 def student_validation_report_status(report):
     db = _db
-    return (report.status == db.report_status(db.report_status.name == 'Draft').id) or \
-            (report.status == db.report_status(db.report_status.name == 'Recheck').id)
+    import datetime
+    current_date = datetime.datetime.now()
+    report_restriction = report.report_restriction.id
+    if report.score_date == None:
+        return False
+    current_date = datetime.datetime.now().date()
+    next_date = report.score_date + datetime.timedelta(
+                    days=get_custom_parameters().rescore_max_days)
+    if not assignation_is_locked(report.assignation) \
+            and ((report.status.name == 'Draft' \
+                    and report.report_restriction.start_date <= current_date \
+                    and report.report_restriction.end_date >= current_date) 
+                 or (report.status.name == 'Recheck' \
+                    and current_date < next_date)):
+        return True
+    return False
 
 def student_validation_report_owner(report):
     db = _db
@@ -234,7 +248,7 @@ def _roles_setup():
     db = _db
     auth = _auth
     ## User Roles Setup:
-    supersu = db.auth_user.insert(email = 'admin@admin.com', first_name = 'Super',
+    supersu = db.auth_user.insert(email = 'dtt.ecys@gmail.com', first_name = 'Super',
                                          last_name = 'Administrator', username = 'admin',
                                          password = db.auth_user.password.validate('superadmin')[0])
     superadmins = auth.add_group(role = 'Super-Administrator',description = 'In charge of the whole system administration.')

@@ -40,11 +40,11 @@
                         <td></td>
                         <td>{{=hours_left}}</td>
                         </tr>
-                        {{for report in inc_vars['reports']:}}
+                        {{for _report in inc_vars['reports']:}}
                         <tr>
-                        <td>{{=report.report_restriction['name']}}</td>
-                        <td>{{=report.hours or 0}}</td>
-                        {{hours_left = hours_left - (report.hours or 0)}}
+                        <td>{{=_report.report_restriction['name']}}</td>
+                        <td>{{=_report.hours or 0}}</td>
+                        {{hours_left = hours_left - (_report.hours or 0)}}
                         <td>{{=hours_left}}</td>
                         </tr>
                         {{pass}}
@@ -113,8 +113,8 @@
                             },
                             xAxis: {
                                 categories: [
-                                    {{for report in inc_vars['reports']:}}
-                                    "{{=report.report_restriction['name']}}",
+                                    {{for _report in inc_vars['reports']:}}
+                                    "{{=_report.report_restriction['name']}}",
                                     {{pass}}
                                 ],
                                 labels: {
@@ -141,8 +141,8 @@
                             series: [{
                                 name: '{{=T("Hours")}}',
                                 data: [
-                                    {{for report in inc_vars['reports']:}}
-                                    {{=report.hours}},
+                                    {{for _report in inc_vars['reports']:}}
+                                    {{=_report.hours}},
                                     {{pass}}
                                                                       ],
                                 dataLabels: {

@@ -11,7 +11,7 @@
 
 if not request.env.web2py_runtime_gae:
     ## if NOT running on Google App Engine use SQLite or other DB
-    db = DAL('mysql://root@localhost/cpfecys', \
+    db = DAL('mysql://root@localhost/cpfecysdebug', \
         pool_size=1,check_reserved=['all'])
 else:
     ## connect to Google BigTable (optional 'google:datastore://namespace')
@@ -98,18 +98,18 @@ auth = Auth(db)
 # NOTE: length=255 is needed because a bug in mysql
 # as describede here: http://goo.gl/NBG5JM
 auth.settings.extra_fields['auth_user']= [
-                  Field('phone', 'string', length=16, notnull=False, \
-                    label="Phone"),
+                  Field('phone', 'string', length=16, notnull=True, \
+                    label=T("Phone")),
+                  Field('home_address', 'string',length=500, notnull=True, \
+                    label=T("Home address")),
                   Field('working', 'boolean', notnull=False, \
-                    label="Working"),
+                    label=T("is Working"), writable=False, readable=False),
                   Field('company_name', 'string', length=200, notnull=False, \
-                    label="Company name"),
+                    label=T("Company name")),
                   Field('work_address', 'string',length=500, notnull=False, \
-                    label="Work address"),
+                    label=T("Work address")),
                   Field('work_phone', 'string',length=500, notnull=False, \
-                    label="Work phone"),
-                  Field('home_address', 'string',length=500, notnull=False, \
-                    label="Home address"),
+                    label=T("Work phone")),
                   Field('uv_token', 'string', length=64, notnull=False, \
                     writable=False, readable=False),
                   Field('data_updated', 'boolean', notnull=False, \
@@ -536,14 +536,14 @@ db.define_table('item_restriction_area',
                     label = T('is_enabled')),
                 )
 
-db.define_table('item_restriction_exception', 
+db.define_table('item_restriction_exception',
                 Field('project', 'reference project', \
                     label = T('project')),
                 Field('item_restriction', 'reference item_restriction', \
                     label = T('item_restriction')),
                 )
 
-db.define_table('mail_log', 
+db.define_table('mail_log',
                 Field('sent_message', 'text', notnull=False, \
                     label = T('sent_message')),
                 Field('roles', 'text', notnull=False, \

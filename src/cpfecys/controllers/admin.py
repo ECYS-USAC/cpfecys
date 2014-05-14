@@ -797,7 +797,7 @@ def send_mail_to_users(users, message, roles, projects, subject, log=False):
         print user.email
         if user.email != None and user.email != '':
             import cpfecys
-            message += (cpfecys.get_custom_parameters().email_signature or '')
+            message = '<html>' + message + (cpfecys.get_custom_parameters().email_signature or '') + '</html>'
             was_sent = mail.send(to=user.email,
               subject=T(subject),
               message=message)
@@ -1379,6 +1379,8 @@ def teacher_assignation_upload():
     warning_users = []
     uv_off = request.vars['uv_off'] or False
     success = False
+    import cpfecys
+    current_period = cpfecys.current_year_period()
     if request.vars.csvfile != None:
         try:
             file = request.vars.csvfile.file
@@ -1405,8 +1407,6 @@ def teacher_assignation_upload():
                 ## check if user exists
                 usr = db.auth_user(db.auth_user.username == rusername)
                 project = db.project(db.project.project_id == rproject)
-                import cpfecys
-                current_period = cpfecys.current_year_period()
                 if usr is None:
                     ## find it on chamilo (db2)
                     if not uv_off:
@@ -1436,19 +1436,19 @@ def teacher_assignation_upload():
                                                   phone=rphone)
                         #add user to role 'Teacher'
                         auth.add_membership('Teacher', usr)
-                else:
-                    assignation = db.user_project(
-                        (db.user_project.assigned_user == usr.id)&
-                        (db.user_project.project == project)&
-                        (db.user_project.assignation_status == None))
-                    if assignation != None:
-                        row.append(T('Error: ') + T('User \
-                         was already assigned, Please Manually Assign Him.'))
-                        error_users.append(row)
+                #else:
+                    #assignation = db.user_project(
+                    #    (db.user_project.assigned_user == usr.id)&
+                    #    (db.user_project.project == project)&
+                    #    (db.user_project.assignation_status == None))
+                    #if assignation != None:
+                    #    row.append(T('Error: ') + T('User \
+                    #     was already assigned, Please Manually Assign Him.'))
+                    #    error_users.append(row)
                         #assignation.update_record(periods = \
                             #rassignation_length, pro_bono = \
                             #rpro_bono)
-                        continue
+                    #    continue
                 if project != None:
                     db.user_project.insert(assigned_user = usr,
                                             project = project,
@@ -1466,15 +1466,18 @@ def teacher_assignation_upload():
             response.flash = T('File doesn\'t seem properly encoded.')
             return dict(success = False,
                 file = False,
-                periods = periods)
+                periods = periods,
+                current_period = current_period)
         response.flash = T('Data uploaded')
         return dict(success = success,
                     errors = error_users,
                     warnings = warning_users,
-                    periods = periods)
+                    periods = periods,
+                    current_period = current_period)
     return dict(success = False,
                 file = False,
-                periods = periods)
+                periods = periods,
+                current_period = current_period)
 
 
 @auth.requires_login()
@@ -1485,6 +1488,8 @@ def assignation_upload():
     warning_users = []
     uv_off = request.vars['uv_off'] or False
     success = False
+    import cpfecys
+    current_period = cpfecys.current_year_period()
     if request.vars.csvfile != None:
         try:
             file = request.vars.csvfile.file
@@ -1508,8 +1513,6 @@ def assignation_upload():
                 ## check if user exists
                 usr = db.auth_user(db.auth_user.username == rusername)
                 project = db.project(db.project.project_id == rproject)
-                import cpfecys
-                current_period = cpfecys.current_year_period()
                 if usr is None:
                     ## find it on chamilo (db2)
                     if not uv_off:
@@ -1566,15 +1569,18 @@ def assignation_upload():
             response.flash = T('File doesn\'t seem properly encoded.')
             return dict(success = False,
                 file = False,
-                periods = periods)
+                periods = periods,
+                current_period = current_period)
         response.flash = T('Data uploaded')
         return dict(success = success,
                     errors = error_users,
                     warnings = warning_users,
-                    periods = periods)
+                    periods = periods,
+                    current_period = current_period)
     return dict(success = False,
                 file = False,
-                periods = periods)
+                periods = periods,
+                current_period = current_period)
 
 @cache.action()
 @auth.requires_login()
