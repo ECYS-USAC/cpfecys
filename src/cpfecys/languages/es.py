@@ -1,5 +1,6 @@
 # coding: utf-8
 {
+'Not delivered yet': 'Falta ser entregado',
 '': '',
 '!=': '!=',
 '!langcode!': 'es',
