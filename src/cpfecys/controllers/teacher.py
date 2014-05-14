@@ -79,15 +79,28 @@ def final_practice():
                         (db.item.assignation==final_practice.user_project.id) \
                         ).select()
     total_items = db((db.item.created==cpfecys.current_year_period())).select()
-    reports = db((db.report.assignation == final_practice.user_project.id)&
-                        (db.report.status.name!='Grading'))
-    avg = reports.select((db.report.score.sum()/db.report.score.count()).\
+    def get_current_reports(period):
+        from datetime import datetime
+        import cpfecys
+        cperiod = cpfecys.current_year_period()
+        year = str(cperiod.yearp)
+        if period.period == 1:
+            start = datetime.strptime(year + '-01-01', "%Y-%m-%d")
+            end = datetime.strptime(year + '-07-01', "%Y-%m-%d")
+        else:
+            start = datetime.strptime(year + '-07-01', "%Y-%m-%d")
+            end = datetime.strptime(year + '-12-31', "%Y-%m-%d")
+
+        reports = db((db.report.assignation == final_practice.user_project.id)&
+                        (db.report.status.name!='Grading')&
+                        (db.report.created >= start)&
+                        (db.report.created <= end))
+        avg = reports.select((db.report.score.sum()/db.report.score.count()).\
                         with_alias('avg')).first()['avg'] or 0
-    reports = reports.select()
+        reports = reports.select(), avg
+        return reports
     return dict(final_practice=final_practice,
                 available_periods=available_periods,
-                reports=reports,
-                reports_avg=avg,
                 items=items,
                 total_items=total_items,
                 get_items=get_items,
@@ -95,7 +108,8 @@ def final_practice():
                 available_item_restriction=available_item_restriction,
                 assignation=assignation,
                 restriction_project_exception=restriction_project_exception,
-                items_instance=items_instance)
+                items_instance=items_instance,
+                get_current_reports=get_current_reports)
 
 @cache.action()
 @auth.requires_login()
