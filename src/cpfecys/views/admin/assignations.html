@@ -79,6 +79,7 @@
                       <th>{{=T('Last Name')}}</th>
                       <th>{{=T('First Name')}}</th>
                       <th>{{=T('Carnet')}}</th>
+                      <th>{{=T('Phone')}}</th>
                       <th>{{=T('Working Address')}}</th>
                       <th>{{=T('Company Name')}}</th>
                       <th>{{=T('Work Phone')}}</th>
@@ -119,6 +120,7 @@
                       <td>{{=row.auth_user.last_name}}</td>
                       <td>{{=row.auth_user.first_name}}</td>
                       <td>{{=row.auth_user.username}}</td>
+                      <td>{{=row.auth_user.phone or T('Pending')}}</td>
                       <td>{{=row.auth_user.work_address or 'N/A'}}</td>
                       <td>{{=row.auth_user.company_name or 'N/A'}}</td>
                       <td>{{=row.auth_user.work_phone or 'N/A'}}</td>

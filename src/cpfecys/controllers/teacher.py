@@ -31,6 +31,7 @@ def final_practice():
         return db(((db.item_restriction.period==period_year) |
                     (db.item_restriction.permanent==True))&
                 (db.item_restriction.is_enabled==True)&
+                (db.item_restriction.hidden_from_teacher!=True)&
                 (db.item_restriction_area.item_restriction==\
                     db.item_restriction.id)&
                 (db.item_restriction_area.area_level==\

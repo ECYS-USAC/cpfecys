@@ -508,7 +508,6 @@ def item():
             session.flash = T('This item can\'t be\
                 edited, item edition for this item is out of time')
             redirect(URL('student', 'index'))
-
         itm_res_area = db(
             (db.item_restriction_area.area_level==area)&
             (db.item_restriction_area.item_restriction== \
@@ -536,7 +535,7 @@ def item():
                     days=item_restriction.limit_days)
                 if cdate > last_date:
                     session.flash = T('This item can\'t be\
-                    edited, doesn\'t out of date, last date was' +\
+                    edited, out of date, last date was' +\
                     last_date)
                     redirect(URL('student', 'index'))
         if item_query.select().first() == None:
@@ -593,7 +592,10 @@ def item():
                                       item_restriction=item_restriction.id,
                                       assignation=user_project)
                 session.flash = T('Item Created')
-                redirect(URL('student', 'item', args = ['edit'], vars = dict(restriction=item_restriction.id, assignation = user_project)))
+                redirect(URL('student', 'item',  args=['edit'],\
+                    vars = dict(restriction=item_restriction.id, \
+                        assignation=user_project, \
+                        period=period)))
                 #return
         else:
             session.flash = T('Action not allowed')
@@ -902,6 +904,7 @@ def final():
 @auth.requires_login()
 @auth.requires_membership('Student')
 def report():
+    import cpfecys
     if (request.args(0) == 'create'):
         #get the data & save the report
         assignation = request.vars['assignation']

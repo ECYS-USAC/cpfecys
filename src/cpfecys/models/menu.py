@@ -40,7 +40,7 @@ if auth.has_membership(role="Super-Administrator"):
          (T('Frontend Administration'), False, URL(),[
              (T('Links Manager'), False, URL('admin', 'links'), []),
              (T('Files Manager'), False, URL('admin', 'files_manager'), []),
-             (T('Notifications Manager'), False, URL('admin', 'notifications_manager'), []),
+             (T('News'), False, URL('admin', 'notifications_manager'), []),
              (T('Mail Notifications Manager'), False, URL(), [
                 (T('Send Mail'), False, URL('admin', 'mail_notifications'), []),
                 (T('Mail Log'), False, URL('admin', 'mail_log'), []),]),
@@ -58,7 +58,7 @@ if auth.has_membership(role="Super-Administrator"):
              ]),
          (T('Reports'), False, URL(),[
              (T('Courses reports'), False, URL('admin', 'courses_report/areas'), []),
-             (T('Active Teachers'), False, URL('admin', 'active_teachers'), []),
+             (T('Project Leaders'), False, URL('admin', 'active_teachers'), []),
              (T('General Report'), False, URL('admin', 'general_report'), []),
              (T('System-wide Mail Logs'), False, URL('mailer', 'index'), []),
              ]),

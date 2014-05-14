@@ -938,21 +938,22 @@ def report_list():
                     ).select(db.report.ALL).first()
                 if report == None:
                     pending += 1
-                else:
-                    hours = report.hours
-                    entries = count_log_entries(\
-                        report.id)[0]['COUNT(log_entry.id)']
-                    metrics = count_metrics_report(\
-                        report.id)[0]['COUNT(log_metrics.id)']
-                    anomalies = count_anomalies(\
-                        report)[0]['COUNT(log_entry.id)']
-                    if assignation.user_project.project.area_level.name == \
-                            'DTT Tutor Académico':
-                        if entries == 0 and metrics == 0 and anomalies == 0:
-                            pending += 1
-                    else:
-                        if hours == None and hours == 0:
-                            pending += 1
+                #esto es para no ver drafts en report_filter
+                #else:
+                #    hours = report.hours
+                #    entries = count_log_entries(\
+                #        report.id)[0]['COUNT(log_entry.id)']
+                #    metrics = count_metrics_report(\
+                #        report.id)[0]['COUNT(log_metrics.id)']
+                #    anomalies = count_anomalies(\
+                #        report)[0]['COUNT(log_entry.id)']
+                #    if assignation.user_project.project.area_level.name == \
+                #            'DTT Tutor Académico':
+                #        if entries == 0 and metrics == 0 and anomalies == 0:
+                #            pending += 1
+                #    else:
+                #        if hours == None and hours == 0:
+                #            pending += 1
 
         return pending
 
@@ -1156,6 +1157,12 @@ def report_filter():
             count_log_entries=count_log_entries,
             count_metrics_report=count_metrics_report,
             count_anomalies=count_anomalies,)
+    elif int(status) == -4:
+        reports = db((db.report.created>start)&
+            (db.report.created<end)&
+            (db.report.never_delivered==True)
+            ).select()
+        status_instance = db(db.report_status.id==status).select().first()
     else:
         reports = db((db.report.created>start)&
             (db.report.created<end)&
@@ -1392,6 +1399,7 @@ def teacher_assignation_upload():
                 rpro_bono = (row[8] == 'Si') or (row[8] == 'si')
                 rhours = row[9]
                 remail = row[5]
+                rphone = row[6] or ''
                 rlast_name = row[3]
                 rfirst_name = row[4]
                 ## check if user exists
@@ -1424,7 +1432,8 @@ def teacher_assignation_upload():
                         usr = db.auth_user.insert(username = rusername,
                                                   email = remail,
                                                   first_name=rfirst_name,
-                                                  last_name=rlast_name)
+                                                  last_name=rlast_name,
+                                                  phone=rphone)
                         #add user to role 'Teacher'
                         auth.add_membership('Teacher', usr)
                 else:

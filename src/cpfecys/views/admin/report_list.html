@@ -120,9 +120,12 @@
 						</a>
 					</td>
 					<td>
-						{{no_delivered = count_no_delivered(pyear)}}
-						<span class="badge badge-important">{{=no_delivered}}</span>
-					 	<span>{{=T('No delivered')}} </span>
+						<a href="{{=URL('admin', 'report_filter', vars=dict(period=pyear.id, \
+						status=-4))}}">
+							{{no_delivered = count_no_delivered(pyear)}}
+							<span class="badge badge-important">{{=no_delivered}}</span>
+						 	<span>{{=T('No delivered')}} </span>
+					 	</a>
 					 	{{count = count + no_delivered}}
 						
 					</td>
