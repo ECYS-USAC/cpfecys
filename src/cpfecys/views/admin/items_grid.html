@@ -96,8 +96,13 @@
                 {{pass}}
                 </td>
                 <td>
+                    {{if area != None:}}
                     <a href="{{=URL(vars=dict(area=area, period=period,
                     school_id=item.assignation.assigned_user.username))}}">
+                    {{else:}}
+                    <a href="{{=URL(vars=dict(period=period,
+                    school_id=item.assignation.assigned_user.username))}}">
+                    {{pass}}
                         {{=item.assignation.assigned_user.username}}
                     </a>
                 </td>

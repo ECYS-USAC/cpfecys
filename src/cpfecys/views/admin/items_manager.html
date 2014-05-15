@@ -14,13 +14,75 @@
 			Primer Semestre: {{=T("Insert days to calculate")}}</div>');
 		$('#end').html('<div>\
 			Segundo Semestre: {{=T("Insert days to calculate")}}</div>');
+
+		if($('#item_restriction_item_type option:selected'
+			).text()=="Grade Activity"){
+			$('#item_restriction_min_score'
+				).css('visibility', 'visible');
+			$('#item_restriction_min_score__label'
+				).css('visibility', 'visible');
+			$('#item_restriction_is_unique'
+			).css('visibility', 'hidden');
+			$('#item_restriction_is_unique__label'
+				).css('visibility', 'hidden');
+		}
+		else if($('#item_restriction_item_type option:selected'
+			).text()=="Schedule")
+		{
+			$('#item_restriction_min_score'
+				).css('visibility', 'hidden');
+			$('#item_restriction_min_score__label'
+				).css('visibility', 'hidden');
+			$('#item_restriction_is_unique'
+			).css('visibility', 'visible');
+			$('#item_restriction_is_unique__label'
+			).css('visibility', 'visible');
+		}
+		else{
+			$('#item_restriction_min_score'
+				).css('visibility', 'hidden');
+			$('#item_restriction_min_score__label'
+				).css('visibility', 'hidden');
+			$('#item_restriction_is_unique'
+			).css('visibility', 'hidden');
+			$('#item_restriction_is_unique__label'
+			).css('visibility', 'hidden');
+		}
+
 		$('#item_restriction_item_type').change(function(){
-			if($('#item_restriction_item_type option:selected'
-				).text()=="Activity")
-				$('#item_restriction_min_score').css('visibility', 'hidden');
-			else
-			$('#item_restriction_min_score').css('visibility', 'visible');
-			
+		if($('#item_restriction_item_type option:selected'
+			).text()=="Grade Activity"){
+			$('#item_restriction_min_score'
+				).css('visibility', 'visible');
+			$('#item_restriction_min_score__label'
+				).css('visibility', 'visible');
+			$('#item_restriction_is_unique'
+			).css('visibility', 'hidden');
+			$('#item_restriction_is_unique__label'
+				).css('visibility', 'hidden');
+		}
+		else if($('#item_restriction_item_type option:selected'
+			).text()=="Schedule")
+		{
+			$('#item_restriction_min_score'
+				).css('visibility', 'hidden');
+			$('#item_restriction_min_score__label'
+				).css('visibility', 'hidden');
+			$('#item_restriction_is_unique'
+			).css('visibility', 'visible');
+			$('#item_restriction_is_unique__label'
+			).css('visibility', 'visible');
+		}
+		else{
+			$('#item_restriction_min_score'
+				).css('visibility', 'hidden');
+			$('#item_restriction_min_score__label'
+				).css('visibility', 'hidden');
+			$('#item_restriction_is_unique'
+			).css('visibility', 'hidden');
+			$('#item_restriction_is_unique__label'
+			).css('visibility', 'hidden');
+		}
 		});
 	});
 </script>

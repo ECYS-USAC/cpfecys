@@ -1367,8 +1367,9 @@ def items_grid():
     context_string = T('All')
     period_entity = db(db.period_year.id==period).select().first()
     if period_entity:
-        context_string = T(str(period_entity.period.name)) + \
-        ' ' + str(period_entity.yearp)
+        period_name = period_entity.period.name
+        period_year = period_entity.yearp
+        context_string = T(str(period_name)) + ' ' + str(period_entity.yearp)
     school_id = request.vars['school_id']
     if not(area=='' or area==None):
         projects = db(db.project.area_level==area).select()    

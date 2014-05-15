@@ -597,7 +597,8 @@ def item():
                 redirect(URL('student', 'item',  args=['edit'],\
                     vars = dict(restriction=item_restriction.id, \
                         assignation=user_project, \
-                        period=period)))
+                        period=period,
+                        item=item.id)))
                 #return
         else:
             session.flash = T('Action not allowed')
@@ -616,6 +617,7 @@ def item():
             redirect(URL('student', 'index'))
 
     elif(request.args(0) == 'edit'):
+        item_id = request.vars['item']
         if assignation == None:
             session.flash = T('This item can\'t be\
                 edited, permissions problem')
@@ -630,14 +632,15 @@ def item():
                 edited, item edition for this item is out of time')
             redirect(URL('student', 'index'))
 
-        itm_res_area = db(
-            (db.item_restriction_area.area_level==area)&
-            (db.item_restriction_area.item_restriction== \
-                item_restriction)&
-            (db.item_restriction_area.is_enabled==True)
-            )._select()
+        can_edit = db((db.item_restriction.id==item_restriction)&
+            (db.item.item_restriction==db.item_restriction.id)&
+            (db.item.id==item_id)&
+            (db.item.assignation==db.user_project.id)&
+            (db.item.assignation==user_project)&
+            (db.item.created==db.period_year.id)&
+            (db.period_year.id==period))
 
-        if itm_res_area == None:
+        if can_edit == None:
             session.flash = T('This item can\'t be\
                 edited, doesn\'t belongs to this project')
             redirect(URL('student', 'index'))
@@ -661,10 +664,10 @@ def item():
                     str(last_date)
                     redirect(URL('student', 'index'))
 
-        item = db((db.item.created==cyear_period)&
-            (db.item.item_restriction==item_restriction)&
-            (db.item.assignation==user_project)).select().first()
+        item = db(db.item.id==item_id).select().first()
         if item == None or item.is_active != True:
+            session.flash = ('This item can\'t be\
+                    edited, doesn\'t exists or is not active')
             redirect(URL('student', 'index'))
         if item.item_restriction.item_type.name == 'File':
             form = FORM(

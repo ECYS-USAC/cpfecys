@@ -388,7 +388,7 @@
                                         <a href="{{=URL('student',
                                                  'item/edit',
                                             vars=dict(period = cyear_period.id,restriction=item_restriction.item_restriction.id,
-                                                 assignation=item.user_project.id, file=instance.uploaded_file))}}" class="btn">
+                                                 assignation=item.user_project.id, item=instance.id))}}" class="btn">
                                             <span class="icon-edit"></span>
                                             {{=T('Edit Item')}}
                                         </a>

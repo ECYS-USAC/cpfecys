@@ -524,6 +524,8 @@ db.define_table('item_restriction',
                     label=T('limitdays')),
                 Field('min_score', 'integer', notnull=False,\
                     label=T('minscore')),
+                Field('is_unique', 'boolean', notnull=False,
+                    label=T('Is unique')),
                 format='%(name)s'
                 )
 
