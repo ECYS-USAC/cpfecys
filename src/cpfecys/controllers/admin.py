@@ -626,6 +626,13 @@ def courses_report():
 @auth.requires_login()
 @auth.requires_membership('Super-Administrator')
 def active_teachers():
+    period = cpfecys.current_year_period()
+    if request.vars['period'] != None:
+            period = request.vars['period']
+            period = db(db.period_year.id==period).select().first()
+            if not period:
+                session.flash = T('Invalid Action.')
+                redirect(URL('default', 'index'))
     if (request.args(0) == 'toggle'):
         enabled = ''
         user = request.vars['user']
@@ -637,14 +644,62 @@ def active_teachers():
             enabled = 'blocked'
         user.update_record(
                 registration_key=enabled)
+        redirect(URL('admin','active_teachers'))
+    elif request.args(0) == 'mail':
+        user = request.vars['user']
+        if user == None:
+            session.flash = T("No existing user")
+            redirect(URL('admin','active_teachers'))
+        user = db(db.auth_user.id==user).select().first()
+        if user == None:
+            session.flash = T("No existing user")
+            redirect(URL('admin','active_teachers'))
+        recovery = cpfecys.get_domain() + \
+            'default/user/retrieve_username?_next=/cpfecys/default/index'
+        message = "Bienvenido a CPFECYS, su usuario es " + user.username + \
+        ' para generar su contraseña puede visitar el siguiente enlace e ' +\
+        'ingresar su usuario ' + recovery
+        subject = 'DTT-ECYS Bienvenido'
+        send_mail_to_users([user], message, None, None, subject)
+        user.update_record(load_alerted=True)
+    elif request.args(0) == 'notifyall':
+        users = get_assignations(False, period, 'Teacher'
+                ).select(db.auth_user.ALL, distinct=True)
+        recovery = cpfecys.get_domain() + \
+            'default/user/retrieve_username?_next=/cpfecys/default/index'
+        for user in users:
+            message = "Bienvenido a CPFECYS, su usuario es " + user.username + \
+            ' para generar su contraseña puede visitar el siguiente enlace e ' +\
+            'ingresar su usuario ' + recovery
+            subject = 'DTT-ECYS Bienvenido'
+            send_mail_to_users([user], message, None, None, subject)
+            user.update_record(load_alerted=True)
+    elif request.args(0) == 'notifypending':
+        project = False
+        users = db(
+            (db.auth_user.id==db.user_project.assigned_user)&
+            (db.auth_user.id==db.auth_membership.user_id)&
+            (db.auth_user.load_alerted==None)&
+            (db.auth_membership.group_id==db.auth_group.id)&
+            (db.auth_group.role=='Teacher')&
+            (project==False or (db.user_project.project==project))&
+            (db.project.area_level==db.area_level.id)&
+            (db.user_project.project==db.project.id)&
+            (db.user_project.period == db.period_year.id)&
+            ((db.user_project.period <= period.id)&
+         ((db.user_project.period + db.user_project.periods) > \
+          period.id))
+            ).select(db.auth_user.ALL, distinct=True)
+        recovery = cpfecys.get_domain() + \
+            'default/user/retrieve_username?_next=/cpfecys/default/index'
+        for user in users:
+            message = "Bienvenido a CPFECYS, su usuario es " + user.username + \
+            ' para generar su contraseña puede visitar el siguiente enlace e ' +\
+            'ingresar su usuario ' + recovery
+            subject = 'DTT-ECYS Bienvenido'
+            send_mail_to_users([user], message, None, None, subject)
+            user.update_record(load_alerted=True)
 
-    period = cpfecys.current_year_period()
-    if request.vars['period'] != None:
-            period = request.vars['period']
-            period = db(db.period_year.id==period).select().first()
-            if not period:
-                session.flash = T('Invalid Action.')
-                redirect(URL('default', 'index'))
     assignations = get_assignations(False, period, 'Teacher' \
                 ).select(db.user_project.ALL,
                 orderby=db.area_level.name|\
@@ -797,14 +852,16 @@ def send_mail_to_users(users, message, roles, projects, subject, log=False):
         print user.email
         if user.email != None and user.email != '':
             import cpfecys
-            message = '<html>' + message + (cpfecys.get_custom_parameters().email_signature or '') + '</html>'
+            message = '<html>' + message + \
+            (cpfecys.get_custom_parameters().email_signature or '') + '</html>'
             was_sent = mail.send(to=user.email,
               subject=T(subject),
               message=message)
             #MAILER LOG
             db.mailer_log.insert(sent_message = message,
                              destination = str(user.email),
-                             result_log = str(mail.error or '') + ':' + str(mail.result),
+                             result_log = str(mail.error or '') + ':' + \
+                             str(mail.result),
                              success = was_sent)
 
 @auth.requires_login()
