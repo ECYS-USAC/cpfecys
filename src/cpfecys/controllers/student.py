@@ -918,20 +918,23 @@ def report():
         import cpfecys
         #valid_rep_restr = cpfecys.student_validation_report_restrictions(report_restriction)
         # Validate report_restriction
-        report_restrict = db.report_restriction(db.report_restriction.id == report_restriction)
+        report_restrict = db.report_restriction(\
+            db.report_restriction.id == report_restriction)
         valid_report = report_restrict != None
         # Validate assignation belongs to this user
         assign = db.user_project((db.user_project.id == assignation)&
                                 (db.user_project.assigned_user == auth.user.id))
         valid_assignation = assign != None
         ## Validate assignation
-        if valid_assignation: valid_assignation = not cpfecys.assignation_is_locked(assign)
+        if valid_assignation: valid_assignation = \
+            not cpfecys.assignation_is_locked(assign)
         # Validate there is not an already inserted report
         valid = db.report((db.report.assignation == assignation)&
                   (db.report.report_restriction == report_restriction)) is None
-        if not(assignation and report_restriction and valid and valid_assignation and valid_report
-           and valid_rep_restr):
-            session.flash = T('Invalid selected assignation and report. Select a valid one.')
+        if not(assignation and report_restriction and valid \
+                and valid_assignation and valid_report):
+            session.flash = T(\
+                'Invalid selected assignation and report. Select a valid one.')
             redirect(URL('student','index'))
         import datetime
         current_date = datetime.datetime.now()
@@ -947,12 +950,12 @@ def report():
         ## Retrieve report data
         report = db.report(db.report.id == report)
         if not(report):
-            session.flash = T('Selected report can\'t be edited. Select a valid report.')
+            session.flash = T('Selected report can\'t be edited. Select a valid report. 1')
             redirect(URL('student','index'))
         ## Validate assignation
         import cpfecys
         if cpfecys.assignation_is_locked(report.assignation):
-            session.flash = T('Selected report can\'t be edited. Select a valid report.')
+            session.flash = T('Selected report can\'t be edited. Select a valid report. 2')
             redirect(URL('student','index'))
         ## Validate report TIMING restriction
         #valid_rep_restr = cpfecys.student_validation_report_restrictions(report.report_restriction.id)
@@ -962,11 +965,11 @@ def report():
         ## Validate that the report belongs to user
         valid_report_owner = cpfecys.student_validation_report_owner(report.id)
         if not(valid_report_owner):
-            session.flash = T('Selected report can\'t be edited. Select a valid report.')
+            session.flash = T('Selected report can\'t be edited. Select a valid report. 3')
             redirect(URL('student','index'))
         ## Validate that the report status is editable (it is either 'Draft' or 'Recheck')
         if not(cpfecys.student_validation_report_status(report)):
-            session.flash = T('Selected report can\'t be edited. Select a valid report.')
+            session.flash = T('Selected report can\'t be edited. Is not in a editable state.')
             redirect(URL('student','index'))
         ## Markmin formatting of reports
         response.view = 'student/report_edit.html'
@@ -1069,7 +1072,7 @@ def report():
         assign = db.user_project((db.user_project.id == report.assignation)&
                                 (db.user_project.assigned_user == auth.user.id))
         valid_assignation = assign != None
-        if not(report and valid_assignation and valid_rep_restr):
+        if not(report and valid_assignation):
             session.flash = T('Invalid selected assignation and report. Select a valid one.')
             redirect(URL('student','index'))
         import datetime

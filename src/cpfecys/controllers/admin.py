@@ -63,7 +63,7 @@ def general_report():
         period = request.vars['period']
         period = db(db.period_year.id==period).select().first()
         if not period:
-            session.flash = T('Invalid Action.')
+            session.flash = T('Not valid Action.')
             redirect(URL('default', 'index'))
     periods = db(db.period_year).select()
     areas = db(db.area_level).select()
@@ -394,6 +394,7 @@ def parameters():
 @auth.requires_membership('Super-Administrator')
 def report():
     import datetime
+    import cpfecys
     cdate = datetime.datetime.now()
     report = request.vars['report']
     report = db.report(db.report.id == report)
@@ -504,7 +505,8 @@ def report():
                 user = report.assignation.assigned_user
                 subject = T('[DTT]Automatic Notification - Report graded ') \
                 +T('BY ADMIN USER')
-                signat = cpfecys.get_custom_parameters().email_signature
+                signat = cpfecys.get_custom_parameters().email_signature or ''
+                cstatus = db(db.report_status.id==report.status).select().first()
                 message = '<html>' + T('The report') + ' ' \
                 + '<b>' + XML(report.report_restriction.name) + '</b><br/>' \
                 + T('sent by student: ') + XML(user.username) + ' ' \
@@ -518,7 +520,7 @@ def report():
                 + T('Comment: ') + XML(comment) + ' ' \
                 + '<br/>' \
                 + T('Current status is: ') \
-                + XML(T(report.status.name)) +'<br/>' \
+                + XML(T(cstatus.name)) +'<br/>' \
                 + T('DTT-ECYS') \
                 + ' ' + cpfecys.get_domain() + '<br />' + signat + '</html>'
                 was_sent = mail.send(to=user.email,
@@ -529,12 +531,12 @@ def report():
                              destination = str(user.email),
                              result_log = str(mail.error or '') + ':' + str(mail.result),
                              success = was_sent)
-                session.flash = T('The report has been scored \
-                    successfully')
-                redirect(URL('admin', 'report/view', \
-                    vars=dict(report=report.id)))
+            session.flash = T('The report has been scored \
+                successfully')
+            redirect(URL('admin', 'report/view', \
+                vars=dict(report=report.id)))
 
-        session.flash = T('Invalid Action.')
+        session.flash = T('Not valid Action.')
         redirect(URL('admin', 'report/view', \
                     vars=dict(report=report.id)))
 
@@ -548,7 +550,7 @@ def courses_report():
         period = request.vars['period']
         period = db(db.period_year.id==period).select().first()
         if not period:
-            session.flash = T('Invalid Action.')
+            session.flash = T('Not valid Action.')
             redirect(URL('default', 'index'))
     if request.args(0) == 'areas':
         areas = db(db.area_level).select()
@@ -631,7 +633,7 @@ def active_teachers():
             period = request.vars['period']
             period = db(db.period_year.id==period).select().first()
             if not period:
-                session.flash = T('Invalid Action.')
+                session.flash = T('Not valid Action.')
                 redirect(URL('default', 'index'))
     if (request.args(0) == 'toggle'):
         enabled = ''

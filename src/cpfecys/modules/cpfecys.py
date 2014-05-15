@@ -80,19 +80,21 @@ def student_validation_report_restrictions(report_restriction):
 def student_validation_report_status(report):
     db = _db
     import datetime
-    current_date = datetime.datetime.now()
+    current_date = datetime.datetime.now().date()
     report_restriction = report.report_restriction.id
     if report.score_date == None:
-        return False
-    current_date = datetime.datetime.now().date()
+        if report.report_restriction.start_date <= current_date \
+            and report.report_restriction.end_date >= current_date \
+            and report.report_restriction.is_enabled == True:
+            return True
+
     next_date = report.score_date + datetime.timedelta(
-                    days=get_custom_parameters().rescore_max_days)
+                days=get_custom_parameters().rescore_max_days)
     if not assignation_is_locked(report.assignation) \
-            and ((report.status.name == 'Draft' \
-                    and report.report_restriction.start_date <= current_date \
-                    and report.report_restriction.end_date >= current_date) 
-                 or (report.status.name == 'Recheck' \
-                    and current_date < next_date)):
+        and ((report.status.name == 'Draft'
+                and report.report_restriction.is_enabled == True) 
+             or (report.status.name == 'Recheck' \
+                and current_date <= next_date)):
         return True
     return False
 
