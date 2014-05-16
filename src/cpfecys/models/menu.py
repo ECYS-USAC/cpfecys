@@ -71,9 +71,9 @@ if auth.has_membership(role="Student"):
     response.menu.extend([(T('My Final Practice'), False, URL('student', 'index'), [])])
 if auth.has_membership(role="DSI") and \
  not auth.has_membership(role="Super-Administrator"):
-    response.menu.extend([(T('Delivered Items'), False, URL('dsi', 'index'), [])])
+    response.menu.extend([(T('DSI tasks'), False, URL('dsi', 'index'), [])])
 elif auth.has_membership(role="Super-Administrator"):
-    response.menu.extend([(T('Delivered Items'), False, URL('admin', 'delivered'), [])])
+    response.menu.extend([(T('DSI tasks'), False, URL('admin', 'delivered'), [])])
 user_menu = []
 if not (auth.is_logged_in()):
     user_menu.append((T('Events'), False, URL(), [

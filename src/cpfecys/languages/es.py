@@ -371,6 +371,7 @@
 'Draft (24 hours)': 'Draft (24 hours)',
 'Draft Saved.': 'Borrador Guardado.',
 'Draft Updated.': 'Borrador Actualizado.',
+'DSI tasks': 'Labor DSI',
 'dsi visible': '¿Visible para DSI?',
 'dsi_visible': 'Visible para DSI?',
 'dsivisible': 'Visible para DSI?',
