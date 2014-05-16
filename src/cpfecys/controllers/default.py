@@ -191,4 +191,10 @@ def resources():
                           (db.item_restriction.period == period)&
                           (db.item.assignation == db.user_project.id)&
                           (db.user_project.project == db.project.id)&
+                          (db.user_project.project == db.project.id)&\
+                        (db.auth_user.id == db.user_project.assigned_user)&\
+                        (db.user_project.assignation_status == None)&\
+                        (db.auth_membership.user_id == db.auth_user.id)&\
+                        (db.auth_membership.group_id == db.auth_group.id)&\
+                        (db.auth_group.role == 'Student')&
                           (db.item.id > 0)).select(groupby=db.project.name, orderby=db.project.name))

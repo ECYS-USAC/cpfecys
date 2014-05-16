@@ -359,6 +359,7 @@
 'Disk Cache Keys': 'Llaves de Cache en Disco',
 'Disk Cleared': 'Disco limpiado',
 'Documentation': 'Documentación',
+'Domingo': 'Domingo',
 "Don't know what to do?": '¿No sabe que hacer?',
 'Done': 'Completado',
 'Done Activity': 'Actividad Relizada',
