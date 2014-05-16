@@ -79,7 +79,7 @@ def index():
     	cperiod = cpfecys.current_year_period()
     	year = str(cperiod.yearp)
     	if cperiod.period == cpfecys.first_period.id: month = '-01-01'
-    	else: month = '-07-01'
+    	else: month = '-06-01'
         start = datetime.datetime.strptime(year + month, "%Y-%m-%d")
         if item_restriction.limit_days != None:
             last_date = start + datetime.timedelta( \
@@ -95,9 +95,9 @@ def index():
         year = str(cperiod.yearp)
         if cperiod.period == cpfecys.first_period.id: 
             month = '-01-01'
-            last = '-07-01'
+            last = '-06-01'
         else: 
-            month = '-07-01'
+            month = '-06-01'
             last = '-01-01'
         start = datetime.datetime.strptime(year + month, "%Y-%m-%d")
         if item_restriction.limit_days != None:
@@ -529,7 +529,7 @@ def item():
             if cperiod.period == cpfecys.first_period.id: 
                 month = '-01-01'
             else: 
-                month = '-07-01'
+                month = '-06-01'
             start = \
                 datetime.datetime.strptime(year + month, "%Y-%m-%d")
             if item_restriction.limit_days != None:
@@ -652,7 +652,7 @@ def item():
             if cperiod.period == cpfecys.first_period.id: 
                 month = '-01-01'
             else: 
-                month = '-07-01'
+                month = '-06-01'
             start = \
                 datetime.datetime.strptime(year + month, "%Y-%m-%d")
             if item_restriction.limit_days != None:

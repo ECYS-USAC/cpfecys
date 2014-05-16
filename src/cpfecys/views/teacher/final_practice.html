@@ -149,19 +149,28 @@
                            {{=item_restriction.item_restriction.name}}
                         </td>
                         <td>
-                        <div class="label label-info">
-                            {{=T('Not delivered yet')}}
-                            {{if item_restriction.item_restriction.limit_days != None:}}
-                            {{import cpfecys}}
-                            {{import datetime}}
-                            , {{=T('Last day')}}:
-                            {{cyearperiod = cpfecys.current_year_period()}}
-                            {{if cyearperiod.period == cpfecys.first_period.id:}}
-                            {{=str(datetime.timedelta(days = item_restriction.item_restriction.limit_days) + datetime.date(cyearperiod.yearp,1,1))}}
-                            {{else:}}
-                            {{=str(datetime.timedelta(days = item_restriction.item_restriction.limit_days) + datetime.date(cyearperiod.yearp,6,1))}}
-                            {{pass}}
-                            {{pass}}
+                        {{last_day = None}}
+                        {{if item_restriction.item_restriction.limit_days != None:}}
+                        {{import cpfecys}}
+                        {{import datetime}}
+                        
+                        {{cyearperiod = cpfecys.current_year_period()}}
+                        {{if cyearperiod.period == cpfecys.first_period.id:}}
+                        {{last_day = str(datetime.timedelta(days = item_restriction.item_restriction.limit_days) + datetime.date(cyearperiod.yearp,1,1))}}
+                        {{else:}}
+                        {{last_day = str(datetime.timedelta(days = item_restriction.item_restriction.limit_days) + datetime.date(cyearperiod.yearp,6,1))}}
+                        {{pass}}
+                        {{pass}}
+
+                        {{status_class = 'info'}}
+                        {{message_status = T('Not delivered yet')}}
+                        {{if last_day != None and compare_last_day(last_day):}}
+                            {{status_class = 'important'}}
+                            {{message_status = T('No delivered')}}
+                        {{pass}}
+                        <div class="label label-{{=status_class}}">
+                        {{=message_status}} , {{=T('Last day')}}: 
+                            {{=last_day or T('Semester ending')}}
                         </div>
                         </td>
                         <td>

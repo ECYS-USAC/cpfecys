@@ -9,9 +9,9 @@ def dtt_general_approval():
     year = str(cperiod.yearp)
     if cperiod.period == 1:
         start = datetime.strptime(year + '-01-01', "%Y-%m-%d")
-        end = datetime.strptime(year + '-07-01', "%Y-%m-%d")
+        end = datetime.strptime(year + '-06-01', "%Y-%m-%d")
     else:
-        start = datetime.strptime(year + '-07-01', "%Y-%m-%d")
+        start = datetime.strptime(year + '-06-01', "%Y-%m-%d")
         end = datetime.strptime(year + '-12-31', "%Y-%m-%d")
     status = request.vars['status']
     period = request.vars['period']
@@ -874,9 +874,9 @@ def anomalies_list():
     year = str(cperiod.yearp)
     if cperiod.period == 1:
         start = datetime.strptime(year + '-01-01', "%Y-%m-%d")
-        end = datetime.strptime(year + '-07-01', "%Y-%m-%d")
+        end = datetime.strptime(year + '-06-01', "%Y-%m-%d")
     else:
-        start = datetime.strptime(year + '-07-01', "%Y-%m-%d")
+        start = datetime.strptime(year + '-06-01', "%Y-%m-%d")
         end = datetime.strptime(year + '-12-31', "%Y-%m-%d")
     def get_month_name(date):
         import datetime
@@ -947,9 +947,9 @@ def report_list():
         year = str(pyear.yearp)
         if pyear.period == 1:
             start = datetime.strptime(year + '-01-01', "%Y-%m-%d")
-            end = datetime.strptime(year + '-07-01', "%Y-%m-%d")
+            end = datetime.strptime(year + '-06-01', "%Y-%m-%d")
         else:
-            start = datetime.strptime(year + '-07-01', "%Y-%m-%d")
+            start = datetime.strptime(year + '-06-01', "%Y-%m-%d")
             end = datetime.strptime(year + '-12-31', "%Y-%m-%d")
         reports = db((db.report.created>start)&
             (db.report.created<end)&
@@ -961,9 +961,9 @@ def report_list():
         year = str(pyear.yearp)
         if pyear.period == 1:
             start = datetime.strptime(year + '-01-01', "%Y-%m-%d")
-            end = datetime.strptime(year + '-07-01', "%Y-%m-%d")
+            end = datetime.strptime(year + '-06-01', "%Y-%m-%d")
         else:
-            start = datetime.strptime(year + '-07-01', "%Y-%m-%d")
+            start = datetime.strptime(year + '-06-01', "%Y-%m-%d")
             end = datetime.strptime(year + '-12-31', "%Y-%m-%d")
         reports = db((db.report.created<end)&
             (db.report.created>start)&
@@ -978,9 +978,9 @@ def report_list():
         year = str(pyear.yearp)
         if pyear.period == 1:
             start = datetime.strptime(year + '-01-01', "%Y-%m-%d")
-            end = datetime.strptime(year + '-07-01', "%Y-%m-%d")
+            end = datetime.strptime(year + '-06-01', "%Y-%m-%d")
         else:
-            start = datetime.strptime(year + '-07-01', "%Y-%m-%d")
+            start = datetime.strptime(year + '-06-01', "%Y-%m-%d")
             end = datetime.strptime(year + '-12-31', "%Y-%m-%d")
         cperiod = cpfecys.current_year_period()
         restrictions = db((db.report_restriction.start_date>=start)&
@@ -1023,9 +1023,9 @@ def report_list():
         string = ''
         if pyear.period == 1:
             start = datetime.strptime(year + '-01-01', "%Y-%m-%d")
-            end = datetime.strptime(year + '-07-01', "%Y-%m-%d")
+            end = datetime.strptime(year + '-06-01', "%Y-%m-%d")
         else:
-            start = datetime.strptime(year + '-07-01', "%Y-%m-%d")
+            start = datetime.strptime(year + '-06-01', "%Y-%m-%d")
             end = datetime.strptime(year + '-12-31', "%Y-%m-%d")
         reports = db((db.report.created>= start)&
             (db.report.created<=end)&
@@ -1053,9 +1053,9 @@ def report_list():
         year = str(pyear.yearp)
         if pyear.period == 1:
             start = datetime.strptime(year + '-01-01', "%Y-%m-%d")
-            end = datetime.strptime(year + '-07-01', "%Y-%m-%d")
+            end = datetime.strptime(year + '-06-01', "%Y-%m-%d")
         else:
-            start = datetime.strptime(year + '-07-01', "%Y-%m-%d")
+            start = datetime.strptime(year + '-06-01', "%Y-%m-%d")
             end = datetime.strptime(year + '-12-31', "%Y-%m-%d")
         reports = db((db.report.created<end)&
             (db.report.created>start)&
@@ -1068,9 +1068,9 @@ def report_list():
         year = str(pyear.yearp)
         if pyear.period == 1:
             start = datetime.strptime(year + '-01-01', "%Y-%m-%d")
-            end = datetime.strptime(year + '-07-01', "%Y-%m-%d")
+            end = datetime.strptime(year + '-06-01', "%Y-%m-%d")
         else:
-            start = datetime.strptime(year + '-07-01', "%Y-%m-%d")
+            start = datetime.strptime(year + '-06-01', "%Y-%m-%d")
             end = datetime.strptime(year + '-12-31', "%Y-%m-%d")
         count = db.report.id.count()
         report_total = db().select(
@@ -1110,9 +1110,9 @@ def report_filter():
     year = str(cperiod.yearp)
     if cperiod.period == 1:
         start = datetime.strptime(year + '-01-01', "%Y-%m-%d")
-        end = datetime.strptime(year + '-07-01', "%Y-%m-%d")
+        end = datetime.strptime(year + '-06-01', "%Y-%m-%d")
     else:
-        start = datetime.strptime(year + '-07-01', "%Y-%m-%d")
+        start = datetime.strptime(year + '-06-01', "%Y-%m-%d")
         end = datetime.strptime(year + '-12-31', "%Y-%m-%d")
     status = request.vars['status']
     period = request.vars['period']
@@ -1274,7 +1274,7 @@ def items_manager():
     cperiod = cpfecys.current_year_period()
     year = str(cperiod.yearp)
     start = datetime.strptime(year + '-01-01', "%Y-%m-%d")
-    end = datetime.strptime(year + '-07-01', "%Y-%m-%d")
+    end = datetime.strptime(year + '-06-01', "%Y-%m-%d")
         
     if request.function == 'new':
         db.item.created.writable=db.item.created.readable=False

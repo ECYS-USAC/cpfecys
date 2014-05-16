@@ -79,6 +79,15 @@ def final_practice():
                         (db.item.assignation==final_practice.user_project.id) \
                         ).select()
     total_items = db((db.item.created==cpfecys.current_year_period())).select()
+
+    def compare_last_day(last_day):
+        from datetime import datetime
+        cdate = datetime.now()
+        last_day = datetime.strptime(str(last_day), "%Y-%m-%d")
+        if cdate > last_day:
+            return True
+        return False
+
     def get_current_reports(period):
         from datetime import datetime
         import cpfecys
@@ -86,9 +95,9 @@ def final_practice():
         year = str(cperiod.yearp)
         if period.period == 1:
             start = datetime.strptime(year + '-01-01', "%Y-%m-%d")
-            end = datetime.strptime(year + '-07-01', "%Y-%m-%d")
+            end = datetime.strptime(year + '-06-01', "%Y-%m-%d")
         else:
-            start = datetime.strptime(year + '-07-01', "%Y-%m-%d")
+            start = datetime.strptime(year + '-06-01', "%Y-%m-%d")
             end = datetime.strptime(year + '-12-31', "%Y-%m-%d")
 
         reports = db((db.report.assignation == final_practice.user_project.id)&
@@ -109,7 +118,8 @@ def final_practice():
                 assignation=assignation,
                 restriction_project_exception=restriction_project_exception,
                 items_instance=items_instance,
-                get_current_reports=get_current_reports)
+                get_current_reports=get_current_reports,
+                compare_last_day=compare_last_day)
 
 @cache.action()
 @auth.requires_login()
