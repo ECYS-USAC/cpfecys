@@ -315,11 +315,15 @@ def assignations():
     q3 = (db.user_project.project == db.project.id)
     q4 = (db.user_project.period == db.period_year.id)
     q5 = (db.project.area_level == db.area_level.id)
+    q6 = (db.auth_user.id==db.user_project.assigned_user)
+    q7 = (db.auth_user.id==db.auth_membership.user_id)
+    q8 = (db.auth_membership.group_id==db.auth_group.id)
+    q9 = (db.auth_group.role!='Teacher')
     orderby =  db.area_level.name
     orderby2 = db.project.name
     orderby3 = db.auth_user.username
     orderby4 = db.auth_user.first_name
-    data = db(q_selected_period_assignations&q2&q3&q4&q5\
+    data = db(q_selected_period_assignations&q2&q3&q4&q5&q6&q7&q8&q9\
         ).select(orderby=orderby|orderby2|orderby3|orderby4)
     current_period_name = T(cpfecys.second_period.name)
     if currentyear_period.period == cpfecys.first_period.id:
