@@ -36,23 +36,39 @@
                 {{pass}}
                 </ul>
             </td>
-            {{if element.item_restriction.item_type.name == 'File':}}
             <td>
-                <a href="{{=URL('default','download', args=element.item.uploaded_file)}}"
+            {{if not element.item_restriction.is_unique:}}
+            {{for element2 in db(db.item.item_restriction == element.item_restriction).select():}}
+            {{if element2.item_restriction.item_type.name == 'File':}}
+                <a href="{{=URL('default','download', args=element2.uploaded_file)}}"
                    class="btn">
                     {{=T('Download')}}
                 </a>
-            </td>
-            {{elif element.item_restriction.item_type.name == 'Schedule':}}
-            <td>
-                {{schedule = db(db.item_schedule.item == element.item.id).select()}}
+            {{elif element2.item_restriction.item_type.name == 'Schedule':}}
+                {{schedule = db(db.item_schedule.item == element2.id).select()}}
                 <ul>
                 {{for s in schedule:}}
                     <li>{{=T(s.day_of_week.name)}}: {{=s.start_time}} - {{=s.end_time}}, {{=s.physical_location}}</li>
                 {{pass}}
                 </ul>
-            </td>
             {{pass}}
+            {{pass}}
+            {{else:}}
+            {{if element.item_restriction.item_type.name == 'File':}}
+                <a href="{{=URL('default','download', args=element2.item.uploaded_file)}}"
+                   class="btn">
+                    {{=T('Download')}}
+                </a>
+            {{elif element.item_restriction.item_type.name == 'Schedule':}}
+                {{schedule = db(db.item_schedule.item == element2.item.id).select()}}
+                <ul>
+                {{for s in schedule:}}
+                    <li>{{=T(s.day_of_week.name)}}: {{=s.start_time}} - {{=s.end_time}}, {{=s.physical_location}}</li>
+                {{pass}}
+                </ul>
+            {{pass}}
+            {{pass}}
+            </td>
             {{counter += 1}}
         </tr>
         {{pass}}
