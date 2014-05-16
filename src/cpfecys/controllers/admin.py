@@ -705,7 +705,7 @@ def active_teachers():
     assignations = get_assignations(False, period, 'Teacher' \
                 ).select(db.user_project.ALL,
                 orderby=db.area_level.name|\
-                db.user_project.project|\
+                db.project.name|\
                 db.auth_user.last_name|\
                 db.auth_user.first_name)
     periods = db(db.period_year).select()
