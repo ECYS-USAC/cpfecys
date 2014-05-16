@@ -892,6 +892,13 @@ def anomalies_list():
         if not valid:
             session.flash = T('Incomplete Information')
             redirect(URL('default', 'index'))
+        cperiod = db(db.period_year.id==period).select().first()
+        if cperiod.period == 1:
+            start = datetime.strptime(year + '-01-01', "%Y-%m-%d")
+            end = datetime.strptime(year + '-06-01', "%Y-%m-%d")
+        else:
+            start = datetime.strptime(year + '-06-01', "%Y-%m-%d")
+            end = datetime.strptime(year + '-12-31', "%Y-%m-%d")
         anomalies = db((db.log_entry.report==db.report.id)&
             (db.log_entry.log_type==db.log_type(name='Anomaly'))&
             (db.report.created>start)&
@@ -909,6 +916,13 @@ def anomalies_list():
         response.view = 'admin/anomaly_periods.html'
         periods = db(db.period_year).select()
         def count_by_period(period):
+            cperiod = db(db.period_year.id==period).select().first()
+            if cperiod.period == 1:
+                start = datetime.strptime(year + '-01-01', "%Y-%m-%d")
+                end = datetime.strptime(year + '-06-01', "%Y-%m-%d")
+            else:
+                start = datetime.strptime(year + '-06-01', "%Y-%m-%d")
+                end = datetime.strptime(year + '-12-31', "%Y-%m-%d")
             anomalies_total = db((db.log_entry.report==db.report.id)&
             (db.log_entry.log_type==db.log_type(name='Anomaly'))&
             (db.report.created>start)&
