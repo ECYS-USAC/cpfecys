@@ -1,4 +1,4 @@
-# coding: utf-8
+# -*- coding: utf-8 -*-
 {
 '': '',
 '!=': '!=',
@@ -189,6 +189,7 @@
 'Available Projects': 'Proyectos Disponibles',
 'Available:': 'Disponible:',
 'Average Score': 'Nota Promedio',
+'Average Score Approved by DTT': 'Nota promedio Aprobados por DTT',
 'Back': 'Atras',
 'Back to Assignation': 'Regresar a Asignación',
 'Blank': 'Blanco',

@@ -120,6 +120,7 @@
                             </thead>
                             <tbody>
                                 {{average_report_scoring = 0}}
+                                {{average_report_scoring_general = 0}}
                                 {{reports = item.user_project.report.select()}}
                                 {{average_report_count = len(reports)}}
                                 {{for report in reports:}}
@@ -185,6 +186,7 @@
                                         <span class="label label-important">{{=T('Not Approved')}}</span>
                                         {{pass}}
                                     </td>
+                                    {{if report.score: average_report_scoring_general += report.score}}
                                     {{if report.score and report.dtt_approval: average_report_scoring += report.score}}
                                     <td>
                                         <a class="btn"
@@ -262,7 +264,13 @@
                         </table>
                         <div class="span12">
                             <div class="span6">
-                                <strong>{{=T('Average Score')}}:</strong>
+                                <small><strong>{{=T('Average Score')}}:</strong>
+                                {{if average_report_count > 0:}}
+                                    {{=average_report_scoring_general/average_report_count}}
+                                {{else:}}
+                                    0
+                                    {{pass}}</small><br />
+                                <strong>{{=T('Average Score Approved by DTT')}}:</strong>
                                 {{if average_report_count > 0:}}
                                     {{=average_report_scoring/average_report_count}}
                                 {{else:}}
