@@ -10,6 +10,9 @@
                     <th colspan="2">{{=T('Actions')}}</th>
                 </tr>
 				<tr>
+                    <th>
+                        {{=T('Num')}}
+                    </th>
 					<th>
 						{{=T('Project')}}
 					</th>
@@ -49,8 +52,13 @@
 				</tr>
 			</thead>
 			<tbody>
+            {{count = 0}}
             {{for record in result:}}
+            {{count += 1}}
             <tr>
+                <td>
+                    {{=count}}
+                </td>
                 <td>{{=record['assignation'].user_project.project.name}}</td>
                 <td>{{=T('Pending')}}</td>
                 <td>{{=record['assignation'].auth_user.username}}</td>

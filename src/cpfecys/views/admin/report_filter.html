@@ -17,6 +17,9 @@
                     <th colspan="2">{{=T('Actions')}}</th>
                 </tr>
 				<tr>
+                    <th>
+                        {{=T('Num')}}
+                    </th>
 					<th>
 						{{=T('Project')}}
 					</th>
@@ -70,6 +73,7 @@
 				</tr>
 			</thead>
 			<tbody>
+                {{count = 0}}
 				{{for report in reports:}}
 				{{hours_left = report.assignation.hours}}
 				{{hours_left = hours_left - (report.hours or 0)}}
@@ -92,7 +96,11 @@
                     {{pass}}
                 {{pass}}
                     {{if show:}}
+                    {{count += 1}}
     				<tr>
+                        <td>
+                            {{=count}}
+                        </td>
     					<td>
     						{{=report.assignation.project.name}}	
     					</td>
@@ -139,14 +147,17 @@
     					</td>
                         <td>
                             {{if report.dtt_approval is None:}}
+                            {{=report.never_delivered}}
                             <span class="label">
                                 {{=T('DTT Approval Pending')}}
                             </span>
                             {{elif report.dtt_approval is True:}}
+                            {{=report.never_delivered}}
                             <span class="label label-success">
                                 {{=T('DTT Approved')}}
                             </span>
                             {{else:}}
+                            {{=report.never_delivered}}
                             <span class="label label-warning">
                                 {{=T('DTT faling')}}
                             </span>
@@ -191,7 +202,7 @@
                     {{pass}}
                 {{pass}}
                 <tr>
-                    <td colspan="10"></td>
+                    <td colspan="11"></td>
                     <td>
                         <div class="pull-right right">
                             <b>{{=T('DTT Approval')}}:</b>

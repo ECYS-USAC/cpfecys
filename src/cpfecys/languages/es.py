@@ -1,4 +1,4 @@
-# -*- coding: utf-8 -*-
+# coding: utf-8
 {
 '': '',
 '!=': '!=',
@@ -757,6 +757,7 @@
 'My Sites': 'Mis Sitios',
 'Máximo': 'Máximo',
 'Mínimo': 'Mínimo',
+'N': 'N',
 'name': 'nombre',
 'Name': 'Nombre',
 'Never': 'Nunca',
@@ -813,6 +814,8 @@
 'Notify All': 'Notificar a todos',
 'Notify Pending': 'Notificar Pendientes',
 'November': 'Noviembre',
+'Num': 'Num',
+'Number': 'Number',
 'Object or table name': 'Objeto o nombre de tabla',
 'October': 'Octubre',
 'Ok': 'Ok',
@@ -1320,8 +1323,8 @@
 'Work address': 'Dirección Laboral',
 'Work Address': 'Dirección Laboral',
 'Work Address:': 'Dirección Laboral:',
-'Work Phone': 'Teléfono de trabajo',
 'Work phone': 'Teléfono de trabajo',
+'Work Phone': 'Teléfono de trabajo',
 'Working': 'Laborando',
 'Working Address': 'Dirección de trabajo',
 'Working...': 'Trabajando...',

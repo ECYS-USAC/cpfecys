@@ -953,7 +953,9 @@ def report_list():
             end = datetime.strptime(year + '-12-31', "%Y-%m-%d")
         reports = db((db.report.created>start)&
             (db.report.created<end)&
-            (db.report.score < db.report.min_score))
+            (db.report.score < db.report.min_score)&
+            (db.report.never_delivered==None 
+                or db.report.never_delivered==False))
         return reports.count()
 
     def count_approved(pyear):
@@ -997,7 +999,7 @@ def report_list():
                     ).select(db.report.ALL).first()
                 if report == None:
                     pending += 1
-                #esto es para no ver drafts en report_filter
+                #esto es para no ver drafts en no_created del report_filter
                 #else:
                 #    hours = report.hours
                 #    entries = count_log_entries(\
@@ -1015,6 +1017,39 @@ def report_list():
                 #            pending += 1
 
         return pending
+
+    def count_acceptance(pyear):
+        from datetime import datetime
+        year = str(pyear.yearp)
+        total = 0
+        string = ''
+        if pyear.period == 1:
+            start = datetime.strptime(year + '-01-01', "%Y-%m-%d")
+            end = datetime.strptime(year + '-06-01', "%Y-%m-%d")
+        else:
+            start = datetime.strptime(year + '-06-01', "%Y-%m-%d")
+            end = datetime.strptime(year + '-12-31', "%Y-%m-%d")
+        reports = db((db.report.created>= start)&
+            (db.report.created<=end)&
+            (db.report.status==db.report_status(name='Acceptance'))).select()
+        array = []
+        for report in reports:
+            hours = report.hours
+            entries = count_log_entries(\
+                report)[0]['COUNT(log_entry.id)']
+            metrics = count_metrics_report(\
+                report)[0]['COUNT(log_metrics.id)']
+            anomalies = count_anomalies(\
+                report)[0]['COUNT(log_entry.id)']
+            string = string + str(entries) + ' ' + str(metrics) + ' ' +str(anomalies) + '<br/>'
+            if report.assignation.project.area_level.name == \
+                    'DTT Tutor Académico':
+                if entries != 0 or metrics != 0 or anomalies != 0:
+                    total += 1
+            else:
+                if hours != None:
+                    total += 1
+        return total
 
     def count_draft(pyear):
         from datetime import datetime
@@ -1041,11 +1076,11 @@ def report_list():
             string = string + str(entries) + ' ' + str(metrics) + ' ' +str(anomalies) + '<br/>'
             if report.assignation.project.area_level.name == \
                     'DTT Tutor Académico':
-                if entries == 0 and metrics == 0 and anomalies == 0:
+                if entries != 0 or metrics != 0 or anomalies != 0:
                             total += 1
-                else:
-                        if hours == None and hours == 0:
-                            total += 1
+            else:
+                if hours != None and hours != 0:
+                    total += 1
         return total
 
     def count_no_delivered(pyear):
@@ -1057,11 +1092,10 @@ def report_list():
         else:
             start = datetime.strptime(year + '-06-01', "%Y-%m-%d")
             end = datetime.strptime(year + '-12-31', "%Y-%m-%d")
-        reports = db((db.report.created<end)&
-            (db.report.created>start)&
-            (db.report.never_delivered == True)&
-            (db.report.min_score!=None)&
-            (db.report.min_score!=0))
+        reports = db((db.report_restriction.start_date>=start)&
+            (db.report_restriction.end_date<=end)&
+            (db.report.report_restriction==db.report_restriction.id)&
+            (db.report.never_delivered == True))
         return reports.count()
     def count_reports(pyear, status, exclude):
         from datetime import datetime
@@ -1096,7 +1130,8 @@ def report_list():
         count_no_created=count_no_created,
         count_reports=count_reports,
         count_draft=count_draft,
-        count_no_delivered=count_no_delivered)
+        count_no_delivered=count_no_delivered,
+        count_acceptance=count_acceptance)
                 
 
 @auth.requires_login()
@@ -1171,7 +1206,9 @@ def report_filter():
             (db.report.created<end)&
             (db.report.score<=db.report.min_score)&
             (db.report.min_score!=None)&
-            (db.report.min_score!=0)).select()
+            (db.report.min_score!=0)&
+            (db.report.never_delivered==None or
+                db.report.never_delivered==False)).select()
         status_instance = db(db.report_status.id==status).select().first()
     elif int(status) == -3:
         result = []
@@ -1217,11 +1254,19 @@ def report_filter():
             count_metrics_report=count_metrics_report,
             count_anomalies=count_anomalies,)
     elif int(status) == -4:
-        reports = db((db.report.created>start)&
-            (db.report.created<end)&
-            (db.report.never_delivered==True)
-            ).select()
-        status_instance = db(db.report_status.id==status).select().first()
+        reports = db((db.report_restriction.start_date>=start)&
+            (db.report_restriction.end_date<=end)&
+            (db.report.report_restriction==db.report_restriction.id)&
+            (db.user_project.id==db.report.assignation)&
+            (db.auth_user.id==db.user_project.assigned_user)&
+            (db.project.id==db.user_project.project)&
+            (db.report.never_delivered == True))
+        status_instance = reports.select()
+        response.view = 'admin/report_filter_never_delivered.html'
+        return dict(status_instance=status_instance,
+            count_log_entries=count_log_entries,
+            count_metrics_report=count_metrics_report,
+            count_anomalies=count_anomalies,)
     else:
         reports = db((db.report.created>start)&
             (db.report.created<end)&
