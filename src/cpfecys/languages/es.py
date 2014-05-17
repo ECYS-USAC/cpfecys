@@ -868,6 +868,7 @@
 'Please fill working information fields': 'Por favor llene los campos relacionados con la Información laboral',
 'please input your password again': 'ingrese nuevamente su contraseña',
 'Please Insert': 'Please Ins rt',
+'Please insert a minimum grade': 'Por favor ingrese una nota mínima',
 "please proceed to replace the item, if you don't take                any action the item will remain disabled.": '. por favor procede a reemplazar el item, de lo contrario el item permanecerá anulado afectando el progreso de tu práctica final.',
 'Please Update your Data before proceed': 'Por favor actualice sus datos antes de continuar',
 'Please upload a file.': 'Porfavor ingrese un archivo.',

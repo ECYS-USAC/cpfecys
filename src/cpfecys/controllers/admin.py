@@ -1336,24 +1336,12 @@ def items_manager():
     from datetime import datetime
     cperiod = cpfecys.current_year_period()
     year = str(cperiod.yearp)
-    start = datetime.strptime(year + '-01-01', "%Y-%m-%d")
-    end = datetime.strptime(year + '-06-01', "%Y-%m-%d")
         
     if request.function == 'new':
         db.item.created.writable=db.item.created.readable=False
     grid = SQLFORM.smartgrid(db.item_restriction,  \
         linked_tables=['item_restriction_area', 'item_restriction_exception'])
-    #grid.element(_name='limit_days')['_onkeyup'] = \
-    #"start = new Date('"+str(start)+"');\
-    #start = start.setDate(start.getDate()+\
-    #    $('#item_restriction_limit_days').val());\
-    #start = new Date('2131564654')\
-    #$('#start').html(start);\
-    #end = new Date('"+str(end)+"');\
-    #end = end.setDate(end.getDate()+\
-    #    $('#item_restriction_limit_days').val());\
-    #$('#end').html(end);"
-    return dict(grid=grid, start=start, end=end)
+    return dict(grid=grid, year=year)
 
 @auth.requires_login()
 @auth.requires_membership('Super-Administrator')
