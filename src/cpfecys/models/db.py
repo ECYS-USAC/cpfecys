@@ -599,8 +599,8 @@ db.define_table('item_schedule',
                 Field('item', 'reference item', notnull = True),
                 Field('physical_location', 'string', notnull = True, label = T('Location')),
                 Field('day_of_week', 'reference day_of_week', label=T('Day'), notnull = True),
-                Field('start_time', 'time', label=T('Start Time'), notnull = True),
-                Field('end_time', 'time', label=T('End Time'), notnull = True))
+                Field('start_time', 'time', label=T('Start Hour'), notnull = True),
+                Field('end_time', 'time', label=T('End Hour'), notnull = True))
 
 db.define_table('custom_parameters',
                 Field('min_score', 'integer', notnull=False, \
