@@ -60,7 +60,7 @@
                     {{=T('Download')}}
                 </a>
             {{elif element.item_restriction.item_type.name == 'Schedule':}}
-                {{schedule = db(db.item_schedule.item == element2.item.id).select()}}
+                {{schedule = db(db.item_schedule.item == element.item.id).select()}}
                 <ul>
                 {{for s in schedule:}}
                     <li>{{=T(s.day_of_week.name)}}: {{=s.start_time}} - {{=s.end_time}}, {{=s.physical_location}}</li>

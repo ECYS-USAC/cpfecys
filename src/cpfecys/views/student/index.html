@@ -197,9 +197,7 @@
                                             {{=T('View Report')}}
                                         </a>
                                         {{if not cpfecys.assignation_is_locked(item.user_project):}}
-                                        {{if (report.status['name'] == 'Draft' \
-                                        and restriction.start_date <= current_date \
-                                        and restriction.end_date >= current_date) \
+                                        {{if (report.status['name'] == 'Draft') \
                                         or (report.status['name'] == 'Recheck') \
                                         and is_indate_range(report):}}
                                         <a class="btn"

@@ -15,7 +15,8 @@ def events():
                  thing = db((db.public_event.semester == cyearperiod.id)&
                             (db.public_event.assignation != None)&
                             (db.public_event.assignation == db.user_project.id)&
-                            (db.user_project.project == db.project.id)).select(orderby=db.project.name))
+                            (db.user_project.project == db.project.id) \
+                            ).select(orderby=db.project.name))
 @auth.requires_login()
 def event_edition():
     #show all assignations of current user

@@ -1284,7 +1284,9 @@ def report_filter():
         return dict(status_instance=status_instance,
             count_log_entries=count_log_entries,
             count_metrics_report=count_metrics_report,
-            count_anomalies=count_anomalies,)
+            count_anomalies=count_anomalies,
+            status=status,
+            period=period)
     else:
         reports = db((db.report.created>start)&
             (db.report.created<end)&

@@ -29,6 +29,9 @@
 					<th>
 						{{=T('School id')}}
 					</th>
+                    <th>
+                        {{=T('Email')}}
+                    </th>
 					<th>
 						{{=T('User')}}
 					</th>
@@ -110,6 +113,9 @@
     					<td>
     						{{=report.assignation.assigned_user.username}}	
     					</td>
+                        <td>
+                            {{=report.assignation.assigned_user.email}}  
+                        </td>                        
     					<td>
     						{{=report.assignation.assigned_user.first_name}}
     						{{=report.assignation.assigned_user.last_name}}

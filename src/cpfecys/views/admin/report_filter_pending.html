@@ -22,6 +22,9 @@
 					<th>
 						{{=T('School id')}}
 					</th>
+                    <th>
+                        {{=T('Email')}}
+                    </th>
 					<th>
 						{{=T('User')}}
 					</th>
@@ -62,6 +65,7 @@
                 <td>{{=record['assignation'].user_project.project.name}}</td>
                 <td>{{=T('Pending')}}</td>
                 <td>{{=record['assignation'].auth_user.username}}</td>
+                <td>{{=record['assignation'].auth_user.email}}</td>
                 <td>
                 {{=record['assignation'].auth_user.first_name}}
                 {{=record['assignation'].auth_user.last_name}}

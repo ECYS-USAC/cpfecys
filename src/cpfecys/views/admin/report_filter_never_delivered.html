@@ -6,6 +6,10 @@
         <table class="table table-bordered">
             <thead>
                 <tr>
+                    <th colspan="11"></th>
+                    <th colspan="2">{{=T('Actions')}}</th>
+                </tr>
+                <tr>
                     <th>
                         {{=T('Num')}}
                     </th>
@@ -17,6 +21,9 @@
                     </th>
                     <th>
                         {{=T('School id')}}
+                    </th>
+                    <th>
+                        {{=T('Email')}}
                     </th>
                     <th>
                         {{=T('User')}}
@@ -38,6 +45,23 @@
                     </th>
                     <th>
                         {{=T('Ends')}}
+                    </th>
+                    <th colspan="2">
+                        <div class="right pull-right">
+                            {{=T('DTT Approval')}}:
+                            <a class="btn btn-success"
+                               href="{{=URL('admin','dtt_general_approval', vars=dict(approve = True, status = status, period = period))}}">
+                            <span class="icon-check"></span>
+                            </a>
+                            <a class="btn btn-danger"
+                               href="{{=URL('admin','dtt_general_approval', vars=dict(approve = False, status = status, period = period))}}">
+                            <span class="icon-remove"></span>
+                            </a>
+                            <a class="btn"
+                               href="{{=URL('admin','dtt_general_approval', vars=dict(status = status, period = period))}}">
+                            <span class="icon-time"></span>
+                            </a>
+                        </div>
                     </th>
                 </tr>
             </thead>
@@ -62,6 +86,7 @@
                 <td>{{=report.assignation.project.name}}</td>
                 <td>{{=report.created}}</td>
                 <td>{{=report.assignation.assigned_user.username}}</td>
+                <td>{{=report.assignation.assigned_user.email}}</td>
                 <td>
                     {{=report.assignation.assigned_user.first_name}}
                     {{=report.assignation.assigned_user.last_name}}
@@ -93,6 +118,64 @@
                 </td>
                 <td>{{=report.report_restriction.start_date}}</td>
                 <td>{{=report.report_restriction.end_date}}</td>
+                <td>
+                    {{if report.dtt_approval is None:}}
+                    {{=report.never_delivered}}
+                    <span class="label">
+                        {{=T('DTT Approval Pending')}}
+                    </span>
+                    {{elif report.dtt_approval is True:}}
+                    {{=report.never_delivered}}
+                    <span class="label label-success">
+                        {{=T('DTT Approved')}}
+                    </span>
+                    {{else:}}
+                    {{=report.never_delivered}}
+                    <span class="label label-important">
+                        {{=T('DTT faling')}}
+                    </span>
+                    {{pass}}
+                    <p>
+                    {{if report.score is None:}}
+                    <span class="label">
+                        {{=T('Teacher Approval Pending')}}
+                    </span>
+                    {{elif report.score >= report.min_score:}}
+                    <span class="label label-success">
+                        {{=T('Teacher Approved')}}
+                    </span>
+                    {{elif report.score < report.min_score \
+                        and report.never_delivered == None:}}
+                    <span class="label label-important">
+                        {{=T('Teacher Failed')}}
+                    </span>
+                    {{else:}}
+                    <span class="label label-important">
+                        {{=T('Automatically Failed')}}
+                    </span>
+                    {{pass}}
+                    </p>
+                    <div class="pull-right right">
+                        <a class="btn btn-success"
+                       href="{{=URL('admin','dtt_approval', vars=dict(report=report.id, approve=True))}}">
+                        <span class="icon-check"></span>
+                        </a>
+                        <a class="btn btn-danger"
+                           href="{{=URL('admin','dtt_approval', vars=dict(report=report.id, approve=False))}}">
+                        <span class="icon-remove"></span>
+                        </a>
+                        <a class="btn"
+                           href="{{=URL('admin','dtt_approval', vars=dict(report=report.id))}}">
+                        <span class="icon-time"></span>
+                        </a>
+                    </div>
+                </td>
+                <td>
+                    <a class="btn " href="{{=URL('admin','report/view', vars=dict(report=report.id))}}">
+                    <span class="icon-eye-open"></span>
+                        {{=T('Report detail')}}
+                    </a>
+                </td>
             </tr>
             {{pass}}
             </tbody>
