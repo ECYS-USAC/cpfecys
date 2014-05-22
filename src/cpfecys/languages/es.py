@@ -1,4 +1,4 @@
-# coding: utf-8
+# -*- coding: utf-8 -*-
 {
 '': '',
 '!=': '!=',
@@ -1059,6 +1059,7 @@
 'Services': 'Servicios',
 'session expired': 'sesión expirada',
 'shell': 'terminal',
+'Show All': 'Mostrar Todos',
 'Show Statistics': 'Mostrar Estadísticos',
 'Show Students': 'Mostrar Estudiantes',
 'site': 'sitio',
