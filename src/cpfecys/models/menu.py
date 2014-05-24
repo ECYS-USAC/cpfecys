@@ -52,6 +52,7 @@ if auth.has_membership(role="Super-Administrator"):
              (T('Reports by status'), False, URL('admin', 'report_list'), []),
              (T('Anomalies per periods'), False, URL('admin', 'anomalies_list/periods'), []),
              (T('Delivered Items Administrator'), False, URL('admin', 'manage_items/periods'), []),
+             (T('Delivered Download'), False, URL('admin', 'delivered_download'), []),
              ]),
          (T('System Configuration'), False, URL(),[
              (T('Parameters configuration'), False, URL('admin', 'parameters'), []),

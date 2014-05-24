@@ -421,9 +421,9 @@ db.define_table('log_final',
                     label = T('Aprobados Laboratorio')),
                 Field('lab_reprobados', 'integer', notnull = True, \
                     label = T('Reprobados Laboratorio')),
-                Field('lab_media', 'integer', notnull = True, \
+                Field('lab_media', 'decimal(8,2)', notnull = True, \
                     label = T('Media Laboratorio')),
-                Field('lab_promedio', 'integer', notnull = True, \
+                Field('lab_promedio', 'decimal(8,2)', notnull = True, \
                     label = T('Promedio Laboratorio')),
                 Field('curso_media', 'decimal(8,2)', notnull = True, \
                     label = T('media')),

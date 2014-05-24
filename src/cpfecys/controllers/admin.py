@@ -73,8 +73,70 @@ def general_report():
     def get_teacher(project):
         assignations = get_assignations(project, period, 'Teacher' \
                 ).select(db.user_project.ALL)
+        return assignations
+    def get_final_report(project_id):
+        from datetime import datetime
+        log_final = None
+        parcial_1 = None
+        parcial_2 = None
+        parcial_3 = None
+        cperiod = cpfecys.current_year_period()
+        year = str(cperiod.yearp)
+        start = datetime.strptime(year + '-06-01', "%Y-%m-%d")
+        end = datetime.strptime(year + '-12-31', "%Y-%m-%d")
+        if cperiod.period == 1:
+            start = datetime.strptime(year + '-01-01', "%Y-%m-%d")
+            end = datetime.strptime(year + '-06-01', "%Y-%m-%d")
+
+        final_report = db((db.report.created>start)&
+                     (db.report.created<end)&
+                     ((db.report_restriction.is_enabled!=None) &
+                        (db.report_restriction.is_enabled!=False))&
+                     (db.report.assignation==db.user_project.id)&
+                     (db.user_project.project==project_id)&
+                     (db.report.report_restriction==db.report_restriction.id)&
+                     ((db.report_restriction.is_final!=None)&
+                        (db.report_restriction.is_final!=False))
+                      ).select(db.report.ALL).first()
+
+        project_reports = db((db.report.created>start)&
+                     (db.report.created<end)&
+                     ((db.report_restriction.is_enabled!=None) &
+                        (db.report_restriction.is_enabled!=False))&
+                     (db.report.assignation==db.user_project.id)&
+                     (db.user_project.project==project_id)
+                      )._select(db.report.id)
+        parcial_1 = db((db.log_metrics.metrics_type== \
+                        db.metrics_type(name='PRIMER PARCIAL'))&
+                        (db.log_metrics.report.belongs(project_reports))
+                        ).select(db.log_metrics.ALL).first()
+        parcial_2 = db((db.log_metrics.metrics_type== \
+                        db.metrics_type(name='SEGUNDO PARCIAL'))&
+                        (db.log_metrics.report.belongs(project_reports))
+                        ).select(db.log_metrics.ALL).first()
+        parcial_3 = db((db.log_metrics.metrics_type== \
+                        db.metrics_type(name='TERCER PARCIAL'))&
+                        (db.log_metrics.report.belongs(project_reports))
+                        ).select(db.log_metrics.ALL).first()
+        final = db((db.log_metrics.metrics_type== \
+                        db.metrics_type(name='EXAMEN FINAL'))&
+                        (db.log_metrics.report.belongs(project_reports))
+                        ).select(db.log_metrics.ALL).first()
+        primera_r = db((db.log_metrics.metrics_type== \
+                        db.metrics_type(name='PRIMERA RETRASADA'))&
+                        (db.log_metrics.report.belongs(project_reports))
+                        ).select(db.log_metrics.ALL).first()
+        segunda_r = db((db.log_metrics.metrics_type== \
+                        db.metrics_type(name='SEGUNDA RETRASADA'))&
+                        (db.log_metrics.report.belongs(project_reports))
+                        ).select(db.log_metrics.ALL).first()
+        if final_report != None:
+            log_final = db(db.log_final.report== \
+                final_report.id).select().first()
+        return final_report, log_final, parcial_1, parcial_2, parcial_3, \
+                final, primera_r, segunda_r
     return dict(areas=areas, get_projects=get_projects, 
-        get_teacher=get_teacher)
+        get_teacher=get_teacher,get_final_report=get_final_report,)
 
 @auth.requires_login()
 @auth.requires_membership('Super-Administrator')
@@ -1382,6 +1444,41 @@ def manage_items():
         return dict(areas=areas,
             period=period,
             count_items=count_items)        
+
+@auth.requires_login()
+@auth.requires_membership('Super-Administrator')
+def delivered_download():
+    if request.args(0) == 'type':
+        period = request.vars['period']
+        restrictions = db((db.item_restriction.period==period)&
+            (db.item_restriction.is_enabled==True)&
+            (db.item_restriction.item_type==db.item_type(name='File')))
+        restrictions = restrictions.select(db.item_restriction.ALL)
+        response.view = 'admin/delivered_download_restrictions.html'
+        return dict(restrictions=restrictions)
+
+    elif request.args(0) == 'zip':
+        import datetime
+        period = request.vars['period']
+        cdate = datetime.datetime.now().date()
+        restriction = request.vars['restriction']
+        r_instance = db(db.item_restriction.id==1
+            ).select(db.item_restriction.ALL)
+        file_name = cdate + T('Deliverable Items')
+        items = db((db.item.item_restriction==restriction)&
+            (db.item.uploaded_file!=None)&
+            (db.item.uploaded_file!='')).select()
+        files = []
+        for item in items:
+            files.append(item.uploaded_file)
+        if len(files) > 0:
+            return response.zip(file_name, files, db)
+        session.flash = T('No files to download.')
+        redirect(URL('admin', 'delivered_download/type', 
+            vars=dict(period=period)))
+
+    periods = db(db.period_year).select()
+    return dict(periods=periods)
 
 @auth.requires_login()
 @auth.requires_membership('Super-Administrator')

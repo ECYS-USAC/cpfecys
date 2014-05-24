@@ -137,17 +137,6 @@
             {{pass}}
             </tbody>
         </table>
-        {{if area!= None:}}
-            {{varx =  dict(area=area, period=period)}}
-        {{else:}}
-            {{varx = dict(period=period)}}
-        {{pass}}
-        {{file_name = 'items_grid/zip/' + cdate + '_' + T('Deliverable Items')}}
-        <a class="btn btn-info" 
-        href="{{=URL('admin', file_name, \
-        vars=varx)}}">
-        {{=T('Download all')}}
-        </a>
     </div>
 </div>
 <script type="text/javascript">

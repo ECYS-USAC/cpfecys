@@ -977,9 +977,11 @@ def report():
             redirect(URL('student','index'))
         ## Markmin formatting of reports
         response.view = 'student/report_edit.html'
-        assignation_reports = db(db.report.assignation == report.assignation).select()
+        assignation_reports = db(db.report.assignation == \
+            report.assignation).select()
         # check minimun requirements
-        reqs = db(db.area_report_requirement.area_level == report.assignation.project.area_level).select()
+        reqs = db(db.area_report_requirement.area_level == \
+            report.assignation.project.area_level).select()
         minimal_requirements = True
         activities_count = db(db.log_entry.report == report.id).count()
         metrics_count = db(db.log_metrics.report == report.id).count()
@@ -1040,22 +1042,28 @@ def report():
             and (final_stats == 0):
                 minimal_requirements = False
                 break
-            if (req.report_requirement.name == 'Encabezado') and (report.heading is None):
+            if (req.report_requirement.name == 'Encabezado') and \
+                        (report.heading is None):
                 minimal_requirements = False
                 break
-            if (req.report_requirement.name == 'Pie de Reporte') and (report.footer is None):
+            if (req.report_requirement.name == 'Pie de Reporte') and \
+                        (report.footer is None):
                 minimal_requirements = False
                 break
-            if (req.report_requirement.name == 'Registrar Actividad') and (activities_count == 0):
+            if (req.report_requirement.name == 'Registrar Actividad') and \
+                        (activities_count == 0):
                 minimal_requirements = False
                 break
-            if (req.report_requirement.name == 'Registrar Actividad con Metricas') and (metrics_count == 0):
+            if (req.report_requirement.name == 'Registrar Actividad con Metricas') and \
+                        (metrics_count == 0):
                 minimal_requirements = False
                 break
-            if (req.report_requirement.name == 'Registrar Deserciones') and (report.desertion_started is None):
+            if (req.report_requirement.name == 'Registrar Deserciones') and \
+                        (report.desertion_started is None):
                 minimal_requirements = False
                 break
-            if (req.report_requirement.name == 'Registrar Horas Completadas') and (report.hours is None):
+            if (req.report_requirement.name == 'Registrar Horas Completadas') and \
+                        (report.hours is None):
                 minimal_requirements = False
                 break
         if not minimal_requirements:

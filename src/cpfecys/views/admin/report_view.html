@@ -19,10 +19,12 @@
               <div class="controls">
                 <select name="status" id="status-drop">
                   {{for status in status_list:}}
+                    {{if status.name != 'Draft':}}
                     <option value="{{=status.id}}"
                     {{if status.id==report.status.id:}}selected{{pass}}>
                     {{=T(add_timing(status.name))}}
                     </option>
+                    {{pass}}
                   {{pass}}
                 </select>
               </div>
