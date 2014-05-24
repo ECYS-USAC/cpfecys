@@ -21,7 +21,12 @@
           </td>
         </tr>
     </table>
-    <table class="table table-striped table-bordered">
+        <a class="btn btn-success pull-right"
+           onclick="tableToExcel('delivered','');">
+            <i class="icon-download icon-white"></i>
+            {{=T('Excel (XLS)')}}
+        </a>
+    <table id="delivered" class="table table-striped table-bordered">
         <thead>
             <tr>
                 <th>

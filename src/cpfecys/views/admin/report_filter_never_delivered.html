@@ -2,8 +2,12 @@
 <div class="row-fluid">
     <div class="well span12" style="overflow:auto;">
         <a onclick="window.history.back()" class="btn" ><i class="icon-arrow-left"></i> Back</a>
-        
-        <table class="table table-bordered">
+        <a class="btn btn-success pull-right"
+           onclick="tableToExcel('report-filter-never-delivered','');">
+            <i class="icon-download icon-white"></i>
+            {{=T('Excel (XLS)')}}
+        </a>
+        <table id="report-filter-never-delivered" class="table table-bordered">
             <thead>
                 <tr>
                     <th colspan="11"></th>

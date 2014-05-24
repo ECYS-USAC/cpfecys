@@ -72,7 +72,12 @@
           </form>
       </div>
       <div class="tab-pane active" id="data{{=currentyear_period.id}}">
-          <table class="table table-bordered table-hover table-striped">
+          <a class="btn btn-success pull-right"
+           onclick="tableToExcel('assignations','');">
+            <i class="icon-download icon-white"></i>
+            {{=T('Excel (XLS)')}}
+        </a>
+          <table id="assignations" class="table table-bordered table-hover table-striped">
               <thead>
                   <tr>
                       <th>{{=T('Status')}}/{{=T('Actions')}}</th>

@@ -19,9 +19,14 @@
               <a class="btn" href="">{{=T('Search')}}</a>
               <input type="hidden" name="area" value="{{=area}}" >
               <input type="hidden" name="period" value="{{=period}}" >
+                <a class="btn btn-success pull-right"
+           onclick="tableToExcel('items-grid','');">
+            <i class="icon-download icon-white"></i>
+            {{=T('Excel (XLS)')}}
+        </a>
             </form>
         </p>
-        <table class="table table-striped table-bordered">
+        <table id="items-grid" class="table table-striped table-bordered">
             <thead>
                 <tr>
                     <th>
