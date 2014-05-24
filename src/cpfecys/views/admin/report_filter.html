@@ -2,6 +2,11 @@
 <div class="row-fluid">
     <div class="well span12" style="overflow:auto;">
   		<a onclick="window.history.back()" class="btn" ><i class="icon-arrow-left"></i> Back</a>
+        <a class="btn btn-success pull-right"
+           onclick="tableToExcel('report-filter','');">
+            <i class="icon-download icon-white"></i>
+            {{=T('Excel (XLS)')}}
+        </a>
         {{if not status_instance:}}
             <h1>{{=T('All')}}</h1>
         {{else:}}
@@ -10,7 +15,7 @@
             {{=T(status_instance.name)}}
             </h1>
         {{pass}}
-		<table class="table table-bordered">
+		<table id="report-filter" class="table table-bordered">
 			<thead>
                 <tr>
                     <th colspan="10"></th>

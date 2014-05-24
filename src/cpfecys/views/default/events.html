@@ -2,6 +2,7 @@
 <h1>{{=T('Events')}}
     <small>{{=T(semester)}}, {{=year}}</small>
 </h1>
+<a class="btn" onclick="$('.project').fadeIn();"><i class="icon-eye-open"></i> {{=T('Show All')}}</a>
 <table class="table table-striped table-bordered">
     <thead>
         <th>{{=T('Id')}}</th>
@@ -13,10 +14,10 @@
         {{old_project_name = None}}
         {{counter = 1}}
         {{for r in thing:}}
-        <tr>
+        <tr class = "project project-{{=r.project.id}}">
             <td>{{=counter}}</td>
             {{if not old_project_name == r.project.name:}}
-            <td>{{=r.project.name}}</td>
+            <td><a onclick="$('.project').not('.project-{{=r.project.id}}').fadeToggle();">{{=r.project.name}}</a></td>
             {{else:}}
             <td></td>
             {{pass}}

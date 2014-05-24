@@ -1,4 +1,4 @@
-# coding: utf-8
+# -*- coding: utf-8 -*-
 {
 '': '',
 '!=': '!=',
@@ -455,6 +455,7 @@
 'Este email ya está registrado en otro usuario.': 'Este email ya está registrado en otro usuario.',
 'Event Name': 'Nombre del Evento',
 'Events': 'Eventos',
+'Excel (XLS)': 'Excel (XLS)',
 'export as csv file': 'exportar como archivo CSV',
 'Export:': 'Exportar:',
 'exposes': 'expone',
@@ -1060,6 +1061,7 @@
 'Services': 'Servicios',
 'session expired': 'sesión expirada',
 'shell': 'terminal',
+'Show All': 'Mostrar Todos',
 'Show Statistics': 'Mostrar Estadísticos',
 'Show Students': 'Mostrar Estudiantes',
 'site': 'sitio',
@@ -1136,6 +1138,7 @@
 'Teacher Failed': 'Reprobado por catedrático',
 'Teacher name': 'Nombre del catedrático',
 'Teacher Name': 'Nombre del catedrático',
+'Teacher name': 'Nombre del catedrático',
 'Teacher Only': 'Solo Profesor',
 'teacher_only': 'Solo Catedrático',
 'Teachers': 'Catedráticos',

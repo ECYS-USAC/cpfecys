@@ -2,7 +2,12 @@
 <div class="row-fluid">
     <div class="well span12">
     	<a onclick="window.history.back()" class="btn" ><i class="icon-arrow-left"></i>{{=T('Back')}}</a>
-    	<table class="table table-striped table-bordered">
+        <a class="btn btn-success pull-right"
+           onclick="tableToExcel('mail-log','');">
+            <i class="icon-download icon-white"></i>
+            {{=T('Excel (XLS)')}}
+        </a>
+    	<table id="mail-log" class="table table-striped table-bordered">
     		{{for log in logs:}}
     		<tr>
     			<td>

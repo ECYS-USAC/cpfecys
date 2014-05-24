@@ -38,7 +38,9 @@
             </td>
             <td>
             {{if not element.item_restriction.is_unique:}}
-            {{for element2 in db(db.item.item_restriction == element.item_restriction).select():}}
+            {{for aux in aux_in_courses(element.project.id):}}
+            {{for element2 in db((db.item.item_restriction == element.item_restriction)&
+                (db.item.assignation == aux.user_project.id)).select():}}
             {{if element2.item_restriction.item_type.name == 'File':}}
                 <a href="{{=URL('default','download', args=element2.uploaded_file)}}"
                    class="btn">
@@ -51,6 +53,7 @@
                     <li>{{=T(s.day_of_week.name)}}: {{=s.start_time}} - {{=s.end_time}}, {{=s.physical_location}}</li>
                 {{pass}}
                 </ul>
+            {{pass}}
             {{pass}}
             {{pass}}
             {{else:}}

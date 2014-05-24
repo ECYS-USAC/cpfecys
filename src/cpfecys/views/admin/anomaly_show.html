@@ -3,7 +3,12 @@
 <div class="row-fluid">
     <div class="well span12">
     	<a onclick="window.history.back()" class="btn" ><i class="icon-arrow-left"></i>{{=T('Back')}}</a>
-    	<table class="table table-bordered ">
+        <a class="btn btn-success pull-right"
+           onclick="tableToExcel('anomaly-show','');">
+            <i class="icon-download icon-white"></i>
+            {{=T('Excel (XLS)')}}
+        </a>
+    	<table id="anomaly-show" class="table table-bordered ">
     		<thead>
     			<tr>
     				<th width="120px">

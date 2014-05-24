@@ -1,23 +1,8 @@
 {{extend 'template.html'}}
-<script>
-    var tableToExcel = (function() {
-      var uri = 'data:application/vnd.ms-excel;base64,'
-        , template = '<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:x="urn:schemas-microsoft-com:office:excel" xmlns="http://www.w3.org/TR/REC-html40"><head><!--[if gte mso 9]><xml><x:ExcelWorkbook><x:ExcelWorksheets><x:ExcelWorksheet><x:Name>{worksheet}</x:Name><x:WorksheetOptions><x:DisplayGridlines/></x:WorksheetOptions></x:ExcelWorksheet></x:ExcelWorksheets></x:ExcelWorkbook></xml><![endif]--></head><body><table>{table}</table></body></html>'
-        , base64 = function(s) { return window.btoa(unescape(encodeURIComponent(s))) }
-        , format = function(s, c) { return s.replace(/{(\w+)}/g, function(m, p) { return c[p]; }) }
-      return function(table, name) {
-        alert(document.getElementById(table).innerHTML);
-        if (!table.nodeType) table = document.getElementById(table)
-        var ctx = {worksheet: name || 'Worksheet', table: table.innerHTML}
-        window.location.href = uri + base64(format(template, ctx))
-      }
-    })()
-</script>
 <div class="row-fluid">
     <div class="well span12">
     <h1>{{=T(actual_period.period.name)}} - {{=actual_period.yearp}}</h1>
         <a onclick="window.history.back()" class="btn" ><i class="icon-arrow-left"></i>{{=T('Back')}}</a>
-        <a class="btn" onclick="tableToExcel('coso','Workbook')" >Descarga</a>
         <a href="{{=URL('admin', \
         'active_teachers/notifyall')}}"class="btn btn-info" >
             {{=T('Notify All')}}
@@ -26,7 +11,12 @@
         'active_teachers/notifypending')}}"class="btn btn-success" >
             {{=T('Notify Pending')}}
         </a>
-    <table class="table-striped table-hover table-bordered" style="align:0 auto;">
+        <a class="btn btn-success pull-right"
+           onclick="tableToExcel('active-teachers','');">
+            <i class="icon-download icon-white"></i>
+            {{=T('Excel (XLS)')}}
+        </a>
+    <table id="active-teachers" class="table-striped table-hover table-bordered" style="align:0 auto;">
     <tr> 
       <td>
       <form class="form-inline" 
@@ -44,7 +34,7 @@
       </td>
     </tr>
     </table>
-    <table id="coso" class="table table-striped table-bordered">
+    <table id="active-teachers" class="table table-striped table-bordered">
     <thead>
         <tr>
             <td>{{=T('Count')}}</td>
