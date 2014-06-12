@@ -33,11 +33,16 @@
                         </tr>
                     </thead>
                     <tbody>
+                    <tr>
+                        <td colspan="2">
+                            <h3>
+                                {{=T('Asistencia')}}
+                            </h3>
+                        </td>
+                    </tr>
                         <tr>
                             <td>
-                                <h3>
-                                    {{=T('Dessertion')}}
-                                </h3>
+                                
                                 <strong>{{=T('Asignados En Actas')}}</strong>
                             </td>
                             <td>{{=final.curso_asignados_actas}}</td></tr>
@@ -50,10 +55,14 @@
                         <tr><td><strong>{{=T('Asistencia Segunda Retrasda')}}</strong></td>
                             <td> {{=final.curso_en_segunda_restrasada}}</td></tr>
                         <tr>
-                            <td>
+                            <td colspan="2">
                                 <h3>
                                     {{=T('Lab Final Statistics')}}
                                 </h3>
+                            </td>    
+                        </tr>
+                        <tr>
+                            <td>
                                 <strong>{{=T('Aprobaron Laboratorio')}}</strong>
                             </td>
                             <td> {{=final.lab_aprobados}}</td></tr>
@@ -64,10 +73,14 @@
                         <tr><td><strong>{{=T('Nota Promedio')}}</strong> </td>
                             <td>{{=final.lab_promedio}}</td></tr>
                         <tr>
-                            <td>
+                            <td colspan="2">
                                 <h3>
                                     {{=T('Class Statistics')}}
                                 </h3>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
                                 <strong>{{=T('Media')}}</strong>
                             </td>
                             <td>{{=final.curso_media}}</td></tr>

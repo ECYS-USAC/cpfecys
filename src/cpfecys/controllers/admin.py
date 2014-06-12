@@ -557,7 +557,8 @@ def report():
                     admin_comment=comment,
                     score_date=cdate,
                     status=status.id,
-                    dtt_approval=True)
+                    dtt_approval=True,
+                    never_delivered=False)
             elif score >= 0  and score <= 100:
                 report.update_record(
                     admin_score=score,
@@ -565,7 +566,8 @@ def report():
                     admin_comment=comment,
                     score_date=cdate,
                     status=db.report_status(name='Acceptance'),
-                    dtt_approval=True)
+                    dtt_approval=True,
+                    never_delivered=False)
 
             if sendmail:
                 user = report.assignation.assigned_user
@@ -1472,7 +1474,7 @@ def delivered_download():
         for item in items:
             files.append(item.uploaded_file)
         if len(files) > 0:
-            return response.zip(file_name, files, db)
+            return response.zip(request, files, db)
         session.flash = T('No files to download.')
         redirect(URL('admin', 'delivered_download/type', 
             vars=dict(period=period)))

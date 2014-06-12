@@ -270,7 +270,7 @@ def auto_daily():
     signature = cpfecys.get_custom_parameters().email_signature
     for rech in recheckies:
         rech.report.status = db.report_status(name = 'Grading')
-        rech.update_record()
+        rech.report.update_record()
         ## TODO: Send Email according to assignation
         me_the_user = rech.report.assignation.assigned_user
         message = '<html>' + T('The report') + ' ' \

@@ -149,6 +149,9 @@
                                             <span class="label label-success">{{=T('Aproved')}}</span>
                                         {{elif report.min_score !=0 and report.min_score != None:}}
                                             <span class="label label-important">{{=T('Failed')}}</span>
+                                            {{ if report.never_delivered:}}
+                                                {{=T('Never delivered')}}
+                                            {{ pass}}
                                         {{else:}}
                                             <span class="label label-info">{{=T('Grade pending')}}</span>
                                         {{pass}}
@@ -162,7 +165,7 @@
                                                     <h3>{{=T('Teacher comment')}}</h3>
                                                   </div>
                                                   <div class="modal-body">
-                                                    <p>{{=report.teacher_comment}}</p>
+                                                    <p>{{=T(report.teacher_comment)}}</p>
                                                   </div>
                                                   <div class="modal-footer">
                                                     <a class="btn" data-dismiss="modal" 
@@ -198,9 +201,7 @@
                                             {{=T('View Report')}}
                                         </a>
                                         {{if not cpfecys.assignation_is_locked(item.user_project):}}
-                                        {{if (report.status['name'] == 'Draft' \
-                                         and restriction.start_date <= current_date \
-                                         and restriction.end_date >= current_date) \
+                                        {{if (report.status['name'] == 'Draft') \
                                         or (report.status['name'] == 'Recheck') \
                                         and is_indate_range(report):}}
                                         <a class="btn"

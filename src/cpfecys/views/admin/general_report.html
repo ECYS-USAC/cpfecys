@@ -82,24 +82,24 @@
                     final, primera_r, segunda_r = get_final_report(project.id)}}
                 {{if final_report != None and metrics != None:}}
                 <td>
-                    {{=metrics.curso_aprobados or '-'}}
+                    {{=metrics.curso_aprobados or ''}}
                 </td>
                 <td>
-                    {{=metrics.curso_reprobados or '-'}}
+                    {{=metrics.curso_reprobados or ''}}
                 </td>
                 <td>
-                    {{=metrics.curso_promedio or '-'}}
+                    {{=metrics.curso_promedio or ''}}
                 </td>
                 <td>
-                    {{=metrics.lab_aprobados or '-'}}
+                    {{=metrics.lab_aprobados or ''}}
                 </td>
                 <td>
-                    {{=metrics.lab_reprobados or '-'}}
+                    {{=metrics.lab_reprobados or ''}}
                 </td>
                 <td>
-                    {{=metrics.lab_promedio or '-'}}
+                    {{=metrics.lab_promedio or ''}}
                 </td>
-                <td></td>
+                <td>{{=metrics.curso_asignados_actas or ''}}</td>
                 <td>
                 {{if parcial_1 != None:}}
                     {{=parcial_1.media}}
@@ -115,7 +115,9 @@
                     {{=parcial_3.media}}
                 {{pass}}
                 </td>
-                <td></td>
+                <td>
+                    {{=metrics.curso_en_final}}
+                </td>
                 <td>
                 {{if final != None:}}
                     {{=final.media}}
@@ -135,9 +137,9 @@
                 <td>{{=final_report.desertion_gone}}</td>
                 <td>{{=final_report.desertion_continued}}</td>
                 {{else:}}
-                <td>-</td><td>-</td><td>-</td><td>-</td><td>-</td><td>-</td><td>-</td>
-                <td>-</td><td>-</td><td>-</td><td>-</td><td>-</td><td>-</td><td>-</td>
-                <td>-</td><td>-</td><td>-</td>
+                <td></td><td></td><td></td><td></td><td></td><td></td><td></td>
+                <td></td><td></td><td></td><td></td><td></td><td></td><td></td>
+                <td></td><td></td><td></td>
                 {{pass}}
                 </tr>
             {{pass}}

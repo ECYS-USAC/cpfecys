@@ -87,6 +87,7 @@ def student_validation_report_status(report):
             and report.report_restriction.end_date >= current_date \
             and report.report_restriction.is_enabled == True:
             return True
+        return False
 
     next_date = report.score_date + datetime.timedelta(
                 days=get_custom_parameters().rescore_max_days)

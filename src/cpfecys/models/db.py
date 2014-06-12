@@ -42,7 +42,9 @@ def zip(self, request, files, db, chunk_size= \
     dst = os.path.join(request.folder,'private',request.args[-1])
     #print dst
     zf = zipfile.ZipFile(dst, "w")
+    i = 0
     for name in files:
+        i+=1
         items = re.compile('(?P<table>.*?)\.(?P<field>.*?)\..*')\
           .match(name)
         if not items:
@@ -57,7 +59,7 @@ def zip(self, request, files, db, chunk_size= \
             stream.close()
             #print filename
             #print stream.name
-            zf.write(stream.name, filename)
+            zf.write(stream.name, (str(i)+filename))
         except IOError:
             raise HTTP(404)
     zf.close()
