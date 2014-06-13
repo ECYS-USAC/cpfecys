@@ -57,6 +57,13 @@ def dtt_general_approval():
 
 @auth.requires_login()
 @auth.requires_membership('Super-Administrator')
+def roles():
+    grid = SQLFORM.smartgrid(
+        db.auth_group, linked_tables=['auth_membership'])
+    return dict(grid=grid)
+
+@auth.requires_login()
+@auth.requires_membership('Super-Administrator')
 def general_report():
     period = cpfecys.current_year_period()
     if request.vars['period'] != None:
