@@ -1,0 +1,8 @@
+{{extend 'template.html'}}
+<h1>
+    {{=T('Roles Administration')}}
+</h1>
+{{=grid}}
+{{if request.is_local:}}
+{{=response.toolbar()}}
+{{pass}}
