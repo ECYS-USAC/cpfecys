@@ -6,3 +6,11 @@
     {{pass}}
 {{pass}}
 </ul>
+<ul>
+{{for link in public_links:}}
+    {{if link.visible:}}
+        <li><a href="{{=link.url}}" {{if link.blank:}}target="_blank"{{pass}}>{$
+    {{pass}}
+{{pass}}
+</ul>
+
