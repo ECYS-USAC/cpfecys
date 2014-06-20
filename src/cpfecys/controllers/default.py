@@ -86,9 +86,8 @@ def links():
                         select(db.auth_group.ALL)
         links = db((db.link.id == db.link_access.link)& \
                    (db.link_access.user_role.belongs(groups))).select(db.link.ALL)
-    else:
-        links = db(db.link.is_public == True).select()
-    return dict(links=links)
+    public_links = db(db.link.is_public == True).select()
+    return dict(links=links, public_links=public_links)
 
 def files():
     """ This url shows all published files published by admin"""
