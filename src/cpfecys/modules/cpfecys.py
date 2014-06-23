@@ -46,7 +46,7 @@ def current_year_period():
     cmonth = cdate.month
     period = second_period
     #current period depends if we are in dates between jan-jun and jul-dec
-    if cmonth < 7 :
+    if cmonth < 6 :
         period = first_period
     return db((db.period_year.yearp == cyear)&
                           (db.period_year.period == period)).select().first()
@@ -329,7 +329,7 @@ def _projects_setup():
     db.project.insert(project_id = '0777C', area_level = lvl_1, name = 'Organización Lenguajes y Compiladores 1 (Sección C)', description = '', physical_location = '')
     db.project.insert(project_id = '0777D', area_level = lvl_1, name = 'Organización Lenguajes y Compiladores 1 (Sección D)', description = '', physical_location = '')
     db.project.insert(project_id = '0781A+', area_level = lvl_1, name = 'Organización Lenguajes y Compiladores 2 (Sección A+)', description = '', physical_location = '')
-    db.project.insert(project_id = '0781A-', area_level = lvl_1, name = 'Organización Lenguajes y Compiladores 2 (Sección A+)', description = '', physical_location = '')
+    db.project.insert(project_id = '0781A-', area_level = lvl_1, name = 'Organización Lenguajes y Compiladores 2 (Sección A-)', description = '', physical_location = '')
     db.project.insert(project_id = '2025A', area_level = lvl_1, name = 'Prácticas Iniciales (Sección A)', description = '', physical_location = '')
     db.project.insert(project_id = '2036A', area_level = lvl_1, name = 'Prácticas Intermedias (Sección A)', description = '', physical_location = '')
     db.project.insert(project_id = '0667P', area_level = lvl_1, name = 'Programación Comercial 1 (Sección P)', description = '', physical_location = '')

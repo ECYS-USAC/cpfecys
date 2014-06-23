@@ -168,14 +168,14 @@ db.define_table('setup',
 
 # A project contains an description and name
 db.define_table('area_level',
-                Field('name', 'string', label = T('name'), unique = True),
+                Field('name', 'string', label = T('name'), unique = True, length = 255),
                 Field('description', 'text', label = T('description')),
                 format='%(name)s')
 
 db.define_table('project',
                 Field ('project_id', 'string', unique = True, length = 255, \
                     label = T('project_id')),
-                Field ('name', 'string', label = T('name'), notnull = True, unique = True),
+                Field ('name', 'string', label = T('name'), notnull = True, unique = True, length = 255),
                 Field ('area_level', 'reference area_level', label =  \
                     T('area_level')),
                 Field ('description', 'text', label = T('description')),
