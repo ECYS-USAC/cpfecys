@@ -298,11 +298,11 @@ db.define_table('notification_access',
 
 #Reports and Activities structure
 db.define_table('report_restriction',
-                Field('name', 'string', notnull=False, \
+                Field('name', 'string', notnull=True, \
                     label = T('name')),
-                Field('start_date', 'date', notnull=False, \
+                Field('start_date', 'date', notnull=True, \
                     label = T('start date')),
-                Field('end_date', 'date', notnull=False, \
+                Field('end_date', 'date', notnull=True, \
                     label = T('end date')),
                 Field('is_enabled', 'boolean', notnull=False, \
                     label = T('is enabled')),
