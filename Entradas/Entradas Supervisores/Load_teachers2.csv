@@ -1,0 +1,68 @@
+Curso,nombre curso,codigo,apellidos,nombres,email,telefono,periodos,adhonorem,horas
+0090A,Programacion de Computadoras 1(090),17625,VELIZ LINARES,HERMAN IGOR,herman.veliz@gmail.com,,1,Si,2
+0092N,Programación de Computadoras 2,930205,CASTANEDA RAMIREZ,SONIA YOLANDA,scastanedadepaz@yahoo.com,52615264,1,Si,2
+0092P,Programación de Computadoras 2,17625,VELIZ LINARES,HERMAN IGOR,herman.veliz@gmail.com,,1,Si,2
+0092Q,Programación de Computadoras 2,930205,CASTANEDA RAMIREZ,SONIA YOLANDA,scastanedadepaz@yahoo.com,52615264,1,Si,2
+0667P,Programación Comercial 1,17625,VELIZ LINARES,HERMAN IGOR,herman.veliz@gmail.com,,1,Si,2
+0770A,Introducción a la Programación y Computación 1,20140001,BATZ SAQUIMUX,CESAR ROLANDO,cesarbatz@gmail.com,,1,Si,2
+0770B,Introducción a la Programación y Computación 1,20071281,CALDERON MENDEZ,NEFTALI DE,neftalicalderon@gmail.com,,1,Si,2
+0770C,Introducción a la Programación y Computación 1,990000045,MINCHEZ SUTUC,WALTER E,weminchez@ing.usac.edu.gt,,1,Si,2
+0770D,Introducción a la Programación y Computación 1,20040258,DE LEON,JULIO CESAR,julio.escobar@telefonica.com.gt,,1,Si,2
+0770E,Introducción a la Programación y Computación 1,20130001,VELASQUEZ,MOISES,mevo284@gmail.com,,1,Si,2
+0771A,Introducción a la Programación y Computación 2,201200002,CANCINOS RENDON,MIGUEL ANGEL,mcancinos.ing.usac@gmail.com,41515509,1,Si,2
+0771B,Introducción a la Programación y Computación 2,970627,ROJAS MORALES,CLAUDIA LICETH,claudiarojas@unis.edu.gt,,1,Si,2
+0771C,Introducción a la Programación y Computación 2,20031134,RUIZ JUAREZ,JOSE MANUEL,jmruizj@gmail.com,,1,Si,2
+0771D,Introducción a la Programación y Computación 2,20140002,ESCOBAR ARGUETA,WILLIAM ESTUARDO,mail_pendiente@m.com,,1,Si,2
+0771E,Introducción a la Programación y Computación 2,20110056,RODRIGUEZ CONDE,LENIN FERNANDO,lenin.rodriguez@gmail.com,,1,Si,2
+0772A,Estructura de Datos,18311,ORNELIS HOIL,EDGAR RENE,ornelyz@ing.usac.edu.gt,54043312,1,Si,2
+0772B,Estructura de Datos,20140003,GUSTAVO ALONZO,CARLOS GUSTAVO,carlosalonzo@intelnett.com,,1,Si,2
+0773A+,Manejo e Implementación de Archivos,950654,DIAZ ARDAVIN,JUAN ALVARO,clases.jadiazar@gmail.com,,1,Si,2
+0773A-,Manejo e Implementación de Archivos,20030756,PAZ CAMPOS,OSCAR ALEJANDRO,pazcampos@gmail.com,,1,Si,2
+0281A,Sistemas Operativos 1,14257,GUEVARA CASTILLO,FRANCISCO JAVIER,fguevara@e-solutions.com.gt,22885001,1,Si,2
+0281B,Sistemas Operativos 1,20110837,MENDEZ AGUILAR,SERGIO ARNALDO,sergioarm.gpl@gmail.com,,1,Si,2
+0285A,Sistemas Operativos 2,18311,ORNELIS HOIL,EDGAR RENE,ornelyz@ing.usac.edu.gt,54043312,1,Si,2
+0777A,Organización Lenguajes y Compiladores 1,20100003,BAUTISTA FUENTES,MARIO JOSE,marjozero@gmail.com,,1,Si,2
+0777B,Organización Lenguajes y Compiladores 1,20000212,CASTILLO REYNA,MANUEL HAROLDO,manuelharoldo@hotmail.com,,1,Si,2
+0777C,Organización Lenguajes y Compiladores 1,20100003,BAUTISTA FUENTES,MARIO JOSE,marjozero@gmail.com,,1,Si,2
+0778A,Arquitectura de Computadores y Ensambladores 1,13858,ESCOBAR LEIVA,OTTO RENE,otto_escobar@yahoo.com,49304333,1,Si,2
+0778B,Arquitectura de Computadores y Ensambladores 1,20100002,ORELLANA LOPEZ,MARLON FRANCISCO,marlonorellana2005@gmail.com,,1,Si,2
+0779N,Arquitectura de Computadores y Ensambladores 2,20120891,DIAS LOPEZ,GABRIEL ALEJANDRO,gdiaz@connextsa.com,54016570,1,Si,2
+0781A+,Organización Lenguajes y Compiladores 2,17270,LOPEZ LOPEZ,BAYRON WOSVELY,blopezw@yahoo.com,54035822,1,Si,2
+0781A-,Organización Lenguajes y Compiladores 2,20090351,SABAN RAXON,EDGAR RUBEN,ticosabrax@gmail.com,,1,Si,2
+0796A+,Lenguajes Formales y de Programación,17983,RODRIGUEZ ACOSTA,OTTO AMILCAR,orodri@gmail.com,24334043,1,Si,2
+0796A-,Lenguajes Formales y de Programación,980267,CAMPOS GONZALEZ,VIVIAN DAMARIS,damaris.campos@gmail.com,59660340,1,Si,2
+0796B+,Lenguajes Formales y de Programación,20140002,ESCOBAR ARGUETA,WILLIAM ESTUARDO,mail2_pendiente@m.com,,1,Si,2
+0796B-,Lenguajes Formales y de Programación,20010638,AGUIRRE ORDONEZ,ZULMA KARINA,zaguirre_usac@yahoo.com,,1,Si,2
+0964A,Organización Computacional,13858,ESCOBAR LEIVA,OTTO RENE,otto_escobar@yahoo.com,49304333,1,Si,2
+0964B,Organización Computacional,13858,ESCOBAR LEIVA,OTTO RENE,otto_escobar@yahoo.com,49304333,1,Si,2
+0966A ,SEGURIDAD Y AUDITORIA DE REDES DE COMPUTADORAS,20120002,RODAS ROBLEDO,EDGAR FRANCISCO,franciscorodas7@gmail.com,,1,Si,2
+0972B,INTELIGENCIA ARTIFICIAL 2,20080862,ESPINO BARRIOS,LUIS FERNANDO,luisespino@yahoo.com,,1,Si,2
+0970A,Redes de Computadoras 1,950740,LOPEZ FERNANDEZ,MANUEL FERNANDO,manuel.lopezf@gmail.com,59660329,1,Si,2
+0972B,Inteligencia Artificial 1,200230367,GONZALEZ GARCIA,VICTOR ADOLFO,vaggsoft@gmail.com,57723404,1,Si,2
+0972A,Inteligencia Artificial 1,20080862,ESPINO BARRIOS,LUIS FERNANDO,luisespino@yahoo.com,,1,Si,2
+0975A,Redes de Computadoras 2,20040256,HERNANDEZ RAMIREZ,PEDRO PABLO,ymyq@hotmail.com,59575483,1,Si,2
+0283A,Análisis y Diseño de Sistemas 1,20080835,GUEVARA ORELLANA,WILLIAM SAMUEL,willgo021983@gmail.com,30346713,1,Si,2
+0283B,Análisis y Diseño de Sistemas 1,20080060,ALDANA LARRAZABAL,MIRNA IVONNE,ivonne.aldana@acs-inc.com,40186192,1,Si,2
+0774A,Base de Datos 1,14257,GUEVARA CASTILLO,FRANCISCO JAVIER,fguevara@e-solutions.com.gt,22885001,1,Si,2
+0774B,Base de Datos 1,20080862,ESPINO BARRIOS,LUIS FERNANDO,manuel.lopezf@gmail.com,,1,Si,2
+0775A,Base de Datos 2,17983,RODRIGUEZ ACOSTA,OTTO AMILCAR,orodri@gmail.com,24334043,1,Si,2
+0775B,Base de Datos 2,20010130,GONZALEZ DIAZ,JOSE ALFREDO,stiasociados@yahoo.com,57091739,1,Si,2
+0780A,Software Avanzado,18150,MEDINILLA RODRIGUEZ,DARWIN EVEREST,xx@gmail.com,,1,Si,2
+0785A,Análisis y Diseño de Sistemas 2,930335,MORALES PRADO,JOSE RICARDO,rmorales88@lycos.com,557542890,1,Si,2
+0014A+,Economía,20081022,RUANO CASTAÑEDA,SERGIO ROMEO,srruanoc@sat.gob.gt,54238740,1,Si,2
+0014A-,Economía,990000975,MORALES RUIZ,EVELYN CAROLINA,emoralesruiz@yahoo.es,,1,Si,2
+0720A,Modelación y Simulación 2,199911671,GONZALEZ CONSTANZA,EDGAR JOSUE,ejosuegc@gmail.com,,1,Si,2
+0722A,Teoría de Sistemas 1,15844,ALVARES MEJIA,JORGE LUIS,jorgelalvarez2010@gmail.com,56516003,1,Si,2
+0721A,Teoría de Sistemas 2,15844,ALVARES MEJIA,JORGE LUIS,jorgelalvarez2010@gmail.com,56516003,1,Si,2
+0729A,Modelación y Simulación 1,15522,FERNANDEZ CACERES,CESAR AUGUSTO,cesarafc1967@gmail.com,,1,Si,2
+0786N,Gerenciales 1,20080345,DE PACHECO,VERA NINETTE,vndeleon@gmail.com,55093627,1,Si,2
+0786P,Gerenciales 1,990000975,MORALES RUIZ,EVELYN CAROLINA,emoralesruiz@yahoo.es,,1,Si,2
+0787A,Gerenciales 2,18151,VETTORAZZI ESPANA,LUIS ALBERTO,lvetto@ufm.edu,55111122,1,Si,2
+0790A,Emprendedores de Negocios Informáticos,970312,ALTAN SAC,LUDWING FEDERICO,lfaltans@gmail.com,58002120,1,Si,2
+0795A+,Lógica de Sistemas,16909,TALA AYERDI,VIRGINIA VICTORIA,vtala@url.edu.gt,52062994,1,Si,2
+0795A-,Lógica de Sistemas,17982,FLORIZA,FLORIZA,afloriza@hotmail.com,52055392,1,Si,2
+0797A,Seminario de Sistemas 1,950740,LOPEZ FERNANDEZ,MANUEL FERNANDO,manuelharoldo@hotmail.com,59660329,1,Si,2
+0798A,Seminario de Sistemas 2,18151,VETTORAZZI ESPANA,LUIS ALBERTO,lvetto@ufm.edu,55111122,1,Si,2
+0799A,SEMINARIO DE INVESTIGACION,15122,AZURDIA MORALES,CARLOS ALFREDO,mail_pendiente3@m.com,,1,Si,2
+2025A,Practicas Iniciales,17982,AVILA,FLORIZA,afloriza@hotmail.com,52055392,1,Si,2
+2036A,Practicas Intermedias,17982,AVILA,FLORIZA,afloriza@hotmail.com,52055392,1,Si,2

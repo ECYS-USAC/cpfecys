@@ -69,7 +69,7 @@ def index():
         cperiod = cpfecys.current_year_period()
         if item_restriction.period.id < cperiod.id:
             item = db((db.item.item_restriction==item_restriction.id)&
-                (db.item.assignation==assignation.id))
+                (db.item.assignation==assignation.user_project.id))
             return item
         return True
 

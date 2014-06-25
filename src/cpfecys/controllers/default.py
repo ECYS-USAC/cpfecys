@@ -128,6 +128,14 @@ def download():
     """
     return response.download(request, db)
 
+def download_file():
+    the_file = db(db.uploaded_file.file_data==request.args[0]).select().first()
+    if the_file != None and the_file.visible == True and the_file.is_public == True:
+        return response.download(request, db)
+    else:
+        session.flash = T('Access Forbidden')
+        redirect(URL('default', 'index'))
+
 
 def call():
     """
