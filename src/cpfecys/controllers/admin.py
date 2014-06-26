@@ -413,7 +413,13 @@ def assignations():
         user = db(db.auth_user.id==user).select().first()
         if user == None:
             session.flash = T("No existing user")
-            redirect(URL('admin','active_teachers'))
+            redirect(URL('admin', 'assignations', \
+            vars=dict(data = data,
+                currentyear_period = currentyear_period,
+                current_period_name = current_period_name,
+                periods_before = periods_before,
+                periods_after = periods_after,
+                other_periods = other_periods)))
         if user.registration_key != 'blocked':
             enabled = 'blocked'
         user.update_record(
@@ -1815,7 +1821,7 @@ def download():
 
 @auth.requires_login()
 @auth.requires_membership('Super-Administrator')
-def assignation():
+def final_practice():
     #requires parameter year_period if no one is provided then it is 
     #automatically detected
     #and shows the current period

@@ -26,7 +26,7 @@ response.menu = [(T('Home'), False, URL('default', 'index'), [])]
 if auth.has_membership(role="Super-Administrator"):
     response.menu.extend([
         (T('Users Administration'), False, URL(),[
-             (T('Final Practice Admin'), False, URL('admin', 'assignation'), []),
+             (T('Final Practice Admin'), False, URL('admin', 'final_practice'), []),
              (T('Users'), False, URL('admin', 'users'), []),
              (T('Roles'), False, URL('admin', 'roles'), []),
              ]),
