@@ -414,24 +414,14 @@ def assignations():
         if user == None:
             session.flash = T("No existing user")
             redirect(URL('admin', 'assignations', \
-            vars=dict(data = data,
-                currentyear_period = currentyear_period,
-                current_period_name = current_period_name,
-                periods_before = periods_before,
-                periods_after = periods_after,
-                other_periods = other_periods)))
+            vars=dict(year_period = currentyear_period)))
         if user.registration_key != 'blocked':
             enabled = 'blocked'
         user.update_record(
                 registration_key=enabled)
         redirect(URL('admin', 'assignations', \
-            vars=dict(data = data,
-                currentyear_period = currentyear_period,
-                current_period_name = current_period_name,
-                periods_before = periods_before,
-                periods_after = periods_after,
-                other_periods = other_periods)))
-        
+            vars=dict(year_period = currentyear_period)))
+
     return dict(data = data,
                 currentyear_period = currentyear_period,
                 current_period_name = current_period_name,
