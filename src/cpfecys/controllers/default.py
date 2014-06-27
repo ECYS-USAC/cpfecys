@@ -79,6 +79,7 @@ def links():
     """ This url shows all important links published by admin
     user. 
     """
+    links = []
     if auth.user != None:
         links = db(db.link).select()
         groups = db((db.auth_membership.user_id==auth.user.id)& \

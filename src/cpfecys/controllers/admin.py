@@ -26,7 +26,6 @@ def dtt_general_approval():
             anomalies = count_anomalies(report)[0]['COUNT(log_entry.id)']
             if entries != 0 or metrics!= 0 or anomalies != 0:
                 report.update_record(dtt_approval = approve)
-
     elif int(status) == -1:
         reports = db((db.report.created>start)&
             (db.report.created<end)&
