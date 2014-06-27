@@ -325,6 +325,7 @@ def graphs():
               (db.auth_group.role == 'Student')&
               (db.auth_membership.group_id == db.auth_group.id)&
               (db.user_project.assigned_user == db.auth_membership.user_id)).select()
+    import cpfecys
     current_period_name = T(cpfecys.second_period_name)
     #if we are second semester then start is 1st july
     import datetime
