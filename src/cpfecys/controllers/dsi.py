@@ -7,9 +7,17 @@ def index():
     period = cpfecys.current_year_period()
     restrictions = db(
        (db.item_restriction.item_type==db.item_type(name='Activity'))& \
-       (db.item_restriction.period==period.id)).select()| \
+       (db.item_restriction.period==period.id)&
+       (db.item_restriction.is_enabled==True)).select()| \
     db((db.item_restriction.item_type==db.item_type(name='Grade Activity'))& \
-       (db.item_restriction.period==period.id)).select()
+       (db.item_restriction.period==period.id)&
+       (db.item_restriction.is_enabled==True)).select()| \
+    db((db.item_restriction.item_type==db.item_type(name='Activity'))& \
+       (db.item_restriction.permanent==True)&
+       (db.item_restriction.is_enabled==True)).select()| \
+    db((db.item_restriction.item_type==db.item_type(name='Grade Activity'))& \
+       (db.item_restriction.permanent==True)&
+       (db.item_restriction.is_enabled==True)).select()
     return dict(restrictions=restrictions)
 
 @auth.requires_login()
@@ -106,6 +114,10 @@ def item_detail():
        if valid:
          session.flash = T('Not permited action.')
          redirect(URL('dsi', 'index'))
+       if not isinstance(score, int):
+        session.flash = T('Value must be numeric.')
+        redirect(URL('dsi','item_detail', 
+          vars=dict(restriction=restriction.id)))
        #Validate if current user assignation is active
        assignations = db(
                         (db.auth_user.id==db.user_project.assigned_user)&
@@ -163,7 +175,15 @@ def item_detail():
     db((db.item_restriction.item_type==db.item_type(name='Grade Activity'))& \
        (db.item_restriction.period==period.id)&
        (db.item_restriction.id==restriction)&
-       (db.item_restriction.is_enabled==True)).select()
+       (db.item_restriction.is_enabled==True)).select()| \
+    db((db.item_restriction.item_type==db.item_type(name='Activity'))& \
+       (db.item_restriction.id==restriction)&
+       (db.item_restriction.is_enabled==True)&
+       (db.item_restriction.permanent==True)).select()| \
+    db((db.item_restriction.item_type==db.item_type(name='Grade Activity'))& \
+       (db.item_restriction.id==restriction)&
+       (db.item_restriction.is_enabled==True)&
+       (db.item_restriction.permanent==True)).select()
     def get_areas(restriction):
        areas = db((db.item_restriction_area.item_restriction==restriction.id)&
          (db.area_level.id==db.item_restriction_area.area_level))

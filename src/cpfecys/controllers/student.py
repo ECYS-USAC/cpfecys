@@ -34,8 +34,8 @@ def index():
         return db((db.report_restriction.start_date <= current_date)&
                   (db.report_restriction.end_date >= current_date)&
                   (db.report_restriction.start_date >= date_min)&
-                  #(db.report_restriction.end_date >= date_min)&
-                  #(db.report_restriction.start_date < date_max)&
+                  (db.report_restriction.end_date >= date_min)&
+                  (db.report_restriction.start_date < date_max)&
                   (db.report_restriction.end_date < date_max)&
                   (db.report_restriction.is_enabled == True))
 
