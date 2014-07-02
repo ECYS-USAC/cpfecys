@@ -317,13 +317,15 @@ def graphs():
     max_display = 1
     currentyear_period = db.period_year(db.period_year.id == year_period)
     if not currentyear_period:
-        currentyear_period = current_year_period()
+        import cpfecys
+        currentyear_period = cpfecys.current_year_period()
     current_data = db((db.user_project.period <= currentyear_period.id)&
               ((db.user_project.period + db.user_project.periods) > currentyear_period.id)&
               (db.user_project.project == current_project.project.id)&
               (db.auth_group.role == 'Student')&
               (db.auth_membership.group_id == db.auth_group.id)&
               (db.user_project.assigned_user == db.auth_membership.user_id)).select()
+    import cpfecys
     current_period_name = T(cpfecys.second_period_name)
     #if we are second semester then start is 1st july
     import datetime
@@ -479,7 +481,8 @@ def courses():
     max_display = 1
     currentyear_period = db.period_year(db.period_year.id == year_period)
     if not currentyear_period:
-        currentyear_period = current_year_period()
+        import cpfecys
+        currentyear_period = cpfecys.current_year_period()
     current_data = db((db.user_project.period <= currentyear_period.id)&
               ((db.user_project.period + db.user_project.periods) > currentyear_period.id)&
               (db.user_project.assigned_user == auth.user.id)).select()
