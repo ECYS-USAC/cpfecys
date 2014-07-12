@@ -77,10 +77,11 @@ def ADD(self, first, second):
         return self.CONCAT(first, second)
 BaseAdapter.ADD = ADD
 
-#Forcing https
-cmd_options = request.global_settings.cmd_options
-if not (cmd_options and cmd_options.scheduler):
-    request.requires_https()
+##Forcing https
+if not request.is_local:
+    cmd_options = request.global_settings.cmd_options
+    if not (cmd_options and cmd_options.scheduler):
+        request.requires_https()
 
 ## by default give a view/generic.extension to all actions from localhost
 ## none otherwise. a pattern can be 'controller/function.extension'
