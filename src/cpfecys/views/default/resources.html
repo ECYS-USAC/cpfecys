@@ -15,8 +15,15 @@
         <th>{{=T('Details')}}</th>
     </thead>
     {{counter = 1}}
+    {{lastcourse = None}}
     <tbody>
         {{for element in data:}}
+        {{if (not (lastcourse == element.project.name)):}}
+        {{if lastcourse != None:}}
+        </td>
+            {{counter += 1}}
+        </tr>
+        {{pass}}
         <tr>
             <td>{{=counter}}</td>
             <td>{{=element.project.name}}</td>
@@ -37,6 +44,7 @@
                 </ul>
             </td>
             <td>
+            {{pass}}
             {{if not element.item_restriction.is_unique:}}
             {{for aux in aux_in_courses(element.project.id):}}
             {{for element2 in db((db.item.item_restriction == element.item_restriction)&
@@ -47,6 +55,7 @@
                     {{=T('Download')}}
                 </a>
             {{elif element2.item_restriction.item_type.name == 'Schedule':}}
+                {{=element.auth_user.last_name}}, {{=element.auth_user.first_name}}:
                 {{schedule = db(db.item_schedule.item == element2.id).select()}}
                 <ul>
                 {{for s in schedule:}}
@@ -63,6 +72,9 @@
                     {{=T('Download')}}
                 </a>
             {{elif element.item_restriction.item_type.name == 'Schedule':}}
+                <strong>
+                    {{=element.auth_user.last_name}}, {{=element.auth_user.first_name}}:
+                </strong>
                 {{schedule = db(db.item_schedule.item == element.item.id).select()}}
                 <ul>
                 {{for s in schedule:}}
@@ -71,9 +83,10 @@
                 </ul>
             {{pass}}
             {{pass}}
-            </td>
-            {{counter += 1}}
-        </tr>
+        {{lastcourse = element.project.name}}
+        {{pass}}
+        {{if lastcourse != None:}}
+        </td></tr>
         {{pass}}
     </tbody>
 </table>
