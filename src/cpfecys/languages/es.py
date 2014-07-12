@@ -1,4 +1,4 @@
-# coding: utf-8
+# -*- coding: utf-8 -*-
 {
 '': '',
 '!=': '!=',
@@ -246,6 +246,7 @@
 'compile': 'compilar',
 'compiled application removed': 'aplicación compilada eliminada',
 'Completed': 'Completado',
+'COMPLETED': 'COMPLETADO',
 'Components and Plugins': 'Componentes y Plugins',
 'Confirm': 'Confirmar',
 'Confirm action': 'Confirmar acción',
@@ -469,6 +470,7 @@
 'Fail report by DTT': 'Reprobar reporte por DTT',
 'Failed': 'Reprobado',
 'failed': 'reprobado',
+'FAILED': 'FALLIDO',
 'failed to reload module': 'la recarga del módulo ha fallado',
 'February': 'Febrero',
 'file': 'archivo',
@@ -669,8 +671,10 @@
 'Last Name': 'Apellido',
 'Last name': 'Apellido',
 'Last Name:': 'Apellido:',
+'Last runtime (start-finish)': 'Úlima Ejecución (inicio-fin)',
 'Last saved on:': 'Guardado en:',
 'Last Semester Day': 'Último día del semestre',
+'Last time seen': 'Last time seen',
 'Layout': 'Diseño de página',
 'Layout Plugins': 'Plugins de diseño',
 'Layouts': 'Diseños de páginas',
@@ -1036,6 +1040,7 @@
 'Saved file hash:': 'Hash del archivo guardado:',
 'Schedule': 'Schedule',
 'Schedule for': 'Horario para',
+'Scheduler Report': 'Scheduler Report',
 'School Id': 'Carnet',
 'School id': 'Carnet',
 'score': 'Nota',

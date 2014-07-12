@@ -1,0 +1,22 @@
+{{extend 'template.html'}}
+<h1>Registro actividades Scheduler</h1>
+<table>
+    <thead>
+        <tr>
+            <th>{{=T('Status')}}</th>
+            <th>{{=T('Last runtime (start-finish)')}}</th>
+        </tr>
+    </thead>
+    <tbody>
+        {{for row in data:}}
+        <tr>
+            <td>
+                {{=T(row.status)}}
+            </td>
+            <td>
+                {{=row.start_time}} - {{=row.stop_time}}
+            </td>
+        </tr>
+        {{pass}}
+    </tbody>
+</table>
