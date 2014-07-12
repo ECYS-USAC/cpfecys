@@ -74,20 +74,14 @@
                         <table style="width:100%;" class="table table-striped table-bordered">
                             <thead>
                                 <tr>
-                                    <th>
-                                    </th>
-                                    <th>
-                                    </th>
-                                    <th>
-                                    </th>
-                                    <th>
-                                    </th>
-                                    <th>
+                                    <th colspan="5">
+                                    {{=T('Information')}}
                                     </th>
                                     <th colspan="2">
-                                        {{=T('Approval')}}
+                                    {{=T('Approval')}}
                                     </th>
                                     <th>
+                                    {{=T('Actions')}}
                                     </th>
                                 </tr>
                                 <tr>
@@ -216,9 +210,9 @@
                                     </td>
                                 </tr>
                                 {{pass}}
-
+                                {{cperiod_year = cpfecys.current_year_period()}}
                                 {{for available_report in  \
-                                available_reports(item.period_year).select():}}
+                                available_reports(cperiod_year).select():}}
                                     {{if to_be_created(available_report, \
                                     item.user_project):}}
                                     <tr class="info">

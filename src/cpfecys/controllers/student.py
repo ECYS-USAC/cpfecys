@@ -28,8 +28,9 @@ def index():
             date_min = datetime.datetime(assignation_period.yearp, 1, 1)
             date_max = datetime.datetime(assignation_period.yearp, 7, 1)
         else:
+            the_year = assignation_period.yearp + 1
             date_min = datetime.datetime(assignation_period.yearp, 7, 1)
-            date_max = datetime.datetime(assignation_period.yearp, 1, 1)
+            date_max = datetime.datetime(the_year, 1, 1)
         return db((db.report_restriction.start_date <= current_date)&
                   (db.report_restriction.end_date >= current_date)&
                   (db.report_restriction.start_date >= date_min)&
