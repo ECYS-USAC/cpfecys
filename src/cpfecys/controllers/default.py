@@ -206,4 +206,4 @@ def resources():
                         (db.auth_membership.user_id == db.auth_user.id)&\
                         (db.auth_membership.group_id == db.auth_group.id)&\
                         (db.auth_group.role == 'Student')&
-                          (db.item.id > 0)).select(groupby=db.project.name, orderby=db.project.name))
+                          (db.item.id > 0)).select(orderby=db.project.name))

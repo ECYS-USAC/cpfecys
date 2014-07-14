@@ -63,6 +63,7 @@ if auth.has_membership(role="Super-Administrator"):
              (T('Project Leaders'), False, URL('admin', 'active_teachers'), []),
              (T('General Report'), False, URL('admin', 'general_report'), []),
              (T('System-wide Mail Logs'), False, URL('mailer', 'index'), []),
+             (T('Scheduler Report'), False, URL('admin', 'scheduler_activity'), []),
              ]),
     ])
 if auth.has_membership(role="Teacher"):

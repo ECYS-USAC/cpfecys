@@ -235,7 +235,7 @@ def auto_daily():
         + XML(me_the_user.first_name) + ' ' + XML(me_the_user.last_name) \
         + '<br/>' \
         + T('was sent to be checked.') + '<br/>' + T('Checking can be done in:') \
-        + ' ' + cpfeycs.get_domain() + '<br />' + signature + '</html>'
+        + ' ' + cpfecys.get_domain() + '<br />' + signature + '</html>'
         # send mail to teacher and student notifying change.
         mails = []
         # retrieve teacher's email

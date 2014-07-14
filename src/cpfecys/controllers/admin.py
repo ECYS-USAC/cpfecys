@@ -3,6 +3,11 @@
 
 @auth.requires_login()
 @auth.requires_membership('Super-Administrator')
+def scheduler_activity():
+    return dict(data = db3(db3.scheduler_run.id>0).select())
+
+@auth.requires_login()
+@auth.requires_membership('Super-Administrator')
 def dtt_general_approval():
     from datetime import datetime
     cperiod = cpfecys.current_year_period()
