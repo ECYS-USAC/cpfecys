@@ -1,7 +1,30 @@
 {{extend 'template.html'}}
 <div class="row-fluid">
     <div class="well span12" style="overflow:auto;">
-  		<a onclick="window.history.back()" class="btn" ><i class="icon-arrow-left"></i> Back</a>
+    <h1>{{=T(actual_period.period.name)}} - {{=actual_period.yearp}}</h1>
+        <table id="general-report" class="table-striped table-hover table-bordered" style="align:0 auto;">
+        <tr> 
+          <td>
+          <form class="form-inline" 
+          action="{{=URL('admin','general_report')}}" 
+            method='get'>
+            <a onclick="window.history.back()" class="btn" ><i class="icon-arrow-left"></i> {{=T('Back')}}</a>
+             <select name="period">
+                {{for period in periods:}}
+                  <option value="{{=period.id}}" 
+                  {{if period.id == actual_period.period.id:}}
+                  selected
+                  {{pass}}
+                  >
+                  {{=T(period.period.name)}} - {{=period.yearp}}
+                  </option>
+                {{pass}}
+            </select>
+            <input class="btn" type="submit" value="{{=T('Filter')}}">
+          </form>
+          </td>
+        </tr>
+        </table>
         <a class="btn btn-success pull-right"
            onclick="tableToExcel('general-report','');">
             <i class="icon-download icon-white"></i>

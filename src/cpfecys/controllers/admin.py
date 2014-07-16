@@ -146,8 +146,10 @@ def general_report():
                 final_report.id).select().first()
         return final_report, log_final, parcial_1, parcial_2, parcial_3, \
                 final, primera_r, segunda_r
+    periods = db(db.period_year).select()
     return dict(areas=areas, get_projects=get_projects, 
-        get_teacher=get_teacher,get_final_report=get_final_report,)
+        get_teacher=get_teacher,get_final_report=get_final_report,
+        actual_period=period, periods=periods)
 
 @auth.requires_login()
 @auth.requires_membership('Super-Administrator')
