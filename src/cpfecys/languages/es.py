@@ -1,4 +1,4 @@
-# -*- coding: utf-8 -*-
+# coding: utf-8
 {
 '': '',
 '!=': '!=',
@@ -928,6 +928,7 @@
 'Promoted': 'Promovido',
 'promoted': 'Promovido',
 'Proyecto': 'Proyecto',
+'Prueba': 'Prueba',
 'Prueba del mensaje': 'Prueba del mensaje',
 'Public Event': 'Evento',
 'Public event schedules': 'Horarios de Evento',

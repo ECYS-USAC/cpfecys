@@ -425,4 +425,4 @@ def get_custom_parameters():
     return db(db.custom_parameters).select().first()
 
 def get_domain():
-    return 'http://dtt-ecys.tk/'
+    return 'http://dtt-ecys.org/'
