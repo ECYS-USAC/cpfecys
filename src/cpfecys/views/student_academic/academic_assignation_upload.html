@@ -1,12 +1,66 @@
 {{extend 'template.html'}}
 <a href="{{=URL('academic_assignation')}}" class="btn" ><i class="icon-arrow-left"></i> {{=T('Back')}}</a>
-<h1>{{=T('Carga Masiva Alumnos')}}</h1>
+
 <h2>
-    {{=name}}
+    {{=T('Carga Masiva Alumnos')}}
+    <a href="#myModal" role="button" class="btn btn-primary" data-toggle="modal"><span class="icon-white icon-question-sign"></span></a><br>
+    <small>{{=name}} - {{=T(current_period.period.name)}} {{=current_period.yearp}}</small>
 </h2>
-<h3>
-    {{=T(current_period.period.name)}} - {{=current_period.yearp}}
-</h3>
+  <div id="myModal" class="modal hide fade" tabindex="-1" role="dialog"
+aria-labelledby="myModalLabel" aria-hidden="true">
+
+  <!--Inicia el boton de ayuda y el contenido de la ayuda-->
+  <div class="modal-header">
+    <button type="button" class="close" data-dismiss="modal"
+aria-hidden="true">×</button>
+      <h3 id="myModalLabel">
+          <span class="icon-question-sign"></span>
+          {{=T('Ayuda Carga Masiva Alumnos')}}
+      </h3>
+  </div>
+  <div class="modal-body">
+    <div class="well">
+        <p>
+            {{=T('Loads automatically record the student in the general list and assigned to the project where the charge was made.')}}
+        </p>
+        <p>
+            <dl>
+                <ul>
+                  <li>{{=T('The characteristics of the bulk load file are:')}}</li>
+                  <dd><li type="circle">{{=T('Comma delimited CSV Extension.')}}</li></dd>
+                  <dd>
+                    <li type="circle">{{=T('3 Columns')}}:</li>
+                    <dl>
+                        <dd>
+                            <li type="disc">
+                              {{=T('Driver: is a field where the student card number is entered.')}}
+                            </li>
+                            <li type="disc">
+                              {{=T('Email: is an alphanumeric field in which the student email is entered.')}}
+                            </li>
+                            <li type="disc">
+                              {{=T('Laboratory: is a True or False field, which specifies whether or not the student takes the laboratory.')}}
+                            </li>
+                        </dd>
+                    </dl>
+                  </dd>
+                </ul>
+            </dl>
+        </p>
+        <p>
+            {{=T('You can download the example file example pressing the download button.')}}
+        </p>
+    </div>
+    <a href="{{=URL('default/download', files())}}" target="blank" class="btn">Descargar Ejemplo</a>
+  </div>
+  <!--Termina el boton de ayuda y su contenido-->
+
+  <div class="modal-footer">
+      <button class="btn" data-dismiss="modal"
+aria-hidden="true">{{=T('Close')}}</button>
+  </div>
+</div>
+
 {{if success:}}
 <div class="accordion" id="accordion2">
   <div class="accordion-group">

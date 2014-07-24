@@ -316,6 +316,14 @@ def periods():
 @auth.requires_login()
 @auth.requires(auth.has_membership('Student') or auth.has_membership('Teacher'))
 def academic_assignation_upload():
+    def files():
+        f = db(db.uploaded_file.name=='CargaEstudiantes_TutoresAcademicos').select()
+        nameP = ''
+        for p2 in f:
+            nameP=p2.file_data
+        return nameP
+        return dict(nameP=nameP)
+
     assignation = request.vars['assignation']
     check = db.user_project(id=assignation, assigned_user = auth.user.id)
     name = check.project.name
@@ -336,7 +344,7 @@ def academic_assignation_upload():
                 file = False,
                 periods = periods,
                 current_period = current_period,
-                name=name)
+                name=name, files=files)
         try:
             cr = csv.reader(file, delimiter=',', quotechar='"')
             success = True
@@ -456,19 +464,19 @@ def academic_assignation_upload():
                 file = False,
                 periods = periods,
                 current_period = current_period,
-                name=name)
+                name=name, files=files)
         response.flash = T('Data uploaded')
         return dict(success = success,
                     errors = error_users,
                     avisos = aviso_users,
                     periods = periods,
                     current_period = current_period,
-                    name=name)
+                    name=name, files=files)
     return dict(success = False,
                 file = False,
                 periods = periods,
                 current_period = current_period,
-                name=name)
+                name=name, files=files)
 
 
 
