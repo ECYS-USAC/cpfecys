@@ -1,0 +1,212 @@
+{{extend 'template.html'}}
+<!-- Additional Scripts for MARKMIN -->
+<script src="http://code.jquery.com/jquery-migrate-1.2.1.js"></script>
+<script type="text/javascript" src="{{=URL('static','markitup')}}/jquery.markitup.pack.js"></script>
+<script type="text/javascript" src="{{=URL('static','markitup')}}/sets/markmin/set.js"></script>
+<script type="text/javascript" src="{{=URL('static','js')}}/highcharts/js/highcharts.js"></script>
+<script type="text/javascript" src="{{=URL('static','js')}}/highcharts/js/modules/data.js"></script>
+<script type="text/javascript" src="{{=URL('static','js')}}/highcharts/js/modules/exporting.js"></script>
+<link rel="stylesheet" type="text/css" href="{{=URL('static','markitup')}}/skins/markitup/style.css"/>
+<link rel="stylesheet" type="text/css" href="{{=URL('static','markitup')}}/sets/markmin/style.css"/>
+<!-- //Additional Scripts for MARKMIN -->
+<h1>{{=T('Notices')}} - {{=name}}
+<br>
+    <small>{{=T(semester)}}, {{=year}}</small>
+</h1>
+<div class="row-fluid">
+    <div class="well span12">
+    	<a onclick="window.history.back()" class="btn" ><i class="icon-arrow-left"></i>{{=T('Back')}}</a>
+	<form action="{{=URL('notification', 'teacher_mail_notifications/send')}}" method="post">
+	  <table>
+	  	<tr>
+			<td>
+				<!--Tabla de los grupos de estudiantes-->
+			  <table class="table-striped table-bordered">
+					<h3>{{=T('Group of Students')}}</h3>
+			   	  	<tr>
+		   	  		  <td>
+		   	  			<input type="checkbox" class="tipo_trigger" 
+		   	  			target="all" name="tipoe" id="all" value="all">
+		   	  		  </td>
+		   	  		  <td>
+		   	  		    {{=T('All')}}
+		   	  		  </td>
+			   	  	</tr>
+			   	  	<tr>
+		   	  		  <td>
+		   	  			<input type="checkbox" class="tipo_trigger" 
+		   	  			target="claboratorio" name="tipoe" id="claboratorio" value="cl">
+		   	  		  </td>
+		   	  		  <td>
+		   	  		    {{=T('Students with laboratory')}}
+		   	  		  </td>
+			   	  	</tr>
+					<tr>
+		   	  		  <td>
+		   	  			<input type="checkbox" class="tipo_trigger" 
+		   	  			target="slaboratorio"  name="tipoe" id="slaboratorio" value="sl">
+		   	  		  </td>
+		   	  		  <td>
+		   	  		    {{=T('Students without laboratory')}}
+		   	  		  </td>
+			   	  	</tr>
+			   	  	<tr>
+		   	  		  <td>
+		   	  			<input type="checkbox" class="tipo_trigger" 
+		   	  			target="finalPractice"  name="tipoe" id="finalPractice" value="fp">
+		   	  		  </td>
+		   	  		  <td>
+		   	  		    {{=T('Final Practice Student')}}
+		   	  		  </td>
+			   	  	</tr>
+			   	  	<tr>
+		   	  		  <td>
+		   	  			<input type="checkbox" class="tipo_trigger" 
+		   	  			target="specific"  name="tipoe" id="specific" value="specific">	
+		   	  		  </td>
+		   	  		  <td>
+		   	  		    {{=T('Specific Users')}}
+		   	  		  </td>
+			   	  	</tr>
+			  </table>
+			  <!--Fin de la Tabla de los grupos de estudiantes-->
+			</td>
+			<td><p>&nbsp;&nbsp;</p></td>
+			<td>
+				<div id="students_content" style="display: none;">
+					<h3><small>{{=T('Students with laboratory')}}</small></h3>
+					<div style="overflow:auto; height:110px;">
+					   	<!--Tabla de Alumnos con Laboratorio-->
+					   	<table class="table-striped table-bordered">
+						  	{{for project in get_projects(1):}}
+						  	<tr>
+						  	  <td>
+							    <input type="checkbox" 
+							    class="claboratorio" ="project" name="listado"
+							    value="{{=project.carnet.id}}">
+							  </td>
+							  <td>
+							  	{{=project.carnet.carnet}}
+							  </td>
+							</tr>
+						  	{{pass}}
+					  	</table>
+						<!--Fin de tabla de alumnos con laboratorio-->
+					</div>
+				</div>
+			</td>
+			<td>
+				<div id="students_content2" style="display: none;">
+					<h3><small>{{=T('Students without laboratory')}}</small></h3>
+					<div style="overflow:auto; height:110px;">
+						<!--Tabla de Alumnos sin Laboratorio-->
+				   	  	<table class="table-striped table-bordered">
+						  	{{for project in get_projects(2):}}
+						  	<tr>
+						  	  <td>
+							    <input type="checkbox" 
+							    class="slaboratorio" ="project" name="listado"
+							    value="{{=project.carnet.id}}">
+							  </td>
+							  <td>
+							  	{{=project.carnet.carnet}}
+							  </td>
+							</tr>
+						  	{{pass}}
+					  	</table>
+					  	<!--Fin de tabla de alumnos sin laboratorio-->
+				  	</div>
+				</div>
+			</td>
+			<td>
+			<div id="students_content3" style="display: none;">
+					<h3><small>{{=T('Final Practice Student')}}</small></h3>
+					<div style="overflow:auto; height:110px;">
+						<!--Tabla de Alumnos sin Laboratorio-->
+				   	  	<table class="table-striped table-bordered">
+						  	{{for project in get_projects(3):}}
+						  	<tr>
+						  	  <td>
+							    <input type="checkbox" class="finalPractice" ="project" name="listado2"
+					    value="{{=project.user_project.assigned_user}}">
+							  </td>
+							  <td>
+							  	{{=project.user_project.assigned_user.username}}
+							  </td>
+							  <td>
+							  	{{=project.user_project.assigned_user.first_name}}&nbsp;{{=project.user_project.assigned_user.last_name}}
+					  		  </td>
+							</tr>
+						  	{{pass}}
+					  	</table>
+					  	<!--Fin de tabla de alumnos sin laboratorio-->
+				  	</div>
+				</div>
+			</td>
+		</tr>
+	</table>
+	  <fieldset>
+	  	<label for="subject">{{=T('Subject')}}</label>
+	    <input type="text" id="subject" name="subject">
+	    <label for="message">{{=T('Message')}}</label>
+	    <textarea id="message" name="message" rows="8"></textarea>
+	    <button type="submit" class="btn btn-success">{{=T('Send')}}</button>
+	  </fieldset>
+	</form>
+	</div>
+</div>
+<script type="text/javascript">
+	$(document).ready(function(){
+		$("#specific").click(function(){
+			if ($("#specific").attr("checked")){
+			   $("#students_content").css("display", "block");
+			   $("#students_content2").css("display", "block");
+			   $("#students_content3").css("display", "block");
+			}else{
+			   $("#students_content").css("display", "none");
+			   $("#students_content2").css("display", "none");
+			   $("#students_content3").css("display", "none");
+			}
+			$("#all").attr("checked", false);
+			$("#slaboratorio").attr("checked", false);
+			$("#claboratorio").attr("checked", false);
+			$("#finalPractice").attr("checked", false);
+		})
+		$("#all").click(function(){
+			$("#students_content").css("display", "none");
+			$("#students_content2").css("display", "none");
+			$("#students_content3").css("display", "none");
+			$("#specific").attr("checked", false);
+			$("#slaboratorio").attr("checked", false);
+			$("#claboratorio").attr("checked", false);
+			$("#finalPractice").attr("checked", false);
+		})
+		$("#claboratorio").click(function(){
+			$("#students_content").css("display", "none");
+			$("#students_content2").css("display", "none");
+			$("#students_content3").css("display", "none");
+			$("#specific").attr("checked", false);
+			$("#all").attr("checked", false);
+			$("#slaboratorio").attr("checked", false);
+			$("#finalPractice").attr("checked", false);
+		})
+		$("#slaboratorio").click(function(){
+			$("#students_content").css("display", "none");
+			$("#students_content2").css("display", "none");
+			$("#students_content3").css("display", "none");
+			$("#specific").attr("checked", false);
+			$("#all").attr("checked", false);
+			$("#claboratorio").attr("checked", false);
+			$("#finalPractice").attr("checked", false);
+		})
+		$("#finalPractice").click(function(){
+			$("#students_content").css("display", "none");
+			$("#students_content2").css("display", "none");
+			$("#students_content3").css("display", "none");
+			$("#specific").attr("checked", false);
+			$("#all").attr("checked", false);
+			$("#claboratorio").attr("checked", false);
+			$("#slaboratorio").attr("checked", false);
+		})
+	});
+</script>

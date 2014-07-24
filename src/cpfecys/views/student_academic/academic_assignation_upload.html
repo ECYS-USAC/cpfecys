@@ -1,0 +1,60 @@
+{{extend 'template.html'}}
+<a href="{{=URL('academic_assignation')}}" class="btn" ><i class="icon-arrow-left"></i> {{=T('Back')}}</a>
+<h1>{{=T('Carga Masiva Alumnos')}}</h1>
+<h2>
+    {{=name}}
+</h2>
+<h3>
+    {{=T(current_period.period.name)}} - {{=current_period.yearp}}
+</h3>
+{{if success:}}
+<div class="accordion" id="accordion2">
+  <div class="accordion-group">
+    <div class="accordion-heading">
+      <a class="accordion-toggle" data-toggle="collapse" data-parent="#accordion2" href="#collapseOne">
+          <span class="icon-remove"></span> {{=T('User upload errors')}}
+          <span class="pull-right">{{=T('Total Errors: ') + len(errors)}}</span>
+      </a>
+    </div>
+    <div id="collapseOne" class="accordion-body collapse">
+    <div class="accordion-inner">
+    <ul>
+    {{for error in errors:}}
+    <li class="error">
+    <pre>
+    {{for row in error:}}{{=row}}  --  {{pass}}
+    </pre>
+    </li>
+    {{pass}}
+    </ul>
+    </div>
+    </div>
+  </div>
+  <div class="accordion-group">
+    <div class="accordion-heading">
+      <a class="accordion-toggle" data-toggle="collapse" data-parent="#accordion2" href="#collapseTwo">
+          <span class="icon-warning-sign"></span> {{=T('Aviso')}}
+          <span class="pull-right">{{=T('Total de Avisos: ') + len(avisos)}}</span>
+      </a>
+    </div>
+    <div id="collapseTwo" class="accordion-body collapse">
+    <div class="accordion-inner">
+    <ul>
+    {{for warning in avisos:}}
+    <li class="error">
+    <pre>
+    {{for row in warning:}}{{=row}}  --  {{pass}}
+    </pre>
+    </li>
+    {{pass}}
+    </ul>
+    </div>
+    </div>
+  </div>
+</div>
+{{else:}}
+<div class="well">
+    {{=FORM(INPUT(_type='file',_name='csvfile'),
+    INPUT(_type='submit',_value='Upload'))}}
+</div>
+{{ pass }}
