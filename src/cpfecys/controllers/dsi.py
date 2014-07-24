@@ -109,15 +109,15 @@ def item_detail():
        restriction = db(db.item_restriction.id==restriction).select().first()
        if restriction.item_type.name == 'Grade Activity':
          valid = not(score and user and restriction)
+         if not isinstance(score, int):
+          session.flash = T('Value must be numeric.')
+          redirect(URL('dsi','item_detail', 
+            vars=dict(restriction=restriction.id)))
        else:
          valid = not(user and restriction)
        if valid:
          session.flash = T('Not permited action.')
          redirect(URL('dsi', 'index'))
-       if not isinstance(score, int):
-        session.flash = T('Value must be numeric.')
-        redirect(URL('dsi','item_detail', 
-          vars=dict(restriction=restriction.id)))
        #Validate if current user assignation is active
        assignations = db(
                         (db.auth_user.id==db.user_project.assigned_user)&
