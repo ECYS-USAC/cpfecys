@@ -570,7 +570,8 @@ db.define_table('mailer_log',
                       default = datetime.datetime.now(), label = T('Sent Time')),
                 Field('destination', 'text', notnull = True, label = T('Destination')),
                 Field('result_log', 'text', notnull = False, label = T('Log')),
-                Field('success', 'boolean', notnull = True, label = T('Success')))
+                Field('success', 'boolean', notnull = True, label = T('Success')),
+                Field('emisor', 'text', notnull = True, label = T('Emisor')))
 
 db.define_table('item',
                 # AFAIK this is_active is for disabled items, true means enabled, false means disabled
