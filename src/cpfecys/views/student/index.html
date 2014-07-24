@@ -424,6 +424,7 @@
                                   <td>
                                   {{=T('Grading Pending')}}
                                   </td>
+                                  <td></td>
                                   <td>
                                   {{=T('None, the grading is in process, if \
                                   you meet the criteria, your grade will apear \
@@ -528,7 +529,7 @@
                                     {{pass}}
                                   </td>
                                   <td>
-                                  <div class="label label-important">
+                                  <div  class="label label-important">
                                   {{=T('No actions available')}}
                                   </div>
                                   </td>
@@ -549,6 +550,7 @@
                                     <td>
                                     {{=T(instance.created.period.name)}} {{=instance.created.yearp}}
                                     </td>
+                                    <td></td>
                                     <td>
                                     <a class="btn" href="{{=URL('cpfecys/student', 'download', instance.uploaded_file)}}">
                                     <span class="icon-eye-open"></span>
@@ -566,6 +568,7 @@
                                             {{=T('Missing Item')}}
                                         </div>
                                     </td>
+                                    <td></td>
                                     <td>
                                         <div class='label label-important'>
                                             {{=T('No actions available')}}
