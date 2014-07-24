@@ -38,7 +38,27 @@ def academic_assignation():
         session.last_assignation = check.id
     cyearperiod = cpfecys.current_year_period()
 
-    query = ((db.academic_course_assignation.semester == currentyear_period.id) & (db.academic_course_assignation.assignation==check.project))
+    if request.vars['search_var'] is None:
+        query = ((db.academic_course_assignation.semester == currentyear_period.id) & (db.academic_course_assignation.assignation==check.project))
+    else:
+        query2 = db((db.academic_course_assignation.carnet == db.academic.id) & (db.academic_course_assignation.semester == currentyear_period.id) & (db.academic_course_assignation.assignation==check.project) & (db.academic.carnet.like('%'+request.vars['search_var']+'%')) ).select()
+        dest = []
+        query = None
+        for q in query2:
+            dest.append(q.academic.id)
+            #consultar a la base de datos para obtener a los usuarios a los que enviaremos
+            query = (db.academic_course_assignation.carnet.belongs(dest))
+        
+
+    fields = (db.academic_course_assignation.id, db.academic_course_assignation.carnet, db.academic_course_assignation.laboratorio)
+
+    #db.academic.id.readable = False
+    #db.academic.id.writable = False
+    #db.academic.carnet.readable = False    
+    #db.academic.carnet.writable = False
+    #db.academic.email.writable = False
+    #db.academic.email.readable = False
+
 
     db.academic_course_assignation.assignation.default = check.project
     db.academic_course_assignation.assignation.writable = False
@@ -48,14 +68,14 @@ def academic_assignation():
     db.academic_course_assignation.semester.readable = False
 
     if (currentyear_period.id == cpfecys.current_year_period().id):
-        grid = SQLFORM.grid(query, oncreate=oncreate_academic_assignation, onupdate=onupdate_academic_assignation, ondelete=ondelete_academic_assignation)
+        grid = SQLFORM.grid(query, fields=fields, oncreate=oncreate_academic_assignation, onupdate=onupdate_academic_assignation, ondelete=ondelete_academic_assignation)
     else:
         checkProject = db((db.user_project.project == check.project) & (db.user_project.assigned_user==check.assigned_user) & (db.user_project.period==currentyear_period.id)).select()
         b=0
         for a in checkProject:
             b=b+1
         if b!=0:
-            grid = SQLFORM.grid(query, deletable=False, editable=False, create=False)
+            grid = SQLFORM.grid(query, fields=fields, deletable=False, editable=False, create=False)
         else:
             session.flash  =T('Not authorized')
             redirect(URL('default','index'))
@@ -479,8 +499,13 @@ def student_courses():
 @auth.requires_login()
 @auth.requires(auth.has_membership('Student') or auth.has_membership('Teacher'))
 def academic():       
-    grid = SQLFORM.smartgrid(
-        db.academic, linked_tables=['academic'], oncreate=oncreate_academic, onupdate=onupdate_academic, ondelete=ondelete_academic)
+    if request.vars['search_var'] is None:
+        query = db.academic
+    else:
+        query = db.academic.carnet.like('%'+request.vars['search_var']+'%')
+
+    grid = SQLFORM.grid(
+        query, oncreate=oncreate_academic, onupdate=onupdate_academic, ondelete=ondelete_academic,  maxtextlength=100,)
     return dict(grid=grid)
 
 def oncreate_academic(form):

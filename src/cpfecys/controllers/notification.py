@@ -411,7 +411,12 @@ def register_mail_notifications_detail():
     db.notification_general_log4.course.readable = False
     db.notification_general_log4.yearp.readable = False
     db.notification_general_log4.period.readable = False
-    query = ((db.notification_log4.register==notice)&(db.notification_general_log4.id==db.notification_log4.register))
+    
+    if request.vars['search_var'] is None:
+        query = ((db.notification_log4.register==notice)&(db.notification_general_log4.id==db.notification_log4.register))
+    else:
+        query = ((db.notification_log4.register==notice)&(db.notification_general_log4.id==db.notification_log4.register) & (db.notification_log4.destination.like('%'+request.vars['search_var']+'%')) )
+    
     grid = SQLFORM.grid(query, deletable=False, editable=False, create=False, paginate=10, details=False, maxtextlength={'notification_log4.result_log' : 256},csv=False)
     
     return dict(subject=asunto, grid=grid, notice=notice)
