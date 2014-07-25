@@ -236,11 +236,11 @@ def teacher_mail_notifications():
                     users1 = db((db.academic.id==db.academic_course_assignation.carnet)&(db.academic_course_assignation.semester == period) & (db.academic_course_assignation.assignation==check.project) & (db.academic_course_assignation.laboratorio=='False')).select(count1)
                     totalC1 = count_Items(users1,count1)
                 elif tipoes =='fp':
-                    users2 = db((db.auth_user.id==db.user_project.assigned_user)&(db.user_project.period == period) & (db.user_project.project==check.project)).select(count2)
+                    users2 = db((db.auth_user.id==db.user_project.assigned_user)&(db.user_project.period == period) & (db.user_project.project==check.project)&(db.auth_membership.user_id==db.user_project.assigned_user)&(db.auth_membership.group_id==2)).select(count2)
                     totalC2 = count_Items(users2,count2)
                 else:
                     users1 = db((db.academic.id==db.academic_course_assignation.carnet)&(db.academic_course_assignation.semester == period) & (db.academic_course_assignation.assignation==check.project)).select(count1)
-                    users2 = db((db.auth_user.id==db.user_project.assigned_user)&(db.user_project.period == period) & (db.user_project.project==check.project)).select(count2)
+                    users2 = db((db.auth_user.id==db.user_project.assigned_user)&(db.user_project.period == period) & (db.user_project.project==check.project)&(db.auth_membership.user_id==db.user_project.assigned_user)&(db.auth_membership.group_id==2)).select(count2)
                     totalC1 = count_Items(users1,count1)
                     totalC2 = count_Items(users2,count2)
                 if tipoes=='all' and (totalC1>0 or totalC2>0):

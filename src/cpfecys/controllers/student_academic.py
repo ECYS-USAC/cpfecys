@@ -47,7 +47,7 @@ def academic_assignation():
         for q in query2:
             dest.append(q.academic.id)
             #consultar a la base de datos para obtener a los usuarios a los que enviaremos
-            query = (db.academic_course_assignation.carnet.belongs(dest))
+        query = (db.academic_course_assignation.carnet.belongs(dest) & (db.academic_course_assignation.semester == currentyear_period.id) & (db.academic_course_assignation.assignation==check.project))
         
 
     fields = (db.academic_course_assignation.id, db.academic_course_assignation.carnet, db.academic_course_assignation.laboratorio)
