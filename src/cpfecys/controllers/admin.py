@@ -186,9 +186,15 @@ def delivered():
     admin = False
     restrictions = db(
        (db.item_restriction.item_type==db.item_type(name='Activity'))& \
-       (db.item_restriction.period==period.id)).select()| \
+       ((db.item_restriction.period==period.id) |
+        ((db.item_restriction.permanent==True)&
+            (db.item_restriction.period <= period.id)))&
+        (db.item_restriction.is_enabled==True)).select()| \
     db((db.item_restriction.item_type==db.item_type(name='Grade Activity'))& \
-       (db.item_restriction.period==period.id)).select()
+       ((db.item_restriction.period==period.id) |
+        ((db.item_restriction.permanent==True)&
+            (db.item_restriction.period <= period.id)))&
+        (db.item_restriction.is_enabled==True)).select()
     def calculate_by_restriction(restriction):
         pending = 0
         graded = 0
@@ -197,12 +203,10 @@ def delivered():
         failed = 0
         restriction_instance = db(
            (db.item_restriction.item_type==db.item_type(name='Activity'))& \
-           (db.item_restriction.period==period.id)&
            (db.item_restriction.id==restriction)&
            (db.item_restriction.is_enabled==True)).select() | \
             db((db.item_restriction.item_type==db.item_type( \
                 name='Grade Activity'))& \
-           (db.item_restriction.period==period.id)&
            (db.item_restriction.id==restriction)&
            (db.item_restriction.is_enabled==True)
                 ).select(db.item_restriction.ALL)
@@ -268,10 +272,10 @@ def delivered():
                             graded += 1
                             failed += 1
                             total += 1
-
         return pending, graded, total, approved, failed
     return dict(restrictions=restrictions, periods=periods,
-        calculate_by_restriction=calculate_by_restriction)
+        calculate_by_restriction=calculate_by_restriction,
+        period=period)
 
 @auth.requires_login()
 @auth.requires_membership('Super-Administrator')

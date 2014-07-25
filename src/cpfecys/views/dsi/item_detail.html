@@ -11,7 +11,11 @@
             value="{{=restrictions[0].id}}">
              <select name="period">
                 {{for cperiod in periods:}}
-                  <option value="{{=period.id}}">
+                      <option value="{{=cperiod.id}}"
+                      {{ if period.id == cperiod.id:}}
+                        selected 
+                      {{pass}}
+                      >
                   {{=T(cperiod.period.name)}}-{{=cperiod.yearp}}
                   </option>
                 {{pass}}

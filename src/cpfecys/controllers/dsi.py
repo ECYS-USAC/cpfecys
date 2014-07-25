@@ -7,17 +7,15 @@ def index():
     period = cpfecys.current_year_period()
     restrictions = db(
        (db.item_restriction.item_type==db.item_type(name='Activity'))& \
-       (db.item_restriction.period==period.id)&
-       (db.item_restriction.is_enabled==True)).select()| \
+       ((db.item_restriction.period==period.id) |
+        ((db.item_restriction.permanent==True)&
+            (db.item_restriction.period <= period.id)))&
+        (db.item_restriction.is_enabled==True)).select()| \
     db((db.item_restriction.item_type==db.item_type(name='Grade Activity'))& \
-       (db.item_restriction.period==period.id)&
-       (db.item_restriction.is_enabled==True)).select()| \
-    db((db.item_restriction.item_type==db.item_type(name='Activity'))& \
-       (db.item_restriction.permanent==True)&
-       (db.item_restriction.is_enabled==True)).select()| \
-    db((db.item_restriction.item_type==db.item_type(name='Grade Activity'))& \
-       (db.item_restriction.permanent==True)&
-       (db.item_restriction.is_enabled==True)).select()
+       ((db.item_restriction.period==period.id) |
+        ((db.item_restriction.permanent==True)&
+            (db.item_restriction.period <= period.id)))&
+        (db.item_restriction.is_enabled==True)).select()
     return dict(restrictions=restrictions)
 
 @auth.requires_login()
