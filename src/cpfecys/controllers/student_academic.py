@@ -68,14 +68,14 @@ def academic_assignation():
     db.academic_course_assignation.semester.readable = False
 
     if (currentyear_period.id == cpfecys.current_year_period().id):
-        grid = SQLFORM.grid(query, fields=fields, oncreate=oncreate_academic_assignation, onupdate=onupdate_academic_assignation, ondelete=ondelete_academic_assignation)
+        grid = SQLFORM.grid(query, fields=fields, oncreate=oncreate_academic_assignation, onupdate=onupdate_academic_assignation, ondelete=ondelete_academic_assignation,csv=False)
     else:
         checkProject = db((db.user_project.project == check.project) & (db.user_project.assigned_user==check.assigned_user) & (db.user_project.period==currentyear_period.id)).select()
         b=0
         for a in checkProject:
             b=b+1
         if b!=0:
-            grid = SQLFORM.grid(query, fields=fields, deletable=False, editable=False, create=False)
+            grid = SQLFORM.grid(query, fields=fields, deletable=False, editable=False, create=False,csv=False)
         else:
             session.flash  =T('Not authorized')
             redirect(URL('default','index'))
@@ -513,7 +513,7 @@ def academic():
         query = db.academic.carnet.like('%'+request.vars['search_var']+'%')
 
     grid = SQLFORM.grid(
-        query, oncreate=oncreate_academic, onupdate=onupdate_academic, ondelete=ondelete_academic,  maxtextlength=100,)
+        query, oncreate=oncreate_academic, onupdate=onupdate_academic, ondelete=ondelete_academic,  maxtextlength=100,csv=False)
     return dict(grid=grid)
 
 def oncreate_academic(form):
