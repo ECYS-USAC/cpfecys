@@ -217,18 +217,6 @@
 'Aviso': 'Aviso',
 'Aviso: ': 'Aviso: ',
 'Avisos enviados - Existen 1 avisos fallidos, revise el registro de avisos': 'Avisos enviados - Existen 1 avisos fallidos, revise el registro de avisos',
-<<<<<<< HEAD
-'Avisos enviados - Existen 14 avisos fallidos, revise el registro de avisos': 'Avisos enviados - Existen 14 avisos fallidos, revise el registro de avisos',
-'Avisos enviados - Existen 2 avisos fallidos, revise el registro de avisos': 'Avisos enviados - Existen 2 avisos fallidos, revise el registro de avisos',
-'Avisos enviados - Existen 26 avisos fallidos, revise el registro de avisos': 'Avisos enviados - Existen 26 avisos fallidos, revise el registro de avisos',
-'Avisos enviados - Existen 31 avisos fallidos, revise el registro de avisos': 'Avisos enviados - Existen 31 avisos fallidos, revise el registro de avisos',
-=======
-'Avisos enviados - Existen 17 avisos fallidos, revise el registro de avisos': 'Avisos enviados - Existen 17 avisos fallidos, revise el registro de avisos',
-'Avisos enviados - Existen 2 avisos fallidos, revise el registro de avisos': 'Avisos enviados - Existen 2 avisos fallidos, revise el registro de avisos',
-'Avisos enviados - Existen 23 avisos fallidos, revise el registro de avisos': 'Avisos enviados - Existen 23 avisos fallidos, revise el registro de avisos',
-'Avisos enviados - Existen 3 avisos fallidos, revise el registro de avisos': 'Avisos enviados - Existen 3 avisos fallidos, revise el registro de avisos',
-'Avisos enviados - Existen 40 avisos fallidos, revise el registro de avisos': 'Avisos enviados - Existen 40 avisos fallidos, revise el registro de avisos',
->>>>>>> origin/Development
 'Ayuda Carga Alumnos': 'Ayuda Carga Alumnos',
 'Ayuda Carga Masiva Alumnos': 'Ayuda Carga Masiva Alumnos',
 'Back': 'Atras',
@@ -466,10 +454,6 @@
 'Edit This App': 'Edite esta App',
 'Editing file': 'Editando archivo',
 'Editing file "%s"': 'Editando archivo "%s"',
-<<<<<<< HEAD
-=======
-'El email no es valido': 'El email no es valido',
->>>>>>> origin/Development
 'El estudiante ya se encuentra registrado en el sistema': 'El estudiante ya se encuentra registrado en el sistema',
 'El estudiante ya se encuentra registrado en el sistema y asignado al curso': 'El estudiante ya se encuentra registrado en el sistema y asignado al curso',
 'Email': 'Email',
@@ -1012,10 +996,6 @@
 'Promoted': 'Promovido',
 'promoted': 'Promovido',
 'Proyecto': 'Proyecto',
-<<<<<<< HEAD
-'Prue': 'Prue',
-=======
->>>>>>> origin/Development
 'prueba': 'prueba',
 'Prueba': 'Prueba',
 'Prueba del mensaje': 'Prueba del mensaje',
