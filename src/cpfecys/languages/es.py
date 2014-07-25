@@ -43,6 +43,7 @@
 'Actions': 'Acciones',
 'Active': 'Activo',
 'Active Teachers': 'Encargados Activos',
+'Actividad sin nota': 'Actividad sin nota',
 'Activities in Course': 'Actividades en Curso',
 'Activities Log': 'Registro de Actividades',
 'Activities Log with metrics': 'Registro de Actividades con Métricas',
