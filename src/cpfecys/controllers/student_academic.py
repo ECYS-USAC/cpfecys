@@ -50,7 +50,7 @@ def academic_assignation():
         query = (db.academic_course_assignation.carnet.belongs(dest) & (db.academic_course_assignation.semester == currentyear_period.id) & (db.academic_course_assignation.assignation==check.project))
         
 
-    fields = (db.academic_course_assignation.id, db.academic_course_assignation.carnet, db.academic_course_assignation.laboratorio)
+    fields = (db.academic_course_assignation.carnet, db.academic_course_assignation.laboratorio)
 
     #db.academic.id.readable = False
     #db.academic.id.writable = False
@@ -511,6 +511,9 @@ def academic():
         query = db.academic
     else:
         query = db.academic.carnet.like('%'+request.vars['search_var']+'%')
+
+    db.academic.id.writable = False
+    db.academic.id.readable = False
 
     grid = SQLFORM.grid(
         query, oncreate=oncreate_academic, onupdate=onupdate_academic, ondelete=ondelete_academic,  maxtextlength=100,csv=False)
