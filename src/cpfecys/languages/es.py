@@ -217,10 +217,18 @@
 'Aviso': 'Aviso',
 'Aviso: ': 'Aviso: ',
 'Avisos enviados - Existen 1 avisos fallidos, revise el registro de avisos': 'Avisos enviados - Existen 1 avisos fallidos, revise el registro de avisos',
+<<<<<<< HEAD
 'Avisos enviados - Existen 14 avisos fallidos, revise el registro de avisos': 'Avisos enviados - Existen 14 avisos fallidos, revise el registro de avisos',
 'Avisos enviados - Existen 2 avisos fallidos, revise el registro de avisos': 'Avisos enviados - Existen 2 avisos fallidos, revise el registro de avisos',
 'Avisos enviados - Existen 26 avisos fallidos, revise el registro de avisos': 'Avisos enviados - Existen 26 avisos fallidos, revise el registro de avisos',
 'Avisos enviados - Existen 31 avisos fallidos, revise el registro de avisos': 'Avisos enviados - Existen 31 avisos fallidos, revise el registro de avisos',
+=======
+'Avisos enviados - Existen 17 avisos fallidos, revise el registro de avisos': 'Avisos enviados - Existen 17 avisos fallidos, revise el registro de avisos',
+'Avisos enviados - Existen 2 avisos fallidos, revise el registro de avisos': 'Avisos enviados - Existen 2 avisos fallidos, revise el registro de avisos',
+'Avisos enviados - Existen 23 avisos fallidos, revise el registro de avisos': 'Avisos enviados - Existen 23 avisos fallidos, revise el registro de avisos',
+'Avisos enviados - Existen 3 avisos fallidos, revise el registro de avisos': 'Avisos enviados - Existen 3 avisos fallidos, revise el registro de avisos',
+'Avisos enviados - Existen 40 avisos fallidos, revise el registro de avisos': 'Avisos enviados - Existen 40 avisos fallidos, revise el registro de avisos',
+>>>>>>> origin/Development
 'Ayuda Carga Alumnos': 'Ayuda Carga Alumnos',
 'Ayuda Carga Masiva Alumnos': 'Ayuda Carga Masiva Alumnos',
 'Back': 'Atras',
@@ -458,6 +466,10 @@
 'Edit This App': 'Edite esta App',
 'Editing file': 'Editando archivo',
 'Editing file "%s"': 'Editando archivo "%s"',
+<<<<<<< HEAD
+=======
+'El email no es valido': 'El email no es valido',
+>>>>>>> origin/Development
 'El estudiante ya se encuentra registrado en el sistema': 'El estudiante ya se encuentra registrado en el sistema',
 'El estudiante ya se encuentra registrado en el sistema y asignado al curso': 'El estudiante ya se encuentra registrado en el sistema y asignado al curso',
 'Email': 'Email',
@@ -543,6 +555,7 @@
 'Files': 'Archivos',
 'Files Manager': 'Admin de Archivos',
 'Files manager': 'Admin de Archivos',
+'Fill all fields of notification': 'Fill all fields of notification',
 'Fill all fields to save.': 'Llenar todos los campos para guardar.',
 'Filter': 'Filtrar',
 'Final': 'Final',
@@ -646,6 +659,8 @@
 'includes': 'incluye',
 'Incomplete Information': 'Información Incompleta',
 'Index': 'Índice',
+'informacion': 'informacion',
+'informacion importante': 'informacion importante',
 'Information': 'Información',
 'Informe de Conferencia': 'Informe de Conferencia',
 'Ingresar Introducción. ': 'Ingresar Introducción. ',
@@ -997,7 +1012,10 @@
 'Promoted': 'Promovido',
 'promoted': 'Promovido',
 'Proyecto': 'Proyecto',
+<<<<<<< HEAD
 'Prue': 'Prue',
+=======
+>>>>>>> origin/Development
 'prueba': 'prueba',
 'Prueba': 'Prueba',
 'Prueba del mensaje': 'Prueba del mensaje',
@@ -1125,6 +1143,7 @@
 'Scored by: ': 'Calificado por: ',
 'sdgf': 'sdgf',
 'Se realizó la asignación': 'Se realizó la asignación',
+'Se realizó la modificacion': 'Se realizó la modificacion',
 'Search': 'Buscar',
 'Search Pages': 'Buscar Páginas',
 'Second Semester': 'Segundo Semestre',
@@ -1398,6 +1417,7 @@
 'Uv Token': 'Token de UV',
 'Valid': 'Valido',
 'Value': 'Valor',
+'Value already in database or empty': 'Value already in database or empty',
 'value already in database or empty': 'Valor actualmente en la base de datos o vacio.',
 'Value must be numeric.': 'El valor debe ser numérico.',
 'Value not allowed': 'Valor no permitido',
@@ -1462,6 +1482,7 @@
 'You can download the example file example pressing the download button.': 'Puede descargar el archivo de ejemplo para cargar estudiantes presionando el botón "Descargar Ejemplo".',
 'You can modify this application and adapt it to your needs': 'Usted puede modificar esta aplicación y adaptarla a sus necesidades',
 'You have:': 'Tienes:',
+'You must select only one group of students': 'You must select only one group of students',
 'You visited the url %s': 'Usted visitó la url %s',
 'YYYY-MM-DD': 'YYYY-MM-DD',
 }
