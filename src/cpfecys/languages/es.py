@@ -812,6 +812,7 @@
 'Mediana': 'Mediana',
 'mediana': '',
 'Mensaje para todos en el tutor academico': 'Mensaje para todos en el tutor academico',
+'Mensaje Prueba': 'Mensaje Prueba',
 'Menu Model': 'Modelo "menu"',
 'merge': 'combinar',
 'Message': 'Mensaje',

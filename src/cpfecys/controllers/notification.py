@@ -117,7 +117,7 @@ def teacher_register_mail_notifications():
 @auth.requires_membership('Teacher')
 def teacher_send_mail_to_students(users1, users2, message, subject, check, semester, year):
     #Obtener valores reales (no ids)
-    nameS = check.assigned_user.first_name+" "+check.assigned_user.last_name
+    nameS2 = check.assigned_user.first_name+" "+check.assigned_user.last_name
     nameU = check.assigned_user.username
     nameP = check.project.name
     try:
@@ -127,7 +127,7 @@ def teacher_send_mail_to_students(users1, users2, message, subject, check, semes
     except:
         None
     period = T(semester)+' '+str(year)
-    messageC = '<html>' + message + '<br><br>'+str(nameS)+'<br>'+str(period)+'<br>'+str(nameP)+'<br>Sistema de Control de Estudiantes de Practica Final<br> Escuela de Ciencias y Sistemas - Universidad de San Carlos de Guatemala</html>'
+    messageC = '<html>' + message + '<br><br>'+str(nameS2)+'<br>'+str(period)+'<br>'+str(nameP)+'<br>Sistema de Control de Estudiantes de Practica Final<br> Escuela de Ciencias y Sistemas - Universidad de San Carlos de Guatemala</html>'
     #variable de control
     control = 0
     #Log General del Envio
@@ -493,7 +493,7 @@ def register_mail_notifications():
 @auth.requires_membership('Student')
 def send_mail_to_students(users, message, subject, check, semester, year):
     #Obtener valores reales (no ids)
-    nameS = check.assigned_user.first_name+" "+check.assigned_user.last_name
+    nameS2 = check.assigned_user.first_name+" "+check.assigned_user.last_name
     nameU = check.assigned_user.username
     nameP = check.project.name
     try:
@@ -503,7 +503,7 @@ def send_mail_to_students(users, message, subject, check, semester, year):
     except:
         None
     period = T(semester)+' '+str(year)
-    messageC = '<html>' + message + '<br><br>'+str(nameS)+'<br>'+str(period)+'<br>'+str(nameP)+'<br>Sistema de Control de Estudiantes de Practica Final<br> Escuela de Ciencias y Sistemas - Universidad de San Carlos de Guatemala</html>'
+    messageC = '<html>' + message + '<br><br>'+str(nameS2)+'<br>'+str(period)+'<br>'+str(nameP)+'<br>Sistema de Control de Estudiantes de Practica Final<br> Escuela de Ciencias y Sistemas - Universidad de San Carlos de Guatemala</html>'
     #variable de control
     control = 0
     #Log General del Envio
