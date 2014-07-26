@@ -1,6 +1,12 @@
 {{extend 'template.html'}}
 <div class="row-fluid reports">
     <div class="well span12">
+    <a onclick="window.history.back()" class="btn" ><i class="icon-arrow-left"></i>{{=T('Back')}}</a>
+    <a class="btn btn-success pull-right"
+       onclick="tableToExcel('delivered','');">
+        <i class="icon-download icon-white"></i>
+        {{=T('Excel (XLS)')}}
+    </a>
     <table class="table-striped table-bordered" style="align:0 auto;">
         <tr>
           <td>
@@ -11,7 +17,11 @@
                 value="{{=restrictions[0].id}}"{{pass}}>
                  <select name="period">
                     {{for cperiod in periods:}}
-                      <option value="{{=period.id}}">
+                      <option value="{{=cperiod.id}}"
+                      {{ if period.id == cperiod.id:}}
+                        selected 
+                      {{pass}}
+                      >
                       {{=T(cperiod.period.name)}}-{{=cperiod.yearp}}
                       </option>
                     {{pass}}
@@ -21,11 +31,7 @@
           </td>
         </tr>
     </table>
-        <a class="btn btn-success pull-right"
-           onclick="tableToExcel('delivered','');">
-            <i class="icon-download icon-white"></i>
-            {{=T('Excel (XLS)')}}
-        </a>
+    <h1 class="pull-left">{{=T(period.period.name)}} - {{=period.yearp}}</h1>
     <table id="delivered" class="table table-striped table-bordered">
         <thead>
             <tr>

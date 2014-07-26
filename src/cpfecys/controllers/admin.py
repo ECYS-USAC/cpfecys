@@ -186,9 +186,15 @@ def delivered():
     admin = False
     restrictions = db(
        (db.item_restriction.item_type==db.item_type(name='Activity'))& \
-       (db.item_restriction.period==period.id)).select()| \
+       ((db.item_restriction.period==period.id) |
+        ((db.item_restriction.permanent==True)&
+            (db.item_restriction.period <= period.id)))&
+        (db.item_restriction.is_enabled==True)).select()| \
     db((db.item_restriction.item_type==db.item_type(name='Grade Activity'))& \
-       (db.item_restriction.period==period.id)).select()
+       ((db.item_restriction.period==period.id) |
+        ((db.item_restriction.permanent==True)&
+            (db.item_restriction.period <= period.id)))&
+        (db.item_restriction.is_enabled==True)).select()
     def calculate_by_restriction(restriction):
         pending = 0
         graded = 0
@@ -197,12 +203,10 @@ def delivered():
         failed = 0
         restriction_instance = db(
            (db.item_restriction.item_type==db.item_type(name='Activity'))& \
-           (db.item_restriction.period==period.id)&
            (db.item_restriction.id==restriction)&
            (db.item_restriction.is_enabled==True)).select() | \
             db((db.item_restriction.item_type==db.item_type( \
                 name='Grade Activity'))& \
-           (db.item_restriction.period==period.id)&
            (db.item_restriction.id==restriction)&
            (db.item_restriction.is_enabled==True)
                 ).select(db.item_restriction.ALL)
@@ -268,10 +272,10 @@ def delivered():
                             graded += 1
                             failed += 1
                             total += 1
-
         return pending, graded, total, approved, failed
     return dict(restrictions=restrictions, periods=periods,
-        calculate_by_restriction=calculate_by_restriction)
+        calculate_by_restriction=calculate_by_restriction,
+        period=period)
 
 @auth.requires_login()
 @auth.requires_membership('Super-Administrator')
@@ -843,16 +847,14 @@ def mail_notifications():
         projects = request.vars['project']
         message = request.vars['message']
         subject = request.vars['subject']
-        if not roles:
-            session.flash = T('At least a project and a role must be selected')
-            redirect(URL('admin', 'mail_notifications'))
-            return
-        if len(roles) == 1:
-            pointless_var = [roles]
-        else:
-            pointless_var = roles
+
+        if isinstance(roles, str):
+            roles = [roles]
+
+        if projects != None and isinstance(projects, str):
+            projects = [projects]
+
         if projects  != None  and roles != None:
-            assignations = None
             for role in request.vars['role']:
                 role = db(db.auth_group.id==role).select().first()
 
@@ -861,27 +863,46 @@ def mail_notifications():
                         (db.auth_user.id==db.auth_membership.user_id)&
                         (db.auth_membership.group_id==db.auth_group.id)&
                         (db.auth_group.role=='DSI'))
-                    dsi_role = [users.select().first().auth_group.id]
+                    group_id = users.select().first().auth_group.id
+                    dsi_role = [group_id]
                     send_mail_to_users(users.select(db.auth_user.ALL), 
                         message, dsi_role, projects,
                         subject)
-                else:    
-                    users = db(
-                        (db.auth_user.id==db.auth_membership.user_id)&
-                        (db.auth_membership.group_id==db.auth_group.id)&
-                        (db.auth_group.id.belongs(pointless_var))&
-                        (db.user_project.project.belongs(projects))&
-                        (db.auth_user.id==db.user_project.assigned_user)&
-                        (db.user_project.period==db.period_year.id)&
-                        ((db.user_project.period <= period.id)&
-                        ((db.user_project.period + db.user_project.periods) > \
-                         period.id))
-                        ).select(db.auth_user.ALL, distinct=True)
-                    send_mail_to_users(users, message, \
-                        pointless_var, projects, subject, True)
+                
+                users = db(
+                    (db.auth_user.id==db.auth_membership.user_id)&
+                    (db.auth_membership.group_id==db.auth_group.id)&
+                    (db.auth_group.id.belongs(roles))&
+                    #Until here we get users from role
+                    (db.user_project.project.belongs(projects))&
+                    (db.auth_user.id==db.user_project.assigned_user)&
+                    #Until here we get users from role assigned to projects
+                    (db.user_project.period==db.period_year.id)&
+                    ((db.user_project.period <= period.id)&
+                    ((db.user_project.period + db.user_project.periods) > \
+                     period.id))
+                    )
+                #return users._select(db.auth_user.ALL, distinct=True)
+                users = users.select(db.auth_user.ALL, distinct=True)
+                #return users
+                send_mail_to_users(users, message, \
+                    roles, projects, subject, True)
 
             session.flash = T('Mail successfully sent')
             redirect(URL('admin', 'mail_notifications'))
+        elif len(roles) == 1:
+            for role in roles:
+                role = db(db.auth_group.id==role).select().first()
+                if role.role == 'DSI':
+                    users = db(
+                        (db.auth_user.id==db.auth_membership.user_id)&
+                        (db.auth_membership.group_id==db.auth_group.id)&
+                        (db.auth_group.role=='DSI'))
+                    group_id = users.select().first().auth_group.id
+                    dsi_role = [group_id]
+                    send_mail_to_users(users.select(db.auth_user.ALL), 
+                        message, dsi_role, projects,
+                        subject)
         else:
             session.flash = T('At least a project and a role must be selected')
             redirect(URL('admin', 'mail_notifications'))
