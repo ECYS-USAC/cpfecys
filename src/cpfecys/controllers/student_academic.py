@@ -68,7 +68,8 @@ def academic_assignation():
     db.academic_course_assignation.semester.readable = False
 
     if (currentyear_period.id == cpfecys.current_year_period().id):
-        grid = SQLFORM.grid(query, fields=fields, oncreate=oncreate_academic_assignation, onupdate=onupdate_academic_assignation, ondelete=ondelete_academic_assignation,csv=False)
+        grid = SQLFORM.grid(query, fields=fields, oncreate=oncreate_academic_assignation, onupdate=onupdate_academic_assignation, ondelete=ondelete_academic_assignation, exportclasses=dict(xml=False,
+            html=False,csv_with_hidden_cols=False,json=False,tsv_with_hidden_cols=False,tsv=False))
     else:
         checkProject = db((db.user_project.project == check.project) & (db.user_project.assigned_user==check.assigned_user) & (db.user_project.period==currentyear_period.id)).select()
         b=0
@@ -368,6 +369,11 @@ def academic_assignation_upload():
                             error_users.append(row)
                         else:
                             #T o F validation
+                            if rlaboratorio == 'TRUE':
+                                rlaboratorio = 'T'
+                            if rlaboratorio == 'FALSE':
+                                rlaboratorio = 'F'
+
                             if rlaboratorio != 'T' and rlaboratorio != 'F':
                                 row.append(T('Error: ') + T('El tipo de laboratorio ingresado no es correcto. Este debe ser T o F.'))
                                 error_users.append(row)
@@ -420,6 +426,11 @@ def academic_assignation_upload():
                     usr2 = db.academic_course_assignation((db.academic_course_assignation.semester == current_period) & (db.academic_course_assignation.assignation == check.project) & (db.academic_course_assignation.carnet == usr.id))
                     if usr2 is None:
                         #T o F validation
+                        if rlaboratorio == 'TRUE':
+                                rlaboratorio = 'T'
+                        if rlaboratorio == 'FALSE':
+                                rlaboratorio = 'F'
+                            
                         if rlaboratorio != 'T' and rlaboratorio != 'F':
                             row.append(T('Error: ') + T('El tipo de laboratorio ingresado no es correcto. Este debe ser T o F.'))
                             error_users.append(row)
