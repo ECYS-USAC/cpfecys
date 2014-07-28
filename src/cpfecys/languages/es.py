@@ -912,6 +912,7 @@
 'Notify All': 'Notificar a todos',
 'Notify Pending': 'Notificar Pendientes',
 'November': 'Noviembre',
+'New Notification': 'Nuevo Aviso',
 'Num': 'Num',
 'Number': 'Number',
 'Object or table name': 'Objeto o nombre de tabla',
