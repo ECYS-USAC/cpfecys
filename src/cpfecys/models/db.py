@@ -703,6 +703,14 @@ db.define_table('academic_course_assignation_log',
                 Field('id_period', 'integer',notnull = False, label = T('id_period')),
                 Field('date_log', 'datetime', notnull = True, default = datetime.datetime.now(), label = T('Fecha')))
 
+db.define_table('library',
+                Field('name', 'text', notnull=True, unique=False, label=T('name')),
+                Field('file_data', 'upload', default='', label = T('file_data')),
+                Field('description', 'text', notnull=True, unique=False, label = T('description')),
+                Field('visible', 'boolean', label = T('visible')),
+                Field('period', 'reference period_year', notnull=True, label = T('period')),
+                Field('project', 'reference project', notnull=True, label = T('project')),
+                Field('owner_file', 'reference auth_user', notnull=True, label = T('owner_file')))
 
 
 
