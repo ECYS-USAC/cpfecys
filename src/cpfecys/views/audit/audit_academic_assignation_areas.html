@@ -1,0 +1,25 @@
+{{extend 'template.html'}}
+<div class="row-fluid">
+    <div class="well span12">
+        <a onclick="window.history.back()" class="btn" ><i class="icon-arrow-left"></i>{{=T('Back')}}</a>
+            <h1>{{=T('Log academic assignation')}}</h1>
+        <table id="audit-academic" class="table table-striped table-bordered">
+        <thead>
+        <tr>
+            <th>{{=T('Area')}}</th>
+            <th>{{=T('Projects')}}</th>
+        </tr>
+        </thead>
+        <tbody>
+        {{for area in areas:}}
+            <tr>
+            <td>{{=area.name}}</td>
+            <td><a class="btn" href="{{=URL('audit','audit_academic_assignation_courses_list',vars=dict(area=area.id))}}">
+            <span class="icon-eye-open"></span>
+            {{=T('View Projects')}}</a></td>
+            </tr>
+        {{pass}}
+        </tbody>
+        </table>
+    </div>
+</div>

@@ -1,0 +1,103 @@
+{{extend 'template.html'}}
+<h2>
+    {{=T('Asignar Alumnos')}}
+    <a href="#myModal" role="button" class="btn btn-primary"
+data-toggle="modal">
+        <span class="icon-white icon-question-sign"></span>
+    </a>
+<br>
+   
+</h2>
+<div id="myModal" class="modal hide fade" tabindex="-1" role="dialog"
+aria-labelledby="myModalLabel" aria-hidden="true">
+
+  <!--Inicia el boton de ayuda y el contenido de la ayuda-->
+  <div class="modal-header">
+    <button type="button" class="close" data-dismiss="modal"
+aria-hidden="true">×</button>
+      <h3 id="myModalLabel">
+          <span class="icon-question-sign"></span>
+          {{=T('Ayuda Carga Alumnos')}}
+      </h3>
+  </div>
+  <div class="modal-body">
+    <div class="well">
+        <p>
+            {{=T('Contenido del mensaje de ayuda.')}}
+        </p>
+    </div>
+  </div>
+  <!--Termina el boton de ayuda y su contenido-->
+
+  <div class="modal-footer">
+      <button class="btn" data-dismiss="modal"
+aria-hidden="true">{{=T('Close')}}</button>
+  </div>
+</div>
+
+<div class="tabbable"> <!-- Only required for left/right tabs -->
+  <ul class="nav nav-tabs">
+    <!--Inicia la creacion de la tab de otro periodo-->
+      <li><a href="#setuptab" data-toggle="tab">{{=T('Other Periods')}}</a></li>
+    {{for item in periods_before:}}
+      <li><a href="{{=URL(vars=dict(year_period=item.id))}}">
+          {{if item.period == cpfecys.first_period.id:}}
+          {{=str(item.yearp) + ' - ' + T(cpfecys.first_period_name)}}
+          {{else:}}
+          {{=str(item.yearp) + ' - ' + T(cpfecys.second_period_name)}}
+          {{pass}}
+      </a></li>
+    {{pass}}
+    <!--La tab de otro periodo-->
+
+
+    <!--Inicia la creacion de la tab del periodo actual-->
+      <li class="active"><a href="#data{{=currentyear_period.id}}"
+data-toggle="tab">
+	<!--El nombre de la tab que tiene Ejemplo: 2014 - Segundo Semestre-->
+          {{=str(currentyear_period.yearp) + ' - ' + current_period_name
+}}
+      </a></li>
+    {{for item in periods_after:}}
+      <li><a href="{{=URL(vars=dict(year_period=item.id))}}">
+          {{if item.period == cpfecys.first_period.id:}}
+          {{=str(item.yearp) + ' - ' + T(cpfecys.first_period.name)}}
+          {{else:}}
+          {{=str(item.yearp) + ' - ' + T(cpfecys.second_period.name)}}
+          {{pass}}
+      </a></li>
+    {{pass}}
+    <!--La tab del periodo actual-->
+
+      <li><a href="{{=URL('academic_assignation_upload')}}">
+          {{=T('Cargar Alumnos')}}
+      </a></li>
+  </ul>
+  <div class="tab-content">
+      <div class="tab-pane" id="setuptab">
+          <form>
+              <select name="year_period">
+                  {{for item in other_periods:}}
+                  {{if item.period == cpfecys.first_period.id:}}
+                  <option value="{{=item.id}}">
+                  {{=str(item.yearp) + ' - ' + T(cpfecys.first_period.name) }}
+                  </option>
+                  {{else:}}
+                  <option value="{{=item.id}}">
+                  {{=str(item.yearp) + ' - ' + T(cpfecys.second_period.name) }}
+                  </option>
+                  {{pass}}
+                  {{pass}}
+              </select>
+              <input type="submit" value="{{=T('go')}}" >
+          </form>
+      </div>
+      <div class="tab-pane active" id="data{{=currentyear_period.id}}">
+          {{=grid}}
+      </div>
+  </div>
+</div>
+</hr>
+{{if request.is_local:}}
+{{=response.toolbar()}}
+{{pass}}

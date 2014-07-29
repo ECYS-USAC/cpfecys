@@ -1,0 +1,51 @@
+{{extend 'template.html'}}
+<div class="row-fluid">
+    <div class="well span12">
+        <a onclick="window.history.back()" class="btn" ><i class="icon-arrow-left"></i>{{=T('Back')}}</a>
+        <table class="table table-striped table-bordered">
+        <thead>
+        <tr class="info">
+            <th colspan="4">{{=obtain_nameProject(user).project.name}}</th> 
+        </tr>
+        <tr class="info">
+            <th colspan="2">Usuario: {{=obtain_nameProject(user).assigned_user.username}}</th> 
+            <th colspan="2">Nombre: {{=obtain_nameProject(user).assigned_user.first_name}} {{=obtain_nameProject(user).assigned_user.last_name}}</th> 
+        </tr>
+        <tr>
+            <th>
+                {{=T('Subject')}}
+            </th>
+            <th>
+                {{=T('Message')}}
+            </th>
+            <th>
+                {{=T('Time_Send')}}
+            </th>
+            <th>
+                {{=T('Detail')}}
+            </th>
+        </tr>
+        </thead>
+        <tbody>
+            {{for notice in obtain_notices(user):}}
+            <tr>
+                <td>
+                    {{=notice.subject}}
+                </td>
+                <td>
+                    {{=notice.sent_message}}
+                </td>
+                <td>
+                    {{=notice.time_date}}
+                </td>
+                <td>
+                    <a class="btn" href="{{=URL('audit','audit_register_mail_notifications_detail', vars=dict(notification=notice.id))}}">
+                        <i class="icon-eye-open"></i> {{=T('Detail')}}
+                    </a>
+                </td>
+            </tr>
+            {{pass}}
+        </tbody>
+        </table>
+    </div>
+</div>

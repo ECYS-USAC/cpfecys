@@ -1,0 +1,150 @@
+{{extend 'template.html'}}
+<div class="row-fluid">
+    <div class="well span12">
+        <a onclick="window.history.back()" class="btn" ><i class="icon-arrow-left"></i>{{=T('Back')}}</a>
+        <table class="table-striped table-bordered" style="align:0 auto;">
+        <tr>
+          <td>
+          <form class="form-inline" 
+          action="{{=URL('notification','teacher_register_mail_notifications')}}" 
+            method='get'>
+                 <select name="period">
+                    {{for period in periods:}}
+                      <option value="{{=period.id}}">
+                      {{=T(period.period.name)}}-{{=period.yearp}}
+                      </option>
+                    {{pass}}
+                </select>
+                <input class="btn" type="submit" value="{{=T('Filter')}}">
+          </form>
+          </td>
+        </tr>
+        </table>
+        {{for project in projects:}}
+            <table class="table table-striped table-bordered">
+                <thead>
+                <tr class="info">
+                    <th colspan="4">{{=obtain_nameProjects(project.project)}}</th>   
+                </tr>
+                </thead>
+                <tbody>
+                    <td>
+                        {{for assignation in obtain_PersonsA(project):}}
+                        <table class="table table-striped table-bordered">
+                            <thead>
+                                <tr class="info">
+                                    <th colspan="4">{{=assignation.assigned_user.username}}: {{=assignation.assigned_user.first_name}} {{=assignation.assigned_user.last_name}}</th>
+                                </tr>
+                                <tr>
+                                    <th>
+                                        {{=T('Subject')}}
+                                    </th>
+                                    <th>
+                                        {{=T('Message')}}
+                                    </th>
+                                    <th>
+                                        {{=T('Time_Send')}}
+                                    </th>
+                                    <th>
+                                        {{=T('Detail')}}
+                                    </th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {{a=0}}
+                                {{for notice in obtain_notices(assignation):}}
+                                {{a=a+1}}
+                                    <tr>
+                                        <td>
+                                            {{=notice.subject}}
+                                        </td>
+                                        <td>
+                                            {{=notice.sent_message}}
+                                        </td>
+                                        <td>
+                                            {{=notice.time_date}}
+                                        </td>
+                                        <td>
+                                            <a class="btn" href="{{=URL('notification','teacher_register_mail_notifications_detail', \
+                                            vars=dict(notification=notice.id))}}">
+                                                <i class="icon-eye-open"></i> {{=T('Detail')}}
+                                            </a>
+                                        </td>
+                                    </tr>
+                                {{pass}}
+                                {{if a==0:}}
+                                <tr>
+                                    <td colspan="4">No tiene registros</td>
+                                </tr>
+                                {{pass}}
+                            </tbody>
+                        {{pass}}
+                        <table class="table table-striped table-bordered">
+                            <thead>
+                                <tr class="info">
+                                    <th colspan="4">Practicantes Finales</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <td>
+                                {{for assignation in obtain_Persons(project):}}
+                                    
+                                        <table class="table table-striped table-bordered">
+                                                <tr>
+                                                    <th colspan="4">
+                                                    {{=assignation.user_project.assigned_user.username}} - {{=assignation.user_project.assigned_user.first_name}} {{=assignation.user_project.assigned_user.last_name}}
+                                                    </th>
+                                                </tr>
+                                                <tr>
+                                                    <td>
+                                                        <small>{{=T('Subject')}}</small>
+                                                    </td>
+                                                    <td>
+                                                        <small>{{=T('Message')}}</small>
+                                                    </td>
+                                                    <td>
+                                                        <small>{{=T('Time_Send')}}</small>
+                                                    </td>
+                                                    <td>
+                                                        <small>{{=T('Detail')}}</small>
+                                                    </td>
+                                                </tr>
+                                                {{a=0}}
+                                                {{for notice in obtain_notices(assignation.user_project):}}
+                                                {{a=a+1}}
+                                                    <tr>
+                                                        <td>
+                                                            {{=notice.subject}}
+                                                        </td>
+                                                        <td>
+                                                            {{=notice.sent_message}}
+                                                        </td>
+                                                        <td>
+                                                            {{=notice.time_date}}
+                                                        </td>
+                                                        <td>
+                                                            <a class="btn" href="{{=URL('notification','teacher_register_mail_notifications_detail', \
+                                                            vars=dict(notification=notice.id))}}">
+                                                                <i class="icon-eye-open"></i> {{=T('Detail')}}
+                                                            </a>
+                                                        </td>
+                                                    </tr>
+                                                {{pass}}
+                                                {{if a==0:}}
+                                                <tr>
+                                                    <td colspan="4">No tiene registros</td>
+                                                </tr>
+                                                {{pass}}
+                                        </table>
+                                    
+                                {{pass}}
+                            </td>
+                            </tbody>
+                        </table>
+                    </td>
+                </tbody>
+            </table>
+            <br>
+        {{pass}}
+    </div>
+</div>
