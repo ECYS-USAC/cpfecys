@@ -701,7 +701,7 @@ def courses_report():
             count_assigned_students=count_assigned_students,
             count_student_hours=count_student_hours,
             periods=periods,
-            area=area)
+            area=area, period=period)
     else:
         session.flash = "Action not allowed"
         redirect(URL('default','index'))
@@ -868,7 +868,7 @@ def mail_notifications():
                     send_mail_to_users(users.select(db.auth_user.ALL), 
                         message, dsi_role, projects,
                         subject)
-                
+
                 users = db(
                     (db.auth_user.id==db.auth_membership.user_id)&
                     (db.auth_membership.group_id==db.auth_group.id)&
