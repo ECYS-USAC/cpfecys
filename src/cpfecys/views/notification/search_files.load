@@ -1,0 +1,3 @@
+{{for all_var in all_list:}}    					
+	&nbsp &nbsp <input type="checkbox" value="{{= all_var.id }}" ><span class="icon-file"></span>  {{= all_var.name }} </a> - {{= all_var.description }}  <br>  
+{{pass}}

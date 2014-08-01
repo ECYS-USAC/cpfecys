@@ -181,6 +181,7 @@ def teacher_send_mail_to_students(users1, users2, message, subject, check, semes
                                  register=row.id)
                 if was_sent==False:
                     control=control+1
+    session.attachment_list = []
     return control
 
     
@@ -363,6 +364,7 @@ def teacher_mail_notifications():
 def teacher_courses_mail_notifications():
     #show all assignations of current user
     import cpfecys
+    session.attachment_list = []
     def split_name(project):
         try:
             (nameP, projectSection) = str(project).split('(')
@@ -496,6 +498,17 @@ def send_mail_to_students(users, message, subject, check, semester, year):
     nameS2 = check.assigned_user.first_name+" "+check.assigned_user.last_name
     nameU = check.assigned_user.username
     nameP = check.project.name
+
+    attachment_m = '<br><br><b>' + T('Attachments') +":</b><br>"
+
+    if session.attachment_list != None:
+        for attachment_list_var in session.attachment_list:
+            for attachment_var in attachment_list_var:
+                attachment_m = attachment_m + '<a href="'+ URL('default/download', attachment_var.file_data) +'" target="blank"> '+ attachment_var.name + '</a> <br>'
+    else:        
+        attachment_m = ''
+        
+    
     try:
         (nameP, projectSection) = str(nameP).split('(')
         (nameS,garbage) = str(projectSection).split(')')
@@ -503,7 +516,7 @@ def send_mail_to_students(users, message, subject, check, semester, year):
     except:
         None
     period = T(semester)+' '+str(year)
-    messageC = '<html>' + message + '<br><br>'+str(nameS2)+'<br>'+str(period)+'<br>'+str(nameP)+'<br>Sistema de Control de Estudiantes de Practica Final<br> Escuela de Ciencias y Sistemas - Universidad de San Carlos de Guatemala</html>'
+    messageC = '<html>' + message + attachment_m + '<br><br>'+str(nameS2)+'<br>'+str(period)+'<br>'+str(nameP)+'<br>Sistema de Control de Estudiantes de Practica Final<br> Escuela de Ciencias y Sistemas - Universidad de San Carlos de Guatemala</html>'
     #variable de control
     control = 0
     #Log General del Envio
@@ -534,6 +547,7 @@ def send_mail_to_students(users, message, subject, check, semester, year):
                              register=row.id)
             if was_sent==False:
                 control=control+1
+    session.attachment_list = []
     return control
 
 
@@ -629,7 +643,8 @@ def mail_notifications():
 
     def get_projects(grupo):
         import cpfecys
-        if grupo == 1:
+        
+        if grupo == 1:       
             #Obtener la asignacion del estudiante
             assignation = request.vars['assignation']
             #Obtener al tutor
@@ -676,12 +691,78 @@ def mail_notifications():
             #Obtener los estudiantes del tutor y asignados al proyecto
             students = db((db.academic_course_assignation.semester == period) & (db.academic_course_assignation.assignation==check.project) & (db.academic_course_assignation.laboratorio=='False')).select()
             return students
+
+    #db.library.period.default = check.project
+    db.library.period.writable = False
+    db.library.period.readable = False
+
+    #db.library.project.default = check.project
+    db.library.project.writable = False
+    db.library.project.readable = False
+
+    #db.library.owner_file.default = check.project
+    db.library.owner_file.writable = False
+    db.library.owner_file.readable = False
+
+    
+
+    upload_form = FORM(INPUT(_name='file_name',_type='text'),
+                        INPUT(_name='file_upload',_type='file'),
+                        INPUT(_name='file_description',_type='text'),
+                        INPUT(_name='file_visible',_type='checkbox'))
+
+    if upload_form.accepts(request.vars,formname='upload_form'):
+        try:
+            if ( upload_form.vars.file_name is "" ) or ( upload_form.vars.file_upload is "") or ( upload_form.vars.file_description is ""):
+                response.flash = T('You must enter all fields.')
+            else:
+                exists = db.library((db.library.name == upload_form.vars.file_name) & (db.library.project == check.project.id) & (db.library.owner_file==auth.user.id) )
+                #num_exists = 0
+                #for var_exists in exists:
+                #    num_exists = num_exists + 1
+
+                if exists is None:                    
+                    file_var = db.library.file_data.store(upload_form.vars.file_upload.file, upload_form.vars.file_upload.filename)
+                    
+                    var_visible = 'False'
+                    if upload_form.vars.file_visible:
+                        var_visible = 'True'
+
+                    id = db.library.insert(file_data=file_var,
+                                            name=upload_form.vars.file_name,
+                                            description=upload_form.vars.file_description,
+                                            visible=var_visible,
+                                            period=cpfecys.current_year_period(),
+                                            project=check.project.id,
+                                            owner_file=auth.user.id)
+
+                    session.attachment_list.append( db(db.library.id==id).select() )
+                    response.flash = T('File loaded successfully.')
+                else:
+                    response.flash = T('File already exists.')
+        except:
+            response.flash = T('Error loading file.')
+    #if request.vars['search_input'] is None:
+    #    all_list = db((db.library.owner_file==auth.user.id) or ((db.library.project == check.project.id) & (db.library.visible=='true')) ).select()
+    #else:
+    #    all_list = db(db.library.name.like('%'+request.vars['search_input']+'%')).select()
+
     return dict(get_projects=get_projects,
         markmin_settings = cpfecys.get_markmin,
         name = check.project.name,
         semester = year_semester.name,
         year = year.yearp,
-        assignation=assignation)
+        assignation=assignation,
+        attachment_list=session.attachment_list
+        #,all_list=all_list
+        )
+
+def search_files():  
+    if request.vars['search_input'] is None:
+        all_list = db((db.library.owner_file==auth.user.id) or ((db.library.project == check.project.id) & (db.library.visible=='true')) ).select()
+    else:
+        all_list = db(db.library.name.like('%'+request.vars['search_input']+'%')).select()
+    return dict(all_list=all_list)
 
 
 #Mostrar los cursos a los cuales esta asignado el tutor academico para enviar mensajes
@@ -690,6 +771,7 @@ def mail_notifications():
 def courses_mail_notifications():
     #show all assignations of current user
     import cpfecys
+    session.attachment_list = []
     def split_name(project):
         try:
             (nameP, projectSection) = str(project).split('(')

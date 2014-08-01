@@ -14,7 +14,7 @@
     <small>{{=T(semester)}}, {{=year}}</small>
 </h1>
 <div class="row-fluid">
-    <div class="well span12">
+    <div class="well span12" id="principal_div">
     	<a onclick="window.history.back()" class="btn" ><i class="icon-arrow-left"></i>{{=T('Back')}}</a>
 	<form action="{{=URL('notification', 'mail_notifications/send')}}" method="post">
 	  <table>
@@ -117,14 +117,238 @@
 	    <input type="text" id="subject" name="subject">
 	    <label for="message">{{=T('Message')}}</label>
 	    <textarea id="message" name="message" rows="8"></textarea>
+	    
+	    <div id="div_list_attachments" >
+			<div class="well">
+				
+			    <div>               	
+			    	<a id="attachments" > 
+			    	<span class="icon-folder-open"></span>
+			    	{{=T('Attachments')}}
+			    	</a> 
+			    	<div  id="attachmentsDiv " value="attachmentsDiv" style="overflow:auto; height:100px;">
+			    		{{files_num = 0}}
+			    		{{if attachment_list != None:}}
+			    			{{for attachment_list_var in attachment_list:}}
+			    				{{for attachment_var in attachment_list_var:}}
+			    					{{files_num = files_num + 1}}
+			    					&nbsp &nbsp <input type="checkbox" value="{{= attachment_var.id }}"><span class="icon-file"></span><a href="{{=URL('default/download', attachment_var.file_data)}}" target="blank">  {{= attachment_var.name }} </a> - {{= attachment_var.description }} <br>
+
+			    				{{pass}}
+			    			{{pass}}
+			    		{{pass}}
+			    		{{if files_num == 0:}}
+			    				<label>&nbsp &nbsp{{=T('Is not attached any files')}}</label>
+			    		{{pass}}
+			        	
+			        	
+			        </div>
+			    </div>
+	    	</div>
+	    </div>
+
 	    <button type="submit" class="btn btn-success">{{=T('Send')}}</button>
+	    <a href="#attachModal" role="button" class="btn btn-primary" data-toggle="modal"> 
+	    	{{=T('Attach')}} <span class="icon-white icon-upload">
+	    </a>
 	  </fieldset>
 	</form>
 
 	</div>
 </div>
+
+<!-- Attach Div-->
+<div id="attachModal" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true" > 
+  <div class="modal-header">
+    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+      <h3 id="myModalLabel">
+          <span class="icon-upload"></span>
+          {{=T('Attach file')}}
+      </h3>
+  </div>
+  <div class="modal-body" style="overflow:auto; height:500px;">
+  	<ul id="myTab" class="nav nav-tabs">
+     	<li class="active" id="var_upload"><a href="#" data-toggle="tab">{{=T('Upload')}}</a></li>
+		<li class="dropdown" id="var_semester" >
+	        <a href="#" class="dropdown-toggle" data-toggle="dropdown">1er Semestre 2014 </b></a>
+	        <ul class="dropdown-menu" style="overflow:auto; height:100px;">
+	          <li><a href="#dropdown1" data-toggle="tab">1er Semestre 2014</a></li>
+	          <li><a href="#dropdown1" data-toggle="tab">1er Semestre 2014</a></li>
+	          <li><a href="#dropdown1" data-toggle="tab">1er Semestre 2014</a></li>
+	          <li><a href="#dropdown1" data-toggle="tab">1er Semestre 2014</a></li>
+	          <li><a href="#dropdown1" data-toggle="tab">1er Semestre 2014</a></li>
+	          <li><a href="#dropdown1" data-toggle="tab">1er Semestre 2014</a></li>
+	          <li><a href="#dropdown2" data-toggle="tab">1er Semestre 2014</a></li>
+	        </ul>
+  		</li>
+  		<li id="var_all"><a href="#home" data-toggle="tab">{{=T('All')}}</a></li>
+  		
+  		<div align="right" id="div_all_search" style="display: none;">
+			<table>
+				<td>
+    				<input type="text" id="search_input" name="search_input"  />
+    			</td>
+    			<td>
+    				<a  role="button"  href="#" class="btn btn-info" id="search_button">
+		    		
+				    	<span class="icon-white icon-search">
+				    </a>
+				</td>
+			</table>
+    	</div>
+	    
+  	</ul>
+
+  	<div id="div_upload" >
+  		<form action="" enctype="multipart/form-data" method="post" >
+  			<div align="center">
+  				<table >
+  					<tr>
+  						<td align="left">
+							<input name="_formname" type="hidden" value="upload_form">
+							<label>{{=T('File name')}}</label>
+							<input class="string" name="file_name" type="text" value="">
+							<label>{{=T('Select file')}}</label>
+							<input class="upload" name="file_upload" type="file">
+							<label>{{=T('Description')}}</label>
+							<input class="string" name="file_description" type="text" value="">
+							<label>{{=T('Visible')}}&nbsp &nbsp<input type="checkbox" name="file_visible"></label>
+						</td>
+					</tr>
+					<tr >
+						<td >
+							<div align="right">	
+								<input type="submit" class="btn btn-primary" value="{{=T('Upload file')}}">
+							</div>
+						<td>
+					</tr>
+				</table>
+			</div>
+		</form>
+  	</div>
+  	<div id="div_semester" style="display: none;">
+		<div class="well">			
+		    <div>               	
+		    	<a id="myfiles" > 
+		    	<span class="icon-folder-open"></span>
+		    	{{=T('My files')}}
+		    	</a>
+		    	<div   id="myfilesDiv" value="myfilesDiv" style="display: none; overflow:auto; height:100px;">
+		        	&nbsp &nbsp <input type="checkbox" value="specific"><span class="icon-file"></span>  uno  <br>
+		        	
+
+		        </div>
+		    </div>
+    	</div>
+    </div>
+
+    <div id="div_all" style="display: none;">
+		
+		<div class="well">
+		    <div> 
+
+		    	<a id="allFiles" > 
+		    	<span class="icon-folder-open"></span>
+		    	{{=T('All files')}}
+		    	</a>
+		    	
+		    	<div  id="allDiv" value="allDiv" style="overflow:auto; height:200px;">
+		    			    		
+
+		        </div>
+
+		    </div>
+		</div>
+	
+    	
+    </div>
+
+  </div>
+  <div class="modal-footer" align="right">
+  	<table align="right">
+  		<tr >
+  			<td>
+			  	<div id="attach_button" style="display: none;">
+			  		<a id="attach_check_files" href="#attachModal" role="button" class="btn btn-primary" data-toggle="modal"> 
+				    	{{=T('Attach')}} <span class="icon-white icon-upload">
+				    </a>
+				</div>
+			</td>
+			<td>
+      			<button class="btn" data-dismiss="modal" aria-hidden="true">{{=T('Close')}}</button>
+      		</td>
+      	</tr>
+    </table>
+  </div>
+</div>
+<!--Finish Attach Div-->
+
+
 <script type="text/javascript">
-	$(document).ready(function(){
+	$(document).ready(function(){		
+		$("#search_input").width(100);
+		
+
+		$("#div_list_attachments").width(parseInt($("#message").width())+15);		
+ 
+		
+
+		 $("input[type=submit]").click(function() {
+	        var accion = $(this).attr('dir');
+	        if(accion==undefined){	                	
+
+	        }
+
+	    });
+		 
+		
+
+
+		$("#allDiv").load('{{=URL('notification','search_files.load')}}',{search_input: document.getElementById('search_input').value});
+		
+		$('#search_input').on('input', function() { 
+		    $("#allDiv").load('{{=URL('notification','search_files.load')}}',{search_input: document.getElementById('search_input').value});
+		});
+		$("#search_button").click(function(){			
+			$("#allDiv").load('{{=URL('notification','search_files.load')}}',{search_input: document.getElementById('search_input').value});
+		})
+
+		
+		
+
+		$("#var_all").click(function(){			
+			$("#div_all_search").css("display", "block");
+			$("#div_all").css("display", "block");
+			$("#div_semester").css("display", "none");
+			$("#div_upload").css("display", "none");
+			$("#attach_button").css("display", "block");
+			
+		})
+		$("#var_upload").click(function(){			
+			$("#div_upload").css("display", "block");
+			$("#div_semester").css("display", "none");
+			$("#div_all").css("display", "none");
+			$("#div_all_search").css("display", "none");
+			$("#attach_button").css("display", "none");
+			
+		})
+		$("#var_semester").click(function(){			
+			$("#div_semester").css("display", "block");
+			$("#div_upload").css("display", "none");
+			$("#div_all").css("display", "none");
+			$("#div_all_search").css("display", "none");
+			$("#attach_button").css("display", "block");
+		})
+
+		$("#attachments").click(function(){			
+			$("#attachmentsDiv").toggle();			
+		})
+		$("#allFiles").click(function(){			
+			$("#allDiv").toggle();			
+		})
+		$("#myfiles").click(function(){			
+			$("#myfilesDiv").toggle();			
+		})
 		$("#specific").click(function(){
 			if ($("#specific").attr("checked")){
 			   $("#students_content").css("display", "block");
