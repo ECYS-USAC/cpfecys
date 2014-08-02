@@ -1,0 +1,6 @@
+{{if request.vars['subject'] != None:}}
+	{{session.notification_subject = request.vars['subject']}}
+{{pass}}
+{{if request.vars['message'] != None:}}
+	{{session.notification_message = request.vars['message']}}
+{{pass}}

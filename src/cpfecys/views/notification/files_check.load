@@ -1,0 +1,35 @@
+{{if request.vars['add_file_id'] != None:}}
+	{{session.attachment_list_temp.append( db(db.library.id==request.vars['add_file_id']).select() ) }}
+{{pass}}
+{{if request.vars['delete_file_id'] != None:}}	
+	{{if session.attachment_list_temp != None:}}
+		{{list_temp2 = []}}
+		{{for var_at in session.attachment_list_temp:}}
+			{{for var_at2 in var_at:}}
+				{{if str(var_at2.id) != str(request.vars['delete_file_id']):}}
+					{{list_temp2.append(var_at) }}
+				{{pass}}
+			{{pass}}
+			
+		{{pass}}
+		{{session.attachment_list_temp = list_temp2 }}
+	{{pass}}    	
+{{pass}}
+
+{{if request.vars['add_attachment_id'] != None:}}
+	{{session.attachment_list_temp2.append( db(db.library.id==request.vars['add_attachment_id']).select() ) }}
+{{pass}}
+{{if request.vars['delete_attachment_id'] != None:}}	
+	{{if session.attachment_list_temp2 != None:}}
+		{{list_temp2 = []}}
+		{{for var_at in session.attachment_list_temp2:}}
+			{{for var_at2 in var_at:}}
+				{{if str(var_at2.id) != str(request.vars['delete_attachment_id']):}}
+					{{list_temp2.append(var_at) }}
+				{{pass}}
+			{{pass}}
+			
+		{{pass}}
+		{{session.attachment_list_temp2 = list_temp2 }}
+	{{pass}}    	
+{{pass}}
