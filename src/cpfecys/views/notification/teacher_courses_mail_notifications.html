@@ -1,0 +1,18 @@
+{{extend 'template.html'}}
+<h1>{{=T('Announcements students')}}</h1>
+<table class="table table-striped table-bordered">
+	<thead>
+		<th>{{=T('Project')}}</th>
+		<th>{{=T('Section')}}</th>
+		<th>{{=T('View')}}</th>
+	</thead>
+	<tbody>
+		{{for assignation in assignations:}}
+		<tr>
+			<td>{{=split_name(assignation.project.name)}}</td>
+			<td>{{=split_section(assignation.project.name)}}</td>
+			<td><a class="btn" href="{{=URL('notification', 'teacher_mail_notifications', vars=dict(assignation = assignation.id))}}">{{=T('Project')}}</a></td>
+		</tr>
+		{{pass}}
+	</tbody>
+</table>

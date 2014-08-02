@@ -87,6 +87,28 @@ if auth.has_membership(role="Student"):
     (T('View Events'), False, URL('default','events'), []),
     (T('Insert Events'), False, URL('default', 'event_edition'), []),
     ]))
+if auth.has_membership(role="Student") or auth.has_membership(role="Teacher"):
+    user_menu.append((T('Asignacion de Estudiantes'), False, URL(), [
+    (T('Agregar Estudiantes'), False, URL('student_academic','academic'), []),
+    (T('Asignar Estudiantes'), False, URL('student_academic', 'student_courses'), []),
+    ]))
+if auth.has_membership(role="Student"):
+    user_menu.append((T('Notices'), False, URL(), [
+    (T('Send Notice'), False, URL('notification','courses_mail_notifications'), []),
+    (T('Register Notices'), False, URL('notification', 'register_mail_notifications'), []),
+    ]))
+if auth.has_membership(role="Teacher"):
+    user_menu.append((T('Notices'), False, URL(), [
+    (T('Send Notice'), False, URL('notification','teacher_courses_mail_notifications'), []),
+    (T('Register Notices'), False, URL('notification', 'teacher_register_mail_notifications'), []),
+    ]))
+if auth.has_membership(role="Super-Administrator"):
+    user_menu.append((T('Audit'), False, URL(), [
+    (T('Teacher notices'), False, URL('audit','audit_teacher_mail_notifications_areas'), []),
+    (T('Student notices'), False, URL('audit', 'audit_student_mail_notifications_areas'), []),
+    (T('Log academic'), False, URL('audit', 'audit_academic'), []),
+    (T('Log academic assignation'), False, URL('audit', 'audit_academic_assignation_areas'), []),
+    ]))
 response.menu.extend(user_menu)
 DEVELOPMENT_MENU = False
 

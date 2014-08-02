@@ -1,0 +1,34 @@
+{{extend 'template.html'}}
+<div class="row-fluid">
+    <div class="well span12">
+        <a onclick="window.history.back()" class="btn" ><i class="icon-arrow-left"></i>{{=T('Back')}}</a>
+        <table class="table-striped table-bordered" style="align:0 auto;">
+        </table>
+        <table class="table table-striped table-bordered">
+        <thead>
+        {{for a in subject:}}
+        <tr class="info">
+            <th colspan="4">{{=T('Subject')}} : {{=a.subject}}</th>
+        </tr>
+        <tr>
+            <th colspan="4"><small>{{=T('Message')}}:<br>{{=a.sent_message}}</small></th>
+        </tr>
+        {{pass}}
+        </thead>
+        <tbody>
+            <td>
+                <div>
+                    <script>
+                        $(document).ready(function(){
+                            $("#w2p_keywords").prop("type", "hidden");
+                            var input1Str = '<input type="text" id="search_var" name="search_var">';
+                            $(input1Str).insertAfter("#w2p_keywords");
+                        }); 
+                    </script>
+                    {{=grid}}
+                </div>
+            </td>
+        </tbody>
+        </table>
+    </div>
+</div>

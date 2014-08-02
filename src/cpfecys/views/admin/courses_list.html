@@ -1,6 +1,7 @@
 {{extend 'template.html'}}
 <div class="row-fluid">
     <div class="well span12">
+        <h1>{{=T(period.period.name)}} - {{=period.yearp}}</h1>
         <a onclick="window.history.back()" class="btn" ><i class="icon-arrow-left"></i>{{=T('Back')}}</a>
         <table class="table-striped table-bordered" style="align:0 auto;">
         <tr>
@@ -10,9 +11,13 @@
             method='get'>
             <input type="hidden" name="area" value="{{=area}}">
                  <select name="period">
-                    {{for period in periods:}}
-                      <option value="{{=period.id}}">
-                      {{=T(period.period.name)}}-{{=period.yearp}}
+                    {{for cperiod in periods:}}
+                      <option value="{{=cperiod.id}}"
+                      {{if period.id==cperiod.id:}}
+                      selected 
+                      {{pass}}
+                      >
+                      {{=T(cperiod.period.name)}}-{{=cperiod.yearp}}
                       </option>
                     {{pass}}
                 </select>

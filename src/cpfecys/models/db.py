@@ -570,7 +570,8 @@ db.define_table('mailer_log',
                       default = datetime.datetime.now(), label = T('Sent Time')),
                 Field('destination', 'text', notnull = True, label = T('Destination')),
                 Field('result_log', 'text', notnull = False, label = T('Log')),
-                Field('success', 'boolean', notnull = True, label = T('Success')))
+                Field('success', 'boolean', notnull = True, label = T('Success')),
+                Field('emisor', 'text', notnull = True, label = T('Emisor')))
 
 db.define_table('item',
                 # AFAIK this is_active is for disabled items, true means enabled, false means disabled
@@ -638,6 +639,74 @@ db.define_table('public_event_schedule',
                 Field('physical_location', 'string', notnull = True, label = T('Location')),
                 Field('start_date', 'datetime', label=T('Start'), notnull = True),
                 Field('end_date', 'datetime', label=T('End'), notnull = True))
+
+#Tabla de alumnos (no auxiliares)
+db.define_table('academic',
+        Field('carnet', 'integer', unique=True, notnull=True, label=T('carnet')),
+        Field('email', 'string', notnull=True, requires = IS_EMAIL(error_message='El email no es valido')),
+        format='%(carnet)s')
+
+#Tabla de asignacion de alumnos al curso
+db.define_table('academic_course_assignation',
+        Field('carnet', 'reference academic', notnull=True, label=T('carnet')),
+        Field('semester', 'reference period_year', notnull=True),
+        Field('assignation', 'reference project', notnull=True),
+        Field('laboratorio', 'boolean', notnull=True))
+
+#Tabla General de avisos
+db.define_table('notification_general_log4',
+                Field('subject', 'text', notnull = True, label = T('Asunto')),
+                Field('sent_message', 'text', notnull = True, label = T('Sent Message')),
+                Field('time_date', 'datetime', notnull = True,
+                      default = datetime.datetime.now(), label = T('Sent Time')),
+                Field('emisor', 'text', notnull=True, label=T('Emisor')),
+                Field('course', 'text', notnull=True, label=T('Curso')),
+                Field('yearp', 'text', notnull=True, label=T('yearp')),
+                Field('period', 'text', notnull=True, label=T('Periodo')))
+
+#Tabla de avisos
+db.define_table('notification_log4',
+                Field('destination', 'text', notnull = True, label = T('Destination')),
+                Field('result_log', 'text', notnull = False, label = T('Log')),
+                Field('success', 'boolean', notnull = True, label = T('Success')),
+                Field('register', 'reference notification_general_log4', notnull = True, label = T('Register')))
+
+db.define_table('academic_log',
+                Field('user_name', 'text', notnull = False, label = T('Usuario')),
+                Field('roll', 'text', notnull = False, label = T('Rol')),
+                Field('operation_log', 'text', notnull = False, label = T('Operacion')),
+                Field('before_carnet', 'text', notnull = False, label = T('Carnet anterior')),
+                Field('after_carnet', 'text', notnull = False, label = T('Carnet actual')),
+                Field('before_email', 'text', notnull = False, label = T('Correo anterior')),
+                Field('after_email', 'text', notnull = False, label = T('Correo actual')),
+                Field('description', 'text',notnull = False, label = T('Descripcion')),
+                Field('id_academic', 'text',notnull = False, label = T('id_academic')),
+                Field('id_period', 'integer',notnull = False, label = T('id_period')),
+                Field('date_log', 'datetime', notnull = True, default = datetime.datetime.now(), label = T('Fecha')))
+
+db.define_table('academic_course_assignation_log',
+                Field('user_name', 'text', notnull = False, label = T('Usuario')),
+                Field('roll', 'text', notnull = False, label = T('Rol')),
+                Field('operation_log', 'text', notnull = False, label = T('Operacion')),
+                Field('before_carnet', 'text', notnull = False, label = T('Carnet anterior')),
+                Field('after_carnet', 'text', notnull = False, label = T('Carnet actual')),
+                Field('before_course', 'text', notnull = False, label = T('Curso anterior')),
+                Field('after_course', 'text', notnull = False, label = T('Curso actual')),
+                Field('before_year', 'text', notnull = False, label = T('Año anterior')),
+                Field('after_year', 'text', notnull = False, label = T('Año actual')),
+                Field('before_semester', 'text', notnull = False, label = T('Semestre anterior')),
+                Field('after_semester', 'text', notnull = False, label = T('Semestre actual')),
+                Field('before_laboratory', 'text', notnull = False, label = T('Laboratorio anterior')),
+                Field('after_laboratory', 'text', notnull = False, label = T('Laboratorio actual')),
+                Field('description', 'text',notnull = False, label = T('Descripcion')),
+                Field('id_academic_course_assignation', 'text',notnull = False, label = T('id_academic_course_assignation')),
+                Field('id_period', 'integer',notnull = False, label = T('id_period')),
+                Field('date_log', 'datetime', notnull = True, default = datetime.datetime.now(), label = T('Fecha')))
+
+
+
+
+
 
 ## after defining tables, uncomment below to enable auditing
     # auth.enable_record_versioning(db)
