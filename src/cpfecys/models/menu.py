@@ -97,6 +97,8 @@ if auth.has_membership(role="Student"):
     (T('Send Notice'), False, URL('notification','courses_mail_notifications'), []),
     (T('Register Notices'), False, URL('notification', 'register_mail_notifications'), []),
     ]))
+if auth.has_membership(role="Student") or auth.has_membership(role="Teacher"):
+    user_menu.append((T('Library'), False, URL('library','file_managers',vars=dict(tipo=0, pro=0)), []),)
 if auth.has_membership(role="Teacher"):
     user_menu.append((T('Notices'), False, URL(), [
     (T('Send Notice'), False, URL('notification','teacher_courses_mail_notifications'), []),

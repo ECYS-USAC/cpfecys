@@ -1,0 +1,68 @@
+{{extend 'template.html'}}
+<div>
+    <div class="well span12">
+        <a onclick="window.history.back()" class="btn" ><i class="icon-arrow-left"></i>{{=T('Back')}}</a>
+        <table>
+            <tr>
+                <td>
+        <div id="div_list_courses" style="overflow-x:auto; overflow-y:auto; height:300px; width:400px;">
+            {{for period in obtainPeriods():}}
+                <a id="p-{{=period.id}}"><span class="icon-folder-open"></span>{{=T(period.period.name)}} {{=period.yearp}}</a>
+                <br>
+                <div id="div_period_{{=period.id}}" style="display: none; padding-left: 20px; ">
+                {{for project in obtainProjects(period.id):}}
+                    <a id="pr-{{=project.id}}"><span class="icon-folder-open"></span>{{=T(project.project.name)}}</a>
+                    <br>
+                    <div id="div_project_{{=project.id}}" style="display: none; padding-left: 20px;">
+                    {{rol = obtenerRol()}}
+                    {{if rol == 2:}}
+                        <a href="{{=URL(vars=dict(tipo=1, pro = project.id))}}"><span class="icon-folder-open"></span>{{=T('Owns')}}</a>
+                            <br>
+                        <a href="{{=URL(vars=dict(tipo=2, pro = project.id))}}"><span class="icon-folder-open"></span>{{=T('Share')}}</a>
+                    {{else:}}
+                        <a href="{{=URL(vars=dict(tipo=3, pro = project.id))}}"><span class="icon-folder-open"></span>{{=T('Owns')}}</a>
+                        {{for student in obtainStudents(project):}}
+                            <br>
+                            <a href="{{=URL(vars=dict(tipo=4, pro = student.user_project.id))}}"><span class="icon-folder-open"></span>{{=T(student.user_project.assigned_user.first_name)}}</a>
+                        {{pass}}
+                    {{pass}}
+                    </div>
+                {{pass}}
+                </div>
+            {{pass}}
+        </div>
+    </td>
+    <td>
+        <div id="showGrid" style="overflow-x:auto;">
+            {{if existeRegistro()==True:}}
+                <h1>{{=name}}
+                <br>
+                    <small>{{=T(semester)}} {{=year}} - {{=usernombre}}</small>
+                </h1>
+                {{=grid}}
+            {{else:}}
+                <h1>
+                    Modulo de Archivos
+                </h1>
+            {{pass}}
+        </div>
+    </td>
+</tr>
+</table>
+    </div>
+</div>
+<script type="text/javascript">
+    $(document).ready(function(){
+        {{for period in obtainPeriods():}}
+            $("#p-{{=period.id}}").click(function(){         
+                $("#div_period_{{=period.id}}").toggle();
+            })
+            {{for project in obtainProjects(period.id):}}
+                $("#pr-{{=project.id}}").click(function(){         
+                    $("#div_project_{{=project.id}}").toggle();
+                })
+            {{pass}}
+        {{pass}}
+    })
+</script>
+{{pass}}
