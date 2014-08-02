@@ -890,7 +890,7 @@ def mail_notifications():
 
             session.flash = T('Mail successfully sent')
             redirect(URL('admin', 'mail_notifications'))
-        elif len(roles) == 1:
+        elif (roles != None) and (len(roles) == 1):
             for role in roles:
                 role = db(db.auth_group.id==role).select().first()
                 if role.role == 'DSI':
