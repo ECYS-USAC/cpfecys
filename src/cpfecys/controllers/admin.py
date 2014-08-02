@@ -4,6 +4,7 @@
 @auth.requires_login()
 @auth.requires_membership('Super-Administrator')
 def scheduler_activity():
+    auto_daily()
     return dict(data = db3(db3.scheduler_run.id>0).select())
 
 @auth.requires_login()

@@ -76,7 +76,10 @@ def assignation_done_succesful(assignation):
             if not items:
                 status = False
                 message += T('There is a missing deliverable item: ') + row.item_restriction.name + '.'
-            if (row.item_restriction.item_type.name == 'File'):
+            elif len(items) == 0:
+                status = False
+                message += T('There is a missing deliverable item: ') + row.item_restriction.name + '.'
+            elif (row.item_restriction.item_type.name == 'File'):
                 #check there is an uploaded file
                 if not items.first().uploaded_file:
                     status = False
