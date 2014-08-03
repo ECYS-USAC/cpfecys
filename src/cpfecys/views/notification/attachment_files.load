@@ -5,8 +5,6 @@
 			<tr>
 				<td>
 					&nbsp &nbsp <input type="checkbox" value="{{= attachment_var.id }}" name="checklist" onClick="run2(this);"><span class="icon-file"></span><a href="{{=URL('default/download', attachment_var.file_data)}}" target="blank">  {{= attachment_var.name }} </a> 
-				</td><td>	
-					{{= attachment_var.description }} 
 				</td>
 			</tr>
 		{{pass}}

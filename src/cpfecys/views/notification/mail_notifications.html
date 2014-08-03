@@ -217,7 +217,10 @@
 							<label>{{=T('File name')}}</label>
 							<input class="string" name="file_name" type="text" value="">
 							<label>{{=T('Select file')}}</label>
-							<input class="upload" name="file_upload" type="file">
+							<input class="upload" name="file_upload" type="file" id="upload_button">
+							<div id="uploadError" style="display: none;" class="alert-error">
+								{{=T('File size must be 2MB or below with pdf or zip extension')}}
+							</div>
 							<label>{{=T('Description')}}</label>
 							<input class="string" name="file_description" type="text" value="">
 							<label>{{=T('Visible')}}&nbsp &nbsp<input type="checkbox" name="file_visible"></label>
@@ -298,6 +301,8 @@
 <div  id="div2" value="div2">		    			        	
 </div>
 
+
+
 <script type="text/javascript">
 	$(document).ready(function(){		
 		$("#search_input").width(100);
@@ -306,12 +311,24 @@
            $("#myForm").submit();
        });
 		
-		function run(object) {
-			alert('hizo click'+object.value);
-		}
+		
 
 		$("#div_list_attachments").width(parseInt($("#message").width())+15);		
  
+		var upload = document.getElementById('upload_button');
+		upload.onchange = function() {
+		    var file = upload.files[0];
+		    if (file.size > 2097152) {		    	
+		    	$("#uploadError").css("display", "block");		       
+		    }else{
+		    	$("#uploadError").css("display", "none");
+		    }
+		    var ext = $('#upload_button').val().split('.').pop().toLowerCase();
+			if($.inArray(ext, ['zip','pdf']) == -1) {
+			    $("#uploadError").css("display", "block");
+			}
+		};
+
 		
 
 		

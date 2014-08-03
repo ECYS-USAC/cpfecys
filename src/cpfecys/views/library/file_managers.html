@@ -2,10 +2,23 @@
 <div>
     <div class="well span12">
         <a onclick="window.history.back()" class="btn" ><i class="icon-arrow-left"></i>{{=T('Back')}}</a>
+        {{if existeRegistro()==True:}}
+            <h1>{{=name}}
+            <br>
+                <small>{{=T(semester)}} {{=year}} - {{=usernombre}}</small>
+            </h1>
+            
+        {{else:}}
+            <h1>
+                {{=T('File module')}}            
+            <br>
+                <small>{{=T('File module')}}</small>
+            </h1>
+        {{pass}}
         <table>
             <tr>
                 <td>
-        <div id="div_list_courses" style="overflow-x:auto; overflow-y:auto; height:300px; width:200px;  background-color:white; border: solid; border-color: black; border-width: 1px; white-space:nowrap;">
+        <div id="div_list_courses" class="well span12" style="overflow-x:auto; overflow-y:auto; height:300px; width:200px;  background-color:white;  white-space:nowrap;">
             {{for period in obtainPeriods():}}
                 <a id="p-{{=period.id}}"><span class="icon-folder-open"></span>{{=T(period.period.name)}} {{=period.yearp}}</a>
                 <br>
@@ -35,15 +48,10 @@
     <td>
         <div id="showGrid" style="overflow-x:auto;">
             {{if existeRegistro()==True:}}
-                <h1>{{=name}}
-                <br>
-                    <small>{{=T(semester)}} {{=year}} - {{=usernombre}}</small>
-                </h1>
+                
                 {{=grid}}
             {{else:}}
-                <h1>
-                    Modulo de Archivos
-                </h1>
+                
             {{pass}}
         </div>
     </td>
