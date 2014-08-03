@@ -120,6 +120,16 @@ def teacher_send_mail_to_students(users1, users2, message, subject, check, semes
     nameS2 = check.assigned_user.first_name+" "+check.assigned_user.last_name
     nameU = check.assigned_user.username
     nameP = check.project.name
+
+    attachment_m = '<br><br><b>' + T('Attachments') +":</b><br>"
+
+    if session.attachment_list != None:
+        for attachment_list_var in session.attachment_list:
+            for attachment_var in attachment_list_var:
+                attachment_m = attachment_m + '<a href="'+ URL('default/download', attachment_var.file_data) +'" target="blank"> '+ attachment_var.name + '</a> <br>'
+    else:        
+        attachment_m = ''
+
     try:
         (nameP, projectSection) = str(nameP).split('(')
         (nameS,garbage) = str(projectSection).split(')')
@@ -127,7 +137,7 @@ def teacher_send_mail_to_students(users1, users2, message, subject, check, semes
     except:
         None
     period = T(semester)+' '+str(year)
-    messageC = '<html>' + message + '<br><br>'+str(nameS2)+'<br>'+str(period)+'<br>'+str(nameP)+'<br>Sistema de Control de Estudiantes de Practica Final<br> Escuela de Ciencias y Sistemas - Universidad de San Carlos de Guatemala</html>'
+    messageC = '<html>' + message + attachment_m + '<br><br>'+str(nameS2)+'<br>'+str(period)+'<br>'+str(nameP)+'<br>Sistema de Control de Estudiantes de Practica Final<br> Escuela de Ciencias y Sistemas - Universidad de San Carlos de Guatemala</html>'
     #variable de control
     control = 0
     #Log General del Envio
@@ -355,12 +365,86 @@ def teacher_mail_notifications():
                 #obtain the final practice students assigned in the course where the user is the manager
                 students = db((db.user_project.project==check.project)&(db.user_project.period==check.period)&(db.user_project.assigned_user!=check.assigned_user)&(db.auth_membership.user_id==db.user_project.assigned_user)&(db.auth_membership.group_id==2)).select()
                 return students
+
+    if session.notification_subject == None:
+        session.notification_subject = ''
+    if session.notification_message == None:
+        session.notification_message = ''    
+
+    upload_form = FORM(INPUT(_name='file_name',_type='text'),
+                        INPUT(_name='file_upload',_type='file'),
+                        INPUT(_name='file_description',_type='text'),
+                        INPUT(_name='file_visible',_type='checkbox'))
+
+    if upload_form.accepts(request.vars,formname='upload_form'):
+        try:
+            if ( upload_form.vars.file_name is "" ) or ( upload_form.vars.file_upload is "") or ( upload_form.vars.file_description is ""):
+                response.flash = T('You must enter all fields.')
+            else:
+                exists = db.library((db.library.name == upload_form.vars.file_name) & (db.library.project == check.project.id) & (db.library.owner_file==auth.user.id) )
+                if exists is None:                    
+                    file_var = db.library.file_data.store(upload_form.vars.file_upload.file, upload_form.vars.file_upload.filename)
+                    
+                    var_visible = 'False'
+                    if upload_form.vars.file_visible:
+                        var_visible = 'True'
+
+                    id = db.library.insert(file_data=file_var,
+                                            name=upload_form.vars.file_name,
+                                            description=upload_form.vars.file_description,
+                                            visible=var_visible,
+                                            period=cpfecys.current_year_period(),
+                                            project=check.project.id,
+                                            owner_file=auth.user.id)
+
+                    session.attachment_list.append( db(db.library.id==id).select() )
+                    response.flash = T('File loaded successfully.')
+                else:
+                    response.flash = T('File already exists.')
+        except:
+            response.flash = T('Error loading file.')
+
+    attach_form = FORM()
+
+    if attach_form.accepts(request.vars,formname='attach_form'):
+        if session.attachment_list_temp != None:
+            for var in session.attachment_list_temp:
+                session.attachment_list.append(var)
+                session.attachment_list_temp = []
+        else:
+            session.attachment_list_temp = []        
+    
+    remove_form = FORM()
+
+    if remove_form.accepts(request.vars,formname='remove_form'):
+        list_tempo = []
+        if session.attachment_list_temp2 != None and len(session.attachment_list_temp2) > 0:
+            for var_list in session.attachment_list:                
+                for tempo1 in var_list:                    
+                    cambiar = 'false'
+                    for var_list_2 in session.attachment_list_temp2:
+                        for tempo2 in var_list_2:
+                            
+                            if (tempo1.id == tempo2.id):
+                                cambiar = 'true'
+
+                if(cambiar == 'false'):
+                    list_tempo.append(var_list)
+
+            session.attachment_list = list_tempo
+            session.attachment_list_temp2 = []
+        else:
+            session.attachment_list_temp2 = []
+
+    
+    session.project_id = check.project.id
     return dict(get_projects=get_projects,
         markmin_settings = cpfecys.get_markmin,
         name = check.project.name,
         semester = year_semester.name,
         year = year.yearp,
-        assignation=assignation)
+        assignation=assignation,
+        attachment_list=session.attachment_list)
 
 #Show all the courses that the teacher has register in the current period
 @auth.requires_login()
@@ -786,6 +870,8 @@ def mail_notifications():
         else:
             session.attachment_list_temp2 = []
 
+    session.project_id = check.project.id
+
     return dict(get_projects=get_projects,
         markmin_settings = cpfecys.get_markmin,
         name = check.project.name,
@@ -806,11 +892,11 @@ def attachment_files():
 
 
 
-def search_files():  
+def search_files(): 
     if request.vars['search_input'] is None:
-        all_list = db((db.library.owner_file==auth.user.id) or ((db.library.project == check.project.id) & (db.library.visible=='true')) ).select()
+        all_list = db((db.library.owner_file==auth.user.id) or ((db.library.project == session.project_id) & (db.library.visible==True)) ).select()
     else:
-        all_list = db(db.library.name.like('%'+request.vars['search_input']+'%')).select()
+        all_list = db( ((db.library.owner_file==auth.user.id) or ((db.library.project == session.project_id) & (db.library.visible==True)) ) & (db.library.name.like('%'+request.vars['search_input']+'%'))).select()
     return dict(all_list=all_list)
 
 

@@ -138,6 +138,11 @@
 			    	<div  id="attachmentsDiv" value="attachmentsDiv" style="display:none; overflow:auto; height:100px;">		    		
 			        	
 			        </div>
+			        <div align="right" id="remove_div" style="display:none;">
+				        <a id="myButton" href="#attachModal" role="button" class="btn btn-danger" title="{{=T('Remove selected')}}"  > 
+				    		<span class="icon-white icon-trash">
+				    	</a>
+			    	</div>
 			        
 			    </div>
 	    	</div>
@@ -149,12 +154,10 @@
 	    </a>
 	  </fieldset>
 	</form>
-	<form action="#div_list_attachments" enctype="multipart/form-data" method="post" >
+	<form action="#div_list_attachments" enctype="multipart/form-data" method="post" id="myForm">
 	  	<div align="right">
 		  	<input name="_formname" type="hidden" value="remove_form">
-			<div align="right" id="remove_div" style="display:none;">
-				<input type="submit" role="button" class="btn btn-danger btn-xs" value="{{=T('Remove selected')}}">
-			</div>
+			
 		</div>
 	</form>
 
@@ -191,7 +194,7 @@
   		<div align="right" id="div_all_search" style="display: none;">
 			<table>
 				<td>
-    				<input type="text" id="search_input" name="search_input"  />
+    				<input type="text" id="search_input" name="search_input"  placeholder="{{=T('Name')}}"/>
     			</td>
     			<td>
     				<a  role="button"  href="#" class="btn btn-info" id="search_button">
@@ -257,7 +260,7 @@
 		    	{{=T('All files')}}
 		    	</a>
 		    	
-		    	<div  id="allDiv" value="allDiv" style="overflow:auto;  height:200px; width:1000px;">
+		    	<div  id="allDiv" value="allDiv" style="overflow:auto;  height:200px; width:500px;">
 		    			    		
 
 		        </div>
@@ -299,7 +302,9 @@
 	$(document).ready(function(){		
 		$("#search_input").width(100);
 
-		
+		$("#myButton").click(function() {
+           $("#myForm").submit();
+       });
 		
 		function run(object) {
 			alert('hizo click'+object.value);
@@ -309,13 +314,7 @@
  
 		
 
-		 $("input[type=submit]").click(function() {
-	        var accion = $(this).attr('dir');
-	        if(accion==undefined){	                	
-
-	        }
-
-	    });
+		
 
 		//hide remove button
 		if({{=files_num}} == 0){

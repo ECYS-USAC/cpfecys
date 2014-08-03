@@ -11,7 +11,7 @@
 		<tr>
 			<td>{{=split_name(assignation.project.name)}}</td>
 			<td>{{=split_section(assignation.project.name)}}</td>
-			<td><a class="btn" href="{{=URL('notification', 'teacher_mail_notifications', vars=dict(assignation = assignation.id))}}">{{=T('Project')}}</a></td>
+			<td><a class="btn" href="{{=URL('notification', 'teacher_mail_notifications', vars=dict(assignation = assignation.id))}}">{{=T('New Notification')}}</a></td>
 		</tr>
 		{{pass}}
 	</tbody>

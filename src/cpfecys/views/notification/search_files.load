@@ -1,4 +1,4 @@
-<table>
+<table >
 <tr>
 	<th>
 
@@ -40,17 +40,17 @@
 		{{project = query_var.name}}
 	{{pass}}
 	<tr>
-		<td>
+		<td style="white-space:nowrap;">
 			&nbsp &nbsp <input type="checkbox" value="{{= all_var.id }}" name="check_files" onClick="run(this);" {{check_state}}>
-		</td><td>
-			<span class="icon-file"></span><a href="{{=URL('default/download', all_var.file_data)}}" target="blank">    {{= all_var.name }} </a> 
-		</td><td> 
+		</td><td style="white-space:nowrap;">
+			<span class="icon-file"></span><a style="white-space:nowrap;" href="{{=URL('default/download', all_var.file_data)}}" target="blank">    {{= all_var.name }} </a> 
+		</td><td style="white-space:nowrap;"> 
 			- {{= all_var.description }}
-		</td><td> 
+		</td><td style="white-space:nowrap;"> 
 			- {{= user_var }}
-		</td><td> 
+		</td><td style="white-space:nowrap;"> 
 			- {{= T(semester)}}, {{=year}}
-		</td><td>  
+		</td><td style="white-space:nowrap;">  
 			- {{=project}}
 		</td></tr>
 {{pass}}
@@ -61,7 +61,7 @@
 <script>
 function run(object) {
 	if(object.checked == true){		
-		$("#div1").load('{{=URL('notification','files_check.load')}}',{add_file_id: object.value});
+		$("#div1").load('{{=URL('notification','files_check.load')}}',{add_file_id: object.value });
 	}else{		
 		$("#div1").load('{{=URL('notification','files_check.load')}}',{delete_file_id: object.value});
 	}
