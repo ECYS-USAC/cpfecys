@@ -5,25 +5,25 @@
         <table>
             <tr>
                 <td>
-        <div id="div_list_courses" style="overflow-x:auto; overflow-y:auto; height:300px; width:400px;">
+        <div id="div_list_courses" style="overflow-x:auto; overflow-y:auto; height:300px; width:200px;  background-color:white; border: solid; border-color: black; border-width: 1px; white-space:nowrap;">
             {{for period in obtainPeriods():}}
                 <a id="p-{{=period.id}}"><span class="icon-folder-open"></span>{{=T(period.period.name)}} {{=period.yearp}}</a>
                 <br>
-                <div id="div_period_{{=period.id}}" style="display: none; padding-left: 20px; ">
+                <div id="div_period_{{=period.id}}" style="display: none; padding-left: 20px; white-space:nowrap;">
                 {{for project in obtainProjects(period.id):}}
-                    <a id="pr-{{=project.id}}"><span class="icon-folder-open"></span>{{=T(project.project.name)}}</a>
+                    <a id="pr-{{=project.id}}" style="white-space:nowrap;"><span class="icon-folder-open"></span>{{=T(project.project.name)}}</a>
                     <br>
-                    <div id="div_project_{{=project.id}}" style="display: none; padding-left: 20px;">
+                    <div id="div_project_{{=project.id}}" style="display: none; padding-left: 20px; white-space:nowrap;">
                     {{rol = obtenerRol()}}
                     {{if rol == 2:}}
-                        <a href="{{=URL(vars=dict(tipo=1, pro = project.id))}}"><span class="icon-folder-open"></span>{{=T('Owns')}}</a>
+                        <a href="{{=URL(vars=dict(tipo=1, pro = project.id))}}" style="white-space:nowrap;"><span class="icon-folder-open"></span>{{=T('Owns')}}</a>
                             <br>
-                        <a href="{{=URL(vars=dict(tipo=2, pro = project.id))}}"><span class="icon-folder-open"></span>{{=T('Share')}}</a>
+                        <a href="{{=URL(vars=dict(tipo=2, pro = project.id))}}" style="white-space:nowrap;"><span class="icon-folder-open"></span>{{=T('Share')}}</a>
                     {{else:}}
-                        <a href="{{=URL(vars=dict(tipo=3, pro = project.id))}}"><span class="icon-folder-open"></span>{{=T('Owns')}}</a>
+                        <a href="{{=URL(vars=dict(tipo=3, pro = project.id))}}" style="white-space:nowrap;"><span class="icon-folder-open"></span>{{=T('Owns')}}</a>
                         {{for student in obtainStudents(project):}}
                             <br>
-                            <a href="{{=URL(vars=dict(tipo=4, pro = student.user_project.id))}}"><span class="icon-folder-open"></span>{{=T(student.user_project.assigned_user.first_name)}}</a>
+                            <a href="{{=URL(vars=dict(tipo=4, pro = student.user_project.id))}}" style="white-space:nowrap;"><span class="icon-folder-open"></span>{{=T(student.user_project.assigned_user.first_name)}}</a>
                         {{pass}}
                     {{pass}}
                     </div>
