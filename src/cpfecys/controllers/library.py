@@ -78,27 +78,27 @@ def file_managers():
                 usernombre=check.assigned_user.first_name
                 query = ((db.library.owner_file==check.assigned_user)&(db.library.project==check.project)&(db.library.period==check.period))
                 if period.id == year.id:
-                    grid = SQLFORM.grid(query, csv=False)
+                    grid = SQLFORM.grid(query, csv=False, paginate=5)
                 else:
                     links = [lambda row: A('Enlazar Semestre Actual',_href=URL("library","change_period",args=[row.id]))]
-                    grid = SQLFORM.grid(query, links=links, csv=False)
+                    grid = SQLFORM.grid(query, links=links, csv=False, paginate=5)
             elif tipo=='2':
                 db.library.owner_file.readable = True
                 query = ((db.library.visible==True)&(db.library.owner_file!=check.assigned_user)&(db.library.project==check.project)&(db.library.period==check.period))
-                grid = SQLFORM.grid(query, csv=False, create=False, editable=False, deletable=False)
+                grid = SQLFORM.grid(query, csv=False, create=False, editable=False, deletable=False, paginate=5)
                 usernombre=T('Share')
             elif tipo=='3':
                 usernombre=check.assigned_user.first_name
                 query = ((db.library.owner_file==check.assigned_user)&(db.library.project==check.project)&(db.library.period==check.period))
                 if period.id == year.id:
-                    grid = SQLFORM.grid(query, csv=False)
+                    grid = SQLFORM.grid(query, csv=False, paginate=5)
                 else:
                     links = [lambda row: A('Enlazar Semestre Actual',_href=URL("library","change_period",args=[row.id]))]
-                    grid = SQLFORM.grid(query, links=links, csv=False)
+                    grid = SQLFORM.grid(query, links=links, csv=False, paginate=5)
             elif tipo=='4':
                 usernombre=check.assigned_user.first_name
                 query = ((db.library.owner_file==check.assigned_user)&(db.library.project==check.project)&(db.library.period==check.period))
-                grid = SQLFORM.grid(query, csv=False, create=False, editable=False, deletable=False)
+                grid = SQLFORM.grid(query, csv=False, create=False, editable=False, deletable=False, paginate=5)
             else:
                 session.flash = T('Not valid Action.')
                 redirect(URL('default', 'index'))
@@ -128,8 +128,16 @@ def change_period():
             total = s[count]
 
         if total == 0:
-            db.library.insert(name=f.name,file_data=f.file_data,description=f.description,visible=f.visible,period=period,project=f.project,owner_file=f.owner_file)
-            session.flash  =T('The file was copy to the actual semester')
+            count2 = db.user_project.id.count()
+            project2 = db((db.user_project.project==f.project)&(db.user_project.assigned_user==f.owner_file)&(db.user_project.period==period)).select(count2)
+            total2=2
+            for s2 in project2:
+                total2 = s2[count2]
+            if total2 == 1:
+                db.library.insert(name=f.name,file_data=f.file_data,description=f.description,visible=f.visible,period=period,project=f.project,owner_file=f.owner_file)
+                session.flash  =T('The file was copy to the actual semester')
+            else:
+                session.flash  ='El archivo no se puede copiar, ya que no tiene asignado el curso en el semestre actual'
             redirect(URL('library','file_managers'))
         else:
             session.flash  =T('The file already exists')
