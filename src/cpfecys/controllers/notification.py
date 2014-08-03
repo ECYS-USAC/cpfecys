@@ -123,7 +123,7 @@ def teacher_send_mail_to_students(users1, users2, message, subject, check, semes
 
     attachment_m = '<br><br><b>' + T('Attachments') +":</b><br>"
 
-    if session.attachment_list != None:
+    if session.attachment_list != []:
         for attachment_list_var in session.attachment_list:
             for attachment_var in attachment_list_var:
                 attachment_m = attachment_m + '<a href="'+ URL('default/download', attachment_var.file_data) +'" target="blank"> '+ attachment_var.name + '</a> <br>'
@@ -148,49 +148,65 @@ def teacher_send_mail_to_students(users1, users2, message, subject, check, semes
                                         yearp=year,
                                         period=semester)
     #Ciclo para el envio de correos para estudiantes
+    ListadoCorreos = ''
     if users1 != None:
         for user in users1:
             print user.email
             if user.email != None and user.email != '':
-                was_sent = mail.send(to=user.email,
-                  subject=T(subject),
-                  message=messageC)
-                #MAILER LOG
-                db.mailer_log.insert(sent_message = messageC,
-                                 destination = str(user.email),
-                                 result_log = str(mail.error or '') + ':' + \
-                                 str(mail.result),
-                                 success = was_sent, emisor=str(check.assigned_user.username))
-                ##Notification LOG
-                db.notification_log4.insert(destination = user.carnet,
-                                 result_log = str(mail.error or '') + ':' + \
-                                 str(mail.result),
-                                 success = was_sent,
-                                 register=row.id)
-                if was_sent==False:
-                    control=control+1
-    #Ciclo para el envio de correos para practicantes
+                if ListadoCorreos == '':
+                    ListadoCorreos = user.email 
+                else:
+                    ListadoCorreos = user.email + ", " + ListadoCorreos 
+
+    ListadoCorreos2 = ''
     if users2 != None:
         for user in users2:
             print user.email
             if user.email != None and user.email != '':
-                was_sent = mail.send(to=user.email,
-                  subject=T(subject),
-                  message=messageC)
-                #MAILER LOG
-                db.mailer_log.insert(sent_message = messageC,
-                                 destination = str(user.email),
-                                 result_log = str(mail.error or '') + ':' + \
-                                 str(mail.result),
-                                 success = was_sent, emisor=str(check.assigned_user.username))
-                ##Notification LOG
-                db.notification_log4.insert(destination = user.username,
-                                 result_log = str(mail.error or '') + ':' + \
-                                 str(mail.result),
-                                 success = was_sent,
-                                 register=row.id)
-                if was_sent==False:
-                    control=control+1
+                if ListadoCorreos2 == '':
+                    ListadoCorreos2 = user.email 
+                else:
+                    ListadoCorreos2 = user.email + ", " + ListadoCorreos2     
+
+
+    if ListadoCorreos != '':
+        was_sent = mail.send(to=ListadoCorreos,
+          subject=T(subject),
+          message=messageC)
+        #MAILER LOG
+        db.mailer_log.insert(sent_message = messageC,
+                         destination = str(ListadoCorreos),
+                         result_log = str(mail.error or '') + ':' + \
+                         str(mail.result),
+                         success = was_sent, emisor=str(check.assigned_user.username))
+        ##Notification LOG
+        db.notification_log4.insert(destination = ListadoCorreos,
+                         result_log = str(mail.error or '') + ':' + \
+                         str(mail.result),
+                         success = was_sent,
+                         register=row.id)
+        if was_sent==False:
+            control=control+1
+                
+    if ListadoCorreos2 != '':
+        was_sent = mail.send(to=ListadoCorreos2,
+          subject=T(subject),
+          message=messageC)
+        #MAILER LOG
+        db.mailer_log.insert(sent_message = messageC,
+                         destination = str(ListadoCorreos2),
+                         result_log = str(mail.error or '') + ':' + \
+                         str(mail.result),
+                         success = was_sent, emisor=str(check.assigned_user.username))
+        ##Notification LOG
+        db.notification_log4.insert(destination = ListadoCorreos2,
+                         result_log = str(mail.error or '') + ':' + \
+                         str(mail.result),
+                         success = was_sent,
+                         register=row.id)
+        if was_sent==False:
+            control=control+1
+
     session.attachment_list = []
     session.attachment_list_temp = []
     session.attachment_list_temp2 = []
@@ -593,7 +609,7 @@ def send_mail_to_students(users, message, subject, check, semester, year):
 
     attachment_m = '<br><br><b>' + T('Attachments') +":</b><br>"
 
-    if session.attachment_list != None:
+    if session.attachment_list != []:
         for attachment_list_var in session.attachment_list:
             for attachment_var in attachment_list_var:
                 attachment_m = attachment_m + '<a href="'+ URL('default/download', attachment_var.file_data) +'" target="blank"> '+ attachment_var.name + '</a> <br>'
@@ -619,26 +635,32 @@ def send_mail_to_students(users, message, subject, check, semester, year):
                                         yearp=year,
                                         period=semester)
     #Ciclo para el envio de correos
+    ListadoCorreos = ''
     for user in users:
         print user.email
         if user.email != None and user.email != '':
-            was_sent = mail.send(to=user.email,
-              subject=T(subject),
-              message=messageC)
-            #MAILER LOG
-            db.mailer_log.insert(sent_message = messageC,
-                             destination = str(user.email),
-                             result_log = str(mail.error or '') + ':' + \
-                             str(mail.result),
-                             success = was_sent, emisor=str(check.assigned_user.username))
-            ##Notification LOG
-            db.notification_log4.insert(destination = user.carnet,
-                             result_log = str(mail.error or '') + ':' + \
-                             str(mail.result),
-                             success = was_sent,
-                             register=row.id)
-            if was_sent==False:
-                control=control+1
+            if ListadoCorreos == '':
+                ListadoCorreos = user.email 
+            else:
+                ListadoCorreos = user.email + ", " + ListadoCorreos 
+
+    was_sent = mail.send(to=ListadoCorreos,
+      subject=T(subject),
+      message=messageC)
+    #MAILER LOG
+    db.mailer_log.insert(sent_message = messageC,
+                     destination = str(ListadoCorreos),
+                     result_log = str(mail.error or '') + ':' + \
+                     str(mail.result),
+                     success = was_sent, emisor=str(check.assigned_user.username))
+    ##Notification LOG
+    db.notification_log4.insert(destination = ListadoCorreos,
+                     result_log = str(mail.error or '') + ':' + \
+                     str(mail.result),
+                     success = was_sent,
+                     register=row.id)
+    if was_sent==False:
+        control=control+1
     session.attachment_list = []
     session.attachment_list_temp = []
     session.attachment_list_temp2 = []
