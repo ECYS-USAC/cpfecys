@@ -114,9 +114,9 @@
 	  </table>
 	  <fieldset>
 	  	<label for="subject">{{=T('Subject')}}</label>
-	    <input type="text" id="subject" name="subject">
+	    <input type="text" id="subject" name="subject" value="{{=session.notification_subject}}">
 	    <label for="message">{{=T('Message')}}</label>
-	    <textarea id="message" name="message" rows="8"></textarea>
+	    <textarea id="message" name="message" rows="8" > {{=session.notification_message}} </textarea>
 	    
 	    <div id="div_list_attachments" >
 			<div class="well">
@@ -125,24 +125,20 @@
 			    	<a id="attachments" > 
 			    	<span class="icon-folder-open"></span>
 			    	{{=T('Attachments')}}
+			    	{{files_num = 0}}
+					{{if attachment_list != None:}}
+						{{for attachment_list_var in attachment_list:}}
+							{{for attachment_var in attachment_list_var:}}
+								{{files_num = files_num + 1}}
+							{{pass}}
+						{{pass}}
+					{{pass}}
+					({{=files_num}})
 			    	</a> 
-			    	<div  id="attachmentsDiv " value="attachmentsDiv" style="overflow:auto; height:100px;">
-			    		{{files_num = 0}}
-			    		{{if attachment_list != None:}}
-			    			{{for attachment_list_var in attachment_list:}}
-			    				{{for attachment_var in attachment_list_var:}}
-			    					{{files_num = files_num + 1}}
-			    					&nbsp &nbsp <input type="checkbox" value="{{= attachment_var.id }}"><span class="icon-file"></span><a href="{{=URL('default/download', attachment_var.file_data)}}" target="blank">  {{= attachment_var.name }} </a> - {{= attachment_var.description }} <br>
-
-			    				{{pass}}
-			    			{{pass}}
-			    		{{pass}}
-			    		{{if files_num == 0:}}
-			    				<label>&nbsp &nbsp{{=T('Is not attached any files')}}</label>
-			    		{{pass}}
-			        	
+			    	<div  id="attachmentsDiv" value="attachmentsDiv" style="display:none; overflow:auto; height:100px;">		    		
 			        	
 			        </div>
+			        
 			    </div>
 	    	</div>
 	    </div>
@@ -153,11 +149,20 @@
 	    </a>
 	  </fieldset>
 	</form>
+	<form action="#div_list_attachments" enctype="multipart/form-data" method="post" >
+	  	<div align="right">
+		  	<input name="_formname" type="hidden" value="remove_form">
+			<div align="right" id="remove_div" style="display:none;">
+				<input type="submit" role="button" class="btn btn-danger btn-xs" value="{{=T('Remove selected')}}">
+			</div>
+		</div>
+	</form>
 
 	</div>
 </div>
 
 <!-- Attach Div-->
+
 <div id="attachModal" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true" > 
   <div class="modal-header">
     <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
@@ -169,7 +174,7 @@
   <div class="modal-body" style="overflow:auto; height:500px;">
   	<ul id="myTab" class="nav nav-tabs">
      	<li class="active" id="var_upload"><a href="#" data-toggle="tab">{{=T('Upload')}}</a></li>
-		<li class="dropdown" id="var_semester" >
+		<!--<li class="dropdown" id="var_semester" >
 	        <a href="#" class="dropdown-toggle" data-toggle="dropdown">1er Semestre 2014 </b></a>
 	        <ul class="dropdown-menu" style="overflow:auto; height:100px;">
 	          <li><a href="#dropdown1" data-toggle="tab">1er Semestre 2014</a></li>
@@ -180,8 +185,8 @@
 	          <li><a href="#dropdown1" data-toggle="tab">1er Semestre 2014</a></li>
 	          <li><a href="#dropdown2" data-toggle="tab">1er Semestre 2014</a></li>
 	        </ul>
-  		</li>
-  		<li id="var_all"><a href="#home" data-toggle="tab">{{=T('All')}}</a></li>
+  		</li>-->
+  		<li id="var_all"><a href="#home" data-toggle="tab">{{=T('All files')}}</a></li>
   		
   		<div align="right" id="div_all_search" style="display: none;">
 			<table>
@@ -244,7 +249,7 @@
 
     <div id="div_all" style="display: none;">
 		
-		<div class="well">
+		<div class="well" style="overflow:auto;">
 		    <div> 
 
 		    	<a id="allFiles" > 
@@ -252,10 +257,12 @@
 		    	{{=T('All files')}}
 		    	</a>
 		    	
-		    	<div  id="allDiv" value="allDiv" style="overflow:auto; height:200px;">
+		    	<div  id="allDiv" value="allDiv" style="overflow:auto;  height:200px; width:1000px;">
 		    			    		
 
 		        </div>
+
+		    
 
 		    </div>
 		</div>
@@ -264,30 +271,39 @@
     </div>
 
   </div>
-  <div class="modal-footer" align="right">
-  	<table align="right">
-  		<tr >
-  			<td>
-			  	<div id="attach_button" style="display: none;">
-			  		<a id="attach_check_files" href="#attachModal" role="button" class="btn btn-primary" data-toggle="modal"> 
-				    	{{=T('Attach')}} <span class="icon-white icon-upload">
-				    </a>
-				</div>
-			</td>
-			<td>
-      			<button class="btn" data-dismiss="modal" aria-hidden="true">{{=T('Close')}}</button>
-      		</td>
-      	</tr>
-    </table>
-  </div>
+  <form   action="#div_list_attachments" enctype="multipart/form-data" method="post" >
+	  <div class="modal-footer" align="right">
+	  	<input name="_formname" type="hidden" value="attach_form">
+	  	<table align="right">
+	  		<tr >
+	  			<td>
+				  	<div id="attach_button" style="display: none;">
+				  		<input type="submit" role="button" class="btn btn-primary" value="{{=T('Attach')}}">					    
+					</div>
+				</td>
+				<td>
+	      			<button class="btn" data-dismiss="modal" aria-hidden="true">{{=T('Close')}}</button>
+	      		</td>
+	      	</tr>
+	    </table>
+	  </div>
+	</form>
 </div>
 <!--Finish Attach Div-->
 
+<!--Div to load functions-->
+<div  id="div2" value="div2">		    			        	
+</div>
 
 <script type="text/javascript">
 	$(document).ready(function(){		
 		$("#search_input").width(100);
+
 		
+		
+		function run(object) {
+			alert('hizo click'+object.value);
+		}
 
 		$("#div_list_attachments").width(parseInt($("#message").width())+15);		
  
@@ -300,7 +316,18 @@
 	        }
 
 	    });
-		 
+
+		//hide remove button
+		if({{=files_num}} == 0){
+			$("#remove_div").css("display", "none");
+		}else{
+			$("#attachmentsDiv").css("display", "block");	
+			$("#remove_div").css("display", "block");
+		}
+
+		//Load list of notifications
+		$("#attachmentsDiv").load('{{=URL('notification','attachment_files.load')}}',{files_num: {{=files_num}} } );
+
 		
 
 
@@ -313,6 +340,14 @@
 			$("#allDiv").load('{{=URL('notification','search_files.load')}}',{search_input: document.getElementById('search_input').value});
 		})
 
+		//
+		$('#subject').on('input', function() { 
+		    $("#div2").load('{{=URL('notification','notification_functions.load')}}',{subject: document.getElementById('subject').value});
+		});
+
+		$('#message').on('input', function() { 
+		    $("#div2").load('{{=URL('notification','notification_functions.load')}}',{message: document.getElementById('message').value});
+		});
 		
 		
 
@@ -341,7 +376,9 @@
 		})
 
 		$("#attachments").click(function(){			
-			$("#attachmentsDiv").toggle();			
+			$("#attachmentsDiv").toggle();	
+			$("#remove_div").toggle();	
+					
 		})
 		$("#allFiles").click(function(){			
 			$("#allDiv").toggle();			

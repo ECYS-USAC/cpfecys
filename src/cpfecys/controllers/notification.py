@@ -182,6 +182,10 @@ def teacher_send_mail_to_students(users1, users2, message, subject, check, semes
                 if was_sent==False:
                     control=control+1
     session.attachment_list = []
+    session.attachment_list_temp = []
+    session.attachment_list_temp2 = []
+    session.notification_subject = ''
+    session.notification_message = ''
     return control
 
     
@@ -365,6 +369,10 @@ def teacher_courses_mail_notifications():
     #show all assignations of current user
     import cpfecys
     session.attachment_list = []
+    session.attachment_list_temp = []
+    session.attachment_list_temp2 = []
+    session.notification_subject = ''
+    session.notification_message = ''
     def split_name(project):
         try:
             (nameP, projectSection) = str(project).split('(')
@@ -548,6 +556,10 @@ def send_mail_to_students(users, message, subject, check, semester, year):
             if was_sent==False:
                 control=control+1
     session.attachment_list = []
+    session.attachment_list_temp = []
+    session.attachment_list_temp2 = []
+    session.notification_message = ''
+    session.notification_subject = ''
     return control
 
 
@@ -704,7 +716,10 @@ def mail_notifications():
     db.library.owner_file.writable = False
     db.library.owner_file.readable = False
 
-    
+    if session.notification_subject == None:
+        session.notification_subject = ''
+    if session.notification_message == None:
+        session.notification_message = ''    
 
     upload_form = FORM(INPUT(_name='file_name',_type='text'),
                         INPUT(_name='file_upload',_type='file'),
@@ -717,10 +732,6 @@ def mail_notifications():
                 response.flash = T('You must enter all fields.')
             else:
                 exists = db.library((db.library.name == upload_form.vars.file_name) & (db.library.project == check.project.id) & (db.library.owner_file==auth.user.id) )
-                #num_exists = 0
-                #for var_exists in exists:
-                #    num_exists = num_exists + 1
-
                 if exists is None:                    
                     file_var = db.library.file_data.store(upload_form.vars.file_upload.file, upload_form.vars.file_upload.filename)
                     
@@ -742,10 +753,38 @@ def mail_notifications():
                     response.flash = T('File already exists.')
         except:
             response.flash = T('Error loading file.')
-    #if request.vars['search_input'] is None:
-    #    all_list = db((db.library.owner_file==auth.user.id) or ((db.library.project == check.project.id) & (db.library.visible=='true')) ).select()
-    #else:
-    #    all_list = db(db.library.name.like('%'+request.vars['search_input']+'%')).select()
+
+    attach_form = FORM()
+
+    if attach_form.accepts(request.vars,formname='attach_form'):
+        if session.attachment_list_temp != None:
+            for var in session.attachment_list_temp:
+                session.attachment_list.append(var)
+                session.attachment_list_temp = []
+        else:
+            session.attachment_list_temp = []        
+    
+    remove_form = FORM()
+
+    if remove_form.accepts(request.vars,formname='remove_form'):
+        list_tempo = []
+        if session.attachment_list_temp2 != None and len(session.attachment_list_temp2) > 0:
+            for var_list in session.attachment_list:                
+                for tempo1 in var_list:                    
+                    cambiar = 'false'
+                    for var_list_2 in session.attachment_list_temp2:
+                        for tempo2 in var_list_2:
+                            
+                            if (tempo1.id == tempo2.id):
+                                cambiar = 'true'
+
+                if(cambiar == 'false'):
+                    list_tempo.append(var_list)
+
+            session.attachment_list = list_tempo
+            session.attachment_list_temp2 = []
+        else:
+            session.attachment_list_temp2 = []
 
     return dict(get_projects=get_projects,
         markmin_settings = cpfecys.get_markmin,
@@ -754,8 +793,18 @@ def mail_notifications():
         year = year.yearp,
         assignation=assignation,
         attachment_list=session.attachment_list
-        #,all_list=all_list
         )
+
+def files_check():
+    return dict(var='');
+
+def notification_functions():
+    return dict(var='');
+
+def attachment_files():
+    return dict(attachment_list=session.attachment_list)
+
+
 
 def search_files():  
     if request.vars['search_input'] is None:
@@ -772,6 +821,10 @@ def courses_mail_notifications():
     #show all assignations of current user
     import cpfecys
     session.attachment_list = []
+    session.attachment_list_temp = []
+    session.attachment_list_temp2 = []
+    session.notification_subject = ''
+    session.notification_message = ''
     def split_name(project):
         try:
             (nameP, projectSection) = str(project).split('(')

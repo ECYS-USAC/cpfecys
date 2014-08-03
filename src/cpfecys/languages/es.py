@@ -1037,7 +1037,6 @@
 'Prueba Agosto 02/08/2014': 'Prueba Agosto 02/08/2014',
 'Prueba de Envio2_Arreglado 02/08/2014': 'Prueba de Envio2_Arreglado 02/08/2014',
 'Prueba del mensaje': 'Prueba del mensaje',
-'Prueba Sabado Agosto Temprano': 'Prueba Sabado Agosto Temprano',
 'prueba2': 'prueba2',
 'Public Event': 'Evento',
 'Public event schedules': 'Horarios de Evento',
