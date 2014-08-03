@@ -123,28 +123,31 @@ def auto_freeze():
     periods_to_work = db(db.assignation_freeze.pmonth == current_month).select()
     # For each assignation_freeze
     for period in periods_to_work:
+        current_period_year = db.period_year((db.period_year.period == period)&
+                                             (db.period_year.yearp == current_year))
+        # this period means that we should check the ones that end in first_semester for example
+        # or the ones that end in second_semester; it always applies to current year
         # Get all the assignations still active
         assignations = db(db.user_project.assignation_status == None).select()
         # Validate each assignation
         for assignation in assignations:
-            # Calculate the amount of time passed of the assignation in semesters
-            difference = (current_year - assignation.period.yearp) + 1
-            difference = difference * 2
-            import cpfecys
-            if assignation.period.period == cpfecys.second_period:
-                difference = difference - 1
-            if period == cpfecys.first_period:
-                difference = difference - 1
-            # If the amount of time in semesters happends to be >= then we should check it :)
-            if difference >= assignation.periods:
-                validation = assignation_done_succesful(assignation)
-                if validation['status']:
-                    assignation.assignation_comment = validation['message']
-                    assignation.assignation_status = db.assignation_status(name = 'Successful')
-                else:
-                    assignation.assignation_comment = validation['message']
-                    assignation.assignation_status = db.assignation_status(name = 'Failed')
-                assignation.update_record()
+            # Obtengo el inicio de la asignacion
+            ass_id = assignation.period.id
+            # Obtengo la duracion
+            length = assignation.periods
+            # finaliza en (id de cuando finaliza en period_year)
+            finish = ass_id + length
+            final = db.period_year(id = finish)
+            if final and current_period_year:
+                if final.id == current_period_year.id:
+                    validation = assignation_done_succesful(assignation)
+                    if validation['status']:
+                        assignation.assignation_comment = validation['message']
+                        assignation.assignation_status = db.assignation_status(name = 'Successful')
+                    else:
+                        assignation.assignation_comment = validation['message']
+                        assignation.assignation_status = db.assignation_status(name = 'Failed')
+                    assignation.update_record()
     db.commit()
 
 #This thing kills reports that where never done to an empty report with score 0
