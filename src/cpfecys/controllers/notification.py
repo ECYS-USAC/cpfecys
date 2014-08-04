@@ -600,10 +600,14 @@ def send_mail_to_students(users, message, subject, check, semester, year):
     nameP = check.project.name
 
     attachment_m = '<br><br><b>' + T('Attachments') +":</b><br>"
-
+    attachments_list = []
     if session.attachment_list != []:
         for attachment_list_var in session.attachment_list:
             for attachment_var in attachment_list_var:
+                try:
+                    attachments_list.append(mail.Attachment(cpfecys.get_domain() + URL('default/download', attachment_var.file_data)))
+                except:
+                    None
                 attachment_m = attachment_m + '<a href="'+ cpfecys.get_domain() + URL('default/download', attachment_var.file_data) +'" target="blank"> '+ attachment_var.name + '</a> <br>'
     else:        
         attachment_m = ''
@@ -638,7 +642,8 @@ def send_mail_to_students(users, message, subject, check, semester, year):
 
     was_sent = mail.send(to=ListadoCorreos,
       subject=T(subject),
-      message=messageC)
+      message=messageC,
+      attachments=attachments_list)
     #MAILER LOG
     db.mailer_log.insert(sent_message = messageC,
                      destination = str(ListadoCorreos),
