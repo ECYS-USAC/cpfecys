@@ -148,54 +148,35 @@ def teacher_send_mail_to_students(users1, users2, message, subject, check, semes
                                         yearp=year,
                                         period=semester)
     #Ciclo para el envio de correos para estudiantes
-    ListadoCorreos = ''
+    ListadoCorreos = None
     if users1 != None:
         for user in users1:
             print user.email
             if user.email != None and user.email != '':
-                if ListadoCorreos == '':
-                    ListadoCorreos = user.email 
+                if ListadoCorreos == None:
+                    ListadoCorreos = []
+                    ListadoCorreos.append(user.email)
                 else:
-                    ListadoCorreos = user.email + ", " + ListadoCorreos 
+                    ListadoCorreos.append(user.email)
 
-    ListadoCorreos2 = ''
     if users2 != None:
         for user in users2:
             print user.email
             if user.email != None and user.email != '':
-                if ListadoCorreos2 == '':
-                    ListadoCorreos2 = user.email 
+                if ListadoCorreos == None:
+                    ListadoCorreos = []
+                    ListadoCorreos.append(user.email)
                 else:
-                    ListadoCorreos2 = user.email + ", " + ListadoCorreos2     
+                    ListadoCorreos.append(user.email)
 
 
-    if ListadoCorreos != '' or ListadoCorreos2 != '':        
-        fullListEmail = ''
-        if ListadoCorreos == '':
-            fullListEmail = ListadoCorreos2
-        else:
-            if ListadoCorreos2 == '':
-                fullListEmail = ListadoCorreos
-            else:
-                fullListEmail = ListadoCorreos+', '+ListadoCorreos2
-             
-        was_sent = mail.send(to=fullListEmail,
-          subject=T(subject),
-          message=messageC)
-
-        db.mailer_log.insert(sent_message = messageC,
-                         destination = str(fullListEmail),
-                         result_log = str(mail.error or '') + ':' + \
-                         str(mail.result),
-                         success = was_sent, emisor=str(check.assigned_user.username))
-        ##Notification LOG
-        db.notification_log4.insert(destination = fullListEmail,
-                         result_log = str(mail.error or '') + ':' + \
-                         str(mail.result),
-                         success = was_sent,
-                         register=row.id)
-        if was_sent==False:
-            control=control+1
+    was_sent = mail.send(to='dtt.ecys@gmail.com',subject=T(subject),message=messageC, bcc=ListadoCorreos)
+    ##Notification LOG GENERAL
+    db.mailer_log.insert(sent_message = messageC, destination = str(fullListEmail), result_log = str(mail.error or '') + ':' + str(mail.result), success = was_sent, emisor=str(check.assigned_user.username))
+    ##Notification LOG
+    db.notification_log4.insert(destination = fullListEmail, result_log = str(mail.error or '') + ':' + str(mail.result), success = was_sent, register=row.id)
+    if was_sent==False:
+        control=control+1
                 
     
 
@@ -631,19 +612,19 @@ def send_mail_to_students(users, message, subject, check, semester, year):
                                         yearp=year,
                                         period=semester)
     #Ciclo para el envio de correos
-    ListadoCorreos = ''
+    ListadoCorreos = None
     for user in users:
         print user.email
         if user.email != None and user.email != '':
-            if ListadoCorreos == '':
-                ListadoCorreos = user.email 
+            if ListadoCorreos == None:
+                ListadoCorreos = []
+                ListadoCorreos.append(user.email)
             else:
-                ListadoCorreos = user.email + ", " + ListadoCorreos 
+                ListadoCorreos.append(user.email)
 
-    was_sent = mail.send(to=ListadoCorreos,
-      subject=T(subject),
-      message=messageC,
-      attachments=attachments_list)
+
+    was_sent = mail.send(to='dtt.ecys@gmail.com',subject=T(subject),message=messageC, bcc=ListadoCorreos)
+
     #MAILER LOG
     db.mailer_log.insert(sent_message = messageC,
                      destination = str(ListadoCorreos),
