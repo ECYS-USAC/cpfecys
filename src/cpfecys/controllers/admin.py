@@ -954,20 +954,23 @@ def send_mail_to_users(users, message, roles, projects, subject, log=False):
     import cpfecys
     message = '<html>' + message + (cpfecys.get_custom_parameters().email_signature or '') + '</html>'
 
-
+    userList= []
     for user in users:
         #print user.email
         if user.email != None and user.email != '':
+            userList.append(user.email)
 
-            was_sent = mail.send(to=user.email,
-              subject=T(subject),
-              message=message)
-            #MAILER LOG
-            db.mailer_log.insert(sent_message = message,
-                             destination = str(user.email),
-                             result_log = str(mail.error or '') + ':' + \
-                             str(mail.result),
-                             success = was_sent)
+    if userList != '':
+        was_sent = mail.send(to='dtt.ecys@gmail.com',
+          subject=T(subject),
+          message=message,
+          bcc=userList)
+        #MAILER LOG
+        db.mailer_log.insert(sent_message = message,
+                     destination = str(userList),
+                     result_log = str(mail.error or '') + ':' + \
+                     str(mail.result),
+                     success = was_sent)
 
 
 @auth.requires_login()
