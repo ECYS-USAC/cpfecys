@@ -120,6 +120,16 @@ def teacher_send_mail_to_students(users1, users2, message, subject, check, semes
     nameS2 = check.assigned_user.first_name+" "+check.assigned_user.last_name
     nameU = check.assigned_user.username
     nameP = check.project.name
+
+    attachment_m = '<br><br><b>' + T('Attachments') +":</b><br>"
+
+    if session.attachment_list != []:
+        for attachment_list_var in session.attachment_list:
+            for attachment_var in attachment_list_var:
+                attachment_m = attachment_m + '<a href="'+ URL('default/download', attachment_var.file_data) +'" target="blank"> '+ attachment_var.name + '</a> <br>'
+    else:        
+        attachment_m = ''
+
     try:
         (nameP, projectSection) = str(nameP).split('(')
         (nameS,garbage) = str(projectSection).split(')')
@@ -127,7 +137,7 @@ def teacher_send_mail_to_students(users1, users2, message, subject, check, semes
     except:
         None
     period = T(semester)+' '+str(year)
-    messageC = '<html>' + message + '<br><br>'+str(nameS2)+'<br>'+str(period)+'<br>'+str(nameP)+'<br>Sistema de Control de Estudiantes de Practica Final<br> Escuela de Ciencias y Sistemas - Universidad de San Carlos de Guatemala</html>'
+    messageC = '<html>' + message + attachment_m + '<br><br>'+str(nameS2)+'<br>'+str(period)+'<br>'+str(nameP)+'<br>Sistema de Control de Estudiantes de Practica Final<br> Escuela de Ciencias y Sistemas - Universidad de San Carlos de Guatemala</html>'
     #variable de control
     control = 0
     #Log General del Envio
@@ -138,49 +148,70 @@ def teacher_send_mail_to_students(users1, users2, message, subject, check, semes
                                         yearp=year,
                                         period=semester)
     #Ciclo para el envio de correos para estudiantes
+    ListadoCorreos = ''
     if users1 != None:
         for user in users1:
             print user.email
             if user.email != None and user.email != '':
-                was_sent = mail.send(to=user.email,
-                  subject=T(subject),
-                  message=messageC)
-                #MAILER LOG
-                db.mailer_log.insert(sent_message = messageC,
-                                 destination = str(user.email),
-                                 result_log = str(mail.error or '') + ':' + \
-                                 str(mail.result),
-                                 success = was_sent, emisor=str(check.assigned_user.username))
-                ##Notification LOG
-                db.notification_log4.insert(destination = user.carnet,
-                                 result_log = str(mail.error or '') + ':' + \
-                                 str(mail.result),
-                                 success = was_sent,
-                                 register=row.id)
-                if was_sent==False:
-                    control=control+1
-    #Ciclo para el envio de correos para practicantes
+                if ListadoCorreos == '':
+                    ListadoCorreos = user.email 
+                else:
+                    ListadoCorreos = user.email + ", " + ListadoCorreos 
+
+    ListadoCorreos2 = ''
     if users2 != None:
         for user in users2:
             print user.email
             if user.email != None and user.email != '':
-                was_sent = mail.send(to=user.email,
-                  subject=T(subject),
-                  message=messageC)
-                #MAILER LOG
-                db.mailer_log.insert(sent_message = messageC,
-                                 destination = str(user.email),
-                                 result_log = str(mail.error or '') + ':' + \
-                                 str(mail.result),
-                                 success = was_sent, emisor=str(check.assigned_user.username))
-                ##Notification LOG
-                db.notification_log4.insert(destination = user.username,
-                                 result_log = str(mail.error or '') + ':' + \
-                                 str(mail.result),
-                                 success = was_sent,
-                                 register=row.id)
-                if was_sent==False:
-                    control=control+1
+                if ListadoCorreos2 == '':
+                    ListadoCorreos2 = user.email 
+                else:
+                    ListadoCorreos2 = user.email + ", " + ListadoCorreos2     
+
+
+    if ListadoCorreos != '':
+        was_sent = mail.send(to=ListadoCorreos,
+          subject=T(subject),
+          message=messageC)
+        #MAILER LOG
+        db.mailer_log.insert(sent_message = messageC,
+                         destination = str(ListadoCorreos),
+                         result_log = str(mail.error or '') + ':' + \
+                         str(mail.result),
+                         success = was_sent, emisor=str(check.assigned_user.username))
+        ##Notification LOG
+        db.notification_log4.insert(destination = ListadoCorreos,
+                         result_log = str(mail.error or '') + ':' + \
+                         str(mail.result),
+                         success = was_sent,
+                         register=row.id)
+        if was_sent==False:
+            control=control+1
+                
+    if ListadoCorreos2 != '':
+        was_sent = mail.send(to=ListadoCorreos2,
+          subject=T(subject),
+          message=messageC)
+        #MAILER LOG
+        db.mailer_log.insert(sent_message = messageC,
+                         destination = str(ListadoCorreos2),
+                         result_log = str(mail.error or '') + ':' + \
+                         str(mail.result),
+                         success = was_sent, emisor=str(check.assigned_user.username))
+        ##Notification LOG
+        db.notification_log4.insert(destination = ListadoCorreos2,
+                         result_log = str(mail.error or '') + ':' + \
+                         str(mail.result),
+                         success = was_sent,
+                         register=row.id)
+        if was_sent==False:
+            control=control+1
+
+    session.attachment_list = []
+    session.attachment_list_temp = []
+    session.attachment_list_temp2 = []
+    session.notification_subject = ''
+    session.notification_message = ''
     return control
 
     
@@ -350,12 +381,86 @@ def teacher_mail_notifications():
                 #obtain the final practice students assigned in the course where the user is the manager
                 students = db((db.user_project.project==check.project)&(db.user_project.period==check.period)&(db.user_project.assigned_user!=check.assigned_user)&(db.auth_membership.user_id==db.user_project.assigned_user)&(db.auth_membership.group_id==2)).select()
                 return students
+
+    if session.notification_subject == None:
+        session.notification_subject = ''
+    if session.notification_message == None:
+        session.notification_message = ''    
+
+    upload_form = FORM(INPUT(_name='file_name',_type='text'),
+                        INPUT(_name='file_upload',_type='file',requires=[IS_UPLOAD_FILENAME(extension = '(pdf|zip)',error_message='Solo se aceptan archivos con extension zip|pdf'),IS_LENGTH(2097152,error_message='El tamaño máximo del archivo es 2MB')]),
+                        INPUT(_name='file_description',_type='text'),
+                        INPUT(_name='file_visible',_type='checkbox'))
+
+    if upload_form.accepts(request.vars,formname='upload_form'):
+        try:
+            if ( upload_form.vars.file_name is "" ) or ( upload_form.vars.file_upload is "") or ( upload_form.vars.file_description is ""):
+                response.flash = T('You must enter all fields.')
+            else:
+                exists = db.library((db.library.name == upload_form.vars.file_name) & (db.library.project == check.project.id) & (db.library.owner_file==auth.user.id) )
+                if exists is None:                    
+                    file_var = db.library.file_data.store(upload_form.vars.file_upload.file, upload_form.vars.file_upload.filename)
+                    
+                    var_visible = 'False'
+                    if upload_form.vars.file_visible:
+                        var_visible = 'True'
+
+                    id = db.library.insert(file_data=file_var,
+                                            name=upload_form.vars.file_name,
+                                            description=upload_form.vars.file_description,
+                                            visible=var_visible,
+                                            period=cpfecys.current_year_period(),
+                                            project=check.project.id,
+                                            owner_file=auth.user.id)
+
+                    session.attachment_list.append( db(db.library.id==id).select() )
+                    response.flash = T('File loaded successfully.')
+                else:
+                    response.flash = T('File already exists.')
+        except:
+            response.flash = T('Error loading file.')
+
+    attach_form = FORM()
+
+    if attach_form.accepts(request.vars,formname='attach_form'):
+        if session.attachment_list_temp != None:
+            for var in session.attachment_list_temp:
+                session.attachment_list.append(var)
+                session.attachment_list_temp = []
+        else:
+            session.attachment_list_temp = []        
+    
+    remove_form = FORM()
+
+    if remove_form.accepts(request.vars,formname='remove_form'):
+        list_tempo = []
+        if session.attachment_list_temp2 != None and len(session.attachment_list_temp2) > 0:
+            for var_list in session.attachment_list:                
+                for tempo1 in var_list:                    
+                    cambiar = 'false'
+                    for var_list_2 in session.attachment_list_temp2:
+                        for tempo2 in var_list_2:
+                            
+                            if (tempo1.id == tempo2.id):
+                                cambiar = 'true'
+
+                if(cambiar == 'false'):
+                    list_tempo.append(var_list)
+
+            session.attachment_list = list_tempo
+            session.attachment_list_temp2 = []
+        else:
+            session.attachment_list_temp2 = []
+
+    
+    session.project_id = check.project.id
     return dict(get_projects=get_projects,
         markmin_settings = cpfecys.get_markmin,
         name = check.project.name,
         semester = year_semester.name,
         year = year.yearp,
-        assignation=assignation)
+        assignation=assignation,
+        attachment_list=session.attachment_list)
 
 #Show all the courses that the teacher has register in the current period
 @auth.requires_login()
@@ -363,6 +468,11 @@ def teacher_mail_notifications():
 def teacher_courses_mail_notifications():
     #show all assignations of current user
     import cpfecys
+    session.attachment_list = []
+    session.attachment_list_temp = []
+    session.attachment_list_temp2 = []
+    session.notification_subject = ''
+    session.notification_message = ''
     def split_name(project):
         try:
             (nameP, projectSection) = str(project).split('(')
@@ -496,6 +606,17 @@ def send_mail_to_students(users, message, subject, check, semester, year):
     nameS2 = check.assigned_user.first_name+" "+check.assigned_user.last_name
     nameU = check.assigned_user.username
     nameP = check.project.name
+
+    attachment_m = '<br><br><b>' + T('Attachments') +":</b><br>"
+
+    if session.attachment_list != []:
+        for attachment_list_var in session.attachment_list:
+            for attachment_var in attachment_list_var:
+                attachment_m = attachment_m + '<a href="'+ URL('default/download', attachment_var.file_data) +'" target="blank"> '+ attachment_var.name + '</a> <br>'
+    else:        
+        attachment_m = ''
+        
+    
     try:
         (nameP, projectSection) = str(nameP).split('(')
         (nameS,garbage) = str(projectSection).split(')')
@@ -503,7 +624,7 @@ def send_mail_to_students(users, message, subject, check, semester, year):
     except:
         None
     period = T(semester)+' '+str(year)
-    messageC = '<html>' + message + '<br><br>'+str(nameS2)+'<br>'+str(period)+'<br>'+str(nameP)+'<br>Sistema de Control de Estudiantes de Practica Final<br> Escuela de Ciencias y Sistemas - Universidad de San Carlos de Guatemala</html>'
+    messageC = '<html>' + message + attachment_m + '<br><br>'+str(nameS2)+'<br>'+str(period)+'<br>'+str(nameP)+'<br>Sistema de Control de Estudiantes de Practica Final<br> Escuela de Ciencias y Sistemas - Universidad de San Carlos de Guatemala</html>'
     #variable de control
     control = 0
     #Log General del Envio
@@ -514,26 +635,37 @@ def send_mail_to_students(users, message, subject, check, semester, year):
                                         yearp=year,
                                         period=semester)
     #Ciclo para el envio de correos
+    ListadoCorreos = ''
     for user in users:
         print user.email
         if user.email != None and user.email != '':
-            was_sent = mail.send(to=user.email,
-              subject=T(subject),
-              message=messageC)
-            #MAILER LOG
-            db.mailer_log.insert(sent_message = messageC,
-                             destination = str(user.email),
-                             result_log = str(mail.error or '') + ':' + \
-                             str(mail.result),
-                             success = was_sent, emisor=str(check.assigned_user.username))
-            ##Notification LOG
-            db.notification_log4.insert(destination = user.carnet,
-                             result_log = str(mail.error or '') + ':' + \
-                             str(mail.result),
-                             success = was_sent,
-                             register=row.id)
-            if was_sent==False:
-                control=control+1
+            if ListadoCorreos == '':
+                ListadoCorreos = user.email 
+            else:
+                ListadoCorreos = user.email + ", " + ListadoCorreos 
+
+    was_sent = mail.send(to=ListadoCorreos,
+      subject=T(subject),
+      message=messageC)
+    #MAILER LOG
+    db.mailer_log.insert(sent_message = messageC,
+                     destination = str(ListadoCorreos),
+                     result_log = str(mail.error or '') + ':' + \
+                     str(mail.result),
+                     success = was_sent, emisor=str(check.assigned_user.username))
+    ##Notification LOG
+    db.notification_log4.insert(destination = ListadoCorreos,
+                     result_log = str(mail.error or '') + ':' + \
+                     str(mail.result),
+                     success = was_sent,
+                     register=row.id)
+    if was_sent==False:
+        control=control+1
+    session.attachment_list = []
+    session.attachment_list_temp = []
+    session.attachment_list_temp2 = []
+    session.notification_message = ''
+    session.notification_subject = ''
     return control
 
 
@@ -629,7 +761,8 @@ def mail_notifications():
 
     def get_projects(grupo):
         import cpfecys
-        if grupo == 1:
+        
+        if grupo == 1:       
             #Obtener la asignacion del estudiante
             assignation = request.vars['assignation']
             #Obtener al tutor
@@ -676,12 +809,118 @@ def mail_notifications():
             #Obtener los estudiantes del tutor y asignados al proyecto
             students = db((db.academic_course_assignation.semester == period) & (db.academic_course_assignation.assignation==check.project) & (db.academic_course_assignation.laboratorio=='False')).select()
             return students
+
+    #db.library.period.default = check.project
+    db.library.period.writable = False
+    db.library.period.readable = False
+
+    #db.library.project.default = check.project
+    db.library.project.writable = False
+    db.library.project.readable = False
+
+    #db.library.owner_file.default = check.project
+    db.library.owner_file.writable = False
+    db.library.owner_file.readable = False
+
+    if session.notification_subject == None:
+        session.notification_subject = ''
+    if session.notification_message == None:
+        session.notification_message = ''    
+
+    upload_form = FORM(INPUT(_name='file_name',_type='text'),
+                        INPUT(_name='file_upload',_type='file',requires=[IS_UPLOAD_FILENAME(extension = '(pdf|zip)',error_message='Solo se aceptan archivos con extension zip|pdf'),IS_LENGTH(2097152,error_message='El tamaño máximo del archivo es 2MB')]),
+                        INPUT(_name='file_description',_type='text'),
+                        INPUT(_name='file_visible',_type='checkbox'))
+
+    if upload_form.accepts(request.vars,formname='upload_form'):
+        try:
+
+            if ( upload_form.vars.file_name is "" ) or ( upload_form.vars.file_upload is "") or ( upload_form.vars.file_description is ""):
+                response.flash = T('You must enter all fields.')
+            else:
+                exists = db.library((db.library.name == upload_form.vars.file_name) & (db.library.project == check.project.id) & (db.library.owner_file==auth.user.id) )
+                if exists is None:                    
+                    file_var = db.library.file_data.store(upload_form.vars.file_upload.file, upload_form.vars.file_upload.filename)
+                    
+                    var_visible = 'False'
+                    if upload_form.vars.file_visible:
+                        var_visible = 'True'
+
+                    id = db.library.insert(file_data=file_var,
+                                            name=upload_form.vars.file_name,
+                                            description=upload_form.vars.file_description,
+                                            visible=var_visible,
+                                            period=cpfecys.current_year_period(),
+                                            project=check.project.id,
+                                            owner_file=auth.user.id)
+
+                    session.attachment_list.append( db(db.library.id==id).select() )
+                    response.flash = T('File loaded successfully.')
+                else:
+                    response.flash = T('File already exists.')
+        except:
+            response.flash = T('Error loading file.')
+
+    attach_form = FORM()
+
+    if attach_form.accepts(request.vars,formname='attach_form'):
+        if session.attachment_list_temp != None:
+            for var in session.attachment_list_temp:
+                session.attachment_list.append(var)
+                session.attachment_list_temp = []
+        else:
+            session.attachment_list_temp = []        
+    
+    remove_form = FORM()
+
+    if remove_form.accepts(request.vars,formname='remove_form'):
+        list_tempo = []
+        if session.attachment_list_temp2 != None and len(session.attachment_list_temp2) > 0:
+            for var_list in session.attachment_list:                
+                for tempo1 in var_list:                    
+                    cambiar = 'false'
+                    for var_list_2 in session.attachment_list_temp2:
+                        for tempo2 in var_list_2:
+                            
+                            if (tempo1.id == tempo2.id):
+                                cambiar = 'true'
+
+                if(cambiar == 'false'):
+                    list_tempo.append(var_list)
+
+            session.attachment_list = list_tempo
+            session.attachment_list_temp2 = []
+        else:
+            session.attachment_list_temp2 = []
+
+    session.project_id = check.project.id
+
     return dict(get_projects=get_projects,
         markmin_settings = cpfecys.get_markmin,
         name = check.project.name,
         semester = year_semester.name,
         year = year.yearp,
-        assignation=assignation)
+        assignation=assignation,
+        attachment_list=session.attachment_list
+        )
+
+def files_check():
+    return dict(var='');
+
+def notification_functions():
+    return dict(var='');
+
+def attachment_files():
+    return dict(attachment_list=session.attachment_list)
+
+
+
+def search_files(): 
+    if request.vars['search_input'] is None:
+        all_list = db((db.library.owner_file==auth.user.id) or ((db.library.project == session.project_id) & (db.library.visible==True)) ).select()
+    else:
+        all_list = db( ((db.library.owner_file==auth.user.id) or ((db.library.project == session.project_id) & (db.library.visible==True) & (db.library.owner_file!=auth.user.id)) ) & (db.library.name.like('%'+request.vars['search_input']+'%'))).select()
+    return dict(all_list=all_list)
 
 
 #Mostrar los cursos a los cuales esta asignado el tutor academico para enviar mensajes
@@ -690,6 +929,11 @@ def mail_notifications():
 def courses_mail_notifications():
     #show all assignations of current user
     import cpfecys
+    session.attachment_list = []
+    session.attachment_list_temp = []
+    session.attachment_list_temp2 = []
+    session.notification_subject = ''
+    session.notification_message = ''
     def split_name(project):
         try:
             (nameP, projectSection) = str(project).split('(')

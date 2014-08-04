@@ -88,15 +88,17 @@ if auth.has_membership(role="Student"):
     (T('Insert Events'), False, URL('default', 'event_edition'), []),
     ]))
 if auth.has_membership(role="Student") or auth.has_membership(role="Teacher"):
-    user_menu.append((T('Asignacion de Estudiantes'), False, URL(), [
-    (T('Agregar Estudiantes'), False, URL('student_academic','academic'), []),
-    (T('Asignar Estudiantes'), False, URL('student_academic', 'student_courses'), []),
+    user_menu.append((T('Academic'), False, URL(), [
+    (T('Academic per Course'), False, URL('student_academic', 'student_courses'), []),
+    (T('General List of Academic'), False, URL('student_academic','academic'), []),    
     ]))
 if auth.has_membership(role="Student"):
     user_menu.append((T('Notices'), False, URL(), [
     (T('Send Notice'), False, URL('notification','courses_mail_notifications'), []),
     (T('Register Notices'), False, URL('notification', 'register_mail_notifications'), []),
     ]))
+if auth.has_membership(role="Student") or auth.has_membership(role="Teacher"):
+    user_menu.append((T('Library'), False, URL('library','file_managers',vars=dict(tipo=0, pro=0)), []),)
 if auth.has_membership(role="Teacher"):
     user_menu.append((T('Notices'), False, URL(), [
     (T('Send Notice'), False, URL('notification','teacher_courses_mail_notifications'), []),

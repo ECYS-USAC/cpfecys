@@ -739,7 +739,7 @@ def active_teachers():
             session.flash = T("No existing user")
             redirect(URL('admin','active_teachers'))
         recovery = cpfecys.get_domain() + \
-            'default/user/retrieve_username?_next=/cpfecys/default/index'
+            'default/user/request_reset_password?_next=/cpfecys/default/index'
         message = "Bienvenido a CPFECYS, su usuario es " + user.username + \
         ' para generar su contraseña puede visitar el siguiente enlace e ' +\
         'ingresar su usuario ' + recovery
@@ -750,7 +750,7 @@ def active_teachers():
         users = get_assignations(False, period, 'Teacher'
                 ).select(db.auth_user.ALL, distinct=True)
         recovery = cpfecys.get_domain() + \
-            'default/user/retrieve_username?_next=/cpfecys/default/index'
+            'default/user/request_reset_password?_next=/cpfecys/default/index'
         for user in users:
             message = "Bienvenido a CPFECYS, su usuario es " + user.username + \
             ' para generar su contraseña puede visitar el siguiente enlace e ' +\
@@ -949,13 +949,21 @@ def send_mail_to_users(users, message, roles, projects, subject, log=False):
             roles=roles_text[1:],
             projects=projects_text[1:],
             sent=cdate)
+<<<<<<< HEAD
         import cpfecys
         message = '<html>' + message + \
             (cpfecys.get_custom_parameters().email_signature or '') + '</html>'
     emails = []
+=======
+
+    import cpfecys
+    message = '<html>' + message + (cpfecys.get_custom_parameters().email_signature or '') + '</html>'
+
+>>>>>>> origin/Development
     for user in users:
         #print user.email
         if user.email != None and user.email != '':
+<<<<<<< HEAD
             emails.append(user.email)
     was_sent = mail.send(to='dtt.ecys@gmail.com',
                          bcc=emails,
@@ -967,6 +975,17 @@ def send_mail_to_users(users, message, roles, projects, subject, log=False):
                          result_log = str(mail.error or '') + ':' + \
                          str(mail.result),
                          success = was_sent)
+=======
+            was_sent = mail.send(to=user.email,
+              subject=T(subject),
+              message=message)
+            #MAILER LOG
+            db.mailer_log.insert(sent_message = message,
+                             destination = str(user.email),
+                             result_log = str(mail.error or '') + ':' + \
+                             str(mail.result),
+                             success = was_sent)
+>>>>>>> origin/Development
 
 @auth.requires_login()
 @auth.requires_membership('Super-Administrator')

@@ -1,0 +1,70 @@
+<table >
+<tr>
+	<th>
+
+	</td><th>
+		{{=T('Name')}}
+	</th><th>
+		{{=T('Description')}}
+	</th><th>
+		{{=T('Owner')}}
+	</th><th>
+		{{=T('Period')}}
+	</th><th>
+		{{=T('Project')}}
+	</th>
+</tr>
+{{for all_var in all_list:}}
+	{{check_state = '' }}
+	{{for var_at in session.attachment_list_temp: }}
+		{{if var_at.id == all_var.id:}}
+			{{check_state = 'checked' }}
+		{{pass}}
+	{{pass}}
+	{{user_var=''}}
+	{{semester=''}}
+	{{year=''}}
+	{{project=''}}
+	{{query=db(db.auth_user.id == all_var.owner_file).select()}}
+	{{for query_var in query:}}
+		{{user_var=query_var.username }}
+	{{pass}}
+	{{query=db(db.period_year.id == all_var.period).select()}}
+	{{for query_var in query:}}
+		{{year_semester = db.period(id=query_var.period)}}
+		{{semester = year_semester.name}}
+		{{year = str(query_var.yearp)}}
+	{{pass}}
+	{{query=db(db.project.id == all_var.project).select()}}
+	{{for query_var in query:}}		
+		{{project = query_var.name}}
+	{{pass}}
+	<tr>
+		<td style="white-space:nowrap;">
+			&nbsp &nbsp <input type="checkbox" value="{{= all_var.id }}" name="check_files" onClick="run(this);" {{check_state}}>
+		</td><td style="white-space:nowrap;">
+			<span class="icon-file"></span><a style="white-space:nowrap;" href="{{=URL('default/download', all_var.file_data)}}" target="blank">    {{= all_var.name }} </a> 
+		</td><td style="white-space:nowrap;"> 
+			- {{= all_var.description }}
+		</td><td style="white-space:nowrap;"> 
+			- {{= user_var }}
+		</td><td style="white-space:nowrap;"> 
+			- {{= T(semester)}}, {{=year}}
+		</td><td style="white-space:nowrap;">  
+			- {{=project}}
+		</td></tr>
+{{pass}}
+</table>
+<div  id="div1" value="div1">		    			        	
+</div>
+
+<script>
+function run(object) {
+	if(object.checked == true){		
+		$("#div1").load('{{=URL('notification','files_check.load')}}',{add_file_id: object.value });
+	}else{		
+		$("#div1").load('{{=URL('notification','files_check.load')}}',{delete_file_id: object.value});
+	}
+	
+}
+</script>

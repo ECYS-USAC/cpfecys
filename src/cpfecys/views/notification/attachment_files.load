@@ -1,0 +1,29 @@
+<table>
+{{if attachment_list != None:}}
+	{{for attachment_list_var in attachment_list:}}
+		{{for attachment_var in attachment_list_var:}}
+			<tr>
+				<td>
+					&nbsp &nbsp <input type="checkbox" value="{{= attachment_var.id }}" name="checklist" onClick="run2(this);"><span class="icon-file"></span><a href="{{=URL('default/download', attachment_var.file_data)}}" target="blank">  {{= attachment_var.name }} </a> 
+				</td>
+			</tr>
+		{{pass}}
+	{{pass}}
+{{pass}}
+</table>
+{{if request.vars['files_num'] == '0':}}
+		<label>&nbsp &nbsp{{=T('Is not attached any file')}}</label>
+{{pass}}
+
+<div  id="div2" value="div2">		    			        	
+</div>
+
+<script>
+function run2(object) {
+	if(object.checked == true){
+		$("#div2").load('{{=URL('notification','files_check.load')}}',{add_attachment_id: object.value});
+	}else{
+		$("#div2").load('{{=URL('notification','files_check.load')}}',{delete_attachment_id: object.value});
+	}
+}
+</script>
