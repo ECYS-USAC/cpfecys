@@ -126,7 +126,7 @@ def teacher_send_mail_to_students(users1, users2, message, subject, check, semes
     if session.attachment_list != []:
         for attachment_list_var in session.attachment_list:
             for attachment_var in attachment_list_var:
-                attachment_m = attachment_m + '<a href="'+ URL('default/download', attachment_var.file_data) +'" target="blank"> '+ attachment_var.name + '</a> <br>'
+                attachment_m = attachment_m + '<a href="' + cpfecys.get_domain() + URL('default/download', attachment_var.file_data) +'" target="blank"> '+ attachment_var.name + '</a> <br>'
     else:        
         attachment_m = ''
 
@@ -612,7 +612,7 @@ def send_mail_to_students(users, message, subject, check, semester, year):
     if session.attachment_list != []:
         for attachment_list_var in session.attachment_list:
             for attachment_var in attachment_list_var:
-                attachment_m = attachment_m + '<a href="'+ URL('default/download', attachment_var.file_data) +'" target="blank"> '+ attachment_var.name + '</a> <br>'
+                attachment_m = attachment_m + '<a href="'+ cpfecys.get_domain() + URL('default/download', attachment_var.file_data) +'" target="blank"> '+ attachment_var.name + '</a> <br>'
     else:        
         attachment_m = ''
         
