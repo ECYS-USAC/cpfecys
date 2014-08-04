@@ -88,9 +88,9 @@ if auth.has_membership(role="Student"):
     (T('Insert Events'), False, URL('default', 'event_edition'), []),
     ]))
 if auth.has_membership(role="Student") or auth.has_membership(role="Teacher"):
-    user_menu.append((T('Asignacion de Estudiantes'), False, URL(), [
-    (T('Agregar Estudiantes'), False, URL('student_academic','academic'), []),
-    (T('Asignar Estudiantes'), False, URL('student_academic', 'student_courses'), []),
+    user_menu.append((T('Academic'), False, URL(), [
+    (T('Academic per Course'), False, URL('student_academic', 'student_courses'), []),
+    (T('General List of Academic'), False, URL('student_academic','academic'), []),    
     ]))
 if auth.has_membership(role="Student"):
     user_menu.append((T('Notices'), False, URL(), [

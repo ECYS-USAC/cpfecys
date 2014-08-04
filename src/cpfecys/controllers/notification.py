@@ -919,7 +919,7 @@ def search_files():
     if request.vars['search_input'] is None:
         all_list = db((db.library.owner_file==auth.user.id) or ((db.library.project == session.project_id) & (db.library.visible==True)) ).select()
     else:
-        all_list = db( ((db.library.owner_file==auth.user.id) or ((db.library.project == session.project_id) & (db.library.visible==True)) ) & (db.library.name.like('%'+request.vars['search_input']+'%'))).select()
+        all_list = db( ((db.library.owner_file==auth.user.id) or ((db.library.project == session.project_id) & (db.library.visible==True) & (db.library.owner_file!=auth.user.id)) ) & (db.library.name.like('%'+request.vars['search_input']+'%'))).select()
     return dict(all_list=all_list)
 
 
