@@ -635,11 +635,8 @@
 'Home': 'Inicio',
 'Home Address': 'Dirección de casa',
 'Home address': 'Dirección Domiciliar',
-<<<<<<< HEAD
 'Horario Clase': 'Horario Clase',
-=======
 'Horario de atención': 'Horario de atención',
->>>>>>> origin/Development
 'Horario de Curso': 'Horario de Curso',
 'Horario de DSI': 'Horario de DSI',
 'Horario de Laboratorio': 'Horario de Laboratorio',
@@ -1055,14 +1052,11 @@
 'Pruba': 'Pruba',
 'prueba': 'prueba',
 'Prueba': 'Prueba',
-<<<<<<< HEAD
 'Prueba de mensajes': 'Prueba de mensajes',
-=======
 'Prueba Agosto 02/08/2014': 'Prueba Agosto 02/08/2014',
 'Prueba de correo': 'Prueba de correo',
 'Prueba de envio': 'Prueba de envio',
 'Prueba de Envio2_Arreglado 02/08/2014': 'Prueba de Envio2_Arreglado 02/08/2014',
->>>>>>> origin/Development
 'Prueba del mensaje': 'Prueba del mensaje',
 'Prueba1': 'Prueba1',
 'prueba2': 'prueba2',
