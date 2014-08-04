@@ -962,7 +962,7 @@ def send_mail_to_users(users, message, roles, projects, subject, log=False):
 
     if userList != '':
         was_sent = mail.send(to='dtt.ecys@gmail.com',
-          subject=T(subject),
+          subject=subject,
           message=message,
           bcc=userList)
         #MAILER LOG
