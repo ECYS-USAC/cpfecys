@@ -169,18 +169,27 @@ def teacher_send_mail_to_students(users1, users2, message, subject, check, semes
                     ListadoCorreos2 = user.email + ", " + ListadoCorreos2     
 
 
-    if ListadoCorreos != '':
-        was_sent = mail.send(to=ListadoCorreos,
+    if ListadoCorreos != '' or ListadoCorreos2 != '':        
+        fullListEmail = ''
+        if ListadoCorreos == '':
+            fullListEmail = ListadoCorreos2
+        else:
+            if ListadoCorreos2 == '':
+                fullListEmail = ListadoCorreos
+            else:
+                fullListEmail = ListadoCorreos+', '+ListadoCorreos2
+             
+        was_sent = mail.send(to=fullListEmail,
           subject=T(subject),
           message=messageC)
-        #MAILER LOG
+
         db.mailer_log.insert(sent_message = messageC,
-                         destination = str(ListadoCorreos),
+                         destination = str(fullListEmail),
                          result_log = str(mail.error or '') + ':' + \
                          str(mail.result),
                          success = was_sent, emisor=str(check.assigned_user.username))
         ##Notification LOG
-        db.notification_log4.insert(destination = ListadoCorreos,
+        db.notification_log4.insert(destination = fullListEmail,
                          result_log = str(mail.error or '') + ':' + \
                          str(mail.result),
                          success = was_sent,
@@ -188,24 +197,7 @@ def teacher_send_mail_to_students(users1, users2, message, subject, check, semes
         if was_sent==False:
             control=control+1
                 
-    if ListadoCorreos2 != '':
-        was_sent = mail.send(to=ListadoCorreos2,
-          subject=T(subject),
-          message=messageC)
-        #MAILER LOG
-        db.mailer_log.insert(sent_message = messageC,
-                         destination = str(ListadoCorreos2),
-                         result_log = str(mail.error or '') + ':' + \
-                         str(mail.result),
-                         success = was_sent, emisor=str(check.assigned_user.username))
-        ##Notification LOG
-        db.notification_log4.insert(destination = ListadoCorreos2,
-                         result_log = str(mail.error or '') + ':' + \
-                         str(mail.result),
-                         success = was_sent,
-                         register=row.id)
-        if was_sent==False:
-            control=control+1
+    
 
     session.attachment_list = []
     session.attachment_list_temp = []
