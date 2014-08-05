@@ -136,9 +136,10 @@ auth.define_tables(username=True, signature=False, migrate=True)
 
 ## configure email
 mail = auth.settings.mailer
-mail.settings.server = 'smtp.gmail.com:587'
-mail.settings.sender = 'dtt.ecys@gmail.com'
-mail.settings.login = 'dtt.ecys@gmail.com:supercontrase;a2'
+mail.settings.server = 'dtt-ecys.org:25'
+mail.settings.sender = 'dtt.ecys@dtt-ecys.org'
+mail.settings.tls = False
+mail.settings.login = None
 
 ## configure auth policy
 auth.settings.registration_requires_verification = False
