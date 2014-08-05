@@ -961,7 +961,7 @@ def send_mail_to_users(users, message, roles, projects, subject, log=False):
             userList.append(user.email)
 
     if userList != '':
-        was_sent = mail.send(to='dtt.ecys@gmail.com',
+        was_sent = mail.send(to='dtt.ecys@dtt-ecys.org',
           subject=subject,
           message=message,
           bcc=userList)
