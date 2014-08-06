@@ -110,8 +110,66 @@ data-toggle="tab">
           {{=grid}}
       </div>
   </div>
+  <div id="attachModal" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true" > 
+    <div id ="a" class="modal-header">
+      <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+        <h3 id="myModalLabel">
+            <span class="icon-upload"></span>
+            {{=T('Edit general information')}}
+        </h3>
+    </div>
+    <div id="actions">
+      <form action="" enctype="multipart/form-data" method="post" >
+        <div align="center">
+          <table >
+            <tr>
+              <td align="left">
+              <input name="_formname" type="hidden" value="upload_form">
+              <label>{{=T('File name')}}</label>
+              <input class="string" name="file_name" type="text" value="">
+              <label>{{=T('Select file')}}</label>
+              <input class="upload" name="file_upload" type="file" id="upload_button">
+              <div id="uploadError" style="display: none;" class="alert-error">
+                {{=T('File size must be 2MB or below with pdf or zip extension')}}
+              </div>
+              <label>{{=T('Description')}}</label>
+              <input class="string" name="file_description" type="text" value="">
+              <label>{{=T('Visible')}}&nbsp &nbsp<input type="checkbox" name="file_visible"></label>
+            </td>
+          </tr>
+          <tr >
+            <td >
+              <div align="right"> 
+                <input type="submit" class="btn btn-primary" value="{{=T('Edit')}}">
+              </div>
+            <td>
+            <td >
+            <div align="right"> 
+              <input type="submit" class="btn btn-error" value="{{=T('Delete')}}">
+            </div>
+            <td>
+            <td >
+            <div align="right"> 
+              <input type="submit" class="btn" value="{{=T('Close')}}">
+            </div>
+            <td>
+          </tr>
+        </table>
+      </div>
+    </form>
+    </div>
+  </div>
 </div>
 </hr>
 {{if request.is_local:}}
 {{=response.toolbar()}}
+
+<script type="text/javascript">
+  $(document).ready(function(){   
+
+  })
+  function hacer(p){
+      alert(p);
+  }
+</script>
 {{pass}}

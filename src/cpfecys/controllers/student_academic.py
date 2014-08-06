@@ -67,8 +67,9 @@ def academic_assignation():
     db.academic_course_assignation.semester.writable = False
     db.academic_course_assignation.semester.readable = False
 
+    links = [lambda row: A('Editar Información General', _role='button', _class='btn btn-info', _onclick='hacer('+str(row.carnet)+')',**{"_data-toggle":"modal", "_data-target": "#attachModal"})]
     if (currentyear_period.id == cpfecys.current_year_period().id):
-        grid = SQLFORM.grid(query, fields=fields, oncreate=oncreate_academic_assignation, onupdate=onupdate_academic_assignation, ondelete=ondelete_academic_assignation, exportclasses=dict(xml=False,
+        grid = SQLFORM.grid(query, fields=fields, links=links, oncreate=oncreate_academic_assignation, onupdate=onupdate_academic_assignation, ondelete=ondelete_academic_assignation, exportclasses=dict(xml=False,
             html=False,csv_with_hidden_cols=False,json=False,tsv_with_hidden_cols=False,tsv=False))
     else:
         checkProject = db((db.user_project.project == check.project) & (db.user_project.assigned_user==check.assigned_user) & (db.user_project.period==currentyear_period.id)).select()
@@ -76,7 +77,7 @@ def academic_assignation():
         for a in checkProject:
             b=b+1
         if b!=0:
-            grid = SQLFORM.grid(query, fields=fields, deletable=False, editable=False, create=False,csv=False)
+            grid = SQLFORM.grid(query, fields=fields, links=links, deletable=False, editable=False, create=False,csv=False)
         else:
             session.flash  =T('Not authorized')
             redirect(URL('default','index'))
