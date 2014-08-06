@@ -49,7 +49,7 @@ def academic_assignation():
             #consultar a la base de datos para obtener a los usuarios a los que enviaremos
         query = (db.academic_course_assignation.carnet.belongs(dest) & (db.academic_course_assignation.semester == currentyear_period.id) & (db.academic_course_assignation.assignation==check.project))
         
-
+    
     fields = (db.academic_course_assignation.carnet, db.academic_course_assignation.laboratorio)
 
     #db.academic.id.readable = False
@@ -57,7 +57,8 @@ def academic_assignation():
     #db.academic.carnet.readable = False    
     #db.academic.carnet.writable = False
     #db.academic.email.writable = False
-    #db.academic.email.readable = False
+    #db.academic.email.readable = True
+    
 
 
     db.academic_course_assignation.assignation.default = check.project
@@ -67,7 +68,67 @@ def academic_assignation():
     db.academic_course_assignation.semester.writable = False
     db.academic_course_assignation.semester.readable = False
 
-    links = [lambda row: A('Editar Información General', _role='button', _class='btn btn-info', _onclick='hacer('+str(row.carnet)+')',**{"_data-toggle":"modal", "_data-target": "#attachModal"})]
+    #update form start
+    update_form = FORM(INPUT(_name='academic_carnet',_type='text'),
+                        INPUT(_name='academic_carnet2',_type='text'),
+                        INPUT(_name='academic_email',_type='text'),
+                        INPUT(_name='academic_email2',_type='text'),
+                        INPUT(_name='academic_id',_type='text'),
+                        INPUT(_name='delete_check',_type='checkbox'))
+
+    if update_form.accepts(request.vars,formname='update_form'):
+        try:
+            #Search for user roles
+            result = db(db.auth_membership.user_id==auth.user.id).select()
+            roll_var = ''
+            i = 0;
+            for a in result:
+                if i == 0:
+                    roll_var = a.group_id.role
+                    i = i+1
+                else:
+                   roll_var = roll_var + ',' + a.group_id.role
+
+            if update_form.vars.delete_check:
+                db(db.academic.id==update_form.vars.academic_id).delete()
+                db.academic_log.insert(user_name = auth.user.username, 
+                                roll =  str(roll_var), 
+                                operation_log = 'delete', 
+                                before_carnet = update_form.vars.academic_carnet, 
+                                before_email = update_form.vars.academic_email, 
+                                id_period = str(currentyear_period.id),
+                                description = 'Se elimino el registro desde la pagina estudiantes.')
+                response.flash = T('Deleted register.')
+            else:
+                if ( update_form.vars.academic_carnet is "" ) or ( update_form.vars.academic_email is ""):
+                    response.flash = T('You must enter all fields.')
+                else: #hola
+                    db(db.academic.id==update_form.vars.academic_id).update(carnet=update_form.vars.academic_carnet,email=update_form.vars.academic_email)
+                    db.academic_log.insert(user_name = auth.user.username, 
+                                                roll =  roll_var, 
+                                                operation_log = 'update', 
+                                                before_carnet = update_form.vars.academic_carnet2, 
+                                                before_email = update_form.vars.academic_email2, 
+                                                after_carnet = update_form.vars.academic_carnet, 
+                                                after_email = update_form.vars.academic_email, 
+                                                id_academic = update_form.vars.academic_id, 
+                                                id_period = str(currentyear_period.id),
+                                                description = 'Se modifico registro desde la pagina estudiantes.')    
+        
+                    response.flash = T('Updated register.')
+        except:
+            response.flash = T('Error.')
+    #update form finish
+
+    
+    links = [lambda row: A(T('Edit academic information'), 
+        _role='button', 
+        _class='btn btn-info', 
+        _onclick='set_values('+str(row.carnet)+','\
+            +str( db(db.academic.id==int(row.carnet)).select(db.academic.carnet).first().carnet )+','\
+            +'"'+str( db(db.academic.id==int(row.carnet)).select(db.academic.email).first().email )+'")', 
+        _title=T('Edit academic information'),**{"_data-toggle":"modal", "_data-target": "#attachModal"})]
+    
     if (currentyear_period.id == cpfecys.current_year_period().id):
         grid = SQLFORM.grid(query, fields=fields, links=links, oncreate=oncreate_academic_assignation, onupdate=onupdate_academic_assignation, ondelete=ondelete_academic_assignation, exportclasses=dict(xml=False,
             html=False,csv_with_hidden_cols=False,json=False,tsv_with_hidden_cols=False,tsv=False))
@@ -94,6 +155,8 @@ def academic_assignation():
     periods_after = db(db.period_year).select(limitby=(currentyear_period.id, \
      end_index))
     other_periods = db(db.period_year).select()
+
+    
     return dict(grid = grid,
                 currentyear_period = currentyear_period,
                 current_period_name = current_period_name,
@@ -568,7 +631,7 @@ def onupdate_academic(form):
     import cpfecys  
     currentyear_period = cpfecys.current_year_period()
     cdate = datetime.datetime.now()
-    #session.flash = T('hola-'+str(form.vars))
+    
     #Search for user roles
     result = db(db.auth_membership.user_id==auth.user.id).select()
     roll_var = ''
