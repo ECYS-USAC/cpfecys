@@ -525,9 +525,11 @@ def academic():
 
     db.academic.id.writable = False
     db.academic.id.readable = False
+    #db.academic.email.writable = False
+    db.academic.email.readable = False
 
     grid = SQLFORM.grid(
-        query, oncreate=oncreate_academic, onupdate=onupdate_academic, ondelete=ondelete_academic,  maxtextlength=100,csv=False)
+        query, oncreate=oncreate_academic, onupdate=onupdate_academic, ondelete=ondelete_academic,  maxtextlength=100,csv=False,editable=False,deletable=False,details=False)
     return dict(grid=grid)
 
 def oncreate_academic(form):
