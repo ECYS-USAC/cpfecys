@@ -92,6 +92,10 @@ if auth.has_membership(role="Student") or auth.has_membership(role="Teacher"):
     (T('Academic per Course'), False, URL('student_academic', 'student_courses'), []),
     (T('General List of Academic'), False, URL('student_academic','academic'), []),    
     ]))
+if auth.has_membership(role="Super-Administrator"):
+    user_menu.append((T('Academic'), False, URL(), [
+    (T('General List of Academic'), False, URL('student_academic','academic'), []),    
+    ]))
 if auth.has_membership(role="Student"):
     user_menu.append((T('Notices'), False, URL(), [
     (T('Send Notice'), False, URL('notification','courses_mail_notifications'), []),

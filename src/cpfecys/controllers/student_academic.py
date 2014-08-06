@@ -516,7 +516,7 @@ def student_courses():
 
 #Mostrar el listado de estudiantes que han sido registrados en el sistema
 @auth.requires_login()
-@auth.requires(auth.has_membership('Student') or auth.has_membership('Teacher'))
+@auth.requires(auth.has_membership('Student') or auth.has_membership('Teacher') or auth.has_membership('Super-Administrator'))
 def academic():       
     if request.vars['search_var'] is None:
         query = db.academic
@@ -528,7 +528,11 @@ def academic():
     #db.academic.email.writable = False
     db.academic.email.readable = False
 
-    grid = SQLFORM.grid(
+    if auth.has_membership('Super-Administrator'):
+        grid = SQLFORM.grid(
+        query, oncreate=oncreate_academic, onupdate=onupdate_academic, ondelete=ondelete_academic,  maxtextlength=100,csv=False)
+    else:
+        grid = SQLFORM.grid(
         query, oncreate=oncreate_academic, onupdate=onupdate_academic, ondelete=ondelete_academic,  maxtextlength=100,csv=False,editable=False,deletable=False,details=False)
     return dict(grid=grid)
 
