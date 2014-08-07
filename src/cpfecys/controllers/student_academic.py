@@ -120,17 +120,25 @@ def academic_assignation():
             response.flash = T('Error.')
     #update form finish
 
-    
-    links = [lambda row: A(T('Edit academic information'), 
+    links = [lambda row: A(str( db(db.academic.id==int(row.carnet)).select(db.academic.email).first().email ),
+        _role='label',
+        _title=str( db(db.academic.id==int(row.carnet)).select(db.academic.email).first().email ),
+        _style='width: 250px; ')]
+    links += [lambda row: A(T('Edit academic'), 
         _role='button', 
         _class='btn btn-info', 
         _onclick='set_values('+str(row.carnet)+','\
             +str( db(db.academic.id==int(row.carnet)).select(db.academic.carnet).first().carnet )+','\
             +'"'+str( db(db.academic.id==int(row.carnet)).select(db.academic.email).first().email )+'")', 
-        _title=T('Edit academic information'),**{"_data-toggle":"modal", "_data-target": "#attachModal"})]
+        _title=T('Edit academic information')+' '+str( db(db.academic.id==int(row.carnet)).select(db.academic.carnet).first().carnet ) ,**{"_data-toggle":"modal", "_data-target": "#attachModal"})]
+    links += [lambda row: A('   ',
+        _role='label')]
+    links += [lambda row: A(T('Assignation:'),
+        _role='label',
+        _title=T('Edit or delete academic assignation')+' '+str( db(db.academic.id==int(row.carnet)).select(db.academic.carnet).first().carnet ) )]
     
     if (currentyear_period.id == cpfecys.current_year_period().id):
-        grid = SQLFORM.grid(query, fields=fields, links=links, oncreate=oncreate_academic_assignation, onupdate=onupdate_academic_assignation, ondelete=ondelete_academic_assignation, exportclasses=dict(xml=False,
+        grid = SQLFORM.grid(query, details=False, fields=fields, links=links, oncreate=oncreate_academic_assignation, onupdate=onupdate_academic_assignation, ondelete=ondelete_academic_assignation, exportclasses=dict(xml=False,
             html=False,csv_with_hidden_cols=False,json=False,tsv_with_hidden_cols=False,tsv=False))
     else:
         checkProject = db((db.user_project.project == check.project) & (db.user_project.assigned_user==check.assigned_user) & (db.user_project.period==currentyear_period.id)).select()
@@ -138,7 +146,7 @@ def academic_assignation():
         for a in checkProject:
             b=b+1
         if b!=0:
-            grid = SQLFORM.grid(query, fields=fields, links=links, deletable=False, editable=False, create=False,csv=False)
+            grid = SQLFORM.grid(query, details=False , fields=fields, links=links, deletable=False, editable=False, create=False,csv=False)
         else:
             session.flash  =T('Not authorized')
             redirect(URL('default','index'))
