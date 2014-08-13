@@ -17,9 +17,17 @@
         </thead>
         <tbody>
             <td>
-                    <div>
+                <div>
+                    <script>
+                        $(document).ready(function(){
+                            $("#w2p_keywords").prop("type", "hidden");
+                            var input1Str = '<input type="text" id="search_var" name="search_var">';
+                            $(input1Str).insertAfter("#w2p_keywords");
+                        }); 
+                    </script>
+
                         {{=grid}}
-                    </div>
+                </div>
             </td>
         </tbody>
         </table>

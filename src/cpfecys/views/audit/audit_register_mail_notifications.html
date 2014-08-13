@@ -30,10 +30,10 @@
             {{for notice in obtain_notices(user):}}
             <tr>
                 <td>
-                    {{=notice.subject[0:15]}}...
+                    {{=notice.subject}}
                 </td>
                 <td>
-                    {{=notice.sent_message[0:60]}}...
+                    {{=notice.sent_message}}
                 </td>
                 <td>
                     {{=notice.time_date}}
