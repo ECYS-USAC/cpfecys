@@ -1,4 +1,5 @@
 {{extend 'template.html'}}
+
 <div>
     <div class="well span12">
         <a onclick="window.history.back()" class="btn" ><i class="icon-arrow-left"></i>{{=T('Back')}}</a>
@@ -19,6 +20,7 @@
             <tr>
                 <td>
         <div id="div_list_courses" class="well span12" style="overflow-x:auto; overflow-y:auto; height:300px; width:200px;  background-color:white;  white-space:nowrap;">
+
             {{for period in obtainPeriods():}}
                 <a id="p-{{=period.id}}"><span class="icon-folder-open"></span>{{=T(period.period.name)}} {{=period.yearp}}</a>
                 <br>
@@ -44,8 +46,10 @@
                 </div>
             {{pass}}
         </div>
+
     </td>
     <td>
+
         <div id="showGrid" style="overflow-x:auto;">
             {{if existeRegistro()==True:}}
                 
@@ -59,6 +63,8 @@
 </table>
     </div>
 </div>
+<div style="height:500px;">
+    </div>
 <script type="text/javascript">
     $(document).ready(function(){
         {{for period in obtainPeriods():}}
