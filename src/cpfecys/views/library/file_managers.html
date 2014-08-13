@@ -1,5 +1,5 @@
 {{extend 'template.html'}}
-            <div id="div_list_courses" class="well span12" style="overflow-x:auto; overflow-y:auto; height:500px; width:400px;  background-color:white;  white-space:nowrap; position:absolute; left:0;); z-index:0;">
+            <div id="div_list_courses" class="well span12" style="overflow-x:auto; overflow-y:auto; height:500px; width:20%;  background-color:white;  white-space:nowrap; position:absolute; left:0;">
             {{for period in obtainPeriods():}}
                 <a id="p-{{=period.id}}"><span class="icon-folder-open"></span>{{=T(period.period.name)}} {{=period.yearp}}</a>
                 <br>
@@ -26,7 +26,7 @@
             {{pass}}
         </div>
 <div id="file1">
-    <div class="well span12" id="file2" style="height:500px;">
+    <div class="well span12" id="file2" style="height:500px; width:60%; position:absolute; left:20%;">
         <a onclick="window.history.back()" class="btn" ><i class="icon-arrow-left"></i>{{=T('Back')}}</a>
         {{if existeRegistro()==True:}}
             <h1>{{=name}}
@@ -51,6 +51,8 @@
         </div>
     </div>
 </div>
+<div style="height:500px;">
+    </div>
 <script type="text/javascript">
     $(document).ready(function(){
         {{for period in obtainPeriods():}}
