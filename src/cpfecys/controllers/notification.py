@@ -110,6 +110,69 @@ def teacher_register_mail_notifications():
 
     return dict(obtain_PersonsA=obtain_PersonsA,obtain_Persons=obtain_Persons, obtain_nameProjects=obtain_nameProjects,periods=periods, projects=projects, obtain_notices=obtain_notices)
 
+#obtain all the registers of the send notices of the student
+def teacher_register_mail():
+    notices=None
+    tipoD=0
+    if request.vars['userN'] != None and request.vars['project']!=None:
+        usuario = db(db.auth_user.id==request.vars['userN']).select().first()
+        project = request.vars['project']
+        userproject = db(db.user_project.id==project).select().first()
+        notices  = db((db.notification_general_log4.emisor==usuario.username) & (db.notification_general_log4.course==userproject.project.name)&(db.notification_general_log4.period==userproject.period.period.name)&(db.notification_general_log4.yearp==userproject.period.yearp)).select()
+        tipoD=1
+    else:
+        if request.vars['project']!=None:
+            project = request.vars['project']
+            userproject = db(db.user_project.id==project).select().first()
+            notices  = db((db.notification_general_log4.emisor==auth.user.username) & (db.notification_general_log4.course==userproject.project.name)&(db.notification_general_log4.period==userproject.period.period.name)&(db.notification_general_log4.yearp==userproject.period.yearp)).select()
+            tipoD=2
+    return dict(notices=notices, tipoD=tipoD)
+
+def teacher_register_mail_detail():
+    if request.vars['notice'] != None:
+        listadoC = db(db.notification_log4.register==request.vars['notice']).select().first()
+        l=listadoC.destination[1:-1].replace("'","").split(",")
+        a=0
+        for i in l:
+            if a>0:
+                l[a]=i[1:]
+            a=a+1
+
+        noticia = db(db.notification_general_log4.id==request.vars['notice']).select().first()
+        a=0
+        tutores = db((db.auth_user.id==db.user_project.assigned_user)&(db.user_project.project==db.project.id)&(db.project.name==noticia.course)&(db.user_project.period==db.period_year.id)&(db.period_year.yearp==noticia.yearp)&(db.period_year.period==db.period.id)&(db.period.name==noticia.period)).select()
+        tempT = []
+        for t in tutores:
+            if t.auth_user.email in l:
+                tempT.append(t.auth_user.id)
+        tutores = db(db.auth_user.id.belongs(tempT)).select()
+        estudiantes = db(db.academic.email.belongs(l)).select()
+    return dict(tutores=tutores, estudiantes=estudiantes, noticia=noticia, log=listadoC)
+
+def teacher_search_destination():
+    if request.vars['notice'] != None:
+        listadoC = db(db.notification_log4.register==request.vars['notice']).select().first()
+        l=listadoC.destination[1:-1].replace("'","").split(",")
+        a=0
+        for i in l:
+            if a>0:
+                l[a]=i[1:]
+            a=a+1
+
+        noticia = db(db.notification_general_log4.id==request.vars['notice']).select().first()
+        tutores = db((db.auth_user.id==db.user_project.assigned_user)&(db.user_project.project==db.project.id)&(db.project.name==noticia.course)&(db.user_project.period==db.period_year.id)&(db.period_year.yearp==noticia.yearp)&(db.period_year.period==db.period.id)&(db.period.name==noticia.period)).select()
+        tempT = []
+        for t in tutores:
+            if t.auth_user.email in l:
+                tempT.append(t.auth_user.id)
+        if request.vars['search_input'] != None:
+            tutores = db((db.auth_user.id.belongs(tempT))&(db.auth_user.username.like('%'+request.vars['search_input']+'%'))).select()
+            estudiantes = db((db.academic.email.belongs(l))&(db.academic.carnet.like('%'+request.vars['search_input']+'%'))).select()
+        else:
+            tutores = db(db.auth_user.id.belongs(tempT)).select()
+            estudiantes = db(db.academic.email.belongs(l)).select()
+    return dict(tutores=tutores, estudiantes=estudiantes, noticia=noticia, log=listadoC)
+
 #*********************************************************
 #**********************ENVIAR AVISOS**********************
 #*********************************************************
@@ -513,7 +576,6 @@ def register_mail_notifications_detail():
 @auth.requires_login()
 @auth.requires_membership('Student')
 def register_mail_notifications():
-#db.user_project.assigned_user == auth.user.id
     #Obtain the current period of the system and all the register periods
     period = cpfecys.current_year_period()
     periods = db(db.period_year).select()
@@ -528,12 +590,7 @@ def register_mail_notifications():
 
     #obtain the projects where the student is register and is of the select semester
     projects = db((db.user_project.period==period) & (db.user_project.assigned_user == auth.user.id)).select()
-#    dest=[]
- #   for student in allProject:
-  #      dest.append(student.project)
-   # projects = db(db.project.id.belongs(dest)).select()
 
-    #obtain the names of the projects that thas register the user
     def obtain_nameProjects(userP):
         p = db(db.project.id==userP).select()
         nameP = ''
@@ -541,34 +598,150 @@ def register_mail_notifications():
             nameP=p2.name
         return nameP
 
-    def obtain_period(periodo):
-        semester = db(db.period.id==periodo).select()
-        nameS = ''
-        for s in semester:
-            nameS=s.name
-        return nameS
+    return dict(obtain_nameProjects=obtain_nameProjects,periods=periods, projects=projects)
 
-    #obtain all the registers of the send notices of the student
-    def obtain_notices(project):
-        #name project
-        n=obtain_nameProjects(project.project)
+#obtain all the registers of the send notices of the student
+def register_mail():
+    notices=None    
+    if request.vars['project'] != None:
+        project = request.vars['project']
+        userproject = db(db.user_project.id==project).select().first()
+        notices  = db((db.notification_general_log4.emisor==auth.user.username) & (db.notification_general_log4.course==userproject.project.name)&(db.notification_general_log4.period==userproject.period.period.name)&(db.notification_general_log4.yearp==userproject.period.yearp)).select()
+    return dict(notices=notices)
 
-        #name of the year
-        anio = db(db.period_year.id==project.period).select()
-        nameY = ''
-        idP = ''
-        for a in anio:
-            nameY=a.yearp
-            idP = a.period
 
-        #name of period
-        nameS=obtain_period(idP)
-        #obtain all the notices that has the user has register
-        notices  = db((db.notification_general_log4.emisor==auth.user.username) & (db.notification_general_log4.course==n)&(db.notification_general_log4.period==nameS)&(db.notification_general_log4.yearp==nameY)).select()
-        return notices
+def register_mail_detail():
+    all_n=None
+    if request.vars['notice'] != None:
+        count = db.notification_log4.id.count()
+        total = db(db.notification_log4.register==request.vars['notice']).select(count).first()
 
-    return dict(obtain_nameProjects=obtain_nameProjects,periods=periods, projects=projects, obtain_notices=obtain_notices)
+        if total[count]==1:
+            listadoC = db(db.notification_log4.register==request.vars['notice']).select().first()
+            d = listadoC.destination[0:1]
+            if d =="|":
+                d=listadoC.destination[1:-1]
+                d=d.replace("|",",")
+                listadoC.destination=str(d).split(",")
+                listadoC.destination = db(db.academic.email.belongs(listadoC.destination)).select()
+            else:
+                listado=[]
+                listado.append(listadoC.destination)
+                listadoC.destination = db(db.academic.carnet.belongs(listado)).select()
+        else:
+            if total[count]>1:
+                    listadoC = db(db.notification_log4.register==request.vars['notice']).select()
+                    listado=[]
+                    for l in listadoC:
+                        listado.append(l.destination)
+                    listadoC = db(db.notification_log4.register==request.vars['notice']).select().first()
+                    listadoC.destination = db(db.academic.carnet.belongs(listado)).select()
+    return dict(all_n=listadoC)
 
+def search_destination():
+    all_n=None
+    if request.vars['notice'] != None:
+        count = db.notification_log4.id.count()
+        total = db(db.notification_log4.register==request.vars['notice']).select(count).first()
+
+        if total[count]==1:
+            listadoC = db(db.notification_log4.register==request.vars['notice']).select().first()
+            d = listadoC.destination[0:1]
+            if d =="|":
+                d=listadoC.destination[1:-1]
+                d=d.replace("|",",")
+                listadoC.destination=str(d).split(",")
+                if request.vars['search_input'] != None:
+                    listadoC.destination = db(db.academic.email.belongs(listadoC.destination) & (db.academic.carnet.like('%'+request.vars['search_input']+'%'))).select()
+                else:
+                    listadoC.destination = db(db.academic.email.belongs(listadoC.destination)).select()
+            else:
+                listado=[]
+                listado.append(listadoC.destination)
+                listadoC.destination = db(db.academic.carnet.belongs(listado)).select()
+                if request.vars['search_input'] != None:
+                    listadoC.destination = db((db.academic.carnet.belongs(listado)) & (db.academic.carnet.like('%'+request.vars['search_input']+'%'))).select()
+                else:
+                    listadoC.destination = db(db.academic.carnet.belongs(listado)).select()
+        else:
+            if total[count]>1:
+                    listadoC = db(db.notification_log4.register==request.vars['notice']).select()
+                    listado=[]
+                    for l in listadoC:
+                        listado.append(l.destination)
+                    listadoC = db(db.notification_log4.register==request.vars['notice']).select().first()
+                    if request.vars['search_input'] != None:
+                        listadoC.destination = db((db.academic.carnet.belongs(listado)) & (db.academic.carnet.like('%'+request.vars['search_input']+'%'))).select()
+                    else:
+                        listadoC.destination = db(db.academic.carnet.belongs(listado)).select()
+
+    #if request.vars['notice'] is None:
+     #   all_list = db((db.library.owner_file==auth.user.id) or ((db.library.project == session.project_id) & (db.library.visible==True)) ).select()
+    #else:
+    all_n=None
+    tipoD = 0
+    if request.vars['notice'] != None:
+        #all_n = db(db.notification_log4.register==request.vars['notice']).select().first()
+        count = db.notification_log4.id.count()
+        total = db(db.notification_log4.register==request.vars['notice']).select(count)
+        totalR = 0
+        for t in total:
+            totalR=t[count]
+        if totalR>1:
+            listadoC = db(db.notification_log4.register==request.vars['notice']).select().first()
+            d = listadoC.destination[0:1]
+            if d !='|':
+                listadoC = db(db.notification_log4.register==request.vars['notice']).select()
+                listado=[]
+                for l in listadoC:
+                    listado.append(int(l.destination))
+                listadoC = db(db.notification_log4.register==request.vars['notice']).select().first()
+                #session.flash=str(listado)
+                #redirect(URL('default','index'))
+                if request.vars['search_input'] != None:
+                    carnets = db((db.academic.carnet.belongs(listado)) & (db.academic.carnet.like('%'+request.vars['search_input']+'%'))).select()
+                else:
+                    carnets = db(db.academic.carnet.belongs(listado)).select()
+                listadoC.destination=carnets
+            else:
+                listadoC = db(db.notification_log4.register==request.vars['notice']).select()
+                listado=''
+                for l in listadoC:
+                    if listado=='':
+                        listado=l.destination[1:-1]
+                    else:
+                        listado+=","+l.destination[1:-1]
+                listadoC = db(db.notification_log4.register==request.vars['notice']).select().first()
+                listadoC.destination=str(listado).split(",")
+                
+                listadoC.destination=carnets
+        else:
+            listadoC = db(db.notification_log4.register==request.vars['notice']).select().first()
+            d = listadoC.destination[0:1]
+            if d =='|':
+                d=listadoC.destination[1:-1]
+                d=d.replace("|",",")
+                listadoC.destination=str(d).split(",")
+                if request.vars['search_input'] != None:
+                    carnets = db(db.academic.email.belongs(listadoC.destination) & (db.academic.carnet.like('%'+request.vars['search_input']+'%'))).select()
+                else:
+                    carnets = db(db.academic.email.belongs(listadoC.destination)).select()
+                listadoC.destination=carnets
+            else:
+                if d=='[':
+                    l=listadoC.destination[1:-1].replace("'","").split(",")
+                    l = list(set(l))
+                    listado = db((db.academic.email.belongs(l))&(db.academic.carnet.like('%'+request.vars['search_input']+'%'))).select()
+                    listadoC.destination=listado
+                else:
+                    listado=[]
+                    listado.append(int(listadoC.destination))
+                    if request.vars['search_input'] != None:
+                        carnets = db((db.academic.carnet.belongs(listado)) & (db.academic.carnet.like('%'+request.vars['search_input']+'%'))).select()
+                    else:
+                        carnets = db(db.academic.carnet.belongs(listado)).select()
+                    listadoC.destination=carnets
+    return dict(all_n=listadoC, tipoD=tipoD)
 #*********************************************************
 #**********************ENVIAR AVISOS**********************
 #*********************************************************
@@ -893,10 +1066,28 @@ def attachment_files():
 
 def search_files(): 
     if request.vars['search_input'] is None:
-        all_list = db((db.library.owner_file==auth.user.id) or ((db.library.project == session.project_id) & (db.library.visible==True)) ).select()
+        #projects = db((db.project.id==db.user_project.project)&(db.period.id==db.user_project.period)&(db.user_project.assigned_user==auth.user.id)).select()
+        #all_list = db((db.library.owner_file==auth.user.id) or ((db.library.project == session.project_id) & (db.library.visible==True)) ).select()
+        all_list = db(((db.library.visible==True)&(db.library.owner_file!=auth.user.id)&(db.library.project==db.project.id)&(db.period.id==db.user_project.period)&(db.project.id==db.user_project.project)&(db.user_project.assigned_user==auth.user.id))).select()
+        p=[]
+        for a in all_list:
+            p.append(a.library)
+        all_list = db((db.library.owner_file==auth.user.id)).select()
+        for a in all_list:
+            p.append(a)
     else:
-        all_list = db( ((db.library.owner_file==auth.user.id) or ((db.library.project == session.project_id) & (db.library.visible==True) & (db.library.owner_file!=auth.user.id)) ) & (db.library.name.like('%'+request.vars['search_input']+'%'))).select()
-    return dict(all_list=all_list)
+        #all_list = db((db.library.visible==True)&(db.library.project==db.project.id)&(db.period.id==db.user_project.period)&(db.project.id==db.user_project.project)&(db.user_project.assigned_user==auth.user.id)).select()
+        #all_list = db((db.library.owner_file==auth.user.id) or ((db.library.project == session.project_id) & (db.library.visible==True)) ).select()
+        #all_list = db( ((db.library.owner_file==auth.user.id) or ((db.library.project == session.project_id) & (db.library.visible==True) & (db.library.owner_file!=auth.user.id)) ) & (db.library.name.like('%'+request.vars['search_input']+'%'))).select()
+
+        all_list = db(((db.library.name.like('%'+request.vars['search_input']+'%'))&(db.library.visible==True)&(db.library.owner_file!=auth.user.id)&(db.library.project==db.project.id)&(db.period.id==db.user_project.period)&(db.project.id==db.user_project.project)&(db.user_project.assigned_user==auth.user.id))).select()
+        p=[]
+        for a in all_list:
+            p.append(a.library)
+        all_list = db((db.library.name.like('%'+request.vars['search_input']+'%'))&(db.library.owner_file==auth.user.id)).select()
+        for a in all_list:
+            p.append(a)
+    return dict(all_list=p)
 
 
 #Mostrar los cursos a los cuales esta asignado el tutor academico para enviar mensajes
