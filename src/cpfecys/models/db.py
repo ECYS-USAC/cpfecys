@@ -713,6 +713,20 @@ db.define_table('library',
                 Field('project', 'reference project', notnull=True, label = T('project')),
                 Field('owner_file', 'reference auth_user', notnull=True, label = T('owner_file')))
 
+db.define_table('activity_category',
+    Field('category', 'string', notnull=True, unique=False, label = T('category')),
+    Field('description', 'text', notnull=True, unique=False, label = T('description')),
+    format='%(category)s')
+
+db.define_table('course_activity_category',
+    Field('category', 'reference activity_category', notnull=True, label = T('category')),    
+    Field('grade', 'decimal(5,2)', notnull=False, label=T('grade')),
+    Field('specific_grade', 'boolean', notnull=True, label = T('specific grade')),
+    Field('semester', 'reference period_year', notnull=True),
+    Field('assignation', 'reference project', notnull=True)
+    )
+
+    
 
 
 

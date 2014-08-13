@@ -73,7 +73,7 @@ uncomment to load jquery-ui //-->
     <div id="ja-mainnavwrap">
       <div id="ja-mainnav" class="clearfix">
           <!-- Navbar ================================================== -->
-          <div class="navbar navbar-inverse">
+          <div class="navbar navbar-inverse" >
             <div class="navbar-inner">
               <div class="container">
                 {{is_mobile=request.user_agent().is_mobile}}
@@ -84,7 +84,7 @@ uncomment to load jquery-ui //-->
                   <span class="icon-bar"></span>
                 </button>
                 <ul id="navbar" class="nav pull-right">{{='auth' in globals() and auth.navbar(mode="dropdown") or ''}}</ul>
-                <div class="{{='nav-collapse' if is_mobile else 'nav'}}">
+                <div class="{{='nav-collapse' if is_mobile else 'nav'}}" style="z-index:15;">
                   {{if response.menu:}}
                   {{=MENU(response.menu, _class='mobile-menu nav' if is_mobile else 'nav',mobile=is_mobile,li_class='',ul_class='')}}
                   {{pass}}

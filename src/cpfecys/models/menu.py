@@ -97,6 +97,12 @@ if auth.has_membership(role="Super-Administrator"):
     (T('General List of Academic'), False, URL('student_academic','academic'), []),    
     ]))
 if auth.has_membership(role="Student"):
+    user_menu.append((T('Students control'), False, URL('activity_control','courses_list'), []),) 
+if auth.has_membership(role="Super-Administrator"):
+    user_menu.append((T('Activity control'), False, URL(), [
+    (T('Activity category'), False, URL('activity_control','activity_category'), []),    
+    ]))
+if auth.has_membership(role="Student"):
     user_menu.append((T('Notices'), False, URL(), [
     (T('Send Notice'), False, URL('notification','courses_mail_notifications'), []),
     (T('Register Notices'), False, URL('notification', 'register_mail_notifications'), []),

@@ -1,0 +1,30 @@
+{{extend 'template.html'}}
+<h2>{{=T('Weighting')}} - {{=name}}
+<br>
+    <small>{{=T(semester)}}, {{=year}}</small>
+</h2>
+<div class="well span10" id="principal_div">
+    <a onclick="window.history.back()" class="btn" ><i class="icon-arrow-left"></i>{{=T('Back')}}</a>
+	<div id="weighting_inside">
+		{{=T('Loading')}}...
+	</div>
+</div>
+
+<script type="text/javascript">
+$(document).ready(function(){
+	var f_view ='{{=request.vars['f_view']}}';	
+	
+	if (f_view == 'weighting'){
+		$("#weighting_inside").load('{{=URL('activity_control','control_weighting.html',vars=dict(assignation = request.vars['assignation']))}}' );	
+	}
+    
+  });
+</script>
+
+<script type="text/javascript">
+	$(document).ready(function(){
+	    $("#modals").load('{{=URL('activity_control','control_students_modals.html')}}' );
+	  });
+</script>
+<div id="modals">
+</div>

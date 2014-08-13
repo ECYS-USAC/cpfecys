@@ -1,0 +1,76 @@
+<div id="createWeighting" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true" > 
+    <div id ="a" class="modal-header">
+      <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+        <h3 id="myModalLabel">
+            {{=T('Weighting')}}
+        </h3>
+    </div>
+    <div id="actions">
+      <form action="" enctype="multipart/form-data" method="post" >
+      	<div align="right">
+      		<a id="categoryButton" href="#createWeighting" role="button" class="btn btn-info"  > 
+				<span class="icon-plus-sign"></span>
+				{{=T('Add Category')}}
+			</a>
+      	</div>
+      	<div align="center" id="categoryDiv" value="categoryDiv" style="display:none; overflow:auto; height:200px;">		    	<table >
+            <tr>
+            	<td align="left">
+            		<label>{{=T('Carnet')}}:</label>
+              <input class="string" name="academic_carnet" type="text" value="" id="academic_carnet">
+              <input class="string" name="academic_carnet2" type="hidden" value="" id="academic_carnet2">
+              <label>{{=T('Email')}}:</label>
+              <input class="string" name="academic_email" type="text" value="" id="academic_email">
+              <input class="string" name="academic_email2" type="hidden" value="" id="academic_email2">
+              </div>
+            	</td>
+            </tr>
+        </table>
+			        	
+        </div>
+
+        <div align="center">
+
+          <table >
+            <tr>
+            	<td >
+            		
+            	</td>
+            </tr>
+            <tr>
+              <td align="left">
+	          	
+              <input name="_formname" type="hidden" value="update_form">
+              <input name="academic_id" type="hidden" id="academic_id">
+              <label>{{=T('Carnet')}}:</label>
+              <input class="string" name="academic_carnet" type="text" value="" id="academic_carnet">
+              <input class="string" name="academic_carnet2" type="hidden" value="" id="academic_carnet2">
+              <label>{{=T('Email')}}:</label>
+              <input class="string" name="academic_email" type="text" value="" id="academic_email">
+              <input class="string" name="academic_email2" type="hidden" value="" id="academic_email2">
+              <label>{{=T('Delete')}}&nbsp &nbsp<input type="checkbox" name="delete_check" onclick="delete_checked(this)" id="delete_check"></label>              
+            </td>
+          </tr>
+          <tr >
+            <td >
+            <div align="right"> 
+              <input type="submit" class="btn btn-primary" value="{{=T('Edit')}}" id="button_action">
+              <button class="btn" data-dismiss="modal" aria-hidden="true">{{=T('Close')}}</button>
+            </div>
+            </td>
+          </tr>
+        </table>
+      </div>
+    </form>
+    </div>
+  </div>
+
+  <script type="text/javascript">
+  $(document).ready(function(){
+  	$("#categoryButton").click(function(){			
+		$("#categoryDiv").toggle();	
+				
+	})
+  });
+		
+  </script>
