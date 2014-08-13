@@ -630,7 +630,7 @@ db.define_table('custom_parameters',
                 )
 
 db.define_table('public_event',
-                Field('name', 'string', label=T('Event Name'), unique=True, length=255, notnull=True),
+                Field('name', 'string', label=T('Event Name'),  length=255, notnull=True),
                 Field('semester', 'reference period_year', notnull=True),
                 Field('assignation', 'reference user_project', notnull=True),
                 format='%(name)s')
