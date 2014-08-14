@@ -952,6 +952,7 @@ def send_mail_to_users(users, message, roles, projects, subject, log=False):
 
 
     import cpfecys
+    message = message.replace("\n","<br>")
     message = '<html>' + message + '<br>'+ (cpfecys.get_custom_parameters().email_signature or '') + '</html>'
 
     userList= []
