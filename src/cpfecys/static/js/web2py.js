@@ -185,7 +185,7 @@
         if(active === undefined) {
           Calendar.setup({
             inputField: this,
-            ifFormat: "%Y-%m-%d %I:%M:%S",
+            ifFormat: format,
             showsTime: true,
             timeFormat: "24"
           });
@@ -202,7 +202,7 @@
         if(active === undefined) {
           Calendar.setup({
             inputField: this,
-            ifFormat: "%Y-%m-%d",
+            ifFormat: format,
             showsTime: false
           });
           $(this).data('w2p_date', 1);
