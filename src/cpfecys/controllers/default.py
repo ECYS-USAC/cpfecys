@@ -20,7 +20,7 @@ def events():
 @auth.requires_login()
 def event_edition():
     #show all assignations of current user
-    return dict(assignations = db((db.user_project.assigned_user == auth.user.id) & (db.user_project.period == cpfecys.current_year_period().id)).select())
+    return dict(assignations = db(db.user_project.assigned_user == auth.user.id).select())
 
 @auth.requires_login()
 def event_editor():
