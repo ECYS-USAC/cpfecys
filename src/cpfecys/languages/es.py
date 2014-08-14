@@ -1320,6 +1320,8 @@
 'The report has been scored                     successfully': 'El reporte ha sido calificado de forma exitosa.',
 'The report has been scored                 successfully': 'The report has been scored                 successfully',
 'The report has been sent to recheck                             you will be notified via email when rechecked': 'El reporte ha sido enviado para revisión, será notificado por email cuando este proceso haya finalizado.',
+'The student is already registered in the system': 'El estudiante ya se encuentra registrado en el sistema',
+'The student is already registered in the system and assigned to the course': 'El estudiante ya se encuentra registrado en el sistema y asignado al curso',
 'The Views': 'Las Vistas',
 'There are no controllers': 'No hay controladores',
 'There are no models': 'No hay modelos',
@@ -1534,4 +1536,10 @@
 'You visited the url %s': 'Usted visitó la url %s',
 'Your username is: %(username)s': 'Your username is: %(username)s',
 'YYYY-MM-DD': 'YYYY-MM-DD',
+'The type of laboratory entered is incorrect. This must be T or F.':'El tipo de laboratorio ingresado no es correcto. Este debe ser T o F.',
+'The email entered is incorrect.':'El correo ingresado no es correcto.',
+'The id is a required field.':'El carnet es un campo obligatorio.',
+'Successful assignment to the course, the student is already registered in the system':'Asignación exitosa al curso, el estudiante ya se encuentra registrado en el sistema',
+'Successful assignment to the course' : 'Asignación exitosa al curso',
+
 }

@@ -433,11 +433,11 @@ def academic_assignation_upload():
                 if usr is None:
                     #Email validation        
                     if rcarnet == '':
-                        row.append(T('Error: ') + T('El carnet es un campo obligatorio.'))
+                        row.append(T('Error: ') + T('The id is a required field.'))
                         error_users.append(row)
                     else:            
                         if IS_EMAIL()(remail)[1]:
-                            row.append(T('Error: ') + T('El correo ingresado no es correcto.'))
+                            row.append(T('Error: ') + T('The email entered is incorrect.'))
                             error_users.append(row)
                         else:
                             #T o F validation
@@ -447,9 +447,11 @@ def academic_assignation_upload():
                                 rlaboratorio = 'F'
 
                             if rlaboratorio != 'T' and rlaboratorio != 'F':
-                                row.append(T('Error: ') + T('El tipo de laboratorio ingresado no es correcto. Este debe ser T o F.'))
+                                row.append(T('Error: ') + T('The type of laboratory entered is incorrect. This must be T or F.'))
                                 error_users.append(row)
                             else:
+                                #Agregar la advertencia que el usuario ya se encuentra registrado en el sistema
+                                row.append(T('Aviso: ') + T('Successful assignment to the course'))
                                 #insert a new user with csv data
                                 usr = db.academic.insert(carnet = rcarnet,
                                                               email = remail)
@@ -492,9 +494,9 @@ def academic_assignation_upload():
                                                         id_academic_course_assignation = str(ingresado.id),
                                                         id_period = current_period.id,
                                                         description = 'Se inserto desde archivo CSV.')
+                                aviso_users.append(row)
                 else:
-                    #Agregar la advertencia que el usuario ya se encuentra registrado en el sistema
-                    row.append(T('Aviso: ') + T('El estudiante ya se encuentra registrado en el sistema'))
+                    
                     usr2 = db.academic_course_assignation((db.academic_course_assignation.semester == current_period) & (db.academic_course_assignation.assignation == check.project) & (db.academic_course_assignation.carnet == usr.id))
                     if usr2 is None:
                         #T o F validation
@@ -504,7 +506,7 @@ def academic_assignation_upload():
                                 rlaboratorio = 'F'
                             
                         if rlaboratorio != 'T' and rlaboratorio != 'F':
-                            row.append(T('Error: ') + T('El tipo de laboratorio ingresado no es correcto. Este debe ser T o F.'))
+                            row.append(T('Error: ') + T('The type of laboratory entered is incorrect. This must be T or F.'))
                             error_users.append(row)
                         else:
                             lab_var = ''
@@ -523,6 +525,8 @@ def academic_assignation_upload():
                                     i = i+1
                                 else:
                                     roll_var = roll_var + ',' + a.group_id.role
+                            #Agregar la advertencia que el usuario ya se encuentra registrado en el sistema
+                            row.append(T('Aviso: ') + T('Successful assignment to the course, the student is already registered in the system'))
 
                             ingresado = db.academic_course_assignation.insert(carnet = usr.id, semester = current_period, assignation = check.project, laboratorio = rlaboratorio)
                             db.academic_course_assignation_log.insert(user_name = auth.user.username, roll =  roll_var, 
@@ -537,8 +541,11 @@ def academic_assignation_upload():
                                                         description = 'Se inserto desde archivo CSV.')
                             aviso_users.append(row)
                     else:
-                        row.remove(T('Aviso: ') + T('El estudiante ya se encuentra registrado en el sistema'))
-                        row.append(T('Error: ') + T('El estudiante ya se encuentra registrado en el sistema y asignado al curso'))
+                        try:
+                            row.remove(T('Aviso: ') + T('The student is already registered in the system'))
+                        except:
+                            None
+                        row.append(T('Error: ') + T('The student is already registered in the system and assigned to the course'))
                         error_users.append(row)
                     continue
         except:
