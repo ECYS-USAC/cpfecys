@@ -487,7 +487,7 @@ def report():
         valid = not(report is None)
         if valid:
             semester = cpfecys.first_period.id
-            if report.created.month > 7:
+            if report.created.month >= 7:
                 semester = cpfecys.second_period.id
 
             period = db((db.period_year.yearp==int(report.created.year))&
@@ -1296,18 +1296,21 @@ def report_filter():
                 '-01-01', "%Y-%m-%d")
         date += timedelta(days=(30*6)*report.assignation.periods)
         semester =''
+        fecha = ''
         if report.assignation.period.period.id == 1:
-
             if report.assignation.periods % 2 == 0:
                 semester = T('Second Semester')
             else:
                 semester = T('First Semester')
+            fecha = str(date.year) + '-' + str(semester)
         else:
             if report.assignation.periods % 2 == 0:
                 semester = T('First Semester')
+                fecha = str(date.year+1) + '-' + str(semester)
             else:
                 semester = T('Second Semester')
-        return str(date.year) + '-' + str(semester)
+                fecha = str(date.year) + '-' + str(semester)
+        return fecha
     if not valid:
         session.flash = T('Incomplete Information')
         redirect(URL('default', 'index'))
