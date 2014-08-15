@@ -10,6 +10,49 @@
 #########################################################################
 @auth.requires_login()
 @auth.requires(auth.has_membership('Student') or auth.has_membership('Teacher'))
+def attendance_list():
+    if request.vars['usuario_proyecto'] != None:
+        check = db.user_project(id=request.vars['usuario_proyecto'], assigned_user = auth.user.id)
+        project = db(db.project.id==check.project).select().first()
+        periodo = db(db.period_year.id==check.period).select().first()
+        alumnos = db((db.academic.id==db.academic_course_assignation.carnet)&(db.academic_course_assignation.assignation==project.id)&(db.academic_course_assignation.semester==periodo.id)).select()
+        l=[]
+        t=[]
+        t.append('Listado de Asistencia')
+        l.append(t)
+
+        t=[]
+        t.append(project.project_id)
+        t.append(project.name)
+        p = T(periodo.period.name)+' '+str(periodo.yearp)
+        t.append(p)
+        l.append(t)
+        t=[]
+        t.append(None)
+        l.append(t)
+        
+        t=[]
+        t.append('Carnet')
+        t.append('Email')
+        t.append('Laboratorio')
+        t.append('Firma')
+        l.append(t)
+        for i in alumnos:
+            t=[]
+            t.append(i.academic.carnet)
+            t.append(i.academic.email)
+            if i.academic_course_assignation.laboratorio==True:
+                t.append('Si')
+            else:
+                t.append('No')
+            l.append(t)
+        nombre='Listado '+project.name
+        return dict(filename=nombre, csvdata=l)
+    else:
+        redirect(URL('default','index'))
+
+@auth.requires_login()
+@auth.requires(auth.has_membership('Student') or auth.has_membership('Teacher'))
 def academic_assignation():
     #requires parameter year_period if no one is provided then it is 
     #automatically detected
@@ -37,6 +80,9 @@ def academic_assignation():
     else:
         session.last_assignation = check.id
     cyearperiod = cpfecys.current_year_period()
+
+    if request.vars['listado'] =='True':
+        redirect(URL('student_academic','attendance_list',vars=dict(usuario_proyecto=str(check.id))))
 
     if request.vars['search_var'] is None:
         query = ((db.academic_course_assignation.semester == currentyear_period.id) & (db.academic_course_assignation.assignation==check.project))
@@ -138,8 +184,7 @@ def academic_assignation():
         _title=T('Edit or delete academic assignation')+' '+str( db(db.academic.id==int(row.carnet)).select(db.academic.carnet).first().carnet ) )]
     
     if (currentyear_period.id == cpfecys.current_year_period().id):
-        grid = SQLFORM.grid(query, details=False, fields=fields, links=links, oncreate=oncreate_academic_assignation, onupdate=onupdate_academic_assignation, ondelete=ondelete_academic_assignation, exportclasses=dict(xml=False,
-            html=False,csv_with_hidden_cols=False,json=False,tsv_with_hidden_cols=False,tsv=False))
+        grid = SQLFORM.grid(query, details=False, fields=fields, links=links, oncreate=oncreate_academic_assignation, onupdate=onupdate_academic_assignation, ondelete=ondelete_academic_assignation, csv=False)
     else:
         checkProject = db((db.user_project.project == check.project) & (db.user_project.assigned_user==check.assigned_user) & (db.user_project.period==currentyear_period.id)).select()
         b=0
