@@ -1,4 +1,5 @@
 {{extend 'template.html'}}
+
 <script src="{{=URL('static','js')}}/jquery-migrate-1.2.1.js"></script>
 <div style=" left:0; position:absolute; z-index:0; width:100%;  left:25px; " >
 
@@ -8,46 +9,21 @@
           <!--WEIGHTING DIV-->
           <div id="weighting_div" style=" width:100%; height:330px;">
                 
-                <a type="button" class="close"  aria-hidden="true" >
+                <a type="button" class="close" title="{{=T('Help')}}" aria-hidden="true" role="button" class="btn btn-warning" data-toggle="modal" data-target="#help_modal_weighting" >
                     <span class="icon-black icon-question-sign"></span>
                 </a>
-                <a type="button" class="close"  aria-hidden="true" onclick="weightingClick();">
+                <a type="button" class="close" title="{{=T('Minimize weighting')}}" aria-hidden="true" onclick="weightingClick();">
                   <span id="weighting_icon" class="icon-black icon-resize-small"></span>
                 </a>
 
-                <a type="button" class="close"  aria-hidden="true" href="{{=URL('activity_control', 'students_control_full',vars=dict(assignation = request.vars['assignation'], f_view='weighting'))}}" >
+                <a type="button" class="close" title="{{=T('View in full page the weighting')}}" aria-hidden="true" href="{{=URL('activity_control', 'students_control_full',vars=dict(assignation = request.vars['assignation'], f_view='weighting'))}}" >
                     <span class="icon-black icon-fullscreen"></span>
                 </a>              
             
-            <div id="h_weighting_h" class="navbar-inner" >            
-              <ul class="dropdown"  class="close" aria-hidden="true"  style="height:10px;">
-                <a style="color:#f0ad4e;text-shadow:none;" class="dropdown-toggle" data-toggle="dropdown" href="">
-                  <span class="icon-list"></span>
-                </a>
-                <h3 class="icon-white" style="text-shadow: -1px 0 white, 0 1px white, 1px 0 white, 0 -1px white;">
-                    {{=T('Weighting') }}
-                </h3> 
-                <ul class="dropdown-menu">                    
-                    <li >                      
-                      <a tabindex="-1" href="#" title="{{=T('Create course weighting')}}">
-                        <span class="icon-plus-sign"></span>
-                        {{=T('Create Weighting')}}
-                      </a>
-                    </li>
-                    <li class="disabled">
-                      <a tabindex="-1" href="#" title="{{=T('Modify course weighting')}}">
-                        <span class="icon-edit" ></span>
-                        {{=T('Edit Weighting')}}
-                      </a>
-                    </li>
-                    <li class="disabled">
-                      <a tabindex="-1" href="#" title="{{=T('Request that the changes be reviewed by the professor or administrator')}}">
-                        <span class="icon-check" ></span>
-                        {{=T('Change Request')}}
-                      </a>
-                    </li>
-                </ul>
-              </ul>  
+            <div id="h_weighting_h" class="navbar-inner" >  
+              <div id="weighting_menu">          
+                
+              </div> 
               <ul>              
                             
             </div>
@@ -59,7 +35,7 @@
                
             </div>
                
-            <div id="weighting_inside" class="well" style="background-color:white; height:250px; ">
+            <div id="weighting_inside" class="well" style="overflow:auto; background-color:white; height:250px; ">
               {{=T('Loading')}}...
             </div>
           </div>
@@ -167,20 +143,20 @@
 </div>
 
 
-<!--Help modal-->
-<div id="myModal" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true"> 
+<!--Help modal weighting -->
+<div id="help_modal_weighting" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true"> 
   <div class="modal-header">
     <button type="button" class="close" data-dismiss="modal"
 aria-hidden="true">×</button>
       <h3 id="myModalLabel">
           <span class="icon-question-sign"></span>
-          {{=T('Activity category help')}}
+          {{=T('Weighting help')}}
       </h3>
   </div>
   <div class="modal-body">
     <div class="well">
         <p>
-            {{=T('In this area you will be able to manage the activities categories. These categories will be selected by the teacher or assistants of the course when they are planning the course or laboratory weighting.')}}
+            {{=T('In this area you can manage the weighting of the course / lab. The actions that can be performed are: Create weighting, Get weighting, Edit weighting and request a change of weighting (academic supervisor).')}}
         </p>
     </div>
   </div>
@@ -189,7 +165,7 @@ aria-hidden="true">×</button>
 aria-hidden="true">{{=T('Close')}}</button>
   </div>
 </div>
-<!--Finish help modal-->
+<!--Finish help modal weighting-->
 <script type="text/javascript">
   
 
@@ -293,9 +269,10 @@ aria-hidden="true">{{=T('Close')}}</button>
     $("#h_activity_v").hide();
     $("#h_control_v").hide();
     $("#activity_inside").children().attr("disabled","disabled");
-    $("#weighting_inside").load('{{=URL('activity_control','control_weighting.html',vars=dict(assignation = request.vars['assignation']))}}' );
-    $("#modals").load('{{=URL('activity_control','control_students_modals.html')}}' );
-
+    $("#weighting_inside").load('{{=URL('activity_control','control_weighting.html',vars=dict(operation="div_update",assignation = request.vars['assignation']))}}' );
+    $("#modals").load('{{=URL('activity_control','control_students_modals.html',vars=dict(assignation = request.vars['assignation']))}}' );
+    $("#weighting_menu").load('{{=URL('activity_control','control_weighting.html',vars=dict(operation="menu_update",assignation = request.vars['assignation']))}}' );
+    
   });
   
 </script>

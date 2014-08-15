@@ -1,75 +1,89 @@
-<div id="createWeighting" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true" > 
+
+<div id="createWeighting" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true" style="width:800px; left:40%;"> 
     <div id ="a" class="modal-header">
       <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
         <h3 id="myModalLabel">
-            {{=T('Weighting')}}
+            {{=T('Weighting')}} - {{=name}}
         </h3>
     </div>
     <div id="actions">
       <form action="" enctype="multipart/form-data" method="post" >
-      	<div align="right">
-      		<a id="categoryButton" href="#createWeighting" role="button" class="btn btn-info"  > 
-				<span class="icon-plus-sign"></span>
-				{{=T('Add Category')}}
-			</a>
-      	</div>
-      	<div align="center" id="categoryDiv" value="categoryDiv" style="display:none; overflow:auto; height:200px;">		    	<table >
-            <tr>
-            	<td align="left">
-            		<label>{{=T('Carnet')}}:</label>
-              <input class="string" name="academic_carnet" type="text" value="" id="academic_carnet">
-              <input class="string" name="academic_carnet2" type="hidden" value="" id="academic_carnet2">
-              <label>{{=T('Email')}}:</label>
-              <input class="string" name="academic_email" type="text" value="" id="academic_email">
-              <input class="string" name="academic_email2" type="hidden" value="" id="academic_email2">
-              </div>
-            	</td>
-            </tr>
-        </table>
-			        	
+        <center>
+          <table >
+              <tr>
+                <td align="left">                	
+                  <div align="center" id="categoryDiv" value="categoryDiv" class="well span12" style="overflow:auto; height:200px; width:300px;">    
+                    
+                  </div>
+                  
+                </td>
+                <td align="left"  >
+                  <div class="well span11" id="div_weighting_show" style="overflow:auto; height:200px; width:300px;">
+            	      
+                  </div>
+              	</td>
+              </tr>
+              <tr >
+                <td>
+                  <div align="right">
+                    <a id="categoryButton" href="#information_text" role="button" class="btn btn-info"  
+                    title="{{=T('Add category to weighting')}}"> 
+                    <span class="icon-plus-sign"></span>
+                    {{=T('Add Category')}}
+                     </a>
+                  </div>
+                </td>
+                <td >
+                  <div align="right"> 
+                    <button class="btn btn-primary" id="button_action"> {{=T('Update')}}</button>
+                    <button class="btn" data-dismiss="modal" aria-hidden="true">{{=T('Close')}}</button>
+                  </div>
+                </td>
+              </tr>
+          </table>
+			   </center>     	
         </div>
 
         <div align="center">
 
-          <table >
-            <tr>
-            	<td >
-            		
-            	</td>
-            </tr>
-            <tr>
-              <td align="left">
-	          	
-              <input name="_formname" type="hidden" value="update_form">
-              <input name="academic_id" type="hidden" id="academic_id">
-              <label>{{=T('Carnet')}}:</label>
-              <input class="string" name="academic_carnet" type="text" value="" id="academic_carnet">
-              <input class="string" name="academic_carnet2" type="hidden" value="" id="academic_carnet2">
-              <label>{{=T('Email')}}:</label>
-              <input class="string" name="academic_email" type="text" value="" id="academic_email">
-              <input class="string" name="academic_email2" type="hidden" value="" id="academic_email2">
-              <label>{{=T('Delete')}}&nbsp &nbsp<input type="checkbox" name="delete_check" onclick="delete_checked(this)" id="delete_check"></label>              
-            </td>
-          </tr>
-          <tr >
-            <td >
-            <div align="right"> 
-              <input type="submit" class="btn btn-primary" value="{{=T('Edit')}}" id="button_action">
-              <button class="btn" data-dismiss="modal" aria-hidden="true">{{=T('Close')}}</button>
-            </div>
-            </td>
-          </tr>
-        </table>
       </div>
     </form>
     </div>
   </div>
 
+
   <script type="text/javascript">
   $(document).ready(function(){
+    $("#div_weighting_show").load("{{=URL('activity_control','weighting.html')}}?op=showTable&amp;assignation={{=request.vars['assignation']}}"); 
+    $("#categoryDiv").load("{{=URL('activity_control','weighting.html')}}?op=showInsert&amp;assignation={{=request.vars['assignation']}}"); 
+          
+
   	$("#categoryButton").click(function(){			
-		$("#categoryDiv").toggle();	
-				
+		  var category_id_var = document.getElementById('category_id').value;
+      var grade_var = document.getElementById('category_grade').value;
+      var SG_var = document.getElementById('SG_check').checked;
+      //alert(SG_var);
+      if (category_id_var==""){
+        alert("{{=T('No categories available')}}");  
+      }else{
+      
+      var regex = /^\d+(?:\.\d{0,2})$/; 
+      var regex2 = /^([0-9])*$/; 
+
+        if (grade_var=="" || parseInt(grade_var) == 0 ){
+          alert("{{=T('The entered value is not correct')}}");  
+        }else{
+          if (!regex.test(grade_var) && !regex2.test(grade_var) ){
+            alert("{{=T('The entered value is not a decimal')}}");  
+          }else{
+
+            
+            $("#div_weighting_show").load("{{=URL('activity_control','weighting.html')}}?op=addCategory&amp;laboratory=true&amp;SG_var=" + SG_var + "&amp;category_id_var=" + category_id_var +"&amp;grade_var=" + grade_var + "&amp;TP=true&amp;assignation={{=request.vars['assignation']}}"); 
+            $("#categoryDiv").load("{{=URL('activity_control','weighting.html')}}?op=showInsert&amp;assignation={{=request.vars['assignation']}}"); 
+            }       
+
+        }
+      }
 	})
   });
 		

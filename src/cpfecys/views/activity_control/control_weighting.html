@@ -1,9 +1,77 @@
-<center>
+{{project_var = db(db.user_project.id == request.vars['assignation']).select().first() }}
+{{total_var2=0}}
 
-	{{=T('Weighting was not created ')}}<br>
-	<a id="myButton" href="#createWeighting" role="button" class="btn btn-warning" data-toggle="modal" data-target="#createWeighting"  > 
-		<span class="icon-plus-sign"></span>
-		{{=T('Create Weighting')}}
-	</a>
-</center>
+{{for project in db((db.course_activity_category.semester==semestre2.id) & (db.course_activity_category.assignation==project_var.project.id)).select():}}		
+	{{total_var2 = float(total_var2) + float(project.grade)}}				
+{{pass}}
+
+{{if request.vars['operation'] == "div_update": }}
+	<center>		
+		{{if float(total_var2) == 100:}}		
+			<div id="table_Weighting">
+			</div>
+		{{else:}}
+			<b><font color="red">{{=T('Weighting was not created')}}</font></b>
+			<br>
+			<a id="myButton" href="#createWeighting" role="button" class="btn btn-warning" data-toggle="modal" data-target="#createWeighting"  > 
+				<span class="icon-plus-sign"></span>
+				{{=T('Create Weighting')}}
+			</a>
+		{{pass}}
+		
+	</center>
+{{pass}}
+
+{{if request.vars['operation'] == "menu_update": }}
+
+	<ul class="dropdown"  class="close" aria-hidden="true"  style="height:10px;">
+	  <a style="color:#f0ad4e;text-shadow:none;" class="dropdown-toggle" data-toggle="dropdown" href="">
+	    <span class="icon-list"></span>
+	  </a>
+	  <h3 class="icon-white" style="text-shadow: -1px 0 white, 0 1px white, 1px 0 white, 0 -1px white;">
+	      {{=T('Weighting') }}
+	  </h3> 
+	  <ul class="dropdown-menu">  
+  		{{if float(total_var2) == 100:}}
+		<li class="disabled"> 
+			<a  tabindex="-1" title="{{=T('Create course weighting')}}" id="menu_create_weighting" >
+		{{else:}}
+		<li>
+			<a  tabindex="-1" title="{{=T('Create course weighting')}}" id="menu_create_weighting" href="#createWeighting" role="button" class="btn btn-warning" data-toggle="modal" data-target="#createWeighting"  >
+		{{pass}}
+	          <span class="icon-plus-sign"></span>
+	          {{=T('Create Weighting')}}
+	        </a>
+	      </li>
+      	{{if float(total_var2) == 100:}}
+		<li> 
+		{{else:}}
+		<li class="disabled"> 
+		{{pass}}
+	        <a tabindex="-1"  title="{{=T('Modify course weighting')}}">
+	          <span class="icon-edit" ></span>
+	          {{=T('Edit Weighting')}}
+	        </a>
+	      </li>
+	    {{if float(total_var2) == 100:}}
+		<li> 
+		{{else:}}
+		<li class="disabled"> 
+		{{pass}}
+	        <a tabindex="-1"  title="{{=T('Request that the changes be reviewed by the professor or administrator')}}">
+	          <span class="icon-check" ></span>
+	          {{=T('Change Request')}}
+	        </a>
+	      </li>
+	  </ul>
+	</ul> 
+{{pass}}
+
+<script type="text/javascript">
+  	$(document).ready(function(){
+		$("#table_Weighting").load("{{=URL('activity_control','weighting.html')}}?op=showTableNoEditable&amp;assignation={{=request.vars['assignation']}}");
+			
+	});
+
+</script>
 

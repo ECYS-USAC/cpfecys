@@ -54,7 +54,7 @@ def students_control():
 
     query = db.activity_category
     grid = SQLFORM.grid(query, maxtextlength=100,csv=False)
-    return dict(name = check.project.name,)
+    return dict(name = check.project.name)
 
 def control_weighting():
     import cpfecys
@@ -82,7 +82,8 @@ def control_weighting():
     return dict(name = check.project.name,
                 semester = year_semester.name,
                 year = year.yearp,
-                assignation=assignation)
+                assignation=assignation,
+                semestre2 = year)
 
 def students_control_full():
     import cpfecys
@@ -113,4 +114,47 @@ def students_control_full():
                 assignation=assignation)
 
 def control_students_modals():
-    return dict(name='hola')
+    import cpfecys
+    #Obtener la asignacion del estudiante
+    assignation = request.vars['assignation']
+    #Obtener al tutor del proyecto
+    check = db.user_project(id = assignation, assigned_user = auth.user.id)
+    if (check is None):
+        #check if there is no assignation or if it is locked (shouldn't be touched)
+        if (session.last_assignation is None):
+            redirect(URL('default','index'))
+            return
+        else:
+            check = db.user_project(id = session.last_assignation)
+            if cpfecys.assignation_is_locked(check):
+                redirect(URL('default','index'))
+                return
+    else:
+        session.last_assignation = check.id
+
+
+    year = db.period_year(id=check.period)
+    return dict(semestre2 = year, name=check.project.name)
+
+def weighting():
+    import cpfecys
+    #Obtener la asignacion del estudiante
+    assignation = request.vars['assignation']
+    #Obtener al tutor del proyecto
+    check = db.user_project(id = assignation, assigned_user = auth.user.id)
+    if (check is None):
+        #check if there is no assignation or if it is locked (shouldn't be touched)
+        if (session.last_assignation is None):
+            redirect(URL('default','index'))
+            return
+        else:
+            check = db.user_project(id = session.last_assignation)
+            if cpfecys.assignation_is_locked(check):
+                redirect(URL('default','index'))
+                return
+    else:
+        session.last_assignation = check.id
+
+
+    year = db.period_year(id=check.period)
+    return dict(semestre2 = year)

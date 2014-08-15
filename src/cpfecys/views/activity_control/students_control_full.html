@@ -3,8 +3,20 @@
 <br>
     <small>{{=T(semester)}}, {{=year}}</small>
 </h2>
-<div class="well span10" id="principal_div">
-    <a onclick="window.history.back()" class="btn" ><i class="icon-arrow-left"></i>{{=T('Back')}}</a>
+
+
+<div class="well span10" id="principal_div" >
+	<div style="position:absolute; right:15%;">
+	<a class="btn" href="{{=URL('activity_control', 'students_control', vars=dict(assignation = request.vars['assignation']))}}">
+		<i class="icon-arrow-left"></i>{{=T('Back')}}
+	</a>
+</div>
+<br>
+	<div id="weighting_menu">            
+  		<br>
+  		<br>
+  	</div>
+    
 	<div id="weighting_inside">
 		{{=T('Loading')}}...
 	</div>
@@ -15,7 +27,7 @@ $(document).ready(function(){
 	var f_view ='{{=request.vars['f_view']}}';	
 	
 	if (f_view == 'weighting'){
-		$("#weighting_inside").load('{{=URL('activity_control','control_weighting.html',vars=dict(assignation = request.vars['assignation']))}}' );	
+		$("#weighting_inside").load("{{=URL('activity_control','control_weighting.html',vars=dict(operation="div_update",assignation = request.vars['assignation']))}}" );	
 	}
     
   });
@@ -23,7 +35,11 @@ $(document).ready(function(){
 
 <script type="text/javascript">
 	$(document).ready(function(){
-	    $("#modals").load('{{=URL('activity_control','control_students_modals.html')}}' );
+
+	    $("#modals").load('{{=URL('activity_control','control_students_modals.html',vars=dict(assignation = request.vars['assignation']))}}' );
+
+	    $("#weighting_menu").load('{{=URL('activity_control','control_weighting.html',vars=dict(operation="menu_update",assignation = request.vars['assignation']))}}' );
+
 	  });
 </script>
 <div id="modals">

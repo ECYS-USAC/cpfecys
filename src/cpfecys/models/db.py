@@ -723,7 +723,9 @@ db.define_table('course_activity_category',
     Field('grade', 'decimal(5,2)', notnull=False, label=T('grade')),
     Field('specific_grade', 'boolean', notnull=True, label = T('specific grade')),
     Field('semester', 'reference period_year', notnull=True),
-    Field('assignation', 'reference project', notnull=True)
+    Field('assignation', 'reference project', notnull=True),
+    Field('laboratory', 'boolean', notnull=True, label = T('laboratory')),
+    Field('teacher_permition', 'boolean', notnull=True, label = T('teacher permition'))
     )
 
     
