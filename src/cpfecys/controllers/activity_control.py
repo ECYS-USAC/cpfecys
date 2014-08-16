@@ -6,7 +6,14 @@ def activity_category():
     return dict(grid=grid)
 
 @auth.requires_login()
-@auth.requires_membership('Student')
+@auth.requires_membership('Super-Administrator')
+def student_control_period():
+    query = db.student_control_period
+    grid = SQLFORM.grid(query, maxtextlength=100,csv=False)
+    return dict(grid=grid)
+
+@auth.requires_login()
+@auth.requires(auth.has_membership('Student') or auth.has_membership('Teacher'))
 def courses_list():
     import cpfecys
     def split_name(project):
@@ -28,7 +35,7 @@ def courses_list():
     return dict(assignations = db((db.user_project.assigned_user == auth.user.id) & (db.user_project.period == cpfecys.current_year_period().id)).select(), split_name=split_name, split_section=split_section)
 
 @auth.requires_login()
-@auth.requires_membership('Student')
+@auth.requires(auth.has_membership('Student') or auth.has_membership('Teacher'))
 def students_control():
     import cpfecys
     #Obtener la asignacion del estudiante

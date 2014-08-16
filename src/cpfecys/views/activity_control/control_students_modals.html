@@ -1,4 +1,4 @@
-
+<!--Create weighting Modal -->
 <div id="createWeighting" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true" style="width:800px; left:40%;"> 
     <div id ="a" class="modal-header">
       <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
@@ -50,15 +50,18 @@
     </form>
     </div>
   </div>
-
+  <!--Finish Create weighting Modal -->
+  
 
   <script type="text/javascript">
   $(document).ready(function(){
-    $("#div_weighting_show").load("{{=URL('activity_control','weighting.html')}}?op=showTable&amp;assignation={{=request.vars['assignation']}}"); 
-    $("#categoryDiv").load("{{=URL('activity_control','weighting.html')}}?op=showInsert&amp;assignation={{=request.vars['assignation']}}"); 
-          
+    //Create
+      $("#div_weighting_show").load("{{=URL('activity_control','weighting.html')}}?op=showTable&amp;assignation={{=request.vars['assignation']}}"); 
+      $("#categoryDiv").load("{{=URL('activity_control','weighting.html')}}?op=showInsert&amp;assignation={{=request.vars['assignation']}}"); 
+    
 
-  	$("#categoryButton").click(function(){			
+
+  	$("#categoryButton").click(function(){
 		  var category_id_var = document.getElementById('category_id').value;
       var grade_var = document.getElementById('category_grade').value;
       var SG_var = document.getElementById('SG_check').checked;
@@ -79,12 +82,14 @@
 
             
             $("#div_weighting_show").load("{{=URL('activity_control','weighting.html')}}?op=addCategory&amp;laboratory=true&amp;SG_var=" + SG_var + "&amp;category_id_var=" + category_id_var +"&amp;grade_var=" + grade_var + "&amp;TP=true&amp;assignation={{=request.vars['assignation']}}"); 
+            
+            $("#categoryDiv").load("{{=URL('activity_control','weighting.html')}}?op=showInsert&amp;assignation={{=request.vars['assignation']}}"); 
             $("#categoryDiv").load("{{=URL('activity_control','weighting.html')}}?op=showInsert&amp;assignation={{=request.vars['assignation']}}"); 
             }       
 
         }
       }
-	})
+	 })
   });
-		
+
   </script>

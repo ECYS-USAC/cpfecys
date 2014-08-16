@@ -37,32 +37,80 @@
 			<a  tabindex="-1" title="{{=T('Create course weighting')}}" id="menu_create_weighting" >
 		{{else:}}
 		<li>
-			<a  tabindex="-1" title="{{=T('Create course weighting')}}" id="menu_create_weighting" href="#createWeighting" role="button" class="btn btn-warning" data-toggle="modal" data-target="#createWeighting"  >
+			<a  tabindex="-1" title="{{=T('Create course weighting')}}" id="menu_create_weighting" href="#createWeighting" role="button"  data-toggle="modal" data-target="#createWeighting"  >
 		{{pass}}
 	          <span class="icon-plus-sign"></span>
 	          {{=T('Create Weighting')}}
 	        </a>
 	      </li>
       	{{if float(total_var2) == 100:}}
-		<li> 
+      		{{if auth.has_membership('Teacher'):}}
+				<li>
+					<a tabindex="-1"  title="{{=T('Modify course weighting')}}" href="#createWeighting" role="button"  data-toggle="modal" data-target="#createWeighting"  id="edit_option"> 
+			{{else:}}
+				{{from datetime import datetime}}
+				{{var_do='false'}}
+				{{for date_var in db((db.student_control_period)).select():}}
+					{{if datetime.now() > date_var.date_start and datetime.now() < date_var.date_finish:}}
+						{{var_do='true'}}					
+					{{pass}}
+				{{pass}}
+				{{if var_do =='true':}}
+					<li>
+					<a tabindex="-1"  title="{{=T('Modify course weighting')}}" href="#createWeighting" role="button"  data-toggle="modal" data-target="#createWeighting"  id="edit_option"> 
+				{{else:}}
+					<li class="disabled"> 
+						<a tabindex="-1"  title="{{=T('Modify course weighting')}}">
+				{{pass}}
+			{{pass}}
 		{{else:}}
 		<li class="disabled"> 
+			<a tabindex="-1"  title="{{=T('Modify course weighting')}}">
 		{{pass}}
-	        <a tabindex="-1"  title="{{=T('Modify course weighting')}}">
 	          <span class="icon-edit" ></span>
 	          {{=T('Edit Weighting')}}
 	        </a>
 	      </li>
 	    {{if float(total_var2) == 100:}}
-		<li> 
+			{{if auth.has_membership('Teacher'):}}
+				{{None}}
+			{{else:}}
+				{{from datetime import datetime}}
+				{{var_do='false'}}
+				{{for date_var in db((db.student_control_period)).select():}}
+					{{if datetime.now() > date_var.date_start and datetime.now() < date_var.date_finish:}}
+				      	{{var_do='true'}}	
+					{{pass}}
+				{{pass}}
+				{{if var_do == 'true':}}
+					<li class="disabled"> 
+							<a tabindex="-1"  title="{{=T('Modify course weighting')}}">
+								<span class="icon-check" ></span>
+					          {{=T('Change Request')}}
+					        </a>
+				      	</li>
+				{{else:}}
+					<li>
+							<a tabindex="-1"  title="{{=T('Request that the changes be reviewed by the professor or administrator')}}" href="#createWeighting" role="button"  data-toggle="modal" data-target="#createWeighting"  id="re_option">
+				          <span class="icon-check" ></span>
+				          {{=T('Change Request')}}
+				        </a>
+				      </li>
+				{{pass}}
+			{{pass}}
 		{{else:}}
-		<li class="disabled"> 
+			{{if auth.has_membership('Teacher'):}}
+				{{None}}
+			{{else:}}
+				<li class="disabled"> 
+					<a tabindex="-1"  title="{{=T('Modify course weighting')}}">
+						<span class="icon-check" ></span>
+			          {{=T('Change Request')}}
+			        </a>
+		      	</li>
+			{{pass}}
 		{{pass}}
-	        <a tabindex="-1"  title="{{=T('Request that the changes be reviewed by the professor or administrator')}}">
-	          <span class="icon-check" ></span>
-	          {{=T('Change Request')}}
-	        </a>
-	      </li>
+	        
 	  </ul>
 	</ul> 
 {{pass}}
@@ -70,6 +118,10 @@
 <script type="text/javascript">
   	$(document).ready(function(){
 		$("#table_Weighting").load("{{=URL('activity_control','weighting.html')}}?op=showTableNoEditable&amp;assignation={{=request.vars['assignation']}}");
+
+		$("#edit_option").click(function(){
+	      $("#div_weighting_show").load("{{=URL('activity_control','weighting.html')}}?op=showEditTable&amp;assignation={{=request.vars['assignation']}}"); 
+	    })
 			
 	});
 

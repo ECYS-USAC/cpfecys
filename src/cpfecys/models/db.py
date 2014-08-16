@@ -728,7 +728,11 @@ db.define_table('course_activity_category',
     Field('teacher_permition', 'boolean', notnull=True, label = T('teacher permition'))
     )
 
-    
+db.define_table('student_control_period',
+    Field('period_name', 'string', notnull=True, unique=False, label = T('period name')),
+    Field('date_start', 'datetime', notnull = True, default = datetime.datetime.now(), label = T('Date Start')),
+    Field('date_finish', 'datetime', notnull = True, default = datetime.datetime.now(), label = T('Date Finish'))
+    )    
 
 
 
