@@ -14,19 +14,19 @@
 		</th>
 	</thead>
 	<tbody>
-		{{for n in notices:}}
+		{{for n in range(len(notices)-1, -1, -1):}}
 			<tr>
 				<td>
-					{{=n.subject[0:30]}}...
+					{{=notices[n].subject[0:30]}}...
 				</td>
 				<td>
-					{{=n.sent_message[0:100]}}...
+					{{=notices[n].sent_message[0:100]}}...
 				</td>
 				<td>
-					{{=n.time_date}}
+					{{=notices[n].time_date}}
 				</td>
 				<td>
-					<a id="notice{{=n.id}}" href="#attachModal" role="button" class="btn btn-primary" data-toggle="modal"> 
+					<a id="notice{{=notices[n].id}}" href="#attachModal" role="button" class="btn btn-primary" data-toggle="modal"> 
 						<i class="icon-eye-open"></i> {{=T('Detail')}}
 					</a>
 				</td>

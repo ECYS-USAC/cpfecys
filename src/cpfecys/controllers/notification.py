@@ -201,7 +201,7 @@ def teacher_send_mail_to_students(users1, users2, message, subject, check, semes
         None
     period = T(semester)+' '+str(year)
     message = message.replace("\n","<br>")
-    messageC = '<html>' + message + attachment_m + '<br><br>'+str(nameS2)+'<br>'+str(period)+'<br>'+str(nameP)+'<br>Sistema de Control de Estudiantes de Practica Final<br> Escuela de Ciencias y Sistemas - Universidad de San Carlos de Guatemala</html>'
+    messageC = '<html>' + message + attachment_m + '<br><br>Catedrático:'+str(nameS2)+'<br>'+str(period)+'<br>'+str(nameP)+'<br>Sistema de Seguimiento de La Escuela de Ciencias y Sistemas<br> Facultad de Ingeniería - Universidad de San Carlos de Guatemala</html>'
     #variable de control
     control = 0
     #Log General del Envio
@@ -776,7 +776,7 @@ def send_mail_to_students(users, message, subject, check, semester, year):
         None
     period = T(semester)+' '+str(year)
     message = message.replace("\n","<br>")
-    messageC = '<html>' + message + attachment_m + '<br><br>'+str(nameS2)+'<br>'+str(period)+'<br>'+str(nameP)+'<br>Sistema de Control de Estudiantes de Practica Final<br> Escuela de Ciencias y Sistemas - Universidad de San Carlos de Guatemala</html>'
+    messageC = '<html>' + message + attachment_m + '<br><br>Tutor Academico: '+str(nameS2)+'<br>'+str(period)+'<br>'+str(nameP)+'<br>Sistema de Seguimiento de La Escuela de Ciencias y Sistemas<br> Facultad de Ingeniería - Universidad de San Carlos de Guatemala</html>'
     #variable de control
     control = 0
     #Log General del Envio
