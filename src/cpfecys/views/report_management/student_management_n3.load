@@ -1,0 +1,87 @@
+<table class="table table-striped table-bordered">
+	<thead>
+		<th>
+			{{=T('User')}}
+		</th>
+		{{if ((tipo1=='all') or (tipo1=='i')):}}
+			<th>
+				<center>{{=T('Total inserted')}}</center>
+			</th>
+		{{pass}}
+		{{if ((tipo1=='all') or (tipo1=='u')):}}
+			<th>
+				<center>{{=T('Total modified')}}</center>
+			</th>
+		{{pass}}
+		{{if ((tipo1=='all') or (tipo1=='d')):}}
+			<th>
+				<center>{{=T('Total out')}}</center>
+			</th>
+		{{pass}}
+	</thead>
+	<tbody>
+		{{for grupo in operaciones:}}
+			<tr>
+				<td>
+					<a id="p{{=periodo}}_r{{=rol}}_u{{=grupo[0]}}_all" style="white-space:nowrap;">{{=grupo[1]}}</a></center>
+				</td>
+				{{if tipo1=='all':}}
+					<td>
+						<center><a id="p{{=periodo}}_r{{=rol}}_u{{=grupo[0]}}_i" class="badge badge-success" style="white-space:nowrap;">{{=grupo[2]}}</a></center>
+					</td>
+					<td>
+						<center><a id="p{{=periodo}}_r{{=rol}}_u{{=grupo[0]}}_u" class="badge badge-info" style="white-space:nowrap;">{{=grupo[3]}}</a></center>
+					</td>
+					<td>
+						<center><a id="p{{=periodo}}_r{{=rol}}_u{{=grupo[0]}}_d" class="badge badge-important" style="white-space:nowrap;">{{=grupo[4]}}</a></center>
+					</td>
+				{{elif tipo1=='i':}}
+					<td>
+						<center><a id="p{{=periodo}}_r{{=rol}}_u{{=grupo[0]}}_i" class="badge badge-success" style="white-space:nowrap;">{{=grupo[2]}}</a></center>
+					</td>
+				{{elif tipo1=='u':}}
+					<td>
+						<center><a id="p{{=periodo}}_r{{=rol}}_u{{=grupo[0]}}_u" class="badge badge-info" style="white-space:nowrap;">{{=grupo[2]}}</a></center>
+					</td>
+				{{elif tipo1=='d':}}
+					<td>
+						<center><a id="p{{=periodo}}_r{{=rol}}_u{{=grupo[0]}}_d" class="badge badge-important" style="white-space:nowrap;">{{=grupo[2]}}</a></center>
+					</td>
+				{{pass}}
+			</tr>
+			<tr>
+				{{if tipo1=='all':}}
+					<td colspan="4">
+				{{elif tipo1=='i' or tipo1=='u' or tipo1=='d':}}
+					<td colspan="2">
+				{{pass}}
+					<div id="div_p{{=periodo}}_r{{=rol}}_u{{=grupo[0]}}" style="display: none;">
+						Cargando
+					</div>
+				</td>
+			</tr>
+		{{pass}}
+	<tbody>
+</table>
+<script type="text/javascript">
+    $(document).ready(function(){
+        {{for grupo in operaciones:}}
+            $("#p{{=periodo}}_r{{=rol}}_u{{=grupo[0]}}_all").click(function(){
+                $("#div_p{{=periodo}}_r{{=rol}}_u{{=grupo[0]}}").toggle();
+				$("#div_p{{=periodo}}_r{{=rol}}_u{{=grupo[0]}}").load("{{=URL('report_management','student_management_n4.load')}}?tipo=all&amp;semestre="+{{=periodo}}+"&amp;rol="+{{=rol}}+"&amp;user="+{{=grupo[0]}});
+            })
+            $("#p{{=periodo}}_r{{=rol}}_u{{=grupo[0]}}_i").click(function(){
+                $("#div_p{{=periodo}}_r{{=rol}}_u{{=grupo[0]}}").toggle();
+				$("#div_p{{=periodo}}_r{{=rol}}_u{{=grupo[0]}}").load("{{=URL('report_management','student_management_n4.load')}}?tipo=i&amp;semestre="+{{=periodo}}+"&amp;rol="+{{=rol}}+"&amp;user="+{{=grupo[0]}});
+            })
+            $("#p{{=periodo}}_r{{=rol}}_u{{=grupo[0]}}_u").click(function(){
+                $("#div_p{{=periodo}}_r{{=rol}}_u{{=grupo[0]}}").toggle();
+				$("#div_p{{=periodo}}_r{{=rol}}_u{{=grupo[0]}}").load("{{=URL('report_management','student_management_n4.load')}}?tipo=u&amp;semestre="+{{=periodo}}+"&amp;rol="+{{=rol}}+"&amp;user="+{{=grupo[0]}});
+            })
+            $("#p{{=periodo}}_r{{=rol}}_u{{=grupo[0]}}_d").click(function(){
+                $("#div_p{{=periodo}}_r{{=rol}}_u{{=grupo[0]}}").toggle();
+				$("#div_p{{=periodo}}_r{{=rol}}_u{{=grupo[0]}}").load("{{=URL('report_management','student_management_n4.load')}}?tipo=d&amp;semestre="+{{=periodo}}+"&amp;rol="+{{=rol}}+"&amp;user="+{{=grupo[0]}});
+            })
+        {{pass}}
+    })
+</script>

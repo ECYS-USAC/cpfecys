@@ -1,0 +1,214 @@
+<table>
+	<tr>
+	<td>
+    	<input id="p{{=periodo}}_r{{=rol}}_u{{=user}}_search_input"  onclick='$("#div_p{{=periodo}}_r{{=rol}}_u{{=user}}_buscar").css("display", "block");' type="text"/>
+    </td>
+    <td>
+   		<a  role="button"  href="#" class="btn btn-info" id="p{{=periodo}}_r{{=rol}}_u{{=user}}_search_button" onclick="jQuery(div_p{{=periodo}}_r{{=rol}}_u{{=user}}_buscar).slideUp();">
+			<span class="icon-white icon-search"></span>Buscar
+		</a>
+		<a  role="button"  href="#" class="btn btn-danger" id="p{{=periodo}}_r{{=rol}}_u{{=user}}_cancel_search_button" onclick="jQuery(div_p{{=periodo}}_r{{=rol}}_u{{=user}}_buscar).slideUp();">
+			<span class="icon-white icon-e"></span>Cerrar
+		</a>
+	</td>
+	</tr>
+	<tr>
+		<td>
+		
+		<div id="div_p{{=periodo}}_r{{=rol}}_u{{=user}}_buscar" style="display:none;">
+			<select id="select_p{{=periodo}}_r{{=rol}}_u{{=user}}_fields" style="float:left">
+				<option value="academic_log.id">Id</option>
+				<option value="academic_log.user_name">Usuario</option>
+				<option value="academic_log.roll">Rol</option>
+				<option value="academic_log.operation_log">Operación</option>
+				<option value="academic_log.before_carnet">Carnet anterior</option>
+				<option value="academic_log.after_carnet">Carnet actual</option>
+				<option value="academic_log.before_email">Correo anterior</option>
+				<option value="academic_log.after_email">Correo actual</option>
+				<option value="academic_log.description">Descripción</option>
+				<option value="academic_log.date_log">Fecha</option>
+			</select>
+			<div id="div_option_p{{=periodo}}_r{{=rol}}_u{{=user}}_academic_log-id" style="display:block; float:left;">
+				<select id="option_p{{=periodo}}_r{{=rol}}_u{{=user}}_academic_log-id">
+					<option value="=">=</option>
+					<option value="!=">!=</option>
+					<option value="&lt;">&lt;</option>
+					<option value="&gt;">&gt;</option>
+					<option value="&lt;=">&lt;=</option>
+					<option value="&gt;=">&gt;=</option>
+					<option value="in">en</option>
+					<option value="not in">no esta en</option>
+				</select>
+				<input class="id" id="p{{=periodo}}_r{{=rol}}_u{{=user}}_value_academic_log-id" type="text" />
+			</div>
+			<div id="div_option_p{{=periodo}}_r{{=rol}}_u{{=user}}_academic_log-most" style="display:none; float:left;">
+				<select id="option_p{{=periodo}}_r{{=rol}}_u{{=user}}_academic_log-most">
+					<option value="=">=</option>
+					<option value="!=">!=</option>
+					<option value="&lt;">&lt;</option>
+					<option value="&gt;">&gt;</option>
+					<option value="&lt;=">&lt;=</option>
+					<option value="&gt;=">&gt;=</option>
+					<option value="starts with">inicia cón</option>
+					<option value="contains">contiene</option>
+					<option value="in">en</option>
+					<option value="not in">no esta en</option>
+				</select>
+				<input class="text" id="p{{=periodo}}_r{{=rol}}_u{{=user}}_value_academic_log-user_name" type="text" />
+			</div>
+			<div id="div_option_p{{=periodo}}_r{{=rol}}_u{{=user}}_academic_log-date_log" style="display:none; float:left;">
+				<select id="option_p{{=periodo}}_r{{=rol}}_u{{=user}}_academic_log-log_date">
+					<option value="=">=</option>
+					<option value="!=">!=</option>
+					<option value="&lt;">&lt;</option>
+					<option value="&gt;">&gt;</option>
+					<option value="&lt;=">&lt;=</option>
+					<option value="&gt;=">&gt;=</option>
+				</select>
+				<input class="datetime" data-w2p_datetime_format="%Y-%m-%d %H:%M:%S" id="p{{=periodo}}_r{{=rol}}_u{{=user}}_value_academic_log-date_log" name="date_log" type="text" value="2014-08-15 09:23:01.991629" />
+			</div>
+			<div style="float:left;">
+				<input class="btn btn-default" id="p{{=periodo}}_r{{=rol}}_u{{=user}}_new" type="button" value="Nueva Busqueda" />
+				<input class="btn btn-default" id="p{{=periodo}}_r{{=rol}}_u{{=user}}_close" type="button" value="Cerrar" />
+			</div>
+		</div>
+		</td>
+	</tr>
+</table>
+
+<div style="overflow:auto; width:100%; height:300px;">
+<table class="table table-striped table-bordered">
+	<thead>
+		<th>
+			ID
+		</th>
+		<th>
+			Usuario
+		</th>
+		<th>
+			Rol
+		</th>
+		<th>
+			Operación
+		</th>
+		<th>
+			Carné Historico
+		</th>
+		<th>
+			Carné Actual
+		</th>
+		<th>
+			Email Historico
+		</th>
+		<th>
+			Email Actual
+		</th>
+		<th>
+			Descripción
+		</th>
+		<th>
+			Periodo
+		</th>
+		<th>
+			Fecha
+		</th>
+	</thead>
+	<tbody>
+		{{for operacion in operaciones:}}
+			<tr>
+				<td>
+				{{=operacion.id}}
+				</td>
+				<td>
+				{{=operacion.user_name}}
+				</td>
+				<td>
+				{{=operacion.roll}}
+				</td>
+				<td>
+				{{=operacion.operation_log}}
+				</td>
+				<td>
+				{{=operacion.before_carnet}}
+				</td>
+				<td>
+				{{=operacion.after_carnet}}
+				</td>
+				<td>
+				{{=operacion.before_email}}
+				</td>
+				<td>
+				{{=operacion.after_email}}
+				</td>
+				<td>
+				{{=operacion.description}}
+				</td>
+				<td>
+				{{=T(obtenerSemestre(operacion.id_period).period.name)}}
+				</td>
+				<td>
+				{{=operacion.date_log}}
+				</td>
+			</tr>
+		{{pass}}
+	<tbody>
+</table>
+<div>
+
+<script type="text/javascript">
+    $(document).ready(function(){
+	var select_p{{=periodo}}_r{{=rol}}_u{{=user}}_fields="academic_log.id";
+	var select_p{{=periodo}}_r{{=rol}}_u{{=user}}_compare="=";
+		$("#p{{=periodo}}_r{{=rol}}_u{{=user}}_cancel_search_button").click(function(){
+			$("#div_p{{=periodo}}_r{{=rol}}_u{{=user}}").load("{{=URL('report_management','student_management_n4.load')}}?tipo={{=tipo}}&amp;semestre="+{{=periodo}}+"&amp;rol="+{{=rol}}+"&amp;user="+{{=user}});
+		})
+		
+		$("#p{{=periodo}}_r{{=rol}}_u{{=user}}_search_button").click(function(){
+			b = document.getElementById('p{{=periodo}}_r{{=rol}}_u{{=user}}_search_input').value.replace(' ','+');
+			$("#div_p{{=periodo}}_r{{=rol}}_u{{=user}}").load("{{=URL('report_management','student_management_n4.load')}}?tipo={{=tipo}}&amp;semestre="+{{=periodo}}+"&amp;rol="+{{=rol}}+"&amp;user="+{{=user}}+"&amp;consulta="+b);
+		})
+		
+		$("#select_p{{=periodo}}_r{{=rol}}_u{{=user}}_fields").click(function(){
+			var valor = document.getElementById('select_p{{=periodo}}_r{{=rol}}_u{{=user}}_fields').value;
+			select_p{{=periodo}}_r{{=rol}}_u{{=user}}_fields = valor;
+			if (valor == "academic_log.id"){
+				select_p{{=periodo}}_r{{=rol}}_u{{=user}}_compare = document.getElementById('option_p{{=periodo}}_r{{=rol}}_u{{=user}}_academic_log-id').value;
+				$("#div_option_p{{=periodo}}_r{{=rol}}_u{{=user}}_academic_log-id").css("display", "block");
+				$("#div_option_p{{=periodo}}_r{{=rol}}_u{{=user}}_academic_log-most").css("display", "none");
+				$("#div_option_p{{=periodo}}_r{{=rol}}_u{{=user}}_academic_log-date_log").css("display", "none");
+			}else{
+				if (valor == "academic_log.date_log"){
+					select_p{{=periodo}}_r{{=rol}}_u{{=user}}_compare = document.getElementById('option_p{{=periodo}}_r{{=rol}}_u{{=user}}_academic_log-log_date').value;
+					$("#div_option_p{{=periodo}}_r{{=rol}}_u{{=user}}_academic_log-id").css("display", "none");
+					$("#div_option_p{{=periodo}}_r{{=rol}}_u{{=user}}_academic_log-most").css("display", "none");
+					$("#div_option_p{{=periodo}}_r{{=rol}}_u{{=user}}_academic_log-date_log").css("display", "block");
+				}else{
+					select_p{{=periodo}}_r{{=rol}}_u{{=user}}_compare = document.getElementById('option_p{{=periodo}}_r{{=rol}}_u{{=user}}_academic_log-most').value;
+					$("#div_option_p{{=periodo}}_r{{=rol}}_u{{=user}}_academic_log-id").css("display", "none");
+					$("#div_option_p{{=periodo}}_r{{=rol}}_u{{=user}}_academic_log-most").css("display", "block");
+					$("#div_option_p{{=periodo}}_r{{=rol}}_u{{=user}}_academic_log-date_log").css("display", "none");
+				}
+			}
+		})
+		
+		$("#option_p{{=periodo}}_r{{=rol}}_u{{=user}}_academic_log-most").click(function(){
+			select_p{{=periodo}}_r{{=rol}}_u{{=user}}_compare = document.getElementById('option_p{{=periodo}}_r{{=rol}}_u{{=user}}_academic_log-most').value;
+		})
+		
+		$("#option_p{{=periodo}}_r{{=rol}}_u{{=user}}_academic_log-id").click(function(){
+			select_p{{=periodo}}_r{{=rol}}_u{{=user}}_compare = document.getElementById('option_p{{=periodo}}_r{{=rol}}_u{{=user}}_academic_log-id').value;
+		})
+		
+		$("#option_p{{=periodo}}_r{{=rol}}_u{{=user}}_academic_log-log_date").click(function(){
+			select_p{{=periodo}}_r{{=rol}}_u{{=user}}_compare = document.getElementById('option_p{{=periodo}}_r{{=rol}}_u{{=user}}_academic_log-log_date').value;
+		})
+		
+		$("#p{{=periodo}}_r{{=rol}}_u{{=user}}_close").click(function(){
+			$("#div_p{{=periodo}}_r{{=rol}}_u{{=user}}_buscar").css("display", "none");
+		})
+		
+		$("#p{{=periodo}}_r{{=rol}}_u{{=user}}_new").click(function(){
+			document.getElementById('p{{=periodo}}_r{{=rol}}_u{{=user}}_search_input').value=select_p{{=periodo}}_r{{=rol}}_u{{=user}}_fields+" "+select_p{{=periodo}}_r{{=rol}}_u{{=user}}_compare+"\""+document.getElementById('p{{=periodo}}_r{{=rol}}_u{{=user}}_value_academic_log-id').value+"\"";
+		})
+    })
+</script>
