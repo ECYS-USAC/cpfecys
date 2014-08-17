@@ -103,10 +103,15 @@ def index():
         start = datetime.datetime.strptime(year + month, "%Y-%m-%d")
         if item_restriction.limit_days != None:
             last_date = start + datetime.timedelta( \
-                days=item_restriction.limit_days)
+                days=item_restriction.limit_days-1)
         else:
-            last_date = datetime.datetime.strptime(year + last, "%Y-%m-%d")
-        return last_date
+            if cperiod.period == cpfecys.first_period.id: 
+                last_date = datetime.datetime.strptime(year + last, "%Y-%m-%d")
+            else:
+                year=str(int(year)+1)
+                last_date = datetime.datetime.strptime(year + last, "%Y-%m-%d")
+                last_date=last_date-datetime.timedelta(days=1)
+        return last_date.date()
 
     def assignation_range(assignation):
         cperiod = cpfecys.current_year_period()
