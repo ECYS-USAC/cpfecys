@@ -1,0 +1,24 @@
+<table class="table table-striped table-bordered">
+		<tbody>
+					{{for p in estudiantes:}}
+							<tr>
+								<td width="60%">
+									{{=p.carnet}}
+								</td>
+								<td width="60%">
+									{{=p.email}}
+								</td>
+							</tr>
+					{{pass}}
+					{{for p in tutores:}}
+							<tr>
+								<td width="60%">
+									{{=p.username}}
+								</td>
+								<td width="60%">
+									{{=p.email}}
+								</td>
+							</tr>
+					{{pass}}
+		<tbody>
+</table>

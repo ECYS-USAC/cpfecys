@@ -1,0 +1,60 @@
+<div class="row-fluid" style="overflow:auto; height:330px;">
+<b>Asunto:</b>{{=noticia.subject}}<br>
+<b>Mensaje:</b>{{=noticia.sent_message}}<br><br>
+<b>Fecha de Envio:</b>{{=noticia.time_date}}<br>
+{{if log.success == False:}}
+	<b>Estado mensaje:</b>Fallido<br>
+{{else:}}
+	<b>Estado mensaje:</b>Exitoso<br>
+	{{pass}}
+<b>Log mensaje:</b>{{=log.result_log}}<hr>
+<div align="right" id="div_all_search">
+			<table>
+			<td>
+				<b>Destinatarios</b>
+			</td>
+				<td>
+    				<input type="text" id="search_input" name="search_input"  placeholder="Carnet"/>
+    			</td>
+    			<td>
+    				<a  role="button"  href="#" class="btn btn-info" id="search_button">		    		
+				    	<span class="icon-white icon-search">
+				    </a>
+				</td>
+			</table>
+    </div>
+<div id="dest" style="height:200px; witdh:310px; overflow:auto;">
+<table class="table table-striped table-bordered">
+		<tbody>
+					{{for p in estudiantes:}}
+							<tr>
+								<td width="60%">
+									{{=p.carnet}}
+								</td>
+								<td width="60%">
+									{{=p.email}}
+								</td>
+							</tr>
+					{{pass}}
+					{{for p in tutores:}}
+							<tr>
+								<td width="60%">
+									{{=p.username}}
+								</td>
+								<td width="60%">
+									{{=p.email}}
+								</td>
+							</tr>
+					{{pass}}
+		<tbody>
+</table>
+</div>
+</div>
+
+<script type="text/javascript">
+    $(document).ready(function(){
+        $('#search_input').on('input', function() { 
+		    $("#dest").load('{{=URL('notification','teacher_search_destination.load')}}',{notice: {{=log.register}}, search_input: document.getElementById('search_input').value});
+		});
+    })
+</script>
