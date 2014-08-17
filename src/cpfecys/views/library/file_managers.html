@@ -26,7 +26,7 @@
                 <br>
                 <div id="div_period_{{=period.id}}" style="display: none; padding-left: 20px; white-space:nowrap;">
                 {{for project in obtainProjects(period.id):}}
-                    <a id="pr-{{=project.id}}" style="white-space:nowrap;"><span class="icon-folder-open"></span>{{=T(project.project.name)}}</a>
+                    <a id="pr-{{=project.id}}" style="white-space:nowrap;"><span class="icon-folder-open"></span>{{=project.project.name}}</a>
                     <br>
                     <div id="div_project_{{=project.id}}" style="display: none; padding-left: 20px; white-space:nowrap;">
                     {{rol = obtenerRol()}}
