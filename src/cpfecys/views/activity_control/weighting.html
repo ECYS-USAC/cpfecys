@@ -4,8 +4,14 @@
 
 	{{total_var2=float(request.vars['grade_var'])}}
 
-	{{for project in db((db.course_activity_category.semester==semestre2.id) & (db.course_activity_category.assignation==project_var.project.id)).select():}}		
-		{{total_var2 = float(total_var2) + float(project.grade)}}				
+	{{if auth.has_membership('Teacher'):}}
+		{{for project in db((db.course_activity_category.semester==semestre2.id) & (db.course_activity_category.assignation==project_var.project.id) & (db.course_activity_category.laboratory==False)).select():}}		
+			{{total_var2 = float(total_var2) + float(project.grade)}}				
+		{{pass}}
+	{{else:}}
+		{{for project in db((db.course_activity_category.semester==semestre2.id) & (db.course_activity_category.assignation==project_var.project.id) & (db.course_activity_category.laboratory==True)).select():}}		
+			{{total_var2 = float(total_var2) + float(project.grade)}}				
+		{{pass}}
 	{{pass}}
 	{{if float(total_var2) > 100:}}		
 		<center>
@@ -13,13 +19,18 @@
 		</center>
 	{{else:}}
 		{{project_var = db(db.user_project.id == request.vars['assignation']).select().first() }}
+		{{var_labo = 'true'}}
+		{{if auth.has_membership('Teacher'):}}
+			{{var_labo = 'false'}}
+		{{pass}}
+
 
 		{{db.course_activity_category.insert(category = int(request.vars['category_id_var']),
 			                                grade =  request.vars['grade_var'], 
 			                                specific_grade = request.vars['SG_var'], 
 			                                semester = int(semestre2.id), 
 			                                assignation = project_var.project.id, 
-			                                laboratory = request.vars['laboratory'],
+			                                laboratory = var_labo,
 			                                teacher_permition = request.vars['TP'])}}
 	{{pass}}
 
@@ -35,11 +46,24 @@
 {{if request.vars['op'] == "updateCategory": }}
 	{{total_var2=float(request.vars['grade_var'])}}
 
-	{{for project in db((db.course_activity_category.semester==semestre2.id) & (db.course_activity_category.assignation==project_var.project.id)).select():}}
-		{{if str(project.id) != str(request.vars['var_id']):}}	
-			{{total_var2 = float(total_var2) + float(project.grade)}}
+
+
+	{{if auth.has_membership('Teacher'):}}
+		{{for project in db((db.course_activity_category.semester==semestre2.id) & (db.course_activity_category.assignation==project_var.project.id) & (db.course_activity_category.laboratory==False)).select():}}		
+			{{if str(project.id) != str(request.vars['var_id']):}}	
+				{{total_var2 = float(total_var2) + float(project.grade)}}
+			{{pass}}
+		{{pass}}
+	{{else:}}
+		{{for project in db((db.course_activity_category.semester==semestre2.id) & (db.course_activity_category.assignation==project_var.project.id) & (db.course_activity_category.laboratory==True)).select():}}		
+			{{if str(project.id) != str(request.vars['var_id']):}}	
+				{{total_var2 = float(total_var2) + float(project.grade)}}
+			{{pass}}
 		{{pass}}
 	{{pass}}
+
+
+	
 	{{if float(total_var2) > 100:}}		
 		<center>
 			<span id="information_text" class="badge badge-important">{{=T('The total weighting exceeds 100 points.') }}</span>
@@ -59,7 +83,14 @@
 	<label>{{=T('Category')}}:</label>
     <select class="generic-widget" id="category_id" name="category" style="width:250px;">
       {{project_var = db(db.user_project.id == request.vars['assignation']).select().first() }}
-      {{cR = db((db.course_activity_category.semester==semestre2.id) & (db.course_activity_category.assignation==project_var.project.id)).select()}}
+
+
+	 	{{if auth.has_membership('Teacher'):}}
+			{{cR = db((db.course_activity_category.semester==semestre2.id) & (db.course_activity_category.assignation==project_var.project.id) & (db.course_activity_category.laboratory==False)).select()}}
+		{{else:}}
+			{{cR = db((db.course_activity_category.semester==semestre2.id) & (db.course_activity_category.assignation==project_var.project.id) & (db.course_activity_category.laboratory==True)).select()}}
+		{{pass}}
+      
       {{categoriasP = []}}
       {{for c in cR:}}
           {{categoriasP.append(c.category)}}
@@ -106,83 +137,183 @@
 				{{pass}}
 			</tr>
 			{{total_var = 0}}
-			{{for project in db((db.course_activity_category.semester==semestre2.id) & (db.course_activity_category.assignation==project_var.project.id)).select():}}
-				{{editable_var='false'}}
-				{{if request.vars['op'] == "showEditCategory":}}
-	            	{{if str(request.vars['var_id']) == str(project.id):}}
-	            		{{editable_var='true'}}
-	            	{{else:}}
-	            		{{editable_var='false'}}
-	            	{{pass}}
-	        	{{pass}}
 
-			<tr>
-				<td>
-					{{if editable_var=='true':}}						
-						<select class="generic-widget" id="edit_category_id" name="category" style="width:75px;">
-							<option value="{{=project.category}}">{{=project.category.category}}</option>
-					      {{project_var = db(db.user_project.id == request.vars['assignation']).select().first() }}
-					      {{cR = db((db.course_activity_category.semester==semestre2.id) & (db.course_activity_category.assignation==project_var.project.id)).select()}}
-					      {{categoriasP = []}}
-					      {{for c in cR:}}
-					          {{categoriasP.append(c.category)}}
-					      {{pass}}
-					      {{for cat in db(~db.activity_category.id.belongs(categoriasP)).select():}}
-					          <option value="{{=cat.id}}">{{=cat.category}}</option>
-					      {{pass}}
-					    </select>
-					{{else:}}
-						{{=project.category.category}}
-					{{pass}}
-				</td>
-				<td>
-					{{if editable_var=='true':}}
-						<input class="string" name="edit_grade" type="text" value="{{=project.grade}}" id="edit_grade" style="width:40px;">
-					{{else:}}
-						{{=project.grade}}
-						
-					{{pass}}
-					{{total_var = total_var + project.grade}}					
-				</td>
-				<td>
-					{{if editable_var=='true':}}
-						{{if str(project.specific_grade) =='True':}}
-							<input type="checkbox" name="edit_SG_check"  id="edit_SG_check" checked>
-						{{else:}}
-							<input type="checkbox" name="edit_SG_check"  id="edit_SG_check">
-						{{pass}}						
-					{{else:}}
-						{{=project.specific_grade}}
-					{{pass}}
-				</td>
-				{{if request.vars['op'] != "showTableNoEditable":}}
-				<td>
-					<center>
-						
 
-                    	{{if editable_var=='true':}}
-							<a id="categoryButton" role="button" class="badge btn-success"  
-							onclick="updateCategory({{=project.id}});"> 
-	                    		<span class="icon-white icon-check"></span>
-	                    	</a>
-                    	{{else:}}
-                    		
-	                    		<a id="categoryButton" role="button" class="badge btn-info"  
-								onclick="editCategory({{=project.id}});"> 
-		                    		<span class="icon-white icon-edit"></span>
+
+
+			{{if auth.has_membership('Teacher'):}}
+				{{for project in db((db.course_activity_category.semester==semestre2.id) & (db.course_activity_category.assignation==project_var.project.id) & (db.course_activity_category.laboratory==False)).select():}}		
+					{{editable_var='false'}}
+					{{if request.vars['op'] == "showEditCategory":}}
+		            	{{if str(request.vars['var_id']) == str(project.id):}}
+		            		{{editable_var='true'}}
+		            	{{else:}}
+		            		{{editable_var='false'}}
+		            	{{pass}}
+		        	{{pass}}
+						<tr>
+						<td>
+							{{if editable_var=='true':}}						
+								<select class="generic-widget" id="edit_category_id" name="category" style="width:75px;">
+									<option value="{{=project.category}}">{{=project.category.category}}</option>
+							      {{project_var = db(db.user_project.id == request.vars['assignation']).select().first() }}
+
+						      	{{if auth.has_membership('Teacher'):}}
+									{{cR = db((db.course_activity_category.semester==semestre2.id) & (db.course_activity_category.assignation==project_var.project.id) & (db.course_activity_category.laboratory==False)).select()}}
+								{{else:}}
+									{{cR = db((db.course_activity_category.semester==semestre2.id) & (db.course_activity_category.assignation==project_var.project.id) & (db.course_activity_category.laboratory==True)).select()}}
+								{{pass}}
+
+							      
+							      {{categoriasP = []}}
+							      {{for c in cR:}}
+							          {{categoriasP.append(c.category)}}
+							      {{pass}}
+							      {{for cat in db(~db.activity_category.id.belongs(categoriasP)).select():}}
+							          <option value="{{=cat.id}}">{{=cat.category}}</option>
+							      {{pass}}
+							    </select>
+							{{else:}}
+								{{=project.category.category}}
+							{{pass}}
+						</td>
+						<td>
+							{{if editable_var=='true':}}
+								<input class="string" name="edit_grade" type="text" value="{{=project.grade}}" id="edit_grade" style="width:40px;">
+							{{else:}}
+								{{=project.grade}}
+								
+							{{pass}}
+							{{total_var = total_var + project.grade}}					
+						</td>
+						<td>
+							{{if editable_var=='true':}}
+								{{if str(project.specific_grade) =='True':}}
+									<input type="checkbox" name="edit_SG_check"  id="edit_SG_check" checked>
+								{{else:}}
+									<input type="checkbox" name="edit_SG_check"  id="edit_SG_check">
+								{{pass}}						
+							{{else:}}
+								{{=project.specific_grade}}
+							{{pass}}
+						</td>
+						{{if request.vars['op'] != "showTableNoEditable":}}
+						<td>
+							<center>
+								
+
+		                    	{{if editable_var=='true':}}
+									<a id="categoryButton" role="button" class="badge btn-success"  
+									onclick="updateCategory({{=project.id}});"> 
+			                    		<span class="icon-white icon-check"></span>
+			                    	</a>
+		                    	{{else:}}
+		                    		
+			                    		<a id="categoryButton" role="button" class="badge btn-info"  
+										onclick="editCategory({{=project.id}});"> 
+				                    		<span class="icon-white icon-edit"></span>
+				                    	</a>
+
+		                    	{{pass}}
+
+		                    	<a id="categoryButton" role="button" class="badge btn-danger" 
+		                    	onclick="removeCategory({{=project.id}});" title="{{=T('Remove weighting category')}}" > 
+		                    		<span class="icon-white icon-remove-sign"></span>
 		                    	</a>
-
-                    	{{pass}}
-
-                    	<a id="categoryButton" role="button" class="badge btn-danger" 
-                    	onclick="removeCategory({{=project.id}});" title="{{=T('Remove weighting category')}}" > 
-                    		<span class="icon-white icon-remove-sign"></span>
-                    	</a>
-					</center>
-				</td>
-				{{pass}}
-			</tr>
+							</center>
+						</td>
+						{{pass}}
+					</tr>
 			{{pass}}
+			{{else:}}
+				{{for project in db((db.course_activity_category.semester==semestre2.id) & (db.course_activity_category.assignation==project_var.project.id) & (db.course_activity_category.laboratory==True)).select():}}		
+					{{editable_var='false'}}
+					{{if request.vars['op'] == "showEditCategory":}}
+		            	{{if str(request.vars['var_id']) == str(project.id):}}
+		            		{{editable_var='true'}}
+		            	{{else:}}
+		            		{{editable_var='false'}}
+		            	{{pass}}
+		        	{{pass}}
+						<tr>
+						<td>
+							{{if editable_var=='true':}}						
+								<select class="generic-widget" id="edit_category_id" name="category" style="width:75px;">
+									<option value="{{=project.category}}">{{=project.category.category}}</option>
+							      {{project_var = db(db.user_project.id == request.vars['assignation']).select().first() }}
+
+						      	{{if auth.has_membership('Teacher'):}}
+									{{cR = db((db.course_activity_category.semester==semestre2.id) & (db.course_activity_category.assignation==project_var.project.id) & (db.course_activity_category.laboratory==False)).select()}}
+								{{else:}}
+									{{cR = db((db.course_activity_category.semester==semestre2.id) & (db.course_activity_category.assignation==project_var.project.id) & (db.course_activity_category.laboratory==True)).select()}}
+								{{pass}}
+
+							      
+							      {{categoriasP = []}}
+							      {{for c in cR:}}
+							          {{categoriasP.append(c.category)}}
+							      {{pass}}
+							      {{for cat in db(~db.activity_category.id.belongs(categoriasP)).select():}}
+							          <option value="{{=cat.id}}">{{=cat.category}}</option>
+							      {{pass}}
+							    </select>
+							{{else:}}
+								{{=project.category.category}}
+							{{pass}}
+						</td>
+						<td>
+							{{if editable_var=='true':}}
+								<input class="string" name="edit_grade" type="text" value="{{=project.grade}}" id="edit_grade" style="width:40px;">
+							{{else:}}
+								{{=project.grade}}
+								
+							{{pass}}
+							{{total_var = total_var + project.grade}}					
+						</td>
+						<td>
+							{{if editable_var=='true':}}
+								{{if str(project.specific_grade) =='True':}}
+									<input type="checkbox" name="edit_SG_check"  id="edit_SG_check" checked>
+								{{else:}}
+									<input type="checkbox" name="edit_SG_check"  id="edit_SG_check">
+								{{pass}}						
+							{{else:}}
+								{{=project.specific_grade}}
+							{{pass}}
+						</td>
+						{{if request.vars['op'] != "showTableNoEditable":}}
+						<td>
+							<center>
+								
+
+		                    	{{if editable_var=='true':}}
+									<a id="categoryButton" role="button" class="badge btn-success"  
+									onclick="updateCategory({{=project.id}});"> 
+			                    		<span class="icon-white icon-check"></span>
+			                    	</a>
+		                    	{{else:}}
+		                    		
+			                    		<a id="categoryButton" role="button" class="badge btn-info"  
+										onclick="editCategory({{=project.id}});"> 
+				                    		<span class="icon-white icon-edit"></span>
+				                    	</a>
+
+		                    	{{pass}}
+
+		                    	<a id="categoryButton" role="button" class="badge btn-danger" 
+		                    	onclick="removeCategory({{=project.id}});" title="{{=T('Remove weighting category')}}" > 
+		                    		<span class="icon-white icon-remove-sign"></span>
+		                    	</a>
+							</center>
+						</td>
+						{{pass}}
+					</tr>
+					{{pass}}
+			{{pass}}
+			
+				
+
+			
 			<tr >
 				<td style="background-color:#eee;">
 					{{=T('Total')}}

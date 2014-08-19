@@ -1,8 +1,14 @@
 {{project_var = db(db.user_project.id == request.vars['assignation']).select().first() }}
 {{total_var2=0}}
 
-{{for project in db((db.course_activity_category.semester==semestre2.id) & (db.course_activity_category.assignation==project_var.project.id)).select():}}		
-	{{total_var2 = float(total_var2) + float(project.grade)}}				
+{{if auth.has_membership('Teacher'):}}
+	{{for project in db((db.course_activity_category.semester==semestre2.id) & (db.course_activity_category.assignation==project_var.project.id) & (db.course_activity_category.laboratory==False)).select():}}		
+		{{total_var2 = float(total_var2) + float(project.grade)}}				
+	{{pass}}
+{{else:}}
+	{{for project in db((db.course_activity_category.semester==semestre2.id) & (db.course_activity_category.assignation==project_var.project.id) & (db.course_activity_category.laboratory==True)).select():}}		
+		{{total_var2 = float(total_var2) + float(project.grade)}}				
+	{{pass}}
 {{pass}}
 
 {{if request.vars['operation'] == "div_update": }}
@@ -11,7 +17,7 @@
 			<div id="table_Weighting">
 			</div>
 		{{else:}}
-			<b><font color="red">{{=T('Weighting was not created')}}</font></b>
+			<b><font color="red">{{=T('Weighting was not created or is incorrect')}}</font></b>
 			<br>
 			<a id="myButton" href="#createWeighting" role="button" class="btn btn-warning" data-toggle="modal" data-target="#createWeighting"  > 
 				<span class="icon-plus-sign"></span>
