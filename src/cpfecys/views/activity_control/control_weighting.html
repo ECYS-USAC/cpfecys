@@ -21,7 +21,7 @@
 			{{if auth.has_membership('Student'):}}
 				{{from datetime import datetime}}
 				{{enddate=None}}
-				{{for date_var in db((db.student_control_period.period_name==str(semester)+" "+str(year))).select():}}
+				{{for date_var in db((db.student_control_period.period_name==T(str(semester))+" "+str(year))).select():}}
 					{{if datetime.now() > date_var.date_start and datetime.now() < date_var.date_finish:}}
 						{{enddate=date_var.date_finish}}					
 					{{pass}}
@@ -63,10 +63,15 @@
       			<li class="disabled"> 
 					<a  tabindex="-1" title="{{=T('Create course weighting')}}" id="menu_create_weighting" >
 						<span class="icon-plus-sign"></span>
-			          {{=T('Create Weighting')}}
+		        		{{=T('Create Weighting')}}
 			        </a>
-			      </li>
-
+			    </li>
+			    <li class="disabled"> 
+					<a  tabindex="-1" title="{{=T('Get weighting of previous semesters')}}" id="menu_create_weighting" >
+						<span class="icon-repeat"></span>
+		        		{{=T('Get Weighting')}}
+			        </a>
+			    </li>
 				<li>
 					<a tabindex="-1"  title="{{=T('Modify course weighting')}}" href="#createWeighting" role="button"  data-toggle="modal" data-target="#createWeighting"  id="edit_option"> 
 						<span class="icon-edit" ></span>
@@ -76,7 +81,7 @@
 			{{else:}}
 				{{from datetime import datetime}}
 				{{var_do='false'}}
-				{{for date_var in db((db.student_control_period)).select():}}
+				{{for date_var in db((db.student_control_period.period_name==T(str(semester))+" "+str(year))).select():}}
 					{{if datetime.now() > date_var.date_start and datetime.now() < date_var.date_finish:}}
 						{{var_do='true'}}					
 					{{pass}}
@@ -84,23 +89,37 @@
 				{{if var_do =='true':}}
 					<li class="disabled"> 
 						<a tabindex="-1"  title="{{=T('Create course weighting')}}">
-						<span class="icon-edit" ></span>
-			          {{=T('Create Weighting')}}
-			        </a>
-			      </li>
+							<span class="icon-edit" ></span>
+			          		{{=T('Create Weighting')}}
+			        	</a>
+			      	</li>
+			      	<li class="disabled"> 
+						<a  tabindex="-1" title="{{=T('Get weighting of previous semesters')}}" id="menu_create_weighting" >
+							<span class="icon-repeat"></span>
+			        		{{=T('Get Weighting')}}
+				        </a>
+				    </li>
 					<li>
-					<a tabindex="-1"  title="{{=T('Modify course weighting')}}" href="#createWeighting" role="button"  data-toggle="modal" data-target="#createWeighting"  id="edit_option"> 
-						<span class="icon-edit" ></span>
-			          {{=T('Edit Weighting')}}
-			        </a>
-			      </li>
+					<li>
+						<a tabindex="-1"  title="{{=T('Modify course weighting')}}" href="#createWeighting" role="button"  data-toggle="modal" data-target="#createWeighting"  id="edit_option"> 
+							<span class="icon-edit" ></span>
+			          		{{=T('Edit Weighting')}}
+			        	</a>
+			      	</li>
 				{{else:}}
 					<li class="disabled"> 
 						<a tabindex="-1"  title="{{=T('Create course weighting')}}">
-						<span class="icon-edit" ></span>
-			          {{=T('Create Weighting')}}
-			        </a>
-			      </li>
+							<span class="icon-edit" ></span>
+			         		{{=T('Create Weighting')}}
+			        	</a>
+			      	</li>
+			      	<li class="disabled"> 
+						<a  tabindex="-1" title="{{=T('Get weighting of previous semesters')}}" id="menu_create_weighting" >
+							<span class="icon-repeat"></span>
+			        		{{=T('Get Weighting')}}
+				        </a>
+				    </li>
+					<li>
 					<li class="disabled"> 
 						<a tabindex="-1"  title="{{=T('Modify course weighting')}}">
 						<span class="icon-edit" ></span>
@@ -112,33 +131,53 @@
 		{{else:}}
 			{{if auth.has_membership('Teacher'):}}
 				<li>
-				<a  tabindex="-1" title="{{=T('Create course weighting')}}" id="menu_create_weighting" href="#createWeighting" role="button"  data-toggle="modal" data-target="#createWeighting"  >
-					<span class="icon-plus-sign"></span>
-		          {{=T('Create Weighting')}}
-		        </a>
-		      </li>
+					<a  tabindex="-1" title="{{=T('Create course weighting')}}" id="menu_create_weighting" href="#createWeighting" role="button"  data-toggle="modal" data-target="#createWeighting"  >
+						<span class="icon-plus-sign"></span>
+		          		{{=T('Create Weighting')}}
+		        	</a>
+		      	</li>
+		      	<li> 
+					<a  tabindex="-1"  title="{{=T('Get weighting of previous semesters')}}" href="#getWeighting" role="button"  data-toggle="modal" data-target="#getWeighting"  id="get_option" >
+						<span class="icon-repeat"></span>
+		        		{{=T('Get Weighting')}}
+			        </a>
+			    </li>
+				<li>
+
 		      {{else:}}
 		      	{{from datetime import datetime}}
 				{{var_do='false'}}
-				{{for date_var in db((db.student_control_period)).select():}}
+				{{for date_var in db((db.student_control_period.period_name==T(str(semester))+" "+str(year))).select():}}
 					{{if datetime.now() > date_var.date_start and datetime.now() < date_var.date_finish:}}
 						{{var_do='true'}}					
 					{{pass}}
 				{{pass}}
 				{{if var_do =='true':}}
 					<li>
-					<a  tabindex="-1" title="{{=T('Create course weighting')}}" id="menu_create_weighting" href="#createWeighting" role="button"  data-toggle="modal" data-target="#createWeighting"  >
-						<span class="icon-plus-sign"></span>
-		          		{{=T('Create Weighting')}}
-		        	</a>
-			      </li>
+						<a  tabindex="-1" title="{{=T('Create course weighting')}}" id="menu_create_weighting" href="#createWeighting" role="button"  data-toggle="modal" data-target="#createWeighting"  >
+							<span class="icon-plus-sign"></span>
+		          			{{=T('Create Weighting')}}
+		        		</a>
+			      	</li>
+			      	<li> 
+						<a  tabindex="-1"  title="{{=T('Get weighting of previous semesters')}}" href="#getWeighting" role="button"  data-toggle="modal" data-target="#getWeighting"  id="get_option" >
+							<span class="icon-repeat"></span>
+			        		{{=T('Get Weighting')}}
+				        </a>
+				    </li>
 				{{else:}}
 					<li class="disabled"> 
 						<a tabindex="-1"  title="{{=T('Create course weighting')}}">
-						<span class="icon-edit" ></span>
-			          {{=T('Create Weighting')}}
-			        </a>
-			      </li>
+							<span class="icon-plus-sign" ></span>
+			          		{{=T('Create Weighting')}}
+			        	</a>
+			      	</li>
+			      	<li class="disabled"> 
+						<a  tabindex="-1"  title="{{=T('Get weighting of previous semesters')}}" >
+							<span class="icon-repeat"></span>
+			        		{{=T('Get Weighting')}}
+				        </a>
+				    </li>
 				{{pass}}
 
 		      {{pass}}
@@ -165,6 +204,8 @@
 		$("#edit_option").click(function(){
 	      $("#div_weighting_show").load("{{=URL('activity_control','weighting.html')}}?op=showEditTable&amp;assignation={{=request.vars['assignation']}}"); 
 	    })
+
+	    
 			
 	});
 

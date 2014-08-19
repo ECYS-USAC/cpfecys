@@ -15,7 +15,7 @@
         <center>
           <table >
               <tr>
-                <td align="left">                	
+                <td align="left">                 
                   <div align="center" id="categoryDiv" value="categoryDiv" class="well span12" style="overflow:auto; height:200px; width:300px;">    
                     
                   </div>
@@ -23,9 +23,9 @@
                 </td>
                 <td align="left"  >
                   <div class="well span11" id="div_weighting_show" style="overflow:auto; height:200px; width:300px;">
-            	      
+                    
                   </div>
-              	</td>
+                </td>
               </tr>
               <tr >
                 <td>
@@ -45,7 +45,7 @@
                 </td>
               </tr>
           </table>
-			   </center>     	
+         </center>      
         </div>
 
         <div align="center">
@@ -55,6 +55,99 @@
     </div>
   </div>
   <!--Finish Create weighting Modal -->
+  
+
+
+
+  <!--Get weighting Modal -->
+<div id="getWeighting" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true" style="width:800px; left:40%;"> 
+    <div id ="a" class="modal-header">
+      <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+        <h3 id="myModalLabel">
+            {{if auth.has_membership('Teacher'):}}
+              <h2>{{=T('Class Weighting')}} - {{=name}}
+            {{else:}}
+              <h2>{{=T('Laboratory Weighting')}} - {{=name}}
+            {{pass}}
+        </h3>
+    </div>
+    <div id="actions">
+      <form action="" enctype="multipart/form-data" method="post" >
+        <center>
+          <table >
+              <tr>
+                <td align="left">                 
+
+                  <div align="center" id="categoryDiv" value="categoryDiv" class="well span12" style="overflow:auto; height:200px; width:300px;"> 
+                    <table>
+                      <tr>
+                        <td>
+                          <select class="generic-widget" id="period_id" name="category" style="width:250px;">
+                            {{project_var = db(db.user_project.id == request.vars['assignation']).select().first() }}
+
+                            {{if auth.has_membership('Teacher'):}}
+                              {{cR = db( (db.course_activity_category.assignation==project_var.project.id) & (db.course_activity_category.laboratory==False)).select()}}
+                            {{else:}}
+                              {{cR = db( (db.course_activity_category.assignation==project_var.project.id) & (db.course_activity_category.laboratory==True)).select()}}
+                            {{pass}}
+                              
+                              {{periodsP = []}}
+                              {{for c in cR:}}
+                                  {{periodsP.append(c.semester)}}
+                              {{pass}}
+                              {{for period_var in db(db.period_year.id.belongs(periodsP)).select():}}
+                                  <option value="{{=period_var.id}}">{{=T(period_var.period.name)}} - {{=period_var.yearp}}</option>
+                              {{pass}}
+                          </select>
+                        </td>
+                        <td>
+                          <a id="refreshButton" role="button" class="btn btn-info" title="{{=T('Refresh')}}"> 
+                          <span class="icon-white icon-refresh"></span>
+                           </a>
+                        </td>
+                      </tr>
+                    </table>   
+                    <div align="center" id="getDiv" style="overflow:auto; height:60%; width:100%;"> 
+
+                    </div>
+                    
+                  </div>
+                  
+                </td>
+                <td align="left"  >
+                  <div class="well span11" id="getViewDiv" style="overflow:auto; height:200px; width:300px;">
+                    
+                  </div>
+                </td>
+              </tr>
+              <tr >
+                <td>
+                  <div align="right">
+                    <a id="getWeightingButton" role="button" class="btn btn-info"  
+                    title="{{=T('Get weighting of the chosen semester')}}"> 
+                    <span class="icon-plus-sign"></span>
+                    {{=T('Get Weighting')}}
+                     </a>
+                  </div>
+                </td>
+                <td >
+                  <div align="right"> 
+                    <button class="btn btn-primary" id="button_action"> {{=T('Update')}}</button>
+                    <button class="btn" data-dismiss="modal" aria-hidden="true">{{=T('Close')}}</button>
+                  </div>
+                </td>
+              </tr>
+          </table>
+         </center>      
+        </div>
+
+        <div align="center">
+
+      </div>
+    </form>
+    </div>
+  </div>
+  <!--Get  weighting Modal -->
   
 
   <script type="text/javascript">
@@ -94,6 +187,18 @@
         }
       }
 	 })
+    $("#refreshButton").click(function(){
+      var id_period_sel = document.getElementById('period_id').value;
+      $("#getDiv").load("{{=URL('activity_control','weighting.html')}}?op=showTableNoEditablePeriod&amp;assignation={{=request.vars['assignation']}}&amp;period_par="+id_period_sel);
+    })
+
+    $("#getWeightingButton").click(function(){
+      var id_period_sel = document.getElementById('period_id').value;
+      $("#getViewDiv").load("{{=URL('activity_control','weighting.html')}}?op=getPreviousWeighting&amp;assignation={{=request.vars['assignation']}}&amp;period_par="+id_period_sel);
+      //$("#getViewDiv").load("{{=URL('activity_control','weighting.html')}}?op=showEditTable&amp;assignation={{=request.vars['assignation']}}");
+      
+    })
+
   });
 
   </script>
