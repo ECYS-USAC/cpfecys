@@ -8,7 +8,15 @@ def activity_category():
 @auth.requires_login()
 @auth.requires_membership('Super-Administrator')
 def student_control_period():
+    import cpfecys
+
+
+    year = cpfecys.current_year_period()
+    year_semester = db.period(id=year.period)
+
     query = db.student_control_period
+    db.student_control_period.period_name.default = str(year_semester.name) +" " + str(year.yearp)
+    db.student_control_period.period_name.writable = False
     grid = SQLFORM.grid(query, maxtextlength=100,csv=False)
     return dict(grid=grid)
 

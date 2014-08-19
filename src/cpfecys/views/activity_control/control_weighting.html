@@ -21,7 +21,7 @@
 			{{if auth.has_membership('Student'):}}
 				{{from datetime import datetime}}
 				{{enddate=None}}
-				{{for date_var in db((db.student_control_period)).select():}}
+				{{for date_var in db((db.student_control_period.period_name==str(semester)+" "+str(year))).select():}}
 					{{if datetime.now() > date_var.date_start and datetime.now() < date_var.date_finish:}}
 						{{enddate=date_var.date_finish}}					
 					{{pass}}
