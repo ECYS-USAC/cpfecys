@@ -1383,6 +1383,7 @@
 'These dates indicate when the selected period will be frozen for ending practices in that period. This will happend the first day of the selected month, at midnight': 'These dates indicate when the selected period will be frozen for ending practices in that period. This will happend the first day of the selected month, at midnight',
 'these files are served without processing, your images go here': 'estos archivos son servidos sin procesar, sus imágenes van aquí',
 'This App': 'Esta Aplicación',
+'This area may program the time period that the academic tutors will have to enter the planning of the laboratory.': 'En esta área podra ingresar el tiempo que tendran los tutores academicos para ingresar la planificacion del laboratorio.',
 'This email already has an account': 'Este email ya está registrado en otro usuario.',
 'This is a copy of the scaffolding application': 'Esta es una copia de la aplicación de andamiaje',
 "This is a report preview, it can't be graded while     the student works on it you'll be notified via mail when available to     grade it": 'Este reporte es una vista previa, no puede ser calificado mientras el estudiante trabaja en el. Usted será notificado por email cuando esté disponible para calificar.',
