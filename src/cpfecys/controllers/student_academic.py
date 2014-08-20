@@ -148,7 +148,7 @@ def academic_assignation():
             else:
                 if ( update_form.vars.academic_carnet is "" ) or ( update_form.vars.academic_email is ""):
                     response.flash = T('You must enter all fields.')
-                else: #hola
+                else: 
                     db(db.academic.id==update_form.vars.academic_id).update(carnet=update_form.vars.academic_carnet,email=update_form.vars.academic_email)
                     db.academic_log.insert(user_name = auth.user.username, 
                                                 roll =  roll_var, 
@@ -170,6 +170,14 @@ def academic_assignation():
         _role='label',
         _title=str( db(db.academic.id==int(row.carnet)).select(db.academic.email).first().email ),
         _style='width: 250px; ')]
+
+    links += [lambda row: A(T('View photo'),
+        _role='button', 
+        _class='btn btn-success', 
+        _onclick='set_photo("'+str(db(db.academic.id==int(row.carnet)).select(db.academic.id_auth_user).first().id_auth_user)+'");', 
+        _title=T('Edit academic information') ,**{"_data-toggle":"modal", "_data-target": "#picModal"})]   
+        
+
     links += [lambda row: A(T('Edit academic'), 
         _role='button', 
         _class='btn btn-info', 
@@ -651,14 +659,30 @@ def academic():
     db.academic.id.readable = False
     #db.academic.email.writable = False
     db.academic.email.readable = False
+    db.academic.id_auth_user.readable = False
+    db.academic.id_auth_user.writable = False
+
+           
 
     if auth.has_membership('Super-Administrator'):
+        
+        db.academic.email.readable = True        
+        #Modal photo
+        links = [lambda row: A(T('View photo'),
+        _role='button', 
+        _class='btn btn-success', 
+        _onclick='set_values("'+str(row.id_auth_user)+'");', 
+        _title=T('Edit academic information') ,**{"_data-toggle":"modal", "_data-target": "#picModal"})]   
+        
         grid = SQLFORM.grid(
-        query, oncreate=oncreate_academic, onupdate=onupdate_academic, ondelete=ondelete_academic,  maxtextlength=100,csv=False)
+        query, oncreate=oncreate_academic,links=links, onupdate=onupdate_academic, ondelete=ondelete_academic,  maxtextlength=100,csv=False)
     else:
         grid = SQLFORM.grid(
         query, oncreate=oncreate_academic, onupdate=onupdate_academic, ondelete=ondelete_academic,  maxtextlength=100,csv=False,editable=False,deletable=False,details=False)
     return dict(grid=grid)
+
+def photo():
+    return dict(var="")
 
 def oncreate_academic(form):
     import datetime

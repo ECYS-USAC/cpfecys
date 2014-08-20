@@ -123,7 +123,11 @@ auth.settings.extra_fields['auth_user']= [
                   Field('data_updated', 'boolean', notnull=False, \
                     writable=False, readable=False),
                   Field('load_alerted', 'boolean', notnull=False, \
-                    writable=False, readable=False),]
+                    writable=False, readable=False),
+                  Field('photo', 'upload', notnull=False, label = T('Photo'), \
+                    requires=[IS_UPLOAD_FILENAME(extension = '(png|jpg)',\
+                    error_message=T('Only files are accepted with extension') +\
+                    ' png|jpg'),IS_LENGTH(2097152,error_message=T('The maximum file size is')+' 2MB')]),]
 
 crud, service, plugins = Crud(db), Service(), PluginManager()
 
@@ -645,7 +649,13 @@ db.define_table('public_event_schedule',
 db.define_table('academic',
         Field('carnet', 'integer', unique=True, notnull=True, label=T('carnet')),
         Field('email', 'string', notnull=True, requires = IS_EMAIL(error_message='El email no es valido')),
+        Field('id_auth_user', 'integer', notnull = False),
         format='%(carnet)s')
+
+
+db.academic._after_insert.append(lambda f,id: academic_insert(f,id))
+db.academic._after_update.append(lambda s,f: academic_update(f))
+
 
 #Tabla de asignacion de alumnos al curso
 db.define_table('academic_course_assignation',
@@ -735,6 +745,52 @@ db.define_table('student_control_period',
     )    
 
 
+##############################ACADEMIC TRIGGERS####################################
+def academic_update(*args):    
+    None
+
+def academic_insert(*args):    
+    academic_var = db.auth_group(db.auth_group.role=='Academic')
+    user_var = db.auth_user(db.auth_user.username==str(args[0]['carnet']))
+    if user_var is None:
+        #AQUI IRIA LA VALIDACION CON EL WEBSERVICE
+        #If not exists, create auth_user of academic
+        id_user = db.auth_user.insert(first_name = str(args[0]['carnet']),
+                        last_name =  " ",
+                        email = str(args[0]['email']),
+                        username = str(args[0]['carnet']),
+                        phone = '12345678',
+                        home_address = T('Enter your address'))
+        #Add the id_auth_user to academic.
+        db(db.academic.id == args[1]['id']).update(id_auth_user = id_user.id)
+        #Create membership to academic
+        db.auth_membership.insert(user_id = id_user.id, group_id =  academic_var.id)   
+    else:
+        membership_var = db.auth_membership((db.auth_membership.user_id==user_var.id) & (db.auth_membership.group_id==academic_var.id))
+        if membership_var is None:
+            #Create membership to academic
+            db.auth_membership.insert(user_id = user_var.id, group_id =  academic_var.id) 
+
+        #Add the id_auth_user to academic. And update academic inforamtion  
+        db(db.academic.id == args[1]['id']).update(id_auth_user = user_var.id,
+                                                email = user_var.email,
+                                                carnet = user_var.username)
+        #academic_LOG 
+        import cpfecys
+        cperiod = cpfecys.current_year_period()
+        db.academic_log.insert(user_name = 'system',
+                            roll = 'system',
+                            operation_log = 'update', 
+                            before_carnet = str(args[0]['carnet']), 
+                            before_email = str(args[0]['email']), 
+                            after_carnet = user_var.username, 
+                            after_email = user_var.email, 
+                            id_academic = args[1]['id'], 
+                            id_period = cperiod,
+                            description = T('Registration data was updated before I entered by the administrator'))
+##############################ACADEMIC TRIGGERS####################################
+
+        
 
 
 ## after defining tables, uncomment below to enable auditing

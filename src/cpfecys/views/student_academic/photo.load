@@ -1,0 +1,18 @@
+<!--<img id="img_img" src="{{=cpfecys.get_domain() + URL('default/download', db(db.auth_user.id==request.vars['id_user']).select(db.auth_user.photo).first().photo)}}" alt="Smiley face" > -->
+
+{{var_query=db(db.auth_user.id==request.vars['id_user']).select().first()}}
+<img id="img_img" src="{{= URL('default/download', var_query.photo)}}" alt="Smiley face" height="50%" width="50%">
+<br>
+<h3>
+{{= var_query.username}} - {{= var_query.first_name}} {{= var_query.last_name}}
+<br>
+<small>{{=var_query.email}}</small>
+</h3>
+
+
+
+
+
+
+
+
