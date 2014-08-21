@@ -1,12 +1,16 @@
 {{extend 'template.html'}}
-<h2>{{=T('Weighting')}} - {{=name}}
+{{if auth.has_membership('Teacher'):}}
+	<h2>{{=T('Class Weighting')}} - {{=name}}
+{{else:}}
+	<h2>{{=T('Laboratory Weighting')}} - {{=name}}
+{{pass}}
 <br>
     <small>{{=T(semester)}}, {{=year}}</small>
 </h2>
 
 
 <div class="well span10" id="principal_div" >
-	<div style="position:absolute; right:15%;">
+	<div style="position:absolute; left:75%;">
 	<a class="btn" href="{{=URL('activity_control', 'students_control', vars=dict(assignation = request.vars['assignation']))}}">
 		<i class="icon-arrow-left"></i>{{=T('Back')}}
 	</a>
