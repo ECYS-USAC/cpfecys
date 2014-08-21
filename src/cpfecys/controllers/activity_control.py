@@ -165,3 +165,88 @@ def weighting():
 
     year = db.period_year(id=check.period)
     return dict(semestre2 = year)
+
+
+
+
+
+
+#------------------------------------------------------------------------------------------------------------------------
+#------------------------------------------------------------------------------------------------------------------------
+#------------------------------------------------------------------------------------------------------------------------
+#------------------------------------------------------------------------------------------------------------------------
+def control_activity():
+    import cpfecys
+    #Obtener la asignacion del estudiante
+    assignation = request.vars['assignation']
+    #Obtener al tutor del proyecto
+    check = db.user_project(id = assignation, assigned_user = auth.user.id)
+    if (check is None):
+        #check if there is no assignation or if it is locked (shouldn't be touched)
+        if (session.last_assignation is None):
+            redirect(URL('default','index'))
+            return
+        else:
+            check = db.user_project(id = session.last_assignation)
+            if cpfecys.assignation_is_locked(check):
+                redirect(URL('default','index'))
+                return
+    else:
+        session.last_assignation = check.id
+
+
+    year = db.period_year(id=check.period)
+    year_semester = db.period(id=year.period)
+    
+    return dict(name = check.project.name,
+                semester = year_semester.name,
+                year = year.yearp,
+                assignation=check,
+                semestre2 = year)
+
+
+def activity():
+    import cpfecys
+    #Obtener la asignacion del estudiante
+    assignation = request.vars['assignation']
+    #Obtener al tutor del proyecto
+    check = db.user_project(id = assignation, assigned_user = auth.user.id)
+    if (check is None):
+        #check if there is no assignation or if it is locked (shouldn't be touched)
+        if (session.last_assignation is None):
+            redirect(URL('default','index'))
+            return
+        else:
+            check = db.user_project(id = session.last_assignation)
+            if cpfecys.assignation_is_locked(check):
+                redirect(URL('default','index'))
+                return
+    else:
+        session.last_assignation = check.id
+
+
+    year = db.period_year(id=check.period)
+    return dict(semestre2 = year)
+
+def control_students_modals2():
+    import cpfecys
+    #Obtener la asignacion del estudiante
+    assignation = request.vars['assignation']
+    #Obtener al tutor del proyecto
+    check = db.user_project(id = assignation, assigned_user = auth.user.id)
+    if (check is None):
+        #check if there is no assignation or if it is locked (shouldn't be touched)
+        if (session.last_assignation is None):
+            redirect(URL('default','index'))
+            return
+        else:
+            check = db.user_project(id = session.last_assignation)
+            if cpfecys.assignation_is_locked(check):
+                redirect(URL('default','index'))
+                return
+    else:
+        session.last_assignation = check.id
+
+
+    year = db.period_year(id=check.period)
+    return dict(semestre2 = year, name=check.project.name)

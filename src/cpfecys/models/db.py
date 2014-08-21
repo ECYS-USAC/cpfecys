@@ -734,6 +734,18 @@ db.define_table('student_control_period',
     Field('date_finish', 'datetime', notnull = True, default = datetime.datetime.now(), label = T('Date Finish'))
     )    
 
+db.define_table('course_activity',
+    Field('course_activity_category', 'reference course_activity_category', notnull=True, label = T('category')),    
+    Field('name', 'string', notnull=True, unique=False, label = T('name')),
+    Field('description', 'string', notnull=True, unique=False, label = T('description')),
+    Field('grade', 'decimal(5,2)', notnull=False, label=T('grade')),
+    Field('semester', 'reference period_year', notnull=True),
+    Field('assignation', 'reference project', notnull=True),
+    Field('laboratory', 'boolean', notnull=True, label = T('laboratory')),
+    Field('teacher_permition', 'boolean', notnull=True, label = T('teacher permition')),
+    Field('date_start', 'datetime', notnull = True, default = datetime.datetime.now(), label = T('Date Start')),
+    Field('date_finish', 'datetime', notnull = True, default = datetime.datetime.now(), label = T('Date Finish'))
+    )
 
 
 
