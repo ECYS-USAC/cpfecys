@@ -1,13 +1,29 @@
 {{project_var = db(db.user_project.id == request.vars['assignation']).select().first() }}
 {{total_var2=0}}
+{{if auth.has_membership('Teacher'):}}
+	{{weighting =  db((db.course_activity_category.semester==semestre2.id) & (db.course_activity_category.assignation==project_var.project.id) & (db.course_activity_category.laboratory==False)).select()}}
+{{else:}}
+	{{weighting =  db((db.course_activity_category.semester==semestre2.id) & (db.course_activity_category.assignation==project_var.project.id) & (db.course_activity_category.laboratory==True)).select()}}
+{{pass}}
 
-{{weighting = db((db.course_activity_category.semester==semestre2.id) & (db.course_activity_category.assignation==project_var.project.id)).select()}}
 {{for project in weighting:}}
 	{{total_var2 = float(total_var2) + float(project.grade)}}				
 {{pass}}
 
 {{if request.vars['operation'] == "div_update": }}
-	<center>		
+		{{if auth.has_membership('Student'):}}
+			{{from datetime import datetime}}
+			{{enddate=None}}
+			{{for date_var in db((db.student_control_period.period_name==T(str(semester))+" "+str(year))).select():}}
+				{{if datetime.now() > date_var.date_start and datetime.now() < date_var.date_finish:}}
+					{{enddate=date_var.date_finish}}					
+				{{pass}}
+			{{pass}}
+			{{if enddate != None:}}
+				<font color="red">{{=T('Deadline for entry activities with specific notes')}}: {{=enddate}}</font>
+			{{pass}}
+		{{pass}}
+	<center>
 		{{if float(total_var2) == 100:}}		
 			<div id="table_activity">
 			</div>

@@ -382,6 +382,7 @@
 'db': 'db',
 'DB Model': 'Modelo "DB"',
 'Deadline for entry': 'Fecha limite de ingreso:',
+'Deadline for entry activities with specific notes': 'Fecha limite para ingreso de actividades con nota específica',
 'December': 'Diciembre',
 'defines tables': 'define tablas',
 'delete': 'eliminar',
