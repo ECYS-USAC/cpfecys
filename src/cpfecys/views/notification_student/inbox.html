@@ -1,0 +1,78 @@
+{{extend 'template.html'}}
+<table style="width:100%;" >
+	<tr>
+		<td style="width:60%;" >
+			
+			<form action="" enctype="multipart/form-data" method="post" >
+				<table>
+					<tr>
+						<td>
+							<input name="_formname" type="hidden" value="select_form">
+			              	<select class="generic-widget" id="semester_id" name="semester_id">
+								{{for per in period_list:}}
+									{{if str(per.semester.id) == str(period_id):}}
+										{{var_sel="selected='selected'"}}
+									{{else:}}
+										{{var_sel=''}}
+									{{pass}}
+									<option  onclick="refresh_period({{=per.semester.id}});" value="{{=per.semester.id}}" {{=var_sel}} >{{=T(per.semester.period.name)}} {{=per.semester.yearp}}</option>
+								{{pass}}
+							</select>
+						</td>
+						<td>
+              				<input type="submit" value="{{=T('go')}}" >
+              			</td>
+              	</table>
+          	</form>
+		</td>
+	</tr>
+	<tr>
+		<td>
+			<div style=" height:500px; overflow:auto;">				
+				<table class="table table-striped table-bordered" >
+					
+					<tbody>
+						{{for assignation in assignations:}}							
+							<tr>
+								<td >
+									<a style="cursor:pointer;" onclick="click_link({{=assignation.assignation.id}});">
+										{{=assignation.assignation.name}}
+									</a>
+									<div id="mail_{{=assignation.assignation.id}}" style="display:none; height:500px; overflow:auto;" >
+										{{=T('Loading')}}...
+									<div>
+								</td>
+
+							</tr>
+						{{pass}}
+					</tbody>
+				</table>
+			</div>
+		</td>
+		<td style="width:40%;">
+			<table class="well" style="width:100%;">
+				<tr>
+					<td>
+						<div id="mail_div" style=" height:500px; overflow:auto;">
+						</div>
+					</td>
+				</tr>
+			</table>
+		</td>
+	</tr>
+</table>
+
+<script type="text/javascript">
+	$(document).ready(function(){
+		
+  	});
+  	
+
+	function click_link(var_id){
+  		$("#mail_"+var_id).toggle(700);
+
+  		$("#mail_"+var_id).load("{{=URL('notification_student','inbox_mails_load.html')}}?operation=mails_list&amp;email={{=email}}&amp;period_id={{=period_id}}&amp;project_id="+var_id);
+	}
+	
+</script>
+

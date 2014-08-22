@@ -1,0 +1,100 @@
+{{if request.vars['operation'] == "mails_list": }}
+	<table class="table table-striped table-bordered" >
+
+		{{for a in range(len(mails)-1, -1, -1):}}
+			{{	#SHOW JUST EMAILS SENDED TO ME
+				mine_var='false'
+				var_query = db.notification_log4(db.notification_log4.register==mails[a].id)
+				split_var1 = list(str(var_query).split("'"))
+				for x in split_var1:
+					split_var2 = list(str(x).split(","))
+					for xx in split_var2:
+						if str(xx) == str(request.vars['email']):
+							mine_var='true'
+						pass
+					pass
+					split_var2 = list(str(x).split("|"))
+					for xx in split_var2:
+						if str(xx) == str(request.vars['email']):
+							mine_var='true'
+						pass
+					pass
+
+				pass}}
+				
+			
+			
+			
+			{{if mine_var=='true':}}
+				<tr>
+					<td  style="height:10px;" >
+						<table style="width:100%;" class="table table-striped table-bordered">
+							<td style="width:55%;">
+								<a style="cursor:pointer;" onclick="view_mail({{=mails[a].id}});">
+									{{=mails[a].subject}}
+								</a>
+							</td>
+							<td style="width:20%;">
+								{{
+									try:
+										user_var = db.auth_user(db.auth_user.username==mails[a].emisor)
+									except:
+										user_var = T("Not found")
+									pass
+								}}
+								{{=user_var.last_name}}
+							</td>
+							<td style="width:25%;">
+								{{=mails[a].time_date}}
+							</td>
+						</table>
+					</td>
+				</tr>
+			{{pass}}
+		{{pass}}
+	</table>
+
+{{pass}}
+
+{{if request.vars['operation'] == "view_mail": }}
+	<table style="width:100%;">
+		<td>
+			<table class="table table-striped table-bordered">
+				<td style="width:25%;" >
+					<div style="height:110px; overflow:hidden">
+						<!--<img id="img_img" src="{{=cpfecys.get_domain() + URL('default/download', emisor.photo)}}" alt="No photo" > -->
+						<img id="img_img" src="{{= URL('default/download', emisor.photo)}}" alt="No photo" height="100%" width="100%">
+					</div>
+				</td>
+				<td style="width:75%;">
+					<h3>
+						{{=mail.subject}}
+						<br>
+						<small>{{=emisor.first_name}} {{=emisor.last_name}}</small>
+					</h3>
+				</td>
+			</table>
+			<hr style="width:100%;"> 
+					<text>
+					{{split_var1 = list(str(mail.sent_message).split("<br>"))}}
+					{{for x in split_var1:}}
+						{{=x}}<br>
+					{{pass}}
+					</text>
+				
+				
+		</tr>
+	</table>
+{{pass}}
+
+
+<script type="text/javascript">
+	$(document).ready(function(){
+		
+  	});
+
+	function view_mail(var_id){ 
+  		$("#mail_div").load("{{=URL('notification_student','inbox_mails_load.html')}}?operation=view_mail&amp;mail_id="+var_id);
+ 		
+	}
+</script>

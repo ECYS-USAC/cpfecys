@@ -119,6 +119,9 @@ def user():
         @auth.requires_permission('read','table name',record_id)
     to decorate functions that need access control
     """
+    if request.args(0) == 'profile':
+        db.auth_user.username.writable = False
+    pass
     return dict(form=auth())
 
 @cache.action()

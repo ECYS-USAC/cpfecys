@@ -653,10 +653,6 @@ db.define_table('academic',
         format='%(carnet)s')
 
 
-db.academic._after_insert.append(lambda f,id: academic_insert(f,id))
-db.academic._after_update.append(lambda s,f: academic_update(f))
-
-
 #Tabla de asignacion de alumnos al curso
 db.define_table('academic_course_assignation',
         Field('carnet', 'reference academic', notnull=True, label=T('carnet')),
@@ -745,11 +741,75 @@ db.define_table('student_control_period',
     )    
 
 
+
+db.academic._after_insert.append(lambda f,id: academic_insert(f,id))
+db.academic._after_update.append(lambda s,f: academic_update(f))
+db.academic._before_delete.append(lambda s: academic_delete(s))
+
+db.auth_user._after_update.append(lambda s,f: auth_user_update(f,s))
+db.auth_user._before_delete.append(lambda s: auth_user_delete(s))
+
+def split_num(var):
+    var_arg = str(var)
+    (first_part, second_part) = str(var_arg).split('=')
+    (result,garbage) = str(second_part).split(')')
+    return result
+
+##############################AUTH_USER TRIGGERS####################################
+def auth_user_update(*args):    
+    try:
+        academic_var = db.academic(db.academic.carnet==args[0]['username'])
+        db(db.academic.id == academic_var.id).update(id_auth_user = str(int(split_num(args[1]))),
+                                                    email = str(args[0]['email']))
+        #log
+        import cpfecys
+        cperiod = cpfecys.current_year_period()
+        db.academic_log.insert(user_name = 'system',
+                        roll = 'system',
+                        operation_log = 'update', 
+                        before_carnet = args[0]['username'],
+                        before_email = academic_var.email,
+                        after_carnet = args[0]['username'],
+                        after_email = str(args[0]['email']),
+                        id_period = cperiod,
+                        description = T('Registration data was update because auth_user was update'))
+    except:
+        None       
+
+def auth_user_delete(*args):    
+    try:                
+        auth_user_var = db.auth_user(db.auth_user.id == str(int(split_num(args[0]))))
+        academic_var = db.academic(db.academic.carnet==str(auth_user_var.username))        
+        if academic_var != None:
+            db(db.academic.id==academic_var.id).delete()
+            import cpfecys
+            cperiod = cpfecys.current_year_period()
+            db.academic_log.insert(user_name = 'system',
+                            roll = 'system',
+                            operation_log = 'delete', 
+                            before_carnet = academic_var.carnet, 
+                            before_email = academic_var.email,  
+                            id_period = cperiod,
+                            description = T('Registration data was deleted because auth_user was remove'))
+    except:
+        None                                 
 ##############################ACADEMIC TRIGGERS####################################
-def academic_update(*args):    
+def academic_delete(*args):    
+    try:                
+        academic_var = db.academic(db.academic.id == str(int(split_num(args[0]))))
+        user_var = db.auth_user(db.auth_user.username==str(academic_var.carnet))
+        
+        if user_var != None:
+            academic_var = db.auth_group(db.auth_group.role=='Academic')
+            membership_var = db.auth_membership((db.auth_membership.user_id==user_var.id) & (db.auth_membership.group_id==academic_var.id))
+            db(db.auth_membership.id==membership_var.id).delete()
+    except:
+        None
+
+def academic_update(*args):
     None
 
-def academic_insert(*args):    
+def academic_insert(*args):
     academic_var = db.auth_group(db.auth_group.role=='Academic')
     user_var = db.auth_user(db.auth_user.username==str(args[0]['carnet']))
     if user_var is None:
@@ -787,7 +847,7 @@ def academic_insert(*args):
                             after_email = user_var.email, 
                             id_academic = args[1]['id'], 
                             id_period = cperiod,
-                            description = T('Registration data was updated before I entered by the administrator'))
+                            description = T('Registration data was updated, set with the information entered by the administrator'))
 ##############################ACADEMIC TRIGGERS####################################
 
         
