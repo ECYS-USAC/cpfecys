@@ -747,6 +747,35 @@ db.define_table('course_activity',
     Field('date_finish', 'datetime', notnull = True, default = datetime.datetime.now(), label = T('Date Finish'))
     )
 
+db.define_table('course_activity_log',
+    Field('user_name', 'text', notnull = False, label = 'Usuario'),
+    Field('roll', 'text', notnull = False, label = 'Rol'),
+    Field('operation_log', 'text', notnull = False, label = 'Operacion'),
+    Field('course', 'text', notnull=False, label='Curso'),
+    Field('yearp', 'text', notnull=False, label='yearp'),
+    Field('period', 'text', notnull=False, label='Periodo'),
+    Field('metric', 'boolean', notnull=False, label='Metrica'),
+    Field('before_course_activity_category', 'text', notnull=False, label = 'Categoria Anterior'),
+    Field('after_course_activity_category', 'text', notnull=False, label = 'Categoria Actual'),
+    Field('before_name', 'text', notnull=False, label = 'Nombre Anterior'),
+    Field('after_name', 'text', notnull=False, label = 'Nombre Actual'),
+    Field('before_description', 'text', notnull=False, label = 'Descripcion Anterior'),
+    Field('after_description', 'text', notnull=False, label = 'Descripcion Actual'),
+    Field('before_grade', 'decimal(5,2)', notnull=False, label='Nota Anterior'),
+    Field('after_grade', 'decimal(5,2)', notnull=False, label='Nota Actual'),
+    Field('before_file', 'upload', notnull=False, label='Reporte Anterior'),
+    Field('after_file', 'upload', notnull=False, label='Reporte Actual'),
+    Field('before_laboratory', 'boolean', notnull=False, label = 'Laboratorio Anterior'),
+    Field('after_laboratory', 'boolean', notnull=False, label = 'Laboratorio Actual'),
+    Field('before_teacher_permition', 'boolean', notnull=False, label = 'permiso Catedratico Anterior'),
+    Field('after_teacher_permition', 'boolean', notnull=False, label = 'Permiso Catedratico Actual'),
+    Field('before_date_start', 'datetime', notnull = False, label = 'Fecha Inicio Anterior'),
+    Field('after_date_start', 'datetime', notnull = False, label = 'Fecha Inicio Actual'),
+    Field('before_date_finish', 'datetime', notnull = False, label = 'Fecha Finalizacion Anterior'),
+    Field('after_date_finish', 'datetime', notnull = False, label = 'Fecha Finalizacion Actual'),
+    Field('date_log', 'datetime', notnull = True, default = datetime.datetime.now(), label = 'Fecha')
+    )
+
 
 
 ## after defining tables, uncomment below to enable auditing
