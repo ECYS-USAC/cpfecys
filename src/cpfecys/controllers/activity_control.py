@@ -229,8 +229,6 @@ def activity():
                 return
     else:
         session.last_assignation = check.id
-
-
     year = db.period_year(id=check.period)
     return dict(semestre2 = year)
 

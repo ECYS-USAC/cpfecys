@@ -716,6 +716,8 @@ db.define_table('library',
 db.define_table('activity_category',
     Field('category', 'string', notnull=True, unique=False, label = T('category')),
     Field('description', 'text', notnull=True, unique=False, label = T('description')),
+    Field('hidden_academic_tutor', 'boolean', notnull=True, label = T('hidden_academic_tutor')),
+    Field('timeout', 'integer', notnull=True, unique=False, label = T('timeout')),
     format='%(category)s')
 
 db.define_table('course_activity_category',
@@ -731,7 +733,8 @@ db.define_table('course_activity_category',
 db.define_table('student_control_period',
     Field('period_name', 'string', notnull=True, unique=False, label = T('period name')),
     Field('date_start', 'datetime', notnull = True, default = datetime.datetime.now(), label = T('Date Start')),
-    Field('date_finish', 'datetime', notnull = True, default = datetime.datetime.now(), label = T('Date Finish'))
+    Field('date_finish', 'datetime', notnull = True, default = datetime.datetime.now(), label = T('Date Finish')),
+    Field('timeout_income_notes', 'integer', notnull=True, unique=False, label = T('timeout_income_notes'))
     )    
 
 db.define_table('course_activity',
