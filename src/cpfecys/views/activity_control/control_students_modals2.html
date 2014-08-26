@@ -1,7 +1,6 @@
 <!--Create Activity Modal -->
-<div id="createActivity" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true" style="width:70%; left:30%;"> 
+<div id="createActivity" class="modal hide fade" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true" style="width:70%; left:30%;"> 
     <div id ="a" class="modal-header">
-      <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
         <h3 id="myModalLabel">
             {{if auth.has_membership('Teacher'):}}
               <h2>{{=T('Class Scheduler')}} - {{=name}}</h2>
@@ -10,7 +9,7 @@
             {{pass}}
         </h3>
     </div>
-    <div id="actions_activity">
+    <div id="actions_activity"  style="overflow:auto; height:100%; width:100%;">
       <form action="" enctype="multipart/form-data" method="post" >
         <center>
           <table >
@@ -21,7 +20,7 @@
                   </div>
                   
                 </td>
-                <td align="left"  >
+                <td align="left">
                   <div class="well span11" id="div_activity_show" style="overflow:auto; height:450px; width:900px;">
             	      
                   </div>
@@ -40,7 +39,6 @@
                 <td >
                   <div align="right"> 
                     <button class="btn btn-primary" id="button_action"> {{=T('Update')}}</button>
-                    <button class="btn" data-dismiss="modal" aria-hidden="true">{{=T('Close')}}</button>
                   </div>
                 </td>
               </tr>

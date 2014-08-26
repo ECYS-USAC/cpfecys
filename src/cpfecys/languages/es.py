@@ -1614,7 +1614,7 @@
 'You can modify this application and adapt it to your needs': 'Usted puede modificar esta aplicación y adaptarla a sus necesidades',
 'You have:': 'Tienes:',
 'You must enter all fields.': 'Debe de ingresar todos los campos.',
-'You must first create the weighting': 'You must first create the weighting',
+'You must first create the weighting': 'Debe de crear la ponderación de primero',
 'You must select only one group of students': 'Debe de seleccionar solo un grupo de estudiantes',
 'You visited the url %s': 'Usted visitó la url %s',
 'Your username is: %(username)s': 'Your username is: %(username)s',
