@@ -1133,6 +1133,7 @@
 'Repeat password (Leave the blank for                             no change)': 'Repetir password (deje en blanco para no cambiarlo)',
 'Repeat password: (Leave the blank for                                 no change)': 'Repetir contraseña: (Deje en blanco para no cambiar)',
 'Repeat password: (Leave the blank for                             no change)': 'Repetir contraseña: (Deje en blanco para no cambiar)',
+'Reply': 'Reply',
 'Repor User': 'Usuario de Reporte',
 'report': 'Reporte',
 'Report': 'Reporte',

@@ -68,20 +68,27 @@
 				</td>
 				<td style="width:75%;">
 					<h3>
-						{{=mail.subject}}
-						<br>
-						<small>{{=emisor.first_name}} {{=emisor.last_name}}</small>
-					</h3>
+						<div style="height:40px; overflow:auto;">
+							{{=mail.subject}} 
+						</div>
+						<div style="height:40px; overflow:auto;">
+							<small>{{=emisor.first_name}} {{=emisor.last_name}} </small>
+						</div>
+						</h3>
+					
 				</td>
 			</table>
 			<hr style="width:100%;"> 
-					<text>
+				<div style="height:220px; overflow:auto;">
 					{{split_var1 = list(str(mail.sent_message).split("<br>"))}}
 					{{for x in split_var1:}}
 						{{=x}}<br>
 					{{pass}}
-					</text>
-				
+				</div>
+			<hr style="width:100%;"> 
+			<div align="right">
+			<input type="submit" value="{{=T('Reply')}}" >
+			<div>
 				
 		</tr>
 	</table>
