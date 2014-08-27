@@ -24,10 +24,14 @@
 			{{var_labo = 'false'}}
 		{{pass}}
 
+		{{var_SG = True}}
+		{{if str(request.vars['SG_var']) == "true":}}
+			{{var_SG = False}}
+		{{pass}}
 
 		{{db.course_activity_category.insert(category = int(request.vars['category_id_var']),
 			                                grade =  request.vars['grade_var'], 
-			                                specific_grade = request.vars['SG_var'], 
+			                                specific_grade = var_SG, 
 			                                semester = int(semestre2.id), 
 			                                assignation = project_var.project.id, 
 			                                laboratory = var_labo,
@@ -70,8 +74,28 @@
 
 <!--DELETE CATEGORY-->
 {{if request.vars['op'] == "removeCategory": }}
-	{{db(db.course_activity_category.id==request.vars['var_id']).delete()}}
+	{{var_labo = True}}
+	{{if auth.has_membership('Teacher'):}}
+		{{var_labo = False}}
+	{{pass}}
+
+	{{project_var = db(db.user_project.id == request.vars['assignation']).select().first() }}
+
+	{{var_cac = db((db.course_activity.course_activity_category == request.vars['var_id']) & (db.course_activity.assignation == project_var.project.id) & (  db.course_activity.laboratory == var_labo) & (db.course_activity.semester == (semestre2.id) ) ).select().first() }}
+
+	{{if var_cac != None:}}
+		<script type="text/javascript">
+		alert("{{=T('Unable to delete category because it already has some activity associated')}}");
+		</script>
+	{{else:}}
+		{{db(db.course_activity_category.id==request.vars['var_id']).delete()}}
+	{{pass}}
+	
 {{pass}}
+	
+
+
+	
 
 <!--UPDATE CATEGORY-->
 {{if request.vars['op'] == "updateCategory": }}
@@ -100,9 +124,13 @@
 			<span id="information_text" class="badge badge-important">{{=T('The total weighting exceeds 100 points.') }}</span>
 		</center>
 	{{else:}}
+		{{var_SG = True}}
+		{{if str(request.vars['SG_var']) == "true":}}
+			{{var_SG = False}}
+		{{pass}}
 		{{db(db.course_activity_category.id==request.vars['var_id']).update(category = int(request.vars['category_id_var']),
 			                                grade =  request.vars['grade_var'], 
-			                                specific_grade = request.vars['SG_var'])}}			                                
+			                                specific_grade = var_SG)}}			                                
 	{{pass}}
 
 {{pass}}
@@ -118,26 +146,42 @@
 
 	 	{{if auth.has_membership('Teacher'):}}
 			{{cR = db((db.course_activity_category.semester==semestre2.id) & (db.course_activity_category.assignation==project_var.project.id) & (db.course_activity_category.laboratory==False)).select()}}
+			{{categoriasP = []}}
+		    {{for c in cR:}}
+		        {{categoriasP.append(c.category)}}
+		    {{pass}}
+		    {{for project in db(~db.activity_category.id.belongs(categoriasP) ).select():}}
+		        <option value="{{=project.id}}">{{=project.category}}</option>
+		    {{pass}}
 		{{else:}}
 			{{cR = db((db.course_activity_category.semester==semestre2.id) & (db.course_activity_category.assignation==project_var.project.id) & (db.course_activity_category.laboratory==True)).select()}}
+			{{categoriasP = []}}
+		    {{for c in cR:}}
+		        {{categoriasP.append(c.category)}}
+		    {{pass}}
+		    {{for project in db((~db.activity_category.id.belongs(categoriasP)) & (db.activity_category.hidden_academic_tutor != True) ).select():}}
+		        <option value="{{=project.id}}">{{=project.category}}</option>
+		    {{pass}}
 		{{pass}}
       
-      {{categoriasP = []}}
-      {{for c in cR:}}
-          {{categoriasP.append(c.category)}}
-      {{pass}}
-      {{for project in db(~db.activity_category.id.belongs(categoriasP)).select():}}
-          <option value="{{=project.id}}">{{=project.category}}</option>
-      {{pass}}
+      
     </select>
     <label>{{=T('Grade')}}:</label>
     <input class="string" name="academic_carnet" type="text" value="" id="category_grade" style="width:240px;">
-    <label>
-    	{{=T('Specific Grade')}}&nbsp &nbsp
-    	<input type="checkbox" name="SG_check"  id="SG_check">  
-    	<span title="{{=T('If you do not select the checkbox the activities of this category will be averaged.')}}" 
-    	class=" icon-question-sign"></span>  	
-    </label>
+    	<br>
+    	<div align="justify"> 
+	    	{{=T('Do you want that all the activities in this category will be averaged?')}}
+	    </div>
+	    
+    	<label>
+    		<div align="right"> 
+		    	{{=T('Yes')}}
+		    	<input type="checkbox" name="SG_check"  id="SG_check">  
+		    	<span title="{{=T('If you do not select the checkbox, when you create activities you must enter the weight of each activity.')}}" 
+		    	class=" icon-question-sign"></span>  	
+	    	</div>
+    	</label>
+	    
     	
 
 {{pass}}
@@ -165,8 +209,8 @@
 				<th>
 					{{=T('Grade')}}
 				</th>
-				<th title="{{=T('Specific Grade')}}">
-					{{=T('SG')}}
+				<th title="{{=T('Average Grades')}}">
+					{{=T('AG')}}
 				</th>
 				{{if request.vars['op'] != "showTableNoEditable":}}
 					<th>
@@ -196,20 +240,28 @@
 									<option value="{{=project.category}}">{{=project.category.category}}</option>
 							      {{project_var = db(db.user_project.id == request.vars['assignation']).select().first() }}
 
-						      	{{if auth.has_membership('Teacher'):}}
-									{{cR = db((db.course_activity_category.semester==int(var_period_sel)) & (db.course_activity_category.assignation==project_var.project.id) & (db.course_activity_category.laboratory==False)).select()}}
+					      		{{if auth.has_membership('Teacher'):}}
+									{{cR = db((db.course_activity_category.semester==semestre2.id) & (db.course_activity_category.assignation==project_var.project.id) & (db.course_activity_category.laboratory==False)).select()}}
+									{{categoriasP = []}}
+								      {{for c in cR:}}
+								          {{categoriasP.append(c.category)}}
+								      {{pass}}
+								      {{for cat in db(~db.activity_category.id.belongs(categoriasP)).select():}}
+								          <option value="{{=cat.id}}">{{=cat.category}}</option>
+								      {{pass}}
 								{{else:}}
-									{{cR = db((db.course_activity_category.semester==int(var_period_sel)) & (db.course_activity_category.assignation==project_var.project.id) & (db.course_activity_category.laboratory==True)).select()}}
+									{{cR = db((db.course_activity_category.semester==semestre2.id) & (db.course_activity_category.assignation==project_var.project.id) & (db.course_activity_category.laboratory==True)).select()}}
+									{{categoriasP = []}}
+								    {{for c in cR:}}
+								          {{categoriasP.append(c.category)}}
+								      {{pass}}
+								      {{for cat in db((~db.activity_category.id.belongs(categoriasP)) & (db.activity_category.hidden_academic_tutor != True) ).select():}}
+								          <option value="{{=cat.id}}">{{=cat.category}}</option>
+								      {{pass}}
 								{{pass}}
 
 							      
-							      {{categoriasP = []}}
-							      {{for c in cR:}}
-							          {{categoriasP.append(c.category)}}
-							      {{pass}}
-							      {{for cat in db(~db.activity_category.id.belongs(categoriasP)).select():}}
-							          <option value="{{=cat.id}}">{{=cat.category}}</option>
-							      {{pass}}
+							      
 							    </select>
 							{{else:}}
 								{{=project.category.category}}
@@ -225,14 +277,21 @@
 							{{total_var = total_var + project.grade}}					
 						</td>
 						<td>
+							{{var_sg = str(project.specific_grade)}}
+							{{if var_sg == 'True':}}
+								{{var_sg="False"}}
+							{{else:}}
+								{{var_sg="True"}}
+							{{pass}}
 							{{if editable_var=='true':}}
-								{{if str(project.specific_grade) =='True':}}
+								
+								{{if var_sg =='True':}}
 									<input type="checkbox" name="edit_SG_check"  id="edit_SG_check" checked>
 								{{else:}}
 									<input type="checkbox" name="edit_SG_check"  id="edit_SG_check">
 								{{pass}}						
 							{{else:}}
-								{{=project.specific_grade}}
+								{{=var_sg}}
 							{{pass}}
 						</td>
 						{{if request.vars['op'] != "showTableNoEditable":}}
@@ -281,19 +340,24 @@
 							      {{project_var = db(db.user_project.id == request.vars['assignation']).select().first() }}
 
 						      	{{if auth.has_membership('Teacher'):}}
-									{{cR = db((db.course_activity_category.semester==int(var_period_sel)) & (db.course_activity_category.assignation==project_var.project.id) & (db.course_activity_category.laboratory==False)).select()}}
+									{{cR = db((db.course_activity_category.semester==semestre2.id) & (db.course_activity_category.assignation==project_var.project.id) & (db.course_activity_category.laboratory==False)).select()}}
+									{{categoriasP = []}}
+								      {{for c in cR:}}
+								          {{categoriasP.append(c.category)}}
+								      {{pass}}
+								      {{for cat in db(~db.activity_category.id.belongs(categoriasP)).select():}}
+								          <option value="{{=cat.id}}">{{=cat.category}}</option>
+								      {{pass}}
 								{{else:}}
-									{{cR = db((db.course_activity_category.semester==int(var_period_sel)) & (db.course_activity_category.assignation==project_var.project.id) & (db.course_activity_category.laboratory==True)).select()}}
+									{{cR = db((db.course_activity_category.semester==semestre2.id) & (db.course_activity_category.assignation==project_var.project.id) & (db.course_activity_category.laboratory==True)).select()}}
+									{{categoriasP = []}}
+								    {{for c in cR:}}
+								          {{categoriasP.append(c.category)}}
+								      {{pass}}
+								      {{for cat in db((~db.activity_category.id.belongs(categoriasP)) & (db.activity_category.hidden_academic_tutor != True) ).select():}}
+								          <option value="{{=cat.id}}">{{=cat.category}}</option>
+								      {{pass}}
 								{{pass}}
-
-							      
-							      {{categoriasP = []}}
-							      {{for c in cR:}}
-							          {{categoriasP.append(c.category)}}
-							      {{pass}}
-							      {{for cat in db(~db.activity_category.id.belongs(categoriasP)).select():}}
-							          <option value="{{=cat.id}}">{{=cat.category}}</option>
-							      {{pass}}
 							    </select>
 							{{else:}}
 								{{=project.category.category}}
@@ -309,14 +373,21 @@
 							{{total_var = total_var + project.grade}}					
 						</td>
 						<td>
+							{{var_sg = str(project.specific_grade)}}
+							{{if var_sg == 'True':}}
+								{{var_sg="False"}}
+							{{else:}}
+								{{var_sg="True"}}
+							{{pass}}
 							{{if editable_var=='true':}}
-								{{if str(project.specific_grade) =='True':}}
+								
+								{{if var_sg =='True':}}
 									<input type="checkbox" name="edit_SG_check"  id="edit_SG_check" checked>
 								{{else:}}
 									<input type="checkbox" name="edit_SG_check"  id="edit_SG_check">
 								{{pass}}						
 							{{else:}}
-								{{=project.specific_grade}}
+								{{=var_sg}}
 							{{pass}}
 						</td>
 						{{if request.vars['op'] != "showTableNoEditable":}}
@@ -418,9 +489,15 @@
 		}
 
 	function removeCategory(var_id){
-			$("#div_weighting_show").load("{{=URL('activity_control','weighting.html')}}?op=removeCategory&amp;op2={{=request.vars['op']}}&amp;var_id="+var_id+"&amp;assignation={{=request.vars['assignation']}}");
+		var r = confirm("{{=T('Do you want to delete this record?')}}");
+		if (r == true) {
+		   $("#div_weighting_show").load("{{=URL('activity_control','weighting.html')}}?op=removeCategory&amp;op2={{=request.vars['op']}}&amp;var_id="+var_id+"&amp;assignation={{=request.vars['assignation']}}");
 
 			$("#categoryDiv").load("{{=URL('activity_control','weighting.html')}}?op=showInsert&amp;assignation={{=request.vars['assignation']}}");
+		} else {
+			$("#categoryDiv").load("{{=URL('activity_control','weighting.html')}}?op=showInsert&amp;assignation={{=request.vars['assignation']}}");
+		} 
+			
 	}
 
 </script>
