@@ -29,6 +29,7 @@
 			{{var_SG = False}}
 		{{pass}}
 
+
 		{{db.course_activity_category.insert(category = int(request.vars['category_id_var']),
 			                                grade =  request.vars['grade_var'], 
 			                                specific_grade = var_SG, 
@@ -128,9 +129,16 @@
 		{{if str(request.vars['SG_var']) == "true":}}
 			{{var_SG = False}}
 		{{pass}}
+
+		{{var_TP = False}}
+		{{if str(request.vars['TP_var']) == "true":}}
+			{{var_TP = True}}
+		{{pass}}
+
 		{{db(db.course_activity_category.id==request.vars['var_id']).update(category = int(request.vars['category_id_var']),
 			                                grade =  request.vars['grade_var'], 
-			                                specific_grade = var_SG)}}			                                
+			                                specific_grade = var_SG,
+			                            	teacher_permition = var_TP)}}
 	{{pass}}
 
 {{pass}}
@@ -181,6 +189,20 @@
 		    	class=" icon-question-sign"></span>  	
 	    	</div>
     	</label>
+    	<br>
+
+    	{{if auth.has_membership('Teacher'):}}
+	    	<div align="justify"> 
+		    	{{=T('Do you want to give permissions to academic tutors so they can create activities in this category?')}}
+		    </div>
+		    
+	    	<label>
+	    		<div align="right"> 
+			    	{{=T('Yes')}}
+			    	<input type="checkbox" name="TP_check"  id="TP_check"> 			    		
+		    	</div>
+	    	</label>
+	    {{pass}}
 	    
     	
 
@@ -211,7 +233,12 @@
 				</th>
 				<th title="{{=T('Average Grades')}}">
 					{{=T('AG')}}
-				</th>
+				</th title="{{=T('Teacher Permition')}}">
+				{{if auth.has_membership('Teacher'):}}
+					<th>
+						{{=T('TP')}}
+					</th>
+				{{pass}}
 				{{if request.vars['op'] != "showTableNoEditable":}}
 					<th>
 						{{=T('Actions')}}
@@ -292,6 +319,17 @@
 								{{pass}}						
 							{{else:}}
 								{{=var_sg}}
+							{{pass}}
+						</td>
+						<td>
+							{{if editable_var=='true':}}								
+								{{if str(project.teacher_permition) =='True':}}
+									<input type="checkbox" name="edit_TP_check"  id="edit_TP_check" checked>
+								{{else:}}
+									<input type="checkbox" name="edit_TP_check"  id="edit_TP_check">
+								{{pass}}						
+							{{else:}}
+								{{=str(project.teacher_permition)}}
 							{{pass}}
 						</td>
 						{{if request.vars['op'] != "showTableNoEditable":}}
@@ -437,8 +475,12 @@
 				<td style="background-color:#eee;">
 				</td>
 				{{if request.vars['op'] != "showTableNoEditable":}}
-				<td style="background-color:#eee;">
-				</td>
+					<td style="background-color:#eee;">
+					</td>
+				{{pass}}
+				{{if auth.has_membership('Teacher'):}}
+					<td style="background-color:#eee;">
+					</td>
 				{{pass}}
 			</tr>
 			
@@ -464,6 +506,9 @@
 	  var category_id_var = document.getElementById('edit_category_id').value;
       var grade_var = document.getElementById('edit_grade').value;
       var SG_var = document.getElementById('edit_SG_check').checked;
+      var TP_var = document.getElementById('edit_TP_check').checked;
+
+      
 
 	      if (category_id_var==""){
 	        alert("{{=T('No categories available')}}");  
@@ -479,7 +524,7 @@
 	            alert("{{=T('The entered value is not a decimal')}}");  
 	          }else{
 	            
-	            $("#div_weighting_show").load("{{=URL('activity_control','weighting.html')}}?op=updateCategory&amp;var_id="+var_id+"&amp;op2=showEditTable&amp;SG_var=" + SG_var + "&amp;category_id_var=" + category_id_var +"&amp;grade_var=" + grade_var + "&amp;assignation={{=request.vars['assignation']}}"); 
+	            $("#div_weighting_show").load("{{=URL('activity_control','weighting.html')}}?op=updateCategory&amp;var_id="+var_id+"&amp;op2=showEditTable&amp;SG_var=" + SG_var + "&amp;TP_var=" + TP_var + "&amp;category_id_var=" + category_id_var +"&amp;grade_var=" + grade_var + "&amp;assignation={{=request.vars['assignation']}}"); 
 	            $("#categoryDiv").load("{{=URL('activity_control','weighting.html')}}?op=showInsert&amp;assignation={{=request.vars['assignation']}}");
 	            }       
 
