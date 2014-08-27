@@ -26,7 +26,7 @@
                   </div>
               	</td>
               </tr>
-              <tr >
+              <tr>
                 <td>
                   <div align="right">
                     <a id="activityButton" href="#information_text" role="button" class="btn btn-info"  
@@ -129,30 +129,41 @@
         if(category_activity_id_var=="" || (activity_name1_var=="" && activity_name2_var=="") || activity_description_var=="" || dateInit_var=="" || dateEnd_var==""){
             alert("{{=T('Fill all fields to save.')}}");
         }else{
-          if(dateInit_var<dateEnd_var){
-            if (field_grade_var!='nada'){
-              var regex = /^\d+(?:\.\d{0,2})$/;
-              var regex2 = /^([0-9])*$/;
-              if (!regex.test(field_grade_var) && !regex2.test(field_grade_var)){
-                alert("{{=T('The entered value is not a decimal')}}");  
+          var formatDate = /^(\d{4})(\/|-)(\d{1,2})(\/|-)(\d{1,2})( )(\d{1,2})(:)(\d{1,2})(:)(\d{1,2})$/;
+          var validDateInit = dateInit_var.match(formatDate);
+          var validDateEnd = dateEnd_var.match(formatDate);
+          if (validDateInit == null || validDateEnd==null) {
+            alert("{{=T('Enter date and time as YYYY-MM-DD HH:MM:SS or YYYY/MM/DD HH:MM:SS')}}");
+          }else{
+            if(dateInit_var<dateEnd_var){
+              if (field_grade_var!='nada'){
+                var regex = /^\d+(?:\.\d{0,2})$/;
+                var regex2 = /^([0-9])*$/;
+                if (!regex.test(field_grade_var) && !regex2.test(field_grade_var)){
+                  alert("{{=T('The entered value is not a decimal')}}");  
+                }else{
+                  if(field_grade_var=='0'){
+                    alert("{{=T('The grade can not be 0')}}");
+                  }else{
+                    if (activity_name2_var==""){
+                      $("#div_activity_show").load("{{=URL('activity_control','activity.html')}}?op=addActivity&amp;category_activity_id_var=" + category_activity_id_var + "&amp;activity_name1_var=" + encodeURIComponent(activity_name1_var) +"&amp;activity_description_var=" + encodeURIComponent(activity_description_var) + "&amp;field_grade_var=" + field_grade_var + "&amp;dateInit_var="+encodeURIComponent(dateInit_var)+ "&amp;dateEnd_var="+encodeURIComponent(dateEnd_var)+"&amp;assignation={{=request.vars['assignation']}}"); 
+                    }else{
+                      $("#div_activity_show").load("{{=URL('activity_control','activity.html')}}?op=addActivity&amp;category_activity_id_var=" + category_activity_id_var + "&amp;activity_name1_var=" + encodeURIComponent(activity_name2_var) +"&amp;activity_description_var=" + encodeURIComponent(activity_description_var) + "&amp;field_grade_var=" + field_grade_var + "&amp;dateInit_var="+encodeURIComponent(dateInit_var)+ "&amp;dateEnd_var="+encodeURIComponent(dateEnd_var)+"&amp;assignation={{=request.vars['assignation']}}"); 
+                    }
+                    $("#activityDiv").load("{{=URL('activity_control','activity.html')}}?op=showInsert&amp;assignation={{=request.vars['assignation']}}");
+                  }
+                }
               }else{
                 if (activity_name2_var==""){
-                  $("#div_activity_show").load("{{=URL('activity_control','activity.html')}}?op=addActivity&amp;category_activity_id_var=" + category_activity_id_var + "&amp;activity_name1_var=" + encodeURIComponent(activity_name1_var) +"&amp;activity_description_var=" + encodeURIComponent(activity_description_var) + "&amp;field_grade_var=" + field_grade_var + "&amp;dateInit_var="+encodeURIComponent(dateInit_var)+ "&amp;dateEnd_var="+encodeURIComponent(dateEnd_var)+"&amp;assignation={{=request.vars['assignation']}}"); 
-                }else{
-                  $("#div_activity_show").load("{{=URL('activity_control','activity.html')}}?op=addActivity&amp;category_activity_id_var=" + category_activity_id_var + "&amp;activity_name1_var=" + encodeURIComponent(activity_name2_var) +"&amp;activity_description_var=" + encodeURIComponent(activity_description_var) + "&amp;field_grade_var=" + field_grade_var + "&amp;dateInit_var="+encodeURIComponent(dateInit_var)+ "&amp;dateEnd_var="+encodeURIComponent(dateEnd_var)+"&amp;assignation={{=request.vars['assignation']}}"); 
-                }
-                $("#activityDiv").load("{{=URL('activity_control','activity.html')}}?op=showInsert&amp;assignation={{=request.vars['assignation']}}");
+                    $("#div_activity_show").load("{{=URL('activity_control','activity.html')}}?op=addActivity&amp;category_activity_id_var=" + category_activity_id_var + "&amp;activity_name1_var=" + encodeURIComponent(activity_name1_var) +"&amp;activity_description_var=" + encodeURIComponent(activity_description_var) + "&amp;field_grade_var=nada&amp;dateInit_var="+encodeURIComponent(dateInit_var)+ "&amp;dateEnd_var="+encodeURIComponent(dateEnd_var)+"&amp;assignation={{=request.vars['assignation']}}"); 
+                  }else{
+                    $("#div_activity_show").load("{{=URL('activity_control','activity.html')}}?op=addActivity&amp;category_activity_id_var=" + category_activity_id_var + "&amp;activity_name1_var=" + encodeURIComponent(activity_name2_var) +"&amp;activity_description_var=" + encodeURIComponent(activity_description_var) + "&amp;field_grade_var=nada&amp;dateInit_var="+encodeURIComponent(dateInit_var)+ "&amp;dateEnd_var="+encodeURIComponent(dateEnd_var)+"&amp;assignation={{=request.vars['assignation']}}"); 
+                  }
+                $("#activityDiv").load("{{=URL('activity_control','activity.html')}}?op=showInsert&amp;assignation={{=request.vars['assignation']}}"); 
               }
             }else{
-              if (activity_name2_var==""){
-                  $("#div_activity_show").load("{{=URL('activity_control','activity.html')}}?op=addActivity&amp;category_activity_id_var=" + category_activity_id_var + "&amp;activity_name1_var=" + encodeURIComponent(activity_name1_var) +"&amp;activity_description_var=" + encodeURIComponent(activity_description_var) + "&amp;field_grade_var=nada&amp;dateInit_var="+encodeURIComponent(dateInit_var)+ "&amp;dateEnd_var="+encodeURIComponent(dateEnd_var)+"&amp;assignation={{=request.vars['assignation']}}"); 
-                }else{
-                  $("#div_activity_show").load("{{=URL('activity_control','activity.html')}}?op=addActivity&amp;category_activity_id_var=" + category_activity_id_var + "&amp;activity_name1_var=" + encodeURIComponent(activity_name2_var) +"&amp;activity_description_var=" + encodeURIComponent(activity_description_var) + "&amp;field_grade_var=nada&amp;dateInit_var="+encodeURIComponent(dateInit_var)+ "&amp;dateEnd_var="+encodeURIComponent(dateEnd_var)+"&amp;assignation={{=request.vars['assignation']}}"); 
-                }
-              $("#activityDiv").load("{{=URL('activity_control','activity.html')}}?op=showInsert&amp;assignation={{=request.vars['assignation']}}"); 
+              alert("{{=T('The end date must be greater than start date')}}");
             }
-          }else{
-            alert("La fecha final debe ser mayor a la fecha inicial");
           }
         }
     })

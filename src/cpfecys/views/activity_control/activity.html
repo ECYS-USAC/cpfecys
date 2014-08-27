@@ -371,19 +371,21 @@
 			var actividadPromedio = [];
 		</script>
 		{{for c in cR:}}
-			<option value="{{=c.id}}">{{=c.category.category}}</option>
-			<script type="text/javascript">
-				if("{{=c.category.category}}"=="Parciales"){
-					varParciales={{=c.id}};
-				}else{
-					if("{{=c.category.category}}"=="Examen Final"){
-						varFinal={{=c.id}};
+			{{if c.category.category != 'Laboratorio':}}
+				<option value="{{=c.id}}">{{=c.category.category}}</option>
+				<script type="text/javascript">
+					if("{{=c.category.category}}"=="Parciales"){
+						varParciales={{=c.id}};
+					}else{
+						if("{{=c.category.category}}"=="Examen Final"){
+							varFinal={{=c.id}};
+						}
 					}
-				}
-				if('{{=c.specific_grade}}'=='True'){
-					actividadPromedio.push('{{=c.id}}');
-				}
-			</script>
+					if('{{=c.specific_grade}}'=='True'){
+						actividadPromedio.push('{{=c.id}}');
+					}
+				</script>
+			{{pass}}
 		{{pass}}
     </select>
     <!--Fill the select of the categorys-->
@@ -398,9 +400,9 @@
     <input class="string" id="field_grade" type="text" value="" style="width:240px; display:none;">
     
     <label>{{=T('Start Date')}}:</label>
-    <input class="datetime" id="dateInit" name="log-date" placeholder="YYYY-MM-DD" type="date" value = "">
+    <input class="datetime" id="dateInit" name="log-date" placeholder="YYYY-MM-DD HH:MM:SS" type="text" value = "">
     <label>{{=T('End Date')}}:</label>
-    <input class="datetime" id="dateEnd" name="log-date" placeholder="YYYY-MM-DD" type="date" value = "">
+    <input class="datetime" id="dateEnd" name="log-date" placeholder="YYYY-MM-DD HH:MM:SS" type="text" value = "">
 {{pass}}
 
 
@@ -428,6 +430,7 @@
 				{{categorys = db((db.course_activity_category.semester==semestre2.id) & (db.course_activity_category.assignation==project_var.project.id) & (db.course_activity_category.laboratory=='T')).select()}}
 			{{pass}}
 			{{for project in categorys:}}
+			{{if project.category.category != 'Laboratorio':}}
 				<tr>
 					<th><center>
 						{{=project.category.category}}
@@ -555,14 +558,14 @@
 									</td>
 									<td>
 										{{if editable_var=='true':}}
-											<input class="datetime" id="edit_dateInit" name="date_log" type="text" value="{{=tAct.date_start}}" style="width:240px;" placeholder="YYYY-MM-DD"/>
+											<input class="datetime" id="edit_dateInit" name="date_log" type="text" value="{{=tAct.date_start}}" style="width:240px;" placeholder="YYYY-MM-DD HH:MM:SS"/>
 										{{else:}}
 											{{=tAct.date_start}}
 										{{pass}}
 									</td>
 									<td>
 										{{if editable_var=='true':}}
-											<input class="datetime" id="edit_dateEnd" name="date_log" type="text" value="{{=tAct.date_finish}}" style="width:240px;" placeholder="YYYY-MM-DD"/>
+											<input class="datetime" id="edit_dateEnd" name="date_log" type="text" value="{{=tAct.date_finish}}" style="width:240px;" placeholder="YYYY-MM-DD HH:MM:SS"/>
 										{{else:}}
 											{{=tAct.date_finish}}
 										{{pass}}
@@ -643,6 +646,7 @@
 						</div>
 					</td>
 				</tr>
+			{{pass}}
 			{{pass}}
 		</table>
 	  </center>	
@@ -961,20 +965,26 @@
 		if(edit_activity_name1_var=="" || (edit_activity_description_var=="" && edit_field_grade_var=="") || edit_dateInit_var=="" || edit_dateEnd_var=="" ){
 			alert("{{=T('Fill all fields to save.')}}");
 		}else{
-		      var regex = /^\d+(?:\.\d{0,2})$/; 
-		      var regex2 = /^([0-9])*$/; 
-
 	        if (edit_field_grade_var==""){
 	          alert("{{=T('The entered value is not correct')}}");  
 	        }else{
-	          if (!regex.test(edit_field_grade_var) && !regex2.test(edit_field_grade_var) ){
-	            alert("{{=T('The entered value is not a decimal')}}");  
+				var regex = /^\d+(?:\.\d{0,2})$/; 
+				var regex2 = /^([0-9])*$/; 
+				if (!regex.test(edit_field_grade_var) && !regex2.test(edit_field_grade_var) ){
+					alert("{{=T('The entered value is not a decimal')}}");  
 				}else{
-					if(edit_dateInit_var<edit_dateEnd_var){
-						$("#div_activity_show").load("{{=URL('activity_control','activity.html')}}?op=updateActivity&amp;var_id="+var_id+"&amp;op2=showEditTable&amp;edit_activity_name1_var=" + encodeURIComponent(edit_activity_name1_var) + "&amp;edit_activity_description_var=" + encodeURIComponent(edit_activity_description_var) +"&amp;edit_field_grade_var=" + edit_field_grade_var + "&amp;edit_dateInit_var="+encodeURIComponent(edit_dateInit_var)+ "&amp;edit_dateEnd_var="+encodeURIComponent(edit_dateEnd_var)+"&amp;assignation={{=request.vars['assignation']}}"); 
-						$("#activityDiv").load("{{=URL('activity_control','activity.html')}}?op=showInsert&amp;assignation={{=request.vars['assignation']}}");
+					var formatDate = /^(\d{4})(\/|-)(\d{1,2})(\/|-)(\d{1,2})( )(\d{1,2})(:)(\d{1,2})(:)(\d{1,2})$/;
+					var validDateInit = edit_dateInit_var.match(formatDate);
+					var validDateEnd = edit_dateEnd_var.match(formatDate);
+					if (validDateInit == null || validDateEnd==null) {
+						alert("{{=T('Enter date and time as YYYY-MM-DD HH:MM:SS or YYYY/MM/DD HH:MM:SS')}}");
 					}else{
-						alert("La fecha final debe ser mayor a la fecha inicial");
+						if(edit_dateInit_var<edit_dateEnd_var){
+							$("#div_activity_show").load("{{=URL('activity_control','activity.html')}}?op=updateActivity&amp;var_id="+var_id+"&amp;op2=showEditTable&amp;edit_activity_name1_var=" + encodeURIComponent(edit_activity_name1_var) + "&amp;edit_activity_description_var=" + encodeURIComponent(edit_activity_description_var) +"&amp;edit_field_grade_var=" + edit_field_grade_var + "&amp;edit_dateInit_var="+encodeURIComponent(edit_dateInit_var)+ "&amp;edit_dateEnd_var="+encodeURIComponent(edit_dateEnd_var)+"&amp;assignation={{=request.vars['assignation']}}"); 
+							$("#activityDiv").load("{{=URL('activity_control','activity.html')}}?op=showInsert&amp;assignation={{=request.vars['assignation']}}");
+						}else{
+							alert("{{=T('The end date must be greater than start date')}}");
+						}
 					}
 	        	}
 	      	}
