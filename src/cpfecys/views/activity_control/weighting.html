@@ -199,9 +199,11 @@
 	    	<label>
 	    		<div align="right"> 
 			    	{{=T('Yes')}}
-			    	<input type="checkbox" name="TP_check"  id="TP_check"> 			    		
+			    	<input type="checkbox" name="TP_check"  id="TP_check" > 			    		
 		    	</div>
 	    	</label>
+	    {{else:}}
+	    	<input type="checkbox" name="TP_check"  id="TP_check" checked style="opacity:0;">
 	    {{pass}}
 	    
     	
