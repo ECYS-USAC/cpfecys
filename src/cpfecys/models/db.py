@@ -734,7 +734,9 @@ db.define_table('student_control_period',
     Field('period_name', 'string', notnull=True, unique=False, label = T('period name')),
     Field('date_start', 'datetime', notnull = True, default = datetime.datetime.now(), label = T('Date Start')),
     Field('date_finish', 'datetime', notnull = True, default = datetime.datetime.now(), label = T('Date Finish')),
-    Field('timeout_income_notes', 'integer', notnull=True, unique=False, label = T('timeout_income_notes'))
+    Field('timeout_income_notes', 'integer', notnull=True, unique=False, label = T('timeout_income_notes')),
+    Field('date_start_semester', 'date', notnull = True, label = T('Date Start Semester')),
+    Field('date_finish_semester', 'date', notnull = True, label = T('Date Finish Semester'))
     )    
 
 db.define_table('course_activity',
@@ -746,8 +748,8 @@ db.define_table('course_activity',
     Field('assignation', 'reference project', notnull=True),
     Field('laboratory', 'boolean', notnull=True, label = T('laboratory')),
     Field('teacher_permition', 'boolean', notnull=True, label = T('teacher permition')),
-    Field('date_start', 'datetime', notnull = True, default = datetime.datetime.now(), label = T('Date Start')),
-    Field('date_finish', 'datetime', notnull = True, default = datetime.datetime.now(), label = T('Date Finish'))
+    Field('date_start', 'date', notnull = True, default = datetime.datetime.now(), label = T('Date Start')),
+    Field('date_finish', 'date', notnull = True, default = datetime.datetime.now(), label = T('Date Finish'))
     )
 
 db.define_table('course_activity_log',
@@ -772,10 +774,10 @@ db.define_table('course_activity_log',
     Field('after_laboratory', 'boolean', notnull=False, label = 'Laboratorio Actual'),
     Field('before_teacher_permition', 'boolean', notnull=False, label = 'permiso Catedratico Anterior'),
     Field('after_teacher_permition', 'boolean', notnull=False, label = 'Permiso Catedratico Actual'),
-    Field('before_date_start', 'datetime', notnull = False, label = 'Fecha Inicio Anterior'),
-    Field('after_date_start', 'datetime', notnull = False, label = 'Fecha Inicio Actual'),
-    Field('before_date_finish', 'datetime', notnull = False, label = 'Fecha Finalizacion Anterior'),
-    Field('after_date_finish', 'datetime', notnull = False, label = 'Fecha Finalizacion Actual'),
+    Field('before_date_start', 'date', notnull = False, label = 'Fecha Inicio Anterior'),
+    Field('after_date_start', 'date', notnull = False, label = 'Fecha Inicio Actual'),
+    Field('before_date_finish', 'date', notnull = False, label = 'Fecha Finalizacion Anterior'),
+    Field('after_date_finish', 'date', notnull = False, label = 'Fecha Finalizacion Actual'),
     Field('date_log', 'datetime', notnull = True, default = datetime.datetime.now(), label = 'Fecha')
     )
 

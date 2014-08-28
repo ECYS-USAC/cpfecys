@@ -129,11 +129,11 @@
         if(category_activity_id_var=="" || (activity_name1_var=="" && activity_name2_var=="") || activity_description_var=="" || dateInit_var=="" || dateEnd_var==""){
             alert("{{=T('Fill all fields to save.')}}");
         }else{
-          var formatDate = /^(\d{4})(\/|-)(\d{1,2})(\/|-)(\d{1,2})( )(\d{1,2})(:)(\d{1,2})(:)(\d{1,2})$/;
+          var formatDate = /^(\d{4})(\/|-)(\d{1,2})(\/|-)(\d{1,2})$/;
           var validDateInit = dateInit_var.match(formatDate);
           var validDateEnd = dateEnd_var.match(formatDate);
           if (validDateInit == null || validDateEnd==null) {
-            alert("{{=T('Enter date and time as YYYY-MM-DD HH:MM:SS or YYYY/MM/DD HH:MM:SS')}}");
+            alert("{{=T('Enter date and time as YYYY-MM-DD or YYYY/MM/DD')}}");
           }else{
             if(dateInit_var<dateEnd_var){
               if (field_grade_var!='nada'){
