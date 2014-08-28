@@ -81,10 +81,42 @@
 					</td>
 				</table>
 				<hr style="width:100%;"> 
-					<div style="height:220px; overflow:auto;">
+					<div style="height:150px; overflow:auto;">
+						<!--Parse message to html <br><b><a>-->
 						{{split_var1 = list(str(mail.sent_message).split("<br>"))}}
 						{{for x in split_var1:}}
-							{{=x}}<br>
+							{{split_var2 = list(str(x).split("<b>"))}}
+							{{for x2 in split_var2:}}								
+								{{split_var3 = list(str(x2).split("</b>"))}}
+								{{for x3 in split_var3:}}
+									{{split_var4 = list(str(x3).split("<a href=\""))}}
+									{{if len(split_var4) >1:}}
+										{{for x4 in split_var4:}}
+											{{split_var5 = list(str(x4).split("\" target=\"blank\">"))}}
+											{{if len(split_var5) >1:}}
+												{{for x5 in split_var5:}}
+													{{split_var6 = list(str(x5).split("</a>"))}}
+													{{if len(split_var6) >1:}}
+														{{for x6 in split_var6:}}
+															{{=x6}}</a>
+														{{pass}}
+													{{else:}}
+														<a href="{{=x5}}" target="blank">
+													{{pass}}													
+												{{pass}}												
+											{{else:}}
+												{{=x4}}
+											{{pass}}											
+										{{pass}}
+									{{else:}}
+										{{=x3}}
+									{{pass}}									 
+									</a></b>
+								{{pass}}
+								<b>
+							{{pass}}
+							
+							</b><br>
 						{{pass}}
 					</div>
 				<hr style="width:100%;"> 

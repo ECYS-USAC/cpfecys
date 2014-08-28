@@ -63,34 +63,59 @@
 				  <!--Finish Courses list-->
 				</td>
 				<td><p>&nbsp;&nbsp;</p></td>
-				<td>
-					{{for assignation in assignations:}}
-						<div id="course_members_{{=assignation.assignation.id}}" style="display: none;">
-							<h3><small>{{=assignation.assignation.name}}</small></h3>
-							<div style="overflow:auto; width:75%; height:150px;">
-							   	<!--course_members-->
-							   	<table class="table-striped table-bordered">
-							   		
-							   		{{#for memb in db((db.user_project.period==cperiod.id) & (db.user_project.project==assignation.assignation.id) & (db.auth_membership.user_id == db.user_project.assigned_user) & (db.auth_membership.group_id==2) ).select():}}
-							   		{{for memb in db((db.user_project.period==cperiod.id) & (db.user_project.project==assignation.assignation.id)  ).select():}}
-									  	<tr>
-									  	  <td>
-										    <input type="checkbox" 
-										    class="claboratorio" ="project" name="list_users"
-										    value="{{=memb.assigned_user.id}}">
-										  </td>
-										  <td>
-										  	{{=memb.assigned_user.first_name}} {{=memb.assigned_user.last_name}}
-										  </td>
-										</tr>
-								  	{{pass}}
-							  	</table>
-								<!--Fin de tabla de alumnos con laboratorio-->
+					<td>
+						{{for assignation in assignations:}}
+							<div id="course_members_{{=assignation.assignation.id}}" style="display: none;">
+								<table>
+									<tr>									
+										<td>
+											<h3><small>{{=T('Academic Tutor')}}</small></h3>
+											<div style="overflow:auto; width:75%; height:150px;">
+											   	<!--course_members-->
+											   	<table class="table-striped table-bordered">							   		
+											   		{{for memb in db((db.user_project.period==cperiod.id) & (db.user_project.project==assignation.assignation.id) & (db.user_project.assigned_user == db.auth_membership.user_id) & (db.auth_membership.group_id==2) ).select():}}
+													  	<tr>
+													  	  <td>
+														    <input type="checkbox" 
+														    class="claboratorio" ="project" name="list_users"
+														    value="{{=memb.user_project.assigned_user.id}}">
+														  </td>
+														  <td>
+														  	{{=memb.user_project.assigned_user.first_name}} {{=memb.user_project.assigned_user.last_name}}
+														  </td>
+														</tr>
+												  	{{pass}}
+											  	</table>
+											</div>
+										</td>
+										<td>
+											<h3><small>{{=T('Teacher')}}</small></h3>
+											<div style="overflow:auto; width:75%; height:150px;">
+											   	<!--course_members-->
+											   	<table class="table-striped table-bordered">							   		
+											   		{{for memb in db((db.user_project.period==cperiod.id) & (db.user_project.project==assignation.assignation.id) & (db.user_project.assigned_user == db.auth_membership.user_id) & (db.auth_membership.group_id==3) ).select():}}
+													  	<tr>
+													  	  <td>
+														    <input type="checkbox" 
+														    class="claboratorio" ="project" name="list_users"
+														    value="{{=memb.user_project.assigned_user.id}}">
+														  </td>
+														  <td>
+														  	{{=memb.user_project.assigned_user.first_name}} {{=memb.user_project.assigned_user.last_name}}
+														  </td>
+														</tr>
+												  	{{pass}}
+											  	</table>
+											</div>
+
+										</td>
+									</tr>
+								</table>
 							</div>
-						</div>
-					{{pass}}
-					
-				</td>
+
+						{{pass}}
+					</td>
+				
 				
 			</tr>
 		  </table>
