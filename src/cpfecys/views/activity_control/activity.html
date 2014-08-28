@@ -488,7 +488,7 @@
 		</script>
 		{{for c in cR:}}
 			{{if c.category.category != 'Laboratorio':}}
-				<option value="{{=c.id}}">{{=c.category.category}}</option>
+				<option value="{{=c.id}}" title="Dias máximo de actividad: {{=c.category.timeout}} dias">{{=c.category.category}}</option>
 				<script type="text/javascript">
 					if("{{=c.category.category}}"=="Parciales"){
 						varParciales={{=c.id}};
@@ -579,10 +579,10 @@
 									<th>
 										{{=T('Grade')}}
 									</th>
-									<th title="{{=T('Specific Grade')}}">
+									<th>
 										{{=T('Start Date')}}
 									</th>
-									<th title="{{=T('Specific Grade')}}">
+									<th>
 										{{=T('End Time')}}
 									</th>
 									{{if request.vars['op'] != "showTableNoEditable":}}
@@ -681,7 +681,7 @@
 									</td>
 									<td>
 										{{if editable_var=='true':}}
-											<input class="date" id="edit_dateEnd" name="date_log" type="text" value="{{=tAct.date_finish}}" style="width:240px;" placeholder="YYYY-MM-DD"/>
+											<input title="Dias máximo de actividad: {{=tAct.course_activity_category.category.timeout}} dias" class="date" id="edit_dateEnd" name="date_log" type="text" value="{{=tAct.date_finish}}" style="width:240px;" placeholder="YYYY-MM-DD"/>
 										{{else:}}
 											{{=tAct.date_finish}}
 										{{pass}}
