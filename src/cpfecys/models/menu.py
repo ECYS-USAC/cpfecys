@@ -83,7 +83,10 @@ if not (auth.is_logged_in()):
         (T('View Events'), False, URL('default','events'), []),
         ]))
 if auth.has_membership(role="Academic"):
-    user_menu.append((T('Inbox'), False, URL('notification_student','inbox'), []),)
+    user_menu.append((T('Mail'), False, URL(), [
+    (T('Inbox'), False, URL('notification_student','inbox'), []),
+    (T('Send Mail'), False, URL('notification_student','send_mail'), []),    
+    ]))
 if auth.has_membership(role="Student"):
     user_menu.append((T('Events'), False, URL(), [
     (T('View Events'), False, URL('default','events'), []),

@@ -201,6 +201,7 @@
   	$(document).ready(function(){
 		$("#table_Weighting").load("{{=URL('activity_control','weighting.html')}}?op=showTableNoEditable&amp;assignation={{=request.vars['assignation']}}");
 
+
 		$("#edit_option").click(function(){
 	      $("#div_weighting_show").load("{{=URL('activity_control','weighting.html')}}?op=showEditTable&amp;assignation={{=request.vars['assignation']}}"); 
 	    })
