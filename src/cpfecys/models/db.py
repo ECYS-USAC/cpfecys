@@ -740,6 +740,23 @@ db.define_table('student_control_period',
     Field('date_finish', 'datetime', notnull = True, default = datetime.datetime.now(), label = T('Date Finish'))
     )    
 
+db.define_table('academic_send_mail_log',
+    Field('subject', 'text', notnull = True, label = T('Asunto')),
+    Field('sent_message', 'text', notnull = True, label = T('Sent Message')),
+    Field('time_date', 'datetime', notnull = True,
+          default = datetime.datetime.now(), label = T('Sent Time')),
+    Field('emisor', 'text', notnull=True, label=T('Emisor')),
+    Field('course', 'text', notnull=True, label=T('Curso')),
+    Field('yearp', 'text', notnull=True, label=T('yearp')),
+    Field('period', 'text', notnull=True, label=T('Periodo')),
+    Field('email_list', 'text', notnull=True, label=T('Email List')),
+    Field('mail_state', 'text', notnull=True, label=T('State'))
+    )
+
+db.define_table('read_mail',
+    Field('id_auth_user', 'integer',notnull = True, label = T('id_auth_user')),
+    Field('id_mail', 'integer',notnull = True, label = T('id_mail'))
+    )
 
 
 db.academic._after_insert.append(lambda f,id: academic_insert(f,id))

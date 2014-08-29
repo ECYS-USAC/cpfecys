@@ -29,13 +29,13 @@
 				<tr>
 					<td  style="height:10px;" >
 						<table style="width:100%;" class="table table-striped table-bordered">
-							<td style="width:55%;">
+							<td style="width:40%;">
 								<span class="icon-envelope"></span>  &nbsp
 								<a style="cursor:pointer;" onclick="view_mail({{=mails[a].id}},'{{=request.vars['project_id']}}');"  role="button"  href="#mailModal" data-toggle="modal" data-target="#mailModal">
 									{{=mails[a].subject}}
 								</a>
 							</td>
-							<td style="width:20%;">
+							<td style="width:25%;">
 								{{
 									try:
 										user_var = db.auth_user(db.auth_user.username==mails[a].emisor)
@@ -47,6 +47,15 @@
 							</td>
 							<td style="width:15%;">
 								{{=mails[a].time_date}}
+							</td>
+							<td style="width:7%;">
+								<center>
+									{{if db((db.read_mail.id_auth_user == auth_user) & (db.read_mail.id_mail == mails[a].id) ).select().first() == None:}}
+										<span id="information_text" class="badge btn-success">{{=T('New') }}</span> 
+									{{else:}}
+										<span id="information_text" class="badge btn-info">{{=T('Viewed') }}</span> 
+									{{pass}}
+								</center>
 							</td>
 						</table>
 					</td>

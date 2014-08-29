@@ -34,10 +34,12 @@ def inbox_mails_load():
                         
             mails = db((db.notification_general_log4.yearp==year_var.yearp) & (db.notification_general_log4.period==period_var.name) & (db.notification_general_log4.course==project_var.name)).select()
             
-            return dict(mails = mails)    
+            return dict(mails = mails, auth_user = auth.user.id)    
 
         if request.vars['operation'] == "view_mail":
-
+            if db((db.read_mail.id_auth_user == auth.user.id) & (db.read_mail.id_mail == request.vars['mail_id']) ).select().first() == None:
+                db.read_mail.insert(id_auth_user = auth.user.id,
+                                id_mail  = request.vars['mail_id'])
             mail_var = db.notification_general_log4(db.notification_general_log4.id==request.vars['mail_id'])
             user_var = db.auth_user(db.auth_user.username==mail_var.emisor)
         return dict(mail = mail_var, emisor = user_var)
@@ -116,11 +118,18 @@ def reply_mail_with_email(email, message, remessage, retime, resub ,subject, sem
     
     academic_var = db.academic(db.academic.id_auth_user==auth.user.id)
 
-    messageC = '<html>' + message  +'<br><br>Estudiante: '+ auth.user.first_name +' '+ auth.user.last_name +'<br>'+auth.user.email+'<br>'+project_name+"<br>"+str(period)+'<br>Sistema de Seguimiento de La Escuela de Ciencias y Sistemas<br> Facultad de Ingeniería - Universidad de San Carlos de Guatemala'
+    messageC = '<html>' + message  +'<br><br>Estudiante: '+ auth.user.first_name +' '+ auth.user.last_name +'<br>Carnet: '+auth.user.username+'<br>Correo: '+auth.user.email+'<br>'+project_name+"<br>"+str(period)+'<br>Sistema de Seguimiento de La Escuela de Ciencias y Sistemas<br> Facultad de Ingeniería - Universidad de San Carlos de Guatemala'
     messageC = messageC + '<br><br><hr style="width:100%;"><b><i>Respuesta al mensaje enviado el '+ retime +':</i></b><br><table><tr><td><i><b>Asunto:</b></td><td>'+resub+ '</td></tr></table></i></html>'
     control = 0
     was_sent = mail.send(to='lecausac@gmail.com',subject=subject,message=messageC, bcc=email)
-    
+    db.academic_send_mail_log.insert(subject=subject,
+                                    sent_message=message,
+                                    emisor=auth.user.username,
+                                    course=project_name,
+                                    yearp=year,
+                                    period=semester,
+                                    email_list=email,
+                                    mail_state=str(was_sent))
     if was_sent==False:
         control=control+1
     
@@ -134,9 +143,11 @@ def send_mail_to_users(users, message, subject, semester,year, project_name):
     
     academic_var = db.academic(db.academic.id_auth_user==auth.user.id)
 
-    messageC = '<html>' + message  +'<br><br>Estudiante: '+ auth.user.first_name +' '+ auth.user.last_name +'<br>'+auth.user.email+'<br>'+project_name+"<br>"+str(period)+'<br>Sistema de Seguimiento de La Escuela de Ciencias y Sistemas<br> Facultad de Ingeniería - Universidad de San Carlos de Guatemala </html>'    
+    messageC = '<html>' + message  +'<br><br>Estudiante: '+ auth.user.first_name +' '+ auth.user.last_name +'<br>Carnet: '+auth.user.username +'<br>Correo: '+auth.user.email+'<br>'+auth.user.username+"<br>"+str(period)+'<br>Sistema de Seguimiento de La Escuela de Ciencias y Sistemas<br> Facultad de Ingeniería - Universidad de San Carlos de Guatemala </html>'    
     control = 0
 
+    
+    
     dest=[]
     students = users
     try:
@@ -145,26 +156,38 @@ def send_mail_to_users(users, message, subject, semester,year, project_name):
         for student in students:
             dest.append(student)
         #consultar a la base de datos para obtener a los usuarios a los que enviaremos
-        user1 = db(db.academic.id.belongs(dest)).select()
+        user1 = db(db.auth_user.id.belongs(dest)).select()
     except:
         #consultar a la base de datos para obtener a los usuarios a los que enviaremos
-        user1 = db(db.academic.id==users).select()
+        user1 = db(db.auth_user.id==users).select()
     
     email_list = None
+    email_list_log = ""
+
     if user1 != None:
         for user in user1:
-            print user.email
             if user.email != None and user.email != '':
                 if email_list == None:
                     email_list = []
                     email_list.append(user.email)
+                    email_list_log = str(user.email)
+
                 else:
                     email_list.append(user.email)
+                    email_list_log = email_list_log + "," + str(user.email)
 
     was_sent = mail.send(to='lecausac@gmail.com',subject=subject,message=messageC, bcc=email_list)
+    db.academic_send_mail_log.insert(subject=subject,
+                                    sent_message=message,
+                                    emisor=auth.user.username,
+                                    course=project_name,
+                                    yearp=year,
+                                    period=semester,
+                                    email_list=str(email_list_log),
+                                    mail_state=str(was_sent))
     
-    if was_sent==False:
-        control=control+1
+    #if was_sent==False:
+    #    control=control+1
     
     return control
 

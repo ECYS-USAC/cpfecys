@@ -215,7 +215,6 @@ def teacher_send_mail_to_students(users1, users2, message, subject, check, semes
     ListadoCorreos = None
     if users1 != None:
         for user in users1:
-            print user.email
             if user.email != None and user.email != '':
                 if ListadoCorreos == None:
                     ListadoCorreos = []
@@ -225,7 +224,6 @@ def teacher_send_mail_to_students(users1, users2, message, subject, check, semes
 
     if users2 != None:
         for user in users2:
-            print user.email
             if user.email != None and user.email != '':
                 if ListadoCorreos == None:
                     ListadoCorreos = []
@@ -789,7 +787,6 @@ def send_mail_to_students(users, message, subject, check, semester, year):
     #Ciclo para el envio de correos
     ListadoCorreos = None
     for user in users:
-        print user.email
         if user.email != None and user.email != '':
             if ListadoCorreos == None:
                 ListadoCorreos = []

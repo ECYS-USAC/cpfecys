@@ -34,10 +34,51 @@
 						{{for assignation in assignations:}}							
 							<tr>
 								<td >
-									<span class="icon-book"></span> &nbsp 
-									<a style="cursor:pointer;" onclick="click_link({{=assignation.assignation.id}});">
-										{{=assignation.assignation.name}}
-									</a>
+									
+										{{cont_news = 0}}
+										{{mails = db((db.notification_general_log4.yearp==assignation.semester.yearp) & (db.notification_general_log4.period==assignation.semester.period.name) & (db.notification_general_log4.course==assignation.assignation.name)).select()}}
+										{{for a in range(len(mails)-1, -1, -1):}}
+											{{	#SHOW JUST EMAILS SENDED TO ME
+												mine_var='false'
+												var_query = db.notification_log4(db.notification_log4.register==mails[a].id)
+												split_var1 = list(str(var_query).split("'"))
+												for x in split_var1:
+													split_var2 = list(str(x).split(","))
+													for xx in split_var2:
+														if str(xx) == str(email):
+															mine_var='true'
+														pass
+													pass
+													split_var2 = list(str(x).split("|"))
+													for xx in split_var2:
+														if str(xx) == str(email):
+															mine_var='true'
+														pass
+													pass
+
+												pass}}
+											{{if mine_var=='true':}}
+												{{if db((db.read_mail.id_auth_user == auth.user.id) & (db.read_mail.id_mail == mails[a].id) ).select().first() == None:}}
+													{{cont_news = cont_news + 1}}
+												{{pass}}
+											{{pass}}
+										{{pass}}
+										<table class="table table-striped table-bordered" >
+											<tr>
+												<td width="100%">
+													<span class="icon-book"></span> &nbsp 
+													<a style="cursor:pointer;" onclick="click_link({{=assignation.assignation.id}});">
+														{{=assignation.assignation.name}}
+													</a>
+												</td>
+												{{if cont_news>0:}}
+													<td align="right">
+														<span id="information_text" class="badge btn-success">{{=T('New Mails')}} {{=cont_news}}</span> 
+													</td>
+												{{pass}}												
+											</tr>
+										</table>
+									
 									<div id="mail_{{=assignation.assignation.id}}" style="display:none; height:200px; overflow:auto;" >
 										{{=T('Loading')}}...
 									<div>
