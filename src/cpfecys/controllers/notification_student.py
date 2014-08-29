@@ -105,11 +105,48 @@ def send_mail():
             return dict(email=None,assignations=assignations,cperiod=cperiod)
             
 
-            
-            
-            
-    
+@auth.requires_login()
+@auth.requires_membership('Academic')
+def sent_mails():        
+    import cpfecys
+    cperiod = cpfecys.current_year_period()
 
+    academic_var = db.academic(db.academic.id_auth_user==auth.user.id)        
+    period_list = db(db.academic_course_assignation.carnet==academic_var.id).select(db.academic_course_assignation.semester,distinct=True)
+
+    select_form = FORM(INPUT(_name='semester_id',_type='text'))
+
+    if select_form.accepts(request.vars,formname='select_form'):
+        assignations = db((db.academic_course_assignation.semester==str(select_form.vars.semester_id)) & (db.academic_course_assignation.carnet==academic_var.id)).select()
+        period_id = str(select_form.vars.semester_id)
+    else:
+        assignations = db((db.academic_course_assignation.semester==cperiod.id) & (db.academic_course_assignation.carnet==academic_var.id)).select()
+        period_id = str(cperiod.id)
+
+    return dict(assignations=assignations,email=auth.user.email,period_id=period_id,period_list=period_list,cperiod=cperiod.id)
+
+
+@auth.requires_login()
+def register_mail():
+    notices=None    
+    if request.vars['project'] != None:
+        project = request.vars['project']
+        semester = request.vars['period_id']        
+        yearp_var = db(db.period_year.id==semester).select().first()
+        project_name = db(db.project.id==project).select().first()
+        notices  = db((db.academic_send_mail_log.emisor==auth.user.username) & (db.academic_send_mail_log.course==project_name.name)&(db.academic_send_mail_log.period==yearp_var.period.name)&(db.academic_send_mail_log.yearp==yearp_var.yearp)).select()
+    return dict(notices=notices)
+
+@auth.requires_login()
+def register_mail_detail():
+    if request.vars['notice'] != None:
+        mail_var = db(db.academic_send_mail_log.id==request.vars['notice']).select().first()
+        listadoC=str(mail_var.email_list).split(",")
+        
+    
+    return dict(mail_var=mail_var,listadoC=listadoC)
+            
+            
 @auth.requires_login()
 def reply_mail_with_email(email, message, remessage, retime, resub ,subject, semester,year, project_name):  
     
