@@ -123,7 +123,8 @@
 	  <fieldset>
 	  	<label for="subject">{{=T('Subject')}}</label>
 	  	{{if email != None:}}
-	    	<input type="text" id="subject" name="subject" value="Re: {{=resub}}">
+	    	<input type="hidden" id="subject" name="subject" value="Re: {{=resub}}">
+	    	<h3><small>Re: {{=resub}}</small><h3>
 	    {{else:}}
 	    	<input type="text" id="subject" name="subject">
 	    {{pass}}

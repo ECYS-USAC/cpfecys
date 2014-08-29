@@ -158,7 +158,7 @@ def reply_mail_with_email(email, message, remessage, retime, resub ,subject, sem
     messageC = '<html>' + message  +'<br><br>Estudiante: '+ auth.user.first_name +' '+ auth.user.last_name +'<br>Carnet: '+auth.user.username+'<br>Correo: '+auth.user.email+'<br>'+project_name+"<br>"+str(period)+'<br>Sistema de Seguimiento de La Escuela de Ciencias y Sistemas<br> Facultad de Ingeniería - Universidad de San Carlos de Guatemala'
     messageC = messageC + '<br><br><hr style="width:100%;"><b><i>Respuesta al mensaje enviado el '+ retime +':</i></b><br><table><tr><td><i><b>Asunto:</b></td><td>'+resub+ '</td></tr></table></i></html>'
     control = 0
-    was_sent = mail.send(to='lecausac@gmail.com',subject=subject,message=messageC, bcc=email)
+    was_sent = mail.send(to='dtt.ecys@dtt-ecys.org',subject=subject,message=messageC, bcc=email)
     db.academic_send_mail_log.insert(subject=subject,
                                     sent_message=message,
                                     emisor=auth.user.username,
@@ -213,7 +213,7 @@ def send_mail_to_users(users, message, subject, semester,year, project_name):
                     email_list.append(user.email)
                     email_list_log = email_list_log + "," + str(user.email)
 
-    was_sent = mail.send(to='lecausac@gmail.com',subject=subject,message=messageC, bcc=email_list)
+    was_sent = mail.send(to='dtt.ecys@dtt-ecys.org',subject=subject,message=messageC, bcc=email_list)
     db.academic_send_mail_log.insert(subject=subject,
                                     sent_message=message,
                                     emisor=auth.user.username,
