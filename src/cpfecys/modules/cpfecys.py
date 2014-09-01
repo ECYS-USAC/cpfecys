@@ -131,6 +131,9 @@ def _period_setup():
     import datetime
     now = datetime.datetime.now()
     year = now.year
+    date1=None
+    date2=None
+    date3=None
     ##### We create the current period
     if now.month < 6:
         #check and create the first semester of current year
@@ -138,24 +141,81 @@ def _period_setup():
                               (db.period_year.period == first_period))
         if not pery:
             db.period_year.insert(yearp = year, period = first_period)
+        
+        #cheack and create the configuration of firts semester of curreynt year
+        configPeriod = db.student_control_period(db.student_control_period.period_name==("Primer Semestre"+str(year)))
+        if not configPeriod:
+            dateInicialP = db.executesql('SELECT date(\''+str(year)+'-01-01\') as fecha;',as_dict=True)
+            for d0 in dateInicialP:
+                date1=d0['fecha']
+            dateInicialP = db.executesql('SELECT date(\''+str(year)+'-02-15\') as fecha;',as_dict=True)
+            for d0 in dateInicialP:
+                date2=d0['fecha']
+            dateInicialP = db.executesql('SELECT date(\''+str(year)+'-05-31\') as fecha;',as_dict=True)
+            for d0 in dateInicialP:
+                date3=d0['fecha']
+            db.student_control_period.insert(period_name=("Primer Semestre"+str(year)), date_start=date1,date_finish=date2,timeout_income_notes=10,date_finish_semester=date3,date_start_semester=date1)
     if now.month > 6:
         #check and create second semester of current year
         pery = db.period_year((db.period_year.yearp == year)&
                               (db.period_year.period == second_period))
         if not pery:
             db.period_year.insert(yearp = year, period = second_period)
+
+        #cheack and create the configuration of firts semester of curreynt year
+        configPeriod = db.student_control_period(db.student_control_period.period_name==("Segundo Semestre"+str(year)))
+        if not configPeriod:
+            dateInicialP = db.executesql('SELECT date(\''+str(year)+'-07-01\') as fecha;',as_dict=True)
+            for d0 in dateInicialP:
+                date1=d0['fecha']
+            dateInicialP = db.executesql('SELECT date(\''+str(year)+'-08-15\') as fecha;',as_dict=True)
+            for d0 in dateInicialP:
+                date2=d0['fecha']
+            dateInicialP = db.executesql('SELECT date(\''+str(year)+'-11-30\') as fecha;',as_dict=True)
+            for d0 in dateInicialP:
+                date3=d0['fecha']
+            db.student_control_period.insert(period_name=("Segundo Semestre"+str(year)), date_start=date1,date_finish=date2,timeout_income_notes=10,date_finish_semester=date3,date_start_semester=date1)
     if now.month == 12:
         #check and create first semester of next year
         pery = db.period_year((db.period_year.yearp == (year + 1))&
                               (db.period_year.period == first_period))
         if not pery:
             db.period_year.insert(yearp = (year + 1), period = first_period)
+
+        #cheack and create the configuration of firts semester of curreynt year
+        configPeriod = db.student_control_period(db.student_control_period.period_name==("Primer Semestre"+str(year)))
+        if not configPeriod:
+            dateInicialP = db.executesql('SELECT date(\''+str(year+1)+'-01-01\') as fecha;',as_dict=True)
+            for d0 in dateInicialP:
+                date1=d0['fecha']
+            dateInicialP = db.executesql('SELECT date(\''+str(year+1)+'-02-15\') as fecha;',as_dict=True)
+            for d0 in dateInicialP:
+                date2=d0['fecha']
+            dateInicialP = db.executesql('SELECT date(\''+str(year+1)+'-05-31\') as fecha;',as_dict=True)
+            for d0 in dateInicialP:
+                date3=d0['fecha']
+            db.student_control_period.insert(period_name=("Primer Semestre"+str(year+1)), date_start=date1,date_finish=date2,timeout_income_notes=10,date_finish_semester=date3,date_start_semester=date1)
     if now.month == 6:
         #check and create second semester of current year
         pery = db.period_year((db.period_year.yearp == year)&
                               (db.period_year.period == second_period))
         if not pery:
             db.period_year.insert(yearp = year, period = second_period)
+
+        #cheack and create the configuration of firts semester of curreynt year
+        configPeriod = db.student_control_period(db.student_control_period.period_name==("Segundo Semestre"+str(year)))
+        if not configPeriod:
+            dateInicialP = db.executesql('SELECT date(\''+str(year)+'-07-01\') as fecha;',as_dict=True)
+            for d0 in dateInicialP:
+                date1=d0['fecha']
+            dateInicialP = db.executesql('SELECT date(\''+str(year)+'-08-15\') as fecha;',as_dict=True)
+            for d0 in dateInicialP:
+                date2=d0['fecha']
+            dateInicialP = db.executesql('SELECT date(\''+str(year)+'-11-30\') as fecha;',as_dict=True)
+            for d0 in dateInicialP:
+                date3=d0['fecha']
+            db.student_control_period.insert(period_name=("Segundo Semestre"+str(year)), date_start=date1,date_finish=date2,timeout_income_notes=10,date_finish_semester=date3,date_start_semester=date1)
+
 
 def _database_setup():
     global first_period_name, second_period_name

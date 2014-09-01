@@ -54,64 +54,6 @@
 </div>
   <!--Finish Create Activity Modal -->
 
-
-<!--Request Change Activity Modal -->
-<div id="changeRequestActivity" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true" style="width:70%; left:30%;"> 
-    <div id ="a" class="modal-header">
-      <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
-        <h3 id="myModalLabel">
-          <h2>{{=T('Laboratory Scheduler')}} - {{=name}}<br>
-          {{=T('Change Request')}}</h2>
-        </h3>
-    </div>
-    <div id="actions_activity">
-      <form action="" enctype="multipart/form-data" method="post" >
-        <center>
-          <table >
-              <tr>
-                <td align="left">                 
-                  <div align="center" id="activityDiv" value="activityDiv" class="well span12" style="overflow:auto; height:450px; width:300px;">    
-                    
-                  </div>
-                  
-                </td>
-                <td align="left"  >
-                  <div class="well span11" id="div_activity_show" style="overflow:auto; height:450px; width:900px;">
-                    
-                  </div>
-                </td>
-              </tr>
-              <tr >
-                <td>
-                  <div align="right">
-                    <a id="activityButton" href="#information_text" role="button" class="btn btn-info"  
-                    title="{{=T('Add activity to scheduler')}}"> 
-                    <span class="icon-plus-sign"></span>
-                    {{=T('Add Activity')}}
-                     </a>
-                  </div>
-                </td>
-                <td >
-                  <div align="right"> 
-                    <button class="btn btn-primary" id="button_action"> {{=T('Update')}}</button>
-                    <button class="btn" data-dismiss="modal" aria-hidden="true">{{=T('Close')}}</button>
-                  </div>
-                </td>
-              </tr>
-          </table>
-         </center>      
-        </div>
-
-        <div align="center">
-
-      </div>
-    </form>
-  </div>
-  </div>
-  <!--Request Change Modal -->
-
-
-
   <script type="text/javascript">
   $(document).ready(function(){
     //Create
@@ -135,7 +77,7 @@
           if (validDateInit == null || validDateEnd==null) {
             alert("{{=T('Enter date and time as YYYY-MM-DD or YYYY/MM/DD')}}");
           }else{
-            if(dateInit_var<dateEnd_var){
+            if(dateInit_var<=dateEnd_var){
               if (field_grade_var!='nada'){
                 var regex = /^\d+(?:\.\d{0,2})$/;
                 var regex2 = /^([0-9])*$/;

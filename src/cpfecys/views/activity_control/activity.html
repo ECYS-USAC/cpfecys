@@ -1,5 +1,134 @@
 {{project_var = db(db.user_project.id == request.vars['assignation']).select().first()}}
-{{if request.vars['op'] == "addActivity": }}
+{{if request.vars['op']=="addActivityRequest":}}
+	{{date1=None}}
+	{{dateInicialP = db.executesql('SELECT date(\''+request.vars['dateInit_var']+'\');',as_dict=True)}}
+	{{for d0 in dateInicialP:}}
+		{{date1=d0['date(\''+request.vars['dateInit_var']+'\')']}}
+	{{pass}}
+	{{date2=None}}
+	{{dateInicialP2 = db.executesql('SELECT date(\''+request.vars['dateEnd_var']+'\');',as_dict=True)}}
+	{{for d0 in dateInicialP2:}}
+		{{date2=d0['date(\''+request.vars['dateEnd_var']+'\')']}}
+	{{pass}}
+
+	{{if date1==None or date2==None:}}
+		<center>
+			<span id="information_text" class="badge badge-important">{{=T('One of the date or both are incorrect')}}</span>
+		</center>
+	{{else:}}
+		{{actualSemester = db(db.period_year.id==semestre2).select().first()}}
+		{{comparacion = T(actualSemester.period.name)+" "+str(actualSemester.yearp)}}
+		{{date_var = db((db.student_control_period.period_name==comparacion)).select().first()}}
+		{{if date1>= date_var.date_start_semester and date2<= date_var.date_finish_semester:}}
+			{{comprobation=False}}
+			{{if auth.has_membership('Teacher'):}}
+				{{comprobation=True}}
+			{{else:}}
+				{{categoryTemp = db((db.course_activity_category.semester==semestre2.id) & (db.course_activity_category.assignation==project_var.project.id) & (db.course_activity_category.id==int(request.vars['category_activity_id_var']))).select().first()}}
+
+				{{dateC1=None}}
+				{{dateC2=None}}
+				{{maximTimeCategory = db.executesql('SELECT DATE_ADD(\''+str(date1)+'\', INTERVAL '+str(categoryTemp.category.timeout)+' Day) as fecha;',as_dict=True)}}
+				{{for d0 in maximTimeCategory:}}
+					{{dateC1=d0['fecha']}}
+				{{pass}}
+				{{if str(date2)>str(dateC1):}}
+					<center>
+						<span id="information_text" class="badge badge-important">{{=T('The maximum number of days of activities in this category is')}} {{=str(categoryTemp.category.timeout)}}</span>
+					</center>
+				{{else:}}
+					{{maximTimeCategory = db.executesql('SELECT DATE_ADD(\''+str(date2)+'\', INTERVAL '+str(date_var.timeout_income_notes)+' Day) as fecha;',as_dict=True)}}
+					{{for d0 in maximTimeCategory:}}
+						{{dateC2=d0['fecha']}}
+					{{pass}}
+					{{if str(dateC2)>str(date_var.date_finish_semester):}}
+						<center>
+							<span id="information_text" class="badge badge-important">{{=T('The end date of the activity over the time you have to enter notes exceeds timeout semester')}}</span>
+						</center>
+					{{else:}}
+						{{comprobation=True}}
+					{{pass}}
+				{{pass}}
+			{{pass}}
+			{{if comprobation==True:}}
+			<script type="text/javascript">
+				var name='f';
+				for (var j=0; j<activities.length; j++){
+					if(activities[j][2]=="{{=request.vars['activity_name1_var']}}" && activities[j][1]=={{=int(request.vars['category_activity_id_var'])}}){
+						name='t';
+					}
+				}
+				if(name=='f'){
+					{{if categoryTemp.specific_grade==True:}}
+						var totalCategory={{=categoryTemp.grade}};
+						var totalTemporal={{=float(request.vars['field_grade_var'])}};
+						for (var j=0; j<activities.length; j++){
+							if(activities[j][1]=={{=int(request.vars['category_activity_id_var'])}}){
+								totalTemporal=totalTemporal+activities[j][4];
+							}
+						}
+						if(totalTemporal<=totalCategory){
+							activities.push([-2,{{=int(request.vars['category_activity_id_var'])}},'{{=request.vars['activity_name1_var']}}','{{=request.vars['activity_description_var']}}',{{=float(request.vars['field_grade_var'])}},'{{=request.vars['dateInit_var']}}','{{=request.vars['dateEnd_var']}}',{{=categoryTemp.category.timeout}}]);
+								document.getElementById('category_activity_id').value="";
+						        document.getElementById('activity_name2').value="";
+						        document.getElementById('activity_name1').value="";
+						        document.getElementById('activity_description').value="";
+						        document.getElementById('field_grade').value="";
+						        document.getElementById('dateInit').value="";
+						        document.getElementById('dateEnd').value="";
+						        jQuery('#label_timeout').empty();
+								jQuery("#label_timeout").append('');
+						}else{
+							jQuery('#div_activity_show').append("<center><span id=\"information_text\" class=\"badge badge-important\">{{=T('The sum of the ratings of the activities exceeds the limit of the category')}}  ("+totalTemporal+" < "+totalCategory+")</span></center>");
+						}
+					{{else:}}
+						activities.push([-2,{{=int(request.vars['category_activity_id_var'])}},'{{=request.vars['activity_name1_var']}}','{{=request.vars['activity_description_var']}}',0,'{{=request.vars['dateInit_var']}}','{{=request.vars['dateEnd_var']}}',{{=categoryTemp.category.timeout}}]);
+						document.getElementById('category_activity_id').value="";
+				        document.getElementById('activity_name2').value="";
+				        document.getElementById('activity_name1').value="";
+				        document.getElementById('activity_description').value="";
+				        document.getElementById('field_grade').value="";
+				        document.getElementById('dateInit').value="";
+				        document.getElementById('dateEnd').value="";
+				        jQuery('#label_timeout').empty();
+						jQuery("#label_timeout").append('');
+					{{pass}}
+				}else{
+					jQuery('#div_activity_show').append("<center><span id=\"information_text\" class=\"badge badge-important\">{{=T('the name of the registered activity already exists.')}}</span></center>");
+				}
+			</script>
+			{{pass}}
+		{{else:}}
+			<center>
+				<span id="information_text" class="badge badge-important">{{=T('The date range of activities are not within the range of the semester')}} ({{=date_var.date_start_semester}} - {{=date_var.date_finish_semester}})</span>
+			</center>
+		{{pass}}
+	{{pass}}
+	<script type="text/javascript">
+		var control=0;
+		var table="<table class=\"table table-striped table-bordered\">";
+		for (var i=0; i < categories.length; i++){
+			table=table+"<tr><th colspan=\"5\"><center>"+categories[i][1]+"</center></th></tr>";
+			for (var j=0; j<activities.length; j++){
+				if(categories[i][0]==activities[j][1]){
+					if(control==0)
+						table=table+"<tr><th>Nombre</th><th>Descripción</th><th>Punteo</th><th>Fecha Inicio</th><th>Fecha Finalización</th>";
+					table=table+"<tr><td>"+activities[j][2]+"</td>";
+					table=table+"<td>"+activities[j][3]+"</td>";
+					table=table+"<td>"+activities[j][4]+"</td>";
+					table=table+"<td>"+activities[j][5]+"</td>";
+					table=table+"<td>"+activities[j][6]+"</td></tr>";
+				}
+				control++;
+			}
+			control=0;
+		}
+		table=table+"</table>";
+		jQuery('#div_activity_show').append(table);
+	</script>
+{{pass}}
+
+{{if request.vars['op'] == "addActivity":}}
 	{{date1=None}}
 	{{dateInicialP = db.executesql('SELECT date(\''+request.vars['dateInit_var']+'\');',as_dict=True)}}
 	{{for d0 in dateInicialP:}}
@@ -773,6 +902,7 @@
 
 
 {{if  request.vars['op'] == "tableRequestChangeActivity": }}
+	{{existRequest = db((db))}}
 	<!--Check that the current date is in the period that de administrator has register-->
 	{{from datetime import datetime}}
 	{{var_do='false'}}
@@ -1095,7 +1225,7 @@
 					if (validDateInit == null || validDateEnd==null) {
 						alert("{{=T('Enter date and time as YYYY-MM-DD or YYYY/MM/DD')}}");
 					}else{
-						if(edit_dateInit_var<edit_dateEnd_var){
+						if(edit_dateInit_var<=edit_dateEnd_var){
 							$("#div_activity_show").load("{{=URL('activity_control','activity.html')}}?op=updateActivity&amp;var_id="+var_id+"&amp;op2=showEditTable&amp;edit_activity_name1_var=" + encodeURIComponent(edit_activity_name1_var) + "&amp;edit_activity_description_var=" + encodeURIComponent(edit_activity_description_var) +"&amp;edit_field_grade_var=" + edit_field_grade_var + "&amp;edit_dateInit_var="+encodeURIComponent(edit_dateInit_var)+ "&amp;edit_dateEnd_var="+encodeURIComponent(edit_dateEnd_var)+"&amp;assignation={{=request.vars['assignation']}}"); 
 							$("#activityDiv").load("{{=URL('activity_control','activity.html')}}?op=showInsert&amp;assignation={{=request.vars['assignation']}}");
 						}else{

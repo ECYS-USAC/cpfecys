@@ -781,6 +781,16 @@ db.define_table('course_activity_log',
     Field('date_log', 'datetime', notnull = True, default = datetime.datetime.now(), label = 'Fecha')
     )
 
+db.define_table('request_change_activity',
+    Field('user_name', 'reference auth_user', notnull = True, label = 'Usuario'),
+    Field('roll', 'text', notnull = True, label = 'Rol'),
+    Field('status', 'text', notnull = True, label = 'Estado'),
+    Field('description', 'string', notnull=True, unique=False, label = 'Descripción'),
+    Field('date_request', 'datetime', notnull = True, default = datetime.datetime.now(), label = 'Fecha'),
+    Field('semester', 'reference period_year', notnull=True, label = 'Periodo'),
+    Field('course', 'reference project', notnull=True, label = 'Curso')
+    )
+
 
 
 ## after defining tables, uncomment below to enable auditing

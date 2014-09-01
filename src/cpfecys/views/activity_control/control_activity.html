@@ -93,14 +93,18 @@
 	    {{else:}}
 	    	{{if var_do == 'false' and float(total_var2) == 100:}}
 	    		<li>
-					<a tabindex="-1"  title="{{=T('Request that the changes be reviewed by the professor or administrator')}}" href="#changeRequestActivity" role="button"  data-toggle="modal" data-target="#changeRequestActivity"  id="menu_re_activity">
+	    			<a role="button" title="{{=T('Request that the changes be reviewed by the professor or administrator')}}" aria-hidden="true" href="{{=URL('activity_control', 'request_change_activity',vars=dict(assignation = request.vars['assignation']))}}" >
+						<span class="icon-black icon-fullscreen"></span>
+						{{=T('Change Request')}}
+					</a>
+					<!--<a tabindex="-1"  title="{{=T('Request that the changes be reviewed by the professor or administrator')}}" href="#changeRequestActivity" role="button"  data-toggle="modal" data-target="#changeRequestActivity"  id="menu_re_activity">
 			          <span class="icon-check" ></span>
 			          {{=T('Change Request')}}
-			        </a>
+			        </a>-->
 				</li>
 	    	{{else:}}
 	    		<li class="disabled"> 
-					<a tabindex="-1"  title="{{=T('Modify course activity')}}">
+					<a tabindex="-1"  title="{{=T('Request that the changes be reviewed by the professor or administrator')}}">
 						<span class="icon-check" ></span>
 			          {{=T('Change Request')}}
 			        </a>
