@@ -1,9 +1,17 @@
 @auth.requires_login()
-@auth.requires(auth.has_membership('Student') or auth.has_membership('Teacher'))
+@auth.requires(auth.has_membership('Student') or auth.has_membership('Teacher') or auth.has_membership('Academic'))
 def file_managers():
     #The list of periods
-    def obtainPeriods():
-        periods = db((db.period_year.id == db.user_project.period)&(db.user_project.assigned_user==auth.user.id)).select(db.period_year.id, db.period_year.yearp, db.period_year.period, distinct = True)
+    def obtainPeriods(func):
+        if func == 1:
+            try:
+                academic_var = db.academic(db.academic.id_auth_user==auth.user.id)        
+                period_list = db(db.academic_course_assignation.carnet==academic_var.id).select(db.academic_course_assignation.semester,distinct=True)
+                periods = period_list
+            except:
+                periods = []
+        else:
+            periods = db((db.period_year.id == db.user_project.period)&(db.user_project.assigned_user==auth.user.id)).select(db.period_year.id, db.period_year.yearp, db.period_year.period, distinct = True)
         return periods
     #The list of the projects
     def obtainProjects(period):
@@ -114,7 +122,7 @@ def file_managers():
     return dict(obtainPeriods = obtainPeriods, obtainProjects=obtainProjects, obtainStudents=obtainStudents, obtenerRol=obtenerRol, existeRegistro=existeRegistro, grid=grid, name = nameProject,semester=nameSemester,year=nameYear,usernombre=usernombre)
 
 @auth.requires_login()
-@auth.requires(auth.has_membership('Student') or auth.has_membership('Teacher'))
+@auth.requires(auth.has_membership('Student') or auth.has_membership('Teacher') or auth.has_membership('Academic'))
 def change_period():
     idFile = request.args(0)
     period = cpfecys.current_year_period()
