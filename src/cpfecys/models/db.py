@@ -722,6 +722,8 @@ db.define_table('library',
 db.define_table('activity_category',
     Field('category', 'string', notnull=True, unique=False, label = T('category')),
     Field('description', 'text', notnull=True, unique=False, label = T('description')),
+    Field('hidden_academic_tutor', 'boolean', notnull=True, label = T('hidden_academic_tutor')),
+    Field('timeout', 'integer', notnull=True, unique=False, label = T('timeout')),
     format='%(category)s')
 
 db.define_table('course_activity_category',
@@ -737,8 +739,12 @@ db.define_table('course_activity_category',
 db.define_table('student_control_period',
     Field('period_name', 'string', notnull=True, unique=False, label = T('period name')),
     Field('date_start', 'datetime', notnull = True, default = datetime.datetime.now(), label = T('Date Start')),
-    Field('date_finish', 'datetime', notnull = True, default = datetime.datetime.now(), label = T('Date Finish'))
+    Field('date_finish', 'datetime', notnull = True, default = datetime.datetime.now(), label = T('Date Finish')),
+    Field('timeout_income_notes', 'integer', notnull=True, unique=False, label = T('timeout_income_notes')),
+    Field('date_start_semester', 'date', notnull = True, label = T('Date Start Semester')),
+    Field('date_finish_semester', 'date', notnull = True, label = T('Date Finish Semester'))
     )    
+
 
 db.define_table('academic_send_mail_log',
     Field('subject', 'text', notnull = True, label = T('Asunto')),
@@ -751,6 +757,47 @@ db.define_table('academic_send_mail_log',
     Field('period', 'text', notnull=True, label=T('Periodo')),
     Field('email_list', 'text', notnull=True, label=T('Email List')),
     Field('mail_state', 'text', notnull=True, label=T('State'))
+
+db.define_table('course_activity',
+    Field('course_activity_category', 'reference course_activity_category', notnull=True, label = T('category')),    
+    Field('name', 'string', notnull=True, unique=False, label = T('name')),
+    Field('description', 'string', notnull=True, unique=False, label = T('description')),
+    Field('grade', 'decimal(5,2)', notnull=False, label=T('grade')),
+    Field('semester', 'reference period_year', notnull=True),
+    Field('assignation', 'reference project', notnull=True),
+    Field('laboratory', 'boolean', notnull=True, label = T('laboratory')),
+    Field('teacher_permition', 'boolean', notnull=True, label = T('teacher permition')),
+    Field('date_start', 'date', notnull = True, default = datetime.datetime.now(), label = T('Date Start')),
+    Field('date_finish', 'date', notnull = True, default = datetime.datetime.now(), label = T('Date Finish'))
+    )
+
+db.define_table('course_activity_log',
+    Field('user_name', 'text', notnull = False, label = 'Usuario'),
+    Field('roll', 'text', notnull = False, label = 'Rol'),
+    Field('operation_log', 'text', notnull = False, label = 'Operacion'),
+    Field('course', 'text', notnull=False, label='Curso'),
+    Field('yearp', 'text', notnull=False, label='yearp'),
+    Field('period', 'text', notnull=False, label='Periodo'),
+    Field('metric', 'boolean', notnull=False, label='Metrica'),
+    Field('before_course_activity_category', 'text', notnull=False, label = 'Categoria Anterior'),
+    Field('after_course_activity_category', 'text', notnull=False, label = 'Categoria Actual'),
+    Field('before_name', 'text', notnull=False, label = 'Nombre Anterior'),
+    Field('after_name', 'text', notnull=False, label = 'Nombre Actual'),
+    Field('before_description', 'text', notnull=False, label = 'Descripcion Anterior'),
+    Field('after_description', 'text', notnull=False, label = 'Descripcion Actual'),
+    Field('before_grade', 'decimal(5,2)', notnull=False, label='Nota Anterior'),
+    Field('after_grade', 'decimal(5,2)', notnull=False, label='Nota Actual'),
+    Field('before_file', 'upload', notnull=False, label='Reporte Anterior'),
+    Field('after_file', 'upload', notnull=False, label='Reporte Actual'),
+    Field('before_laboratory', 'boolean', notnull=False, label = 'Laboratorio Anterior'),
+    Field('after_laboratory', 'boolean', notnull=False, label = 'Laboratorio Actual'),
+    Field('before_teacher_permition', 'boolean', notnull=False, label = 'permiso Catedratico Anterior'),
+    Field('after_teacher_permition', 'boolean', notnull=False, label = 'Permiso Catedratico Actual'),
+    Field('before_date_start', 'date', notnull = False, label = 'Fecha Inicio Anterior'),
+    Field('after_date_start', 'date', notnull = False, label = 'Fecha Inicio Actual'),
+    Field('before_date_finish', 'date', notnull = False, label = 'Fecha Finalizacion Anterior'),
+    Field('after_date_finish', 'date', notnull = False, label = 'Fecha Finalizacion Actual'),
+    Field('date_log', 'datetime', notnull = True, default = datetime.datetime.now(), label = 'Fecha')
     )
 
 db.define_table('read_mail',

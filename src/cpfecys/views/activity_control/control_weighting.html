@@ -14,7 +14,7 @@
 {{if request.vars['operation'] == "div_update": }}
 	<center>		
 		{{if float(total_var2) == 100:}}		
-			<div id="table_Weighting">
+			<div id="table_Weighting" sytle="overflow:auto;" >
 			</div>
 		{{else:}}
 			<b><font color="red">{{=T('Weighting was not created or is incorrect')}}</font></b>

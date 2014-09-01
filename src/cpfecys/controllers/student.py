@@ -1157,7 +1157,7 @@ def report():
         if valid: valid = cpfecys.student_validation_report_owner(report.id)
         if valid:
             semester = cpfecys.first_period.id
-            if report.created.month > 7:
+            if report.created.month >= 7:
                 semester = cpfecys.second_period.id
 
             period = db((db.period_year.yearp==int(report.created.year))&

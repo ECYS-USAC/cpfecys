@@ -1,7 +1,6 @@
 <!--Create weighting Modal -->
-<div id="createWeighting" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true" style="width:800px; left:40%;"> 
+<div id="createWeighting" class="modal hide fade" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true" style="width:800px; left:40%;"> 
     <div id ="a" class="modal-header">
-      <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
         <h3 id="myModalLabel">
             {{if auth.has_membership('Teacher'):}}
               <h2>{{=T('Class Weighting')}} - {{=name}}
@@ -40,7 +39,6 @@
                 <td >
                   <div align="right"> 
                     <button class="btn btn-primary" id="button_action"> {{=T('Update')}}</button>
-                    <button class="btn" data-dismiss="modal" aria-hidden="true">{{=T('Close')}}</button>
                   </div>
                 </td>
               </tr>
@@ -162,9 +160,11 @@
 		  var category_id_var = document.getElementById('category_id').value;
       var grade_var = document.getElementById('category_grade').value;
       var SG_var = document.getElementById('SG_check').checked;
+      var TP_var = document.getElementById('TP_check').checked;
+      
       //alert(SG_var);
       if (category_id_var==""){
-        alert("{{=T('No categories available')}}");  
+        alert("{{=T('No categories available')}}");
       }else{
       
       var regex = /^\d+(?:\.\d{0,2})$/; 
@@ -178,11 +178,11 @@
           }else{
 
             
-            $("#div_weighting_show").load("{{=URL('activity_control','weighting.html')}}?op=addCategory&amp;laboratory=true&amp;SG_var=" + SG_var + "&amp;category_id_var=" + category_id_var +"&amp;grade_var=" + grade_var + "&amp;TP=true&amp;assignation={{=request.vars['assignation']}}"); 
+            $("#div_weighting_show").load("{{=URL('activity_control','weighting.html')}}?op=addCategory&amp;laboratory=true&amp;SG_var=" + SG_var + "&amp;category_id_var=" + category_id_var +"&amp;grade_var=" + grade_var + "&amp;TP="+TP_var+"&amp;assignation={{=request.vars['assignation']}}"); 
             
             $("#categoryDiv").load("{{=URL('activity_control','weighting.html')}}?op=showInsert&amp;assignation={{=request.vars['assignation']}}"); 
             $("#categoryDiv").load("{{=URL('activity_control','weighting.html')}}?op=showInsert&amp;assignation={{=request.vars['assignation']}}"); 
-            }       
+            }
 
         }
       }
@@ -195,8 +195,6 @@
     $("#getWeightingButton").click(function(){
       var id_period_sel = document.getElementById('period_id').value;
       $("#getViewDiv").load("{{=URL('activity_control','weighting.html')}}?op=getPreviousWeighting&amp;assignation={{=request.vars['assignation']}}&amp;period_par="+id_period_sel);
-      //$("#getViewDiv").load("{{=URL('activity_control','weighting.html')}}?op=showEditTable&amp;assignation={{=request.vars['assignation']}}");
-      
     })
 
   });

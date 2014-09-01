@@ -1,0 +1,172 @@
+<!--Create Activity Modal -->
+<div id="createActivity" class="modal hide fade" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true" style=" width:70%; left:30%;"> 
+    <div id ="a" class="modal-header">
+        <h3 id="myModalLabel">
+            {{if auth.has_membership('Teacher'):}}
+              <h2>{{=T('Class Scheduler')}} - {{=name}}</h2>
+            {{else:}}
+              <h2>{{=T('Laboratory Scheduler')}} - {{=name}}</h2>
+            {{pass}}
+        </h3>
+    </div>
+    <div id="actions_activity"  style="overflow:auto; height:100%; width:100%;">
+      <form action="" enctype="multipart/form-data" method="post" >
+        <center>
+          <table >
+              <tr>
+                <td align="left">                	
+                  <div align="center" id="activityDiv" value="activityDiv" class="well span12" style="overflow:auto; height:350px; width:300px;">    
+                    
+                  </div>
+                  
+                </td>
+                <td align="left">
+                  <div class="well span11" id="div_activity_show" style="overflow:auto; height:350px; width:600px;">
+            	      
+                  </div>
+              	</td>
+              </tr>
+              <tr>
+                <td>
+                  <div align="right">
+                    <a id="activityButton" href="#information_text" role="button" class="btn btn-info"  
+                    title="{{=T('Add activity to scheduler')}}"> 
+                    <span class="icon-plus-sign"></span>
+                    {{=T('Add Activity')}}
+                     </a>
+                  </div>
+                </td>
+                <td >
+                  <div align="right"> 
+                    <button class="btn btn-primary" id="button_action"> {{=T('Update')}}</button>
+                  </div>
+                </td>
+              </tr>
+          </table>
+			   </center>     	
+        </div>
+
+        <div align="center">
+
+      </div>
+    </form>
+  </div>
+</div>
+  <!--Finish Create Activity Modal -->
+
+
+<!--Request Change Activity Modal -->
+<div id="changeRequestActivity" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true" style="width:70%; left:30%;"> 
+    <div id ="a" class="modal-header">
+      <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+        <h3 id="myModalLabel">
+          <h2>{{=T('Laboratory Scheduler')}} - {{=name}}<br>
+          {{=T('Change Request')}}</h2>
+        </h3>
+    </div>
+    <div id="actions_activity">
+      <form action="" enctype="multipart/form-data" method="post" >
+        <center>
+          <table >
+              <tr>
+                <td align="left">                 
+                  <div align="center" id="activityDiv" value="activityDiv" class="well span12" style="overflow:auto; height:450px; width:300px;">    
+                    
+                  </div>
+                  
+                </td>
+                <td align="left"  >
+                  <div class="well span11" id="div_activity_show" style="overflow:auto; height:450px; width:900px;">
+                    
+                  </div>
+                </td>
+              </tr>
+              <tr >
+                <td>
+                  <div align="right">
+                    <a id="activityButton" href="#information_text" role="button" class="btn btn-info"  
+                    title="{{=T('Add activity to scheduler')}}"> 
+                    <span class="icon-plus-sign"></span>
+                    {{=T('Add Activity')}}
+                     </a>
+                  </div>
+                </td>
+                <td >
+                  <div align="right"> 
+                    <button class="btn btn-primary" id="button_action"> {{=T('Update')}}</button>
+                    <button class="btn" data-dismiss="modal" aria-hidden="true">{{=T('Close')}}</button>
+                  </div>
+                </td>
+              </tr>
+          </table>
+         </center>      
+        </div>
+
+        <div align="center">
+
+      </div>
+    </form>
+  </div>
+  </div>
+  <!--Request Change Modal -->
+
+
+
+  <script type="text/javascript">
+  $(document).ready(function(){
+    //Create
+      $("#div_activity_show").load("{{=URL('activity_control','activity.html')}}?op=showTable&amp;assignation={{=request.vars['assignation']}}"); 
+      $("#activityDiv").load("{{=URL('activity_control','activity.html')}}?op=showInsert&amp;assignation={{=request.vars['assignation']}}"); 
+
+    $("#activityButton").click(function(){
+        var category_activity_id_var = document.getElementById('category_activity_id').value;
+        var activity_name2_var = document.getElementById('activity_name2').value;
+        var activity_name1_var = document.getElementById('activity_name1').value;
+        var activity_description_var = document.getElementById('activity_description').value;
+        var field_grade_var = document.getElementById('field_grade').value;
+        var dateInit_var = document.getElementById('dateInit').value;
+        var dateEnd_var = document.getElementById('dateEnd').value;
+        if(category_activity_id_var=="" || (activity_name1_var=="" && activity_name2_var=="") || activity_description_var=="" || dateInit_var=="" || dateEnd_var==""){
+            alert("{{=T('Fill all fields to save.')}}");
+        }else{
+          var formatDate = /^(\d{4})(\/|-)(\d{1,2})(\/|-)(\d{1,2})$/;
+          var validDateInit = dateInit_var.match(formatDate);
+          var validDateEnd = dateEnd_var.match(formatDate);
+          if (validDateInit == null || validDateEnd==null) {
+            alert("{{=T('Enter date and time as YYYY-MM-DD or YYYY/MM/DD')}}");
+          }else{
+            if(dateInit_var<dateEnd_var){
+              if (field_grade_var!='nada'){
+                var regex = /^\d+(?:\.\d{0,2})$/;
+                var regex2 = /^([0-9])*$/;
+                if (!regex.test(field_grade_var) && !regex2.test(field_grade_var)){
+                  alert("{{=T('The entered value is not a decimal')}}");  
+                }else{
+                  if(field_grade_var=='0'){
+                    alert("{{=T('The grade can not be 0')}}");
+                  }else{
+                    if (activity_name2_var==""){
+                      $("#div_activity_show").load("{{=URL('activity_control','activity.html')}}?op=addActivity&amp;category_activity_id_var=" + category_activity_id_var + "&amp;activity_name1_var=" + encodeURIComponent(activity_name1_var) +"&amp;activity_description_var=" + encodeURIComponent(activity_description_var) + "&amp;field_grade_var=" + field_grade_var + "&amp;dateInit_var="+encodeURIComponent(dateInit_var)+ "&amp;dateEnd_var="+encodeURIComponent(dateEnd_var)+"&amp;assignation={{=request.vars['assignation']}}"); 
+                    }else{
+                      $("#div_activity_show").load("{{=URL('activity_control','activity.html')}}?op=addActivity&amp;category_activity_id_var=" + category_activity_id_var + "&amp;activity_name1_var=" + encodeURIComponent(activity_name2_var) +"&amp;activity_description_var=" + encodeURIComponent(activity_description_var) + "&amp;field_grade_var=" + field_grade_var + "&amp;dateInit_var="+encodeURIComponent(dateInit_var)+ "&amp;dateEnd_var="+encodeURIComponent(dateEnd_var)+"&amp;assignation={{=request.vars['assignation']}}"); 
+                    }
+                    $("#activityDiv").load("{{=URL('activity_control','activity.html')}}?op=showInsert&amp;assignation={{=request.vars['assignation']}}");
+                  }
+                }
+              }else{
+                if (activity_name2_var==""){
+                    $("#div_activity_show").load("{{=URL('activity_control','activity.html')}}?op=addActivity&amp;category_activity_id_var=" + category_activity_id_var + "&amp;activity_name1_var=" + encodeURIComponent(activity_name1_var) +"&amp;activity_description_var=" + encodeURIComponent(activity_description_var) + "&amp;field_grade_var=nada&amp;dateInit_var="+encodeURIComponent(dateInit_var)+ "&amp;dateEnd_var="+encodeURIComponent(dateEnd_var)+"&amp;assignation={{=request.vars['assignation']}}"); 
+                  }else{
+                    $("#div_activity_show").load("{{=URL('activity_control','activity.html')}}?op=addActivity&amp;category_activity_id_var=" + category_activity_id_var + "&amp;activity_name1_var=" + encodeURIComponent(activity_name2_var) +"&amp;activity_description_var=" + encodeURIComponent(activity_description_var) + "&amp;field_grade_var=nada&amp;dateInit_var="+encodeURIComponent(dateInit_var)+ "&amp;dateEnd_var="+encodeURIComponent(dateEnd_var)+"&amp;assignation={{=request.vars['assignation']}}"); 
+                  }
+                $("#activityDiv").load("{{=URL('activity_control','activity.html')}}?op=showInsert&amp;assignation={{=request.vars['assignation']}}"); 
+              }
+            }else{
+              alert("{{=T('The end date must be greater than start date')}}");
+            }
+          }
+        }
+    })
+  });
+
+  </script>

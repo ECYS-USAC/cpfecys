@@ -20,89 +20,71 @@
                     <span class="icon-black icon-fullscreen"></span>
                 </a>              
             
+
             <div id="h_weighting_h" class="navbar-inner" >  
               <div id="weighting_menu">          
                 
-              </div> 
-              <ul>              
-                            
+              </div>        
             </div>
+
+
             <div id="h_weighting_v" style="-webkit-transform: rotate(270deg); -moz-transform: rotate(270deg); -o-transform: rotate(270deg); -ms-transform: rotate(270deg); transform: rotate(270deg); position:absolute;  left:-15px;  z-index:1; top:140px;">
               
               <h3 style="color:#f0ad4e; text-shadow: -1px 0 white, 0 1px white, 1px 0 white, 0 -1px white;">
-                    {{=T('Weighting')}}
-               </h3>
-               
+                  {{=T('Weighting')}}
+              </h3>
             </div>
-               
+            
+
             <div id="weighting_inside" class="well" style="overflow:auto; background-color:white; height:250px; ">
               {{=T('Loading')}}...
             </div>
           </div>
           <!--FINISH WEIGHTING DIV-->
+
+
           </td></tr><tr><td>
           <br>
+
+
           <!--ACTIVITY DIV-->
           <div  id="activity_div" style=" width:100%; height:350px;">
-
-            <a type="button" class="close"  aria-hidden="true" >
+              <!--Menu of activity DIV Right-->
+              <a type="button" class="close" title="{{=T('Help')}}" aria-hidden="true" role="button" class="btn btn-warning" data-toggle="modal" data-target="#help_modal_activity" >
                 <span class="icon-black icon-question-sign"></span>
-            </a>
-            <a type="button" class="close"  aria-hidden="true" onclick="activityClick();">
-              <span id="activity_icon" class="icon-black icon-resize-small"></span>
-            </a>
-            <a type="button" class="close"  aria-hidden="true" href="{{=URL('activity_control', 'students_control_full')}}" >
-                <span class="icon-black icon-fullscreen"></span>
-            </a>         
-            
-            <div id="h_activity_h" class="navbar-inner" style="height:10px;">
-              <ul class="dropdown"  class="close" aria-hidden="true"  style="height:10px;">
-                <a style="color:#f0ad4e;text-shadow:none;" class="dropdown-toggle" data-toggle="dropdown" href="">
-                  <span class="icon-list"></span>
-                </a>
-                <h3 class="icon-white" style="text-shadow: -1px 0 white, 0 1px white, 1px 0 white, 0 -1px white;">
-                    {{=T('Activity')}}
-                </h3> 
-                <ul class="dropdown-menu">                    
-                    <li >                      
-                      <a tabindex="-1" href="#" title="{{=T('Create course activities')}}">
-                        <span class="icon-plus-sign"></span>
-                        {{=T('Create Activities')}}
-                      </a>
-                    </li>
-                    <li class="disabled">
-                      <a tabindex="-1" href="#" title="{{=T('Modify course activities')}}">
-                        <span class="icon-edit" ></span>
-                        {{=T('Edit activities')}}
-                      </a>
-                    </li>
-                    <li class="disabled">
-                      <a tabindex="-1" href="#" title="{{=T('Request that the changes be reviewed by the professor or administrator')}}">
-                        <span class="icon-check" ></span>
-                        {{=T('Change Request')}}
-                      </a>
-                    </li>
-                </ul>
-              </ul>  
-
-              <h3 class="icon-white" style="color:#f0ad4e; text-shadow: -1px 0 white, 0 1px white, 1px 0 white, 0 -1px white;">
-                    
-               </h3>
-            </div>
-            <div id="h_activity_v" style="-webkit-transform: rotate(270deg); -moz-transform: rotate(270deg); -o-transform: rotate(270deg); -ms-transform: rotate(270deg); transform: rotate(270deg); left:-15px; position:absolute; bottom:135px;">
-              <h3 style="color:#f0ad4e; text-shadow: -1px 0 white, 0 1px white, 1px 0 white, 0 -1px white;">
-                    {{=T('Activity')}}
-               </h3>
-            </div>
-               
-            <div id="activity_inside" class="well" style="background-color:white; height:250px; ">
-              <center>
-              <a id="myButton" href="#attachModal" role="button" class="btn btn-warning"   > 
-                {{=('Crear actividades')}}
               </a>
-              </center>
+              <a type="button" class="close" title="{{=T('Minimize activity')}}" aria-hidden="true" onclick="activityClick();">
+                <span id="activity_icon" class="icon-black icon-resize-small"></span>
+              </a>
+              <a type="button" class="close" title="{{=T('View in full page the activities')}}" aria-hidden="true" href="{{=URL('activity_control', 'students_control_full',vars=dict(assignation = request.vars['assignation'], f_view='activity'))}}" >
+                <span class="icon-black icon-fullscreen"></span>
+              </a>
+              <!--Menu of activity DIV Right-->
+
+              <!--Menu of activity DIV left-->
+              <div id="h_activity_h" class="navbar-inner">
+                <div id="activity_menu">
+                </div>
+              </div>
+              <!--Menu of the activity DIV lett-->
+
+
+              <!--Cuadro del lado derecho la información-->
+              <div id="h_activity_v" style="-webkit-transform: rotate(270deg); -moz-transform: rotate(270deg); -o-transform: rotate(270deg); -ms-transform: rotate(270deg); transform: rotate(270deg); left:-15px; position:absolute; bottom:135px;">
+              
+                <h3 style="color:#f0ad4e; text-shadow: -1px 0 white, 0 1px white, 1px 0 white, 0 -1px white;">
+                  {{=T('Scheduler')}}
+                </h3>
+              </div>
+              <!--Cuadro del lado derecho la información-->
+            
+
+              <!--Cuadro donde sale la información-->
+              <div id="activity_inside" class="well" style="overflow:auto; background-color:white; height:250px;  ">
+                {{=T('Loading')}}...
+              </div>
+              <!--Cuadro donde sale la información-->
             </div>
-          </div>
           <!--FINISH activity DIV-->
         </td>
       </tr>
@@ -111,11 +93,6 @@
 <table id="control_table" style="width:60%; right:2%; top:0; position:absolute; z-index:0;">
   <tr>
   <td style=" width:100%;">
-    <!--CONTROL DIV-->
-          <!--<div id="control_div" style=" width:100%; height:660px;">
-            <button type="button" class="close"  aria-hidden="true" onclick="controlClick();">
-              <span id="control_icon" class="icon-black icon-resize-small"></span>
-            </button>-->
             
             <div id="h_control_h" class="navbar-inner">
               <h3 class="icon-white" style="white-space:nowrap; text-shadow: -1px 0 white, 0 1px white, 1px 0 white, 0 -1px white;">
@@ -166,6 +143,33 @@ aria-hidden="true">{{=T('Close')}}</button>
   </div>
 </div>
 <!--Finish help modal weighting-->
+
+<!--Help modal activity -->
+<div id="help_modal_activity" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true"> 
+  <div class="modal-header">
+    <button type="button" class="close" data-dismiss="modal"
+aria-hidden="true">×</button>
+      <h3 id="myModalLabel">
+          <span class="icon-question-sign"></span>
+          {{=T('Scheduler help')}}
+      </h3>
+  </div>
+  <div class="modal-body">
+    <div class="well">
+        <p>
+            {{=T('In this area you can manage the activities of the course / lab. The actions that can be performed are: Create activity, Edit activity and request a change of activity (academic supervisor).')}}
+        </p>
+    </div>
+  </div>
+  <div class="modal-footer">
+      <button class="btn" data-dismiss="modal"
+aria-hidden="true">{{=T('Close')}}</button>
+  </div>
+</div>
+<!--Finish help modal activity-->
+
+
+
 <script type="text/javascript">
   
 
@@ -268,11 +272,16 @@ aria-hidden="true">{{=T('Close')}}</button>
     $("#h_weighting_v").hide();
     $("#h_activity_v").hide();
     $("#h_control_v").hide();
-    $("#activity_inside").children().attr("disabled","disabled");
+
+    //$("#activity_inside").children().attr("disabled","disabled");
+    
     $("#weighting_inside").load('{{=URL('activity_control','control_weighting.html',vars=dict(operation="div_update",assignation = request.vars['assignation']))}}' );
     $("#modals").load('{{=URL('activity_control','control_students_modals.html',vars=dict(assignation = request.vars['assignation']))}}' );
     $("#weighting_menu").load('{{=URL('activity_control','control_weighting.html',vars=dict(operation="menu_update",assignation = request.vars['assignation']))}}' );
     
+    $("#activity_inside").load('{{=URL('activity_control','control_activity.html',vars=dict(operation="div_update",assignation = request.vars['assignation']))}}' );
+	$("#modals_activity").load('{{=URL('activity_control','control_students_modals2.html',vars=dict(assignation = request.vars['assignation']))}}' );
+    $("#activity_menu").load('{{=URL('activity_control','control_activity.html',vars=dict(operation="menu_update",assignation = request.vars['assignation']))}}' );
   });
   
 </script>
@@ -292,3 +301,7 @@ aria-hidden="true">{{=T('Close')}}</button>
     </div>
 </div>
 <!-- PIC MODAL -->
+
+<div id="modals_activity">
+</div>
+
