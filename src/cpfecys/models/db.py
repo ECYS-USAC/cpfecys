@@ -757,6 +757,7 @@ db.define_table('academic_send_mail_log',
     Field('period', 'text', notnull=True, label=T('Periodo')),
     Field('email_list', 'text', notnull=True, label=T('Email List')),
     Field('mail_state', 'text', notnull=True, label=T('State'))
+    )
 
 db.define_table('course_activity',
     Field('course_activity_category', 'reference course_activity_category', notnull=True, label = T('category')),    
