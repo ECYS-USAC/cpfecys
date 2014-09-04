@@ -329,6 +329,7 @@
 'Course Name': 'Nombre de Curso',
 'Course Progress': 'Progreso de Curso',
 'Course Results': 'Course Results',
+'Course Weighting': 'Course Weighting',
 'Courses': 'Cursos',
 'Courses reports': 'Reportes Cursos',
 'Create': 'Crear',

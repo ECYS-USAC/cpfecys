@@ -508,8 +508,12 @@
 	  var category_id_var = document.getElementById('edit_category_id').value;
       var grade_var = document.getElementById('edit_grade').value;
       var SG_var = document.getElementById('edit_SG_check').checked;
-      var TP_var = document.getElementById('edit_TP_check').checked;
-
+      try{
+      	var TP_var = document.getElementById('edit_TP_check').checked;	
+      }catch(err){
+      	var TP_var = true;
+      }
+      
       
 
 	      if (category_id_var==""){

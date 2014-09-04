@@ -1,13 +1,18 @@
+{{if request.vars['f_view'] == "weighting_edit":}}
 <!--Create weighting Modal -->
-<div id="createWeighting" class="modal hide fade" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true" style="width:800px; left:40%;"> 
-    <div id ="a" class="modal-header">
-        <h3 id="myModalLabel">
+<div > 
+    <div >
+      <center>
+        <h3>
+          <small>
             {{if auth.has_membership('Teacher'):}}
               <h2>{{=T('Class Weighting')}} - {{=name}}
             {{else:}}
               <h2>{{=T('Laboratory Weighting')}} - {{=name}}
             {{pass}}
+          </small>
         </h3>
+      </center>
     </div>
     <div id="actions">
       <form action="" enctype="multipart/form-data" method="post" >
@@ -15,13 +20,13 @@
           <table >
               <tr>
                 <td align="left">                 
-                  <div align="center" id="categoryDiv" value="categoryDiv" class="well span12" style="overflow:auto; height:200px; width:300px;">    
+                  <div align="center" id="categoryDiv" value="categoryDiv" class="well span12" style="overflow:auto; width:300px;">    
                     
                   </div>
                   
                 </td>
                 <td align="left"  >
-                  <div class="well span11" id="div_weighting_show" style="overflow:auto; height:200px; width:300px;">
+                  <div class="well span11" id="div_weighting_show" style="overflow:auto;  width:300px;">
                     
                   </div>
                 </td>
@@ -38,7 +43,7 @@
                 </td>
                 <td >
                   <div align="right"> 
-                    <button class="btn btn-primary" id="button_action"> {{=T('Update')}}</button>
+                    
                   </div>
                 </td>
               </tr>
@@ -53,21 +58,24 @@
     </div>
   </div>
   <!--Finish Create weighting Modal -->
-  
-
-
-
-  <!--Get weighting Modal -->
-<div id="getWeighting" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true" style="width:800px; left:40%;"> 
-    <div id ="a" class="modal-header">
-      <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
-        <h3 id="myModalLabel">
+{{pass}}
+{{if request.vars['f_view'] == "weighting_get":}}
+<!--Get weighting Modal -->
+<div > 
+    <div id ="a">
+        <center>
+        
+        <h3 >
+          <small>
             {{if auth.has_membership('Teacher'):}}
               <h2>{{=T('Class Weighting')}} - {{=name}}
             {{else:}}
               <h2>{{=T('Laboratory Weighting')}} - {{=name}}
             {{pass}}
+        </small>
         </h3>
+      
+      </center>
     </div>
     <div id="actions">
       <form action="" enctype="multipart/form-data" method="post" >
@@ -76,7 +84,7 @@
               <tr>
                 <td align="left">                 
 
-                  <div align="center" id="categoryDiv" value="categoryDiv" class="well span12" style="overflow:auto; height:200px; width:300px;"> 
+                  <div align="center" id="categoryDiv1" value="categoryDiv" class="well span12" style="overflow:auto;  width:300px;"> 
                     <table>
                       <tr>
                         <td>
@@ -129,10 +137,7 @@
                   </div>
                 </td>
                 <td >
-                  <div align="right"> 
-                    <button class="btn btn-primary" id="button_action"> {{=T('Update')}}</button>
-                    <button class="btn" data-dismiss="modal" aria-hidden="true">{{=T('Close')}}</button>
-                  </div>
+                 
                 </td>
               </tr>
           </table>
@@ -146,7 +151,7 @@
     </div>
   </div>
   <!--Get  weighting Modal -->
-  
+{{pass}}
 
   <script type="text/javascript">
   $(document).ready(function(){

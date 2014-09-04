@@ -793,6 +793,8 @@ db.define_table('request_change_activity',
 
 
 
+
+
 ## after defining tables, uncomment below to enable auditing
     # auth.enable_record_versioning(db)
 # automatic forcing spanish language

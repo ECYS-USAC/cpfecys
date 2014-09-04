@@ -1,5 +1,5 @@
 <!--Create Activity Modal -->
-<div id="createActivity" class="modal hide fade" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true" style=" width:70%; left:30%;"> 
+<div id="createActivity" > 
     <div id ="a" class="modal-header">
         <h3 id="myModalLabel">
             {{if auth.has_membership('Teacher'):}}
@@ -15,33 +15,25 @@
           <table >
               <tr>
                 <td align="left">                	
-                  <div align="center" id="activityDiv" value="activityDiv" class="well span12" style="overflow:auto; height:350px; width:300px;">    
+                  <div align="center" id="activityDiv" value="activityDiv" class="well span12" style="overflow:auto;  width:300px;">    
                     
                   </div>
-                  
-                </td>
-                <td align="left">
-                  <div class="well span11" id="div_activity_show" style="overflow:auto; height:350px; width:600px;">
-            	      
-                  </div>
-              	</td>
-              </tr>
-              <tr>
-                <td>
-                  <div align="right">
+                   <div align="right">
                     <a id="activityButton" href="#information_text" role="button" class="btn btn-info"  
                     title="{{=T('Add activity to scheduler')}}"> 
                     <span class="icon-plus-sign"></span>
                     {{=T('Add Activity')}}
                      </a>
                   </div>
+                  
                 </td>
-                <td >
-                  <div align="right"> 
-                    <button class="btn btn-primary" id="button_action"> {{=T('Update')}}</button>
+                <td align="left">
+                  <div class="well span11" id="div_activity_show" style="overflow:auto; height:600px;  width:90%">
+            	      
                   </div>
-                </td>
+              	</td>
               </tr>
+              
           </table>
 			   </center>     	
         </div>

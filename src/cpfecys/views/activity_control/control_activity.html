@@ -58,7 +58,7 @@
 	  	<!--Create activity option-->
   		{{if float(total_var2) == 100:}}
 			<li>
-				<a  tabindex="-1" title="{{=T('Create activity')}}" id="menu_create_activity" href="#createActivity" role="button"  data-toggle="modal" data-target="#createActivity">
+				<a  tabindex="-1" title="{{=T('Create activity')}}" id="menu_create_activity" href="{{=URL('activity_control', 'students_control_full',vars=dict(assignation = request.vars['assignation'], f_view='activity_edit'))}}">
 		{{else:}}
 			<li class="disabled"> 
 				<a  tabindex="-1" title="{{=T('Create activity')}}" id="menu_create_activity">
@@ -72,10 +72,10 @@
 		<!--Edit activity option-->
       	{{if float(total_var2) == 100 and auth.has_membership('Teacher'):}}
 			<li>
-				<a tabindex="-1"  title="{{=T('Modify activity')}}" href="#createActivity" role="button"  data-toggle="modal" data-target="#createActivity"  id="menu_edit_activity"> 
+				<a tabindex="-1"  title="{{=T('Modify activity')}}" href="{{=URL('activity_control', 'students_control_full',vars=dict(assignation = request.vars['assignation'], f_view='activity_edit'))}}"> 
 		{{elif float(total_var2) == 100 and var_do =='true':}}
 			<li>
-				<a tabindex="-1"  title="{{=T('Modify activity')}}" href="#createActivity" role="button"  data-toggle="modal" data-target="#createActivity"  id="menu_edit_activity"> 
+				<a tabindex="-1"  title="{{=T('Modify activity')}}" href="{{=URL('activity_control', 'students_control_full',vars=dict(assignation = request.vars['assignation'], f_view='activity_edit'))}}"> 
 		{{else:}}
 		<li class="disabled"> 
 			<a tabindex="-1"  title="{{=T('Modify activity')}}">
@@ -124,6 +124,7 @@
 		$("#menu_edit_activity").click(function(){
 	      $("#div_activity_show").load("{{=URL('activity_control','activity.html')}}?op=showEditTable&amp;assignation={{=request.vars['assignation']}}"); 
 	    })
+	    
 	
 	});
 </script>
