@@ -605,7 +605,7 @@
 
 		function makeRequest(var_id){
 			if(var_id==0){
-				var r = confirm("{{=T('Do you want want to request changes?')}}");
+				var r = confirm("{{=T('Do you want to request changes?')}}");
 				if (r == true) {
 					var description_request_var = document.getElementById('activity_description_request').value;
 					if(description_request_var==""){
@@ -631,7 +631,7 @@
 								}
 							}
 						}
-						
+
 						if(activitiesOriginal.length!=activities.length){
 							for (var i=0; i < categories.length; i++){
 								control=0;
@@ -652,7 +652,7 @@
 						activities=[];
 						activitiesOriginal=[];
 						activitiesD=[];
-						//$("#div_activity_show").load("{{=URL('activity_control','activity.html')}}?op=makeActivityRequest&amp;tip=e&amp;assignation={{=request.vars['assignation']}}");
+						$("#content").load("{{=URL('activity_control','activity.html')}}?op=makeActivityRequest&amp;tip=e&amp;assignation={{=request.vars['assignation']}}&amp;project={{=request.vars['project']}}&amp;year={{=request.vars['year']}}");
 					}
 				}
 			}
