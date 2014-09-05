@@ -113,7 +113,6 @@ def control_weighting():
     #Obtener la asignacion del estudiante
     assignation = request.vars['assignation']
     
-
     year = db(db.period_year.id == request.vars['year']).select().first() 
     year_semester = year.period
     
@@ -255,7 +254,7 @@ def control_students_modals2():
     
     year = db(db.period_year.id == request.vars['year']).select().first() 
 
-    print "entro yearp++ +" + str(request.vars['year'])
+    
     if (assignation == 'None'):
         project_var = db(db.project.id == request.vars['project']).select().first() 
         return dict(semestre2 = year, name=project_var.name)

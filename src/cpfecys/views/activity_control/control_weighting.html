@@ -5,7 +5,6 @@
 	{{var_project_id=project}}
 {{pass}}
 {{total_var2=0}}
-
 {{if request.vars['type'] == 'course':}}
 	{{for project in db((db.course_activity_category.semester==semestre2.id) & (db.course_activity_category.assignation==var_project_id) & (db.course_activity_category.laboratory==False)).select():}}		
 		{{total_var2 = float(total_var2) + float(project.grade)}}				
@@ -15,7 +14,6 @@
 		{{total_var2 = float(total_var2) + float(project.grade)}}				
 	{{pass}}
 {{pass}}
-
 {{if request.vars['operation'] == "div_update": }}
 	<center>		
 		{{if float(total_var2) == 100:}}		
@@ -51,8 +49,8 @@
 		
 	</center>
 {{pass}}
-
 {{if request.vars['operation'] == "menu_update": }}
+	
 	{{exception_query = db(db.course_laboratory_exception.project == request.vars['project']).select().first()}}
 	
 	{{if exception_query is None:}}
@@ -63,12 +61,10 @@
 		{{exception_s_var = exception_query.s_edit_course}}
 		
 	{{pass}}
-	
 	{{no_menu=True}}
 	{{if (auth.has_membership('Teacher') and request.vars['type'] == "course") or (auth.has_membership('Student') and request.vars['type'] == "lab") or (auth.has_membership('Student')  and request.vars['type'] == "course" and exception_s_var == True) or (auth.has_membership('Teacher')  and request.vars['type'] == "lab" and exception_t_var == True):}}
 		{{no_menu=False}}
 	{{pass}}
-
 		<ul class="dropdown"  class="close" aria-hidden="true"  style="height:10px;">
 		{{if no_menu == False:}}
 		  <a style="color:#f0ad4e;text-shadow:none;" class="dropdown-toggle" data-toggle="dropdown" href="">
