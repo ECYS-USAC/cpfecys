@@ -674,7 +674,7 @@
 				{{comprobation=True}}
 			{{else:}}
 				{{activityTemp = db(db.course_activity.id==int(request.vars['var_id'])).select().first()}}
-				{{categoryTemp = db((db.course_activity_category.semester==semestre2.id) & (db.course_activity_category.assignation==project_var.project.id) & (db.course_activity_category.id==activityTemp.course_activity_category)).select().first()}}
+				{{categoryTemp = db((db.course_activity_category.semester==semestre2.id) & (db.course_activity_category.assignation==var_project_id) & (db.course_activity_category.id==activityTemp.course_activity_category)).select().first()}}
 				{{categoryTemp = db((db.course_activity_category.semester==semestre2.id) & (db.course_activity_category.assignation==var_project_id) & (db.course_activity_category.id==int(request.vars['activityTemp.course_activity_category']))).select().first()}}
 				{{dateC1=None}}
 				{{dateC2=None}}
@@ -1244,6 +1244,7 @@
 	    var edit_field_grade_var = document.getElementById('edit_field_grade').value;
 	    var edit_dateInit_var = document.getElementById('edit_dateInit').value;
 	    var edit_dateEnd_var = document.getElementById('edit_dateEnd').value;
+	    alert("entro")
 		if(edit_activity_name1_var=="" || edit_activity_description_var=="" || edit_field_grade_var=="" || edit_dateInit_var=="" || edit_dateEnd_var=="" ){
 			alert("{{=T('Fill all fields to save.')}}");
 		}else{
@@ -1262,8 +1263,11 @@
 						alert("{{=T('Enter date and time as YYYY-MM-DD or YYYY/MM/DD')}}");
 					}else{
 						if(edit_dateInit_var<=edit_dateEnd_var){
+							
 							$("#div_activity_show").load("{{=URL('activity_control','activity.html')}}?op=updateActivity&amp;var_id="+var_id+"&amp;op2=showEditTable&amp;edit_activity_name1_var=" + encodeURIComponent(edit_activity_name1_var) + "&amp;edit_activity_description_var=" + encodeURIComponent(edit_activity_description_var) +"&amp;edit_field_grade_var=" + edit_field_grade_var + "&amp;edit_dateInit_var="+encodeURIComponent(edit_dateInit_var)+ "&amp;edit_dateEnd_var="+encodeURIComponent(edit_dateEnd_var)+"&amp;assignation={{=request.vars['assignation']}}&amp;project={{=request.vars['project']}}&amp;year={{=request.vars['year']}}"); 
+							
 							$("#activityDiv").load("{{=URL('activity_control','activity.html')}}?op=showInsert&amp;assignation={{=request.vars['assignation']}}&amp;project={{=request.vars['project']}}&amp;year={{=request.vars['year']}}");
+							
 						}else{
 							alert("{{=T('The end date must be greater than start date')}}");
 						}

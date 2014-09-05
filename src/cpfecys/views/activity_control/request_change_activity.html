@@ -37,7 +37,7 @@
 	<div class="row-fluid">
 	    <div class="well span12" style="overflow:auto; width:120%">
 			<div>
-				<a class="btn" href="{{=URL('activity_control', 'students_control', vars=dict(assignation = request.vars['assignation']))}}">
+				<a class="btn" href="{{=URL('activity_control', 'students_control', vars=dict(assignation = request.vars['assignation'], project = request.vars['project'], year = request.vars['year']))}}">
 					<i class="icon-arrow-left"></i>{{=T('Back')}}
 				</a>
 			</div>
@@ -93,9 +93,9 @@
 												jQuery('#div_requestChange').append(table2);
 												table2="";
 												if(totalChanges>0 && totalErrores==0){
-													jQuery('#div_requestChange').append("<center><a class=\"btn\" title=\"{{=T('Make the change requestt')}}\" id=\"botonRequest\" onclick=\"makeRequest(0);\">{{=T('Make request')}}</a><a class=\"btn\" title=\"{{=T('Cancel the change request')}}\" id=\"botonCancelRequest\" href=\"{{=URL('activity_control', 'students_control', vars=dict(assignation = request.vars['assignation']))}}\">{{=T('Cancel request')}}</a></center>");
+													jQuery('#div_requestChange').append("<center><a class=\"btn\" title=\"{{=T('Make the change requestt')}}\" id=\"botonRequest\" onclick=\"makeRequest(0);\">{{=T('Make request')}}</a><a class=\"btn\" title=\"{{=T('Cancel the change request')}}\" id=\"botonCancelRequest\" href=\"{{=URL('activity_control', 'students_control', vars=dict(assignation = request.vars['assignation'], project = request.vars['project'], year = request.vars['year']))}}\">{{=T('Cancel request')}}</a></center>");
 												}else{
-													jQuery('#div_requestChange').append("<center><a class=\"btn disabled\" title=\"{{=T('Fix all errors of weight')}}\" id=\"botonRequest\" onclick=\"makeRequest(1);\">{{=T('Make request')}}</a> <a class=\"btn\" title=\"{{=T('Cancel the change request')}}\" id=\"botonCancelRequest\" href=\"{{=URL('activity_control', 'students_control', vars=dict(assignation = request.vars['assignation']))}}\">{{=T('Cancel request')}}</a></center>");
+													jQuery('#div_requestChange').append("<center><a class=\"btn disabled\" title=\"{{=T('Fix all errors of weight')}}\" id=\"botonRequest\" onclick=\"makeRequest(1);\">{{=T('Make request')}}</a> <a class=\"btn\" title=\"{{=T('Cancel the change request')}}\" id=\"botonCancelRequest\" href=\"{{=URL('activity_control', 'students_control', vars=dict(assignation = request.vars['assignation'], project = request.vars['project'], year = request.vars['year']))}}\">{{=T('Cancel request')}}</a></center>");
 												}
 											</script>
 										</div>
@@ -341,17 +341,17 @@
 		                    alert("{{=T('The grade can not be 0')}}");
 		                  }else{
 		                    if (activity_name2_var==""){
-		                      $("#div_activity_show").load("{{=URL('activity_control','activity.html')}}?op=addActivityRequest&amp;category_activity_id_var=" + category_activity_id_var + "&amp;activity_name1_var=" + encodeURIComponent(activity_name1_var) +"&amp;activity_description_var=" + encodeURIComponent(activity_description_var) + "&amp;field_grade_var=" + field_grade_var + "&amp;dateInit_var="+encodeURIComponent(dateInit_var)+ "&amp;dateEnd_var="+encodeURIComponent(dateEnd_var)+"&amp;assignation={{=request.vars['assignation']}}"); 
+		                      $("#div_activity_show").load("{{=URL('activity_control','activity.html')}}?op=addActivityRequest&amp;category_activity_id_var=" + category_activity_id_var + "&amp;activity_name1_var=" + encodeURIComponent(activity_name1_var) +"&amp;activity_description_var=" + encodeURIComponent(activity_description_var) + "&amp;field_grade_var=" + field_grade_var + "&amp;dateInit_var="+encodeURIComponent(dateInit_var)+ "&amp;dateEnd_var="+encodeURIComponent(dateEnd_var)+"&amp;assignation={{=request.vars['assignation']}}&amp;project={{=request.vars['project']}}&amp;year={{=request.vars['year']}}"); 
 		                    }else{
-		                      $("#div_activity_show").load("{{=URL('activity_control','activity.html')}}?op=addActivityRequest&amp;category_activity_id_var=" + category_activity_id_var + "&amp;activity_name1_var=" + encodeURIComponent(activity_name2_var) +"&amp;activity_description_var=" + encodeURIComponent(activity_description_var) + "&amp;field_grade_var=" + field_grade_var + "&amp;dateInit_var="+encodeURIComponent(dateInit_var)+ "&amp;dateEnd_var="+encodeURIComponent(dateEnd_var)+"&amp;assignation={{=request.vars['assignation']}}"); 
+		                      $("#div_activity_show").load("{{=URL('activity_control','activity.html')}}?op=addActivityRequest&amp;category_activity_id_var=" + category_activity_id_var + "&amp;activity_name1_var=" + encodeURIComponent(activity_name2_var) +"&amp;activity_description_var=" + encodeURIComponent(activity_description_var) + "&amp;field_grade_var=" + field_grade_var + "&amp;dateInit_var="+encodeURIComponent(dateInit_var)+ "&amp;dateEnd_var="+encodeURIComponent(dateEnd_var)+"&amp;assignation={{=request.vars['assignation']}}&amp;project={{=request.vars['project']}}&amp;year={{=request.vars['year']}}"); 
 		                    }
 		                  }
 		                }
 		              }else{
 		                if (activity_name2_var==""){
-		                    $("#div_activity_show").load("{{=URL('activity_control','activity.html')}}?op=addActivityRequest&amp;category_activity_id_var=" + category_activity_id_var + "&amp;activity_name1_var=" + encodeURIComponent(activity_name1_var) +"&amp;activity_description_var=" + encodeURIComponent(activity_description_var) + "&amp;field_grade_var=nada&amp;dateInit_var="+encodeURIComponent(dateInit_var)+ "&amp;dateEnd_var="+encodeURIComponent(dateEnd_var)+"&amp;assignation={{=request.vars['assignation']}}"); 
+		                    $("#div_activity_show").load("{{=URL('activity_control','activity.html')}}?op=addActivityRequest&amp;category_activity_id_var=" + category_activity_id_var + "&amp;activity_name1_var=" + encodeURIComponent(activity_name1_var) +"&amp;activity_description_var=" + encodeURIComponent(activity_description_var) + "&amp;field_grade_var=nada&amp;dateInit_var="+encodeURIComponent(dateInit_var)+ "&amp;dateEnd_var="+encodeURIComponent(dateEnd_var)+"&amp;assignation={{=request.vars['assignation']}}&amp;project={{=request.vars['project']}}&amp;year={{=request.vars['year']}}"); 
 		                  }else{
-		                    $("#div_activity_show").load("{{=URL('activity_control','activity.html')}}?op=addActivityRequest&amp;category_activity_id_var=" + category_activity_id_var + "&amp;activity_name1_var=" + encodeURIComponent(activity_name2_var) +"&amp;activity_description_var=" + encodeURIComponent(activity_description_var) + "&amp;field_grade_var=nada&amp;dateInit_var="+encodeURIComponent(dateInit_var)+ "&amp;dateEnd_var="+encodeURIComponent(dateEnd_var)+"&amp;assignation={{=request.vars['assignation']}}"); 
+		                    $("#div_activity_show").load("{{=URL('activity_control','activity.html')}}?op=addActivityRequest&amp;category_activity_id_var=" + category_activity_id_var + "&amp;activity_name1_var=" + encodeURIComponent(activity_name2_var) +"&amp;activity_description_var=" + encodeURIComponent(activity_description_var) + "&amp;field_grade_var=nada&amp;dateInit_var="+encodeURIComponent(dateInit_var)+ "&amp;dateEnd_var="+encodeURIComponent(dateEnd_var)+"&amp;assignation={{=request.vars['assignation']}}&amp;project={{=request.vars['project']}}&amp;year={{=request.vars['year']}}"); 
 		                  }
 		              }
 		            }else{
@@ -550,9 +550,9 @@
 				jQuery('#div_requestChange').append(table2);
 				table2="";
 				if(totalChanges>0 && totalErrores==0){
-					jQuery('#div_requestChange').append("<center><a class=\"btn\" title=\"{{=T('Make the change requestt')}}\" id=\"botonRequest\" onclick=\"makeRequest(0);\">{{=T('Make request')}}</a><a class=\"btn\" title=\"{{=T('Cancel the change request')}}\" id=\"botonCancelRequest\" href=\"{{=URL('activity_control', 'students_control', vars=dict(assignation = request.vars['assignation']))}}\">{{=T('Cancel request')}}</a></center>");
+					jQuery('#div_requestChange').append("<center><a class=\"btn\" title=\"{{=T('Make the change requestt')}}\" id=\"botonRequest\" onclick=\"makeRequest(0);\">{{=T('Make request')}}</a><a class=\"btn\" title=\"{{=T('Cancel the change request')}}\" id=\"botonCancelRequest\" href=\"{{=URL('activity_control', 'students_control', vars=dict(assignation = request.vars['assignation'], project = request.vars['project'], year = request.vars['year']))}}\">{{=T('Cancel request')}}</a></center>");
 				}else{
-					jQuery('#div_requestChange').append("<center><a class=\"btn disabled\" title=\"{{=T('Fix all errors of weight')}}\" id=\"botonRequest\" onclick=\"makeRequest(1);\">{{=T('Make request')}}</a><a class=\"btn\" title=\"{{=T('Cancel the change request')}}\" id=\"botonCancelRequest\" href=\"{{=URL('activity_control', 'students_control', vars=dict(assignation = request.vars['assignation']))}}\">{{=T('Cancel request')}}</a></center>");
+					jQuery('#div_requestChange').append("<center><a class=\"btn disabled\" title=\"{{=T('Fix all errors of weight')}}\" id=\"botonRequest\" onclick=\"makeRequest(1);\">{{=T('Make request')}}</a><a class=\"btn\" title=\"{{=T('Cancel the change request')}}\" id=\"botonCancelRequest\" href=\"{{=URL('activity_control', 'students_control', vars=dict(assignation = request.vars['assignation'], project = request.vars['project'], year = request.vars['year']))}}\">{{=T('Cancel request')}}</a></center>");
 				}
 			});
 
@@ -610,11 +610,11 @@
 					if(description_request_var==""){
 						alert("{{=T('Fill all fields to save.')}}");
 					}else{
-						$("#div_activity_show").load("{{=URL('activity_control','activity.html')}}?op=makeActivityRequest&amp;tip=n&amp;edit_activity_description_var=" + encodeURIComponent(description_request_var) +"&amp;assignation={{=request.vars['assignation']}}");
+						$("#div_activity_show").load("{{=URL('activity_control','activity.html')}}?op=makeActivityRequest&amp;tip=n&amp;edit_activity_description_var=" + encodeURIComponent(description_request_var) +"&amp;assignation={{=request.vars['assignation']}}&amp;project={{=request.vars['project']}}&amp;year={{=request.vars['year']}}");
 
 						for (var j=0; j<activities.length; j++){
 							if(activities[j][0]==-2){
-								$("#div_activity_show").load("{{=URL('activity_control','activity.html')}}?op=makeActivityRequest&amp;category_activity_id_var=" + encodeURIComponent(activities[j][1]) + "&amp;tip=i&amp;activity_name1_var=" + encodeURIComponent(activities[j][2]) +"&amp;activity_description_var=" + encodeURIComponent(activities[j][3]) + "&amp;field_grade_var=" + encodeURIComponent(activities[j][4]) + "&amp;dateInit_var="+encodeURIComponent(activities[j][5])+ "&amp;dateEnd_var="+encodeURIComponent(activities[j][6])+"&amp;assignation={{=request.vars['assignation']}}&amp;idA=" + encodeURIComponent(activities[j][0]));
+								$("#div_activity_show").load("{{=URL('activity_control','activity.html')}}?op=makeActivityRequest&amp;category_activity_id_var=" + encodeURIComponent(activities[j][1]) + "&amp;tip=i&amp;activity_name1_var=" + encodeURIComponent(activities[j][2]) +"&amp;activity_description_var=" + encodeURIComponent(activities[j][3]) + "&amp;field_grade_var=" + encodeURIComponent(activities[j][4]) + "&amp;dateInit_var="+encodeURIComponent(activities[j][5])+ "&amp;dateEnd_var="+encodeURIComponent(activities[j][6])+"&amp;assignation={{=request.vars['assignation']}}&amp;project={{=request.vars['project']}}&amp;year={{=request.vars['year']}}&amp;idA=" + encodeURIComponent(activities[j][0]));
 							}else{
 								var change=0;
 								for(var k=0; k<activitiesOriginal.length; k++){
@@ -626,7 +626,7 @@
 									}
 								}
 								if(change==0){
-									$("#div_activity_show").load("{{=URL('activity_control','activity.html')}}?op=makeActivityRequest&amp;category_activity_id_var=" + encodeURIComponent(activities[j][1]) + "&amp;tip=u&amp;activity_name1_var=" + encodeURIComponent(activities[j][2]) +"&amp;activity_description_var=" + encodeURIComponent(activities[j][3]) + "&amp;field_grade_var=" + encodeURIComponent(activities[j][4]) + "&amp;dateInit_var="+encodeURIComponent(activities[j][5])+ "&amp;dateEnd_var="+encodeURIComponent(activities[j][6])+"&amp;assignation={{=request.vars['assignation']}}&amp;idA=" + encodeURIComponent(activities[j][0]));
+									$("#div_activity_show").load("{{=URL('activity_control','activity.html')}}?op=makeActivityRequest&amp;category_activity_id_var=" + encodeURIComponent(activities[j][1]) + "&amp;tip=u&amp;activity_name1_var=" + encodeURIComponent(activities[j][2]) +"&amp;activity_description_var=" + encodeURIComponent(activities[j][3]) + "&amp;field_grade_var=" + encodeURIComponent(activities[j][4]) + "&amp;dateInit_var="+encodeURIComponent(activities[j][5])+ "&amp;dateEnd_var="+encodeURIComponent(activities[j][6])+"&amp;assignation={{=request.vars['assignation']}}&amp;project={{=request.vars['project']}}&amp;year={{=request.vars['year']}}&amp;idA=" + encodeURIComponent(activities[j][0]));
 								}
 							}
 						}
@@ -641,7 +641,7 @@
 											}
 										}
 										if(control==0){
-											$("#div_activity_show").load("{{=URL('activity_control','activity.html')}}?op=makeActivityRequest&amp;category_activity_id_var=" + encodeURIComponent(activitiesOriginal[j1][1]) + "&amp;tip=d&amp;activity_name1_var=" + encodeURIComponent(activitiesOriginal[j1][2]) +"&amp;activity_description_var=" + encodeURIComponent(activitiesOriginal[j1][3]) + "&amp;field_grade_var=" + encodeURIComponent(activitiesOriginal[j1][4]) + "&amp;dateInit_var="+encodeURIComponent(activitiesOriginal[j1][5])+ "&amp;dateEnd_var="+encodeURIComponent(activitiesOriginal[j1][6])+"&amp;assignation={{=request.vars['assignation']}}&amp;idA=" + encodeURIComponent(activitiesOriginal[j1][0]));
+											$("#div_activity_show").load("{{=URL('activity_control','activity.html')}}?op=makeActivityRequest&amp;category_activity_id_var=" + encodeURIComponent(activitiesOriginal[j1][1]) + "&amp;tip=d&amp;activity_name1_var=" + encodeURIComponent(activitiesOriginal[j1][2]) +"&amp;activity_description_var=" + encodeURIComponent(activitiesOriginal[j1][3]) + "&amp;field_grade_var=" + encodeURIComponent(activitiesOriginal[j1][4]) + "&amp;dateInit_var="+encodeURIComponent(activitiesOriginal[j1][5])+ "&amp;dateEnd_var="+encodeURIComponent(activitiesOriginal[j1][6])+"&amp;assignation={{=request.vars['assignation']}}&amp;project={{=request.vars['project']}}&amp;year={{=request.vars['year']}}&amp;idA=" + encodeURIComponent(activitiesOriginal[j1][0]));
 										}
 									}
 								}
@@ -659,7 +659,7 @@
 		function deleteActivityRequestOption(var_id){
 			var r = confirm("{{=T('Do you want to delete this record?')}}");
 			if (r == true) {
-				$("#div_activity_show").load("{{=URL('activity_control','activity.html')}}?op=deleteActivityRequest&amp;activity_id_var=" + var_id + "&amp;assignation={{=request.vars['assignation']}}");
+				$("#div_activity_show").load("{{=URL('activity_control','activity.html')}}?op=deleteActivityRequest&amp;activity_id_var=" + var_id + "&amp;assignation={{=request.vars['assignation']}}&amp;project={{=request.vars['project']}}&amp;year={{=request.vars['year']}}");
 			}
 		}
 
@@ -686,7 +686,7 @@
 		                if (!regex.test(edit_field_grade_var) && !regex2.test(edit_field_grade_var)){
 		                  alert("{{=T('The entered value is not a decimal')}}");  
 		                }else{
-		                	$("#div_activity_show").load("{{=URL('activity_control','activity.html')}}?op=updateActivityRequest&amp;var_id="+var_id+"&amp;edit_activity_name1_var=" + encodeURIComponent(edit_activity_name1_var) + "&amp;edit_activity_description_var=" + encodeURIComponent(edit_activity_description_var) +"&amp;edit_field_grade_var=" + edit_field_grade_var + "&amp;edit_dateInit_var="+encodeURIComponent(edit_dateInit_var)+ "&amp;edit_dateEnd_var="+encodeURIComponent(edit_dateEnd_var)+"&amp;assignation={{=request.vars['assignation']}}");
+		                	$("#div_activity_show").load("{{=URL('activity_control','activity.html')}}?op=updateActivityRequest&amp;var_id="+var_id+"&amp;edit_activity_name1_var=" + encodeURIComponent(edit_activity_name1_var) + "&amp;edit_activity_description_var=" + encodeURIComponent(edit_activity_description_var) +"&amp;edit_field_grade_var=" + edit_field_grade_var + "&amp;edit_dateInit_var="+encodeURIComponent(edit_dateInit_var)+ "&amp;edit_dateEnd_var="+encodeURIComponent(edit_dateEnd_var)+"&amp;assignation={{=request.vars['assignation']}}&amp;project={{=request.vars['project']}}&amp;year={{=request.vars['year']}}");
 		                }
 		            }else{
 		              alert("{{=T('The end date must be greater than start date')}}");
@@ -700,7 +700,7 @@
 	<div class="row-fluid">
 	    <div class="well span12" style="overflow:auto; width:120%">
 			<div>
-				<a class="btn" href="{{=URL('activity_control', 'students_control', vars=dict(assignation = request.vars['assignation']))}}">
+				<a class="btn" href="{{=URL('activity_control', 'students_control', vars=dict(assignation = request.vars['assignation'], project = request.vars['project'], year = request.vars['year']))}}">
 					<i class="icon-arrow-left"></i>{{=T('Back')}}
 				</a>
 			</div>
