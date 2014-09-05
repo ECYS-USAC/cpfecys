@@ -1,0 +1,32 @@
+{{extend 'template.html'}}
+<h1>{{=T('Request Control')}}</h1>
+<table class="table table-striped table-bordered">
+	<thead>
+		<th>{{=T('Project')}}</th>
+		<th>{{=T('Section')}}</th>
+		<th>{{=T('View')}}</th>
+	</thead>
+	<tbody>
+		{{for course in courses_request:}}
+		<tr>
+			{{if auth.has_membership('Teacher'):}}
+				<td>{{=split_name(course.user_project.project.name)}}</td>
+				<td>{{=split_section(course.user_project.project.name)}}</td>
+			{{else:}}
+				<td>{{=split_name(course.name)}}</td>
+				<td>{{=split_section(course.name)}}</td>
+			{{pass}}
+			<td>
+				<center>
+					{{if auth.has_membership('Teacher'):}}
+						<a class="btn" href="{{=URL('activity_control', 'solve_request_change_activity', vars=dict(course = course.user_project.project))}}">{{=T('Go')}}
+					{{else:}}
+						<a class="btn" href="{{=URL('activity_control', 'solve_request_change_activity', vars=dict(course = course.id))}}">{{=T('Go')}}
+					{{pass}}
+					</a>
+				</center>
+			</td>
+		</tr>
+		{{pass}}
+	</tbody>
+</table>

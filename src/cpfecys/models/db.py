@@ -781,16 +781,31 @@ db.define_table('course_activity_log',
     Field('date_log', 'datetime', notnull = True, default = datetime.datetime.now(), label = 'Fecha')
     )
 
-db.define_table('request_change_activity',
-    Field('user_name', 'reference auth_user', notnull = True, label = 'Usuario'),
+db.define_table('requestchange_activity',
+    Field('user_id', 'reference auth_user', notnull = True, label = 'Usuario_ID'),
+    Field('user_name', 'text', notnull = True, label = 'Usuario'),
     Field('roll', 'text', notnull = True, label = 'Rol'),
     Field('status', 'text', notnull = True, label = 'Estado'),
+    Field('user_name_resolve', 'text', notnull = False, label = 'Usuario Resolvio'),
+    Field('roll_resolve', 'text', notnull = False, label = 'Rol Resolvio'),
     Field('description', 'string', notnull=True, unique=False, label = 'Descripción'),
     Field('date_request', 'datetime', notnull = True, default = datetime.datetime.now(), label = 'Fecha'),
+    Field('date_request_resolve', 'datetime', notnull = False, label = 'Fecha Resolvio'),
     Field('semester', 'reference period_year', notnull=True, label = 'Periodo'),
     Field('course', 'reference project', notnull=True, label = 'Curso')
     )
 
+db.define_table('requestchange_course_activity',
+    Field('requestchange_activity', 'reference requestchange_activity', notnull=True, label = 'Solicitud Cambio'),
+    Field('operation_request', 'text', notnull = True, label = 'Operacion'),
+    Field('activity', 'integer', notnull=False, label = 'Actividad'),
+    Field('course_activity_category', 'integer', notnull=False, label = 'Categoria'),
+    Field('name', 'string', notnull=False, unique=False, label = T('name')),
+    Field('description', 'string', notnull=False, unique=False, label = T('description')),
+    Field('grade', 'decimal(5,2)', notnull=False, label=T('grade')),
+    Field('date_start', 'date', notnull = False, default = datetime.datetime.now(), label = T('Date Start')),
+    Field('date_finish', 'date', notnull = False, default = datetime.datetime.now(), label = T('Date Finish'))
+    )
 
 
 ## after defining tables, uncomment below to enable auditing

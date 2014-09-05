@@ -11,33 +11,7 @@ def student_control_period():
     import cpfecys
     year = cpfecys.current_year_period()
     year_semester = db.period(id=year.period)
-
-    query = db.student_control_period
-    db.student_control_period.period_name.default = T(str(year_semester.name)) +" " + str(year.yearp)
-    db.student_control_period.period_name.writable = False
-    
-    date1 = None
-    date2 = None
-    if year_semester.id==1:
-        dateInicial = db.executesql('SELECT date(\''+str(year.yearp)+'-01-01\');',as_dict=True)
-        for d0 in dateInicial:
-            date1=d0['date(\''+str(year.yearp)+'-01-01\')']
-        dateEnd = db.executesql('SELECT date(\''+str(year.yearp)+'-05-31\');',as_dict=True)
-        for d0 in dateEnd:
-            date2=d0['date(\''+str(year.yearp)+'-05-31\')']
-    else:
-        dateInicial = db.executesql('SELECT date(\''+str(year.yearp)+'-07-01\');',as_dict=True)
-        for d0 in dateInicial:
-            date1=d0['date(\''+str(year.yearp)+'-07-01\')']
-
-        dateEnd = db.executesql('SELECT date(\''+str(year.yearp)+'-11-30\');',as_dict=True)
-        for d1 in dateEnd:
-            date2=d1['date(\''+str(year.yearp)+'-11-30\')']
-    db.student_control_period.date_finish_semester.default = date2
-    db.student_control_period.date_start_semester.default = date1
-    db.student_control_period.date_start_semester.writable=False
-    db.student_control_period.date_finish_semester.writable=False
-    grid = SQLFORM.grid(query, maxtextlength=100,csv=False)
+    grid = SQLFORM.grid(db.student_control_period, maxtextlength=100,csv=False,create=False,deletable=False,)
     return dict(grid=grid)
 
 @auth.requires_login()
@@ -305,3 +279,89 @@ def request_change_activity():
                 semestre2 = year,
                 year = year.yearp,
                 assignation=assignation)
+
+
+
+#------------------------------------------------------------------------------------------------------------------------
+#------------------------------------------------------------------------------------------------------------------------
+#------------------------------------------------------------------------------------------------------------------------
+#------------------------------------------------------------------------------------------------------------------------
+
+
+
+@auth.requires_login()
+@auth.requires(auth.has_membership('Super-Administrator') or auth.has_membership('Teacher'))
+def courses_list_request():
+    import cpfecys
+    def split_name(project):
+        try:
+            (nameP, projectSection) = str(project).split('(')
+        except:
+            nameP = project
+        return nameP
+
+    def split_section(project):
+        try:
+            projectSection = None
+            nameS = None
+            (nameP, projectSection) = str(project).split('(')
+            (nameS,garbage) = str(projectSection).split(')')
+        except:
+            nameS = '--------'
+        return nameS
+
+    area = db(db.area_level.name=='DTT Tutor Académico').select().first()
+    courses_request=None
+    if auth.has_membership('Teacher'):
+        courses_request = db((db.user_project.assigned_user == auth.user.id) & (db.user_project.period == cpfecys.current_year_period().id) & (db.user_project.project==db.project.id) & (db.project.area_level==area.id)).select()
+    if auth.has_membership('Super-Administrator'):
+        courses_request = db(db.project.area_level==area.id).select()
+
+    return dict(courses_request = courses_request, split_name=split_name, split_section=split_section)
+
+
+@auth.requires_login()
+@auth.requires(auth.has_membership('Super-Administrator') or auth.has_membership('Teacher'))
+def solve_request_change_activity():
+    import cpfecys
+    #Obtain the course that want to view the request
+    courseCheck = request.vars['course']
+
+    #Check that the request vars contain something
+    if (courseCheck is None):
+        redirect(URL('default','index'))
+    else:
+        #Check if teacher or other role
+        course=None
+        if auth.has_membership('Teacher'):
+            course = db((db.user_project.assigned_user == auth.user.id) & (db.user_project.period == cpfecys.current_year_period().id) & (db.user_project.project==courseCheck)).select().first()
+            if (course is None):
+                session.flash=T('You do not have permission to view course requests')
+                redirect(URL('default','index'))
+        else:
+            course=db.project(id=courseCheck)
+
+        #Check that the course exist
+        name=None
+        if (course is None):
+            redirect(URL('default','index'))
+        else:
+            if auth.has_membership('Teacher'):
+                name=course.project.name
+            else:
+                name=course.name
+
+        currentyear_period = cpfecys.current_year_period()
+        return dict(name = name,
+                    semester = currentyear_period.period.name,
+                    semestre2 = currentyear_period,
+                    year = currentyear_period.yearp,
+                    course=courseCheck)
+
+
+@auth.requires_login()
+@auth.requires(auth.has_membership('Super-Administrator') or auth.has_membership('Teacher'))
+def activityRequest():
+    import cpfecys
+    currentyear_period = cpfecys.current_year_period()
+    return dict(semestre2 = currentyear_period)
