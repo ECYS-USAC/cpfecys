@@ -795,6 +795,7 @@ db.define_table('requestchange_activity',
     Field('course', 'reference project', notnull=True, label = 'Curso')
     )
 
+
 db.define_table('requestchange_course_activity',
     Field('requestchange_activity', 'reference requestchange_activity', notnull=True, label = 'Solicitud Cambio'),
     Field('operation_request', 'text', notnull = True, label = 'Operacion'),
@@ -806,6 +807,13 @@ db.define_table('requestchange_course_activity',
     Field('date_start', 'date', notnull = False, default = datetime.datetime.now(), label = T('Date Start')),
     Field('date_finish', 'date', notnull = False, default = datetime.datetime.now(), label = T('Date Finish'))
     )
+
+
+db.define_table('course_laboratory_exception',
+    Field('project', 'reference project', notnull = True, unique=True, label = T('Course')),
+    Field('t_edit_lab', 'boolean', notnull = True, label = T('Teacher can edit laboratory')),
+    Field('s_edit_course', 'boolean', notnull = True, label = T('Student can edit course'))
+)
 
 
 ## after defining tables, uncomment below to enable auditing

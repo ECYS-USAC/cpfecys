@@ -1,9 +1,15 @@
-{{project_var = db(db.user_project.id == request.vars['assignation']).select().first() }}
+{{try:}}
+	{{project_var = db(db.user_project.id == request.vars['assignation']).select().first() }}
+	{{var_project_id = project_var.project.id}}
+{{except:}}
+	{{var_project_id=project}}
+{{pass}}
+
 {{total_var2=0}}
 {{if auth.has_membership('Teacher'):}}
-	{{weighting =  db((db.course_activity_category.semester==semestre2.id) & (db.course_activity_category.assignation==project_var.project.id) & (db.course_activity_category.laboratory==False)).select()}}
+	{{weighting =  db((db.course_activity_category.semester==semestre2.id) & (db.course_activity_category.assignation==var_project_id) & (db.course_activity_category.laboratory==False)).select()}}
 {{else:}}
-	{{weighting =  db((db.course_activity_category.semester==semestre2.id) & (db.course_activity_category.assignation==project_var.project.id) & (db.course_activity_category.laboratory==True)).select()}}
+	{{weighting =  db((db.course_activity_category.semester==semestre2.id) & (db.course_activity_category.assignation==var_project_id) & (db.course_activity_category.laboratory==True)).select()}}
 {{pass}}
 
 {{for project in weighting:}}
@@ -58,7 +64,7 @@
 	  	<!--Create activity option-->
   		{{if float(total_var2) == 100:}}
 			<li>
-				<a  tabindex="-1" title="{{=T('Create activity')}}" id="menu_create_activity" href="#createActivity" role="button"  data-toggle="modal" data-target="#createActivity">
+				<a  tabindex="-1" title="{{=T('Create activity')}}" id="menu_create_activity" href="{{=URL('activity_control', 'students_control_full',vars=dict(assignation = request.vars['assignation'], project = request.vars['project'], year = request.vars['year'], f_view='activity_edit'))}}">
 		{{else:}}
 			<li class="disabled"> 
 				<a  tabindex="-1" title="{{=T('Create activity')}}" id="menu_create_activity">
@@ -72,10 +78,10 @@
 		<!--Edit activity option-->
       	{{if float(total_var2) == 100 and auth.has_membership('Teacher'):}}
 			<li>
-				<a tabindex="-1"  title="{{=T('Modify activity')}}" href="#createActivity" role="button"  data-toggle="modal" data-target="#createActivity"  id="menu_edit_activity"> 
+				<a tabindex="-1"  title="{{=T('Modify activity')}}" href="{{=URL('activity_control', 'students_control_full',vars=dict(assignation = request.vars['assignation'], project = request.vars['project'], year = request.vars['year'], f_view='activity_edit'))}}"> 
 		{{elif float(total_var2) == 100 and var_do =='true':}}
 			<li>
-				<a tabindex="-1"  title="{{=T('Modify activity')}}" href="#createActivity" role="button"  data-toggle="modal" data-target="#createActivity"  id="menu_edit_activity"> 
+				<a tabindex="-1"  title="{{=T('Modify activity')}}" href="{{=URL('activity_control', 'students_control_full',vars=dict(assignation = request.vars['assignation'], project = request.vars['project'], year = request.vars['year'], f_view='activity_edit'))}}"> 
 		{{else:}}
 		<li class="disabled"> 
 			<a tabindex="-1"  title="{{=T('Modify activity')}}">
@@ -93,7 +99,7 @@
 	    {{else:}}
 	    	{{if var_do == 'false' and float(total_var2) == 100:}}
 	    		<li>
-	    			<a role="button" title="{{=T('Request that the changes be reviewed by the professor or administrator')}}" aria-hidden="true" href="{{=URL('activity_control', 'request_change_activity',vars=dict(assignation = request.vars['assignation']))}}" >
+	    			<a role="button" title="{{=T('Request that the changes be reviewed by the professor or administrator')}}" aria-hidden="true" href="{{=URL('activity_control', 'request_change_activity',vars=dict(assignation = request.vars['assignation'], project = request.vars['project'], year = request.vars['year']))}}" >
 						<span class="icon-black icon-fullscreen"></span>
 						{{=T('Change Request')}}
 					</a>
@@ -119,11 +125,13 @@
 
 <script type="text/javascript">
   	$(document).ready(function(){
-		$("#table_activity").load("{{=URL('activity_control','activity.html')}}?op=showTableNoEditable&amp;assignation={{=request.vars['assignation']}}");
+  		
+		$("#table_activity").load("{{=URL('activity_control','activity.html')}}?op=showTableNoEditable&amp;project={{=request.vars['project']}}&amp;year={{=request.vars['year']}}&amp;assignation={{=request.vars['assignation']}}");
 
 		$("#menu_edit_activity").click(function(){
-	      $("#div_activity_show").load("{{=URL('activity_control','activity.html')}}?op=showEditTable&amp;assignation={{=request.vars['assignation']}}"); 
+	      $("#div_activity_show").load("{{=URL('activity_control','activity.html')}}?op=showEditTable&amp;project={{=request.vars['project']}}&amp;year={{=request.vars['year']}}&amp;assignation={{=request.vars['assignation']}}"); 
 	    })
+	    
 	
 	});
 </script>

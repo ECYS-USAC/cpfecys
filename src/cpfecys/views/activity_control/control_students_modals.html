@@ -1,13 +1,18 @@
+{{if request.vars['f_view'] == "weighting_edit":}}
 <!--Create weighting Modal -->
-<div id="createWeighting" class="modal hide fade" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true" style="width:800px; left:40%;"> 
-    <div id ="a" class="modal-header">
-        <h3 id="myModalLabel">
+<div style="overflow:auto;"> 
+    <div >
+      <center>
+        <h3>
+          <small>
             {{if auth.has_membership('Teacher'):}}
               <h2>{{=T('Class Weighting')}} - {{=name}}
             {{else:}}
               <h2>{{=T('Laboratory Weighting')}} - {{=name}}
             {{pass}}
+          </small>
         </h3>
+      </center>
     </div>
     <div id="actions">
       <form action="" enctype="multipart/form-data" method="post" >
@@ -15,19 +20,9 @@
           <table >
               <tr>
                 <td align="left">                 
-                  <div align="center" id="categoryDiv" value="categoryDiv" class="well span12" style="overflow:auto; height:200px; width:300px;">    
+                  <div align="center" id="categoryDiv" value="categoryDiv" class="well span12" style="overflow:auto; width:300px;">    
                     
                   </div>
-                  
-                </td>
-                <td align="left"  >
-                  <div class="well span11" id="div_weighting_show" style="overflow:auto; height:200px; width:300px;">
-                    
-                  </div>
-                </td>
-              </tr>
-              <tr >
-                <td>
                   <div align="right">
                     <a id="categoryButton" href="#information_text" role="button" class="btn btn-info"  
                     title="{{=T('Add category to weighting')}}"> 
@@ -36,12 +31,13 @@
                      </a>
                   </div>
                 </td>
-                <td >
-                  <div align="right"> 
-                    <button class="btn btn-primary" id="button_action"> {{=T('Update')}}</button>
+                <td align="left"  >
+                  <div class="well span11" id="div_weighting_show" style="overflow:auto;  width:400px;">
+                    
                   </div>
                 </td>
               </tr>
+              
           </table>
          </center>      
         </div>
@@ -53,21 +49,24 @@
     </div>
   </div>
   <!--Finish Create weighting Modal -->
-  
-
-
-
-  <!--Get weighting Modal -->
-<div id="getWeighting" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true" style="width:800px; left:40%;"> 
-    <div id ="a" class="modal-header">
-      <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
-        <h3 id="myModalLabel">
+{{pass}}
+{{if request.vars['f_view'] == "weighting_get":}}
+<!--Get weighting Modal -->
+<div > 
+    <div id ="a">
+        <center>
+        
+        <h3 >
+          <small>
             {{if auth.has_membership('Teacher'):}}
               <h2>{{=T('Class Weighting')}} - {{=name}}
             {{else:}}
               <h2>{{=T('Laboratory Weighting')}} - {{=name}}
             {{pass}}
+        </small>
         </h3>
+      
+      </center>
     </div>
     <div id="actions">
       <form action="" enctype="multipart/form-data" method="post" >
@@ -76,17 +75,22 @@
               <tr>
                 <td align="left">                 
 
-                  <div align="center" id="categoryDiv" value="categoryDiv" class="well span12" style="overflow:auto; height:200px; width:300px;"> 
+                  <div align="center" id="categoryDiv1" value="categoryDiv" class="well span12" style="overflow:auto;  width:300px;"> 
                     <table>
                       <tr>
                         <td>
                           <select class="generic-widget" id="period_id" name="category" style="width:250px;">
-                            {{project_var = db(db.user_project.id == request.vars['assignation']).select().first() }}
+                            {{try:}}
+                              {{project_var = db(db.user_project.id == request.vars['assignation']).select().first() }}
+                              {{var_project_id = project_var.project.id}}
+                            {{except:}}
+                              {{var_project_id=project}}
+                            {{pass}}
 
                             {{if auth.has_membership('Teacher'):}}
-                              {{cR = db( (db.course_activity_category.assignation==project_var.project.id) & (db.course_activity_category.laboratory==False)).select()}}
+                              {{cR = db( (db.course_activity_category.assignation==var_project_id) & (db.course_activity_category.laboratory==False)).select()}}
                             {{else:}}
-                              {{cR = db( (db.course_activity_category.assignation==project_var.project.id) & (db.course_activity_category.laboratory==True)).select()}}
+                              {{cR = db( (db.course_activity_category.assignation==var_project_id) & (db.course_activity_category.laboratory==True)).select()}}
                             {{pass}}
                               
                               {{periodsP = []}}
@@ -129,10 +133,7 @@
                   </div>
                 </td>
                 <td >
-                  <div align="right"> 
-                    <button class="btn btn-primary" id="button_action"> {{=T('Update')}}</button>
-                    <button class="btn" data-dismiss="modal" aria-hidden="true">{{=T('Close')}}</button>
-                  </div>
+                 
                 </td>
               </tr>
           </table>
@@ -146,13 +147,13 @@
     </div>
   </div>
   <!--Get  weighting Modal -->
-  
+{{pass}}
 
   <script type="text/javascript">
   $(document).ready(function(){
     //Create
-      $("#div_weighting_show").load("{{=URL('activity_control','weighting.html')}}?op=showTable&amp;assignation={{=request.vars['assignation']}}"); 
-      $("#categoryDiv").load("{{=URL('activity_control','weighting.html')}}?op=showInsert&amp;assignation={{=request.vars['assignation']}}"); 
+      $("#div_weighting_show").load("{{=URL('activity_control','weighting.html')}}?op=showTable&amp;assignation={{=request.vars['assignation']}}&amp;project={{=request.vars['project']}}&amp;year={{=request.vars['year']}}"); 
+      $("#categoryDiv").load("{{=URL('activity_control','weighting.html')}}?op=showInsert&amp;assignation={{=request.vars['assignation']}}&amp;project={{=request.vars['project']}}&amp;year={{=request.vars['year']}}"); 
     
 
 
@@ -178,10 +179,10 @@
           }else{
 
             
-            $("#div_weighting_show").load("{{=URL('activity_control','weighting.html')}}?op=addCategory&amp;laboratory=true&amp;SG_var=" + SG_var + "&amp;category_id_var=" + category_id_var +"&amp;grade_var=" + grade_var + "&amp;TP="+TP_var+"&amp;assignation={{=request.vars['assignation']}}"); 
+            $("#div_weighting_show").load("{{=URL('activity_control','weighting.html')}}?op=addCategory&amp;laboratory=true&amp;SG_var=" + SG_var + "&amp;category_id_var=" + category_id_var +"&amp;grade_var=" + grade_var + "&amp;TP="+TP_var+"&amp;assignation={{=request.vars['assignation']}}&amp;project={{=request.vars['project']}}&amp;year={{=request.vars['year']}}"); 
             
-            $("#categoryDiv").load("{{=URL('activity_control','weighting.html')}}?op=showInsert&amp;assignation={{=request.vars['assignation']}}"); 
-            $("#categoryDiv").load("{{=URL('activity_control','weighting.html')}}?op=showInsert&amp;assignation={{=request.vars['assignation']}}"); 
+            $("#categoryDiv").load("{{=URL('activity_control','weighting.html')}}?op=showInsert&amp;assignation={{=request.vars['assignation']}}&amp;project={{=request.vars['project']}}&amp;year={{=request.vars['year']}}"); 
+            $("#categoryDiv").load("{{=URL('activity_control','weighting.html')}}?op=showInsert&amp;assignation={{=request.vars['assignation']}}&amp;project={{=request.vars['project']}}&amp;year={{=request.vars['year']}}"); 
             }
 
         }
@@ -189,12 +190,12 @@
 	 })
     $("#refreshButton").click(function(){
       var id_period_sel = document.getElementById('period_id').value;
-      $("#getDiv").load("{{=URL('activity_control','weighting.html')}}?op=showTableNoEditablePeriod&amp;assignation={{=request.vars['assignation']}}&amp;period_par="+id_period_sel);
+      $("#getDiv").load("{{=URL('activity_control','weighting.html')}}?op=showTableNoEditablePeriod&amp;assignation={{=request.vars['assignation']}}&amp;project={{=request.vars['project']}}&amp;year={{=request.vars['year']}}&amp;period_par="+id_period_sel);
     })
 
     $("#getWeightingButton").click(function(){
       var id_period_sel = document.getElementById('period_id').value;
-      $("#getViewDiv").load("{{=URL('activity_control','weighting.html')}}?op=getPreviousWeighting&amp;assignation={{=request.vars['assignation']}}&amp;period_par="+id_period_sel);
+      $("#getViewDiv").load("{{=URL('activity_control','weighting.html')}}?op=getPreviousWeighting&amp;assignation={{=request.vars['assignation']}}&amp;project={{=request.vars['project']}}&amp;year={{=request.vars['year']}}&amp;period_par="+id_period_sel);
     })
 
   });

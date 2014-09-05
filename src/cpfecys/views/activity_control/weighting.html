@@ -1,15 +1,21 @@
+{{try:}}
+	{{project_var = db(db.user_project.id == request.vars['assignation']).select().first() }}
+	{{var_project_id = project_var.project.id}}
+{{except:}}
+	{{var_project_id=project}}
+{{pass}}
 
-{{project_var = db(db.user_project.id == request.vars['assignation']).select().first() }}
+
 {{if request.vars['op'] == "addCategory": }}
 
 	{{total_var2=float(request.vars['grade_var'])}}
 
 	{{if auth.has_membership('Teacher'):}}
-		{{for project in db((db.course_activity_category.semester==semestre2.id) & (db.course_activity_category.assignation==project_var.project.id) & (db.course_activity_category.laboratory==False)).select():}}		
+		{{for project in db((db.course_activity_category.semester==semestre2.id) & (db.course_activity_category.assignation==var_project_id) & (db.course_activity_category.laboratory==False)).select():}}		
 			{{total_var2 = float(total_var2) + float(project.grade)}}				
 		{{pass}}
 	{{else:}}
-		{{for project in db((db.course_activity_category.semester==semestre2.id) & (db.course_activity_category.assignation==project_var.project.id) & (db.course_activity_category.laboratory==True)).select():}}		
+		{{for project in db((db.course_activity_category.semester==semestre2.id) & (db.course_activity_category.assignation==var_project_id) & (db.course_activity_category.laboratory==True)).select():}}		
 			{{total_var2 = float(total_var2) + float(project.grade)}}				
 		{{pass}}
 	{{pass}}
@@ -18,7 +24,6 @@
 			<span id="information_text" class="badge badge-important">{{=T('The total weighting exceeds 100 points.') }}</span>
 		</center>
 	{{else:}}
-		{{project_var = db(db.user_project.id == request.vars['assignation']).select().first() }}
 		{{var_labo = 'true'}}
 		{{if auth.has_membership('Teacher'):}}
 			{{var_labo = 'false'}}
@@ -34,7 +39,7 @@
 			                                grade =  request.vars['grade_var'], 
 			                                specific_grade = var_SG, 
 			                                semester = int(semestre2.id), 
-			                                assignation = project_var.project.id, 
+			                                assignation = var_project_id, 
 			                                laboratory = var_labo,
 			                                teacher_permition = request.vars['TP'])}}
 	{{pass}}
@@ -47,23 +52,22 @@
 {{if request.vars['op'] == "getPreviousWeighting": }}
 	{{var_period_sel=str(request.vars['period_par'])}}
 
-	{{project_var = db(db.user_project.id == request.vars['assignation']).select().first() }}
 	{{var_labo = 'true'}}
 	{{if auth.has_membership('Teacher'):}}
 		{{var_labo = 'false'}}
 	{{pass}}
 	
-	{{for we_pass in db((db.course_activity_category.semester==int(semestre2.id)) & (db.course_activity_category.assignation==project_var.project.id) & (db.course_activity_category.laboratory==var_labo)).select():}}	
+	{{for we_pass in db((db.course_activity_category.semester==int(semestre2.id)) & (db.course_activity_category.assignation==var_project_id) & (db.course_activity_category.laboratory==var_labo)).select():}}	
 		{{db(db.course_activity_category.id==we_pass.id).delete()}}
 	{{pass}}
 
-	{{for we in db((db.course_activity_category.semester==var_period_sel) & (db.course_activity_category.assignation==project_var.project.id) & (db.course_activity_category.laboratory==var_labo)).select():}}		
+	{{for we in db((db.course_activity_category.semester==var_period_sel) & (db.course_activity_category.assignation==var_project_id) & (db.course_activity_category.laboratory==var_labo)).select():}}		
 		
 		{{db.course_activity_category.insert(category = we.category,
 	                                grade =  we.grade,
 	                                specific_grade = we.specific_grade,
 	                                semester = int(semestre2.id), 
-	                                assignation = project_var.project.id, 
+	                                assignation = var_project_id, 
 	                                laboratory = we.laboratory,
 	                                teacher_permition = we.teacher_permition)}}
 	{{pass}}
@@ -80,9 +84,7 @@
 		{{var_labo = False}}
 	{{pass}}
 
-	{{project_var = db(db.user_project.id == request.vars['assignation']).select().first() }}
-
-	{{var_cac = db((db.course_activity.course_activity_category == request.vars['var_id']) & (db.course_activity.assignation == project_var.project.id) & (  db.course_activity.laboratory == var_labo) & (db.course_activity.semester == (semestre2.id) ) ).select().first() }}
+	{{var_cac = db((db.course_activity.course_activity_category == request.vars['var_id']) & (db.course_activity.assignation == var_project_id) & (  db.course_activity.laboratory == var_labo) & (db.course_activity.semester == (semestre2.id) ) ).select().first() }}
 
 	{{if var_cac != None:}}
 		<script type="text/javascript">
@@ -105,13 +107,13 @@
 
 
 	{{if auth.has_membership('Teacher'):}}
-		{{for project in db((db.course_activity_category.semester==semestre2.id) & (db.course_activity_category.assignation==project_var.project.id) & (db.course_activity_category.laboratory==False)).select():}}		
+		{{for project in db((db.course_activity_category.semester==semestre2.id) & (db.course_activity_category.assignation==var_project_id) & (db.course_activity_category.laboratory==False)).select():}}		
 			{{if str(project.id) != str(request.vars['var_id']):}}	
 				{{total_var2 = float(total_var2) + float(project.grade)}}
 			{{pass}}
 		{{pass}}
 	{{else:}}
-		{{for project in db((db.course_activity_category.semester==semestre2.id) & (db.course_activity_category.assignation==project_var.project.id) & (db.course_activity_category.laboratory==True)).select():}}		
+		{{for project in db((db.course_activity_category.semester==semestre2.id) & (db.course_activity_category.assignation==var_project_id) & (db.course_activity_category.laboratory==True)).select():}}		
 			{{if str(project.id) != str(request.vars['var_id']):}}	
 				{{total_var2 = float(total_var2) + float(project.grade)}}
 			{{pass}}
@@ -149,11 +151,9 @@
 {{if request.vars['op'] == "showInsert": }}
 	<label>{{=T('Category')}}:</label>
     <select class="generic-widget" id="category_id" name="category" style="width:250px;">
-      {{project_var = db(db.user_project.id == request.vars['assignation']).select().first() }}
-
 
 	 	{{if auth.has_membership('Teacher'):}}
-			{{cR = db((db.course_activity_category.semester==semestre2.id) & (db.course_activity_category.assignation==project_var.project.id) & (db.course_activity_category.laboratory==False)).select()}}
+			{{cR = db((db.course_activity_category.semester==semestre2.id) & (db.course_activity_category.assignation==var_project_id) & (db.course_activity_category.laboratory==False)).select()}}
 			{{categoriasP = []}}
 		    {{for c in cR:}}
 		        {{categoriasP.append(c.category)}}
@@ -162,7 +162,7 @@
 		        <option value="{{=project.id}}">{{=project.category}}</option>
 		    {{pass}}
 		{{else:}}
-			{{cR = db((db.course_activity_category.semester==semestre2.id) & (db.course_activity_category.assignation==project_var.project.id) & (db.course_activity_category.laboratory==True)).select()}}
+			{{cR = db((db.course_activity_category.semester==semestre2.id) & (db.course_activity_category.assignation==var_project_id) & (db.course_activity_category.laboratory==True)).select()}}
 			{{categoriasP = []}}
 		    {{for c in cR:}}
 		        {{categoriasP.append(c.category)}}
@@ -236,7 +236,7 @@
 				<th title="{{=T('Average Grades')}}">
 					{{=T('AG')}}
 				</th title="{{=T('Teacher Permition')}}">
-				{{if auth.has_membership('Teacher'):}}
+				{{if request.vars['type'] == 'course':}}
 					<th>
 						{{=T('TP')}}
 					</th>
@@ -252,8 +252,8 @@
 
 
 
-			{{if auth.has_membership('Teacher'):}}
-				{{for project in db((db.course_activity_category.semester==int(var_period_sel)) & (db.course_activity_category.assignation==project_var.project.id) & (db.course_activity_category.laboratory==False)).select():}}		
+			{{if request.vars['type'] == 'course':}}
+				{{for project in db((db.course_activity_category.semester==int(var_period_sel)) & (db.course_activity_category.assignation==var_project_id) & (db.course_activity_category.laboratory==False)).select():}}		
 					{{editable_var='false'}}
 					{{if request.vars['op'] == "showEditCategory":}}
 		            	{{if str(request.vars['var_id']) == str(project.id):}}
@@ -267,10 +267,9 @@
 							{{if editable_var=='true':}}						
 								<select class="generic-widget" id="edit_category_id" name="category" style="width:75px;">
 									<option value="{{=project.category}}">{{=project.category.category}}</option>
-							      {{project_var = db(db.user_project.id == request.vars['assignation']).select().first() }}
-
+							      
 					      		{{if auth.has_membership('Teacher'):}}
-									{{cR = db((db.course_activity_category.semester==semestre2.id) & (db.course_activity_category.assignation==project_var.project.id) & (db.course_activity_category.laboratory==False)).select()}}
+									{{cR = db((db.course_activity_category.semester==semestre2.id) & (db.course_activity_category.assignation==var_project_id) & (db.course_activity_category.laboratory==False)).select()}}
 									{{categoriasP = []}}
 								      {{for c in cR:}}
 								          {{categoriasP.append(c.category)}}
@@ -279,7 +278,7 @@
 								          <option value="{{=cat.id}}">{{=cat.category}}</option>
 								      {{pass}}
 								{{else:}}
-									{{cR = db((db.course_activity_category.semester==semestre2.id) & (db.course_activity_category.assignation==project_var.project.id) & (db.course_activity_category.laboratory==True)).select()}}
+									{{cR = db((db.course_activity_category.semester==semestre2.id) & (db.course_activity_category.assignation==var_project_id) & (db.course_activity_category.laboratory==True)).select()}}
 									{{categoriasP = []}}
 								    {{for c in cR:}}
 								          {{categoriasP.append(c.category)}}
@@ -363,7 +362,7 @@
 					</tr>
 			{{pass}}
 			{{else:}}
-				{{for project in db((db.course_activity_category.semester==int(var_period_sel)) & (db.course_activity_category.assignation==project_var.project.id) & (db.course_activity_category.laboratory==True)).select():}}		
+				{{for project in db((db.course_activity_category.semester==int(var_period_sel)) & (db.course_activity_category.assignation==var_project_id) & (db.course_activity_category.laboratory==True)).select():}}		
 					{{editable_var='false'}}
 					{{if request.vars['op'] == "showEditCategory":}}
 		            	{{if str(request.vars['var_id']) == str(project.id):}}
@@ -377,10 +376,8 @@
 							{{if editable_var=='true':}}						
 								<select class="generic-widget" id="edit_category_id" name="category" style="width:75px;">
 									<option value="{{=project.category}}">{{=project.category.category}}</option>
-							      {{project_var = db(db.user_project.id == request.vars['assignation']).select().first() }}
-
 						      	{{if auth.has_membership('Teacher'):}}
-									{{cR = db((db.course_activity_category.semester==semestre2.id) & (db.course_activity_category.assignation==project_var.project.id) & (db.course_activity_category.laboratory==False)).select()}}
+									{{cR = db((db.course_activity_category.semester==semestre2.id) & (db.course_activity_category.assignation==var_project_id) & (db.course_activity_category.laboratory==False)).select()}}
 									{{categoriasP = []}}
 								      {{for c in cR:}}
 								          {{categoriasP.append(c.category)}}
@@ -389,7 +386,7 @@
 								          <option value="{{=cat.id}}">{{=cat.category}}</option>
 								      {{pass}}
 								{{else:}}
-									{{cR = db((db.course_activity_category.semester==semestre2.id) & (db.course_activity_category.assignation==project_var.project.id) & (db.course_activity_category.laboratory==True)).select()}}
+									{{cR = db((db.course_activity_category.semester==semestre2.id) & (db.course_activity_category.assignation==var_project_id) & (db.course_activity_category.laboratory==True)).select()}}
 									{{categoriasP = []}}
 								    {{for c in cR:}}
 								          {{categoriasP.append(c.category)}}
@@ -480,7 +477,7 @@
 					<td style="background-color:#eee;">
 					</td>
 				{{pass}}
-				{{if auth.has_membership('Teacher'):}}
+				{{if request.vars['type'] == 'course':}}
 					<td style="background-color:#eee;">
 					</td>
 				{{pass}}
@@ -501,15 +498,19 @@
 	});
 
 	function editCategory(var_id){
-			$("#div_weighting_show").load("{{=URL('activity_control','weighting.html')}}?op=showEditCategory&amp;var_id="+var_id+"&amp;assignation={{=request.vars['assignation']}}");
+			$("#div_weighting_show").load("{{=URL('activity_control','weighting.html')}}?op=showEditCategory&amp;var_id="+var_id+"&amp;assignation={{=request.vars['assignation']}}&amp;project={{=request.vars['project']}}&amp;year={{=request.vars['year']}}");
 	}
 
 	function updateCategory(var_id){
 	  var category_id_var = document.getElementById('edit_category_id').value;
       var grade_var = document.getElementById('edit_grade').value;
       var SG_var = document.getElementById('edit_SG_check').checked;
-      var TP_var = document.getElementById('edit_TP_check').checked;
-
+      try{
+      	var TP_var = document.getElementById('edit_TP_check').checked;	
+      }catch(err){
+      	var TP_var = true;
+      }
+      
       
 
 	      if (category_id_var==""){
@@ -526,8 +527,8 @@
 	            alert("{{=T('The entered value is not a decimal')}}");  
 	          }else{
 	            
-	            $("#div_weighting_show").load("{{=URL('activity_control','weighting.html')}}?op=updateCategory&amp;var_id="+var_id+"&amp;op2=showEditTable&amp;SG_var=" + SG_var + "&amp;TP_var=" + TP_var + "&amp;category_id_var=" + category_id_var +"&amp;grade_var=" + grade_var + "&amp;assignation={{=request.vars['assignation']}}"); 
-	            $("#categoryDiv").load("{{=URL('activity_control','weighting.html')}}?op=showInsert&amp;assignation={{=request.vars['assignation']}}");
+	            $("#div_weighting_show").load("{{=URL('activity_control','weighting.html')}}?op=updateCategory&amp;var_id="+var_id+"&amp;op2=showEditTable&amp;SG_var=" + SG_var + "&amp;TP_var=" + TP_var + "&amp;category_id_var=" + category_id_var +"&amp;grade_var=" + grade_var + "&amp;assignation={{=request.vars['assignation']}}&amp;project={{=request.vars['project']}}&amp;year={{=request.vars['year']}}"); 
+	            $("#categoryDiv").load("{{=URL('activity_control','weighting.html')}}?op=showInsert&amp;assignation={{=request.vars['assignation']}}&amp;project={{=request.vars['project']}}&amp;year={{=request.vars['year']}}");
 	            }       
 
 	        }
@@ -538,11 +539,11 @@
 	function removeCategory(var_id){
 		var r = confirm("{{=T('Do you want to delete this record?')}}");
 		if (r == true) {
-		   $("#div_weighting_show").load("{{=URL('activity_control','weighting.html')}}?op=removeCategory&amp;op2={{=request.vars['op']}}&amp;var_id="+var_id+"&amp;assignation={{=request.vars['assignation']}}");
+		   $("#div_weighting_show").load("{{=URL('activity_control','weighting.html')}}?op=removeCategory&amp;op2={{=request.vars['op']}}&amp;var_id="+var_id+"&amp;assignation={{=request.vars['assignation']}}&amp;project={{=request.vars['project']}}&amp;year={{=request.vars['year']}}");
 
-			$("#categoryDiv").load("{{=URL('activity_control','weighting.html')}}?op=showInsert&amp;assignation={{=request.vars['assignation']}}");
+			$("#categoryDiv").load("{{=URL('activity_control','weighting.html')}}?op=showInsert&amp;assignation={{=request.vars['assignation']}}&amp;project={{=request.vars['project']}}&amp;year={{=request.vars['year']}}");
 		} else {
-			$("#categoryDiv").load("{{=URL('activity_control','weighting.html')}}?op=showInsert&amp;assignation={{=request.vars['assignation']}}");
+			$("#categoryDiv").load("{{=URL('activity_control','weighting.html')}}?op=showInsert&amp;assignation={{=request.vars['assignation']}}&amp;project={{=request.vars['project']}}&amp;year={{=request.vars['year']}}");
 		} 
 			
 	}

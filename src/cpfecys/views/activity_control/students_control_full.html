@@ -1,40 +1,38 @@
 {{extend 'template.html'}}
 {{if request.vars['f_view'] == "weighting":}}
-	{{if auth.has_membership('Teacher'):}}
-		<h2>{{=T('Class Weighting')}} - {{=name}}
+	{{if request.vars['type'] == "course":}}
+		<h2>{{=T('Course Weighting')}} - {{=name}}
 	{{else:}}
 		<h2>{{=T('Laboratory Weighting')}} - {{=name}}
 	{{pass}}
 {{elif request.vars['f_view'] == "activity":}}
-	{{if auth.has_membership('Teacher'):}}
-		<h2>{{=T('Class Scheduler')}} - {{=name}}
+	{{if request.vars['type'] == "course":}}
+		<h2>{{=T('Course Scheduler')}} - {{=name}}
 	{{else:}}
 		<h2>{{=T('Laboratory Scheduler')}} - {{=name}}
 	{{pass}}
 {{pass}}
 	<br>
-    <small>{{=T(semester)}}, {{=year}}</small>
+    
 </h2>
 
 
-<div class="well span10" id="principal_div" >
+<div class="well " id="principal_div" >
 	<div>
-		<a class="btn" href="{{=URL('activity_control', 'students_control', vars=dict(assignation = request.vars['assignation']))}}">
-			<i class="icon-arrow-left"></i>{{=T('Back')}}
-		</a>
+		<a onclick="window.history.back()" class="btn" ><i class="icon-arrow-left"></i> Back</a>
 	</div>
 <br>
-	{{if request.vars['f_view'] == "weighting":}}
+	{{if request.vars['f_view'] == "weighting" or request.vars['f_view'] == "weighting_edit" or request.vars['f_view'] == "weighting_get":}}
 		<div id="weighting_menu">
-	{{elif request.vars['f_view'] == "activity":}}
+	{{elif request.vars['f_view'] == "activity" or request.vars['f_view'] == "activity_edit":}}
 		<div id="activity_menu">
 	{{pass}}
   	</div>
     
 
-    {{if request.vars['f_view'] == "weighting":}}
+    {{if request.vars['f_view'] == "weighting" or request.vars['f_view'] == "weighting_edit" or request.vars['f_view'] == "weighting_get":}}
 		<div id="weighting_inside">
-	{{elif request.vars['f_view'] == "activity":}}
+	{{elif request.vars['f_view'] == "activity" or request.vars['f_view'] == "activity_edit":}}
 		<div id="activity_inside">
 	{{pass}}
 		{{=T('Loading')}}...
@@ -47,25 +45,35 @@
 $(document).ready(function(){
 	var f_view ='{{=request.vars['f_view']}}';	
 	if (f_view == 'weighting'){
-		$("#weighting_inside").load("{{=URL('activity_control','control_weighting.html',vars=dict(operation="div_update",assignation = request.vars['assignation']))}}" );	
+		if ("{{=request.vars['type']}}" == 'course'){
+			$("#weighting_inside").load('{{=URL('activity_control','control_weighting.html',vars=dict(operation="div_update", type="course",assignation = request.vars['assignation'], project = request.vars['project'], year = request.vars['year']))}}' );
+		}else{
+			$("#weighting_inside").load('{{=URL('activity_control','control_weighting.html',vars=dict(operation="div_update", type="lab",assignation = request.vars['assignation'], project = request.vars['project'], year = request.vars['year']))}}' );	
+		}
 	}
+
+	if (f_view == 'weighting_edit'){
+		$("#weighting_inside").load('{{=URL('activity_control','control_students_modals.html',vars=dict(assignation = request.vars['assignation'], project = request.vars['project'], year = request.vars['year'],f_view = 'weighting_edit'))}}' );
+	}
+
+	if (f_view == 'weighting_get'){
+		$("#weighting_inside").load('{{=URL('activity_control','control_students_modals.html',vars=dict(assignation = request.vars['assignation'], project = request.vars['project'], year = request.vars['year'],f_view = 'weighting_get'))}}' );
+	}
+
 	if (f_view == 'activity'){
-		$("#activity_inside").load('{{=URL('activity_control','control_activity.html',vars=dict(operation="div_update",operationT="0",assignation = request.vars['assignation']))}}' );
+		$("#activity_inside").load('{{=URL('activity_control','control_activity.html',vars=dict(operation="div_update",operationT="0",assignation = request.vars['assignation'], project = request.vars['project'], year = request.vars['year']))}}' );
+	}
+
+	if (f_view == 'activity_edit'){
+		$("#activity_inside").load('{{=URL('activity_control','control_students_modals2.html',vars=dict(assignation = request.vars['assignation'], project = request.vars['project'], year = request.vars['year'],f_view = 'activity_get'))}}' );
 	}
   });
 </script>
 
 <script type="text/javascript">
 	$(document).ready(function(){
+	    $("#weighting_menu").load('{{=URL('activity_control','control_weighting.html',vars=dict(operation="menu_update", type=request.vars['type'],assignation = request.vars['assignation'], project = request.vars['project'], year = request.vars['year']))}}');
 
-	    $("#modals").load('{{=URL('activity_control','control_students_modals.html',vars=dict(assignation = request.vars['assignation']))}}' );
-	    $("#weighting_menu").load('{{=URL('activity_control','control_weighting.html',vars=dict(operation="menu_update",assignation = request.vars['assignation']))}}');
-
-	    $("#modals_activity").load('{{=URL('activity_control','control_students_modals2.html',vars=dict(assignation = request.vars['assignation']))}}' );
-	    $("#activity_menu").load('{{=URL('activity_control','control_activity.html',vars=dict(operation="menu_update",assignation = request.vars['assignation']))}}');
+	    $("#activity_menu").load('{{=URL('activity_control','control_activity.html',vars=dict(operation="menu_update",assignation = request.vars['assignation'], project = request.vars['project'], year = request.vars['year']))}}');
 	  });
 </script>
-<div id="modals">
-</div>
-<div id="modals_activity">
-</div>

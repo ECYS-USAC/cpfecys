@@ -1,4 +1,10 @@
-{{project_var = db(db.user_project.id == request.vars['assignation']).select().first()}}
+{{try:}}
+	{{project_var = db(db.user_project.id == request.vars['assignation']).select().first()}}
+	{{var_project_id = project_var.project.id}}
+{{except:}}
+	{{var_project_id=project}}
+{{pass}}
+
 {{if request.vars['op']=="makeActivityRequest":}}
 	{{if request.vars['tip']=="n":}}
 		{{db.requestchange_activity.insert(user_id=int(project_var.assigned_user), user_name = project_var.assigned_user.username, roll='Student', status='Pending', description = request.vars['edit_activity_description_var'] , semester = int(semestre2.id), course = int(project_var.project.id))}}
@@ -297,7 +303,7 @@
 		{{date_var = db((db.student_control_period.period_name==comparacion)).select().first()}}
 		{{if date1>= date_var.date_start_semester and date2<= date_var.date_finish_semester:}}
 			{{comprobation=False}}
-			{{categoryTemp = db((db.course_activity_category.semester==semestre2.id) & (db.course_activity_category.assignation==project_var.project.id) & (db.course_activity_category.id==int(request.vars['category_activity_id_var']))).select().first()}}
+			{{categoryTemp = db((db.course_activity_category.semester==semestre2.id) & (db.course_activity_category.assignation==var_project_id) & (db.course_activity_category.id==int(request.vars['category_activity_id_var']))).select().first()}}
 
 			{{dateC1=None}}
 			{{dateC2=None}}
@@ -426,7 +432,7 @@
 			{{if auth.has_membership('Teacher'):}}
 				{{comprobation=True}}
 			{{else:}}
-				{{categoryTemp = db((db.course_activity_category.semester==semestre2.id) & (db.course_activity_category.assignation==project_var.project.id) & (db.course_activity_category.id==int(request.vars['category_activity_id_var']))).select().first()}}
+				{{categoryTemp = db((db.course_activity_category.semester==semestre2.id) & (db.course_activity_category.assignation==var_project_id) & (db.course_activity_category.id==int(request.vars['category_activity_id_var']))).select().first()}}
 
 				{{dateC1=None}}
 				{{dateC2=None}}
@@ -455,10 +461,10 @@
 			{{if comprobation==True:}}
 				{{isLaboratory='F'}}
 				{{if auth.has_membership('Teacher'):}}
-					{{aC = db((db.course_activity.semester==semestre2.id)&(db.course_activity.assignation==project_var.project.id)&(db.course_activity.laboratory=='F')&(db.course_activity.course_activity_category==request.vars['category_activity_id_var'])).select()}}
+					{{aC = db((db.course_activity.semester==semestre2.id)&(db.course_activity.assignation==var_project_id)&(db.course_activity.laboratory=='F')&(db.course_activity.course_activity_category==request.vars['category_activity_id_var'])).select()}}
 					{{isLaboratory='F'}}
 				{{else:}}
-					{{aC = db((db.course_activity.semester==semestre2.id)&(db.course_activity.assignation==project_var.project.id)&(db.course_activity.laboratory=='T')&(db.course_activity.course_activity_category==int(request.vars['category_activity_id_var']))).select()}}
+					{{aC = db((db.course_activity.semester==semestre2.id)&(db.course_activity.assignation==var_project_id)&(db.course_activity.laboratory=='T')&(db.course_activity.course_activity_category==int(request.vars['category_activity_id_var']))).select()}}
 					{{isLaboratory='T'}}
 				{{pass}}
 
@@ -484,7 +490,7 @@
 
 
 				{{if totalCategory==0 and request.vars['field_grade_var']!="nada":}}
-					{{varCategory = db((db.course_activity_category.semester==semestre2.id) & (db.course_activity_category.assignation==project_var.project.id) & (db.course_activity_category.id==int(request.vars['category_activity_id_var']))).select().first()}}
+					{{varCategory = db((db.course_activity_category.semester==semestre2.id) & (db.course_activity_category.assignation==var_project_id) & (db.course_activity_category.id==int(request.vars['category_activity_id_var']))).select().first()}}
 					{{totalCategory=varCategory.grade}}
 				{{pass}}
 
@@ -495,13 +501,13 @@
 														description=request.vars['activity_description_var'],
 						                                grade =  float(request.vars['field_grade_var']), 
 						                                semester = int(semestre2.id), 
-						                                assignation = project_var.project.id, 
+						                                assignation = var_project_id, 
 						                                laboratory = isLaboratory,
 						                                teacher_permition = 'F',
 						                                date_start = request.vars['dateInit_var'],
 						                                date_finish = request.vars['dateEnd_var'])}}
 
-					{{varCategory = db((db.course_activity_category.semester==semestre2.id) & (db.course_activity_category.assignation==project_var.project.id) & (db.course_activity_category.id==int(request.vars['category_activity_id_var']))).select().first()}}
+					{{varCategory = db((db.course_activity_category.semester==semestre2.id) & (db.course_activity_category.assignation==var_project_id) & (db.course_activity_category.id==int(request.vars['category_activity_id_var']))).select().first()}}
 					{{if auth.has_membership('Teacher'):}}
 						{{db.course_activity_log.insert(user_name=project_var.assigned_user.username,
 																roll='Teacher',
@@ -541,13 +547,13 @@
 														description=request.vars['activity_description_var'],
 						                                grade =  0, 
 						                                semester = int(semestre2.id),
-						                                assignation = project_var.project.id,
+						                                assignation = var_project_id,
 						                                laboratory = isLaboratory,
 						                                teacher_permition = 'F',
 						                                date_start = request.vars['dateInit_var'],
 						                                date_finish = request.vars['dateEnd_var'])}}
 					
-					{{varCategory = db((db.course_activity_category.semester==semestre2.id) & (db.course_activity_category.assignation==project_var.project.id) & (db.course_activity_category.id==int(request.vars['category_activity_id_var']))).select().first()}}
+					{{varCategory = db((db.course_activity_category.semester==semestre2.id) & (db.course_activity_category.assignation==var_project_id) & (db.course_activity_category.id==int(request.vars['category_activity_id_var']))).select().first()}}
 					{{if auth.has_membership('Teacher'):}}
 						{{db.course_activity_log.insert(user_name=project_var.assigned_user.username,
 																roll='Teacher',
@@ -669,6 +675,7 @@
 			{{else:}}
 				{{activityTemp = db(db.course_activity.id==int(request.vars['var_id'])).select().first()}}
 				{{categoryTemp = db((db.course_activity_category.semester==semestre2.id) & (db.course_activity_category.assignation==project_var.project.id) & (db.course_activity_category.id==activityTemp.course_activity_category)).select().first()}}
+				{{categoryTemp = db((db.course_activity_category.semester==semestre2.id) & (db.course_activity_category.assignation==var_project_id) & (db.course_activity_category.id==int(request.vars['activityTemp.course_activity_category']))).select().first()}}
 				{{dateC1=None}}
 				{{dateC2=None}}
 				{{maximTimeCategory = db.executesql('SELECT DATE_ADD(\''+str(date1)+'\', INTERVAL '+str(categoryTemp.category.timeout)+' Day) as fecha;',as_dict=True)}}
@@ -696,9 +703,9 @@
 			{{if comprobation==True:}}
 				{{activityOldR=db(db.course_activity.id==request.vars['var_id']).select().first()}}
 			    {{if auth.has_membership('Teacher'):}}
-					{{upActivities = db((db.course_activity.semester==semestre2.id)&(db.course_activity.assignation==project_var.project.id)&(db.course_activity.laboratory=='F')&(db.course_activity.course_activity_category==activityOldR.course_activity_category)).select()}}
+					{{upActivities = db((db.course_activity.semester==semestre2.id)&(db.course_activity.assignation==var_project_id)&(db.course_activity.laboratory=='F')&(db.course_activity.course_activity_category==activityOldR.course_activity_category)).select()}}
 				{{else:}}
-					{{upActivities = db((db.course_activity.semester==semestre2.id)&(db.course_activity.assignation==project_var.project.id)&(db.course_activity.laboratory=='T')&(db.course_activity.course_activity_category==activityOldR.course_activity_category)).select()}}
+					{{upActivities = db((db.course_activity.semester==semestre2.id)&(db.course_activity.assignation==var_project_id)&(db.course_activity.laboratory=='T')&(db.course_activity.course_activity_category==activityOldR.course_activity_category)).select()}}
 				{{pass}}
 				
 				{{total_Names=0}}
@@ -874,12 +881,12 @@
     	<option value=""></option>
     	{{cR=None}}
     	{{if auth.has_membership('Teacher'):}}
-    		{{cR = db((db.course_activity_category.semester==semestre2.id) & (db.course_activity_category.assignation==project_var.project.id)&(db.course_activity_category.laboratory=='F')).select()}}
+    		{{cR = db((db.course_activity_category.semester==semestre2.id) & (db.course_activity_category.assignation==var_project_id)&(db.course_activity_category.laboratory=='F')).select()}}
     	{{else:}}
     		{{if var_do =='true':}}
-    			{{cR = db((db.course_activity_category.semester==semestre2.id) & (db.course_activity_category.assignation==project_var.project.id)&(db.course_activity_category.laboratory=='T')).select()}}
+    			{{cR = db((db.course_activity_category.semester==semestre2.id) & (db.course_activity_category.assignation==var_project_id)&(db.course_activity_category.laboratory=='T')).select()}}
     		{{else:}}
-    			{{cR = db((db.course_activity_category.semester==semestre2.id) & (db.course_activity_category.assignation==project_var.project.id)&(db.course_activity_category.laboratory=='T')&(db.course_activity_category.specific_grade=='F')).select()}}
+    			{{cR = db((db.course_activity_category.semester==semestre2.id) & (db.course_activity_category.assignation==var_project_id)&(db.course_activity_category.laboratory=='T')&(db.course_activity_category.specific_grade=='F')).select()}}
     		{{pass}}
     	{{pass}}
 		<script type="text/javascript">
@@ -942,9 +949,9 @@
 	  <center>
 	  	<table class="table table-striped table-bordered">
 			{{if auth.has_membership('Teacher'):}}
-				{{categorys = db((db.course_activity_category.semester==semestre2.id) & (db.course_activity_category.assignation==project_var.project.id) & (db.course_activity_category.laboratory=='F')).select()}}
+				{{categorys = db((db.course_activity_category.semester==semestre2.id) & (db.course_activity_category.assignation==var_project_id) & (db.course_activity_category.laboratory=='F')).select()}}
 			{{else:}}
-				{{categorys = db((db.course_activity_category.semester==semestre2.id) & (db.course_activity_category.assignation==project_var.project.id) & (db.course_activity_category.laboratory=='T')).select()}}
+				{{categorys = db((db.course_activity_category.semester==semestre2.id) & (db.course_activity_category.assignation==var_project_id) & (db.course_activity_category.laboratory=='T')).select()}}
 			{{pass}}
 			{{for project in categorys:}}
 			{{if project.category.category != 'Laboratorio':}}
@@ -956,9 +963,9 @@
 				<tr>
 					<td colspan="3">
 						{{if auth.has_membership('Teacher'):}}
-							{{tActivities = db((db.course_activity.semester==semestre2.id)&(db.course_activity.assignation==project_var.project.id)&(db.course_activity.laboratory=='F')&(db.course_activity.course_activity_category==project.id)).select()}}
+							{{tActivities = db((db.course_activity.semester==semestre2.id)&(db.course_activity.assignation==var_project_id)&(db.course_activity.laboratory=='F')&(db.course_activity.course_activity_category==project.id)).select()}}
 						{{else:}}
-							{{tActivities = db((db.course_activity.semester==semestre2.id)&(db.course_activity.assignation==project_var.project.id)&(db.course_activity.laboratory=='T')&(db.course_activity.course_activity_category==project.id)).select()}}
+							{{tActivities = db((db.course_activity.semester==semestre2.id)&(db.course_activity.assignation==var_project_id)&(db.course_activity.laboratory=='T')&(db.course_activity.course_activity_category==project.id)).select()}}
 						{{pass}}
 						{{totalCategoryE=float(0)}}
 						{{total_var2E=float(0)}}
@@ -1172,7 +1179,6 @@
 
 
 
-
 <script type="text/javascript">
  var category_create="";
   	$(document).ready(function(){
@@ -1223,10 +1229,13 @@
 				}
   			}
 		})
+
+		
+    	
 	});
 
 	function editActivity(var_id){
-		$("#div_activity_show").load("{{=URL('activity_control','activity.html')}}?op=showEditActivity&amp;var_id="+var_id+"&amp;assignation={{=request.vars['assignation']}}");
+		$("#div_activity_show").load("{{=URL('activity_control','activity.html')}}?op=showEditActivity&amp;var_id="+var_id+"&amp;assignation={{=request.vars['assignation']}}&amp;project={{=request.vars['project']}}&amp;year={{=request.vars['year']}}");
 	}
 
 	function updateActivity(var_id){
@@ -1253,8 +1262,8 @@
 						alert("{{=T('Enter date and time as YYYY-MM-DD or YYYY/MM/DD')}}");
 					}else{
 						if(edit_dateInit_var<=edit_dateEnd_var){
-							$("#div_activity_show").load("{{=URL('activity_control','activity.html')}}?op=updateActivity&amp;var_id="+var_id+"&amp;op2=showEditTable&amp;edit_activity_name1_var=" + encodeURIComponent(edit_activity_name1_var) + "&amp;edit_activity_description_var=" + encodeURIComponent(edit_activity_description_var) +"&amp;edit_field_grade_var=" + edit_field_grade_var + "&amp;edit_dateInit_var="+encodeURIComponent(edit_dateInit_var)+ "&amp;edit_dateEnd_var="+encodeURIComponent(edit_dateEnd_var)+"&amp;assignation={{=request.vars['assignation']}}"); 
-							$("#activityDiv").load("{{=URL('activity_control','activity.html')}}?op=showInsert&amp;assignation={{=request.vars['assignation']}}");
+							$("#div_activity_show").load("{{=URL('activity_control','activity.html')}}?op=updateActivity&amp;var_id="+var_id+"&amp;op2=showEditTable&amp;edit_activity_name1_var=" + encodeURIComponent(edit_activity_name1_var) + "&amp;edit_activity_description_var=" + encodeURIComponent(edit_activity_description_var) +"&amp;edit_field_grade_var=" + edit_field_grade_var + "&amp;edit_dateInit_var="+encodeURIComponent(edit_dateInit_var)+ "&amp;edit_dateEnd_var="+encodeURIComponent(edit_dateEnd_var)+"&amp;assignation={{=request.vars['assignation']}}&amp;project={{=request.vars['project']}}&amp;year={{=request.vars['year']}}"); 
+							$("#activityDiv").load("{{=URL('activity_control','activity.html')}}?op=showInsert&amp;assignation={{=request.vars['assignation']}}&amp;project={{=request.vars['project']}}&amp;year={{=request.vars['year']}}");
 						}else{
 							alert("{{=T('The end date must be greater than start date')}}");
 						}
@@ -1267,10 +1276,10 @@
 	function removeActivity(var_id){
 		var r = confirm("{{=T('Do you want to delete this record?')}}");
 		if (r == true) {
-			$("#div_activity_show").load("{{=URL('activity_control','activity.html')}}?op=removeActivity&amp;var_id="+var_id+"&amp;assignation={{=request.vars['assignation']}}");
-			$("#activityDiv").load("{{=URL('activity_control','activity.html')}}?op=showInsert&amp;assignation={{=request.vars['assignation']}}");
+			$("#div_activity_show").load("{{=URL('activity_control','activity.html')}}?op=removeActivity&amp;var_id="+var_id+"&amp;assignation={{=request.vars['assignation']}}&amp;project={{=request.vars['project']}}&amp;year={{=request.vars['year']}}");
+			$("#activityDiv").load("{{=URL('activity_control','activity.html')}}?op=showInsert&amp;assignation={{=request.vars['assignation']}}&amp;project={{=request.vars['project']}}&amp;year={{=request.vars['year']}}");
 		}else{
-			$("#activityDiv").load("{{=URL('activity_control','activity.html')}}?op=showInsert&amp;assignation={{=request.vars['assignation']}}");
+			$("#activityDiv").load("{{=URL('activity_control','activity.html')}}?op=showInsert&amp;assignation={{=request.vars['assignation']}}&amp;project={{=request.vars['project']}}&amp;year={{=request.vars['year']}}");
 		}
 	}
 </script>

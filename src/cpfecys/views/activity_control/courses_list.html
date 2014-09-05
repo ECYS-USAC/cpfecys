@@ -13,7 +13,7 @@
 			<td>{{=split_section(assignation.project.name)}}</td>
 			<td>
 				<center>
-					<a class="btn" href="{{=URL('activity_control', 'students_control', vars=dict(assignation = assignation.id))}}">{{=T('Go')}}
+					<a class="btn" href="{{=URL('activity_control', 'students_control', vars=dict(assignation = assignation.id, project = assignation.project))}}">{{=T('Go')}}
 					</a>
 				</center>
 			</td>

@@ -1,25 +1,23 @@
 {{extend 'template.html'}}
 
 <script src="{{=URL('static','js')}}/jquery-migrate-1.2.1.js"></script>
-<div style=" left:0; position:absolute; z-index:0; width:100%;  left:25px; " >
-
-      <table style="width:35%; left:0; position:absolute; z-index:0;">
+<div style=" left:0; width:100%;  left:25px; overflow:auto;" >
+  <table style="width:100%;">
+    <tr>
+      <td style="width:30%;">
+      <table style="width:100%; left:0;">
         <tr>
           <td>
-          <!--WEIGHTING DIV-->
+          <!--CLASS WEIGHTING DIV-->
           <div id="weighting_div" style=" width:100%; height:330px;">
                 
                 <a type="button" class="close" title="{{=T('Help')}}" aria-hidden="true" role="button" class="btn btn-warning" data-toggle="modal" data-target="#help_modal_weighting" >
                     <span class="icon-black icon-question-sign"></span>
                 </a>
-                <a type="button" class="close" title="{{=T('Minimize weighting')}}" aria-hidden="true" onclick="weightingClick();">
-                  <span id="weighting_icon" class="icon-black icon-resize-small"></span>
-                </a>
 
-                <a type="button" class="close" title="{{=T('View in full page the weighting')}}" aria-hidden="true" href="{{=URL('activity_control', 'students_control_full',vars=dict(assignation = request.vars['assignation'], f_view='weighting'))}}" >
+                <a type="button" class="close" title="{{=T('View in full page the weighting')}}" aria-hidden="true" href="{{=URL('activity_control', 'students_control_full',vars=dict(assignation = request.vars['assignation'], year = year, type='course', project = request.vars['project'], f_view='weighting'))}}" >
                     <span class="icon-black icon-fullscreen"></span>
                 </a>              
-            
 
             <div id="h_weighting_h" class="navbar-inner" >  
               <div id="weighting_menu">          
@@ -27,96 +25,79 @@
               </div>        
             </div>
 
-
-            <div id="h_weighting_v" style="-webkit-transform: rotate(270deg); -moz-transform: rotate(270deg); -o-transform: rotate(270deg); -ms-transform: rotate(270deg); transform: rotate(270deg); position:absolute;  left:-15px;  z-index:1; top:140px;">
-              
-              <h3 style="color:#f0ad4e; text-shadow: -1px 0 white, 0 1px white, 1px 0 white, 0 -1px white;">
-                  {{=T('Weighting')}}
-              </h3>
-            </div>
-            
-
             <div id="weighting_inside" class="well" style="overflow:auto; background-color:white; height:250px; ">
               {{=T('Loading')}}...
             </div>
           </div>
-          <!--FINISH WEIGHTING DIV-->
+          <!--FINISH CLASS WEIGHTING DIV-->
 
 
           </td></tr><tr><td>
           <br>
 
 
-          <!--ACTIVITY DIV-->
-          <div  id="activity_div" style=" width:100%; height:350px;">
-              <!--Menu of activity DIV Right-->
-              <a type="button" class="close" title="{{=T('Help')}}" aria-hidden="true" role="button" class="btn btn-warning" data-toggle="modal" data-target="#help_modal_activity" >
-                <span class="icon-black icon-question-sign"></span>
-              </a>
-              <a type="button" class="close" title="{{=T('Minimize activity')}}" aria-hidden="true" onclick="activityClick();">
-                <span id="activity_icon" class="icon-black icon-resize-small"></span>
-              </a>
-              <a type="button" class="close" title="{{=T('View in full page the activities')}}" aria-hidden="true" href="{{=URL('activity_control', 'students_control_full',vars=dict(assignation = request.vars['assignation'], f_view='activity'))}}" >
-                <span class="icon-black icon-fullscreen"></span>
-              </a>
-              <!--Menu of activity DIV Right-->
+          <!--LAB WEIGHTING DIV-->
+          <div  id="weighting_lab_div" style=" width:100%; height:350px;">
+                
+                <a type="button" class="close" title="{{=T('Help')}}" aria-hidden="true" role="button" class="btn btn-warning" data-toggle="modal" data-target="#help_modal_weighting" >
+                    <span class="icon-black icon-question-sign"></span>
+                </a>
+                
 
-              <!--Menu of activity DIV left-->
-              <div id="h_activity_h" class="navbar-inner">
-                <div id="activity_menu">
-                </div>
-              </div>
-              <!--Menu of the activity DIV lett-->
-
-
-              <!--Cuadro del lado derecho la información-->
-              <div id="h_activity_v" style="-webkit-transform: rotate(270deg); -moz-transform: rotate(270deg); -o-transform: rotate(270deg); -ms-transform: rotate(270deg); transform: rotate(270deg); left:-15px; position:absolute; bottom:135px;">
-              
-                <h3 style="color:#f0ad4e; text-shadow: -1px 0 white, 0 1px white, 1px 0 white, 0 -1px white;">
-                  {{=T('Scheduler')}}
-                </h3>
-              </div>
-              <!--Cuadro del lado derecho la información-->
+                <a type="button" class="close" title="{{=T('View in full page the weighting')}}" aria-hidden="true" href="{{=URL('activity_control', 'students_control_full',vars=dict(assignation = request.vars['assignation'], year = year, type='lab', project = request.vars['project'], f_view='weighting'))}}" >
+                    <span class="icon-black icon-fullscreen"></span>
+                </a>              
             
 
-              <!--Cuadro donde sale la información-->
-              <div id="activity_inside" class="well" style="overflow:auto; background-color:white; height:250px;  ">
-                {{=T('Loading')}}...
-              </div>
-              <!--Cuadro donde sale la información-->
+            <div id="h_weighting_lab_h" class="navbar-inner" >  
+              <div id="weighting_lab_menu">          
+                
+              </div>        
             </div>
-          <!--FINISH activity DIV-->
+
+
+            <div id="weighting_lab_inside" class="well" style="overflow:auto; background-color:white; height:250px; ">
+              {{=T('Loading')}}...
+            </div>
+          </div>
+          <!--FINISH LAB WEIGHTING DIV-->
+
         </td>
       </tr>
     </table>
-
-<table id="control_table" style="width:60%; right:2%; top:0; position:absolute; z-index:0;">
-  <tr>
-  <td style=" width:100%;">
-            
-            <div id="h_control_h" class="navbar-inner">
-              <h3 class="icon-white" style="white-space:nowrap; text-shadow: -1px 0 white, 0 1px white, 1px 0 white, 0 -1px white;">
-                    {{=T('Grades Control')}} - {{=name}}
-               </h3>
-            </div>
-            <div id="h_control_v" style="-webkit-transform: rotate(270deg); -moz-transform: rotate(270deg); -o-transform: rotate(270deg); -ms-transform: rotate(270deg); transform: rotate(270deg); left:-37px; position:absolute; bottom:300px;">
-              <h3 style="color:#f0ad4e; text-shadow: -1px 0 white, 0 1px white, 1px 0 white, 0 -1px white;">
-                    {{=T('Grades Control')}}
-               </h3>
-            </div>
-               
-            <div id="control_inside" class="well" style="background-color:white; height:605px; ">
-              aqui van las actividades
-            </div>
-          </div>
-          <!--FINISH CONTROL DIV-->
-
   </td>
-  </tr>
-</table>
+  <td style="width:64%;">
+    <table id="control_table" style="width:100%; right:2%; top:0; ">
+      <tr>
+      <td style=" width:100%;">
+          <!--Menu of activity DIV Right-->
+          <a type="button" class="close" title="{{=T('Help')}}" aria-hidden="true" role="button" class="btn btn-warning" data-toggle="modal" data-target="#help_modal_activity" >
+            <span class="icon-black icon-question-sign"></span>
+          </a>
+          <a type="button" class="close" title="{{=T('View in full page the activities')}}" aria-hidden="true" href="{{=URL('activity_control', 'students_control_full',vars=dict(assignation = request.vars['assignation'], year = year, project = request.vars['project'], f_view='activity'))}}" >
+            <span class="icon-black icon-fullscreen"></span>
+          </a>
+          <!--Menu of activity DIV Right-->
+           <!--Menu of activity DIV left-->
+            <div id="h_activity_h" class="navbar-inner">
+              <div id="activity_menu">
+              </div>
+            </div>
+            <!--Menu of the activity DIV lett-->
+               <!--Cuadro donde sale la información-->
+                <div id="activity_inside" class="well" style=" background-color:white;  ">
+                  {{=T('Loading')}}...
+                </div>
+                <!--Cuadro donde sale la información-->
+              </div>
+              <!--FINISH CONTROL DIV-->
 
-</div>
-<div style="height:700px;">
+      </td>
+      </tr>
+    </table>
+  </td>
+</tr>
+</table>
 </div>
 
 
@@ -173,116 +154,27 @@ aria-hidden="true">{{=T('Close')}}</button>
 <script type="text/javascript">
   
 
-
-  function weightingClick(){   
-    var mydiv = document.getElementById("weighting_div");
-    
-    if(mydiv.style.width == "10px"){
-      $( "#weighting_div" ).width("100%");
-      $("#h_weighting_v").hide(500);
-      $("#weighting_inside").show(1000);
-      $("#h_weighting_h").show(1000);
-      $( "#weighting_div" ).width("10px");
-      $( "#weighting_div" ).animate({ width: "100%" }, 500 );
-      document.getElementById('weighting_icon').className  = "icon-black icon-resize-small";
-      document.getElementById('weighting_div').className  = "";
-      var mydiv2 = document.getElementById("control_table");
-      if(mydiv2.style.width != "60%"){
-        $( "#control_table" ).animate({ width: "60%" }, 1000 );
-      }     
-    
-    }else{
-      $( "#weighting_div" ).animate({ width: "10px" }, 1000 );
-      $("#h_weighting_v").show(1000);      
-      $("#h_weighting_h").hide(500);
-      $("#weighting_inside").hide(500);
-
-      document.getElementById('weighting_div').className  = "navbar-inner";
-      document.getElementById('weighting_icon').className  = "icon-black icon-resize-full";
-
-      var mydiv2 = document.getElementById("activity_div");
-      if(mydiv2.style.width == "10px"){
-        $( "#control_table" ).animate({ width: "90%" }, 1000 );
-      }
-      
-    }
-  }
-
-    function activityClick(){   
-      var mydiv = document.getElementById("activity_div");
-      
-      if(mydiv.style.width == "10px"){
-        $( "#activity_div" ).width("100%");
-        $("#h_activity_v").hide(500);
-        $("#activity_inside").show(1000);
-        $("#h_activity_h").show(1000);
-        $( "#activity_div" ).width("10px");
-        $( "#activity_div" ).animate({ width: "100%" }, 500 );
-        document.getElementById('activity_icon').className  = "icon-black icon-resize-small";
-        document.getElementById('activity_div').className  = "";
-        var mydiv2 = document.getElementById("control_table");
-        if(mydiv2.style.width != "60%"){
-        $( "#control_table" ).animate({ width: "60%" }, 1000 );
-        }
-        
-      
-      }else{
-        $( "#activity_div" ).animate({ width: "10px" }, 1000 );
-        $("#h_activity_v").show(1000);      
-        $("#h_activity_h").hide(500);
-        $("#activity_inside").hide(500);
-        document.getElementById('activity_div').className  = "navbar-inner";
-        document.getElementById('activity_icon').className  = "icon-black icon-resize-full";
-
-        var mydiv2 = document.getElementById("weighting_div");
-        if(mydiv2.style.width == "10px"){
-          $( "#control_table" ).animate({ width: "90%" }, 1000 );
-        }
-        
-      }
-    }
-     
-
-  function controlClick(){   
-        var mydiv = document.getElementById("control_div");
-        
-        if(mydiv.style.width == "10px"){
-          $( "#control_div" ).width("100%");
-          $("#h_control_v").hide(500);
-          $("#control_inside").show(1000);
-          $("#h_control_h").show(1000);
-          $( "#control_div" ).width("10px");
-          $( "#control_div" ).animate({ width: "100%" }, 500 );
-          document.getElementById('control_icon').className  = "icon-black icon-resize-small";
-          document.getElementById('control_div').className  = "";
-        
-        }else{
-          $( "#control_div" ).animate({ width: "10px" }, 1000 );
-          $("#h_control_v").show(1000);      
-          $("#h_control_h").hide(500);
-          $("#control_inside").hide(500);
-          document.getElementById('control_div').className  = "navbar-inner";
-          document.getElementById('control_icon').className  = "icon-black icon-resize-full";
-          
-        }
-      }
- 
-
   $(document).ready(function(){
     $("#h_weighting_v").hide();
-    $("#h_activity_v").hide();
+    $("#h_weighting_lab_v").hide();
     $("#h_control_v").hide();
 
-    //$("#activity_inside").children().attr("disabled","disabled");
+
     
-    $("#weighting_inside").load('{{=URL('activity_control','control_weighting.html',vars=dict(operation="div_update",assignation = request.vars['assignation']))}}' );
-    $("#modals").load('{{=URL('activity_control','control_students_modals.html',vars=dict(assignation = request.vars['assignation']))}}' );
-    $("#weighting_menu").load('{{=URL('activity_control','control_weighting.html',vars=dict(operation="menu_update",assignation = request.vars['assignation']))}}' );
+    $("#weighting_inside").load('{{=URL('activity_control','control_weighting.html',vars=dict(operation="div_update", type="course",assignation = request.vars['assignation'], year = year, project = project))}}' );
+    $("#weighting_lab_inside").load('{{=URL('activity_control','control_weighting.html',vars=dict(operation="div_update", type="lab",assignation = request.vars['assignation'], year = year, project = project))}}' );
+
+    $("#weighting_menu").load('{{=URL('activity_control','control_weighting.html',vars=dict(operation="menu_update", type="course",assignation = request.vars['assignation'], year = year, project = project))}}' );
+
+    $("#weighting_lab_menu").load('{{=URL('activity_control','control_weighting.html',vars=dict(operation="menu_update", type="lab", assignation = request.vars['assignation'], year = year, project = project))}}' );
     
-    $("#activity_inside").load('{{=URL('activity_control','control_activity.html',vars=dict(operation="div_update",assignation = request.vars['assignation']))}}' );
-    $("#modals_activity").load('{{=URL('activity_control','control_students_modals2.html',vars=dict(assignation = request.vars['assignation']))}}' );
-    $("#activity_menu").load('{{=URL('activity_control','control_activity.html',vars=dict(operation="menu_update",assignation = request.vars['assignation']))}}' );
+    $("#activity_inside").load('{{=URL('activity_control','control_activity.html',vars=dict(operation="div_update",assignation = request.vars['assignation'], year = year, project = project))}}' );
+    $("#activity_menu").load('{{=URL('activity_control','control_activity.html',vars=dict(operation="menu_update",assignation = request.vars['assignation'], year = year, project = project))}}' );
+
   });
+
+
+  
   
 </script>
 <div id="modals">
