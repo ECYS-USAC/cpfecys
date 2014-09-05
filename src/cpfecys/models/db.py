@@ -791,6 +791,12 @@ db.define_table('request_change_activity',
     Field('course', 'reference project', notnull=True, label = 'Curso')
     )
 
+db.define_table('course_laboratory_exception',
+    Field('project', 'reference project', notnull = True, unique=True, label = T('Course')),
+    Field('t_edit_lab', 'boolean', notnull = True, label = T('Teacher can edit laboratory')),
+    Field('s_edit_course', 'boolean', notnull = True, label = T('Student can edit course'))
+)
+
 
 
 

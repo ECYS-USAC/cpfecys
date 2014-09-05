@@ -100,7 +100,9 @@ if auth.has_membership(role="Student") or auth.has_membership(role="Teacher"):
     user_menu.append((T('Students control'), False, URL('activity_control','courses_list'), []),) 
 if auth.has_membership(role="Super-Administrator"):
     user_menu.append((T('Activity control'), False, URL(), [
+    (T('Students control'), False, URL('activity_control','admin_areas_list'), []),
     (T('Activity category'), False, URL('activity_control','activity_category'), []),
+    (T('Course and Laboratory Exceptions'), False, URL('activity_control','course_laboratory_exception'), []),
     (T('Period'), False, URL('activity_control','student_control_period'), []),    
     ]))
 if auth.has_membership(role="Student"):

@@ -1,13 +1,13 @@
 {{extend 'template.html'}}
 {{if request.vars['f_view'] == "weighting":}}
-	{{if auth.has_membership('Teacher'):}}
-		<h2>{{=T('Class Weighting')}} - {{=name}}
+	{{if request.vars['type'] == "course":}}
+		<h2>{{=T('Course Weighting')}} - {{=name}}
 	{{else:}}
 		<h2>{{=T('Laboratory Weighting')}} - {{=name}}
 	{{pass}}
 {{elif request.vars['f_view'] == "activity":}}
-	{{if auth.has_membership('Teacher'):}}
-		<h2>{{=T('Class Scheduler')}} - {{=name}}
+	{{if request.vars['type'] == "course":}}
+		<h2>{{=T('Course Scheduler')}} - {{=name}}
 	{{else:}}
 		<h2>{{=T('Laboratory Scheduler')}} - {{=name}}
 	{{pass}}
@@ -45,31 +45,35 @@
 $(document).ready(function(){
 	var f_view ='{{=request.vars['f_view']}}';	
 	if (f_view == 'weighting'){
-		$("#weighting_inside").load("{{=URL('activity_control','control_weighting.html',vars=dict(operation="div_update",assignation = request.vars['assignation']))}}" );	
+		if ("{{=request.vars['type']}}" == 'course'){
+			$("#weighting_inside").load('{{=URL('activity_control','control_weighting.html',vars=dict(operation="div_update", type="course",assignation = request.vars['assignation'], project = request.vars['project'], year = request.vars['year']))}}' );
+		}else{
+			$("#weighting_inside").load('{{=URL('activity_control','control_weighting.html',vars=dict(operation="div_update", type="lab",assignation = request.vars['assignation'], project = request.vars['project'], year = request.vars['year']))}}' );	
+		}
 	}
 
 	if (f_view == 'weighting_edit'){
-		$("#weighting_inside").load('{{=URL('activity_control','control_students_modals.html',vars=dict(assignation = request.vars['assignation'],f_view = 'weighting_edit'))}}' );
+		$("#weighting_inside").load('{{=URL('activity_control','control_students_modals.html',vars=dict(assignation = request.vars['assignation'], project = request.vars['project'], year = request.vars['year'],f_view = 'weighting_edit'))}}' );
 	}
 
 	if (f_view == 'weighting_get'){
-		$("#weighting_inside").load('{{=URL('activity_control','control_students_modals.html',vars=dict(assignation = request.vars['assignation'],f_view = 'weighting_get'))}}' );
+		$("#weighting_inside").load('{{=URL('activity_control','control_students_modals.html',vars=dict(assignation = request.vars['assignation'], project = request.vars['project'], year = request.vars['year'],f_view = 'weighting_get'))}}' );
 	}
 
 	if (f_view == 'activity'){
-		$("#activity_inside").load('{{=URL('activity_control','control_activity.html',vars=dict(operation="div_update",operationT="0",assignation = request.vars['assignation']))}}' );
+		$("#activity_inside").load('{{=URL('activity_control','control_activity.html',vars=dict(operation="div_update",operationT="0",assignation = request.vars['assignation'], project = request.vars['project'], year = request.vars['year']))}}' );
 	}
 
 	if (f_view == 'activity_edit'){
-		$("#activity_inside").load('{{=URL('activity_control','control_students_modals2.html',vars=dict(assignation = request.vars['assignation'],f_view = 'activity_get'))}}' );
+		$("#activity_inside").load('{{=URL('activity_control','control_students_modals2.html',vars=dict(assignation = request.vars['assignation'], project = request.vars['project'], year = request.vars['year'],f_view = 'activity_get'))}}' );
 	}
   });
 </script>
 
 <script type="text/javascript">
 	$(document).ready(function(){
-	    $("#weighting_menu").load('{{=URL('activity_control','control_weighting.html',vars=dict(operation="menu_update",assignation = request.vars['assignation']))}}');
+	    $("#weighting_menu").load('{{=URL('activity_control','control_weighting.html',vars=dict(operation="menu_update", type=request.vars['type'],assignation = request.vars['assignation'], project = request.vars['project'], year = request.vars['year']))}}');
 
-	    $("#activity_menu").load('{{=URL('activity_control','control_activity.html',vars=dict(operation="menu_update",assignation = request.vars['assignation']))}}');
+	    $("#activity_menu").load('{{=URL('activity_control','control_activity.html',vars=dict(operation="menu_update",assignation = request.vars['assignation'], project = request.vars['project'], year = request.vars['year']))}}');
 	  });
 </script>
