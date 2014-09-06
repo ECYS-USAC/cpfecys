@@ -130,48 +130,39 @@ def teacher_register_mail():
 
 def teacher_register_mail_detail():
     if request.vars['notice'] != None:
-        listadoC = db(db.notification_log4.register==request.vars['notice']).select().first()
-        l=listadoC.destination[1:-1].replace("'","").split(",")
-        a=0
-        for i in l:
-            if a>0:
-                l[a]=i[1:]
-            a=a+1
-
         noticia = db(db.notification_general_log4.id==request.vars['notice']).select().first()
-        a=0
+
+        mail_var = db(db.notification_log4.register==request.vars['notice']).select().first()
+        listadoC=str(mail_var.destination).split(",")
+
         tutores = db((db.auth_user.id==db.user_project.assigned_user)&(db.user_project.project==db.project.id)&(db.project.name==noticia.course)&(db.user_project.period==db.period_year.id)&(db.period_year.yearp==noticia.yearp)&(db.period_year.period==db.period.id)&(db.period.name==noticia.period)).select()
         tempT = []
         for t in tutores:
-            if t.auth_user.email in l:
+            if t.auth_user.email in listadoC:
                 tempT.append(t.auth_user.id)
         tutores = db(db.auth_user.id.belongs(tempT)).select()
-        estudiantes = db(db.academic.email.belongs(l)).select()
-    return dict(tutores=tutores, estudiantes=estudiantes, noticia=noticia, log=listadoC)
+        estudiantes = db(db.academic.email.belongs(listadoC)).select()
+    return dict(tutores=tutores, estudiantes=estudiantes, noticia=noticia, log=mail_var)
 
 def teacher_search_destination():
     if request.vars['notice'] != None:
-        listadoC = db(db.notification_log4.register==request.vars['notice']).select().first()
-        l=listadoC.destination[1:-1].replace("'","").split(",")
-        a=0
-        for i in l:
-            if a>0:
-                l[a]=i[1:]
-            a=a+1
-
         noticia = db(db.notification_general_log4.id==request.vars['notice']).select().first()
+
+        mail_var = db(db.notification_log4.register==request.vars['notice']).select().first()
+        listadoC=str(mail_var.destination).split(",")
+
         tutores = db((db.auth_user.id==db.user_project.assigned_user)&(db.user_project.project==db.project.id)&(db.project.name==noticia.course)&(db.user_project.period==db.period_year.id)&(db.period_year.yearp==noticia.yearp)&(db.period_year.period==db.period.id)&(db.period.name==noticia.period)).select()
         tempT = []
         for t in tutores:
-            if t.auth_user.email in l:
+            if t.auth_user.email in listadoC:
                 tempT.append(t.auth_user.id)
         if request.vars['search_input'] != None:
             tutores = db((db.auth_user.id.belongs(tempT))&(db.auth_user.username.like('%'+request.vars['search_input']+'%'))).select()
-            estudiantes = db((db.academic.email.belongs(l))&(db.academic.carnet.like('%'+request.vars['search_input']+'%'))).select()
+            estudiantes = db((db.academic.email.belongs(listadoC))&(db.academic.carnet.like('%'+request.vars['search_input']+'%'))).select()
         else:
             tutores = db(db.auth_user.id.belongs(tempT)).select()
-            estudiantes = db(db.academic.email.belongs(l)).select()
-    return dict(tutores=tutores, estudiantes=estudiantes, noticia=noticia, log=listadoC)
+            estudiantes = db(db.academic.email.belongs(listadoC)).select()
+    return dict(tutores=tutores, estudiantes=estudiantes, noticia=noticia, log=mail_var)
 
 #*********************************************************
 #**********************ENVIAR AVISOS**********************
@@ -213,6 +204,7 @@ def teacher_send_mail_to_students(users1, users2, message, subject, check, semes
                                         period=semester)
     #Ciclo para el envio de correos para estudiantes
     ListadoCorreos = None
+    email_list_log=""
     if users1 != None:
         for user in users1:
             print user.email
@@ -220,8 +212,11 @@ def teacher_send_mail_to_students(users1, users2, message, subject, check, semes
                 if ListadoCorreos == None:
                     ListadoCorreos = []
                     ListadoCorreos.append(user.email)
+                    email_list_log=""
+                    email_list_log=str(user.email)
                 else:
                     ListadoCorreos.append(user.email)
+                    email_list_log=email_list_log+","+str(user.email)
 
     if users2 != None:
         for user in users2:
@@ -230,15 +225,18 @@ def teacher_send_mail_to_students(users1, users2, message, subject, check, semes
                 if ListadoCorreos == None:
                     ListadoCorreos = []
                     ListadoCorreos.append(user.email)
+                    email_list_log=""
+                    email_list_log=str(user.email)
                 else:
                     ListadoCorreos.append(user.email)
+                    email_list_log=email_list_log+","+str(user.email)
 
 
     was_sent = mail.send(to='dtt.ecys@dtt-ecys.org',subject=subject,message=messageC, bcc=ListadoCorreos)
     ##Notification LOG GENERAL
-    db.mailer_log.insert(sent_message = messageC, destination = str(ListadoCorreos), result_log = str(mail.error or '') + ':' + str(mail.result), success = was_sent, emisor=str(check.assigned_user.username))
+    db.mailer_log.insert(sent_message = messageC, destination = email_list_log, result_log = str(mail.error or '') + ':' + str(mail.result), success = was_sent, emisor=str(check.assigned_user.username))
     ##Notification LOG
-    db.notification_log4.insert(destination = str(ListadoCorreos), result_log = str(mail.error or '') + ':' + str(mail.result), success = was_sent, register=row.id)
+    db.notification_log4.insert(destination = email_list_log, result_log = str(mail.error or '') + ':' + str(mail.result), success = was_sent, register=row.id)
     if was_sent==False:
         control=control+1
                 
@@ -614,135 +612,24 @@ def register_mail():
 def register_mail_detail():
     all_n=None
     if request.vars['notice'] != None:
-        count = db.notification_log4.id.count()
-        total = db(db.notification_log4.register==request.vars['notice']).select(count).first()
+        noticia = db(db.notification_general_log4.id==request.vars['notice']).select().first()
 
-        if total[count]==1:
-            listadoC = db(db.notification_log4.register==request.vars['notice']).select().first()
-            d = listadoC.destination[0:1]
-            if d =="|":
-                d=listadoC.destination[1:-1]
-                d=d.replace("|",",")
-                listadoC.destination=str(d).split(",")
-                listadoC.destination = db(db.academic.email.belongs(listadoC.destination)).select()
-            else:
-                listado=[]
-                listado.append(listadoC.destination)
-                listadoC.destination = db(db.academic.carnet.belongs(listado)).select()
-        else:
-            if total[count]>1:
-                    listadoC = db(db.notification_log4.register==request.vars['notice']).select()
-                    listado=[]
-                    for l in listadoC:
-                        listado.append(l.destination)
-                    listadoC = db(db.notification_log4.register==request.vars['notice']).select().first()
-                    listadoC.destination = db(db.academic.carnet.belongs(listado)).select()
-    return dict(all_n=listadoC)
+        mail_var = db(db.notification_log4.register==request.vars['notice']).select().first()
+        listadoC=str(mail_var.destination).split(",")
+        mail_var.destination = db(db.academic.email.belongs(listadoC)).select()
+    return dict(notice=noticia, all_n=mail_var)
 
 def search_destination():
     all_n=None
-    if request.vars['notice'] != None:
-        count = db.notification_log4.id.count()
-        total = db(db.notification_log4.register==request.vars['notice']).select(count).first()
-
-        if total[count]==1:
-            listadoC = db(db.notification_log4.register==request.vars['notice']).select().first()
-            d = listadoC.destination[0:1]
-            if d =="|":
-                d=listadoC.destination[1:-1]
-                d=d.replace("|",",")
-                listadoC.destination=str(d).split(",")
-                if request.vars['search_input'] != None:
-                    listadoC.destination = db(db.academic.email.belongs(listadoC.destination) & (db.academic.carnet.like('%'+request.vars['search_input']+'%'))).select()
-                else:
-                    listadoC.destination = db(db.academic.email.belongs(listadoC.destination)).select()
-            else:
-                listado=[]
-                listado.append(listadoC.destination)
-                listadoC.destination = db(db.academic.carnet.belongs(listado)).select()
-                if request.vars['search_input'] != None:
-                    listadoC.destination = db((db.academic.carnet.belongs(listado)) & (db.academic.carnet.like('%'+request.vars['search_input']+'%'))).select()
-                else:
-                    listadoC.destination = db(db.academic.carnet.belongs(listado)).select()
-        else:
-            if total[count]>1:
-                    listadoC = db(db.notification_log4.register==request.vars['notice']).select()
-                    listado=[]
-                    for l in listadoC:
-                        listado.append(l.destination)
-                    listadoC = db(db.notification_log4.register==request.vars['notice']).select().first()
-                    if request.vars['search_input'] != None:
-                        listadoC.destination = db((db.academic.carnet.belongs(listado)) & (db.academic.carnet.like('%'+request.vars['search_input']+'%'))).select()
-                    else:
-                        listadoC.destination = db(db.academic.carnet.belongs(listado)).select()
-
-    #if request.vars['notice'] is None:
-     #   all_list = db((db.library.owner_file==auth.user.id) or ((db.library.project == session.project_id) & (db.library.visible==True)) ).select()
-    #else:
-    all_n=None
     tipoD = 0
     if request.vars['notice'] != None:
-        #all_n = db(db.notification_log4.register==request.vars['notice']).select().first()
-        count = db.notification_log4.id.count()
-        total = db(db.notification_log4.register==request.vars['notice']).select(count)
-        totalR = 0
-        for t in total:
-            totalR=t[count]
-        if totalR>1:
-            listadoC = db(db.notification_log4.register==request.vars['notice']).select().first()
-            d = listadoC.destination[0:1]
-            if d !='|':
-                listadoC = db(db.notification_log4.register==request.vars['notice']).select()
-                listado=[]
-                for l in listadoC:
-                    listado.append(int(l.destination))
-                listadoC = db(db.notification_log4.register==request.vars['notice']).select().first()
-                #session.flash=str(listado)
-                #redirect(URL('default','index'))
-                if request.vars['search_input'] != None:
-                    carnets = db((db.academic.carnet.belongs(listado)) & (db.academic.carnet.like('%'+request.vars['search_input']+'%'))).select()
-                else:
-                    carnets = db(db.academic.carnet.belongs(listado)).select()
-                listadoC.destination=carnets
-            else:
-                listadoC = db(db.notification_log4.register==request.vars['notice']).select()
-                listado=''
-                for l in listadoC:
-                    if listado=='':
-                        listado=l.destination[1:-1]
-                    else:
-                        listado+=","+l.destination[1:-1]
-                listadoC = db(db.notification_log4.register==request.vars['notice']).select().first()
-                listadoC.destination=str(listado).split(",")
-                
-                listadoC.destination=carnets
+        mail_var = db(db.notification_log4.register==request.vars['notice']).select().first()
+        listadoC=str(mail_var.destination).split(",")
+        if request.vars['search_input'] != None:
+            mail_var.destination = db((db.academic.email.belongs(listadoC)) & (db.academic.carnet.like('%'+request.vars['search_input']+'%'))).select()
         else:
-            listadoC = db(db.notification_log4.register==request.vars['notice']).select().first()
-            d = listadoC.destination[0:1]
-            if d =='|':
-                d=listadoC.destination[1:-1]
-                d=d.replace("|",",")
-                listadoC.destination=str(d).split(",")
-                if request.vars['search_input'] != None:
-                    carnets = db(db.academic.email.belongs(listadoC.destination) & (db.academic.carnet.like('%'+request.vars['search_input']+'%'))).select()
-                else:
-                    carnets = db(db.academic.email.belongs(listadoC.destination)).select()
-                listadoC.destination=carnets
-            else:
-                if d=='[':
-                    l=listadoC.destination[1:-1].replace("'","").split(",")
-                    l = list(set(l))
-                    listado = db((db.academic.email.belongs(l))&(db.academic.carnet.like('%'+request.vars['search_input']+'%'))).select()
-                    listadoC.destination=listado
-                else:
-                    listado=[]
-                    listado.append(int(listadoC.destination))
-                    if request.vars['search_input'] != None:
-                        carnets = db((db.academic.carnet.belongs(listado)) & (db.academic.carnet.like('%'+request.vars['search_input']+'%'))).select()
-                    else:
-                        carnets = db(db.academic.carnet.belongs(listado)).select()
-                    listadoC.destination=carnets
-    return dict(all_n=listadoC, tipoD=tipoD)
+            mail_var.destination = db(db.academic.email.belongs(listadoC)).select()
+    return dict(all_n=mail_var, tipoD=tipoD)
 #*********************************************************
 #**********************ENVIAR AVISOS**********************
 #*********************************************************
@@ -788,24 +675,29 @@ def send_mail_to_students(users, message, subject, check, semester, year):
                                         period=semester)
     #Ciclo para el envio de correos
     ListadoCorreos = None
+    email_list_log=""
     for user in users:
         print user.email
         if user.email != None and user.email != '':
             if ListadoCorreos == None:
                 ListadoCorreos = []
                 ListadoCorreos.append(user.email)
+                email_list_log=""
+                email_list_log=str(user.email)
             else:
                 ListadoCorreos.append(user.email)
+                ListadoCorreos.append(user.email)
+                email_list_log=email_list_log+","+str(user.email)
 
     was_sent = mail.send(to='dtt.ecys@dtt-ecys.org',subject=subject,message=messageC, bcc=ListadoCorreos)
     #MAILER LOG
     db.mailer_log.insert(sent_message = messageC,
-                     destination = str(ListadoCorreos),
+                     destination = email_list_log,
                      result_log = str(mail.error or '') + ':' + \
                      str(mail.result),
                      success = was_sent, emisor=str(check.assigned_user.username))
     ##Notification LOG
-    db.notification_log4.insert(destination = ListadoCorreos,
+    db.notification_log4.insert(destination = email_list_log,
                      result_log = str(mail.error or '') + ':' + \
                      str(mail.result),
                      success = was_sent,

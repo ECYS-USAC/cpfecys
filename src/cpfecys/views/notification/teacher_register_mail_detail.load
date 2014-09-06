@@ -16,14 +16,9 @@
 				<td>
     				<input type="text" id="search_input" name="search_input"  placeholder="Carnet"/>
     			</td>
-    			<td>
-    				<a  role="button"  href="#" class="btn btn-info" id="search_button">		    		
-				    	<span class="icon-white icon-search">
-				    </a>
-				</td>
 			</table>
     </div>
-<div id="dest" style="height:200px; witdh:310px; overflow:auto;">
+<div id="dest" style="height:100px; witdh:310px; overflow:auto;">
 <table class="table table-striped table-bordered">
 		<tbody>
 					{{for p in estudiantes:}}

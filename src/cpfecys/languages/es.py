@@ -1161,7 +1161,7 @@
 'register': 'regístrese',
 'Register': 'Regístrese',
 'Register Notices': 'Registro de Avisos',
-'Register Notices Detail': 'Register Notices Detail',
+'Register Notices Detail': 'Detalle de Registro de Aviso',
 'Registration identifier': 'Identificador de Registro',
 'Registration key': 'Llave de Registro',
 'Registration successful': 'Registro exitoso',
