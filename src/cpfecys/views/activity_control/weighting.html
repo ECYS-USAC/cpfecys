@@ -55,22 +55,24 @@
 	{{if request.vars['type'] == 'course':}}
 		{{var_labo = 'false'}}
 	{{pass}}
-	
-	{{for we_pass in db((db.course_activity_category.semester==int(semestre2.id)) & (db.course_activity_category.assignation==var_project_id) & (db.course_activity_category.laboratory==var_labo)).select():}}	
-		{{db(db.course_activity_category.id==we_pass.id).delete()}}
-	{{pass}}
 
-	{{for we in db((db.course_activity_category.semester==var_period_sel) & (db.course_activity_category.assignation==var_project_id) & (db.course_activity_category.laboratory==var_labo)).select():}}		
-		
-		{{db.course_activity_category.insert(category = we.category,
-	                                grade =  we.grade,
-	                                specific_grade = we.specific_grade,
-	                                semester = int(semestre2.id), 
-	                                assignation = var_project_id, 
-	                                laboratory = we.laboratory,
-	                                teacher_permition = we.teacher_permition)}}
-	{{pass}}
-	{{request.vars['op'] ="showTable"}}
+	
+		{{for we_pass in db((db.course_activity_category.semester==int(semestre2.id)) & (db.course_activity_category.assignation==var_project_id) & (db.course_activity_category.laboratory==var_labo)).select():}}	
+			{{db(db.course_activity_category.id==we_pass.id).delete()}}
+		{{pass}}
+
+		{{for we in db((db.course_activity_category.semester==var_period_sel) & (db.course_activity_category.assignation==var_project_id) & (db.course_activity_category.laboratory==var_labo)).select():}}		
+			
+			{{db.course_activity_category.insert(category = we.category,
+		                                grade =  we.grade,
+		                                specific_grade = we.specific_grade,
+		                                semester = int(semestre2.id), 
+		                                assignation = var_project_id, 
+		                                laboratory = we.laboratory,
+		                                teacher_permition = we.teacher_permition)}}
+		{{pass}}
+	
+	{{request.vars['op'] ="showTableNoEditable"}}
 		
 {{pass}}
 
@@ -234,9 +236,9 @@
 				</th>
 				<th title="{{=T('Average Grades')}}">
 					{{=T('AG')}}
-				</th title="{{=T('Teacher Permition')}}">
+				</th>
 				{{if request.vars['type'] == 'course':}}
-					<th>
+					<th title="{{=T('Teacher Permition')}}">
 						{{=T('TP')}}
 					</th>
 				{{pass}}
@@ -497,7 +499,7 @@
 	});
 
 	function editCategory(var_id){
-			$("#div_weighting_show").load("{{=URL('activity_control','weighting.html')}}?op=showEditCategory&amp;var_id="+var_id+"&amp;assignation={{=request.vars['assignation']}}&amp;project={{=request.vars['project']}}&amp;year={{=request.vars['year']}}&amp;type={{=request.vars['type']}}");
+			$("#div_weighting_show").load("{{=URL('activity_control','weighting.html')}}?op=showEditCategory&amp;var_id="+var_id+"&amp;project={{=request.vars['project']}}&amp;year={{=request.vars['year']}}&amp;type={{=request.vars['type']}}");
 	}
 
 	function updateCategory(var_id){
@@ -526,8 +528,8 @@
 	            alert("{{=T('The entered value is not a decimal')}}");  
 	          }else{
 	            
-	            $("#div_weighting_show").load("{{=URL('activity_control','weighting.html')}}?op=updateCategory&amp;var_id="+var_id+"&amp;op2=showEditTable&amp;SG_var=" + SG_var + "&amp;TP_var=" + TP_var + "&amp;category_id_var=" + category_id_var +"&amp;grade_var=" + grade_var + "&amp;assignation={{=request.vars['assignation']}}&amp;project={{=request.vars['project']}}&amp;year={{=request.vars['year']}}&amp;type={{=request.vars['type']}}"); 
-	            $("#categoryDiv").load("{{=URL('activity_control','weighting.html')}}?op=showInsert&amp;assignation={{=request.vars['assignation']}}&amp;project={{=request.vars['project']}}&amp;year={{=request.vars['year']}}&amp;type={{=request.vars['type']}}");
+	            $("#div_weighting_show").load("{{=URL('activity_control','weighting.html')}}?op=updateCategory&amp;var_id="+var_id+"&amp;op2=showEditTable&amp;SG_var=" + SG_var + "&amp;TP_var=" + TP_var + "&amp;category_id_var=" + category_id_var +"&amp;grade_var=" + grade_var + "&amp;project={{=request.vars['project']}}&amp;year={{=request.vars['year']}}&amp;type={{=request.vars['type']}}"); 
+	            $("#categoryDiv").load("{{=URL('activity_control','weighting.html')}}?op=showInsert&amp;project={{=request.vars['project']}}&amp;year={{=request.vars['year']}}&amp;type={{=request.vars['type']}}");
 	            }       
 
 	        }
@@ -538,11 +540,11 @@
 	function removeCategory(var_id){
 		var r = confirm("{{=T('Do you want to delete this record?')}}");
 		if (r == true) {
-		   $("#div_weighting_show").load("{{=URL('activity_control','weighting.html')}}?op=removeCategory&amp;op2={{=request.vars['op']}}&amp;var_id="+var_id+"&amp;assignation={{=request.vars['assignation']}}&amp;project={{=request.vars['project']}}&amp;year={{=request.vars['year']}}&amp;type={{=request.vars['type']}}");
+		   $("#div_weighting_show").load("{{=URL('activity_control','weighting.html')}}?op=removeCategory&amp;op2={{=request.vars['op']}}&amp;var_id="+var_id+"&amp;project={{=request.vars['project']}}&amp;year={{=request.vars['year']}}&amp;type={{=request.vars['type']}}");
 
-			$("#categoryDiv").load("{{=URL('activity_control','weighting.html')}}?op=showInsert&amp;assignation={{=request.vars['assignation']}}&amp;project={{=request.vars['project']}}&amp;year={{=request.vars['year']}}&amp;type={{=request.vars['type']}}");
+			$("#categoryDiv").load("{{=URL('activity_control','weighting.html')}}?op=showInsert&amp;project={{=request.vars['project']}}&amp;year={{=request.vars['year']}}&amp;type={{=request.vars['type']}}");
 		} else {
-			$("#categoryDiv").load("{{=URL('activity_control','weighting.html')}}?op=showInsert&amp;assignation={{=request.vars['assignation']}}&amp;project={{=request.vars['project']}}&amp;year={{=request.vars['year']}}&amp;type={{=request.vars['type']}}");
+			$("#categoryDiv").load("{{=URL('activity_control','weighting.html')}}?op=showInsert&amp;project={{=request.vars['project']}}&amp;year={{=request.vars['year']}}&amp;type={{=request.vars['type']}}");
 		} 
 			
 	}

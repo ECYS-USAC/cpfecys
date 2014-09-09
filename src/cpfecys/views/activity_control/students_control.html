@@ -14,7 +14,7 @@
                     <span class="icon-black icon-question-sign"></span>
                 </a>
 
-                <a type="button" class="close" title="{{=T('View in full page the weighting')}}" aria-hidden="true" href="{{=URL('activity_control', 'students_control_full',vars=dict(assignation = request.vars['assignation'], year = year, type='course', project = request.vars['project'], f_view='weighting'))}}" >
+                <a type="button" class="close" title="{{=T('View in full page the weighting')}}" aria-hidden="true" href="{{=URL('activity_control', 'students_control_full',vars=dict( year = year, type='course', project = request.vars['project'], f_view='weighting'))}}" >
                     <span class="icon-black icon-fullscreen"></span>
                 </a>              
 
@@ -43,7 +43,7 @@
                 </a>
                 
 
-                <a type="button" class="close" title="{{=T('View in full page the weighting')}}" aria-hidden="true" href="{{=URL('activity_control', 'students_control_full',vars=dict(assignation = request.vars['assignation'], year = year, type='lab', project = request.vars['project'], f_view='weighting'))}}" >
+                <a type="button" class="close" title="{{=T('View in full page the weighting')}}" aria-hidden="true" href="{{=URL('activity_control', 'students_control_full',vars=dict( year = year, type='lab', project = request.vars['project'], f_view='weighting'))}}" >
                     <span class="icon-black icon-fullscreen"></span>
                 </a>              
             
@@ -73,7 +73,7 @@
           <a type="button" class="close" title="{{=T('Help')}}" aria-hidden="true" role="button" class="btn btn-warning" data-toggle="modal" data-target="#help_modal_activity" >
             <span class="icon-black icon-question-sign"></span>
           </a>
-          <a type="button" class="close" title="{{=T('View in full page the activities')}}" aria-hidden="true" href="{{=URL('activity_control', 'students_control_full',vars=dict(assignation = request.vars['assignation'], year = year, project = request.vars['project'], f_view='activity'))}}" >
+          <a type="button" class="close" title="{{=T('View in full page the activities')}}" aria-hidden="true" href="{{=URL('activity_control', 'students_control_full',vars=dict( year = year, project = request.vars['project'], f_view='activity'))}}" >
             <span class="icon-black icon-fullscreen"></span>
           </a>
           <!--Menu of activity DIV Right-->
@@ -160,12 +160,12 @@ aria-hidden="true">{{=T('Close')}}</button>
 
 
     
-    $("#weighting_inside").load('{{=URL('activity_control','control_weighting.html',vars=dict(operation="div_update", type="course",assignation = request.vars['assignation'], year = year, project = project))}}' );
-    $("#weighting_lab_inside").load('{{=URL('activity_control','control_weighting.html',vars=dict(operation="div_update", type="lab",assignation = request.vars['assignation'], year = year, project = project))}}' );
+    $("#weighting_inside").load('{{=URL('activity_control','control_weighting.html',vars=dict(operation="div_update", type="course", year = year, project = project))}}' );
+    $("#weighting_lab_inside").load('{{=URL('activity_control','control_weighting.html',vars=dict(operation="div_update", type="lab", year = year, project = project))}}' );
 
-    $("#weighting_menu").load('{{=URL('activity_control','control_weighting.html',vars=dict(operation="menu_update", type="course",assignation = request.vars['assignation'], year = year, project = project))}}' );
+    $("#weighting_menu").load('{{=URL('activity_control','control_weighting.html',vars=dict(operation="menu_update", type="course", year = year, project = project))}}' );
 
-    $("#weighting_lab_menu").load('{{=URL('activity_control','control_weighting.html',vars=dict(operation="menu_update", type="lab", assignation = request.vars['assignation'], year = year, project = project))}}' );
+    $("#weighting_lab_menu").load('{{=URL('activity_control','control_weighting.html',vars=dict(operation="menu_update", type="lab",  year = year, project = project))}}' );
     
     $("#activity_inside").load('{{=URL('activity_control','control_activity.html',vars=dict(operation="div_update",assignation = request.vars['assignation'], year = year, project = project))}}' );
     $("#activity_menu").load('{{=URL('activity_control','control_activity.html',vars=dict(operation="menu_update",assignation = request.vars['assignation'], year = year, project = project))}}' );

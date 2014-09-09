@@ -87,9 +87,9 @@
                               {{var_project_id=request.vars['project']}}
                             {{pass}}
                             {{if request.vars['type'] == 'course':}}
-                              {{cR = db( (db.course_activity_category.assignation==var_project_id) & (db.course_activity_category.laboratory==False)).select()}}
+                              {{cR = db( (db.course_activity_category.assignation==var_project_id) & (db.course_activity_category.semester != cpfecys.current_year_period().id) & (db.course_activity_category.laboratory==False)).select()}}
                             {{else:}}
-                              {{cR = db( (db.course_activity_category.assignation==var_project_id) & (db.course_activity_category.laboratory==True)).select()}}
+                              {{cR = db( (db.course_activity_category.assignation==var_project_id)  & (db.course_activity_category.semester != cpfecys.current_year_period().id) & (db.course_activity_category.laboratory==True)).select()}}
                             {{pass}}
                               
                               {{periodsP = []}}
@@ -151,8 +151,8 @@
   <script type="text/javascript">
   $(document).ready(function(){
     //Create
-      $("#div_weighting_show").load("{{=URL('activity_control','weighting.html')}}?op=showTable&amp;assignation={{=request.vars['assignation']}}&amp;project={{=request.vars['project']}}&amp;year={{=request.vars['year']}}&amp;type={{=request.vars['type']}}"); 
-      $("#categoryDiv").load("{{=URL('activity_control','weighting.html')}}?op=showInsert&amp;assignation={{=request.vars['assignation']}}&amp;project={{=request.vars['project']}}&amp;year={{=request.vars['year']}}&amp;type={{=request.vars['type']}}"); 
+      $("#div_weighting_show").load("{{=URL('activity_control','weighting.html')}}?op=showTable&amp;project={{=request.vars['project']}}&amp;year={{=request.vars['year']}}&amp;type={{=request.vars['type']}}"); 
+      $("#categoryDiv").load("{{=URL('activity_control','weighting.html')}}?op=showInsert&amp;project={{=request.vars['project']}}&amp;year={{=request.vars['year']}}&amp;type={{=request.vars['type']}}"); 
     
 
 
@@ -178,10 +178,10 @@
           }else{
 
             
-            $("#div_weighting_show").load("{{=URL('activity_control','weighting.html')}}?op=addCategory&amp;laboratory=true&amp;SG_var=" + SG_var + "&amp;category_id_var=" + category_id_var +"&amp;grade_var=" + grade_var + "&amp;TP="+TP_var+"&amp;assignation={{=request.vars['assignation']}}&amp;project={{=request.vars['project']}}&amp;year={{=request.vars['year']}}&amp;type={{=request.vars['type']}}"); 
+            $("#div_weighting_show").load("{{=URL('activity_control','weighting.html')}}?op=addCategory&amp;laboratory=true&amp;SG_var=" + SG_var + "&amp;category_id_var=" + category_id_var +"&amp;grade_var=" + grade_var + "&amp;TP="+TP_var+"&amp;project={{=request.vars['project']}}&amp;year={{=request.vars['year']}}&amp;type={{=request.vars['type']}}"); 
             
-            $("#categoryDiv").load("{{=URL('activity_control','weighting.html')}}?op=showInsert&amp;assignation={{=request.vars['assignation']}}&amp;project={{=request.vars['project']}}&amp;year={{=request.vars['year']}}&amp;type={{=request.vars['type']}}"); 
-            $("#categoryDiv").load("{{=URL('activity_control','weighting.html')}}?op=showInsert&amp;assignation={{=request.vars['assignation']}}&amp;project={{=request.vars['project']}}&amp;year={{=request.vars['year']}}&amp;type={{=request.vars['type']}}"); 
+            $("#categoryDiv").load("{{=URL('activity_control','weighting.html')}}?op=showInsert&amp;project={{=request.vars['project']}}&amp;year={{=request.vars['year']}}&amp;type={{=request.vars['type']}}"); 
+            $("#categoryDiv").load("{{=URL('activity_control','weighting.html')}}?op=showInsert&amp;project={{=request.vars['project']}}&amp;year={{=request.vars['year']}}&amp;type={{=request.vars['type']}}"); 
             }
 
         }
@@ -189,12 +189,20 @@
 	 })
     $("#refreshButton").click(function(){
       var id_period_sel = document.getElementById('period_id').value;
-      $("#getDiv").load("{{=URL('activity_control','weighting.html')}}?op=showTableNoEditablePeriod&amp;assignation={{=request.vars['assignation']}}&amp;project={{=request.vars['project']}}&amp;year={{=request.vars['year']}}&amp;type={{=request.vars['type']}}&amp;period_par="+id_period_sel);
+      if (id_period_sel != ""){
+        $("#getDiv").load("{{=URL('activity_control','weighting.html')}}?op=showTableNoEditablePeriod&amp;project={{=request.vars['project']}}&amp;year={{=request.vars['year']}}&amp;type={{=request.vars['type']}}&amp;period_par="+id_period_sel);  
+      }else{
+        alert("{{=T('Semester has not been selected')}}");
+      }
     })
 
     $("#getWeightingButton").click(function(){
       var id_period_sel = document.getElementById('period_id').value;
-      $("#getViewDiv").load("{{=URL('activity_control','weighting.html')}}?op=getPreviousWeighting&amp;assignation={{=request.vars['assignation']}}&amp;project={{=request.vars['project']}}&amp;year={{=request.vars['year']}}&amp;type={{=request.vars['type']}}&amp;period_par="+id_period_sel);
+      if (id_period_sel != ""){
+        $("#getViewDiv").load("{{=URL('activity_control','weighting.html')}}?op=getPreviousWeighting&amp;project={{=request.vars['project']}}&amp;year={{=request.vars['year']}}&amp;type={{=request.vars['type']}}&amp;period_par="+id_period_sel);
+      }else{
+        alert("{{=T('Semester has not been selected')}}");
+      }
     })
 
   });

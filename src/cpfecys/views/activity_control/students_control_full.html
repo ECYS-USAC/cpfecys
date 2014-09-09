@@ -46,34 +46,34 @@ $(document).ready(function(){
 	var f_view ='{{=request.vars['f_view']}}';	
 	if (f_view == 'weighting'){
 		if ("{{=request.vars['type']}}" == 'course'){
-			$("#weighting_inside").load('{{=URL('activity_control','control_weighting.html',vars=dict(operation="div_update", type="course",assignation = request.vars['assignation'], project = request.vars['project'], year = request.vars['year']))}}' );
+			$("#weighting_inside").load('{{=URL('activity_control','control_weighting.html',vars=dict(operation="div_update", type="course", project = request.vars['project'], year = request.vars['year']))}}' );
 		}else{
-			$("#weighting_inside").load('{{=URL('activity_control','control_weighting.html',vars=dict(operation="div_update", type="lab",assignation = request.vars['assignation'], project = request.vars['project'], year = request.vars['year']))}}' );	
+			$("#weighting_inside").load('{{=URL('activity_control','control_weighting.html',vars=dict(operation="div_update", type="lab", project = request.vars['project'], year = request.vars['year']))}}' );	
 		}
 	}
 
 	if (f_view == 'weighting_edit'){
-		$("#weighting_inside").load('{{=URL('activity_control','control_students_modals.html',vars=dict(assignation = request.vars['assignation'], project = request.vars['project'], year = request.vars['year'],f_view = 'weighting_edit', type = request.vars['type']))}}' );
+		$("#weighting_inside").load('{{=URL('activity_control','control_students_modals.html',vars=dict( project = request.vars['project'], year = request.vars['year'],f_view = 'weighting_edit', type = request.vars['type']))}}' );
 	}
 
 	if (f_view == 'weighting_get'){
-		$("#weighting_inside").load('{{=URL('activity_control','control_students_modals.html',vars=dict(assignation = request.vars['assignation'], project = request.vars['project'], year = request.vars['year'],f_view = 'weighting_get', type = request.vars['type']))}}' );
+		$("#weighting_inside").load('{{=URL('activity_control','control_students_modals.html',vars=dict( project = request.vars['project'], year = request.vars['year'],f_view = 'weighting_get', type = request.vars['type']))}}' );
 	}
 
 	if (f_view == 'activity'){
-		$("#activity_inside").load('{{=URL('activity_control','control_activity.html',vars=dict(operation="div_update",operationT="0",assignation = request.vars['assignation'], project = request.vars['project'], year = request.vars['year']))}}' );
+		$("#activity_inside").load('{{=URL('activity_control','control_activity.html',vars=dict(operation="div_update",operationT="0", project = request.vars['project'], year = request.vars['year']))}}' );
 	}
 
 	if (f_view == 'activity_edit'){
-		$("#activity_inside").load('{{=URL('activity_control','control_students_modals2.html',vars=dict(assignation = request.vars['assignation'], project = request.vars['project'], year = request.vars['year'],f_view = 'activity_get'))}}' );
+		$("#activity_inside").load('{{=URL('activity_control','control_students_modals2.html',vars=dict( project = request.vars['project'], year = request.vars['year'],f_view = 'activity_get'))}}' );
 	}
   });
 </script>
 
 <script type="text/javascript">
 	$(document).ready(function(){
-	    $("#weighting_menu").load('{{=URL('activity_control','control_weighting.html',vars=dict(operation="menu_update", type=request.vars['type'],assignation = request.vars['assignation'], project = request.vars['project'], year = request.vars['year']))}}');
+	    $("#weighting_menu").load('{{=URL('activity_control','control_weighting.html',vars=dict(operation="menu_update", type=request.vars['type'], project = request.vars['project'], year = request.vars['year']))}}');
 
-	    $("#activity_menu").load('{{=URL('activity_control','control_activity.html',vars=dict(operation="menu_update",assignation = request.vars['assignation'], project = request.vars['project'], year = request.vars['year']))}}');
+	    $("#activity_menu").load('{{=URL('activity_control','control_activity.html',vars=dict(operation="menu_update", project = request.vars['project'], year = request.vars['year']))}}');
 	  });
 </script>

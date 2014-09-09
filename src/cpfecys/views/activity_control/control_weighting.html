@@ -32,14 +32,14 @@
 				{{if enddate != None:}}
 					<br><font color="red">{{=T('Deadline for entry')}}: {{=enddate}}</font><br>
 					<br>
-					<a id="myButton" class="btn btn-warning" href="{{=URL('activity_control', 'students_control_full',vars=dict(assignation = request.vars['assignation'], project = request.vars['project'], year = request.vars['year'], f_view='weighting_edit', type = request.vars['type']))}}"> 
+					<a id="myButton" class="btn btn-warning" href="{{=URL('activity_control', 'students_control_full',vars=dict( project = request.vars['project'], year = request.vars['year'], f_view='weighting_edit', type = request.vars['type']))}}"> 
 						<span class="icon-plus-sign"></span>
 						{{=T('Create Weighting')}}
 					</a>
 				{{pass}}
 			{{else:}}
 				<br>
-				<a id="myButton" class="btn btn-warning" href="{{=URL('activity_control', 'students_control_full',vars=dict(assignation = request.vars['assignation'], project = request.vars['project'], year = request.vars['year'], f_view='weighting_edit', type = request.vars['type']))}}"> 
+				<a id="myButton" class="btn btn-warning" href="{{=URL('activity_control', 'students_control_full',vars=dict( project = request.vars['project'], year = request.vars['year'], f_view='weighting_edit', type = request.vars['type']))}}"> 
 					<span class="icon-plus-sign"></span>
 					{{=T('Create Weighting')}}
 				</a>
@@ -62,7 +62,7 @@
 		
 	{{pass}}
 	{{no_menu=True}}
-	{{if (auth.has_membership('Super-Administrator')) or (auth.has_membership('Teacher') and request.vars['type'] == "course") or (auth.has_membership('Student') and request.vars['type'] == "lab") or (auth.has_membership('Student')  and request.vars['type'] == "course" and exception_s_var == True) or (auth.has_membership('Teacher')  and request.vars['type'] == "lab" and exception_t_var == True):}}
+	{{if (auth.has_membership('Super-Administrator')) or (auth.has_membership('Teacher') and request.vars['type'] == "course"  and assigned_to_project == True) or (auth.has_membership('Student') and request.vars['type'] == "lab"  and assigned_to_project == True) or (auth.has_membership('Student')  and request.vars['type'] == "course" and exception_s_var == True  and assigned_to_project == True) or (auth.has_membership('Teacher')  and request.vars['type'] == "lab" and exception_t_var == True  and assigned_to_project == True):}}
 		{{no_menu=False}}
 	{{pass}}
 		<ul class="dropdown"  class="close" aria-hidden="true"  style="height:10px;">
@@ -96,7 +96,7 @@
 				        </a>
 				    </li>
 					<li>
-						<a tabindex="-1"  title="{{=T('Modify course weighting')}}" href="{{=URL('activity_control', 'students_control_full',vars=dict(assignation = request.vars['assignation'], project = request.vars['project'], year = request.vars['year'], f_view='weighting_edit', type = request.vars['type']))}}" role="button"   id="edit_option"> 
+						<a tabindex="-1"  title="{{=T('Modify course weighting')}}" href="{{=URL('activity_control', 'students_control_full',vars=dict( project = request.vars['project'], year = request.vars['year'], f_view='weighting_edit', type = request.vars['type']))}}" role="button"   id="edit_option"> 
 							<span class="icon-edit" ></span>
 				          {{=T('Edit Weighting')}}
 				        </a>
@@ -124,7 +124,7 @@
 					    </li>
 						<li>
 						<li>
-							<a tabindex="-1"  title="{{=T('Modify course weighting')}}" href="{{=URL('activity_control', 'students_control_full',vars=dict(assignation = request.vars['assignation'], project = request.vars['project'], year = request.vars['year'], f_view='weighting_edit', type = request.vars['type']))}}" role="button"   id="edit_option"> 
+							<a tabindex="-1"  title="{{=T('Modify course weighting')}}" href="{{=URL('activity_control', 'students_control_full',vars=dict( project = request.vars['project'], year = request.vars['year'], f_view='weighting_edit', type = request.vars['type']))}}" role="button"   id="edit_option"> 
 								<span class="icon-edit" ></span>
 				          		{{=T('Edit Weighting')}}
 				        	</a>
@@ -154,13 +154,13 @@
 			{{else:}}
 				{{if auth.has_membership('Teacher'):}}
 					<li>
-						<a  tabindex="-1" title="{{=T('Create course weighting')}}" id="menu_create_weighting" href="{{=URL('activity_control', 'students_control_full',vars=dict(assignation = request.vars['assignation'], project = request.vars['project'], year = request.vars['year'], f_view='weighting_edit', type = request.vars['type']))}}" role="button"   id="edit_option">
+						<a  tabindex="-1" title="{{=T('Create course weighting')}}" id="menu_create_weighting" href="{{=URL('activity_control', 'students_control_full',vars=dict( project = request.vars['project'], year = request.vars['year'], f_view='weighting_edit', type = request.vars['type']))}}" role="button"   id="edit_option">
 							<span class="icon-plus-sign"></span>
 			          		{{=T('Create Weighting')}}
 			        	</a>
 			      	</li>
 			      	<li> 
-						<a  tabindex="-1"  title="{{=T('9ighting of previous semesters')}}" href="{{=URL('activity_control', 'students_control_full',vars=dict(assignation = request.vars['assignation'], project = request.vars['project'], year = request.vars['year'], f_view='weighting_get', type = request.vars['type']))}}" role="button"   id="edit_option">
+						<a  tabindex="-1"  title="{{=T('9ighting of previous semesters')}}" href="{{=URL('activity_control', 'students_control_full',vars=dict( project = request.vars['project'], year = request.vars['year'], f_view='weighting_get', type = request.vars['type']))}}" role="button"   id="edit_option">
 							<span class="icon-repeat"></span>
 			        		{{=T('Get Weighting')}}
 				        </a>
@@ -177,13 +177,13 @@
 					{{pass}}
 					{{if var_do =='true':}}
 						<li>
-							<a  tabindex="-1" title="{{=T('Create course weighting')}}" id="menu_create_weighting" href="{{=URL('activity_control', 'students_control_full',vars=dict(assignation = request.vars['assignation'], project = request.vars['project'], year = request.vars['year'], f_view='weighting_edit', type = request.vars['type']))}}" role="button"   id="edit_option">
+							<a  tabindex="-1" title="{{=T('Create course weighting')}}" id="menu_create_weighting" href="{{=URL('activity_control', 'students_control_full',vars=dict( project = request.vars['project'], year = request.vars['year'], f_view='weighting_edit', type = request.vars['type']))}}" role="button"   id="edit_option">
 								<span class="icon-plus-sign"></span>
 			          			{{=T('Create Weighting')}}
 			        		</a>
 				      	</li>
 				      	<li> 
-							<a  tabindex="-1"  title="{{=T('Get weighting of previous semesters')}}" href="{{=URL('activity_control', 'students_control_full',vars=dict(assignation = request.vars['assignation'], project = request.vars['project'], year = request.vars['year'], f_view='weighting_get', type = request.vars['type']))}}" role="button"   id="edit_option">
+							<a  tabindex="-1"  title="{{=T('Get weighting of previous semesters')}}" href="{{=URL('activity_control', 'students_control_full',vars=dict( project = request.vars['project'], year = request.vars['year'], f_view='weighting_get', type = request.vars['type']))}}" role="button"   id="edit_option">
 								<span class="icon-repeat"></span>
 				        		{{=T('Get Weighting')}}
 					        </a>
@@ -223,10 +223,10 @@
 
 <script type="text/javascript">
   	$(document).ready(function(){
-		$("#table_Weighting_{{=request.vars['type']}}").load("{{=URL('activity_control','weighting.html')}}?op=showTableNoEditable&amp;type={{=request.vars['type']}}&amp;project={{=request.vars['project']}}&amp;year={{=request.vars['year']}}&amp;assignation={{=request.vars['assignation']}}");
+		$("#table_Weighting_{{=request.vars['type']}}").load("{{=URL('activity_control','weighting.html')}}?op=showTableNoEditable&amp;type={{=request.vars['type']}}&amp;project={{=request.vars['project']}}&amp;year={{=request.vars['year']}}");
 		
 		$("#edit_option").click(function(){
-	      $("#div_weighting_show").load("{{=URL('activity_control','weighting.html')}}?op=showEditTable&amp;project={{=request.vars['project']}}}&amp;year={{=request.vars['year']}}&amp;type={{=request.vars['type']}}&amp;assignation={{=request.vars['assignation']}}"); 
+	      $("#div_weighting_show").load("{{=URL('activity_control','weighting.html')}}?op=showEditTable&amp;project={{=request.vars['project']}}}&amp;year={{=request.vars['year']}}&amp;type={{=request.vars['type']}}&amp;"); 
 	    })
 
 	    
