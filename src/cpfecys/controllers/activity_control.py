@@ -235,12 +235,10 @@ def students_control_full():
 def control_students_modals():
     import cpfecys
     #Obtener la asignacion del estudiante
-
     assignation = request.vars['assignation']
     project = request.vars['project']
     
     year = db(db.period_year.id == request.vars['year']).select().first() 
-
     
     if (assignation == 'None'):
         project_var = db(db.project.id == request.vars['project']).select().first() 

@@ -5,12 +5,11 @@
 	{{var_project_id=project}}
 {{pass}}
 
-
 {{if request.vars['op'] == "addCategory": }}
 
 	{{total_var2=float(request.vars['grade_var'])}}
 
-	{{if auth.has_membership('Teacher'):}}
+	{{if request.vars['type'] == 'course':}}
 		{{for project in db((db.course_activity_category.semester==semestre2.id) & (db.course_activity_category.assignation==var_project_id) & (db.course_activity_category.laboratory==False)).select():}}		
 			{{total_var2 = float(total_var2) + float(project.grade)}}				
 		{{pass}}
@@ -25,7 +24,7 @@
 		</center>
 	{{else:}}
 		{{var_labo = 'true'}}
-		{{if auth.has_membership('Teacher'):}}
+		{{if request.vars['type'] == 'course':}}
 			{{var_labo = 'false'}}
 		{{pass}}
 
@@ -53,7 +52,7 @@
 	{{var_period_sel=str(request.vars['period_par'])}}
 
 	{{var_labo = 'true'}}
-	{{if auth.has_membership('Teacher'):}}
+	{{if request.vars['type'] == 'course':}}
 		{{var_labo = 'false'}}
 	{{pass}}
 	
@@ -80,7 +79,7 @@
 <!--DELETE CATEGORY-->
 {{if request.vars['op'] == "removeCategory": }}
 	{{var_labo = True}}
-	{{if auth.has_membership('Teacher'):}}
+	{{if request.vars['type'] == 'course':}}
 		{{var_labo = False}}
 	{{pass}}
 
@@ -106,7 +105,7 @@
 
 
 
-	{{if auth.has_membership('Teacher'):}}
+	{{if request.vars['type'] == 'course':}}
 		{{for project in db((db.course_activity_category.semester==semestre2.id) & (db.course_activity_category.assignation==var_project_id) & (db.course_activity_category.laboratory==False)).select():}}		
 			{{if str(project.id) != str(request.vars['var_id']):}}	
 				{{total_var2 = float(total_var2) + float(project.grade)}}
@@ -152,7 +151,7 @@
 	<label>{{=T('Category')}}:</label>
     <select class="generic-widget" id="category_id" name="category" style="width:250px;">
 
-	 	{{if auth.has_membership('Teacher'):}}
+	 	{{if request.vars['type'] == 'course':}}
 			{{cR = db((db.course_activity_category.semester==semestre2.id) & (db.course_activity_category.assignation==var_project_id) & (db.course_activity_category.laboratory==False)).select()}}
 			{{categoriasP = []}}
 		    {{for c in cR:}}
@@ -191,7 +190,7 @@
     	</label>
     	<br>
 
-    	{{if auth.has_membership('Teacher'):}}
+    	{{if request.vars['type'] == 'course':}}
 	    	<div align="justify"> 
 		    	{{=T('Do you want to give permissions to academic tutors so they can create activities in this category?')}}
 		    </div>
@@ -268,7 +267,7 @@
 								<select class="generic-widget" id="edit_category_id" name="category" style="width:75px;">
 									<option value="{{=project.category}}">{{=project.category.category}}</option>
 							      
-					      		{{if auth.has_membership('Teacher'):}}
+					      		{{if request.vars['type'] == 'course':}}
 									{{cR = db((db.course_activity_category.semester==semestre2.id) & (db.course_activity_category.assignation==var_project_id) & (db.course_activity_category.laboratory==False)).select()}}
 									{{categoriasP = []}}
 								      {{for c in cR:}}
@@ -376,7 +375,7 @@
 							{{if editable_var=='true':}}						
 								<select class="generic-widget" id="edit_category_id" name="category" style="width:75px;">
 									<option value="{{=project.category}}">{{=project.category.category}}</option>
-						      	{{if auth.has_membership('Teacher'):}}
+						      	{{if request.vars['type'] == 'course':}}
 									{{cR = db((db.course_activity_category.semester==semestre2.id) & (db.course_activity_category.assignation==var_project_id) & (db.course_activity_category.laboratory==False)).select()}}
 									{{categoriasP = []}}
 								      {{for c in cR:}}
@@ -498,7 +497,7 @@
 	});
 
 	function editCategory(var_id){
-			$("#div_weighting_show").load("{{=URL('activity_control','weighting.html')}}?op=showEditCategory&amp;var_id="+var_id+"&amp;assignation={{=request.vars['assignation']}}&amp;project={{=request.vars['project']}}&amp;year={{=request.vars['year']}}");
+			$("#div_weighting_show").load("{{=URL('activity_control','weighting.html')}}?op=showEditCategory&amp;var_id="+var_id+"&amp;assignation={{=request.vars['assignation']}}&amp;project={{=request.vars['project']}}&amp;year={{=request.vars['year']}}&amp;type={{=request.vars['type']}}");
 	}
 
 	function updateCategory(var_id){
@@ -527,8 +526,8 @@
 	            alert("{{=T('The entered value is not a decimal')}}");  
 	          }else{
 	            
-	            $("#div_weighting_show").load("{{=URL('activity_control','weighting.html')}}?op=updateCategory&amp;var_id="+var_id+"&amp;op2=showEditTable&amp;SG_var=" + SG_var + "&amp;TP_var=" + TP_var + "&amp;category_id_var=" + category_id_var +"&amp;grade_var=" + grade_var + "&amp;assignation={{=request.vars['assignation']}}&amp;project={{=request.vars['project']}}&amp;year={{=request.vars['year']}}"); 
-	            $("#categoryDiv").load("{{=URL('activity_control','weighting.html')}}?op=showInsert&amp;assignation={{=request.vars['assignation']}}&amp;project={{=request.vars['project']}}&amp;year={{=request.vars['year']}}");
+	            $("#div_weighting_show").load("{{=URL('activity_control','weighting.html')}}?op=updateCategory&amp;var_id="+var_id+"&amp;op2=showEditTable&amp;SG_var=" + SG_var + "&amp;TP_var=" + TP_var + "&amp;category_id_var=" + category_id_var +"&amp;grade_var=" + grade_var + "&amp;assignation={{=request.vars['assignation']}}&amp;project={{=request.vars['project']}}&amp;year={{=request.vars['year']}}&amp;type={{=request.vars['type']}}"); 
+	            $("#categoryDiv").load("{{=URL('activity_control','weighting.html')}}?op=showInsert&amp;assignation={{=request.vars['assignation']}}&amp;project={{=request.vars['project']}}&amp;year={{=request.vars['year']}}&amp;type={{=request.vars['type']}}");
 	            }       
 
 	        }
@@ -539,11 +538,11 @@
 	function removeCategory(var_id){
 		var r = confirm("{{=T('Do you want to delete this record?')}}");
 		if (r == true) {
-		   $("#div_weighting_show").load("{{=URL('activity_control','weighting.html')}}?op=removeCategory&amp;op2={{=request.vars['op']}}&amp;var_id="+var_id+"&amp;assignation={{=request.vars['assignation']}}&amp;project={{=request.vars['project']}}&amp;year={{=request.vars['year']}}");
+		   $("#div_weighting_show").load("{{=URL('activity_control','weighting.html')}}?op=removeCategory&amp;op2={{=request.vars['op']}}&amp;var_id="+var_id+"&amp;assignation={{=request.vars['assignation']}}&amp;project={{=request.vars['project']}}&amp;year={{=request.vars['year']}}&amp;type={{=request.vars['type']}}");
 
-			$("#categoryDiv").load("{{=URL('activity_control','weighting.html')}}?op=showInsert&amp;assignation={{=request.vars['assignation']}}&amp;project={{=request.vars['project']}}&amp;year={{=request.vars['year']}}");
+			$("#categoryDiv").load("{{=URL('activity_control','weighting.html')}}?op=showInsert&amp;assignation={{=request.vars['assignation']}}&amp;project={{=request.vars['project']}}&amp;year={{=request.vars['year']}}&amp;type={{=request.vars['type']}}");
 		} else {
-			$("#categoryDiv").load("{{=URL('activity_control','weighting.html')}}?op=showInsert&amp;assignation={{=request.vars['assignation']}}&amp;project={{=request.vars['project']}}&amp;year={{=request.vars['year']}}");
+			$("#categoryDiv").load("{{=URL('activity_control','weighting.html')}}?op=showInsert&amp;assignation={{=request.vars['assignation']}}&amp;project={{=request.vars['project']}}&amp;year={{=request.vars['year']}}&amp;type={{=request.vars['type']}}");
 		} 
 			
 	}

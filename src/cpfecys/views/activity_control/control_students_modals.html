@@ -1,5 +1,6 @@
 {{if request.vars['f_view'] == "weighting_edit":}}
 <!--Create weighting Modal -->
+
 <div style="overflow:auto;"> 
     <div >
       <center>
@@ -50,22 +51,21 @@
   </div>
   <!--Finish Create weighting Modal -->
 {{pass}}
+
 {{if request.vars['f_view'] == "weighting_get":}}
 <!--Get weighting Modal -->
 <div > 
     <div id ="a">
         <center>
-        
         <h3 >
           <small>
-            {{if auth.has_membership('Teacher'):}}
+            {{if request.vars['type'] == 'course':}}
               <h2>{{=T('Class Weighting')}} - {{=name}}
             {{else:}}
               <h2>{{=T('Laboratory Weighting')}} - {{=name}}
             {{pass}}
         </small>
         </h3>
-      
       </center>
     </div>
     <div id="actions">
@@ -84,10 +84,9 @@
                               {{project_var = db(db.user_project.id == request.vars['assignation']).select().first() }}
                               {{var_project_id = project_var.project.id}}
                             {{except:}}
-                              {{var_project_id=project}}
+                              {{var_project_id=request.vars['project']}}
                             {{pass}}
-
-                            {{if auth.has_membership('Teacher'):}}
+                            {{if request.vars['type'] == 'course':}}
                               {{cR = db( (db.course_activity_category.assignation==var_project_id) & (db.course_activity_category.laboratory==False)).select()}}
                             {{else:}}
                               {{cR = db( (db.course_activity_category.assignation==var_project_id) & (db.course_activity_category.laboratory==True)).select()}}
@@ -152,8 +151,8 @@
   <script type="text/javascript">
   $(document).ready(function(){
     //Create
-      $("#div_weighting_show").load("{{=URL('activity_control','weighting.html')}}?op=showTable&amp;assignation={{=request.vars['assignation']}}&amp;project={{=request.vars['project']}}&amp;year={{=request.vars['year']}}"); 
-      $("#categoryDiv").load("{{=URL('activity_control','weighting.html')}}?op=showInsert&amp;assignation={{=request.vars['assignation']}}&amp;project={{=request.vars['project']}}&amp;year={{=request.vars['year']}}"); 
+      $("#div_weighting_show").load("{{=URL('activity_control','weighting.html')}}?op=showTable&amp;assignation={{=request.vars['assignation']}}&amp;project={{=request.vars['project']}}&amp;year={{=request.vars['year']}}&amp;type={{=request.vars['type']}}"); 
+      $("#categoryDiv").load("{{=URL('activity_control','weighting.html')}}?op=showInsert&amp;assignation={{=request.vars['assignation']}}&amp;project={{=request.vars['project']}}&amp;year={{=request.vars['year']}}&amp;type={{=request.vars['type']}}"); 
     
 
 
@@ -179,10 +178,10 @@
           }else{
 
             
-            $("#div_weighting_show").load("{{=URL('activity_control','weighting.html')}}?op=addCategory&amp;laboratory=true&amp;SG_var=" + SG_var + "&amp;category_id_var=" + category_id_var +"&amp;grade_var=" + grade_var + "&amp;TP="+TP_var+"&amp;assignation={{=request.vars['assignation']}}&amp;project={{=request.vars['project']}}&amp;year={{=request.vars['year']}}"); 
+            $("#div_weighting_show").load("{{=URL('activity_control','weighting.html')}}?op=addCategory&amp;laboratory=true&amp;SG_var=" + SG_var + "&amp;category_id_var=" + category_id_var +"&amp;grade_var=" + grade_var + "&amp;TP="+TP_var+"&amp;assignation={{=request.vars['assignation']}}&amp;project={{=request.vars['project']}}&amp;year={{=request.vars['year']}}&amp;type={{=request.vars['type']}}"); 
             
-            $("#categoryDiv").load("{{=URL('activity_control','weighting.html')}}?op=showInsert&amp;assignation={{=request.vars['assignation']}}&amp;project={{=request.vars['project']}}&amp;year={{=request.vars['year']}}"); 
-            $("#categoryDiv").load("{{=URL('activity_control','weighting.html')}}?op=showInsert&amp;assignation={{=request.vars['assignation']}}&amp;project={{=request.vars['project']}}&amp;year={{=request.vars['year']}}"); 
+            $("#categoryDiv").load("{{=URL('activity_control','weighting.html')}}?op=showInsert&amp;assignation={{=request.vars['assignation']}}&amp;project={{=request.vars['project']}}&amp;year={{=request.vars['year']}}&amp;type={{=request.vars['type']}}"); 
+            $("#categoryDiv").load("{{=URL('activity_control','weighting.html')}}?op=showInsert&amp;assignation={{=request.vars['assignation']}}&amp;project={{=request.vars['project']}}&amp;year={{=request.vars['year']}}&amp;type={{=request.vars['type']}}"); 
             }
 
         }
@@ -190,12 +189,12 @@
 	 })
     $("#refreshButton").click(function(){
       var id_period_sel = document.getElementById('period_id').value;
-      $("#getDiv").load("{{=URL('activity_control','weighting.html')}}?op=showTableNoEditablePeriod&amp;assignation={{=request.vars['assignation']}}&amp;project={{=request.vars['project']}}&amp;year={{=request.vars['year']}}&amp;period_par="+id_period_sel);
+      $("#getDiv").load("{{=URL('activity_control','weighting.html')}}?op=showTableNoEditablePeriod&amp;assignation={{=request.vars['assignation']}}&amp;project={{=request.vars['project']}}&amp;year={{=request.vars['year']}}&amp;type={{=request.vars['type']}}&amp;period_par="+id_period_sel);
     })
 
     $("#getWeightingButton").click(function(){
       var id_period_sel = document.getElementById('period_id').value;
-      $("#getViewDiv").load("{{=URL('activity_control','weighting.html')}}?op=getPreviousWeighting&amp;assignation={{=request.vars['assignation']}}&amp;project={{=request.vars['project']}}&amp;year={{=request.vars['year']}}&amp;period_par="+id_period_sel);
+      $("#getViewDiv").load("{{=URL('activity_control','weighting.html')}}?op=getPreviousWeighting&amp;assignation={{=request.vars['assignation']}}&amp;project={{=request.vars['project']}}&amp;year={{=request.vars['year']}}&amp;type={{=request.vars['type']}}&amp;period_par="+id_period_sel);
     })
 
   });

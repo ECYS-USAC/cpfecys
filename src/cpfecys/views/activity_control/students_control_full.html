@@ -53,11 +53,11 @@ $(document).ready(function(){
 	}
 
 	if (f_view == 'weighting_edit'){
-		$("#weighting_inside").load('{{=URL('activity_control','control_students_modals.html',vars=dict(assignation = request.vars['assignation'], project = request.vars['project'], year = request.vars['year'],f_view = 'weighting_edit'))}}' );
+		$("#weighting_inside").load('{{=URL('activity_control','control_students_modals.html',vars=dict(assignation = request.vars['assignation'], project = request.vars['project'], year = request.vars['year'],f_view = 'weighting_edit', type = request.vars['type']))}}' );
 	}
 
 	if (f_view == 'weighting_get'){
-		$("#weighting_inside").load('{{=URL('activity_control','control_students_modals.html',vars=dict(assignation = request.vars['assignation'], project = request.vars['project'], year = request.vars['year'],f_view = 'weighting_get'))}}' );
+		$("#weighting_inside").load('{{=URL('activity_control','control_students_modals.html',vars=dict(assignation = request.vars['assignation'], project = request.vars['project'], year = request.vars['year'],f_view = 'weighting_get', type = request.vars['type']))}}' );
 	}
 
 	if (f_view == 'activity'){
