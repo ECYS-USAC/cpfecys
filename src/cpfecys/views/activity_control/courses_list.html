@@ -1,23 +1,120 @@
 {{extend 'template.html'}}
-<h1>{{=T('Students Control')}}</h1>
-<table class="table table-striped table-bordered">
-	<thead>
-		<th>{{=T('Project')}}</th>
-		<th>{{=T('Section')}}</th>
-		<th>{{=T('View')}}</th>
-	</thead>
-	<tbody>
-		{{for assignation in assignations:}}
-		<tr>
-			<td>{{=split_name(assignation.project.name)}}</td>
-			<td>{{=split_section(assignation.project.name)}}</td>
-			<td>
-				<center>
-					<a class="btn" href="{{=URL('activity_control', 'students_control', vars=dict(assignation = assignation.id, project = assignation.project))}}">{{=T('Go')}}
-					</a>
-				</center>
-			</td>
-		</tr>
+<div class="row-fluid">
+    <div class="well span12"  style="overflow:auto;">
+		<a onclick="window.history.back()" class="btn" ><i class="icon-arrow-left"></i>{{=T('Back')}}</a>
+        <table class="table-striped table-bordered" style="align:0 auto;">
+        <tr>
+          <td>
+          <form class="form-inline" 
+          action="{{=URL('activity_control','courses_list')}}" 
+            method='get'>
+                 <select name="period">
+                    {{for period in periods:}}
+                      <option value="{{=period.id}}">
+                      {{=T(period.period.name)}}-{{=period.yearp}}
+                      </option>
+                    {{pass}}
+                </select>
+                <input class="btn" type="submit" value="{{=T('Filter')}}">
+          </form>
+          </td>
+        </tr>
+        </table>
+
+        <h1>{{=T('Academic Control')}}
+			<br>
+			<small>{{=T(periodo.period.name)}} {{=str(periodo.yearp)}}</small>
+        </h1>
+        
+        {{if auth.has_membership('Teacher') or auth.has_membership('Super-Administrator'):}}
+		<table class="table table-striped table-bordered">
+			<thead>
+				<th>{{=T('Course')}}</th>
+				<th><center>{{=T('Section')}}</center></th>
+				<th><center>{{=T('View')}}</center></th>
+			</thead>
+			<tbody>
+				{{for course in coursesAdmin:}}
+				<tr>
+					{{if auth.has_membership('Teacher'):}}
+						<td>{{=split_name(course.user_project.project.name)}}</td>
+						<td>{{=split_section(course.user_project.project.name)}}</td>
+					{{else:}}
+						<td>{{=split_name(course.name)}}</td>
+						<td><center>{{=split_section(course.name)}}</center></td>
+					{{pass}}
+					<td>
+						<center>
+							{{if auth.has_membership('Super-Administrator'):}}
+							<a class="btn" href="{{=URL('activity_control', 'students_control', vars=dict(project = course.id, period=periodo.id))}}">{{=T('Sign in')}}
+							{{else:}}
+							<a class="btn" href="{{=URL('activity_control', 'students_control', vars=dict( project = course.user_project.project, period=periodo.id))}}">{{=T('Sign in')}}
+							{{pass}}
+							</a>
+						</center>
+					</td>
+				</tr>
+				{{pass}}
+			</tbody>
+		</table>
+		{{else:}}
+			{{if countcoursesAdminT>0:}}
+				<table class="table table-striped table-bordered">
+				<tr>
+					<th colspan="3"><center>Practica Final</center></th>
+				</tr>
+				<tr>
+					<th>{{=T('Course')}}</th>
+					<th><center>{{=T('Section')}}</center></th>
+					<th><center>{{=T('View')}}</center></th>
+				</tr>
+				{{for course in coursesAdmin:}}
+					<tr>
+						<td>{{=split_name(course.user_project.project.name)}}</td>
+						<td><center>{{=split_section(course.user_project.project.name)}}</center></td>
+						<td>
+							<center>
+								<a class="btn btn-primary" href="{{=URL('activity_control', 'students_control', vars=dict( project = course.user_project.project, period=periodo.id))}}">{{=T('Sign in')}}
+								</a>
+							</center>
+						</td>
+					</tr>
+				{{pass}}
+				</table>
+			{{pass}}
+
+			{{if countcoursesAdminT!=0 and coursesStudentT!=0:}}
+			<br><br>
+			{{pass}}
+			
+			{{if coursesStudentT>0:}}
+				<table class="table table-striped table-bordered">
+				<tr>
+					<th colspan="3"><center>Cursos Asignados</center></th>
+				</tr>
+				<tr>
+					<th>{{=T('Course')}}</th>
+					<th><center>{{=T('Section')}}</center></th>
+					<th><center>{{=T('View')}}</center></th>
+				</tr>
+				{{for course in coursesStudent:}}
+					<tr>
+						<td>{{=split_name(course.academic_course_assignation.assignation.name)}}</td>
+						<td><center>{{=split_section(course.academic_course_assignation.assignation.name)}}</center></td>
+						<td>
+							<center>
+								<a class="btn btn-info" href="{{=URL('activity_control', 'students_control', vars=dict( project = course.academic_course_assignation.assignation, period=periodo.id))}}">{{=T('Sign in')}}
+								</a>
+							</center>
+						</td>
+					</tr>
+				{{pass}}
+				</table>
+			{{pass}}
+
+			{{if countcoursesAdminT==0 and coursesStudentT==0:}}
+				<center><h3>No tiene asignaciones</h3></center>
+			{{pass}}
 		{{pass}}
-	</tbody>
-</table>
+	</div>
+</div>

@@ -1,4 +1,96 @@
 @auth.requires_login()
+def courses_list():
+    area = db(db.area_level.name=='DTT Tutor Académico').select().first()
+    coursesAdmin = None
+    countcoursesAdmin = db.user_project.id.count()
+    countcoursesAdminT = 0
+    coursesStudent = None
+    countcoursesStudent = db.academic_course_assignation.id.count()
+    coursesStudentT = 0
+    
+
+    import cpfecys
+    #Obtain the current period of the system and all the register periods
+    period = cpfecys.current_year_period()
+    periods = db(db.period_year).select()
+
+    def split_name(project):
+        try:
+            (nameP, projectSection) = str(project).split('(')
+        except:
+            nameP = project
+        return nameP
+
+    def split_section(project):
+        try:
+            projectSection = None
+            nameS = None
+            (nameP, projectSection) = str(project).split('(')
+            (nameS,garbage) = str(projectSection).split(')')
+        except:
+            nameS = '--------'
+        return nameS
+
+    #Check if the period is change
+    if request.vars['period'] is None:
+        period = cpfecys.current_year_period()
+        periods = db(db.period_year).select()
+    else:
+        if request.vars['period']!='':
+            period = request.vars['period']
+            period = db(db.period_year.id==period).select().first()
+        else:
+            session.flash = T('Not valid Action.')
+            redirect(URL('default','index'))
+
+    response.view='activity_control/courses_list.html'
+    if auth.has_membership('Super-Administrator'):
+        coursesAdmin = db(db.project.area_level==area.id).select()
+    elif auth.has_membership('Teacher'):
+        coursesAdmin = db((db.user_project.assigned_user == auth.user.id) & (db.user_project.period == period.id) & (db.user_project.project==db.project.id) & (db.project.area_level==area.id)).select()
+    elif auth.has_membership('Student'):
+        coursesAdmin = db((db.user_project.assigned_user == auth.user.id) & (db.user_project.period == period.id) & (db.user_project.project==db.project.id) & (db.project.area_level==area.id)).select(countcoursesAdmin).first()
+        countcoursesAdminT = coursesAdmin[countcoursesAdmin]
+        coursesAdmin = db((db.user_project.assigned_user == auth.user.id) & (db.user_project.period == period.id) & (db.user_project.project==db.project.id) & (db.project.area_level==area.id)).select()        
+
+        academicCourse = db(db.academic.carnet==auth.user.username).select().first()
+        if academicCourse is not None:
+            coursesStudent = db((db.academic_course_assignation.carnet == academicCourse.id) & (db.academic_course_assignation.semester == period.id) & (db.academic_course_assignation.assignation==db.project.id) & (db.project.area_level==area.id)).select(countcoursesStudent).first()
+            coursesStudentT = coursesStudent[countcoursesStudent]
+            coursesStudent = db((db.academic_course_assignation.carnet == academicCourse.id) & (db.academic_course_assignation.semester == period.id) & (db.academic_course_assignation.assignation==db.project.id) & (db.project.area_level==area.id)).select()
+            #session.flash=str(coursesStudent)
+            #redirect(URL('default','index'))
+    elif auth.has_membership('Academic'):
+        academicCourse = db(db.academic.carnet==auth.user.username).select().first()
+        if academicCourse is not None:
+            coursesStudent = db((db.academic_course_assignation.carnet == academicCourse.id) & (db.academic_course_assignation.semester == period.id) & (db.academic_course_assignation.assignation==db.project.id) & (db.project.area_level==area.id)).select(countcoursesStudent).first()
+            coursesStudentT = coursesStudent[countcoursesStudent]
+            coursesStudent = db((db.academic_course_assignation.carnet == academicCourse.id) & (db.academic_course_assignation.semester == period.id) & (db.academic_course_assignation.assignation==db.project.id) & (db.project.area_level==area.id)).select()
+    else:
+        session.flash = T('Not valid Action.')
+        redirect(URL('default','index'))
+
+
+
+    return dict(coursesAdmin = coursesAdmin, countcoursesAdminT=countcoursesAdminT, coursesStudent=coursesStudent, coursesStudentT=coursesStudentT, split_name=split_name, split_section=split_section, periods=periods,period=period,periodo=period)
+
+
+
+
+#**************************************************************************************************************************************************************************
+#**************************************************************************************************************************************************************************
+#**************************************************************************************************************************************************************************
+#**************************************************************************************************************************************************************************
+#**************************************************************************************************************************************************************************
+#**************************************************************************************************************************************************************************
+
+
+
+
+
+
+
+@auth.requires_login()
 @auth.requires_membership('Super-Administrator')
 def activity_category():
     query = db.activity_category
@@ -21,27 +113,6 @@ def student_control_period():
     grid = SQLFORM.grid(db.student_control_period, maxtextlength=100,csv=False,create=False,deletable=False,)
     return dict(grid=grid)
 
-@auth.requires_login()
-@auth.requires(auth.has_membership('Student') or auth.has_membership('Teacher'))
-def courses_list():
-    import cpfecys
-    def split_name(project):
-        try:
-            (nameP, projectSection) = str(project).split('(')
-        except:
-            nameP = project
-        return nameP
-
-    def split_section(project):
-        try:
-            projectSection = None
-            nameS = None
-            (nameP, projectSection) = str(project).split('(')
-            (nameS,garbage) = str(projectSection).split(')')
-        except:
-            nameS = '--------'
-        return nameS
-    return dict(assignations = db((db.user_project.assigned_user == auth.user.id) & (db.user_project.period == cpfecys.current_year_period().id)).select(), split_name=split_name, split_section=split_section)
 
 @auth.requires_login()
 @auth.requires(auth.has_membership('Super-Administrator'))
