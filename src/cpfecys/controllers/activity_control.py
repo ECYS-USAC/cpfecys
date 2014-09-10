@@ -106,6 +106,13 @@ def course_laboratory_exception():
 
 @auth.requires_login()
 @auth.requires_membership('Super-Administrator')
+def course_limit_exception():
+    query = db.course_limit_exception
+    grid = SQLFORM.grid(query, maxtextlength=100,csv=False)
+    return dict(grid=grid)
+
+@auth.requires_login()
+@auth.requires_membership('Super-Administrator')
 def student_control_period():
     import cpfecys
     year = cpfecys.current_year_period()

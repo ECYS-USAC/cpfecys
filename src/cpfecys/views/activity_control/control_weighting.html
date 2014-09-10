@@ -25,8 +25,14 @@
 				{{from datetime import datetime}}
 				{{enddate=None}}
 				{{for date_var in db((db.student_control_period.period_name==T(str(semester))+" "+str(year))).select():}}
-					{{if datetime.now() > date_var.date_start and datetime.now() < date_var.date_finish:}}
-						{{enddate=date_var.date_finish}}					
+					{{var_exception = db((db.course_limit_exception.project == request.vars['project']) & (db.course_limit_exception.date_finish > datetime.now())).select().first()}}
+					{{if var_exception != None:}}
+						{{var_date_finish = var_exception.date_finish}}
+					{{else:}}
+						{{var_date_finish = date_var.date_finish}}
+					{{pass}}
+					{{if datetime.now() > date_var.date_start and datetime.now() < var_date_finish:}}
+						{{enddate=var_date_finish}}					
 					{{pass}}
 				{{pass}}
 				{{if enddate != None:}}
@@ -63,7 +69,10 @@
 	{{pass}}
 	{{no_menu=True}}
 	{{if (auth.has_membership('Super-Administrator')) or (auth.has_membership('Teacher') and request.vars['type'] == "course"  and assigned_to_project == True) or (auth.has_membership('Student') and request.vars['type'] == "lab"  and assigned_to_project == True) or (auth.has_membership('Student')  and request.vars['type'] == "course" and exception_s_var == True  and assigned_to_project == True) or (auth.has_membership('Teacher')  and request.vars['type'] == "lab" and exception_t_var == True  and assigned_to_project == True):}}
-		{{no_menu=False}}
+		{{if str(request.vars['year']) == str(cpfecys.current_year_period().id):}}
+
+			{{no_menu=False}}
+		{{pass}}
 	{{pass}}
 		<ul class="dropdown"  class="close" aria-hidden="true"  style="height:10px;">
 		{{if no_menu == False:}}
@@ -105,7 +114,14 @@
 					{{from datetime import datetime}}
 					{{var_do='false'}}
 					{{for date_var in db((db.student_control_period.period_name==T(str(semester))+" "+str(year))).select():}}
-						{{if datetime.now() > date_var.date_start and datetime.now() < date_var.date_finish:}}
+						{{var_exception = db((db.course_limit_exception.project == request.vars['project']) & (db.course_limit_exception.date_finish > datetime.now())).select().first()}}
+						{{if var_exception != None:}}
+							{{var_date_finish = var_exception.date_finish}}
+						{{else:}}
+							{{var_date_finish = date_var.date_finish}}
+						{{pass}}
+						
+						{{if datetime.now() > date_var.date_start and datetime.now() < var_date_finish:}}
 							{{var_do='true'}}					
 						{{pass}}
 					{{pass}}
@@ -171,7 +187,14 @@
 			      	{{from datetime import datetime}}
 					{{var_do='false'}}
 					{{for date_var in db((db.student_control_period.period_name==T(str(semester))+" "+str(year))).select():}}
-						{{if datetime.now() > date_var.date_start and datetime.now() < date_var.date_finish:}}
+						{{var_exception = db((db.course_limit_exception.project == request.vars['project']) & (db.course_limit_exception.date_finish > datetime.now())).select().first()}}
+						{{if var_exception != None:}}
+							{{var_date_finish = var_exception.date_finish}}
+						{{else:}}
+							{{var_date_finish = date_var.date_finish}}
+						{{pass}}
+						
+						{{if datetime.now() > date_var.date_start and datetime.now() < var_date_finish:}}
 							{{var_do='true'}}					
 						{{pass}}
 					{{pass}}

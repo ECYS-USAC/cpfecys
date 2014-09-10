@@ -815,6 +815,12 @@ db.define_table('course_laboratory_exception',
     Field('s_edit_course', 'boolean', notnull = True, label = T('Student can edit course'))
 )
 
+db.define_table('course_limit_exception',
+    Field('project', 'reference project', notnull = True, unique=True, label = T('Course')),
+    Field('semester_repet', 'boolean', notnull = True, label = T('Repeat Each Semester')),
+    Field('date_finish', 'datetime', notnull = True, label = T('Date Finish'))
+)
+
 
 ## after defining tables, uncomment below to enable auditing
     # auth.enable_record_versioning(db)

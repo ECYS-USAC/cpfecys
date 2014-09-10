@@ -113,6 +113,7 @@ if auth.has_membership(role="Super-Administrator"):
     (T('Students control'), False, URL('activity_control','admin_areas_list'), []),
     (T('Activity category'), False, URL('activity_control','activity_category'), []),
     (T('Course and Laboratory Exceptions'), False, URL('activity_control','course_laboratory_exception'), []),
+    (T('Course Time Limit Exception'), False, URL('activity_control','course_limit_exception'), []),
     (T('Period'), False, URL('activity_control','student_control_period'), []),    
     ]))
 if auth.has_membership(role="Student"):
