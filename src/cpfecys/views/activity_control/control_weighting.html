@@ -4,6 +4,25 @@
 {{except:}}
 	{{var_project_id=project}}
 {{pass}}
+
+{{exception_query = db(db.course_laboratory_exception.project == request.vars['project']).select().first()}}
+	
+{{if exception_query is None:}}
+	{{exception_s_var = False}}
+	{{exception_t_var = False}}
+{{else:}}
+	{{exception_t_var = exception_query.t_edit_lab}}
+	{{exception_s_var = exception_query.s_edit_course}}
+	
+{{pass}}
+{{no_menu=True}}
+{{if (auth.has_membership('Super-Administrator')) or (auth.has_membership('Teacher') and request.vars['type'] == "course"  and assigned_to_project == True) or (auth.has_membership('Student') and request.vars['type'] == "lab"  and assigned_to_project == True) or (auth.has_membership('Student')  and request.vars['type'] == "course" and exception_s_var == True  and assigned_to_project == True) or (auth.has_membership('Teacher')  and request.vars['type'] == "lab" and exception_t_var == True  and assigned_to_project == True):}}
+	{{if str(request.vars['year']) == str(cpfecys.current_year_period().id):}}
+		{{no_menu=False}}
+	{{pass}}
+{{pass}}
+
+
 {{total_var2=0}}
 {{if request.vars['type'] == 'course':}}
 	{{for project in db((db.course_activity_category.semester==semestre2.id) & (db.course_activity_category.assignation==var_project_id) & (db.course_activity_category.laboratory==False)).select():}}		
@@ -20,23 +39,31 @@
 			<div id="table_Weighting_{{=request.vars['type']}}" sytle="overflow:auto;" >
 			</div>
 		{{else:}}
-			<b><font color="red">{{=T('Weighting was not created or is incorrect')}}</font></b>
-			{{if auth.has_membership('Student'):}}
-				{{from datetime import datetime}}
-				{{enddate=None}}
-				{{for date_var in db((db.student_control_period.period_name==T(str(semester))+" "+str(year))).select():}}
-					{{var_exception = db((db.course_limit_exception.project == request.vars['project']) & (db.course_limit_exception.date_finish > datetime.now())).select().first()}}
-					{{if var_exception != None:}}
-						{{var_date_finish = var_exception.date_finish}}
-					{{else:}}
-						{{var_date_finish = date_var.date_finish}}
+			{{if no_menu == False:}}
+				<b><font color="red">{{=T('Weighting was not created or is incorrect')}}</font></b>
+				{{if auth.has_membership('Student'):}}
+					{{from datetime import datetime}}
+					{{enddate=None}}
+					{{for date_var in db((db.student_control_period.period_name==T(str(semester))+" "+str(year))).select():}}
+						{{var_exception = db((db.course_limit_exception.project == request.vars['project']) & (db.course_limit_exception.date_finish > datetime.now())).select().first()}}
+						{{if var_exception != None:}}
+							{{var_date_finish = var_exception.date_finish}}
+						{{else:}}
+							{{var_date_finish = date_var.date_finish}}
+						{{pass}}
+						{{if datetime.now() > date_var.date_start and datetime.now() < var_date_finish:}}
+							{{enddate=var_date_finish}}					
+						{{pass}}
 					{{pass}}
-					{{if datetime.now() > date_var.date_start and datetime.now() < var_date_finish:}}
-						{{enddate=var_date_finish}}					
+					{{if enddate != None:}}
+						<br><font color="red">{{=T('Deadline for entry')}}: {{=enddate}}</font><br>
+						<br>
+						<a id="myButton" class="btn btn-warning" href="{{=URL('activity_control', 'students_control_full',vars=dict( project = request.vars['project'], year = request.vars['year'], f_view='weighting_edit', type = request.vars['type']))}}"> 
+							<span class="icon-plus-sign"></span>
+							{{=T('Create Weighting')}}
+						</a>
 					{{pass}}
-				{{pass}}
-				{{if enddate != None:}}
-					<br><font color="red">{{=T('Deadline for entry')}}: {{=enddate}}</font><br>
+				{{else:}}
 					<br>
 					<a id="myButton" class="btn btn-warning" href="{{=URL('activity_control', 'students_control_full',vars=dict( project = request.vars['project'], year = request.vars['year'], f_view='weighting_edit', type = request.vars['type']))}}"> 
 						<span class="icon-plus-sign"></span>
@@ -44,36 +71,15 @@
 					</a>
 				{{pass}}
 			{{else:}}
-				<br>
-				<a id="myButton" class="btn btn-warning" href="{{=URL('activity_control', 'students_control_full',vars=dict( project = request.vars['project'], year = request.vars['year'], f_view='weighting_edit', type = request.vars['type']))}}"> 
-					<span class="icon-plus-sign"></span>
-					{{=T('Create Weighting')}}
-				</a>
+				<b><font color="red">{{=T('Weighting was not created')}}</font></b>
 			{{pass}}
-			
 		{{pass}}
 		
 	</center>
 {{pass}}
 {{if request.vars['operation'] == "menu_update": }}
 	
-	{{exception_query = db(db.course_laboratory_exception.project == request.vars['project']).select().first()}}
 	
-	{{if exception_query is None:}}
-		{{exception_s_var = False}}
-		{{exception_t_var = False}}
-	{{else:}}
-		{{exception_t_var = exception_query.t_edit_lab}}
-		{{exception_s_var = exception_query.s_edit_course}}
-		
-	{{pass}}
-	{{no_menu=True}}
-	{{if (auth.has_membership('Super-Administrator')) or (auth.has_membership('Teacher') and request.vars['type'] == "course"  and assigned_to_project == True) or (auth.has_membership('Student') and request.vars['type'] == "lab"  and assigned_to_project == True) or (auth.has_membership('Student')  and request.vars['type'] == "course" and exception_s_var == True  and assigned_to_project == True) or (auth.has_membership('Teacher')  and request.vars['type'] == "lab" and exception_t_var == True  and assigned_to_project == True):}}
-		{{if str(request.vars['year']) == str(cpfecys.current_year_period().id):}}
-
-			{{no_menu=False}}
-		{{pass}}
-	{{pass}}
 		<ul class="dropdown"  class="close" aria-hidden="true"  style="height:10px;">
 		{{if no_menu == False:}}
 		  <a style="color:#f0ad4e;text-shadow:none;" class="dropdown-toggle" data-toggle="dropdown" href="">
