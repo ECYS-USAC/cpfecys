@@ -1,4 +1,5 @@
 @auth.requires_login()
+@auth.requires(auth.has_membership('Student') or auth.has_membership('Teacher') or auth.has_membership('Super-Administrator') or auth.has_membership('Academic'))
 def courses_list():
     area = db(db.area_level.name=='DTT Tutor Académico').select().first()
     coursesAdmin = None
@@ -58,8 +59,6 @@ def courses_list():
             coursesStudent = db((db.academic_course_assignation.carnet == academicCourse.id) & (db.academic_course_assignation.semester == period.id) & (db.academic_course_assignation.assignation==db.project.id) & (db.project.area_level==area.id)).select(countcoursesStudent).first()
             coursesStudentT = coursesStudent[countcoursesStudent]
             coursesStudent = db((db.academic_course_assignation.carnet == academicCourse.id) & (db.academic_course_assignation.semester == period.id) & (db.academic_course_assignation.assignation==db.project.id) & (db.project.area_level==area.id)).select()
-            #session.flash=str(coursesStudent)
-            #redirect(URL('default','index'))
     elif auth.has_membership('Academic'):
         academicCourse = db(db.academic.carnet==auth.user.username).select().first()
         if academicCourse is not None:
@@ -74,6 +73,43 @@ def courses_list():
 
     return dict(coursesAdmin = coursesAdmin, countcoursesAdminT=countcoursesAdminT, coursesStudent=coursesStudent, coursesStudentT=coursesStudentT, split_name=split_name, split_section=split_section, periods=periods,period=period,periodo=period)
 
+
+
+@auth.requires_login()
+@auth.requires(auth.has_membership('Student') or auth.has_membership('Teacher') or auth.has_membership('Super-Administrator'))
+def students_control():
+    #vars
+    year = None
+    project_var = None
+    #Check if the period is correct
+    if request.vars['period'] is None or request.vars['period']=='':
+        session.flash = T('Not valid Action.')
+        redirect(URL('default','index'))
+    else:
+        year = request.vars['period']
+        year = db(db.period_year.id==year).select().first()
+        if year is None:
+            session.flash = T('Not valid Action.')
+            redirect(URL('default','index'))
+
+
+    project_var = request.vars['project']
+    if auth.has_membership('Super-Administrator') == False:
+        assigantion = db((db.user_project.assigned_user == auth.user.id) & (db.user_project.period == year.id) & (db.user_project.project == project_var)).select().first()
+        
+        if assigantion is None:
+            academic_var = db(db.academic.carnet==auth.user.username).select().first()
+            try:
+                academic_assig = db((db.academic_course_assignation.carnet == academic_var.id) & (db.academic_course_assignation.semester == year.id) & (db.academic_course_assignation.assignation==project_var) ).select().first()
+            
+                if academic_assig is None:
+                    session.flash=T('You do not have permission to view course requests')
+                    redirect(URL('default','index'))
+            except:
+                session.flash=T('You do not have permission to view course requests')
+                redirect(URL('default','index'))
+        
+    return dict(project = project_var, year = year.id)
 
 
 
@@ -153,29 +189,6 @@ def admin_courses_list():
 
 
 @auth.requires_login()
-@auth.requires(auth.has_membership('Student') or auth.has_membership('Teacher') or auth.has_membership('Super-Administrator'))
-def students_control():
-    import cpfecys
-    year = cpfecys.current_year_period().id
-    project_var = request.vars['project']
-    if auth.has_membership('Super-Administrator') == False:
-        assigantion = db((db.user_project.assigned_user == auth.user.id) & (db.user_project.period == year) & (db.user_project.project == project_var)).select().first()
-        
-        if assigantion is None:
-            academic_var = db(db.academic.carnet==auth.user.username).select().first()
-            try:
-                academic_assig = db((db.academic_course_assignation.carnet == academic_var.id) & (db.academic_course_assignation.semester == year) & (db.academic_course_assignation.assignation==project_var) ).select().first()
-            
-                if academic_assig is None:
-                    session.flash=T('You do not have permission to view course requests')
-                    redirect(URL('default','index'))
-            except:
-                session.flash=T('You do not have permission to view course requests')
-                redirect(URL('default','index'))
-        
-    return dict(project = project_var, year = year)
-
-@auth.requires_login()
 def control_weighting():
     import cpfecys
     year = db(db.period_year.id == request.vars['year']).select().first() 
@@ -251,71 +264,49 @@ def weighting():
 #------------------------------------------------------------------------------------------------------------------------
 #------------------------------------------------------------------------------------------------------------------------
 #------------------------------------------------------------------------------------------------------------------------
+@auth.requires_login()
 def control_activity():
-    import cpfecys
-    #Obtener la asignacion del estudiante
-    assignation = request.vars['assignation']
-    
     year = db(db.period_year.id == request.vars['year']).select().first() 
     year_semester = year.period
-    
-    if assignation == 'None':
-        check = db(db.project.id == request.vars['project']).select().first()
-        return dict(name = check.name,
-            semester = year_semester.name,
-            year = year.yearp,
-            assignation=assignation,
-            semestre2 = year,
-            project = request.vars['project'])
-    else:
-        check = db.user_project(id = assignation, assigned_user = auth.user.id)
-        if (check is None):
-            #check if there is no assignation or if it is locked (shouldn't be touched)
-            if (session.last_assignation is None):
-                redirect(URL('default','index'))
-                return
-            else:
-                check = db.user_project(id = session.last_assignation)
-                if cpfecys.assignation_is_locked(check):
-                    redirect(URL('default','index'))
-                    return
-        else:
-            session.last_assignation = check.id
-        
-        return dict(name = check.project.name,
-                    semester = year_semester.name,
-                    year = year.yearp,
-                    assignation=assignation,
-                    semestre2 = year)
+    project = db(db.project.id==request.vars['project']).select().first()
 
+    assigantion = db((db.user_project.assigned_user == auth.user.id) & (db.user_project.period == year.id) & (db.user_project.project == project.id)).select().first()
+    if assigantion is None:
+        assigned_to_project = False
+    else:
+        assigned_to_project = True
+
+    return dict(semester = year_semester.name,
+            year = year.yearp,
+            semestre2 = year,
+            project = project,
+            type=request.vars['type'],
+            assigned_to_project = assigned_to_project)
+@auth.requires_login()
 def activity():
     import cpfecys
-    #Obtener la asignacion del estudiante
-    assignation = request.vars['assignation']
+    #Obteners la asignacion del estudiante
     project = request.vars['project']
+    typ = request.vars['type']
     
     year = db(db.period_year.id == request.vars['year']).select().first() 
-    
-    return dict(semestre2 = year, project = project)
-
-
-def control_students_modals2():
-    import cpfecys
-    #Obtener la asignacion del estudiante
-    assignation = request.vars['assignation']
-    project = request.vars['project']
-    
-    year = db(db.period_year.id == request.vars['year']).select().first() 
-
-    
-    if (assignation == 'None'):
-        project_var = db(db.project.id == request.vars['project']).select().first() 
-        return dict(semestre2 = year, name=project_var.name)
+    assigantion = db((db.user_project.assigned_user == auth.user.id) & (db.user_project.period == year.id) & (db.user_project.project == project)).select().first()
+    if assigantion is None:
+        assigned_to_project = False
     else:
-        check = db.user_project(id = assignation, assigned_user = auth.user.id)
-        return dict(semestre2 = year, name=check.project.name)
+        assigned_to_project = True
+    
+    return dict(semestre2 = year, project = project, type=typ, assigned_to_project = assigned_to_project)
 
+@auth.requires_login()
+def control_students_modals2():
+    #Obtener la asignacion del estudiante
+    project = request.vars['project']
+    year = db(db.period_year.id == request.vars['year']).select().first() 
+    project_var = db(db.project.id == request.vars['project']).select().first() 
+    return dict(semestre2 = year, name=project_var.name)
 
+@auth.requires_login()
 def request_change_activity():
     import cpfecys
     #Obtener la asignacion del estudiante
@@ -429,3 +420,61 @@ def activityRequest():
     import cpfecys
     currentyear_period = cpfecys.current_year_period()
     return dict(semestre2 = currentyear_period)
+
+
+
+#------------------------------------------------------------------------------------------------------------------------
+#------------------------------------------------------------------------------------------------------------------------
+#------------------------------------------------------------------------------------------------------------------------
+#------------------------------------------------------------------------------------------------------------------------
+
+
+@auth.requires_login()
+@auth.requires(auth.has_membership('Student') or auth.has_membership('Teacher') or auth.has_membership('Super-Administrator') or auth.has_membership('Academic'))
+def General_report_activities():
+    #vars
+    year = None
+    project_var = None
+    #Check if the period is correct
+    if request.vars['period'] is None or request.vars['period']=='':
+        session.flash = T('Not valid Action.')
+        redirect(URL('default','index'))
+    else:
+        year = request.vars['period']
+        year = db(db.period_year.id==year).select().first()
+        if year is None:
+            session.flash = T('Not valid Action.')
+            redirect(URL('default','index'))
+
+
+    #Check if the period is correct
+    if request.vars['project'] is None or request.vars['project']=='':
+        session.flash = T('Not valid Action.')
+        redirect(URL('default','index'))
+    else:
+        project_var = request.vars['project']
+        project_var = db(db.project.id==project_var).select().first()
+        if year is None:
+            session.flash = T('Not valid Action.')
+            redirect(URL('default','index'))
+
+    project_var = project_var.id
+    if auth.has_membership('Super-Administrator') == False:
+        assigantion = db((db.user_project.assigned_user == auth.user.id) & (db.user_project.period == year.id) & (db.user_project.project == project_var)).select().first()
+        if assigantion is None:
+            academic_var = db(db.academic.carnet==auth.user.username).select().first()
+            try:
+                academic_assig = db((db.academic_course_assignation.carnet == academic_var.id) & (db.academic_course_assignation.semester == year.id) & (db.academic_course_assignation.assignation==project_var) ).select().first()
+                if academic_assig is None:
+                    session.flash=T('You do not have permission to view course requests')
+                    redirect(URL('default','index'))
+            except:
+                session.flash=T('You do not have permission to view course requests')
+                redirect(URL('default','index'))
+
+    
+    teacher = db((db.user_project.period == year.id) & (db.user_project.project == project_var)).select().first()
+    practice = db((db.user_project.period == year.id) & (db.user_project.project == project_var)).select()
+    students = db((db.academic_course_assignation.semester == year.id) & (db.academic_course_assignation.assignation==project_var) ).select()
+        
+    return dict(project = project_var, year = year.id, teacher=teacher, practice=practice, students=students)

@@ -1,0 +1,44 @@
+{{extend 'template.html'}}
+{{course=db(db.project.id==project).select().first()}}
+{{period=db(db.period_year.id==year).select().first()}}
+<div class="row-fluid">
+    <div class="well span12"  style="overflow:auto;">
+		<a onclick="window.history.back()" class="btn" ><i class="icon-arrow-left"></i>{{=T('Back')}}</a>
+        <h2>{{=T('General Report of Activities')}}
+			<br>
+			<small>{{=course.name}} - {{=T(period.period.name)}} {{=str(period.yearp)}}</small></small>
+        </h2>
+
+        <table class="table-striped table-bordered">
+        	<tr>
+        		<th>{{=T('Teacher')}}</th>
+        		<th>{{=teacher.assigned_user.first_name}} {{=teacher.assigned_user.last_name}}</th>
+        	</tr>
+        	<tr>
+        		<th Colspan="2"><br></th>
+        	</tr>
+        	{{for t1 in practice:}}
+        		<tr>
+        			<th>{{=T('Final Practice Student')}}</th>
+        			<th>{{=t1.assigned_user.first_name}} {{=t1.assigned_user.last_name}}</th>
+        		</tr>
+        	{{pass}}
+        	<tr>
+        		<th Colspan="2"><br></th>
+        	</tr>
+        	<tr>
+        		<th Colspan="2"><center>{{=T('Academic')}}</center></th>
+        	</tr>
+        	<tr>
+        		<th>{{=T('Carnet')}}</th>
+        		<th>{{=T('Total')}}</th>
+        	</tr>
+        	{{for t1 in students:}}
+        		<tr>
+        			<td>{{=t1.carnet.carnet}}</td>
+        			<td>0</td>
+        		</tr>
+        	{{pass}}
+        </table>
+	</div>
+</div>

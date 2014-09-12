@@ -2,9 +2,8 @@
 <div id="createActivity" > 
     <div>
       <center>
-        <h3>
-          
-            {{if auth.has_membership('Teacher'):}}
+        <h3>          
+            {{if request.vars['type'] == "class":}}
               <h2><small>{{=T('Class Scheduler')}} - {{=name}}</small></h2>
             {{else:}}
               <h2><small>{{=T('Laboratory Scheduler')}} - {{=name}}</small></h2>
@@ -32,7 +31,7 @@
                   
                 </td>
                 <td align="left">
-                  <div class="well span11" id="div_activity_show" style="overflow:auto; height:450px;  width:90%">
+                  <div class="well span11" id="div_activity_show" style="width:900px">
             	      
                   </div>
               	</td>
@@ -53,8 +52,8 @@
   <script type="text/javascript">
   $(document).ready(function(){
     //Create
-      $("#div_activity_show").load("{{=URL('activity_control','activity.html')}}?op=showTable&amp;assignation={{=request.vars['assignation']}}&amp;project={{=request.vars['project']}}&amp;year={{=request.vars['year']}}"); 
-      $("#activityDiv").load("{{=URL('activity_control','activity.html')}}?op=showInsert&amp;assignation={{=request.vars['assignation']}}&amp;project={{=request.vars['project']}}&amp;year={{=request.vars['year']}}"); 
+    $("#div_activity_show").load("{{=URL('activity_control','activity.html')}}?op=showTable&amp;project={{=request.vars['project']}}&amp;year={{=request.vars['year']}}&amp;type={{=request.vars['type']}}"); 
+    $("#activityDiv").load("{{=URL('activity_control','activity.html')}}?op=showInsert&amp;project={{=request.vars['project']}}&amp;year={{=request.vars['year']}}&amp;type={{=request.vars['type']}}"); 
 
     $("#activityButton").click(function(){
         var category_activity_id_var = document.getElementById('category_activity_id').value;
@@ -64,6 +63,11 @@
         var field_grade_var = document.getElementById('field_grade').value;
         var dateInit_var = document.getElementById('dateInit').value;
         var dateEnd_var = document.getElementById('dateEnd').value;
+        try{
+          var TPA_var = document.getElementById('TP_check_activity').checked;  
+        }catch(err){
+          var TPA_var = true;
+        }
         if(category_activity_id_var=="" || (activity_name1_var=="" && activity_name2_var=="") || activity_description_var=="" || dateInit_var=="" || dateEnd_var==""){
             alert("{{=T('Fill all fields to save.')}}");
         }else{
@@ -84,20 +88,20 @@
                     alert("{{=T('The grade can not be 0')}}");
                   }else{
                     if (activity_name2_var==""){
-                      $("#div_activity_show").load("{{=URL('activity_control','activity.html')}}?op=addActivity&amp;category_activity_id_var=" + category_activity_id_var + "&amp;activity_name1_var=" + encodeURIComponent(activity_name1_var) +"&amp;activity_description_var=" + encodeURIComponent(activity_description_var) + "&amp;field_grade_var=" + field_grade_var + "&amp;dateInit_var="+encodeURIComponent(dateInit_var)+ "&amp;dateEnd_var="+encodeURIComponent(dateEnd_var)+"&amp;assignation={{=request.vars['assignation']}}&amp;project={{=request.vars['project']}}&amp;year={{=request.vars['year']}}"); 
+                      $("#div_activity_show").load("{{=URL('activity_control','activity.html')}}?op=addActivity&amp;category_activity_id_var=" + category_activity_id_var + "&amp;activity_name1_var=" + encodeURIComponent(activity_name1_var) +"&amp;activity_description_var=" + encodeURIComponent(activity_description_var) + "&amp;field_grade_var=" + field_grade_var + "&amp;TPA_var=" + TPA_var + "&amp;dateInit_var="+encodeURIComponent(dateInit_var)+ "&amp;dateEnd_var="+encodeURIComponent(dateEnd_var)+"&amp;type={{=request.vars['type']}}&amp;project={{=request.vars['project']}}&amp;year={{=request.vars['year']}}"); 
                     }else{
-                      $("#div_activity_show").load("{{=URL('activity_control','activity.html')}}?op=addActivity&amp;category_activity_id_var=" + category_activity_id_var + "&amp;activity_name1_var=" + encodeURIComponent(activity_name2_var) +"&amp;activity_description_var=" + encodeURIComponent(activity_description_var) + "&amp;field_grade_var=" + field_grade_var + "&amp;dateInit_var="+encodeURIComponent(dateInit_var)+ "&amp;dateEnd_var="+encodeURIComponent(dateEnd_var)+"&amp;assignation={{=request.vars['assignation']}}&amp;project={{=request.vars['project']}}&amp;year={{=request.vars['year']}}"); 
+                      $("#div_activity_show").load("{{=URL('activity_control','activity.html')}}?op=addActivity&amp;category_activity_id_var=" + category_activity_id_var + "&amp;activity_name1_var=" + encodeURIComponent(activity_name2_var) +"&amp;activity_description_var=" + encodeURIComponent(activity_description_var) + "&amp;field_grade_var=" + field_grade_var + "&amp;TPA_var=" + TPA_var + "&amp;dateInit_var="+encodeURIComponent(dateInit_var)+ "&amp;dateEnd_var="+encodeURIComponent(dateEnd_var)+"&amp;type={{=request.vars['type']}}&amp;project={{=request.vars['project']}}&amp;year={{=request.vars['year']}}"); 
                     }
-                    $("#activityDiv").load("{{=URL('activity_control','activity.html')}}?op=showInsert&amp;assignation={{=request.vars['assignation']}}&amp;project={{=request.vars['project']}}&amp;year={{=request.vars['year']}}");
+                    $("#activityDiv").load("{{=URL('activity_control','activity.html')}}?op=showInsert&amp;type={{=request.vars['type']}}&amp;project={{=request.vars['project']}}&amp;year={{=request.vars['year']}}");
                   }
                 }
               }else{
                 if (activity_name2_var==""){
-                    $("#div_activity_show").load("{{=URL('activity_control','activity.html')}}?op=addActivity&amp;category_activity_id_var=" + category_activity_id_var + "&amp;activity_name1_var=" + encodeURIComponent(activity_name1_var) +"&amp;activity_description_var=" + encodeURIComponent(activity_description_var) + "&amp;field_grade_var=nada&amp;dateInit_var="+encodeURIComponent(dateInit_var)+ "&amp;dateEnd_var="+encodeURIComponent(dateEnd_var)+"&amp;assignation={{=request.vars['assignation']}}&amp;project={{=request.vars['project']}}&amp;year={{=request.vars['year']}}"); 
+                    $("#div_activity_show").load("{{=URL('activity_control','activity.html')}}?op=addActivity&amp;category_activity_id_var=" + category_activity_id_var + "&amp;activity_name1_var=" + encodeURIComponent(activity_name1_var) +"&amp;activity_description_var=" + encodeURIComponent(activity_description_var) + "&amp;field_grade_var=nada&amp;TPA_var=" + TPA_var + "&amp;dateInit_var="+encodeURIComponent(dateInit_var)+ "&amp;dateEnd_var="+encodeURIComponent(dateEnd_var)+"&amp;type={{=request.vars['type']}}&amp;project={{=request.vars['project']}}&amp;year={{=request.vars['year']}}"); 
                   }else{
-                    $("#div_activity_show").load("{{=URL('activity_control','activity.html')}}?op=addActivity&amp;category_activity_id_var=" + category_activity_id_var + "&amp;activity_name1_var=" + encodeURIComponent(activity_name2_var) +"&amp;activity_description_var=" + encodeURIComponent(activity_description_var) + "&amp;field_grade_var=nada&amp;dateInit_var="+encodeURIComponent(dateInit_var)+ "&amp;dateEnd_var="+encodeURIComponent(dateEnd_var)+"&amp;assignation={{=request.vars['assignation']}}&amp;project={{=request.vars['project']}}&amp;year={{=request.vars['year']}}"); 
+                    $("#div_activity_show").load("{{=URL('activity_control','activity.html')}}?op=addActivity&amp;category_activity_id_var=" + category_activity_id_var + "&amp;activity_name1_var=" + encodeURIComponent(activity_name2_var) +"&amp;activity_description_var=" + encodeURIComponent(activity_description_var) + "&amp;field_grade_var=nada&amp;TPA_var=" + TPA_var + "&amp;dateInit_var="+encodeURIComponent(dateInit_var)+ "&amp;dateEnd_var="+encodeURIComponent(dateEnd_var)+"&amp;type={{=request.vars['type']}}&amp;project={{=request.vars['project']}}&amp;year={{=request.vars['year']}}"); 
                   }
-                $("#activityDiv").load("{{=URL('activity_control','activity.html')}}?op=showInsert&amp;assignation={{=request.vars['assignation']}}&amp;project={{=request.vars['project']}}&amp;year={{=request.vars['year']}}"); 
+                $("#activityDiv").load("{{=URL('activity_control','activity.html')}}?op=showInsert&amp;type={{=request.vars['type']}}&amp;project={{=request.vars['project']}}&amp;year={{=request.vars['year']}}"); 
               }
             }else{
               alert("{{=T('The end date must be greater than start date')}}");

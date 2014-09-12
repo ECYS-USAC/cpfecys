@@ -1,23 +1,22 @@
-{{try:}}
-	{{project_var = db(db.user_project.id == request.vars['assignation']).select().first() }}
-	{{var_project_id = project_var.project.id}}
-{{except:}}
-	{{var_project_id=project}}
-{{pass}}
-
 {{total_var2=0}}
-{{if auth.has_membership('Teacher'):}}
-	{{weighting =  db((db.course_activity_category.semester==semestre2.id) & (db.course_activity_category.assignation==var_project_id) & (db.course_activity_category.laboratory==False)).select()}}
+{{activityPermition=0}}
+{{if type=="class":}}
+	{{weighting1 =  db((db.course_activity_category.semester==semestre2.id) & (db.course_activity_category.assignation==project.id) & (db.course_activity_category.laboratory==False)).select()}}
 {{else:}}
-	{{weighting =  db((db.course_activity_category.semester==semestre2.id) & (db.course_activity_category.assignation==var_project_id) & (db.course_activity_category.laboratory==True)).select()}}
+	{{weighting1 =  db((db.course_activity_category.semester==semestre2.id) & (db.course_activity_category.assignation==project.id) & (db.course_activity_category.laboratory==True)).select()}}
 {{pass}}
 
-{{for project in weighting:}}
-	{{total_var2 = float(total_var2) + float(project.grade)}}				
+{{for category in weighting1:}}
+	{{total_var2 = float(total_var2) + float(category.grade)}}
+	{{if category.teacher_permition==True:}}
+		{{activityPermition=activityPermition+1}}
+	{{pass}}				
 {{pass}}
+
+
 
 {{if request.vars['operation'] == "div_update": }}
-		{{if auth.has_membership('Student'):}}
+		{{if auth.has_membership('Student') and assigned_to_project == True and type=="lab":}}
 			{{from datetime import datetime}}
 			{{enddate=None}}
 			{{for date_var in db((db.student_control_period.period_name==T(str(semester))+" "+str(year))).select():}}
@@ -34,90 +33,129 @@
 			<div id="table_activity">
 			</div>
 		{{else:}}
-			<b><font color="red">{{=T('You must first create the weighting')}}</font></b>
+			{{if (auth.has_membership('Student') or auth.has_membership('Teacher')) and assigned_to_project == True:}}
+				<b><font color="red">{{=T('You must first create the weighting')}}</font></b>
+			{{else:}}
+				<b><font color="red">{{=T('Exist a problem in the weighting, the activities can not show')}}</font></b>
+			{{pass}}
 		{{pass}}
 		
 	</center>
 {{pass}}
 
+
+
+
+
+
 {{if request.vars['operation'] == "menu_update": }}
-	<!--Check that the current date is in the period that de administrator has register-->
-	{{from datetime import datetime}}
 	{{var_do='false'}}
-	{{for date_var in db((db.student_control_period)).select():}}
-		{{if datetime.now() >= date_var.date_start and datetime.now() <= date_var.date_finish:}}
-			{{var_do='true'}}					
+	{{if auth.has_membership('Student'):}}
+		<!--Check that the current date is in the period that de administrator has register-->
+		{{from datetime import datetime}}
+		{{for date_var in db((db.student_control_period)).select():}}
+			{{if datetime.now() >= date_var.date_start and datetime.now() <= date_var.date_finish:}}
+				{{var_do='true'}}					
+			{{pass}}
 		{{pass}}
+		<!--End of the check of period-->
 	{{pass}}
-	<!--End of the check of period-->
+
+
+	{{exception_query = db(db.course_laboratory_exception.project == project.id).select().first()}}
+	{{exception_s_var = False}}
+	{{exception_t_var = False}}
+	{{no_menu=True}}
+
+	{{if exception_query is not None:}}
+		{{exception_t_var = exception_query.t_edit_lab}}
+		{{exception_s_var = exception_query.s_edit_course}}
+	{{pass}}
+
+	{{if (auth.has_membership('Super-Administrator')) or (auth.has_membership('Teacher') and request.vars['type'] == "class"  and assigned_to_project == True) or (auth.has_membership('Student') and request.vars['type'] == "lab"  and assigned_to_project == True) or (auth.has_membership('Student')  and request.vars['type'] == "class" and (exception_s_var == True  or activityPermition>0)  and assigned_to_project == True) or (auth.has_membership('Teacher')  and request.vars['type'] == "lab" and exception_t_var == True  and assigned_to_project == True):}}
+		{{no_menu=False}}
+	{{pass}}
 
 	<ul class="dropdown"  class="close" aria-hidden="true"  style="height:10px;">
-	  <a style="color:#f0ad4e;text-shadow:none;" class="dropdown-toggle" data-toggle="dropdown" href="">
-	    <span class="icon-list"></span>
-	  </a>
-	  <h3 class="icon-white" style="text-shadow: -1px 0 white, 0 1px white, 1px 0 white, 0 -1px white;">
-	      {{=T('Scheduler') }}
-	  </h3> 
-	  <ul class="dropdown-menu">  
+		<a style="color:#f0ad4e;text-shadow:none;" class="dropdown-toggle" data-toggle="dropdown" href="">
+	    	<span class="icon-list"></span>
+	  	</a>
+	  	<h3 class="icon-white" style="text-shadow: -1px 0 white, 0 1px white, 1px 0 white, 0 -1px white;">
+			{{=T('Scheduler') }}
+		</h3> 
+		<ul class="dropdown-menu">  
 	  	
 
-	  	<!--Create activity option-->
-  		{{if float(total_var2) == 100:}}
-			<li>
-				<a  tabindex="-1" title="{{=T('Create activity')}}" id="menu_create_activity" href="{{=URL('activity_control', 'students_control_full',vars=dict(assignation = request.vars['assignation'], project = request.vars['project'], year = request.vars['year'], f_view='activity_edit'))}}">
-		{{else:}}
-			<li class="disabled"> 
-				<a  tabindex="-1" title="{{=T('Create activity')}}" id="menu_create_activity">
+	  	{{import cpfecys}}
+	  	{{if cpfecys.current_year_period().id==semestre2.id:}}
+		  	{{if no_menu == False:}}
+				  	<!--Create activity option-->
+			  		{{if float(total_var2) == 100:}}
+						<li>
+							<a  tabindex="-1" title="{{=T('Create activity')}}" id="menu_create_activity" href="{{=URL('activity_control', 'students_control_full',vars=dict(project = request.vars['project'], year = request.vars['year'], f_view='activity_edit',type=request.vars['type']))}}">
+					{{else:}}
+						<li class="disabled"> 
+							<a  tabindex="-1" title="{{=T('Create activity')}}" id="menu_create_activity">
+					{{pass}}
+						<span class="icon-plus-sign"></span>{{=T('Create Activity')}}
+						</a>
+					</li>
+					<!--Create activity option-->
+
+					<!--Edit activity option-->
+			      	{{if float(total_var2) == 100 and auth.has_membership('Student')==True and request.vars['type']=="lab":}}
+			      		{{if var_do=='true':}}
+							<li>
+								<a tabindex="-1"  title="{{=T('Modify activity')}}" id="menu_edit_activity" href="{{=URL('activity_control', 'students_control_full',vars=dict(project = request.vars['project'], year = request.vars['year'], f_view='activity_edit',type=request.vars['type']))}}"> 
+						{{else:}}
+							<li class="disabled"> 
+								<a tabindex="-1"  title="{{=T('Modify activity')}}">
+						{{pass}}
+					{{elif float(total_var2)==100:}}
+						<li>
+							<a tabindex="-1"  title="{{=T('Modify activity')}}" id="menu_edit_activity" href="{{=URL('activity_control', 'students_control_full',vars=dict(project = request.vars['project'], year = request.vars['year'], f_view='activity_edit',type=request.vars['type']))}}">
+					{{else:}}
+						<li class="disabled"> 
+							<a tabindex="-1"  title="{{=T('Modify activity')}}">
+					{{pass}}
+				          <span class="icon-edit" ></span>
+				          {{=T('Edit Activity')}}
+				        </a>
+				     </li>
+				     <!--Edit activity option-->
+
+				{{if auth.has_membership('Student') and request.vars['type']=="lab":}}
+				     <!--Change request option-->
+			    	{{if var_do == 'false' and float(total_var2) == 100:}}
+			    		<li>
+			    			<a role="button" title="{{=T('Request that the changes be reviewed by the professor or administrator')}}" aria-hidden="true" href="{{=URL('activity_control', 'request_change_activity',vars=dict(project = request.vars['project'], year = request.vars['year'],type=request.vars['type']))}}" >
+								<span class="icon-black icon-fullscreen"></span>
+								{{=T('Change Request')}}
+							</a>
+						</li>
+			    	{{else:}}
+			    		<li class="disabled"> 
+							<a tabindex="-1"  title="{{=T('Request that the changes be reviewed by the professor or administrator')}}">
+								<span class="icon-check" ></span>
+					          {{=T('Change Request')}}
+					        </a>
+				      	</li>
+			    	{{pass}}
+				    <!--Change request option-->
+			    {{pass}}
+			{{pass}}
 		{{pass}}
-			<span class="icon-plus-sign"></span>{{=T('Create Activity')}}
-			</a>
-		</li>
-		<!--Create activity option-->
 
 
-		<!--Edit activity option-->
-      	{{if float(total_var2) == 100 and auth.has_membership('Teacher'):}}
-			<li>
-				<a tabindex="-1"  title="{{=T('Modify activity')}}" href="{{=URL('activity_control', 'students_control_full',vars=dict(assignation = request.vars['assignation'], project = request.vars['project'], year = request.vars['year'], f_view='activity_edit'))}}"> 
-		{{elif float(total_var2) == 100 and var_do =='true':}}
-			<li>
-				<a tabindex="-1"  title="{{=T('Modify activity')}}" href="{{=URL('activity_control', 'students_control_full',vars=dict(assignation = request.vars['assignation'], project = request.vars['project'], year = request.vars['year'], f_view='activity_edit'))}}"> 
-		{{else:}}
-		<li class="disabled"> 
-			<a tabindex="-1"  title="{{=T('Modify activity')}}">
+		{{if float(total_var2) == 100:}}
+		    <li>
+				<a tabindex="-1"  title="{{=T('General Report of Activities')}}" href="{{=URL('activity_control', 'General_report_activities',vars=dict(project = request.vars['project'], period = request.vars['year']))}}"> 
+					<span class="icon-folder-open"></span>
+				{{=T('General Report of Activities')}}
+				</a>
+			</li>
 		{{pass}}
-	          <span class="icon-edit" ></span>
-	          {{=T('Edit Activity')}}
-	        </a>
-	     </li>
-	     <!--Edit activity option-->
 
-
-	     <!--Change request option-->
-	    {{if auth.has_membership('Teacher'):}}
-	    	{{None}}
-	    {{else:}}
-	    	{{if var_do == 'false' and float(total_var2) == 100:}}
-	    		<li>
-	    			<a role="button" title="{{=T('Request that the changes be reviewed by the professor or administrator')}}" aria-hidden="true" href="{{=URL('activity_control', 'request_change_activity',vars=dict(assignation = request.vars['assignation'], project = request.vars['project'], year = request.vars['year']))}}" >
-						<span class="icon-black icon-fullscreen"></span>
-						{{=T('Change Request')}}
-					</a>
-					<!--<a tabindex="-1"  title="{{=T('Request that the changes be reviewed by the professor or administrator')}}" href="#changeRequestActivity" role="button"  data-toggle="modal" data-target="#changeRequestActivity"  id="menu_re_activity">
-			          <span class="icon-check" ></span>
-			          {{=T('Change Request')}}
-			        </a>-->
-				</li>
-	    	{{else:}}
-	    		<li class="disabled"> 
-					<a tabindex="-1"  title="{{=T('Request that the changes be reviewed by the professor or administrator')}}">
-						<span class="icon-check" ></span>
-			          {{=T('Change Request')}}
-			        </a>
-		      	</li>
-	    	{{pass}}
-	    {{pass}}
-		<!--Change request option-->
 
 	  </ul>
 	</ul> 
@@ -125,11 +163,10 @@
 
 <script type="text/javascript">
   	$(document).ready(function(){
-  		
-		$("#table_activity").load("{{=URL('activity_control','activity.html')}}?op=showTableNoEditable&amp;project={{=request.vars['project']}}&amp;year={{=request.vars['year']}}&amp;assignation={{=request.vars['assignation']}}");
+		$("#table_activity").load("{{=URL('activity_control','activity.html')}}?op=showTableNoEditable&amp;project={{=request.vars['project']}}&amp;year={{=request.vars['year']}}&amp;type={{=request.vars['type']}}");
 
 		$("#menu_edit_activity").click(function(){
-	      $("#div_activity_show").load("{{=URL('activity_control','activity.html')}}?op=showEditTable&amp;project={{=request.vars['project']}}&amp;year={{=request.vars['year']}}&amp;assignation={{=request.vars['assignation']}}"); 
+	      $("#div_activity_show").load("{{=URL('activity_control','activity.html')}}?op=showEditTable&amp;project={{=request.vars['project']}}&amp;year={{=request.vars['year']}}&amp;type={{=request.vars['type']}}"); 
 	    })
 	    
 	
