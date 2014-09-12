@@ -864,16 +864,17 @@
 														{{average=float(d0['average'])}}
 													{{pass}}
 												{{pass}}
-												<center><b>
-												{{if average < float(61):}}
-												<FONT COLOR="Red">
-												{{elif average>float(61) and average < float(90):}}
-												<FONT COLOR="#5E610B">
-												{{else:}}
-												<FONT COLOR="Green">
-												{{pass}}
-													{{=average}}
-												</font></b></center>
+												<center>
+													{{if average < float(61):}}
+														<span class="label label-important">
+													{{elif average>float(61) and average < float(90):}}
+														<span class="label label-warning">
+													{{else:}}
+														<span class="label label-success">
+													{{pass}}
+														{{=average}}
+													</span>
+												</center>
 												<!--Average of the grades of the activity-->
 											</td>
 											{{if no_menu==False:}}
