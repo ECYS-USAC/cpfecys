@@ -1,5 +1,5 @@
 @auth.requires_login()
-@auth.requires(auth.has_membership('Student') or auth.has_membership('Teacher') or auth.has_membership('Super-Administrator') or auth.has_membership('Academic'))
+@auth.requires(auth.has_membership('Student') or auth.has_membership('Teacher') or auth.has_membership('Super-Administrator') or auth.has_membership('Academic') or auth.has_membership('Ecys-Administrator'))
 def courses_list():
     area = db(db.area_level.name=='DTT Tutor Académico').select().first()
     coursesAdmin = None
@@ -75,7 +75,7 @@ def courses_list():
 
 
 @auth.requires_login()
-@auth.requires(auth.has_membership('Student') or auth.has_membership('Teacher') or auth.has_membership('Super-Administrator'))
+@auth.requires(auth.has_membership('Student') or auth.has_membership('Teacher') or auth.has_membership('Super-Administrator') or auth.has_membership('Ecys-Administrator'))
 def students_control():
     #vars
     year = None
@@ -507,7 +507,7 @@ def activityRequest():
 
 
 @auth.requires_login()
-@auth.requires(auth.has_membership('Student') or auth.has_membership('Teacher') or auth.has_membership('Super-Administrator') or auth.has_membership('Academic'))
+@auth.requires(auth.has_membership('Student') or auth.has_membership('Teacher') or auth.has_membership('Super-Administrator') or auth.has_membership('Academic') or auth.has_membership('Ecys-Administrator'))
 def General_report_activities():
     #vars
     year = None
