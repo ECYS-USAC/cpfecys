@@ -67,11 +67,38 @@ if auth.has_membership(role="Super-Administrator"):
              ]),
     ])
 if auth.has_membership(role="Teacher"):
-    response.menu.extend([(T('Courses'), False, URL('teacher', 'courses'), []),
-    (T('Reports Pending Grading'), False, URL('teacher', 'todo_reports'), []),
+    response.menu.extend([(T('Courses'), False, URL(),[
+             (T('Show Students'), False, URL('teacher', 'courses'), []),
+             (T('Show Academic'), False, URL(), [
+                (T('Academic per Course'), False, URL('student_academic', 'student_courses'), []),
+                (T('General List of Academic'), False, URL('student_academic','academic'), []),    
+             ]),
+             (T('Academic Control')+"", False, URL(), [
+                (T('Academic Control'), False, URL('activity_control','courses_list'), []),
+                (T('Request control'), False, URL('activity_control','courses_list_request'), []),]),
+             ]),
+        (T('Reports Pending Grading'), False, URL('teacher', 'todo_reports'), []),
     ])
+
 if auth.has_membership(role="Student"):
-    response.menu.extend([(T('My Final Practice'), False, URL('student', 'index'), [])])
+    response.menu.extend([(T('My Final Practice'), False, URL(),[
+             (T('My Final Practice'), False, URL('student', 'index'), []),
+             (T('Show Academic'), False, URL(), [
+                (T('Academic per Course'), False, URL('student_academic', 'student_courses'), []),
+                (T('General List of Academic'), False, URL('student_academic','academic'), []),    
+             ]),             
+             (T('Notices'), False, URL(), [
+              (T('Send Notice'), False, URL('notification','courses_mail_notifications'), []),
+              (T('Register Notices'), False, URL('notification', 'register_mail_notifications'), []),
+             ]),
+             (T('Events'), False, URL(), [
+                (T('View Events'), False, URL('default','events'), []),
+                (T('Insert Events'), False, URL('default', 'event_edition'), []),
+              ])
+             ]),
+            (T('Academic Control')+"", False, URL('activity_control','courses_list'), []),
+    ])
+
 if auth.has_membership(role="DSI") and \
  not auth.has_membership(role="Super-Administrator"):
     response.menu.extend([(T('DSI tasks'), False, URL('dsi', 'index'), [])])
@@ -82,27 +109,12 @@ if not (auth.is_logged_in()):
     user_menu.append((T('Events'), False, URL(), [
         (T('View Events'), False, URL('default','events'), []),
         ]))
-if auth.has_membership(role="Student"):
-    user_menu.append((T('Events'), False, URL(), [
-    (T('View Events'), False, URL('default','events'), []),
-    (T('Insert Events'), False, URL('default', 'event_edition'), []),
-    ]))
-if auth.has_membership(role="Student") or auth.has_membership(role="Teacher"):
-    user_menu.append((T('Academic'), False, URL(), [
-    (T('Academic per Course'), False, URL('student_academic', 'student_courses'), []),
-    (T('General List of Academic'), False, URL('student_academic','academic'), []),    
-    ]))
+ 
 if auth.has_membership(role="Super-Administrator"):
     user_menu.append((T('Academic'), False, URL(), [
     (T('General List of Academic'), False, URL('student_academic','academic'), []),    
     ]))
-if auth.has_membership(role="Student"):
-    user_menu.append((T('Students control'), False, URL('activity_control','courses_list'), []),) 
-if auth.has_membership(role="Teacher"):
-    user_menu.append((T('Students control'), False, URL(), [
-    (T('Students control'), False, URL('activity_control','courses_list'), []),
-    (T('Request control'), False, URL('activity_control','courses_list_request'), []),
-    ]))
+
 if auth.has_membership(role="Super-Administrator"):
     user_menu.append((T('Students control'), False, URL(), [
     (T('Students control'), False, URL('activity_control','courses_list'), []),
@@ -115,12 +127,7 @@ if auth.has_membership(role="Super-Administrator"):
     (T('Course and Laboratory Exceptions'), False, URL('activity_control','course_laboratory_exception'), []),
     (T('Course Time Limit Exception'), False, URL('activity_control','course_limit_exception'), []),
     (T('Period'), False, URL('activity_control','student_control_period'), []),    
-    ]))
-if auth.has_membership(role="Student"):
-    user_menu.append((T('Notices'), False, URL(), [
-    (T('Send Notice'), False, URL('notification','courses_mail_notifications'), []),
-    (T('Register Notices'), False, URL('notification', 'register_mail_notifications'), []),
-    ]))
+    ]))   
 if auth.has_membership(role="Student") or auth.has_membership(role="Teacher"):
     user_menu.append((T('Library'), False, URL('library','file_managers',vars=dict(tipo=0, pro=0)), []),)
 if auth.has_membership(role="Teacher"):

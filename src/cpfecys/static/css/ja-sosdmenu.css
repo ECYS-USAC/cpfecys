@@ -43,7 +43,7 @@ The second part will define the visual look for this menu.
 }
 
 #ja-mainnav li ul ul { /* third-and-above-level lists */
-	margin: -42px 0 0 200px;
+	margin: -41px 0 0 201px;
 }
 
 #ja-mainnav li:hover ul ul,
@@ -103,6 +103,7 @@ The second part will define the visual look for this menu.
 
 /* -------- sub-levels -------- */
 #ja-mainnav ul ul li {
+	width: 200px;
 	border-left: 1px solid #666666;
 	border-right: 1px solid #333333;
 	border-top: 1px solid #666666;
