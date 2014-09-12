@@ -139,6 +139,12 @@ def control_students_grades():
         session.flash = T('Not valid Action.')
         redirect(URL('default', 'index'))
 
+    if auth.has_membership('Super-Administrator') == False and auth.has_membership('Ecys-Administrator'):
+        assigantion = db((db.user_project.assigned_user == auth.user.id) & (db.user_project.period == var_period.id) & (db.user_project.project == var_project.id)).select().first()
+        if assigantion is None:
+            session.flash=T('You do not have permission to view course requests')
+            redirect(URL('default','index'))
+     
     if var_activity.laboratory == True:
         academic_assig =  db((db.academic_course_assignation.assignation==id_project) & (db.academic_course_assignation.semester==id_year) &  (db.academic_course_assignation.laboratorio==True)).select()
     else:
