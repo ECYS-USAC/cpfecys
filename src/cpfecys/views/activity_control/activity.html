@@ -86,7 +86,6 @@
 		{{actualSemester = db(db.period_year.id==semestre2).select().first()}}
 		{{comparacion = T(actualSemester.period.name)+" "+str(actualSemester.yearp)}}
 		{{date_var = db((db.student_control_period.period_name==comparacion)).select().first()}}
-
 		{{if date1>= date_var.date_start_semester and date2<= date_var.date_finish_semester:}}
 			{{comprobation=False}}
 			{{if auth.has_membership('Student')==False:}}
@@ -95,15 +94,20 @@
 				{{if request.vars['type'] == "class":}}
 					{{comprobation=True}}
 				{{else:}}
+					{{print 1}}
 					{{activityTemp = db(db.course_activity.id==int(request.vars['var_id'])).select().first()}}
+					{{print 11}}
 					{{categoryTemp = db((db.course_activity_category.semester==semestre2.id) & (db.course_activity_category.assignation==var_project_id) & (db.course_activity_category.id==activityTemp.course_activity_category)).select().first()}}
-					{{categoryTemp = db((db.course_activity_category.semester==semestre2.id) & (db.course_activity_category.assignation==var_project_id) & (db.course_activity_category.id==int(request.vars['activityTemp.course_activity_category']))).select().first()}}
+					{{print 111}}
+					{{categoryTemp = db((db.course_activity_category.semester==semestre2.id) & (db.course_activity_category.assignation==var_project_id) & (db.course_activity_category.id==int(activityTemp.course_activity_category))).select().first()}}
+					{{print 1111}}
 					{{dateC1=None}}
 					{{dateC2=None}}
 					{{maximTimeCategory = db.executesql('SELECT DATE_ADD(\''+str(date1)+'\', INTERVAL '+str(categoryTemp.category.timeout)+' Day) as fecha;',as_dict=True)}}
 					{{for d0 in maximTimeCategory:}}
 						{{dateC1=d0['fecha']}}
 					{{pass}}
+					{{print 3}}
 					{{if str(date2)>str(dateC1):}}
 						<center>
 							<span id="information_text" class="badge badge-important">{{=T('The maximum number of days of activities in this category is')}} {{=str(categoryTemp.category.timeout)}}</span>
@@ -123,6 +127,7 @@
 					{{pass}}
 				{{pass}}
 			{{pass}}
+			{{print 020}}
 			{{if comprobation==True:}}
 				{{activityOldR=db(db.course_activity.id==request.vars['var_id']).select().first()}}
 			    {{if request.vars['type'] == "class":}}
