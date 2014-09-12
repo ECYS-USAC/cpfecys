@@ -3,19 +3,35 @@
 <script src="{{=URL('static','js')}}/jquery.js"></script>
 <script src="{{=URL('static','js')}}/jquery-ui.js"></script>
 <div class="well ">
-<h1>
-	{{=T('Grades')}}
-	<a href="#myModal" role="button" class="btn btn-primary" data-toggle="modal">
-		<span class="icon-white icon-question-sign"></span>
-	</a>
-  <br>
-</h1>
+  <table style="width:100%;" >
+    <tr>
+      <td>
+        <div>
+          <h1>
+            {{=T('Grades')}}
+            <a href="#myModal" role="button" class="btn btn-primary" data-toggle="modal">
+              <span class="icon-white icon-question-sign"></span>
+            </a>
+            <br>
+          </h1>
+        </div>
+      </td>
+      <td>
+        <div align="right">
+          <a onclick="window.history.back()" class="btn" ><i class="icon-arrow-left"></i>{{=T('Back')}}</a>
+        </div>
+      </td>
+      
+    </tr>
+  </tabe>
+  
+
 
 <table class="table table-striped table-bordered">
   <tr>
     <th colspan="4">
       <center>
-        {{=str(var_activity.name)}}
+        <h5>{{=str(var_activity.name)}}</h5>
       </center>
     </th>
   </tr>

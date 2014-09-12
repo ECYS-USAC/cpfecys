@@ -139,7 +139,10 @@ def control_students_grades():
         session.flash = T('Not valid Action.')
         redirect(URL('default', 'index'))
 
-    academic_assig =  db((db.academic_course_assignation.assignation==id_project) & (db.academic_course_assignation.semester==id_year) &  (db.academic_course_assignation.laboratorio==var_activity.laboratory)).select()
+    if var_activity.laboratory == True:
+        academic_assig =  db((db.academic_course_assignation.assignation==id_project) & (db.academic_course_assignation.semester==id_year) &  (db.academic_course_assignation.laboratorio==True)).select()
+    else:
+        academic_assig =  db((db.academic_course_assignation.assignation==id_project) & (db.academic_course_assignation.semester==id_year)).select()
 
     return dict(academic_assig=academic_assig, var_period=var_period, var_activity=var_activity, var_project=var_project)
 
@@ -166,7 +169,11 @@ def grades():
         session.flash = T('Not valid Action.')
         redirect(URL('default', 'index'))
 
-    academic_assig =  db((db.academic_course_assignation.assignation==id_project) & (db.academic_course_assignation.semester==id_year) &  (db.academic_course_assignation.laboratorio==var_activity.laboratory)).select()
+    if var_activity.laboratory == True:
+        academic_assig =  db((db.academic_course_assignation.assignation==id_project) & (db.academic_course_assignation.semester==id_year) &  (db.academic_course_assignation.laboratorio==True)).select()
+    else:
+        academic_assig =  db((db.academic_course_assignation.assignation==id_project) & (db.academic_course_assignation.semester==id_year)).select()
+
 
     return dict(academic_assig=academic_assig, var_period=var_period, var_activity=var_activity, var_project=var_project)
 

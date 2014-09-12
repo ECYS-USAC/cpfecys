@@ -7,8 +7,8 @@
   {{try:}}
     {{academic_var =  db(db.academic.carnet==request.vars['carnet']).select().first()}}
 
-    
-      {{assig_var =  db((db.academic_course_assignation.assignation==var_project.id) & (db.academic_course_assignation.semester==var_period.id) &  (db.academic_course_assignation.laboratorio==var_activity.laboratory) & (db.academic_course_assignation.carnet == academic_var.id)).select().first()}}
+      {{assig_var =  db((db.academic_course_assignation.assignation==var_project.id) & (db.academic_course_assignation.semester==var_period.id) & (db.academic_course_assignation.carnet == academic_var.id)).select().first()}}
+
       {{grade = db.grades.insert(academic_assignation = assig_var.id,
                           activity = var_activity.id,
                           grade =  request.vars['grade'])}}
@@ -26,9 +26,15 @@
 
       
     {{except:}}
-      <script type="text/javascript">
-        jQuery("#information_text").append('{{=T('Failed to add grade')}}'+" | Carnet: '{{=request.vars['carnet']}}' {{=T('not exist')}}");
-      </script>
+      {{if academic_var is None:}}
+        <script type="text/javascript">
+          jQuery("#information_text").append('{{=T('Failed to add grade')}}'+" | Carnet: '{{=request.vars['carnet']}}' {{=T('not exist')}}");
+        </script>
+      {{else:}}
+        <script type="text/javascript">
+          jQuery("#information_text").append('{{=T('Failed to add grade')}}');
+        </script>
+      {{pass}}
     {{pass}}
     {{request.vars['op']="view_grades"}}
 
@@ -61,7 +67,7 @@
         {{=academic.carnet.carnet}}
       </td>
       
-      {{var_grade = db(db.grades.academic_assignation==academic.id).select().first()}}
+      {{var_grade = db((db.grades.academic_assignation==academic.id) & (db.grades.activity==var_activity.id)).select().first()}}
       {{if var_grade is None:}}
         <td style="width:25%;">
         </td>
