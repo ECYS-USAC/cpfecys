@@ -240,6 +240,8 @@
 <!--DELETE ACTIVITY-->
 {{if request.vars['op'] == "removeActivity": }}
 	{{activity_var = db(db.course_activity.id == request.vars['var_id']).select().first()}}
+
+
 	{{rolLog=''}}
 	{{if auth.has_membership('Super-Administrator')==True:}}
 		{{rolLog='Super-Administrator'}}
@@ -621,11 +623,9 @@
 									<th>
 										{{=T('End Time')}}
 									</th>
-									{{if request.vars['type'] == 'class':}}
-										<th title="{{=T('Teacher Permition')}}">
-											{{=T('TP')}}
-										</th>
-									{{pass}}
+									<th title="{{=T('Teacher Permition')}}">
+										{{=T('TP')}}
+									</th>
 									{{if request.vars['op'] == "showTableNoEditable":}}
 										{{if no_menu==False or assigned_to_project==True:}}
 										<th>
@@ -819,7 +819,7 @@
 												<center>
 												{{if auth.has_membership('Student'):}}
 													{{if request.vars['type']=="lab" or exception_s_var == True or tAct.teacher_permition==True or tAct.course_activity_category.teacher_permition==True:}}
-														<a id="gradeButton" role="button" class="badge btn-info" onclick="addGrade({{=tAct.id}});"> 
+														<a id="gradeButton" role="button" class="badge btn-info" href="{{=URL('activity_control','control_students_grades', vars=dict(project=project_var.id, year=semestre2.id, activity=tAct.id))}}">
 								                    		<span class="icon-white icon-edit"></span>{{=T('Grades')}}
 								                    	</a>
 													{{else:}}
@@ -828,7 +828,7 @@
 														<!--Grade of the activity-->
 													{{pass}}
 												{{else:}}
-													<a id="gradeButton" role="button" class="badge btn-info" onclick="addGrade({{=tAct.id}});"> 
+													<a id="gradeButton" role="button" class="badge btn-info" href="{{=URL('activity_control','control_students_grades', vars=dict(project=project_var.id, year=semestre2.id, activity=tAct.id))}}">
 							                    		<span class="icon-white icon-edit"></span>{{=T('Grades')}}
 							                    	</a>
 												{{pass}}
