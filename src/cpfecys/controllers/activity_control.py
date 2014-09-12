@@ -93,7 +93,7 @@ def students_control():
 
 
     project_var = request.vars['project']
-    if auth.has_membership('Super-Administrator') == False and auth.has_membership('Ecys-Administrator'):
+    if auth.has_membership('Super-Administrator') == False and auth.has_membership('Ecys-Administrator') == False :
         assigantion = db((db.user_project.assigned_user == auth.user.id) & (db.user_project.period == year.id) & (db.user_project.project == project_var)).select().first()
         
         if assigantion is None:
@@ -139,12 +139,19 @@ def control_students_grades():
         session.flash = T('Not valid Action.')
         redirect(URL('default', 'index'))
 
-    if auth.has_membership('Super-Administrator') == False and auth.has_membership('Ecys-Administrator'):
+    if auth.has_membership('Super-Administrator') == False and auth.has_membership('Ecys-Administrator') == False :
         assigantion = db((db.user_project.assigned_user == auth.user.id) & (db.user_project.period == var_period.id) & (db.user_project.project == var_project.id)).select().first()
-        if assigantion is None:
-            session.flash=T('You do not have permission to view course requests')
-            redirect(URL('default','index'))
-     
+        #exception_query = db(db.course_laboratory_exception.project == id_project).select().first()
+        #if exception_query is None:
+        #    exception_s_var = False
+        #    exception_t_var = False
+        #else:
+        #    exception_t_var = exception_query.t_edit_lab
+        #    exception_s_var = exception_query.s_edit_course
+        #if (assigantion is None): #or (auth.has_membership('Teacher') and var_activity.laboratory == True and exception_t_var == False) or (auth.has_membership('Student') and var_activity.laboratory == False and exception_s_var == False):
+        #    session.flash=T('You do not have permission to view course requests')
+        #    redirect(URL('default','index'))
+        
     if var_activity.laboratory == True:
         academic_assig =  db((db.academic_course_assignation.assignation==id_project) & (db.academic_course_assignation.semester==id_year) &  (db.academic_course_assignation.laboratorio==True)).select()
     else:
@@ -286,7 +293,7 @@ def students_control_full():
     year = db(db.period_year.id == request.vars['year']).select().first() 
 
     project_var = request.vars['project']
-    if auth.has_membership('Super-Administrator') == False and auth.has_membership('Ecys-Administrator'):
+    if auth.has_membership('Super-Administrator') == False and auth.has_membership('Ecys-Administrator') == False :
         assigantion = db((db.user_project.assigned_user == auth.user.id) & (db.user_project.period == year.id) & (db.user_project.project == project_var)).select().first()
         
         if assigantion is None:

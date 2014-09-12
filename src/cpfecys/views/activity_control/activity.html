@@ -868,20 +868,21 @@
 														{{average=float(d0['average'])}}
 													{{pass}}
 												{{pass}}
-
+												
 												{{actualSemester = db(db.period_year.id==semestre2).select().first()}}
 												{{comparacion = T(actualSemester.period.name)+" "+str(actualSemester.yearp)}}
 												{{controlP = db((db.student_control_period.period_name==comparacion)).select().first()}}
-												<center><b>
+												<center>
 												{{if average < controlP.min_average:}}
-												<FONT COLOR="Red">
+												<span class="label label-important">
 												{{elif average>controlP.min_average and average < controlP.max_average:}}
-												<FONT COLOR="#5E610B">
+												<span class="label label-warning">
 												{{else:}}
-												<FONT COLOR="Green">
+												<span class="label label-success">
 												{{pass}}
 													{{=average}}
-												</font></b></center>
+													</span>
+												</center>
 												<!--Average of the grades of the activity-->
 											</td>
 											{{if no_menu==False:}}
