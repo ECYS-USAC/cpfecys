@@ -822,6 +822,26 @@ db.define_table('course_limit_exception',
 )
 
 
+db.define_table('grades',    
+    Field('academic_assignation', 'reference academic_course_assignation', notnull=True, label = T('Academic Assignation')),
+    Field('grade', 'decimal(5,2)', notnull=False, label=T('Grade')),
+)
+
+db.define_table('grades_log',
+    Field('user_name', 'text', notnull = False, label = 'Usuario'),
+    Field('roll', 'text', notnull = False, label = 'Rol'),
+    Field('operation_log', 'text', notnull = False, label = 'Operacion'),
+    Field('course', 'text', notnull=False, label='Curso'),
+    Field('yearp', 'text', notnull=False, label='yearp'),
+    Field('period', 'text', notnull=False, label='Periodo'),
+    Field('before_grade', 'decimal(5,2)', notnull=False, label='Nota Anterior'),
+    Field('after_grade', 'decimal(5,2)', notnull=False, label='Nota Actual'),
+    Field('date_log', 'datetime', notnull = True, default = datetime.datetime.now(), label = 'Fecha')
+)
+
+
+
+
 ## after defining tables, uncomment below to enable auditing
     # auth.enable_record_versioning(db)
 # automatic forcing spanish language

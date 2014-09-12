@@ -79,12 +79,61 @@ def courses_list():
 
 #**************************************************************************************************************************************************************************
 #**************************************************************************************************************************************************************************
-#**************************************************************************************************************************************************************************
-#**************************************************************************************************************************************************************************
-#**************************************************************************************************************************************************************************
-#**************************************************************************************************************************************************************************
+#************************************************************************************************************************************************************************
+#*******************grades********************************************************************************************************************************************
+
+@auth.requires_login()
+@auth.requires(auth.has_membership('Student') or auth.has_membership('Teacher') or auth.has_membership('Super-Administrator') or auth.has_membership('Ecys-Administrator'))
+def control_students_grades():
+    id_activity = role = request.vars['activity']
+    id_project = role = request.vars['project']
+    id_year = role = request.vars['year']
+
+    var_period = db(db.period_year.id==id_year).select().first()
+    if not var_period:
+        session.flash = T('Not valid Action.')
+        redirect(URL('default', 'index'))
+
+    var_activity = db(db.course_activity.id==id_activity).select().first()
+    if not var_activity:
+        session.flash = T('Not valid Action.')
+        redirect(URL('default', 'index'))
+
+    var_project = db(db.project.id==id_project).select().first()
+    if not var_project:
+        session.flash = T('Not valid Action.')
+        redirect(URL('default', 'index'))
+
+    academic_assig =  db((db.academic_course_assignation.assignation==id_project) & (db.academic_course_assignation.semester==id_year) &  (db.academic_course_assignation.laboratorio==var_activity.laboratory)).select()
+
+    return dict(academic_assig=academic_assig, var_period=var_period, var_activity=var_activity, var_project=var_project)
 
 
+@auth.requires_login()
+@auth.requires(auth.has_membership('Student') or auth.has_membership('Teacher') or auth.has_membership('Super-Administrator') or auth.has_membership('Ecys-Administrator'))
+def grades():
+    id_activity = role = request.vars['activity']
+    id_project = role = request.vars['project']
+    id_year = role = request.vars['year']
+
+    var_period = db(db.period_year.id==id_year).select().first()
+    if not var_period:
+        session.flash = T('Not valid Action.')
+        redirect(URL('default', 'index'))
+
+    var_activity = db(db.course_activity.id==id_activity).select().first()
+    if not var_activity:
+        session.flash = T('Not valid Action.')
+        redirect(URL('default', 'index'))
+
+    var_project = db(db.project.id==id_project).select().first()
+    if not var_project:
+        session.flash = T('Not valid Action.')
+        redirect(URL('default', 'index'))
+
+    academic_assig =  db((db.academic_course_assignation.assignation==id_project) & (db.academic_course_assignation.semester==id_year) &  (db.academic_course_assignation.laboratorio==var_activity.laboratory)).select()
+
+    return dict(academic_assig=academic_assig, var_period=var_period, var_activity=var_activity, var_project=var_project)
 
 
 
@@ -103,6 +152,7 @@ def course_laboratory_exception():
     query = db.course_laboratory_exception
     grid = SQLFORM.grid(query, maxtextlength=100,csv=False)
     return dict(grid=grid)
+
 
 @auth.requires_login()
 @auth.requires_membership('Super-Administrator')
@@ -160,12 +210,12 @@ def admin_courses_list():
 
 
 @auth.requires_login()
-@auth.requires(auth.has_membership('Student') or auth.has_membership('Teacher') or auth.has_membership('Super-Administrator'))
+@auth.requires(auth.has_membership('Student') or auth.has_membership('Teacher') or auth.has_membership('Super-Administrator') or auth.has_membership('Ecys-Administrator'))
 def students_control():
     import cpfecys
     year = cpfecys.current_year_period().id
     project_var = request.vars['project']
-    if auth.has_membership('Super-Administrator') == False:
+    if auth.has_membership('Super-Administrator') == False and auth.has_membership('Ecys-Administrator'):
         assigantion = db((db.user_project.assigned_user == auth.user.id) & (db.user_project.period == year) & (db.user_project.project == project_var)).select().first()
         
         if assigantion is None:
@@ -210,7 +260,7 @@ def students_control_full():
     year = db(db.period_year.id == request.vars['year']).select().first() 
 
     project_var = request.vars['project']
-    if auth.has_membership('Super-Administrator') == False:
+    if auth.has_membership('Super-Administrator') == False and auth.has_membership('Ecys-Administrator'):
         assigantion = db((db.user_project.assigned_user == auth.user.id) & (db.user_project.period == year.id) & (db.user_project.project == project_var)).select().first()
         
         if assigantion is None:
@@ -361,7 +411,7 @@ def request_change_activity():
 
 
 @auth.requires_login()
-@auth.requires(auth.has_membership('Super-Administrator') or auth.has_membership('Teacher'))
+@auth.requires(auth.has_membership('Super-Administrator') or auth.has_membership('Ecys-Administrator') or auth.has_membership('Teacher'))
 def courses_list_request():
     import cpfecys
     def split_name(project):
@@ -385,14 +435,14 @@ def courses_list_request():
     courses_request=None
     if auth.has_membership('Teacher'):
         courses_request = db((db.user_project.assigned_user == auth.user.id) & (db.user_project.period == cpfecys.current_year_period().id) & (db.user_project.project==db.project.id) & (db.project.area_level==area.id)).select()
-    if auth.has_membership('Super-Administrator'):
+    if auth.has_membership('Super-Administrator') or auth.has_membership('Ecys-Administrator'):
         courses_request = db(db.project.area_level==area.id).select()
 
     return dict(courses_request = courses_request, split_name=split_name, split_section=split_section)
 
 
 @auth.requires_login()
-@auth.requires(auth.has_membership('Super-Administrator') or auth.has_membership('Teacher'))
+@auth.requires(auth.has_membership('Super-Administrator') or auth.has_membership('Ecys-Administrator') or auth.has_membership('Teacher'))
 def solve_request_change_activity():
     import cpfecys
     #Obtain the course that want to view the request
@@ -431,7 +481,7 @@ def solve_request_change_activity():
 
 
 @auth.requires_login()
-@auth.requires(auth.has_membership('Super-Administrator') or auth.has_membership('Teacher'))
+@auth.requires(auth.has_membership('Super-Administrator') or auth.has_membership('Ecys-Administrator') or auth.has_membership('Teacher'))
 def activityRequest():
     import cpfecys
     currentyear_period = cpfecys.current_year_period()
