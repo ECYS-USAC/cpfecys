@@ -824,6 +824,7 @@ db.define_table('course_limit_exception',
 
 db.define_table('grades',    
     Field('academic_assignation', 'reference academic_course_assignation', notnull=True, label = T('Academic Assignation')),
+    Field('activity', 'reference course_activity', notnull=True, label = T('Activity')),    
     Field('grade', 'decimal(5,2)', notnull=False, label=T('Grade')),
 )
 

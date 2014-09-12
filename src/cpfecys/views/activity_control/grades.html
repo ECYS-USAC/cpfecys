@@ -10,6 +10,7 @@
     
       {{assig_var =  db((db.academic_course_assignation.assignation==var_project.id) & (db.academic_course_assignation.semester==var_period.id) &  (db.academic_course_assignation.laboratorio==var_activity.laboratory) & (db.academic_course_assignation.carnet == academic_var.id)).select().first()}}
       {{grade = db.grades.insert(academic_assignation = assig_var.id,
+                          activity = var_activity.id,
                           grade =  request.vars['grade'])}}
 
       {{if grade != None:}}
