@@ -1,0 +1,209 @@
+{{extend 'template.html'}}
+<link rel="stylesheet" href="{{=URL('static','css')}}/jquery-ui.css">
+<script src="{{=URL('static','js')}}/jquery.js"></script>
+<script src="{{=URL('static','js')}}/jquery-ui.js"></script>
+<div class="well ">
+<h1>
+	{{=T('Grades')}}
+	<a href="#myModal" role="button" class="btn btn-primary" data-toggle="modal">
+		<span class="icon-white icon-question-sign"></span>
+	</a>
+  <br>
+</h1>
+
+<table class="table table-striped table-bordered">
+  <tr>
+    <th colspan="4">
+      <center>
+        {{=str(var_activity.name)}}
+      </center>
+    </th>
+  </tr>
+  <tr>
+    <td  style="width:25%;">
+      <b>{{=T('Date Start')}}</b>
+    </td>
+    <td  style="width:25%;">
+      {{=str(var_activity.date_start)}}
+    </td>
+    <td  style="width:25%;">
+      <b>{{=T('Date Finish')}}</b>
+    </td>
+    <td  style="width:25%;">
+      {{=str(var_activity.date_finish)}}
+    </td>
+  </tr>
+  <tr>
+    <td>
+      {{if var_activity.laboratory == True:}}
+        <b>{{=T('Activity of Laboratory')}}</b>
+      {{else:}}
+        <b>{{=T('Activity of Course')}}</b>
+      {{pass}}
+    </td>
+    <td>
+      {{=T('Yes')}}
+    </td>
+    <td>
+      <b>{{=T('Categoria')}}</b>
+    </td>
+    <td>
+      {{=str(var_activity.course_activity_category.category.category)}}
+    </td>
+  </tr>
+  <tr>
+    <td>
+      <b>{{=T('Course')}}</b>
+    </td>
+    <td>
+      {{=T(var_project.name)}}
+    </td>
+    <td>
+      <b>{{=T('Semester')}}</b>
+    </td>
+    <td>
+      {{=T(var_period.period.name)}} {{=str(var_period.yearp)}}
+    </td>
+  </tr>
+  <tr>
+  <tr>
+    <td>
+      <b>{{=T('Description')}}</b>
+    </td>
+    <td colspan="3">
+      <pre>
+        {{=str(var_activity.description)}}
+      </pre>
+    </td>
+  </tr>
+  
+    <td>
+      <b>{{=T('Add New Grade')}}</b>
+    </td>
+    <td colspan="3">
+      <center>
+        <table class="table table-striped table-bordered" >
+          <td>
+            <input tabindex="1" type="text" id="carnet_input" name="carnet_input"  placeholder="{{=T('Carnet')}}"/>
+          </td>
+          <td>
+            <center>
+              <input tabindex="2" type="text" id="grade_input" name="grade_input"  onkeypress="key_press_add_grade(event);"  style="width:50px;" placeholder="{{=T('Grade')}}"/>
+            </center>
+          </td>
+          <td>
+            <center>
+              <a  tabindex="3" role="button"  class="btn btn-success" id="add_grade" onkeypress="key_press_add_grade(event);" onclick="click_add_grade();">            
+                <span class="icon-white icon-plus"></span>
+                {{=T('Add Grade')}}
+              </a>
+            </center>
+          </td>
+        </table>
+        <div id="add_result_div">
+          <span id="information_text" >
+
+          </span>
+        </div>
+        </center>
+    </td>
+  </tr>
+  <tr>
+    <td>
+      <b>{{=T('Academic List')}}</b>
+    </td>
+    <td colspan="3">
+      <center>
+        <div id="grades_list" style="overflow:auto; ">
+          {{=T('Loading')}}...
+        </div>
+      </center>
+    </td>
+  </tr>
+  </table>
+
+
+
+<!--Help modal-->
+<div id="myModal" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true"> 
+  <div class="modal-header">
+    <button type="button" class="close" data-dismiss="modal"
+aria-hidden="true">×</button>
+      <h3 id="myModalLabel">
+          <span class="icon-question-sign"></span>
+          {{=T('Grades Help')}}
+      </h3>
+  </div>
+  <div class="modal-body">
+    <div class="well">
+        <p>
+            {{=T('In this area you can manage student grades under the activity ') +"\"" +str(var_activity.name) + "\"."}}
+        </p>
+    </div>
+  </div>
+  <div class="modal-footer">
+      <button class="btn" data-dismiss="modal"
+aria-hidden="true">{{=T('Close')}}</button>
+  </div>
+</div>
+<!--Finish help modal-->
+<script type="text/javascript">
+ $(document).ready(function(){ 
+
+    refresh_list_grade();
+
+    var availableTags = [{{for academic in academic_assig:}}"{{=str(academic.carnet.carnet)}}",{{pass}}"" ];
+    $("#carnet_input").autocomplete({
+      source: availableTags
+    });
+
+      
+  });
+
+  function refresh_list_grade(){
+    $("#grades_list").load("{{=URL('activity_control','grades.html')}}?op=view_grades&amp;activity={{=var_activity.id}}&amp;project={{=var_project.id}}&amp;year={{=var_period.id}}");
+  }
+  function key_press_add_grade(e){
+    var evtobj=window.event? event : e
+    var unicode=evtobj.charCode? evtobj.charCode : evtobj.keyCode
+      
+    if(unicode==32 || unicode==13){
+      click_add_grade();
+    }
+  }
+  
+  function click_add_grade(){
+    
+      var carnet_var = document.getElementById('carnet_input').value;
+      var grade_var = document.getElementById('grade_input').value;
+
+      var regex = /^\d+(?:\.\d{0,2})$/; 
+      var regex2 = /^([0-9])*$/;
+
+      if (carnet_var==""){
+        alert("{{=T('The id value is not correct')}}");
+        document.getElementById('carnet_input').focus();
+        document.getElementById('carnet_input').select();
+      }else{
+        if (grade_var=="" || parseInt(grade_var) < 0 || parseInt(grade_var) > 100){
+          alert("{{=T('The grade value is not correct')}}");
+          document.getElementById('grade_input').focus();
+          document.getElementById('grade_input').select();
+        }else{
+          if (!regex.test(grade_var) && !regex2.test(grade_var) ){
+            alert("{{=T('The grade value is not a decimal')}}"); 
+            document.getElementById('grade_input').focus(); 
+            document.getElementById('grade_input').select();
+          }else{
+            $("#grades_list").load("{{=URL('activity_control','grades.html')}}?op=add_grade&amp;activity={{=var_activity.id}}&amp;project={{=var_project.id}}&amp;year={{=var_period.id}}&amp;carnet="+carnet_var+"&amp;grade="+grade_var);
+            document.getElementById('carnet_input').focus();
+            document.getElementById('carnet_input').select();
+            document.getElementById('grade_input').value = "";
+          }
+        }
+      }
+    
+  }
+
+  
+</script>
