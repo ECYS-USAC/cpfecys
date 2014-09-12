@@ -136,7 +136,7 @@
 				     <!--Change request option-->
 			    	{{if var_do == 'false' and float(total_var2) == 100:}}
 			    		<li>
-			    			<a role="button" title="{{=T('Request that the changes be reviewed by the professor or administrator')}}" aria-hidden="true" href="{{=URL('activity_control', 'request_change_activity',vars=dict(project = request.vars['project'], year = request.vars['year'],type=request.vars['type']))}}" >
+			    			<a role="button" title="{{=T('Request that the changes be reviewed by the professor or administrator')}}" aria-hidden="true" href="{{=URL('activity_control', 'request_change_activity',vars=dict(project = request.vars['project'], year = request.vars['year']))}}" >
 								<span class="icon-black icon-fullscreen"></span>
 								{{=T('Change Request')}}
 							</a>

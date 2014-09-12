@@ -27,6 +27,10 @@
 {{if (auth.has_membership('Ecys-Administrator')) or (auth.has_membership('Super-Administrator')) or (auth.has_membership('Teacher') and request.vars['type'] == "class"  and assigned_to_project == True) or (auth.has_membership('Student') and request.vars['type'] == "lab"  and assigned_to_project == True) or (auth.has_membership('Student')  and request.vars['type'] == "class" and (exception_s_var == True  or activityPermition>0)  and assigned_to_project == True) or (auth.has_membership('Teacher')  and request.vars['type'] == "lab" and exception_t_var == True  and assigned_to_project == True):}}
 	{{no_menu=False}}
 {{pass}}
+
+{{if cpfecys.current_year_period().id != semestre2.id:}}
+	{{no_menu=True}}
+{{pass}}
 <!--Comprobar si tiene permisos o no-->
 <!--Check that the current date is in the period that de administrator has register-->
 {{from datetime import datetime}}
@@ -864,10 +868,14 @@
 														{{average=float(d0['average'])}}
 													{{pass}}
 												{{pass}}
+
+												{{actualSemester = db(db.period_year.id==semestre2).select().first()}}
+												{{comparacion = T(actualSemester.period.name)+" "+str(actualSemester.yearp)}}
+												{{controlP = db((db.student_control_period.period_name==comparacion)).select().first()}}
 												<center><b>
-												{{if average < float(61):}}
+												{{if average < controlP.min_average:}}
 												<FONT COLOR="Red">
-												{{elif average>float(61) and average < float(90):}}
+												{{elif average>controlP.min_average and average < controlP.max_average:}}
 												<FONT COLOR="#5E610B">
 												{{else:}}
 												<FONT COLOR="Green">
