@@ -29,7 +29,7 @@
 			{{pass}}
 		{{pass}}
 	<center>
-		{{if float(total_var2) == 100:}}		
+		{{if float(total_var2) == 100:}}
 			<div id="table_activity">
 			</div>
 		{{else:}}
@@ -56,6 +56,14 @@
 		{{for date_var in db((db.student_control_period)).select():}}
 			{{if datetime.now() >= date_var.date_start and datetime.now() <= date_var.date_finish:}}
 				{{var_do='true'}}					
+			{{pass}}
+		{{pass}}
+		{{if var_do=='false':}}
+			{{extraTime = db(db.course_limit_exception.project==project.id).select().first()}}
+			{{if extraTime is not None:}}
+				{{if datetime.now() >= date_var.date_start and datetime.now() <= extraTime.date_finish:}}
+					{{var_do='true'}}
+				{{pass}}
 			{{pass}}
 		{{pass}}
 		<!--End of the check of period-->

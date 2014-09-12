@@ -66,7 +66,7 @@
         try{
           var TPA_var = document.getElementById('TP_check_activity').checked;  
         }catch(err){
-          var TPA_var = true;
+          var TPA_var = false;
         }
         if(category_activity_id_var=="" || (activity_name1_var=="" && activity_name2_var=="") || activity_description_var=="" || dateInit_var=="" || dateEnd_var==""){
             alert("{{=T('Fill all fields to save.')}}");
