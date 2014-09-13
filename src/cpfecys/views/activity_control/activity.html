@@ -651,18 +651,18 @@
 							<table class="table table-striped table-bordered">
 						  		<tr>
 						  			<th>
-										{{=T('name')}}
+										{{=T('Name')}}
 									</th>
 									<th>
-										{{=T('description')}}
+										{{=T('Description')}}
 									</th>
 									<th>
 										{{=T('Grade')}}
 									</th>
-									<th>
+									<th style="white-space:initial;">
 										{{=T('Start Date')}}
 									</th>
-									<th>
+									<th style="white-space:initial;">
 										{{=T('End Time')}}
 									</th>
 									<th title="{{=T('Teacher Permition')}}">
@@ -670,12 +670,12 @@
 									</th>
 									{{if request.vars['op'] == "showTableNoEditable":}}
 										{{if no_menu==False or assigned_to_project==True:}}
-										<th>
+										<th style="white-space:initial;">
 											{{=T('Entered Grades')}}
 										</th>
-										<th>
+										<th style="white-space:initial;">
 											{{=T('Average of Grades')}}
-										</th>
+										</th >
 										{{if no_menu==False:}}
 										<th>
 											{{=T('Actions')}}

@@ -1371,7 +1371,7 @@
 'Start': 'Iniciar',
 'Start Amount': 'Cantidad Inicial',
 'Start building a new search': '¿Empezar a construir nueva busqueda?',
-'Start Date': 'Fecha de Inicio',
+'Start Date': 'Fecha Inicio',
 'start date': 'Fecha de Inicio',
 'Start Hour': 'Hora de Inicio',
 'Start Time': 'Hora de Inicio',
