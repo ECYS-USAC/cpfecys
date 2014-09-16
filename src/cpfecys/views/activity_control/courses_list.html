@@ -30,7 +30,7 @@
 		<table class="table table-striped table-bordered">
 			<thead>
 				<th>{{=T('Course')}}</th>
-				<th><center>{{=T('Section')}}</center></th>
+				<th>{{=T('Section')}}</th>
 				<th><center>{{=T('View')}}</center></th>
 			</thead>
 			<tbody>
@@ -41,7 +41,7 @@
 						<td>{{=split_section(course.user_project.project.name)}}</td>
 					{{else:}}
 						<td>{{=split_name(course.name)}}</td>
-						<td><center>{{=split_section(course.name)}}</center></td>
+						<td>{{=split_section(course.name)}}</td>
 					{{pass}}
 					<td>
 						<center>

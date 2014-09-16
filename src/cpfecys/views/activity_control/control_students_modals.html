@@ -6,8 +6,8 @@
       <center>
         <h3>
           <small>
-            {{if auth.has_membership('Teacher'):}}
-              <h2>{{=T('Class Weighting')}} - {{=name}}
+            {{if request.vars['type'] == 'course':}}
+              <h2>{{=T('Course Weighting')}} - {{=name}}
             {{else:}}
               <h2>{{=T('Laboratory Weighting')}} - {{=name}}
             {{pass}}

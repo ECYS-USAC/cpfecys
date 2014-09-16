@@ -4,14 +4,20 @@
 	<thead>
 		<th>{{=T('Project')}}</th>
 		<th>{{=T('Section')}}</th>
-		<th>{{=T('View')}}</th>
+		<th><center>{{=T('View')}}</center></th>
 	</thead>
 	<tbody>
 		{{for assignation in assignations:}}
 		<tr>
 			<td>{{=split_name(assignation.project.name)}}</td>
 			<td>{{=split_section(assignation.project.name)}}</td>
-			<td><a class="btn" href="{{=URL('notification', 'mail_notifications', vars=dict(assignation = assignation.id))}}">{{=T('New Notification')}}</a></td>
+			<td>
+				<center>
+					<a class="btn" href="{{=URL('notification', 'mail_notifications', vars=dict(assignation = assignation.id))}}">
+						{{=T('New Notification')}}
+					</a>
+				</center>
+			</td>
 		</tr>
 		{{pass}}
 	</tbody>
