@@ -720,6 +720,7 @@ db.define_table('activity_category',
     Field('timeout', 'integer', notnull=True, unique=False, label = T('timeout')),
     format='%(category)s')
 
+#Table of weighting
 db.define_table('course_activity_category',
     Field('category', 'reference activity_category', notnull=True, label = T('category')),    
     Field('grade', 'decimal(5,2)', notnull=False, label=T('grade')),
@@ -729,6 +730,23 @@ db.define_table('course_activity_category',
     Field('laboratory', 'boolean', notnull=True, label = T('laboratory')),
     Field('teacher_permition', 'boolean', notnull=True, label = T('teacher permition'))
     )
+
+#Table of weighting log
+#db.define_table('course_activity_category_log',
+#    Field('before_category', 'string', notnull=True, label = T('before category')),
+#    Field('after_category', 'string', notnull=True, label = T('after category')),
+#    Field('before_grade', 'decimal(5,2)', notnull=False, label=T('before grade')),
+#    Field('after_grade', 'decimal(5,2)', notnull=False, label=T('after grade')),
+#    Field('before_specific_grade', 'boolean', notnull=True, label = T('before specific grade')),
+#    Field('after_specific_grade', 'boolean', notnull=True, label = T('after specific grade')),
+#    Field('semester', 'string', notnull=True, label = T('semester')),
+#    Field('yearp', 'string', notnull=True, label = T('year')),
+#    Field('assignation', 'string', notnull=True),
+#    Field('before_laboratory', 'boolean', notnull=True, label = T('before laboratory')),
+#    Field('after_laboratory', 'boolean', notnull=True, label = T('after laboratory')),
+#    Field('before_teacher_permition', 'boolean', notnull=True, label = T('before teacher permition'))
+#    Field('after_teacher_permition', 'boolean', notnull=True, label = T('after teacher permition'))
+#    )
 
 db.define_table('student_control_period',
     Field('period_name', 'string', notnull=True, unique=False, label = T('period name')),
@@ -810,6 +828,55 @@ db.define_table('requestchange_course_activity',
     Field('date_finish', 'date', notnull = False, default = datetime.datetime.now(), label = T('Date Finish'))
     )
 
+db.define_table('request_change_weighting',
+    Field('user_id', 'reference auth_user', notnull = True, label = T('User')),
+    Field('roll', 'text', notnull = False, label = 'Rol'),
+    Field('status', 'text', notnull = True, label = T('Status')),
+    Field('resolve_user', 'reference auth_user', notnull = False, label = T('Resolve User')),
+    Field('roll_resolve', 'text', notnull = False, label = 'Rol'),
+    Field('description', 'string', notnull=False,  label = T('Description')),
+    Field('date_request', 'datetime', notnull = True, default = datetime.datetime.now(), label = T('Date')),
+    Field('date_request_resolve', 'datetime', notnull = False, label = T('Resolve Date')),
+    Field('period', 'reference period_year', notnull=True, label = T('Periodo')),
+    Field('project', 'reference project', notnull=True, label = T('Project'))
+    )
+
+db.define_table('request_change_weighting_detail',
+    Field('request_change_weighting', 'reference request_change_weighting', notnull = True, label = T('Request Change')),
+    Field('operation_request', 'text', notnull = True, label = T('Operation')),
+    Field('course_category', 'reference course_activity_category', notnull=False, label = T('Course Category')),
+    Field('category', 'reference activity_category', notnull=False, label = T('Category')),
+    Field('grade', 'decimal(5,2)', notnull=False, label=T('Grade')),
+    Field('specific_grade', 'boolean', notnull=False, label = T('Specific Grade'))
+)
+
+db.define_table('request_change_w_log',
+    Field('r_c_w_id', 'integer', notnull = False),
+    Field('username', 'text', notnull = True, label = T('User')),
+    Field('roll', 'text', notnull = False, label = 'Rol'),
+    Field('before_status', 'text', notnull = True, label = T('Status')),
+    Field('after_status', 'text', notnull = True, label = T('Status')),
+    Field('resolve_user', 'text', notnull = False, label = T('Resolve User')),
+    Field('roll_resolve', 'text', notnull = False, label = 'Rol'),
+    Field('description', 'string', notnull=False,  label = T('Description')),
+    Field('date_operation', 'datetime', notnull = True, default = datetime.datetime.now(), label = T('Date')),
+    Field('date_request', 'datetime', notnull = True, default = datetime.datetime.now(), label = T('Date Request')),
+    Field('date_request_resolve', 'datetime', notnull = False, label = T('Resolve Date')),
+    Field('semester', 'text', notnull=True, label = T('Semester')),
+    Field('yearp', 'text', notnull=True, label = T('Year')),
+    Field('project', 'text', notnull=True, label = T('Project'))
+)
+
+db.define_table('request_change_w_detail_log',
+    Field('request_change_w_log', 'reference request_change_w_log', notnull = True, label = T('Request Change')),
+    Field('operation_request', 'text', notnull = True, label = T('Operation')),
+    Field('course_category', 'text', notnull=False, label = T('Course Category')),
+    Field('category', 'text', notnull=False, label = T('Category')),
+    Field('before_grade', 'decimal(5,2)', notnull=False, label=T('Before Grade')),
+    Field('after_grade', 'decimal(5,2)', notnull=False, label=T('After Grade')),
+    Field('before_specific_grade', 'boolean', notnull=False, label = T('Before Specific Grade')),
+    Field('after_specific_grade', 'boolean', notnull=False, label = T('After Specific Grade'))
+)
 
 db.define_table('course_laboratory_exception',
     Field('project', 'reference project', notnull = True, unique=True, label = T('Course')),

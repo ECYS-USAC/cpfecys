@@ -19,9 +19,9 @@
 			<td>
 				<center>
 					{{if auth.has_membership('Teacher'):}}
-						<a class="btn" href="{{=URL('activity_control', 'solve_request_change_activity', vars=dict(course = course.user_project.project))}}">{{=T('Go')}}
+						<a class="btn" href="{{=URL('activity_control', 'solve_request_change_weighting', vars=dict(course = course.user_project.project))}}">{{=T('Go')}}
 					{{else:}}
-						<a class="btn" href="{{=URL('activity_control', 'solve_request_change_activity', vars=dict(course = course.id))}}">{{=T('Go')}}
+						<a class="btn" href="{{=URL('activity_control', 'solve_request_change_weighting', vars=dict(course = course.id))}}">{{=T('Go')}}
 					{{pass}}
 					</a>
 				</center>

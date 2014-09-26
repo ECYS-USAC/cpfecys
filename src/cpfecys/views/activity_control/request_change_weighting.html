@@ -1,0 +1,147 @@
+{{extend 'template.html'}}	
+{{project_var = db(db.user_project.id == assignation).select().first()}}
+<h2>
+	{{=T('Weighting')}} - {{=T('Change Request')}}
+	<br>
+    <small>{{=name}} - {{=T(semester)}}, {{=year}}</small>
+</h2>
+<div class="row-fluid">
+    <div class="well span12" style="overflow:auto; width:100%">
+		<div>
+			<a class="btn" href="{{=URL('activity_control', 'students_control', vars=dict(project = request.vars['project'], period = request.vars['year']))}}">
+				<i class="icon-arrow-left"></i>{{=T('Back')}}
+			</a>
+		</div>
+		<br>
+		<div id="contentSuper">
+			<div align="center" id="controlActivity">
+				<ul id="myTab" class="nav nav-tabs">
+					<li class="active" id="var_requestDone" style ="cursor:pointer;"><a  onclick="pending_request();">{{=T('Pending requests')}}</a></li>
+					<li id="all_request" style ="cursor:pointer;"><a  onclick="all_request();">{{=T('All request')}}</a></li>
+					<li id="accepted_request" style ="cursor:pointer;"><a  onclick="accepted_request();">{{=T('Accepted request')}}</a></li>
+					<li id="rejected_request" style ="cursor:pointer;"><a  onclick="rejected_request();">{{=T('Rejected request')}}</a></li>
+					<li id="create_request" style ="cursor:pointer;"><a  onclick="create_request();">{{=T('Create Request')}}</a></li>
+				</ul>
+
+				<div id="content">
+					<table>
+						<tr>
+							<td>
+								<div id="div_request_show">
+			        				
+			                  	</div>
+			                </td>
+			            </tr>
+			        </table>
+
+                  	<div class="well span11" id="div_request_detail" style="display: none; overflow:auto;">
+                  		<div>
+							<table>
+								<tr>
+									<td>
+										<div class="well span11" id="div_request_detail_view" style=" overflow:auto;">
+						    			</div>
+										
+								    </td>
+								    <td width="10%">
+							    	</td>
+							    	<td>
+							    		<div id ="div_description"class="well span12" style="width:300px;  overflow:auto;" >
+							    			
+									    </div>
+							    		
+								    </td>
+								  <tr>
+							</table>
+						</div>
+						
+                  	</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+
+<script type="text/javascript">
+	
+	$("#div_request_show").load("{{=URL('activity_control','request_change_weighting_load.html')}}?op=select_change&amp;project={{=project}}&amp;year={{=semestre2.id}}&amp;tip=p");
+
+	function disable_div() {
+
+	    
+	}
+
+	function create_request(){
+		document.getElementById('var_requestDone').className = "";
+		document.getElementById('all_request').className = "";
+		document.getElementById('accepted_request').className = "";
+		document.getElementById('rejected_request').className = "";
+		document.getElementById('create_request').className = "active";		
+		
+		$("#div_request_detail").css("display", "block");
+		$("#div_request_show").css("display", "none");
+		$("#div_request_detail_view").load("{{=URL('activity_control','request_change_weighting_load.html')}}?op=create_request&amp;project={{=project}}&amp;year={{=semestre2.id}}"); 
+		$("#div_description").load("{{=URL('activity_control','request_change_weighting_load.html')}}?op=description&amp;project={{=project}}&amp;year={{=semestre2.id}}");
+		 
+	}
+
+	//pending_request,all_request,,,create_request
+	function all_request(){
+		document.getElementById('var_requestDone').className = "";
+		document.getElementById('all_request').className = "active";
+		document.getElementById('accepted_request').className = "";
+		document.getElementById('rejected_request').className = "";
+		document.getElementById('create_request').className = "";			
+		$("#div_request_detail").css("display", "none");
+		$("#div_request_show").css("display", "block");
+		$("#div_request_show").load("{{=URL('activity_control','request_change_weighting_load.html')}}?op=select_change&amp;project={{=project}}&amp;year={{=semestre2.id}}");
+
+	}
+
+	function accepted_request(){
+		document.getElementById('var_requestDone').className = "";
+		document.getElementById('all_request').className = "";
+		document.getElementById('accepted_request').className = "active";
+		document.getElementById('rejected_request').className = "";
+		document.getElementById('create_request').className = "";		
+		$("#div_request_detail").css("display", "none");
+		$("#div_request_show").css("display", "block");
+		$("#div_request_show").load("{{=URL('activity_control','request_change_weighting_load.html')}}?op=select_change&amp;project={{=project}}&amp;year={{=semestre2.id}}&amp;tip=a");
+
+	}
+
+	function rejected_request(){
+		document.getElementById('var_requestDone').className = "";
+		document.getElementById('all_request').className = "";
+		document.getElementById('accepted_request').className = "";
+		document.getElementById('rejected_request').className = "active";
+		document.getElementById('create_request').className = "";		
+		$("#div_request_detail").css("display", "none");
+		$("#div_request_show").css("display", "block");
+		$("#div_request_show").load("{{=URL('activity_control','request_change_weighting_load.html')}}?op=select_change&amp;project={{=project}}&amp;year={{=semestre2.id}}&amp;tip=r");
+
+	}
+
+	function pending_request(){
+		document.getElementById('var_requestDone').className = "active";
+		document.getElementById('all_request').className = "";
+		document.getElementById('accepted_request').className = "";
+		document.getElementById('rejected_request').className = "";
+		document.getElementById('create_request').className = "";		
+		$("#div_request_detail").css("display", "none");
+		$("#div_request_show").css("display", "block");
+		$("#div_request_show").load("{{=URL('activity_control','request_change_weighting_load.html')}}?op=select_change&amp;project={{=project}}&amp;year={{=semestre2.id}}&amp;tip=p");
+
+	}
+
+
+	function detail(var_id){
+		//$("#div_request_show").css("display", "none");
+		$("#div_request_detail").css("display", "block");
+		$("#div_request_detail_view").load("{{=URL('activity_control','request_change_weighting_load.html')}}?op=create_request&amp;project={{=project}}&amp;year={{=semestre2.id}}&amp;change_id="+var_id); 
+		$("#div_description").load("{{=URL('activity_control','request_change_weighting_load.html')}}?op=description&amp;project={{=project}}&amp;year={{=semestre2.id}}&amp;change_id="+var_id); 
+		
+		
+		
+	}
+</script>

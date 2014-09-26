@@ -1,3 +1,9 @@
+{{temp_op = request.vars['f_view']}}
+{{if (temp_op == "weighting_edit" or temp_op == "weighting_get") and (auth.has_membership('Academic') or ( auth.has_membership('Super-Administrator') == False and auth.has_membership('Ecys-Administrator') == False and assigantion == None)): }}
+	{{session.flash = T('Not valid Action.')}}
+	{{redirect(URL('default','index'))}}
+{{else:}}
+
 {{extend 'template.html'}}
 {{if request.vars['f_view'] == "weighting":}}
 	{{if request.vars['type'] == "course":}}
@@ -78,3 +84,4 @@ $(document).ready(function(){
 	    $("#activity_menu").load('{{=URL('activity_control','control_activity.html',vars=dict(operation="menu_update", project = request.vars['project'], year = request.vars['year'], type = request.vars['type']))}}');
 	  });
 </script>
+{{pass}}

@@ -260,9 +260,168 @@ def admin_courses_list():
 
         return dict(projects=projects,area=area,periods =periods)
     else:
-        session.flash = "Action not allowed"
+        session.flash = T("Action not allowed")
         redirect(URL('default','index'))
 
+@auth.requires_login()
+@auth.requires(auth.has_membership('Student'))
+def request_change_weighting():
+    import cpfecys
+    year = db(db.period_year.id == request.vars['year']).select().first() 
+    year_semester = year.period
+
+    assignation = db((db.user_project.assigned_user == auth.user.id) & (db.user_project.period == year.id) & (db.user_project.project == request.vars['project'])).select().first()
+    if assignation is None:
+        session.flash = T("Action not allowed")
+        redirect(URL('default','index'))    
+    check = db(db.project.id == request.vars['project']).select().first()
+    
+    
+    try:
+        
+        if request.vars['operation'] == "cancel":
+            db((db.request_change_weighting.period == year.id) & (db.request_change_weighting.project == request.vars['project']) & ((db.request_change_weighting.status != 'accepted') & (db.request_change_weighting.status != 'rejected'))).delete()
+            response.flash = T("Request has been canceled")
+        if (request.args(0) == 'request'):
+            if str(request.vars['description']) == "":
+                response.flash = "Error. "+ T("Please enter a description")
+            else:
+                
+                if session.total_var != 100:
+                    if session.total_var != None:
+                        response.flash = "Error. "+ T("The sum of the weighting is incorrect") + ": " + str(session.total_var)
+                else:
+                    response.flash = T("Request has been sent")
+                    temp = db((db.request_change_weighting.period == year.id) & (db.request_change_weighting.project == request.vars['project']) & ((db.request_change_weighting.status != 'accepted') & (db.request_change_weighting.status != 'rejected')) ).select().first()
+                    db((db.request_change_weighting.id == temp.id) ).update(status = 'pending',
+                                            description = str(request.vars['description']),
+                                            date_request = datetime.datetime.now())
+                    #LOG
+                    temp2 = db.request_change_w_log.insert(r_c_w_id=temp.id,
+                                                    username=auth.user.username,
+                                                    roll='Student',
+                                                    before_status='edit',
+                                                    after_status='pending',
+                                                    description=str(request.vars['description']),
+                                                    semester=year_semester.name,
+                                                    yearp=str(year.yearp),
+                                                    project=str(check.name))
+                    #LOG_DETAIL
+                    r_c_w_d_var = db((db.request_change_weighting_detail.request_change_weighting==temp)).select()
+                    for var_temp in r_c_w_d_var:
+                        if var_temp.operation_request == 'insert':
+                            cat_temp = db(db.activity_category.id==var_temp.category).select().first()
+                            db.request_change_w_detail_log.insert(request_change_w_log=temp2,
+                                                                operation_request=var_temp.operation_request,
+                                                                category=cat_temp.category,
+                                                                after_grade=var_temp.grade,
+                                                                after_specific_grade=var_temp.specific_grade)
+                        if var_temp.operation_request == 'delete':
+                            cat_temp = db(db.course_activity_category.id==var_temp.course_category).select().first()
+                            
+                            db.request_change_w_detail_log.insert(request_change_w_log=temp2,
+                                                                operation_request=var_temp.operation_request,
+                                                                course_category=cat_temp.category.category,
+                                                                before_grade=cat_temp.grade,
+                                                                before_specific_grade=cat_temp.specific_grade)
+                        if var_temp.operation_request == 'update':
+                            cat_temp = db(db.course_activity_category.id==var_temp.course_category).select().first()
+                            cat_temp2 = db(db.activity_category.id==var_temp.category).select().first()
+                            db.request_change_w_detail_log.insert(request_change_w_log=temp2,
+                                                                operation_request=var_temp.operation_request,
+                                                                course_category=cat_temp.category.category,
+                                                                category=cat_temp2.category,
+                                                                before_grade=cat_temp.grade,                                                                
+                                                                after_specific_grade=var_temp.specific_grade,
+                                                                after_grade=var_temp.grade,
+                                                                before_specific_grade=cat_temp.specific_grade)
+
+    except:
+        None
+
+    session.total_var = None
+    return dict(name = check.name,
+        semester = year_semester.name,
+        year = year.yearp,
+        semestre2 = year,
+        project = request.vars['project'],
+        assignation=assignation)
+
+@auth.requires_login()
+@auth.requires(auth.has_membership('Student') or auth.has_membership('Super-Administrator') or auth.has_membership('Ecys-Administrator') or auth.has_membership('Teacher'))
+def request_change_weighting_load():
+    session.total_var = None
+    import cpfecys
+    year = db(db.period_year.id == request.vars['year']).select().first() 
+    year_semester = year.period
+    project_id = request.vars['project']
+    change_id = request.vars['change_id']
+    op = request.vars['op']
+    change = None
+    if op != "select_change":
+        if change_id is None:
+            change = db((db.request_change_weighting.period == year.id) & (db.request_change_weighting.project == project_id) & ((db.request_change_weighting.status != 'accepted') & (db.request_change_weighting.status != 'rejected'))).select().first()
+            if change is None:
+                change = db.request_change_weighting.insert(user_id=auth.user.id,
+                                                            roll='Student',
+                                                            status='edit',
+                                                            period=year.id,
+                                                            project=project_id)
+        else:
+            change = db((db.request_change_weighting.id == change_id)).select().first()
+    
+    assignation = db((db.user_project.assigned_user == auth.user.id) & (db.user_project.period == year.id) & (db.user_project.project == project_id)).select().first()
+    if assignation is None:
+        session.flash = T("Action not allowed")
+        redirect(URL('default','index'))    
+    check = db(db.project.id == request.vars['project']).select().first()
+
+    return dict(name = check.name,
+        semester = year_semester.name,
+        year = year.yearp,
+        semestre2 = year,
+        project = request.vars['project'],
+        assignation = assignation,
+        op = op,
+        change = change)
+
+@auth.requires_login()
+@auth.requires(auth.has_membership('Super-Administrator') or auth.has_membership('Ecys-Administrator') or auth.has_membership('Teacher'))
+def solve_request_change_weighting():
+    import cpfecys
+    #Obtain the course that want to view the request
+    courseCheck = request.vars['course']
+
+    #Check that the request vars contain something
+    if (courseCheck is None):
+        redirect(URL('default','index'))
+    else:
+        #Check if teacher or other role
+        course=None
+        if auth.has_membership('Teacher'):
+            course = db((db.user_project.assigned_user == auth.user.id) & (db.user_project.period == cpfecys.current_year_period().id) & (db.user_project.project==courseCheck)).select().first()
+            if (course is None):
+                session.flash=T('You do not have permission to view course requests')
+                redirect(URL('default','index'))
+        else:
+            course=db.project(id=courseCheck)
+
+        #Check that the course exist
+        name=None
+        if (course is None):
+            redirect(URL('default','index'))
+        else:
+            if auth.has_membership('Teacher'):
+                name=course.project.name
+            else:
+                name=course.name
+
+        currentyear_period = cpfecys.current_year_period()
+        return dict(name = name,
+                    semester = currentyear_period.period.name,
+                    semestre2 = currentyear_period,
+                    year = currentyear_period.yearp,
+                    course=courseCheck)
 
 
 @auth.requires_login()
@@ -289,7 +448,7 @@ def control_weighting():
 def students_control_full():
     import cpfecys
     project = request.vars['project']
-    
+    assigantion =None
     year = db(db.period_year.id == request.vars['year']).select().first() 
 
     project_var = request.vars['project']
@@ -311,7 +470,8 @@ def students_control_full():
 
     return dict(name = '',
                 semester = year.period.name,
-                year = year.yearp)
+                year = year.yearp,
+                assigantion=assigantion)
 
 @auth.requires_login()
 def control_students_modals():
@@ -329,11 +489,8 @@ def weighting():
     project = request.vars['project']
    
     year = db(db.period_year.id == request.vars['year']).select().first() 
-    
-    return dict(semestre2 = year, project = project)
-
-
-
+    assigantion = db((db.user_project.assigned_user == auth.user.id) & (db.user_project.period == year.id) & (db.user_project.project == project)).select().first()
+    return dict(semestre2 = year, project = project, assigantion=assigantion)
 
 
 
@@ -481,6 +638,13 @@ def solve_request_change_activity():
 @auth.requires_login()
 @auth.requires(auth.has_membership('Super-Administrator') or auth.has_membership('Ecys-Administrator') or auth.has_membership('Teacher'))
 def activityRequest():
+    import cpfecys
+    currentyear_period = cpfecys.current_year_period()
+    return dict(semestre2 = currentyear_period)
+
+@auth.requires_login()
+@auth.requires(auth.has_membership('Super-Administrator') or auth.has_membership('Ecys-Administrator') or auth.has_membership('Teacher'))
+def weighting_request():
     import cpfecys
     currentyear_period = cpfecys.current_year_period()
     return dict(semestre2 = currentyear_period)

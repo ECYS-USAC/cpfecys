@@ -1,3 +1,9 @@
+
+{{temp_op = request.vars['op']}}
+{{if (temp_op == "updateCategory" or temp_op == "addCategory" or temp_op == "getPreviousWeighting" or temp_op == "removeCategory") and (auth.has_membership('Academic') or ( auth.has_membership('Super-Administrator') == False and auth.has_membership('Ecys-Administrator') == False and assigantion == None)): }}
+	{{response.flash = T('Not valid Action.')}}
+{{else:}}
+
 {{try:}}
 	{{project_var = db(db.user_project.id == request.vars['assignation']).select().first() }}
 	{{var_project_id = project_var.project.id}}
@@ -550,3 +556,4 @@
 	}
 
 </script>
+{{pass}}
