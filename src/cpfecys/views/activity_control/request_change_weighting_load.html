@@ -207,12 +207,12 @@
 		{{for var_chang_ins in db((db.request_change_weighting_detail.request_change_weighting ==  change.id) & (db.request_change_weighting_detail.operation_request == 'insert')).select():}}
 			<tr>
 	    		<td>
-	    			<font color="blue">
+	    			<font color="green">
 	    				{{=var_chang_ins.category.category}}
 	    			</font>
 	    		</td>
 	    		<td>
-	    			<font color="blue">
+	    			<font color="green">
 	    				{{=var_chang_ins.grade}}
 	    				{{if var_chang_ins.grade != None:}}
 	    					{{total_var = total_var + var_chang_ins.grade}}
@@ -220,7 +220,7 @@
 	    			</font>
 	    		</td>
 	    		<td>
-	    			<font color="blue">
+	    			<font color="green">
 	    				{{var_SG = True}}
 						{{if str(var_chang_ins.specific_grade) == "True":}}
 							{{var_SG = False}}
@@ -261,7 +261,7 @@
 	    			{{var_color="red"}}
 	    		{{pass}}
 	    		{{if var_chang.operation_request == 'update':}}
-	    			{{var_color="green"}}
+	    			{{var_color="blue"}}
 	    		{{pass}}
 	    		<tr>
 		    		<td>
@@ -428,18 +428,18 @@
 									{{pass}}
 									{{if r_c_w_d_l.operation_request == 'update':}}
 										<td>
-											<font color="green">
+											<font color="blue">
 											{{=r_c_w_d_l.category}}
 											</font>
 										</td>
 										<td>
-											<font color="green">
+											<font color="blue">
 											{{=r_c_w_d_l.after_grade}}
 											{{total_var = total_var + r_c_w_d_l.after_grade}}
 											</font>
 										</td>
 										<td>
-											<font color="green">
+											<font color="blue">
 											{{var_SG = True}}
 											{{if r_c_w_d_l.after_specific_grade == "true":}}
 												{{var_SG = False}}
@@ -493,9 +493,9 @@
 	<br>
 		<b>{{=T('Legend')}}:</b>
 	<br>
-		<span class="label label-info">&nbsp;&nbsp;&nbsp;</span> {{=T('Category created')}}
+		<span class="label label-success">&nbsp;&nbsp;&nbsp;</span> {{=T('Category created')}}
 	<br>
-		<span class="label label-success">&nbsp;&nbsp;&nbsp;</span> {{=T('Category edited')}}
+		<span class="label label-info">&nbsp;&nbsp;&nbsp;</span> {{=T('Category edited')}}
 	<br>
 		<span class="label label-important">&nbsp;&nbsp;&nbsp;</span> {{=T('Category deleted')}}
 	<br>

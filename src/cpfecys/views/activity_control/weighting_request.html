@@ -13,7 +13,9 @@
 	{{if request.vars['tip']=="t":}}
 		{{allRequest = db((db.request_change_weighting.status!='edit')&(db.request_change_weighting.period==int(semestre2.id))&(db.request_change_weighting.project==int(request.vars['project']))).select()}}
 	{{pass}}
+	{{if allRequest.first() !=None:}}
 	<table class="table table-striped table-bordered">
+	
 		<tr>
 			<th>{{=T('User')}}</th>
 			<th>{{=T('Role')}} </th>
@@ -21,6 +23,7 @@
 			<th>Fecha Solicitud</th>
 			<th><center>{{=T('Action')}}</center></th>
 		</tr>
+	
 	{{for change in allRequest:}}
 		<tr>
 			<td>{{=change.user_id.username}}</td>
@@ -39,6 +42,9 @@
 		</tr>
 	{{pass}}
 	</table>
+	{{else:}}
+		{{=T('There is no request')}}
+	{{pass}}
 {{pass}}
 
 
@@ -198,18 +204,18 @@
 											{{pass}}
 											{{if project.operation_request == 'insert':}}
 												<td>
-													<font color="blue">
+													<font color="Green">
 													{{=project.category}}
 													</font>
 												</td>
 												<td>
-													<font color="blue">
+													<font color="Green">
 													{{=project.after_grade}}
 													{{total_var = total_var + project.after_grade}}
 													</font>
 												</td>
 												<td>
-													<font color="blue">
+													<font color="Green">
 													{{var_SG = True}}
 													{{if project.after_specific_grade == "true":}}
 														{{var_SG = False}}
@@ -220,18 +226,18 @@
 											{{pass}}
 											{{if project.operation_request == 'update':}}
 												<td>
-													<font color="green">
+													<font color="blue">
 													{{=project.category}}
 													</font>
 												</td>
 												<td>
-													<font color="green">
+													<font color="blue">
 													{{=project.after_grade}}
 													{{total_var = total_var + project.after_grade}}
 													</font>
 												</td>
 												<td>
-													<font color="green">
+													<font color="blue">
 													{{var_SG = True}}
 													{{if project.after_specific_grade == "true":}}
 														{{var_SG = False}}
@@ -277,9 +283,9 @@
 							<br>
 								<b>{{=T('Legend')}}:</b>
 							<br>
-								<span class="label label-info">&nbsp;&nbsp;&nbsp;</span> {{=T('Category created')}}
+								<span class="label label-success">&nbsp;&nbsp;&nbsp;</span> {{=T('Category created')}}
 							<br>
-								<span class="label label-success">&nbsp;&nbsp;&nbsp;</span> {{=T('Category edited')}}
+								<span class="label label-info">&nbsp;&nbsp;&nbsp;</span> {{=T('Category edited')}}
 							<br>
 								<span class="label label-important">&nbsp;&nbsp;&nbsp;</span> {{=T('Category deleted')}}
 							<br>
