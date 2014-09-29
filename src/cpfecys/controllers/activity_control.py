@@ -384,6 +384,7 @@ def control_students_modals2():
     return dict(semestre2 = year, name=project_var.name)
 
 @auth.requires_login()
+@auth.requires(auth.has_membership('Student'))
 def request_change_activity():
     #Obtener al tutor del proyecto
     check = db.user_project(project = request.vars['project'], period = request.vars['year'], assigned_user = auth.user.id)
@@ -398,6 +399,141 @@ def request_change_activity():
                 semestre2 = year,
                 year = year.yearp,
                 assignation=check.id)
+
+@auth.requires_login()
+@auth.requires_membership('Student')
+def send_mail_to_students(message, subject, user, check, semester, year):
+    control = 0
+    was_sent = mail.send(to='dtt.ecys@dtt-ecys.org',subject=subject,message=message, bcc=user)
+    #MAILER LOG
+    db.mailer_log.insert(sent_message = message,
+                     destination = user,
+                     result_log = str(mail.error or '') + ':' + \
+                     str(mail.result),
+                     success = was_sent, emisor=str(check.assigned_user.username))
+    if was_sent==False:
+        control=control+1
+    return control
+
+
+@auth.requires_login()
+def requestchangeactivity():
+    import datetime
+    #Cancel the request made
+    if request.args(0) == 'reject':
+        Pending = db((db.requestchange_activity.id==int(request.vars['requestID']))&(db.requestchange_activity.status=='Pending')&(db.requestchange_activity.semester==int(request.vars['year']))&(db.requestchange_activity.course==int(request.vars['project']))).select().first()
+        if Pending is None:
+            session.flash=T('The plan change request has been answered by another user or is there a problem with the request')
+        else:
+            db(db.requestchange_activity.id==int(request.vars['requestID'])).update(status = 'Rejected', user_resolve = auth.user.id, roll_resolve =  'Student', date_request_resolve =  datetime.datetime.now())
+            #Log of request change activity
+            Rejected = db(db.requestchange_activity.id==int(request.vars['requestID'])).select().first()
+            if Rejected is not None:
+                nameP=None
+                nameS=None
+                try:
+                    (nameP, projectSection) = str(Rejected.course.name).split('(')
+                    (nameS,garbage) = str(projectSection).split(')')
+                    (garbage,nameS) = str(nameS).split(' ')
+                except:
+                    nameP=project.name
+                idR = db.requestchange_activity_log.insert(user_request=Rejected.user_id.username, roll_request=Rejected.roll, status='Rejected', user_resolve=Rejected.user_resolve.username, roll_resolve=Rejected.roll_resolve, description=Rejected.description, date_request=Rejected.date_request, date_request_resolve=Rejected.date_request_resolve, category_request=Rejected.course_activity_category.category.category, semester=Rejected.semester.period.name, yearp=Rejected.semester.yearp, course=nameP, course_section=nameS)
+                activitiesChange = db(db.requestchange_course_activity.requestchange_activity==Rejected.id).select()
+                for actChange in activitiesChange:
+                    db.requestchange_course_activity_log.insert(requestchange_activity=idR, operation_request=actChange.operation_request, activity=actChange.activity, name=actChange.name, description=actChange.description, grade=actChange.grade, date_start=actChange.date_start, date_finish=actChange.date_finish)
+            session.flash=T('The plan change request has been canceled')
+        redirect(URL('activity_control','request_change_activity',vars=dict(project=request.vars['project'], year=request.vars['year'])))
+
+
+    #Cancel the request without having done
+    if request.args(0)=='cancelR':
+        if request.vars['year']=='' or request.vars['year'] is None or request.vars['project']=='' or request.vars['project'] is None:
+            session.flash = T('Not valid Action.')
+            redirect(URL('default','index'))
+        else:
+            deleteR = db((db.requestchange_activity.status=='Draft')&(db.requestchange_activity.semester==int(request.vars['year']))&(db.requestchange_activity.course==int(request.vars['project']))).select().first()
+            if deleteR is not None:
+                db(db.requestchange_activity.id==deleteR.id).delete()
+            session.flash=T('The change activities request has been canceled')
+            redirect(URL('activity_control','request_change_activity',vars=dict(project=request.vars['project'], year=request.vars['year'])))
+
+
+    cat = None
+    if request.vars['category'] is None or request.vars['category']=='':
+        cat=-1
+    else:
+        cat=db(db.course_activity_category.id==request.vars['category']).select().first()
+
+    year = db.period_year(id=request.vars['year'])
+    project = db.project(id=request.vars['project'])
+    
+    Draft = db((db.requestchange_activity.status=='Draft')&(db.requestchange_activity.semester==year.id)&(db.requestchange_activity.course==project.id)).select().first()
+
+    if request.vars['op'] == "createRequestChangeL":
+        #Update the request change activity
+        db(db.requestchange_activity.id==Draft.id).update(description=request.vars['activity_description_request_var'],status='Pending', date_request = datetime.datetime.now())
+        Draft = db((db.requestchange_activity.status=='Pending')&(db.requestchange_activity.semester==year.id)&(db.requestchange_activity.course==project.id)).select().first()
+        #Log of request change activity
+        nameP=None
+        nameS=None
+        try:
+            (nameP, projectSection) = str(project.name).split('(')
+            (nameS,garbage) = str(projectSection).split(')')
+            (garbage,nameS) = str(nameS).split(' ')
+        except:
+            nameP=project.name
+        idR = db.requestchange_activity_log.insert(user_request=Draft.user_id.username, roll_request='Student', status='Pending', description=request.vars['activity_description_request_var'], date_request=Draft.date_request, category_request=Draft.course_activity_category.category.category, semester=year.period.name, yearp=year.yearp, course=nameP, course_section=nameS)
+        activitiesChange = db(db.requestchange_course_activity.requestchange_activity==Draft.id).select()
+        for actChange in activitiesChange:
+            db.requestchange_course_activity_log.insert(requestchange_activity=idR, operation_request=actChange.operation_request, activity=actChange.activity, name=actChange.name, description=actChange.description, grade=actChange.grade, date_start=actChange.date_start, date_finish=actChange.date_finish)
+        #Check the user project
+        check = db.user_project(project = request.vars['project'], period = request.vars['year'], assigned_user = auth.user.id)
+        #Message
+        users2 = db((db.auth_user.id==db.user_project.assigned_user)&(db.user_project.period == check.period) & (db.user_project.project==check.project)&(db.auth_membership.user_id==db.user_project.assigned_user)&(db.auth_membership.group_id==3)).select().first()
+        subject="Solicitud de cambio de actividades - "+project.name
+        
+        message2="<br>Por este medio se le informa que el(la) practicante "+check.assigned_user.first_name+" "+check.assigned_user.last_name+" ha creado una solicitud de cambio de actividades en la categoría \""+Draft.course_activity_category.category.category+"\" dentro de la ponderación de laboratorio del Curso de \""+project.name+"\"."
+        message2=message2+"<br>Para aceptar o rechazar dicha solicitud dirigirse al control de solicitudes o al siguiente link: "
+        message2=message2+"<br>Saludos.<br><br>Sistema de Seguimiento de La Escuela de Ciencias y Sistemas<br>Facultad de Ingeniería - Universidad de San Carlos de Guatemala</html>"
+
+        #Send Mail to the Teacher
+        message="<html>catedratico(a) "+users2.auth_user.first_name+" "+users2.auth_user.last_name+" reciba un cordial saludo.<br>"
+        message3=message+message2
+        fail1 = send_mail_to_students(message3,subject,users2.auth_user.email,check,year.period.name,year.yearp)
+        fail1=1
+        #Send Mail to the DTT Administrator
+        message="<html>Administrator de DTT reciba un cordial saludo.<br>"
+        message3=message+message2
+        fail2 = send_mail_to_students(message3,subject,'dtt.ecys@dtt-ecys.org',check,year.period.name,year.yearp)
+        fail2=1
+        #Refresh the var Draft
+        Draft=None
+        if fail1==1 and fail2==1:
+            session.flash='Se ha creado la solicitud de cambios con exito. No se ha podido informar por medio de correo electronico al administrador del sistema DTT ni al catedratico(a) a cargo del curso sobre la solicitud creada, se solicita informarle a cada uno de ellos para tener una rapida atención a la solicitud creada.'
+        elif fail1==1:
+            session.flash='Se ha creado la solicitud de cambios con exito. Se ha informado por medio de correo electronico al administrador del sistema DTT y fallo el aviso al catedratico(a) a cargo del curso.'
+        elif fail2==1:
+            session.flash='Se ha creado la solicitud de cambios con exito. Se ha informado por medio de correo electronico al catedratico(a) a cargo del curso y fallo el aviso al administrador del sistema DTT.'
+        else:
+            session.flash='Se ha creado la solicitud de cambios con exito. Se ha informado por medio de correo electronico al catedratico(a) a cargo del curso y al administrador del sistema DTT.'
+
+    requestC=db((db.requestchange_activity.course==project.id)&(db.requestchange_activity.semester==year.id)&(db.requestchange_activity.status=='Pending')).select()
+    tempCategories=[]
+    tempCategories.append(-1)
+    for r in requestC:
+        tempCategories.append(int(r.course_activity_category))
+    categories = db((db.course_activity_category.assignation==project.id)&(db.course_activity_category.semester==year.id)&(db.course_activity_category.laboratory=='T')&(~db.course_activity_category.id.belongs(tempCategories))).select()
+    totalCategories=0
+    if categories is not None:
+        for c in categories:
+            totalCategories=totalCategories+1
+    return dict(period=year,
+                project=project,
+                requestC=requestC,
+                categories=categories,
+                totalCategories=totalCategories,
+                cat=cat,
+                Draft=Draft)
 
 
 

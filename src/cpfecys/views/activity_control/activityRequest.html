@@ -21,7 +21,7 @@
 		</tr>
 	{{for change in allRequest:}}
 		<tr>
-			<td>{{=change.user_name}}</td>
+			<td>{{=change.user_id.username}}</td>
 			<td>{{=T(change.roll)}}</td>
 			<td>{{=T(change.status)}}</td>
 			<td>{{=change.date_request}}</td>
@@ -42,7 +42,7 @@
 			<th colspan="6"><center>{{=T('Change Request')}}</center></th>
 		</tr>
 		<tr>
-			<th>{{=T('User')}}</th><td>{{=Request.user_name}}</td>
+			<th>{{=T('User')}}</th><td>{{=Request.user_id.username}}</td>
 			<th>{{=T('Role')}}</th><td>{{=T(Request.roll)}}</td>
 			<th>{{=T('Date Request')}}</th><td>{{=Request.date_request}}</td>
 		</tr>

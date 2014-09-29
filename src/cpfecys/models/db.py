@@ -742,7 +742,7 @@ db.define_table('student_control_period',
     )    
 
 db.define_table('course_activity',
-    Field('course_activity_category', 'reference course_activity_category', notnull=True, label = T('category')),    
+    Field('course_activity_category', 'reference course_activity_category', notnull=True, label = T('category')),
     Field('name', 'string', notnull=True, unique=False, label = T('name')),
     Field('description', 'string', notnull=True, unique=False, label = T('description')),
     Field('grade', 'decimal(5,2)', notnull=False, label=T('grade')),
@@ -785,14 +785,14 @@ db.define_table('course_activity_log',
 
 db.define_table('requestchange_activity',
     Field('user_id', 'reference auth_user', notnull = True, label = 'Usuario_ID'),
-    Field('user_name', 'text', notnull = True, label = 'Usuario'),
     Field('roll', 'text', notnull = True, label = 'Rol'),
     Field('status', 'text', notnull = True, label = 'Estado'),
-    Field('user_name_resolve', 'text', notnull = False, label = 'Usuario Resolvio'),
+    Field('user_resolve', 'reference auth_user', notnull = False, label = 'Usuario Resolvio'),
     Field('roll_resolve', 'text', notnull = False, label = 'Rol Resolvio'),
     Field('description', 'string', notnull=True, unique=False, label = 'Descripción'),
     Field('date_request', 'datetime', notnull = True, default = datetime.datetime.now(), label = 'Fecha'),
     Field('date_request_resolve', 'datetime', notnull = False, label = 'Fecha Resolvio'),
+    Field('course_activity_category', 'reference course_activity_category', notnull=True, label = T('category')),
     Field('semester', 'reference period_year', notnull=True, label = 'Periodo'),
     Field('course', 'reference project', notnull=True, label = 'Curso')
     )
@@ -801,8 +801,35 @@ db.define_table('requestchange_activity',
 db.define_table('requestchange_course_activity',
     Field('requestchange_activity', 'reference requestchange_activity', notnull=True, label = 'Solicitud Cambio'),
     Field('operation_request', 'text', notnull = True, label = 'Operacion'),
+    Field('activity', 'reference course_activity', notnull=False, label = 'Actividad'),
+    Field('name', 'string', notnull=False, unique=False, label = T('name')),
+    Field('description', 'string', notnull=False, unique=False, label = T('description')),
+    Field('grade', 'decimal(5,2)', notnull=False, label=T('grade')),
+    Field('date_start', 'date', notnull = False, default = datetime.datetime.now(), label = T('Date Start')),
+    Field('date_finish', 'date', notnull = False, default = datetime.datetime.now(), label = T('Date Finish'))
+    )
+
+
+db.define_table('requestchange_activity_log',
+    Field('user_request', 'text', notnull = True, label = 'Usuario Solicitud'),
+    Field('roll_request', 'text', notnull = True, label = 'Rol'),
+    Field('status', 'text', notnull = True, label = 'Estado'),
+    Field('user_resolve', 'text', notnull = False, label = 'Usuario Resolvio'),
+    Field('roll_resolve', 'text', notnull = False, label = 'Rol Resolvio'),
+    Field('description', 'string', notnull=True, unique=False, label = 'Descripción'),
+    Field('date_request', 'datetime', notnull = True, default = datetime.datetime.now(), label = 'Fecha'),
+    Field('date_request_resolve', 'datetime', notnull = False, label = 'Fecha Resolvio'),
+    Field('category_request', 'text', notnull=True, label = T('category')),
+    Field('semester', 'text', notnull=True, label = 'Periodo'),
+    Field('yearp', 'integer', notnull=True, label = 'Año'),
+    Field('course', 'text', notnull=True, label = 'Curso'),
+    Field('course_section', 'text', notnull=False, label = 'Sección')
+    )
+
+db.define_table('requestchange_course_activity_log',
+    Field('requestchange_activity', 'reference requestchange_activity_log', notnull=True, label = 'Solicitud Cambio'),
+    Field('operation_request', 'text', notnull = True, label = 'Operacion'),
     Field('activity', 'integer', notnull=False, label = 'Actividad'),
-    Field('course_activity_category', 'integer', notnull=False, label = 'Categoria'),
     Field('name', 'string', notnull=False, unique=False, label = T('name')),
     Field('description', 'string', notnull=False, unique=False, label = T('description')),
     Field('grade', 'decimal(5,2)', notnull=False, label=T('grade')),

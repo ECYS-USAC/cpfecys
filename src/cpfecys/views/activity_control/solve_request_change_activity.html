@@ -33,7 +33,7 @@
 								</tr>
 							{{for change in db((db.requestchange_activity.status=='Pending')&(db.requestchange_activity.semester==int(semestre2.id))&(db.requestchange_activity.course==int(course))).select():}}
 								<tr>
-									<td>{{=change.user_name}}</td>
+									<td>{{=change.user_id.username}}</td>
 									<td>{{=T(change.roll)}}</td>
 									<td>{{=T(change.status)}}</td>
 									<td>{{=change.date_request}}</td>

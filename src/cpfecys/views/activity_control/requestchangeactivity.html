@@ -1,0 +1,1227 @@
+{{if request.vars['op'] == "solveActivityRequestDetail":}}
+	{{Request = db(db.requestchange_activity.id==int(request.vars['Idrequest'])).select().first()}}
+		<label id="idR" value="{{=Request.id}}" style="display=none;"></label>
+		<table class="table table-striped table-bordered">
+			<tr>
+				<th colspan="6"><center>{{=T('Change Request')}}</center></th>
+			</tr>
+			<tr>
+				<th>{{=T('User')}}</th><td>{{=Request.user_id.username}}</td>
+				<th>{{=T('Role')}}</th><td>{{=T(Request.roll)}}</td>
+				<th>{{=T('Date Request')}}</th><td>{{=Request.date_request}}</td>
+			</tr>
+			<tr>
+				<th>{{=T('Status')}}:</th>
+				{{if Request.status=='Pending':}}
+					<th><FONT COLOR="#5E610B">{{=T(Request.status)}}</font></th>
+				{{elif Request.status=='Accepted':}}
+					<th><FONT COLOR="Green">{{=T(Request.status)}}</font></th>
+				{{else:}}
+					<th><FONT COLOR="Red">{{=T(Request.status)}}</font></th>
+				{{pass}}
+				<th>{{=T('Date of resolution')}}</th>
+				{{if Request.status=='Pending':}}
+					<td>---</td>
+				{{else:}}
+					<td>{{=Request.date_request_resolve}}</td>
+				{{pass}}
+				<th>{{=T('Role resolution')}}</th>
+				{{if Request.status=='Pending':}}
+					<td>---</td>
+				{{else:}}
+					<td>{{=Request.roll_resolve}}</td>
+				{{pass}}
+			</tr>
+			<tr>
+				<th>{{=T('Description')}}:</th>
+				<td colspan="5"><pre>{{=Request.description}}</pre></td>
+			</tr>
+			<tr>
+				<th colspan="6"><center>{{=T('Detail of Request')}}</center></th>
+			</tr>
+			<tr>
+				<th>Operación</th>
+				<th>Nombre Actividad</th>
+				<th>Descripción Actividad</th>
+				<th>Nota de Actividad</th>
+				<th>Fecha de Inicio</th>
+				<th>Fecha de Finalización</th>
+			</tr>
+			{{for change in db(db.requestchange_course_activity.requestchange_activity==Request.id).select():}}
+				<tr>
+					<td>{{=change.operation_request}}</td>
+					<td>{{=change.name}}</td>
+					<td>{{=change.description}}</td>
+					<td>{{=change.grade}}</td>
+					<td>{{=change.date_start}}</td>
+					<td>{{=change.date_finish}}</td>
+				</tr>
+			{{pass}}
+			<tr>
+				<td colspan="4"></td>
+				<td><center>
+					<a class="btn btn-danger" title="{{=T('Cancel the change request')}}" href="{{=URL('activity_control', 'requestchangeactivity/reject', vars=dict(requestID=Request.id, project=project.id, year=period.id))}}">
+						{{=T('Cancel request')}}
+					</a>
+				</center></td>
+				<td><center>
+					<a class="btn" title="{{=T('Close the detail of the change request')}}" onclick="closeDetail();">{{=T('Close Detail')}}</a>
+				</center></td>
+			</tr>
+		</table>
+{{pass}}
+<!--******************************************************************************************************************-->
+<!--******************************************************************************************************************-->
+<!--******************************************************************************************************************-->
+<!--******************************************************************************************************************-->
+<!--******************************************************************************************************************-->
+
+<!--UPDATE ACTIVITY-->
+{{if request.vars['op'] == "updateActivity":}}
+	{{date1=None}}
+	{{dateInicialP = db.executesql('SELECT date(\''+request.vars['edit_dateInit_var']+'\');',as_dict=True)}}
+	{{for d0 in dateInicialP:}}
+		{{date1=d0['date(\''+request.vars['edit_dateInit_var']+'\')']}}
+	{{pass}}
+	{{date2=None}}
+	{{dateInicialP2 = db.executesql('SELECT date(\''+request.vars['edit_dateEnd_var']+'\');',as_dict=True)}}
+	{{for d0 in dateInicialP2:}}
+		{{date2=d0['date(\''+request.vars['edit_dateEnd_var']+'\')']}}
+	{{pass}}
+
+	{{if date1==None or date2==None:}}
+		<script type="text/javascript"> 
+			alert("{{=T('One of the date or both are incorrect')}}"); 
+		</script>
+	{{else:}}
+		{{actualSemester = db(db.period_year.id==request.vars['year']).select().first()}}
+		{{comparacion = T(actualSemester.period.name)+" "+str(actualSemester.yearp)}}
+		{{date_var = db((db.student_control_period.period_name==comparacion)).select().first()}}
+
+		{{if date1>= date_var.date_start_semester and date2<= date_var.date_finish_semester:}}
+			{{comprobation=False}}
+			{{dateC2=None}}
+			{{maximTimeCategory = db.executesql('SELECT DATE_ADD(\''+str(date2)+'\', INTERVAL '+str(date_var.timeout_income_notes)+' Day) as fecha;',as_dict=True)}}
+			{{for d0 in maximTimeCategory:}}
+				{{dateC2=d0['fecha']}}
+			{{pass}}
+			{{if str(dateC2)>str(date_var.date_finish_semester):}}
+				<script type="text/javascript"> 
+					alert("{{=T('The end date of the activity over the time you have to enter notes exceeds timeout semester')}}"); 
+				</script>
+			{{else:}}
+				{{comprobation=True}}
+			{{pass}}
+
+			{{if comprobation==True:}}
+				{{changeActivities = db(db.requestchange_course_activity.requestchange_activity==Draft.id).select()}}
+				{{tActivities = db((db.course_activity.semester==period.id)&(db.course_activity.assignation==project.id)&(db.course_activity.laboratory=='T')&(db.course_activity.course_activity_category==cat.id)).select()}}
+
+				{{vecAct1=[]}}
+				{{vecAct2=[]}}
+				{{totalChanges=0}}
+				<!--Activities that has change-->
+				{{for c1 in changeActivities:}}
+					{{if c1.operation_request=='insert':}}
+						{{if c1.activity==None and request.vars['var_id'] == "0" and request.vars['var_name'] == c1.name:}}
+							{{None}}
+						{{else:}}
+							{{vecAct2.append(c1.name)}}
+							{{vecAct2.append(c1.grade)}}
+							{{vecAct1.append(vecAct2)}}
+							{{vecAct2=[]}}
+						{{pass}}
+					{{else:}}
+						{{totalChanges=totalChanges+1}}
+					{{pass}}
+				{{pass}}
+				<!--Activities originals-->
+				{{vecAct2=[]}}
+				{{exist=0}}
+				{{for c2 in tActivities:}}
+					{{if totalChanges>0:}}
+						{{for c1 in changeActivities:}}
+							{{if c1.activity==c2.id:}}
+								{{exist=1}}
+								{{if c1.operation_request=='update':}}
+									{{if request.vars['var_id'] == str(c2.id):}}
+										{{None}}
+									{{else:}}
+										{{vecAct2.append(c1.name)}}
+										{{vecAct2.append(c1.grade)}}
+										{{vecAct1.append(vecAct2)}}
+										{{vecAct2=[]}}
+									{{pass}}
+								{{pass}}
+							{{pass}}
+						{{pass}}
+						{{if exist==0:}}
+							{{if request.vars['var_id'] == str(c2.id) and request.vars['var_name'] == c2.name:}}
+								{{None}}
+							{{else:}}
+								{{vecAct2.append(c2.name)}}
+								{{vecAct2.append(c2.grade)}}
+								{{vecAct1.append(vecAct2)}}
+								{{vecAct2=[]}}
+							{{pass}}
+						{{pass}}
+					{{else:}}
+						{{if request.vars['var_id'] == str(c2.id) and request.vars['var_name'] == c2.name:}}
+							{{None}}
+						{{else:}}
+							{{vecAct2.append(c2.name)}}
+							{{vecAct2.append(c2.grade)}}
+							{{vecAct1.append(vecAct2)}}
+							{{vecAct2=[]}}
+						{{pass}}
+					{{pass}}
+					{{vecAct2=[]}}
+					{{exist=0}}
+				{{pass}}	
+				<!--Check-->
+				{{existName='false'}}
+				{{total_var2=float(request.vars['edit_field_grade_var'])}}
+				{{for a1 in vecAct1:}}
+					{{if a1[0] == request.vars['edit_activity_name1_var']:}}
+						{{existName='true'}}
+					{{pass}}
+					{{total_var2=total_var2+float(a1[1])}}
+				{{pass}}
+
+				{{refres=0}}
+				{{if existName=='false':}}
+					{{if cat.specific_grade==True:}}
+						{{if float(total_var2)<=float(cat.grade):}}
+							{{refres=1}}
+						{{else:}}
+							<script type="text/javascript"> 
+								alert("{{=T('The sum of the ratings of the activities exceeds the limit of the category') }}  ({{=str(total_var2)}} / {{=str(cat.grade)}})"); 
+							</script>
+						{{pass}}
+					{{else:}}
+						{{refres=1}}
+					{{pass}}
+
+
+					{{if refres==1:}}
+						{{change=0}}
+						{{for c1 in changeActivities:}}
+							{{if c1.operation_request=='insert':}}
+								{{if c1.activity==None and request.vars['var_id'] == "0" and request.vars['var_name'] == c1.name:}}
+									{{db(db.requestchange_course_activity.id==c1.id).update(name=request.vars['edit_activity_name1_var'], description = request.vars['edit_activity_description_var'], grade = float(request.vars['edit_field_grade_var']), date_start = request.vars['edit_dateInit_var'], date_finish=request.vars['edit_dateEnd_var'])}}
+									{{change=1}}
+								{{pass}}
+							{{elif c1.operation_request=='update':}}
+								{{if request.vars['var_id'] == str(c1.activity) and request.vars['var_name'] == c1.name:}}
+									{{db(db.requestchange_course_activity.id==c1.id).update(name=request.vars['edit_activity_name1_var'], description = request.vars['edit_activity_description_var'], grade = float(request.vars['edit_field_grade_var']), date_start = request.vars['edit_dateInit_var'], date_finish=request.vars['edit_dateEnd_var'])}}
+									{{change=1}}
+								{{pass}}
+							{{pass}}
+						{{pass}}
+						<!--Activities originals-->
+						{{if change==0:}}
+							{{for c2 in tActivities:}}
+								{{if request.vars['var_id'] == str(c2.id) and request.vars['var_name'] == c2.name:}}
+									{{db.requestchange_course_activity.insert(requestchange_activity=Draft.id, operation_request = 'update', name=request.vars['edit_activity_name1_var'], description = request.vars['edit_activity_description_var'], grade = float(request.vars['edit_field_grade_var']), date_start = request.vars['edit_dateInit_var'], date_finish=request.vars['edit_dateEnd_var'],activity=c2.id)}}
+								{{pass}}
+							{{pass}}
+						{{pass}}
+					{{pass}}
+				{{else:}}
+					<script type="text/javascript"> 
+						alert("{{=T('the name of the registered activity already exists.')}}"); 
+					</script>
+				{{pass}}
+
+			{{pass}}
+		{{else:}}
+			<script type="text/javascript"> 
+				alert("{{=T('The date range of activities are not within the range of the semester')}} ({{=date_var.date_start_semester}} - {{=date_var.date_finish_semester}})"); 
+			</script>
+		{{pass}}
+
+	{{pass}}
+{{pass}}
+
+
+<!--CREATE ACTIVITY-->
+{{if request.vars['op'] == "createActivity":}}
+	{{date1=None}}
+	{{dateInicialP = db.executesql('SELECT date(\''+request.vars['dateInit_var']+'\');',as_dict=True)}}
+	{{for d0 in dateInicialP:}}
+		{{date1=d0['date(\''+request.vars['dateInit_var']+'\')']}}
+	{{pass}}
+	{{date2=None}}
+	{{dateInicialP2 = db.executesql('SELECT date(\''+request.vars['dateEnd_var']+'\');',as_dict=True)}}
+	{{for d0 in dateInicialP2:}}
+		{{date2=d0['date(\''+request.vars['dateEnd_var']+'\')']}}
+	{{pass}}
+
+	{{if date1==None or date2==None:}}
+		<script type="text/javascript"> 
+			alert("{{=T('One of the date or both are incorrect')}}"); 
+		</script>
+	{{else:}}
+		{{actualSemester = db(db.period_year.id==request.vars['year']).select().first()}}
+		{{comparacion = T(actualSemester.period.name)+" "+str(actualSemester.yearp)}}
+		{{date_var = db((db.student_control_period.period_name==comparacion)).select().first()}}
+
+		{{if date1>= date_var.date_start_semester and date2<= date_var.date_finish_semester:}}
+			{{comprobation=False}}
+			{{dateC1=None}}
+			{{dateC2=None}}
+			{{maximTimeCategory = db.executesql('SELECT DATE_ADD(\''+str(date1)+'\', INTERVAL '+str(cat.category.timeout)+' Day) as fecha;',as_dict=True)}}
+			{{for d0 in maximTimeCategory:}}
+				{{dateC1=d0['fecha']}}
+			{{pass}}
+			{{if str(date2)>str(dateC1):}}
+				<script type="text/javascript"> 
+					alert("{{=T('The maximum number of days of activities in this category is')}} {{=str(cat.category.timeout)}}"); 
+				</script>
+			{{else:}}
+				{{maximTimeCategory = db.executesql('SELECT DATE_ADD(\''+str(date2)+'\', INTERVAL '+str(date_var.timeout_income_notes)+' Day) as fecha;',as_dict=True)}}
+				{{for d0 in maximTimeCategory:}}
+					{{dateC2=d0['fecha']}}
+				{{pass}}
+				{{if str(dateC2)>str(date_var.date_finish_semester):}}
+					<script type="text/javascript"> 
+						alert("{{=T('The end date of the activity over the time you have to enter notes exceeds timeout semester')}}"); 
+					</script>
+				{{else:}}
+					{{comprobation=True}}
+				{{pass}}
+			{{pass}}
+
+			{{if comprobation==True:}}
+				{{changeActivities = db(db.requestchange_course_activity.requestchange_activity==Draft.id).select()}}
+				{{tActivities = db((db.course_activity.semester==period.id)&(db.course_activity.assignation==project.id)&(db.course_activity.laboratory=='T')&(db.course_activity.course_activity_category==cat.id)).select()}}
+
+				{{vecAct1=[]}}
+				{{vecAct2=[]}}
+				{{totalChanges=0}}
+				<!--Activities that has change-->
+				{{for c1 in changeActivities:}}
+					{{if c1.operation_request=='insert':}}
+						{{vecAct2.append(c1.name)}}
+						{{vecAct2.append(c1.grade)}}
+						{{vecAct1.append(vecAct2)}}
+						{{vecAct2=[]}}
+					{{else:}}
+						{{totalChanges=totalChanges+1}}
+					{{pass}}
+				{{pass}}
+				<!--Activities originals-->
+				{{vecAct2=[]}}
+				{{exist=0}}
+				{{for c2 in tActivities:}}
+					{{if totalChanges>0:}}
+						{{for c1 in changeActivities:}}
+							{{if c1.activity==c2.id:}}
+								{{exist=1}}
+								{{if c1.operation_request=='update':}}
+									{{vecAct2.append(c1.name)}}
+									{{vecAct2.append(c1.grade)}}
+									{{vecAct1.append(vecAct2)}}
+								{{pass}}
+							{{pass}}
+						{{pass}}
+						{{if exist==0:}}
+							{{vecAct2.append(c2.name)}}
+							{{vecAct2.append(c2.grade)}}
+							{{vecAct1.append(vecAct2)}}
+						{{pass}}
+					{{else:}}
+						{{vecAct2.append(c2.name)}}
+						{{vecAct2.append(c2.grade)}}
+						{{vecAct1.append(vecAct2)}}
+					{{pass}}
+					{{vecAct2=[]}}
+					{{exist=0}}
+				{{pass}}
+				
+
+				<!--Check-->
+				{{existName='false'}}
+				{{total_var2=float(request.vars['field_grade_var'])}}
+				{{for a1 in vecAct1:}}
+					{{if a1[0] == request.vars['activity_name1_var']:}}
+						{{existName='true'}}
+					{{pass}}
+					{{total_var2=total_var2+float(a1[1])}}
+				{{pass}}
+
+				{{if existName=='false':}}
+					{{if cat.specific_grade==True:}}
+						{{if float(total_var2)<=float(cat.grade):}}
+							{{db.requestchange_course_activity.insert(requestchange_activity=Draft.id, operation_request = 'insert', name=request.vars['activity_name1_var'], description = request.vars['activity_description_var'], grade = request.vars['field_grade_var'], date_start = request.vars['dateInit_var'], date_finish=request.vars['dateEnd_var'])}}
+						{{else:}}
+							<script type="text/javascript"> 
+								alert("{{=T('The sum of the ratings of the activities exceeds the limit of the category') }}  ({{=str(total_var2)}} / {{=str(cat.grade)}})"); 
+							</script>
+						{{pass}}
+					{{else:}}
+						{{db.requestchange_course_activity.insert(requestchange_activity=Draft.id, operation_request = 'insert', name=request.vars['activity_name1_var'], description = request.vars['activity_description_var'], grade = float(0), date_start = request.vars['dateInit_var'], date_finish=request.vars['dateEnd_var'])}}
+					{{pass}}
+				{{else:}}
+					<script type="text/javascript"> 
+						alert("{{=T('the name of the registered activity already exists.')}}"); 
+					</script>
+				{{pass}}
+
+			{{pass}}
+		{{else:}}
+			<script type="text/javascript"> 
+				alert("{{=T('The date range of activities are not within the range of the semester')}} ({{=date_var.date_start_semester}} - {{=date_var.date_finish_semester}})"); 
+			</script>
+		{{pass}}
+
+	{{pass}}
+{{pass}}
+
+
+<!--DELETE ACTIVITY-->
+{{if request.vars['op'] == "removeActivityL":}}
+	{{if request.vars['var_id'] == "0":}}
+		{{db((db.requestchange_course_activity.name==request.vars['var_name'])&(db.requestchange_course_activity.activity==None)&(db.requestchange_course_activity.requestchange_activity==Draft.id)).delete()}}
+	{{else:}}
+		{{activity_var = db(db.course_activity.id == request.vars['var_id']).select().first()}}
+		{{var_act = db(db.grades.activity == request.vars['var_id']).select().first()}}
+		{{if var_act != None:}} 
+			<script type="text/javascript"> 
+				alert("{{=T('Unable to delete activity because it already has some grade associated')}}"); 
+			</script>
+		{{else:}}
+			{{actTemp = db((db.requestchange_course_activity.name==request.vars['var_name'])&(db.requestchange_course_activity.activity==request.vars['var_id'])&(db.requestchange_course_activity.requestchange_activity==Draft.id)).select().first()}}
+			{{if actTemp==None:}}
+				{{db.requestchange_course_activity.insert(requestchange_activity=Draft.id, operation_request = 'delete', name=activity_var.name, description = activity_var.description, grade = activity_var.grade, date_start = activity_var.date_start, date_finish=activity_var.date_finish,activity=activity_var.id)}}
+			{{else:}}
+				{{db(db.requestchange_course_activity.id==actTemp.id).update(operation_request='delete')}}
+			{{pass}}
+		{{pass}}
+	{{pass}}
+{{pass}}
+
+
+
+
+<!--******************************************************************************************************************-->
+<!--******************************************************************************************************************-->
+<!--******************************************************************************************************************-->
+<!--******************************************************************************************************************-->
+<!--******************************************************************************************************************-->
+
+
+
+{{if request.vars['op'] == "showRequestDone":}}
+	<table class="table table-striped table-bordered">
+		<tr>
+			<th>{{=T('Category')}}</th>
+			<th>{{=T('User')}}</th>
+			<th>{{=T('Role')}} </th>
+			<th>{{=T('Status')}}</th>
+			<th>{{=T('Date Request')}}</th>
+			<th>{{=T('Action')}}</th>
+		</tr>
+	{{for change in db((db.requestchange_activity.status=='Pending')&(db.requestchange_activity.semester==period.id)&(db.requestchange_activity.course==project.id)).select():}}
+		<tr>
+			<td>{{=change.course_activity_category.category.category}}</td>
+			<td>{{=change.user_id.username}}</td>
+			<td>{{=T(change.roll)}}</td>
+			<td>{{=T(change.status)}}</td>
+			<td>{{=change.date_request}}</td>
+			<td>
+				<a class="btn" title="{{=T('View the change request')}}" onclick="detail({{=change.id}});">{{=T('Detail')}}</a>
+			</td>
+		</tr>
+	{{pass}}
+	</table>
+{{pass}}
+
+
+
+
+
+{{if request.vars['op'] == "createRequest":}}
+	{{if Draft==None:}}
+		{{if totalCategories>0:}}
+			<table>
+				<tr>
+					<td colspan="2"><center>{{=T('Category')}}</center></td>
+				</tr>
+				<tr>
+					<td>
+						<select class="generic-widget" id="categoryID" style="width:140px;">
+						{{for category in categories:}}
+								<option value="{{=category.id}}">{{=category.category.category}}</option>
+						{{pass}}
+						</select>
+					</td>
+					<td>
+						<a id="loadActivity" role="button" class="btn btn-warning" title="{{=T('Load Category')}}" onclick="showCategory();"> 
+				            {{=T('Load Category')}}
+						</a>
+					</td>
+				</tr>
+			</table>
+		{{else:}}
+			<H1>No hay categorias para realizar la solicitud de cambio</H1>
+		{{pass}}
+	{{else:}}
+		{{db(db.requestchange_activity.id==Draft.id).delete()}}
+		{{if totalCategories>0:}}
+			<table>
+				<tr>
+					<td colspan="2"><center>{{=T('Category')}}</center></td>
+				</tr>
+				<tr>
+					<td>
+						<select class="generic-widget" id="categoryID" style="width:140px;">
+						{{for category in categories:}}
+								<option value="{{=category.id}}">{{=category.category.category}}</option>
+						{{pass}}
+						</select>
+					</td>
+					<td>
+						<a id="loadActivity" role="button" class="btn btn-warning" title="{{=T('Load Category')}}" onclick="showCategory();"> 
+				            {{=T('Load Category')}}
+						</a>
+					</td>
+				</tr>
+			</table>
+		{{else:}}
+			<H1>No hay categorias para realizar la solicitud de cambio</H1>
+		{{pass}}
+	{{pass}}
+{{pass}}
+
+
+
+{{if request.vars['op'] == "showRequest":}}
+	{{if request.vars['initial']!="n":}}
+		<!--Insert the request change activity like draft-->
+		{{db.requestchange_activity.insert(user_id=auth.user.id, roll='Student', status='Draft', semester = int(period.id), course = int(project.id), course_activity_category=int(cat.id))}}
+	{{pass}}
+
+	{{tActivities = db((db.course_activity.semester==period.id)&(db.course_activity.assignation==project.id)&(db.course_activity.laboratory=='T')&(db.course_activity.course_activity_category==cat.id)).select()}}
+	{{changeActivities=None}}
+	{{if Draft!=None:}}
+		{{changeActivities = db(db.requestchange_course_activity.requestchange_activity==Draft.id).select()}}
+	{{pass}}
+	<ul id="myTab" class="nav nav-tabs">
+		<li class="active" id="var_requestChange"><a href="#" data-toggle="tab" onclick="createRequestChange()";>{{=T('Request Change')}}</a></li>
+		<li id="var_allActivity"><a href="#" data-toggle="tab" onclick="controlActivities()";>{{=T('Control Activities')}}</a></li>
+	</ul>
+	<table>
+		<tr>
+			<td align="left">
+				<div class="well span11" id="div_requestChange" style="overflow:auto; width:100%;">
+					<label>{{=T('Description')}}</label>
+					<textarea class="string" cols="40" type="text" value="" id="activity_description_request" style="width:280px; height:100px;"></textarea>
+					{{totalChanges=0}}
+					{{if changeActivities!=None:}}
+						{{for change in changeActivities:}}
+							{{totalChanges=totalChanges+1}}
+						{{pass}}
+					{{pass}}
+					<label>{{=T('Total Changes')}}: {{=totalChanges}}</label>
+					<table class="table table-bordered">
+						<tr>
+							<th>{{=T('Category')}}</th>
+							<th>{{=T('Detail')}}</th>
+						</tr>
+						{{totalControl=0}}
+						{{exist=0}}
+						{{for act in tActivities:}}
+							{{if totalChanges==0:}}
+								{{if cat.specific_grade==True:}}
+									{{totalControl=totalControl+act.grade}}
+								{{else:}}
+									{{totalControl=totalControl+1}}
+								{{pass}}
+							{{else:}}
+								{{for change in changeActivities:}}
+									{{if act.id==change.activity:}}
+										{{exist=1}}
+										{{if change.operation_request!='delete':}}
+											{{if cat.specific_grade==True:}}
+												{{totalControl=totalControl+change.grade}}
+											{{else:}}
+												{{totalControl=totalControl+1}}
+											{{pass}}
+										{{pass}}
+									{{pass}}
+								{{pass}}
+								{{if exist==0:}}
+									{{if cat.specific_grade==True:}}
+										{{totalControl=totalControl+act.grade}}
+									{{else:}}
+										{{totalControl=totalControl+1}}
+									{{pass}}
+								{{pass}}
+								{{exist=0}}
+							{{pass}}
+						{{pass}}
+						{{if changeActivities!=None:}}
+							{{for change in changeActivities:}}
+								{{if change.operation_request=='insert':}}
+									{{if cat.specific_grade==True:}}
+										{{totalControl=totalControl+change.grade}}
+									{{else:}}
+										{{totalControl=totalControl+1}}
+									{{pass}}
+								{{pass}}
+							{{pass}}
+						{{pass}}
+						<tr>
+							{{if cat.specific_grade==True:}}
+								{{if totalControl==cat.grade:}}
+									<td><FONT COLOR="Blue">{{=cat.category.category}}</font></td><td><FONT COLOR="Blue">---</font></td>
+								{{else:}}
+									<td><FONT COLOR="Red">{{=cat.category.category}}</font></td><td><FONT COLOR="Red">Ponderación Erronea: {{=totalControl}}/{{=cat.grade}}</font></td>
+								{{pass}}
+							{{else:}}
+								{{if totalControl==0:}}
+									<td><FONT COLOR="Red">{{=cat.category.category}}</font></td><td><FONT COLOR="Red">No tiene actividades</font></td>
+								{{else:}}
+									<td><FONT COLOR="Blue">{{=cat.category.category}}</font></td><td><FONT COLOR="Blue">---</font></td>
+								{{pass}}
+							{{pass}}
+						</tr>
+					</table>
+					<center>
+					{{if totalChanges>0 and ((cat.specific_grade==True and totalControl==cat.grade) or (cat.specific_grade==False and totalControl>0)):}}
+						
+						<a class="btn btn-success" title="{{=T('Make the change requestt')}}" id="botonRequest" onclick="makeRequest(1);" href="{{=URL('activity_control', 'request_change_activity', vars=dict(project = project.id, year=period.id))}}">
+							{{=T('Make request')}}
+						</a>
+					{{else:}}
+						<a class="btn disabled" title="{{=T('Make the change requestt')}}" id="botonRequest" onclick="makeRequest(0);">
+							{{=T('Make request')}}
+						</a>
+					{{pass}}
+					<a class="btn btn-danger" title="{{=T('Cancel the change request')}}" href="{{=URL('activity_control', 'requestchangeactivity/cancelR', vars=dict(project=project.id, year=period.id))}}">
+						{{=T('Cancel request')}}
+					</a>
+					</center>
+				</div>
+			</td>
+			<td align="left">
+				<div class="well span11" id="div_activity_show"  style="overflow:auto; width:100%;">
+    				<table class="table table-striped table-bordered">
+    					<tr><th colspan="5"><center>{{=cat.category.category}} ({{=cat.grade}} pts)</center></th></tr>
+    					<tr><th>Nombre</th><th>Descripción</th><th>Punteo</th><th>Fecha Inicio</th><th>Fecha Finalización</th></tr>
+	    				{{exist=0}}
+	    				{{for act in tActivities:}}
+	    					<tr>
+							{{if totalChanges==0:}}
+								<td>{{=act.name}}</td>
+								<td>{{=act.description}}</td>
+								<td>{{=act.grade}}</td>
+								<td>{{=act.date_start}}</td>
+								<td>{{=act.date_finish}}</td>
+							{{else:}}
+								{{for change in changeActivities:}}
+									{{if act.id==change.activity:}}
+										{{exist=1}}
+										{{if change.operation_request=='delete':}}
+											<td><FONT COLOR="Red">{{=act.name}}</font></td>
+											<td><FONT COLOR="Red">{{=act.description}}</font></td>
+											<td><FONT COLOR="Red">{{=act.grade}}</font></td>
+											<td><FONT COLOR="Red">{{=act.date_start}}</font></td>
+											<td><FONT COLOR="Red">{{=act.date_finish}}</font></td>
+										{{else:}}
+											<td><FONT COLOR="Green">{{=change.name}}</font></td>
+											<td><FONT COLOR="Green">{{=change.description}}</font></td>
+											<td><FONT COLOR="Green">{{=change.grade}}</font></td>
+											<td><FONT COLOR="Green">{{=change.date_start}}</font></td>
+											<td><FONT COLOR="Green">{{=change.date_finish}}</font></td>
+										{{pass}}
+									{{pass}}
+								{{pass}}
+								{{if exist==0:}}
+									<td>{{=act.name}}</td>
+									<td>{{=act.description}}</td>
+									<td>{{=act.grade}}</td>
+									<td>{{=act.date_start}}</td>
+									<td>{{=act.date_finish}}</td>
+								{{pass}}
+								{{exist=0}}
+							{{pass}}
+							</tr>
+						{{pass}}
+						{{if totalChanges>0:}}
+							{{for change in changeActivities:}}
+								{{if change.operation_request=='insert':}}
+									<tr>
+										<td><FONT COLOR="Blue">{{=change.name}}</font></td>
+										<td><FONT COLOR="Blue">{{=change.description}}</font></td>
+										<td><FONT COLOR="Blue">{{=change.grade}}</font></td>
+										<td><FONT COLOR="Blue">{{=change.date_start}}</font></td>
+										<td><FONT COLOR="Blue">{{=change.date_finish}}</font></td>
+									</tr>
+								{{pass}}
+							{{pass}}
+						{{pass}}
+						<TFOOT>
+						     <tr>
+						 		<td colspan="5"><b>{{=T('Lengend')}}</b>
+						 		<br>
+						 		<span class="label label-info">&nbsp;&nbsp;&nbsp;</span>&nbsp;{{=T('Activities added')}}
+						 		<br>
+						 		<span class="label label-success">&nbsp;&nbsp;&nbsp;</span>&nbsp;{{=T('Activities to date')}}
+						 		<br>
+						 		<span class="label label-important">&nbsp;&nbsp;&nbsp;</span>&nbsp;{{=T('Eliminated activities')}}
+						 		<br>
+						 		<span class="label">&nbsp;&nbsp;&nbsp;</span>&nbsp;{{=T('Normal activities')}}
+						 		</td>
+						 	</tr>
+						</TFOOT>
+					</table>
+              	</div>
+			</td>
+		</tr>
+	</table>
+	
+{{pass}}
+
+
+
+
+
+{{if request.vars['op'] == "addActivities":}}
+	{{if Draft is None:}}
+		<script type="text/javascript">
+			alert('La solicitud de cambios ha sido eliminada');
+			window.location.href = "{{=URL('default', 'index')}}";
+		</script>
+	{{else:}}
+		{{if Draft.course_activity_category!=request.vars['category']:}}
+			<script type="text/javascript">
+				alert('La solicitud de cambios ha sido eliminada');
+				window.location.href = "{{=URL('default', 'index')}}";
+			</script>
+		{{pass}}
+	{{pass}}
+	<label id="{{=cat.id}}">{{=cat.category.category}} ({{=cat.grade}} pts.)</label>
+	<label>{{=T('name')}}:</label>
+	{{if cat.category.category=='Examen Final':}}
+		<input class="string" type="text" id="activity_name1" style="width:200px;" value="Examen Final" disabled>
+	{{elif cat.category.category=='Parciales':}}
+		<select class="generic-widget" id="activity_name1" style="width:200px;">
+			<option value="Primer Parcial">Primer Parcial</option>
+			<option value="Segundo Parcial">Segundo Parcial</option>
+			<option value="Tercer Parcial">Tercer Parcial</option>
+		</select>
+	{{else:}}
+		<input class="string" type="text" value="" id="activity_name1" style="width:200px;">
+	{{pass}}
+	<label>{{=T('description')}}:</label>
+    <textarea class="string" cols="40" type="text" value="" id="activity_description" style="width:200px; height:100px;"></textarea>
+    {{if cat.specific_grade==True:}}
+    	<label id="label_grade">{{=T('Grade')}}:</label>
+    	{{if cat.category.category=='Examen Final':}}
+    		<input class="string" id="field_grade" type="text" value="{{=cat.grade}}" style="width:200px;" disabled>
+    	{{else:}}
+    		<input class="string" id="field_grade" type="text" value="" style="width:200px;">
+    	{{pass}}
+    {{else:}}
+    	<input class="string" id="field_grade" type="text" value="1" style="width:200px; display:none;">
+    {{pass}}
+    <label id="label_timeout"></label>
+    <label>{{=T('Start Date')}}:</label>
+    <input class="date" id="dateInit" name="log-date" placeholder="YYYY-MM-DD" type="text" value = "" style="width:200px;">
+    <label>{{=T('End Date')}}:</label>
+    <input class="date" id="dateEnd" name="log-date" placeholder="YYYY-MM-DD" type="text" value = "" style="width:200px;">
+    <a id="addActivity" role="button" class="btn btn-info" title="{{=T('Add activity to scheduler')}}" onclick="createActivity();"> 
+        <span class="icon-plus-sign"></span>
+        {{=T('Add Activity')}}
+	</a>
+{{pass}}
+
+
+
+{{if request.vars['op'] == "controlActivities" or request.vars['op'] == "removeActivityL" or request.vars['op'] == "createActivity" or request.vars['op'] == "showEditActivity" or request.vars['op'] == "updateActivity":}}
+	{{tActivities = db((db.course_activity.semester==period.id)&(db.course_activity.assignation==project.id)&(db.course_activity.laboratory=='T')&(db.course_activity.course_activity_category==cat.id)).select()}}
+	{{changeActivities=None}}
+	{{if Draft!=None:}}
+		{{changeActivities = db(db.requestchange_course_activity.requestchange_activity==Draft.id).select()}}
+	{{pass}}
+
+	{{totalChanges=0}}
+	{{if changeActivities!=None:}}
+		{{for change in changeActivities:}}
+			{{totalChanges=totalChanges+1}}
+		{{pass}}
+	{{pass}}
+	<table class="table table-striped table-bordered">
+		<tr><th colspan="6"><center>{{=cat.category.category}} ({{=cat.grade}} pts)</center></th></tr>
+		<tr><th>Nombre</th><th>Descripción</th><th>Punteo</th><th>Fecha Inicio</th><th>Fecha Finalización</th><th>{{=T('Actions')}}</th>
+		</tr>
+		{{exist=0}}
+		{{editable_var='false'}}
+		{{for act in tActivities:}}
+			{{editable_var='false'}}
+			<tr>
+			{{if totalChanges==0:}}
+				{{if request.vars['op'] == "showEditActivity":}}
+					{{if str(act.id)==request.vars['var_id'] and act.name==request.vars['var_name']:}}
+						{{editable_var='true'}}
+					{{pass}}
+				{{pass}}
+				{{if editable_var=='true':}}
+					<td>
+						{{if cat.category.category=='Examen Final':}}
+							<input class="string" type="text" id="edit_activity_name1" style="width:140px;" value="Examen Final" disabled>
+						{{elif act.name=='Primer Parcial' or act.name=='Segundo Parcial' or act.name=='Tercer Parcial':}}
+							<select class="generic-widget" id="edit_activity_name1" style="width:140px;">
+							{{if act.name=='Primer parcial':}}
+								<option value="{{=act.name}}">{{=act.name}}</option>
+								<option value="Segundo Parcial">Segundo Parcial</option>
+								<option value="Tercer Parcial">Tercer Parcial</option>
+							{{elif act.name=='Segundo parcial':}}
+								<option value="Primer Parcial">Primer Parcial</option>
+								<option value="{{=act.name}}">{{=act.name}}</option>
+								<option value="Tercer Parcial">Tercer Parcial</option>
+							{{else:}}
+								<option value="Primer Parcial">Primer Parcial</option>
+								<option value="Segundo Parcial">Segundo Parcial</option>
+								<option value="{{=act.name}}">{{=act.name}}</option>
+							{{pass}}
+							</select>
+						{{else:}}
+							<input class="string" type="text" value="{{=act.name}}" id="edit_activity_name1" style="width:140px;">
+						{{pass}}
+					</td>
+					<td>
+						<textarea class="string" cols="40" type="text" id="edit_activity_description" style="width:200px; height:100px;">{{=act.description}}</textarea>
+					</td>
+					<td>
+						{{if cat.specific_grade==True:}}
+					    	{{if cat.category.category=='Examen Final':}}
+					    		<input class="string" id="edit_field_grade" type="text" value="{{=act.grade}}" style="width:40px;" disabled>
+					    	{{else:}}
+					    		<input class="string" id="edit_field_grade" type="text" value="{{=act.grade}}" style="width:40px;">
+					    	{{pass}}
+					    {{else:}}
+					    	<input class="string" id="edit_field_grade" type="text" value="{{=act.grade}}" style="width:40px;" disabled>
+					    {{pass}}
+					</td>
+					<td>
+					    <input class="date" id="edit_dateInit" name="log-date" placeholder="YYYY-MM-DD" type="text" value = "{{=act.date_start}}" style="width:100px;">
+					</td>
+					<td>
+					    <input class="date" id="edit_dateEnd" name="log-date" placeholder="YYYY-MM-DD" type="text" value = "{{=act.date_finish}}" style="width:100px;">
+					</td>
+				{{else:}}
+					<td>{{=act.name}}</td>
+					<td>{{=act.description}}</td>
+					<td>{{=act.grade}}</td>
+					<td>{{=act.date_start}}</td>
+					<td>{{=act.date_finish}}</td>
+				{{pass}}
+				<td>
+					<center>
+						{{if editable_var=='true':}}
+							<a id="activityButton" role="button" class="badge btn-success"  
+							onclick="updateActivity({{=act.id}},'{{=act.name}}');"> 
+	                    		<span class="icon-white icon-check"></span>
+	                    	</a>
+                    	{{else:}}
+                    		<a id="activityButton" role="button" class="badge btn-info"  
+							onclick="editActivity({{=act.id}},'{{=act.name}}');"> 
+	                    		<span class="icon-white icon-edit"></span>
+	                    	</a>
+                    	{{pass}}
+                    	<a id="activityButton" role="button" class="badge btn-danger" 
+                    	onclick="removeActivity({{=act.id}},'{{=act.name}}');"> 
+                    		<span class="icon-white icon-remove-sign"></span>
+                    	</a>
+					</center>
+				</td>
+			{{else:}}
+				{{for change in changeActivities:}}
+					{{if act.id==change.activity:}}
+						{{exist=1}}
+						{{if change.operation_request=='update':}}
+							{{if request.vars['op'] == "showEditActivity":}}
+								{{if str(change.activity)==request.vars['var_id'] and change.name==request.vars['var_name']:}}
+									{{editable_var='true'}}
+								{{pass}}
+							{{pass}}
+							{{if editable_var=='true':}}
+								<td>
+									{{if cat.category.category=='Examen Final':}}
+										<input class="string" type="text" id="edit_activity_name1" style="width:140px;" value="Examen Final" disabled>
+									{{elif act.name=='Primer Parcial' or act.name=='Segundo Parcial' or act.name=='Tercer Parcial':}}
+										<select class="generic-widget" id="edit_activity_name1" style="width:140px;">
+										{{if act.name=='Primer parcial':}}
+											<option value="{{=act.name}}">{{=change.name}}</option>
+											<option value="Segundo Parcial">Segundo Parcial</option>
+											<option value="Tercer Parcial">Tercer Parcial</option>
+										{{elif act.name=='Segundo parcial':}}
+											<option value="Primer Parcial">Primer Parcial</option>
+											<option value="{{=act.name}}">{{=change.name}}</option>
+											<option value="Tercer Parcial">Tercer Parcial</option>
+										{{else:}}
+											<option value="Primer Parcial">Primer Parcial</option>
+											<option value="Segundo Parcial">Segundo Parcial</option>
+											<option value="{{=act.name}}">{{=change.name}}</option>
+										{{pass}}
+										</select>
+									{{else:}}
+										<input class="string" type="text" value="{{=change.name}}" id="edit_activity_name1" style="width:140px;">
+									{{pass}}
+								</td>
+								<td>
+									<textarea class="string" cols="40" type="text" id="edit_activity_description" style="width:200px; height:100px;">{{=change.description}}</textarea>
+								</td>
+								<td>
+									{{if cat.specific_grade==True:}}
+								    	{{if cat.category.category=='Examen Final':}}
+								    		<input class="string" id="edit_field_grade" type="text" value="{{=change.grade}}" style="width:40px;" disabled>
+								    	{{else:}}
+								    		<input class="string" id="edit_field_grade" type="text" value="{{=change.grade}}" style="width:40px;">
+								    	{{pass}}
+								    {{else:}}
+								    	<input class="string" id="edit_field_grade" type="text" value="{{=change.grade}}" style="width:40px;" disabled>
+								    {{pass}}
+								</td>
+								<td>
+								    <input class="date" id="edit_dateInit" name="log-date" placeholder="YYYY-MM-DD" type="text" value = "{{=change.date_start}}" style="width:100px;">
+								</td>
+								<td>
+								    <input class="date" id="edit_dateEnd" name="log-date" placeholder="YYYY-MM-DD" type="text" value = "{{=change.date_finish}}" style="width:100px;">
+								</td>
+							{{else:}}
+								<td><FONT COLOR="Green">{{=change.name}}</font></td>
+								<td><FONT COLOR="Green">{{=change.description}}</font></td>
+								<td><FONT COLOR="Green">{{=change.grade}}</font></td>
+								<td><FONT COLOR="Green">{{=change.date_start}}</font></td>
+								<td><FONT COLOR="Green">{{=change.date_finish}}</font></td>
+							{{pass}}
+							<td>
+								<center>
+									{{if editable_var=='true':}}
+										<a id="activityButton" role="button" class="badge btn-success"  
+										onclick="updateActivity({{=change.activity}},'{{=change.name}}');"> 
+				                    		<span class="icon-white icon-check"></span>
+				                    	</a>
+			                    	{{else:}}
+			                    		<a id="activityButton" role="button" class="badge btn-info"  
+										onclick="editActivity({{=change.activity}},'{{=change.name}}');"> 
+				                    		<span class="icon-white icon-edit"></span>
+				                    	</a>
+			                    	{{pass}}
+			                    	<a id="activityButton" role="button" class="badge btn-danger" 
+			                    	onclick="removeActivity({{=change.activity}},'{{=change.name}}');">
+			                    		<span class="icon-white icon-remove-sign"></span>
+			                    	</a>
+								</center>
+							</td>
+						{{pass}}
+					{{pass}}
+				{{pass}}
+				{{if exist==0:}}
+					{{if request.vars['op'] == "showEditActivity":}}
+						{{if str(act.id)==request.vars['var_id'] and act.name==request.vars['var_name']:}}
+							{{editable_var='true'}}
+						{{pass}}
+					{{pass}}
+					{{if editable_var=='true':}}
+						<td>
+							{{if cat.category.category=='Examen Final':}}
+								<input class="string" type="text" id="edit_activity_name1" style="width:140px;" value="Examen Final" disabled>
+							{{elif act.name=='Primer Parcial' or act.name=='Segundo Parcial' or act.name=='Tercer Parcial':}}
+								<select class="generic-widget" id="edit_activity_name1" style="width:140px;">
+								{{if act.name=='Primer parcial':}}
+									<option value="{{=act.name}}">{{=act.name}}</option>
+									<option value="Segundo Parcial">Segundo Parcial</option>
+									<option value="Tercer Parcial">Tercer Parcial</option>
+								{{elif act.name=='Segundo parcial':}}
+									<option value="Primer Parcial">Primer Parcial</option>
+									<option value="{{=act.name}}">{{=act.name}}</option>
+									<option value="Tercer Parcial">Tercer Parcial</option>
+								{{else:}}
+									<option value="Primer Parcial">Primer Parcial</option>
+									<option value="Segundo Parcial">Segundo Parcial</option>
+									<option value="{{=act.name}}">{{=act.name}}</option>
+								{{pass}}
+								</select>
+							{{else:}}
+								<input class="string" type="text" value="{{=act.name}}" id="edit_activity_name1" style="width:140px;">
+							{{pass}}
+						</td>
+						<td>
+							<textarea class="string" cols="40" type="text" id="edit_activity_description" style="width:200px; height:100px;">{{=act.description}}</textarea>
+						</td>
+						<td>
+							{{if cat.specific_grade==True:}}
+						    	{{if cat.category.category=='Examen Final':}}
+						    		<input class="string" id="edit_field_grade" type="text" value="{{=act.grade}}" style="width:40px;" disabled>
+						    	{{else:}}
+						    		<input class="string" id="edit_field_grade" type="text" value="{{=act.grade}}" style="width:40px;">
+						    	{{pass}}
+						    {{else:}}
+						    	<input class="string" id="edit_field_grade" type="text" value="{{=act.grade}}" style="width:40px;" disabled>
+						    {{pass}}
+						</td>
+						<td>
+						    <input class="date" id="edit_dateInit" name="log-date" placeholder="YYYY-MM-DD" type="text" value = "{{=act.date_start}}" style="width:100px;">
+						</td>
+						<td>
+						    <input class="date" id="edit_dateEnd" name="log-date" placeholder="YYYY-MM-DD" type="text" value = "{{=act.date_finish}}" style="width:100px;">
+						</td>
+					{{else:}}
+						<td>{{=act.name}}</td>
+						<td>{{=act.description}}</td>
+						<td>{{=act.grade}}</td>
+						<td>{{=act.date_start}}</td>
+						<td>{{=act.date_finish}}</td>
+					{{pass}}
+					<td>
+						<center>
+							{{if editable_var=='true':}}
+								<a id="activityButton" role="button" class="badge btn-success"  
+								onclick="updateActivity({{=act.id}},'{{=act.name}}');"> 
+		                    		<span class="icon-white icon-check"></span>
+		                    	</a>
+	                    	{{else:}}
+	                    		<a id="activityButton" role="button" class="badge btn-info"  
+								onclick="editActivity({{=act.id}},'{{=act.name}}');"> 
+		                    		<span class="icon-white icon-edit"></span>
+		                    	</a>
+	                    	{{pass}}
+	                    	<a id="activityButton" role="button" class="badge btn-danger" 
+	                    	onclick="removeActivity({{=act.id}},'{{=act.name}}');">
+	                    		<span class="icon-white icon-remove-sign"></span>
+	                    	</a>
+						</center>
+					</td>
+				{{pass}}
+				{{exist=0}}
+			{{pass}}
+			</tr>
+		{{pass}}
+
+		{{if totalChanges>0:}}
+			{{for change in changeActivities:}}
+				{{if change.operation_request=='insert':}}
+					{{editable_var='false'}}
+					{{if request.vars['op'] == "showEditActivity":}}
+						{{if change.activity==None and request.vars['var_id']=="0" and change.name==request.vars['var_name']:}}
+							{{editable_var='true'}}
+						{{pass}}
+					{{pass}}
+					<tr>
+						{{if editable_var=='true':}}
+							<td>
+								{{if cat.category.category=='Examen Final':}}
+									<input class="string" type="text" id="edit_activity_name1" style="width:140px;" value="Examen Final" disabled>
+								{{elif change.name=='Primer Parcial' or change.name=='Segundo Parcial' or change.name=='Tercer Parcial':}}
+									<select class="generic-widget" id="edit_activity_name1" style="width:140px;">
+									{{if change.name=='Primer parcial':}}
+										<option value="{{=change.name}}">{{=change.name}}</option>
+										<option value="Segundo Parcial">Segundo Parcial</option>
+										<option value="Tercer Parcial">Tercer Parcial</option>
+									{{elif change.name=='Segundo parcial':}}
+										<option value="Primer Parcial">Primer Parcial</option>
+										<option value="{{=change.name}}">{{=change.name}}</option>
+										<option value="Tercer Parcial">Tercer Parcial</option>
+									{{else:}}
+										<option value="Primer Parcial">Primer Parcial</option>
+										<option value="Segundo Parcial">Segundo Parcial</option>
+										<option value="{{=change.name}}">{{=change.name}}</option>
+									{{pass}}
+									</select>
+								{{else:}}
+									<input class="string" type="text" value="{{=change.name}}" id="edit_activity_name1" style="width:140px;">
+								{{pass}}
+							</td>
+							<td>
+								<textarea class="string" cols="40" type="text" id="edit_activity_description" style="width:200px; height:100px;">{{=change.description}}</textarea>
+							</td>
+							<td>
+								{{if cat.specific_grade==True:}}
+							    	{{if cat.category.category=='Examen Final':}}
+							    		<input class="string" id="edit_field_grade" type="text" value="{{=change.grade}}" style="width:40px;" disabled>
+							    	{{else:}}
+							    		<input class="string" id="edit_field_grade" type="text" value="{{=change.grade}}" style="width:40px;">
+							    	{{pass}}
+							    {{else:}}
+							    	<input class="string" id="edit_field_grade" type="text" value="{{=change.grade}}" style="width:40px;" disabled>
+							    {{pass}}
+							</td>
+							<td>
+							    <input class="date" id="edit_dateInit" name="log-date" placeholder="YYYY-MM-DD" type="text" value = "{{=change.date_start}}" style="width:100px;">
+							</td>
+							<td>
+							    <input class="date" id="edit_dateEnd" name="log-date" placeholder="YYYY-MM-DD" type="text" value = "{{=change.date_finish}}" style="width:100px;">
+							</td>
+						{{else:}}
+							<td><FONT COLOR="Blue">{{=change.name}}</font></td>
+							<td><FONT COLOR="Blue">{{=change.description}}</font></td>
+							<td><FONT COLOR="Blue">{{=change.grade}}</font></td>
+							<td><FONT COLOR="Blue">{{=change.date_start}}</font></td>
+							<td><FONT COLOR="Blue">{{=change.date_finish}}</font></td>
+						{{pass}}
+						<td>
+							<center>
+								{{if editable_var=='true':}}
+									<a id="activityButton" role="button" class="badge btn-success"  
+									onclick="updateActivity(0,'{{=change.name}}');"> 
+			                    		<span class="icon-white icon-check"></span>
+			                    	</a>
+		                    	{{else:}}
+		                    		<a id="activityButton" role="button" class="badge btn-info"  
+									onclick="editActivity(0,'{{=change.name}}');"> 
+			                    		<span class="icon-white icon-edit"></span>
+			                    	</a>
+		                    	{{pass}}
+		                    	<a id="activityButton" role="button" class="badge btn-danger" 
+		                    	onclick="removeActivity(0,'{{=change.name}}');"> 
+		                    		<span class="icon-white icon-remove-sign"></span>
+		                    	</a>
+							</center>
+						</td>
+					</tr>
+				{{pass}}
+			{{pass}}
+		{{pass}}
+		<TFOOT>
+		     <tr>
+		 		<td colspan="6"><b>{{=T('Lengend')}}</b>
+		 		<br>
+		 		<span class="label label-info">&nbsp;&nbsp;&nbsp;</span>&nbsp;{{=T('Activities added')}}
+		 		<br>
+		 		<span class="label label-success">&nbsp;&nbsp;&nbsp;</span>&nbsp;{{=T('Activities to date')}}
+		 		<br>
+		 		<span class="label">&nbsp;&nbsp;&nbsp;</span>&nbsp;{{=T('Normal activities')}}
+		 		</td>
+		 	</tr>
+		</TFOOT>
+	</table>
+{{pass}}
+
+
+
+<script type="text/javascript">
+	function showCategory(){
+		createRequest=1;
+		$("#div_request_show").load("{{=URL('activity_control','requestchangeactivity.html')}}?op=showRequest&amp;project={{=request.vars['project']}}&amp;year={{=request.vars['year']}}&amp;category="+document.getElementById('categoryID').value);
+		category=document.getElementById('categoryID').value;
+	}
+
+
+	function makeRequest(var_type){
+		if (var_type==1){
+			var activity_description_request_var = document.getElementById('activity_description_request').value;
+			if(activity_description_request_var==""){
+				alert("{{=T('Fill all fields to save.')}}");
+			}else{
+				category=-1;
+				createRequest=0;
+				jQuery('#div_request_detail').empty();
+				$("#div_request_detail").css("display", "none");
+				$("#div_request_show").load("{{=URL('activity_control','requestchangeactivity.html')}}?op=createRequestChangeL&amp;create=y&amp;project={{=request.vars['project']}}&amp;year={{=request.vars['year']}}&amp;activity_description_request_var="+encodeURIComponent(activity_description_request_var));
+			}
+		}
+	}
+
+	//Functions of tabs of control activities
+	function controlActivities(){
+		$("#div_requestChange").load("{{=URL('activity_control','requestchangeactivity.html')}}?op=addActivities&amp;project={{=request.vars['project']}}&amp;year={{=request.vars['year']}}&amp;category="+category);
+		$("#div_activity_show").load("{{=URL('activity_control','requestchangeactivity.html')}}?op=controlActivities&amp;project={{=request.vars['project']}}&amp;year={{=request.vars['year']}}&amp;category="+category);
+	}
+
+	function createRequestChange(){
+		$("#div_request_show").load("{{=URL('activity_control','requestchangeactivity.html')}}?op=showRequest&amp;initial=n&amp;project={{=request.vars['project']}}&amp;year={{=request.vars['year']}}&amp;category="+category);
+	}
+
+	//Functions of edit the activities
+	function removeActivity(var_id, var_name){
+		var r = confirm("{{=T('Do you want to delete this record?')}}");
+		if (r == true) {
+			$("#div_activity_show").load("{{=URL('activity_control','requestchangeactivity.html')}}?op=removeActivityL&amp;var_id="+var_id+"&amp;var_name="+encodeURIComponent(var_name)+"&amp;project={{=request.vars['project']}}&amp;year={{=request.vars['year']}}&amp;category="+category);
+		}
+	}
+
+	function createActivity(){
+		var activity_name1_var = document.getElementById('activity_name1').value;
+	    var activity_description_var = document.getElementById('activity_description').value;
+	    var field_grade_var = document.getElementById('field_grade').value;
+	    var dateInit_var = document.getElementById('dateInit').value;
+	    var dateEnd_var = document.getElementById('dateEnd').value;
+	    if(activity_name1_var=="" || activity_description_var=="" || field_grade_var=="" || dateInit_var=="" || dateEnd_var=="" ){
+	    	alert("{{=T('Fill all fields to save.')}}");
+	    }else{
+	    	var regex = /^\d+(?:\.\d{0,2})$/; 
+			var regex2 = /^([0-9])*$/;
+			if (!regex.test(field_grade_var) && !regex2.test(field_grade_var) ){
+				alert("{{=T('The entered value is not a decimal')}}");
+			}else{
+				var formatDate = /^(\d{4})(\/|-)(\d{1,2})(\/|-)(\d{1,2})$/;
+				var validDateInit = dateInit_var.match(formatDate);
+				var validDateEnd = dateEnd_var.match(formatDate);
+				if (validDateInit == null || validDateEnd==null) {
+					alert("{{=T('Enter date and time as YYYY-MM-DD or YYYY/MM/DD')}}");
+				}else{
+					if(dateInit_var<=dateEnd_var){
+						$("#div_activity_show").load("{{=URL('activity_control','requestchangeactivity.html')}}?op=createActivity&amp;activity_name1_var=" + encodeURIComponent(activity_name1_var) + "&amp;activity_description_var=" + encodeURIComponent(activity_description_var) +"&amp;field_grade_var=" + field_grade_var + "&amp;dateInit_var="+encodeURIComponent(dateInit_var)+ "&amp;dateEnd_var="+encodeURIComponent(dateEnd_var)+"&amp;project={{=request.vars['project']}}&amp;year={{=request.vars['year']}}&amp;category="+category);
+
+						$("#div_requestChange").load("{{=URL('activity_control','requestchangeactivity.html')}}?op=addActivities&amp;project={{=request.vars['project']}}&amp;year={{=request.vars['year']}}&amp;category="+category);
+					}else{
+						alert("{{=T('The end date must be greater than start date')}}");
+					}
+				}
+			}
+	    }
+	}
+
+	function editActivity(var_id, var_name){
+		$("#div_activity_show").load("{{=URL('activity_control','requestchangeactivity.html')}}?op=showEditActivity&amp;var_id="+var_id+"&amp;var_name="+encodeURIComponent(var_name)+"&amp;project={{=request.vars['project']}}&amp;year={{=request.vars['year']}}&amp;category="+category);
+	}
+
+	function updateActivity(var_id, var_name){
+		var edit_activity_name1_var = document.getElementById('edit_activity_name1').value;
+	    var edit_activity_description_var = document.getElementById('edit_activity_description').value;
+	    var edit_field_grade_var = document.getElementById('edit_field_grade').value;
+	    var edit_dateInit_var = document.getElementById('edit_dateInit').value;
+	    var edit_dateEnd_var = document.getElementById('edit_dateEnd').value;
+	    if(edit_activity_name1_var=="" || edit_activity_description_var=="" || edit_field_grade_var=="" || edit_dateInit_var=="" || edit_dateEnd_var=="" ){
+	    	alert("{{=T('Fill all fields to save.')}}");
+	    }else{
+	    	var regex = /^\d+(?:\.\d{0,2})$/; 
+			var regex2 = /^([0-9])*$/;
+			if (!regex.test(edit_field_grade_var) && !regex2.test(edit_field_grade_var) ){
+				alert("{{=T('The entered value is not a decimal')}}");
+			}else{
+				var formatDate = /^(\d{4})(\/|-)(\d{1,2})(\/|-)(\d{1,2})$/;
+				var validDateInit = edit_dateInit_var.match(formatDate);
+				var validDateEnd = edit_dateEnd_var.match(formatDate);
+				if (validDateInit == null || validDateEnd==null) {
+					alert("{{=T('Enter date and time as YYYY-MM-DD or YYYY/MM/DD')}}");
+				}else{
+					if(edit_dateInit_var<=edit_dateEnd_var){
+						$("#div_activity_show").load("{{=URL('activity_control','requestchangeactivity.html')}}?op=updateActivity&amp;var_id="+var_id+"&amp;var_name="+encodeURIComponent(var_name)+"&amp;edit_activity_name1_var=" + encodeURIComponent(edit_activity_name1_var) + "&amp;edit_activity_description_var=" + encodeURIComponent(edit_activity_description_var) +"&amp;edit_field_grade_var=" + edit_field_grade_var + "&amp;edit_dateInit_var="+encodeURIComponent(edit_dateInit_var)+ "&amp;edit_dateEnd_var="+encodeURIComponent(edit_dateEnd_var)+"&amp;project={{=request.vars['project']}}&amp;year={{=request.vars['year']}}&amp;category="+category);
+
+						$("#div_requestChange").load("{{=URL('activity_control','requestchangeactivity.html')}}?op=addActivities&amp;project={{=request.vars['project']}}&amp;year={{=request.vars['year']}}&amp;category="+category);
+					}else{
+						alert("{{=T('The end date must be greater than start date')}}");
+					}
+				}
+			}
+	    }
+	}
+
+	function detail(var_id){
+		$("#div_request_done").css("display", "none");
+		$("#div_request_detail").css("display", "block");
+		$("#div_request_detail").load("{{=URL('activity_control','requestchangeactivity.html')}}?op=solveActivityRequestDetail&amp;project={{=request.vars['project']}}&amp;year={{=request.vars['year']}}&amp;Idrequest="+var_id); 
+	}
+
+	function closeDetail(){
+		jQuery('#div_request_detail').empty();
+		$("#div_request_detail").css("display", "none");
+		$("#div_request_done").css("display", "block");
+	}
+</script>
