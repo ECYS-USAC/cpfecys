@@ -729,7 +729,10 @@ def courses_list_request():
     if auth.has_membership('Super-Administrator') or auth.has_membership('Ecys-Administrator'):
         courses_request = db(db.project.area_level==area.id).select()
 
-    return dict(courses_request = courses_request, split_name=split_name, split_section=split_section)
+    return dict(courses_request = courses_request, 
+                split_name=split_name, 
+                split_section=split_section,
+                semester_id=cpfecys.current_year_period())
 
 
 @auth.requires_login()

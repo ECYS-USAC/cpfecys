@@ -1,32 +1,120 @@
 {{extend 'template.html'}}
-<h1>{{=T('Request Control')}}</h1>
+
+<h1>{{=T('Change Request Control')}}</h1>
+<div style="overflow:auto;" class="well">
 <table class="table table-striped table-bordered">
 	<thead>
 		<th>{{=T('Project')}}</th>
 		<th>{{=T('Section')}}</th>
-		<th><center>{{=T('View')}}</center></th>
+		<th><center>{{=T('Weighting Request')}}</center></th>
+		<th><center>{{=T('Activity Request')}}</center></th>
+		<th><center>{{=T('Grades Request')}}</center></th>
 	</thead>
 	<tbody>
 		{{for course in courses_request:}}
-		<tr>
 			{{if auth.has_membership('Teacher'):}}
-				<td>{{=split_name(course.user_project.project.name)}}</td>
-				<td>{{=split_section(course.user_project.project.name)}}</td>
+				<tr>
+					<td>{{=split_name(course.user_project.project.name)}}</td>
+					<td>{{=split_section(course.user_project.project.name)}}</td>
+					<td>
+						<center>					
+						{{var_count = db((db.request_change_weighting.status=='pending')&(db.request_change_weighting.period==int(semester_id.id))&(db.request_change_weighting.project==course.user_project.project)).count()}}
+						{{if var_count == 0:}}
+							<a class="btn btn-info" href="{{=URL('activity_control', 'solve_request_change_weighting', vars=dict(course = course.user_project.project))}}">
+						{{else:}}
+							<a class="btn btn-warning" href="{{=URL('activity_control', 'solve_request_change_weighting', vars=dict(course = course.user_project.project))}}">
+						{{pass}}
+							{{=T('View')}} ({{=var_count}})
+					
+							</a>
+						</center>
+					</td>
+					<td>
+						<center>
+								{{var_count = db((db.requestchange_activity.status=='pending')&(db.requestchange_activity.semester==int(semester_id.id))&(db.requestchange_activity.course==course.user_project.project)).count()}}
+								{{if var_count == 0:}}
+									<a class="btn btn-info" href="{{=URL('activity_control', 'solve_request_change_activity', vars=dict(course = course.user_project.project))}}">
+								{{else:}}
+									<a class="btn btn-warning" href="{{=URL('activity_control', 'solve_request_change_activity', vars=dict(course = course.user_project.project))}}">
+								{{pass}}
+									{{=T('View')}} ({{=var_count}})
+
+							</a>
+						</center>
+					</td>
+					<td>
+						<center>
+							{{if auth.has_membership('Teacher'):}}
+								<a class="btn" href="{{=URL('activity_control', 'solve_request_change_grades', vars=dict(course = course.user_project.project))}}">{{=T('View')}}
+							{{else:}}
+								<a class="btn" href="{{=URL('activity_control', 'solve_request_change_grades', vars=dict(course = course.id))}}">{{=T('View')}}
+							{{pass}}
+							</a>
+						</center>
+					</td>
+				</tr>
 			{{else:}}
-				<td>{{=split_name(course.name)}}</td>
-				<td>{{=split_section(course.name)}}</td>
+				{{var_count = db((db.request_change_weighting.status=='pending')&(db.request_change_weighting.period==int(semester_id.id))&(db.request_change_weighting.project==course.id)).count()}}
+				{{var_count_2 = db((db.requestchange_activity.status=='pending')&(db.requestchange_activity.semester==int(semester_id.id))&(db.requestchange_activity.course==course.id)).count()}}
+				{{if (var_count != 0) | (var_count_2 != 0):}}
+				<tr>
+					<td>{{=split_name(course.name)}}</td>
+					<td>{{=split_section(course.name)}}</td>
+					<td>
+						<center>
+							{{if var_count == 0:}}
+								<a class="btn btn-info" href="{{=URL('activity_control', 'solve_request_change_weighting', vars=dict(course = course.id))}}">
+							{{else:}}
+								<a class="btn btn-warning" href="{{=URL('activity_control', 'solve_request_change_weighting', vars=dict(course = course.id))}}">
+							{{pass}}
+								{{=T('View')}} ({{=var_count}})
+								</a>
+						</center>
+					</td>
+					<td>
+						<center>
+								{{if var_count_2 == 0:}}
+									<a class="btn btn-info" href="{{=URL('activity_control', 'solve_request_change_activity', vars=dict(course = course.id))}}">
+								{{else:}}
+									<a class="btn btn-warning" href="{{=URL('activity_control', 'solve_request_change_activity', vars=dict(course = course.id))}}">
+								{{pass}}
+									{{=T('View')}} ({{=var_count_2}})
+									</a>
+						</center>
+					</td>
+					<td>
+						<center>
+							{{if auth.has_membership('Teacher'):}}
+								<a class="btn" href="{{=URL('activity_control', 'solve_request_change_grades', vars=dict(course = course.user_project.project))}}">{{=T('View')}}
+							{{else:}}
+								<a class="btn" href="{{=URL('activity_control', 'solve_request_change_grades', vars=dict(course = course.id))}}">{{=T('View')}}
+							{{pass}}
+							</a>
+						</center>
+					</td>
+				</tr>	
+				{{pass}}		
 			{{pass}}
-			<td>
-				<center>
-					{{if auth.has_membership('Teacher'):}}
-						<a class="btn" href="{{=URL('activity_control', 'solve_request_change_weighting', vars=dict(course = course.user_project.project))}}">{{=T('Go')}}
-					{{else:}}
-						<a class="btn" href="{{=URL('activity_control', 'solve_request_change_weighting', vars=dict(course = course.id))}}">{{=T('Go')}}
-					{{pass}}
-					</a>
-				</center>
-			</td>
-		</tr>
 		{{pass}}
 	</tbody>
+	<tfoot>
+		<tr>
+			<td colspan='6'>
+				<div align="left">
+					
+						<b>{{=T('Legend')}}:</b>
+					<br>
+						<span class="label label-warning">&nbsp;&nbsp;&nbsp;</span> {{=T('There are pending requests')}}
+					<br>
+						<span class="label label-info">&nbsp;&nbsp;&nbsp;</span> {{=T('There are no pending requests')}}
+					<br>
+						*{{=T('Inside the parentheses the number of pending requests is shown')}}
+					<br>
+				</div>
+			</td>
+		</tr>
+	</tfoot>
 </table>
+</div>
+
+					
