@@ -97,7 +97,7 @@
 		  <ul class="dropdown-menu">  
 	  	          
 	      	{{if float(total_var2) == 100:}}
-	      		{{if auth.has_membership('Teacher'):}}
+	      		{{if auth.has_membership('Student') == False:}}
 	      			<li class="disabled"> 
 						<a  tabindex="-1" title="{{=T('Create course weighting')}}" id="menu_create_weighting" >
 							<span class="icon-plus-sign"></span>
@@ -116,6 +116,7 @@
 				          {{=T('Edit Weighting')}}
 				        </a>
 				      </li>
+
 				{{else:}}
 					{{from datetime import datetime}}
 					{{var_do='false'}}
@@ -134,7 +135,7 @@
 					{{if var_do =='true':}}
 						<li class="disabled"> 
 							<a tabindex="-1"  title="{{=T('Create course weighting')}}">
-								<span class="icon-edit" ></span>
+								<span class="icon-plus-sign" ></span>
 				          		{{=T('Create Weighting')}}
 				        	</a>
 				      	</li>
@@ -154,7 +155,7 @@
 					{{else:}}
 						<li class="disabled"> 
 							<a tabindex="-1"  title="{{=T('Create course weighting')}}">
-								<span class="icon-edit" ></span>
+								<span class="icon-plus-sign" ></span>
 				         		{{=T('Create Weighting')}}
 				        	</a>
 				      	</li>
@@ -164,17 +165,25 @@
 				        		{{=T('Get Weighting')}}
 					        </a>
 					    </li>
-						<li>
-						<li class="disabled"> 
-							<a tabindex="-1"  title="{{=T('Modify course weighting')}}">
+					    {{if request.vars['type'] == "course":}}
+					    <li>
+						<a tabindex="-1"  title="{{=T('Modify course weighting')}}" href="{{=URL('activity_control', 'students_control_full',vars=dict( project = request.vars['project'], year = request.vars['year'], f_view='weighting_edit', type = request.vars['type']))}}" role="button"   id="edit_option"> 
 							<span class="icon-edit" ></span>
 				          {{=T('Edit Weighting')}}
 				        </a>
 				      </li>
+				      {{else:}}
+				      <li>
+		    			<a role="button" title="{{=T('Request that the changes be reviewed by the professor or administrator')}}" aria-hidden="true" href="{{=URL('activity_control', 'request_change_weighting',vars=dict(project = request.vars['project'], year = request.vars['year']))}}" >
+							<span class="icon-black icon-random"></span>
+							{{=T('Change Request')}}
+						</a>
+					  </li>
+					  {{pass}}
 					{{pass}}
 				{{pass}}
 			{{else:}}
-				{{if auth.has_membership('Teacher'):}}
+				{{if request.vars['type'] == "course":}}
 					<li>
 						<a  tabindex="-1" title="{{=T('Create course weighting')}}" id="menu_create_weighting" href="{{=URL('activity_control', 'students_control_full',vars=dict( project = request.vars['project'], year = request.vars['year'], f_view='weighting_edit', type = request.vars['type']))}}" role="button"   id="edit_option">
 							<span class="icon-plus-sign"></span>
@@ -232,7 +241,7 @@
 					    </li>
 					{{pass}}
 
-			      {{pass}}
+			    {{pass}}
 				<li class="disabled"> 
 					<a tabindex="-1"  title="{{=T('Modify course weighting')}}">
 					<span class="icon-edit" ></span>

@@ -1,0 +1,586 @@
+{{if op == "select_change":}}
+	{{select_change = db((db.request_change_weighting.period==int(semestre2.id))&(db.request_change_weighting.project==int(project))).select()}}
+
+	{{if request.vars['tip']=="p":}}
+		{{select_change = db((db.request_change_weighting.status=='pending')&(db.request_change_weighting.period==int(semestre2.id))&(db.request_change_weighting.project==int(project))).select()}}
+	{{pass}}
+	{{if request.vars['tip']=="a":}}
+		{{select_change = db((db.request_change_weighting.status=='accepted')&(db.request_change_weighting.period==int(semestre2.id))&(db.request_change_weighting.project==int(request.vars['project']))).select()}}
+	{{pass}}
+	{{if request.vars['tip']=="r":}}
+		{{select_change = db((db.request_change_weighting.status=='rejected')&(db.request_change_weighting.period==int(semestre2.id))&(db.request_change_weighting.project==int(request.vars['project']))).select()}}
+	{{pass}}
+
+	<table class="table table-striped table-bordered">
+		{{if select_change.first() != None:}}
+			<tr>
+				<th>{{=T('User')}}</th>
+				<th>{{=T('Status')}}</th>
+				<th>{{=T('Date Request')}}</th>
+				<th><center>{{=T('Action')}}</center></th>
+			</tr>
+		{{else:}}
+			{{=T('There is no request')}}
+		{{pass}}
+		{{for change in select_change:}}
+			<tr>
+				<td>{{=change.user_id.username}}</td>
+				<td>{{=T(change.status)}}</td>
+				<td>{{=change.date_request}}</td>
+				<td>
+					<center>
+						<a class="btn" title="{{=T('View the change request')}}" onclick="detail({{=change.id}});">{{=T('Detail')}}</a>
+					</center>
+				</td>
+			</tr>
+		{{pass}}
+	</table>
+{{pass}}
+
+{{if op == "description":}}
+<form action="{{=URL('activity_control', 'request_change_weighting/request', vars=dict(project = request.vars['project'], year = request.vars['year']))}}" method="post">
+	<label>{{=T('Description')}}:</label>
+	{{try:}}
+		{{if change.description != None:}}
+			<textarea type="submit" id="description" name="description" rows="10" >{{=change.description}}</textarea>
+		{{else:}}
+			<textarea type="submit" id="description" name="description" rows="10" ></textarea>
+		{{pass}}
+	{{except:}}
+		<textarea type="submit" id="description" name="description" rows="10" ></textarea>
+	{{pass}}
+	{{if change.status == 'edit':}}
+		<button type="submit"  class="btn btn-success">{{=T('Change Request')}}</button>
+	{{pass}}
+	{{if (change.status != 'accepted') & (change.status != 'rejected'):}}
+		<a  class="btn" href="{{=URL('activity_control', 'request_change_weighting', vars=dict(project = request.vars['project'], year = request.vars['year'], operation = 'cancel'))}}">{{=T('Cancel')}}</a>
+	{{pass}}
+</form>
+{{pass}}
+
+{{if op == "remove_cat":}}
+	{{var_cac = db((db.course_activity.course_activity_category == request.vars['var_id']) & (db.course_activity.assignation == project) & (  db.course_activity.laboratory == True) & (db.course_activity.semester == (semestre2.id) ) ).select().first() }}
+
+	{{if var_cac != None:}}
+		<script type="text/javascript">
+		alert("{{=T('Unable to delete category because it already has some activity associated')}}");
+		</script>
+	{{else:}}
+		{{result = db.request_change_weighting_detail.insert(request_change_weighting=change.id,
+	                                                operation_request='delete',
+	                                                course_category=str(request.vars['var_id'])
+	                                            )}}
+	{{pass}}
+    {{op = "create_request"}}
+    {{request.vars['var_id'] =""}}
+{{pass}}
+
+{{if op == "update_cat" or op == "add_cat":}}
+	{{var_SG = True}}
+	{{if str(request.vars['SG_var']) == "true":}}
+		{{var_SG = False}}
+	{{pass}}
+
+	{{if op == "add_cat":}}
+		{{result = db.request_change_weighting_detail.insert(request_change_weighting=change.id,
+                                                operation_request='insert',
+                                                grade=request.vars['grade_var'],
+                                                specific_grade=var_SG,
+                                                category=request.vars['category_id_var']
+                                            )}}
+	{{else:}}
+		{{var_cac = db((db.course_activity.course_activity_category == request.vars['var_id']) & (db.course_activity.assignation == project) & (  db.course_activity.laboratory == True) & (db.course_activity.semester == (semestre2.id) ) ).select().first() }}
+
+		{{if var_cac != None:}}
+			<script type="text/javascript">
+			alert("{{=T('Unable to edit category because it already has some activity associated')}}");
+			</script>
+		{{else:}}
+			{{result = db.request_change_weighting_detail.insert(request_change_weighting=change.id,
+                                                operation_request='update',
+                                                course_category=str(request.vars['var_id']),
+                                                grade=request.vars['grade_var'],
+                                                specific_grade=var_SG,
+                                                category=request.vars['category_id_var']
+                                            )}}
+        {{pass}}
+	{{pass}}
+	
+    {{op = "create_request"}}
+    {{request.vars['var_id'] =""}}
+{{pass}}
+
+
+{{if op == "create_request":}}
+	{{var_project_id=project}}
+	{{if change.status == 'edit':}}
+	<table class="table table-striped table-bordered">
+		<tr>
+			<th>
+				{{=T('Category')}}
+			</th>
+			<th>
+				{{=T('Grade')}}
+			</th>
+			<th title="{{=T('Average Grades')}}">
+				{{=T('AG')}}
+			</th>
+			<th width="25px">
+				{{=T('Actions')}}
+			</th>
+		</tr>
+		<tr>
+		
+		<td>
+	    	<select class="generic-widget" id="category_id" name="category" style="width:90px;">
+				{{cR = db((db.course_activity_category.semester==semestre2.id) & (db.course_activity_category.assignation==var_project_id) & (db.course_activity_category.laboratory==True)).select()}}
+				{{cR2 = db((db.request_change_weighting_detail.request_change_weighting ==  change.id)  & ((db.request_change_weighting_detail.operation_request == "insert") | (db.request_change_weighting_detail.operation_request == "update"))).select()}}
+
+				{{categoriasP = []}}
+				{{categoriasP2 = []}}
+				
+			    {{for c in cR:}}
+			        {{categoriasP.append(c.category)}}
+			    {{pass}}
+			    {{for c in cR2:}}
+			        {{categoriasP.append(c.category)}}
+			        {{categoriasP2.append(c.category)}}
+			    {{pass}}
+			    
+			    {{for project in db((~db.activity_category.id.belongs(categoriasP)) & (db.activity_category.hidden_academic_tutor != True) ).select():}}
+			        <option value="{{=project.id}}">{{=project.category}}</option>
+			    {{pass}}
+			    {{for project in db((db.request_change_weighting_detail.request_change_weighting ==  change.id) & (db.request_change_weighting_detail.operation_request ==  'delete')  ).select():}}
+			    	{{do_it = True}}
+			    	{{for list_t in categoriasP2:}}
+			    		{{if str(list_t) == str(project.course_category.category):}}
+			    			{{do_it = False}}
+			    		{{pass}}
+			    	{{pass}}
+			    	{{if do_it == True:}}
+			        	<option value="{{=project.course_category.category}}">{{=project.course_category.category.category}}</option>
+			        {{pass}}
+			    {{pass}}
+	    	</select>
+		</td>
+		<td>
+			<input class="string" name="academic_carnet" type="text" value="" id="category_grade" style="width:40px;">
+		</td>
+		<td>
+
+	    	<input type="checkbox" name="SG_check"  id="SG_check">  
+	    	<span title="{{=T('If you do not select the checkbox, when you create activities you must enter the weight of each activity.')}}" 
+	    	class=" icon-question-sign"></span>  	
+			<input type="checkbox" name="TP_check"  id="TP_check" checked style="opacity:0;">
+		</td>
+		<td width="40px">
+			<center>
+				<a id="categoryButton" role="button" class="badge btn-success"  
+				onclick="add_cagetory();" title = "{{=T('Add Category')}}"> 
+            		<span class="icon-white  icon-plus-sign"></span>
+            	</a>
+            </center>
+		</td>
+	</tr>
+</table>
+{{pass}}
+<center>
+	<table class="table table-striped table-bordered">
+		{{var_period_sel=str(semestre2.id)}}
+		<tr>
+			<th>
+				{{=T('Category')}}
+			</th>
+			<th>
+				{{=T('Grade')}}
+			</th>
+			<th title="{{=T('Average Grades')}}">
+				{{=T('AG')}}
+			</th>
+			{{if change.status == 'edit':}}
+			<th width="25px">
+				{{=T('Actions')}}
+			</th>
+			{{pass}}
+		</tr>
+		{{total_var = 0}}
+		{{for var_chang_ins in db((db.request_change_weighting_detail.request_change_weighting ==  change.id) & (db.request_change_weighting_detail.operation_request == 'insert')).select():}}
+			<tr>
+	    		<td>
+	    			<font color="blue">
+	    				{{=var_chang_ins.category.category}}
+	    			</font>
+	    		</td>
+	    		<td>
+	    			<font color="blue">
+	    				{{=var_chang_ins.grade}}
+	    				{{if var_chang_ins.grade != None:}}
+	    					{{total_var = total_var + var_chang_ins.grade}}
+	    				{{pass}}
+	    			</font>
+	    		</td>
+	    		<td>
+	    			<font color="blue">
+	    				{{var_SG = True}}
+						{{if str(var_chang_ins.specific_grade) == "True":}}
+							{{var_SG = False}}
+						{{pass}}
+	    				{{=var_SG}}
+	    			</font>	    			
+	    		</td>
+	    		{{if change.status == 'edit':}}
+	    			<td>
+						<center>
+		                	
+						</center>
+					</td>
+	    		{{pass}}
+    		</tr>
+    		{{pass}}
+		{{for project in db((db.course_activity_category.semester==int(var_period_sel)) & (db.course_activity_category.assignation==var_project_id) & (db.course_activity_category.laboratory==True)).select():}}		
+		{{editable_var='false'}}
+
+    	{{if str(request.vars['var_id']) == str(project.id):}}
+    		{{editable_var='true'}}
+    	{{else:}}
+    		{{editable_var='false'}}
+    	{{pass}}
+
+    	{{var_chang = db(db.request_change_weighting_detail.course_category ==  str(project.id)).select().first()}}
+
+    	{{temp_do = False}}
+
+    	{{if (var_chang != None): }}
+    		{{if (change.id == var_chang.request_change_weighting):}}
+    			{{temp_do = True}}
+    		{{pass}}
+		{{pass}}
+    	
+    	{{if (temp_do == True): }}
+	    		{{if var_chang.operation_request == 'delete':}}
+	    			{{var_color="red"}}
+	    		{{pass}}
+	    		{{if var_chang.operation_request == 'update':}}
+	    			{{var_color="green"}}
+	    		{{pass}}
+	    		<tr>
+		    		<td>
+		    			<font color="{{=var_color}}">
+		    				{{if var_chang.operation_request == 'update':}}
+				    			{{=var_chang.category.category}}
+				    		{{else:}}
+				    			{{=project.category.category}}
+				    		{{pass}}	    				
+		    			</font>
+		    		</td>
+		    		<td>
+		    			<font color="{{=var_color}}">
+		    				{{=var_chang.grade}}
+		    				{{if var_chang.grade != None:}}
+		    					{{total_var = total_var + var_chang.grade}}
+		    				{{pass}}
+		    			</font>
+		    		</td>
+		    		<td>
+		    			<font color="{{=var_color}}">
+		    				{{if var_chang.operation_request == 'update':}}
+			    				{{var_SG = True}}
+								{{if str(var_chang.specific_grade) == "true":}}
+									{{var_SG = False}}
+								{{pass}}
+								{{=var_SG}}						
+							{{pass}}	    				
+		    			</font>	    			
+		    		</td>
+		    		{{if change.status == 'edit':}}
+		    		<td>
+		    			<font color="{{=var_color}}">
+		    				
+		    			</font>	    			
+		    		</td>
+		    		{{pass}}
+	    		</tr>
+
+    	{{else:}}
+    		{{if (change.status == 'edit') | (change.status == 'pending'):}}
+    		
+				<tr>
+					<td>
+
+					{{if editable_var=='true':}}						
+						<select class="generic-widget" id="edit_category_id" name="category" style="width:75px;">
+							<option value="{{=project.category}}">{{=project.category.category}}</option>
+
+							{{cR = db((db.course_activity_category.semester==semestre2.id) & (db.course_activity_category.assignation==var_project_id) & (db.course_activity_category.laboratory==True)).select()}}
+							{{cR2 = db((db.request_change_weighting_detail.request_change_weighting ==  change.id)  & ((db.request_change_weighting_detail.operation_request == "insert") | (db.request_change_weighting_detail.operation_request == "update"))).select()}}
+
+							{{categoriasP = []}}
+							{{categoriasP2 = []}}
+							
+						    {{for c in cR:}}
+						        {{categoriasP.append(c.category)}}
+						    {{pass}}
+						    {{for c in cR2:}}
+						        {{categoriasP.append(c.category)}}
+						        {{categoriasP2.append(c.category)}}
+						    {{pass}}
+						    
+						    {{for cat_tempo in db((~db.activity_category.id.belongs(categoriasP)) & (db.activity_category.hidden_academic_tutor != True) ).select():}}
+						        <option value="{{=cat_tempo.id}}">{{=cat_tempo.category}}</option>
+						    {{pass}}
+						    {{for cat_tempo in db((db.request_change_weighting_detail.request_change_weighting ==  change.id) & (db.request_change_weighting_detail.operation_request ==  'delete')  ).select():}}
+						    	{{do_it = True}}
+						    	{{for list_t in categoriasP2:}}
+						    		{{if str(list_t) == str(cat_tempo.course_category.category):}}
+						    			{{do_it = False}}
+						    		{{pass}}
+						    	{{pass}}
+						    	{{if do_it == True:}}
+						        	<option value="{{=cat_tempo.course_category.category}}">{{=cat_tempo.course_category.category.category}}</option>
+						        {{pass}}
+						    {{pass}}
+				      
+					    </select>
+					{{else:}}
+						{{=project.category.category}}
+					{{pass}}
+				</td>
+				<td>
+					{{if editable_var=='true':}}
+						<input class="string" name="edit_grade" type="text" value="{{=project.grade}}" id="edit_grade" style="width:40px;">
+					{{else:}}
+						{{=project.grade}}
+						
+					{{pass}}
+					{{total_var = total_var + project.grade}}
+				</td>
+				<td>
+					{{var_sg = str(project.specific_grade)}}
+					{{if var_sg == 'True':}}
+						{{var_sg="False"}}
+					{{else:}}
+						{{var_sg="True"}}
+					{{pass}}
+					{{if editable_var=='true':}}
+						
+						{{if var_sg =='True':}}
+							<input type="checkbox" name="edit_SG_check"  id="edit_SG_check" checked>
+						{{else:}}
+							<input type="checkbox" name="edit_SG_check"  id="edit_SG_check">
+						{{pass}}						
+					{{else:}}
+						{{=var_sg}}
+					{{pass}}
+					</td>
+					{{if request.vars['op'] != "showTableNoEditable":}}
+						{{if change.status == 'edit':}}
+							<td>
+								<center>
+				                	{{if editable_var=='true':}}
+										<a id="categoryButton" role="button" class="badge btn-success"  
+										onclick="updateCategory({{=project.id}});"> 
+				                    		<span class="icon-white icon-check"></span>
+				                    	</a>
+				                	{{else:}}
+				                		
+				                    		<a id="categoryButton" role="button" class="badge btn-info"  
+											onclick="editCategory({{=project.id}});"> 
+					                    		<span class="icon-white icon-edit"></span>
+					                    	</a>
+
+				                	{{pass}}
+
+				                	<a id="categoryButton" role="button" class="badge btn-danger" 
+				                	onclick="removeCategory({{=project.id}});" title="{{=T('Remove weighting category')}}" > 
+				                		<span class="icon-white icon-remove-sign"></span>
+				                	</a>
+								</center>
+							</td>
+						{{pass}}
+					{{pass}}
+				</tr>
+				{{pass}}
+
+			{{pass}}
+			{{else:}}	
+				{{if (change.status != 'edit') & (change.status != 'pending'):}}
+					{{temp = db((db.request_change_w_log.r_c_w_id == change.id) & (db.request_change_w_log.before_status=='pending') ).select().first() }}
+
+						{{for r_c_w_d_l in db(db.request_change_w_detail_log.request_change_w_log==temp.id).select():}}
+							<tr>
+								{{try:}}
+									{{if r_c_w_d_l.operation_request == 'none':}}
+										<td>
+											{{=r_c_w_d_l.category}}
+										</td>
+										<td>
+											{{=r_c_w_d_l.after_grade}}
+											{{total_var = total_var + r_c_w_d_l.after_grade}}
+										</td>
+										<td>
+											{{var_SG = True}}
+											{{if r_c_w_d_l.after_specific_grade == "true":}}
+												{{var_SG = False}}
+											{{pass}}
+											{{=var_SG}}
+
+										</td>
+									{{pass}}
+									{{if r_c_w_d_l.operation_request == 'update':}}
+										<td>
+											<font color="green">
+											{{=r_c_w_d_l.category}}
+											</font>
+										</td>
+										<td>
+											<font color="green">
+											{{=r_c_w_d_l.after_grade}}
+											{{total_var = total_var + r_c_w_d_l.after_grade}}
+											</font>
+										</td>
+										<td>
+											<font color="green">
+											{{var_SG = True}}
+											{{if r_c_w_d_l.after_specific_grade == "true":}}
+												{{var_SG = False}}
+											{{pass}}
+											{{=var_SG}}
+											</font>
+										</td>
+									{{pass}}
+									{{if r_c_w_d_l.operation_request == 'delete':}}
+										<td>
+											<font color="red">
+											{{=r_c_w_d_l.course_category}}
+											</font>
+										</td>
+										<td>
+											
+										</td>
+										<td>
+											
+										</td>
+									{{pass}}
+								{{except:}}
+									{{None}}
+								{{pass}}
+							</tr>
+						{{pass}}
+				{{pass}}		
+			{{pass}}
+		<tr >
+			<td style="background-color:#eee;">
+				{{=T('Total')}}
+			</td>
+			<td style="background-color:#eee;">
+				{{if total_var != 100:}}
+					<b><font color="red">{{=total_var}}</font></b>
+				{{else:}}
+					<b><font color="green">{{=total_var}}</font></b>
+				{{pass}}
+			</td>
+			<td style="background-color:#eee;">
+			</td>
+			{{if change.status == 'edit':}}
+				<td style="background-color:#eee;">
+				</td>
+			{{pass}}
+		</tr>
+		{{session.total_var = total_var}}
+		
+	</table>		
+	<div align="left">
+	<br>
+		<b>{{=T('Legend')}}:</b>
+	<br>
+		<span class="label label-info">&nbsp;&nbsp;&nbsp;</span> {{=T('Category created')}}
+	<br>
+		<span class="label label-success">&nbsp;&nbsp;&nbsp;</span> {{=T('Category edited')}}
+	<br>
+		<span class="label label-important">&nbsp;&nbsp;&nbsp;</span> {{=T('Category deleted')}}
+	<br>
+	</div>
+	
+
+{{pass}}
+
+{{if op != "select_change":}}
+<script type="text/javascript">
+	{{if change.status != 'edit':}}
+		$("#div_request_detail *").prop('disabled',true);
+	{{pass}}
+</script>
+{{pass}}
+
+{{if (op != "description") & (op != "select_change"):}}
+<script type="text/javascript">
+	
+	function add_cagetory(){
+		alert("hola");
+	}
+	function editCategory(var_id){
+		$("#div_request_detail_view").load("{{=URL('activity_control','request_change_weighting_load.html')}}?op=create_request&amp;project={{=var_project_id}}&amp;year={{=semestre2.id}}&amp;var_id="+var_id); 
+
+	}
+
+	function updateCategory(var_id){
+		
+		var category_id_var = document.getElementById('edit_category_id').value;
+		var grade_var = document.getElementById('edit_grade').value;
+		var SG_var = document.getElementById('edit_SG_check').checked;
+
+		if (category_id_var==""){
+			alert("{{=T('No categories available')}}");  
+		}else{
+
+			var regex = /^\d+(?:\.\d{0,2})$/; 
+			var regex2 = /^([0-9])*$/; 
+
+			if (grade_var=="" || parseInt(grade_var) == 0 ){
+				alert("{{=T('The entered value is not correct')}}");  
+			}else{
+				if (!regex.test(grade_var) && !regex2.test(grade_var) ){
+					alert("{{=T('The entered value is not a decimal')}}");  
+				}else{
+					$("#div_request_detail_view").load("{{=URL('activity_control','request_change_weighting_load.html')}}?op=update_cat&amp;project={{=var_project_id}}&amp;year={{=semestre2.id}}&amp;var_id="+var_id+"&amp;SG_var=" + SG_var + "&amp;category_id_var=" + category_id_var +"&amp;grade_var=" + grade_var); 				
+				}       
+			}
+		}				
+	}
+
+	function add_cagetory(){
+		var category_id_var = document.getElementById('category_id').value;
+		var grade_var = document.getElementById('category_grade').value;
+		var SG_var = document.getElementById('SG_check').checked;
+
+		if (category_id_var==""){
+			alert("{{=T('No categories available')}}");  
+		}else{
+
+			var regex = /^\d+(?:\.\d{0,2})$/; 
+			var regex2 = /^([0-9])*$/; 
+
+			if (grade_var=="" || parseInt(grade_var) == 0 ){
+				alert("{{=T('The entered value is not correct')}}");  
+			}else{
+				if (!regex.test(grade_var) && !regex2.test(grade_var) ){
+					alert("{{=T('The entered value is not a decimal')}}");  
+				}else{
+					$("#div_request_detail_view").load("{{=URL('activity_control','request_change_weighting_load.html')}}?op=add_cat&amp;project={{=var_project_id}}&amp;year={{=semestre2.id}}&amp;SG_var=" + SG_var + "&amp;category_id_var=" + category_id_var +"&amp;grade_var=" + grade_var); 
+				}       
+			}
+		}	
+	}
+
+	function removeCategory(var_id){
+		var r = confirm("{{=T('Do you want to delete this record?')}}");
+		if (r == true) {
+		   $("#div_request_detail_view").load("{{=URL('activity_control','request_change_weighting_load.html')}}?op=remove_cat&amp;project={{=var_project_id}}&amp;year={{=semestre2.id}}&amp;var_id="+var_id); 
+		} else {
+
+		} 
+			
+	}
+
+</script>
+{{pass}}

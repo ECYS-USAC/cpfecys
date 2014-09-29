@@ -16,8 +16,10 @@
           </h1>
         </div>
       </td>
+    </tr>
+    <tr>
       <td>
-        <div align="right">
+        <div >
           <a onclick="window.history.back()" class="btn" ><i class="icon-arrow-left"></i>{{=T('Back')}}</a>
         </div>
       </td>
@@ -213,8 +215,8 @@ aria-hidden="true">{{=T('Close')}}</button>
           }else{
             $("#grades_list").load("{{=URL('activity_control','grades.html')}}?op=add_grade&amp;activity={{=var_activity.id}}&amp;project={{=var_project.id}}&amp;year={{=var_period.id}}&amp;carnet="+carnet_var+"&amp;grade="+grade_var);
             document.getElementById('carnet_input').focus();
-            document.getElementById('carnet_input').select();
             document.getElementById('grade_input').value = "";
+            document.getElementById('carnet_input').value = "";
           }
         }
       }
