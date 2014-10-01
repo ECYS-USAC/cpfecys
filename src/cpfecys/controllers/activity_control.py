@@ -586,6 +586,7 @@ def send_mail_to_students(message, subject, user, check, semester, year):
 @auth.requires_login()
 def requestchangeactivity():
     import datetime
+    stateRequest=0
     #Cancel the request made
     if request.args(0) == 'reject':
         Pending = db((db.requestchange_activity.id==int(request.vars['requestID']))&(db.requestchange_activity.status=='Pending')&(db.requestchange_activity.semester==int(request.vars['year']))&(db.requestchange_activity.course==int(request.vars['project']))).select().first()
@@ -637,52 +638,63 @@ def requestchangeactivity():
     Draft = db((db.requestchange_activity.status=='Draft')&(db.requestchange_activity.semester==year.id)&(db.requestchange_activity.course==project.id)).select().first()
 
     if request.vars['op'] == "createRequestChangeL":
-        #Update the request change activity
-        db(db.requestchange_activity.id==Draft.id).update(description=request.vars['activity_description_request_var'],status='Pending', date_request = datetime.datetime.now())
-        Draft = db((db.requestchange_activity.status=='Pending')&(db.requestchange_activity.semester==year.id)&(db.requestchange_activity.course==project.id)).select().first()
-        #Log of request change activity
-        nameP=None
-        nameS=None
-        try:
-            (nameP, projectSection) = str(project.name).split('(')
-            (nameS,garbage) = str(projectSection).split(')')
-            (garbage,nameS) = str(nameS).split(' ')
-        except:
-            nameP=project.name
-        idR = db.requestchange_activity_log.insert(user_request=Draft.user_id.username, roll_request='Student', status='Pending', description=request.vars['activity_description_request_var'], date_request=Draft.date_request, category_request=Draft.course_activity_category.category.category, semester=year.period.name, yearp=year.yearp, course=nameP, course_section=nameS)
-        activitiesChange = db(db.requestchange_course_activity.requestchange_activity==Draft.id).select()
-        for actChange in activitiesChange:
-            db.requestchange_course_activity_log.insert(requestchange_activity=idR, operation_request=actChange.operation_request, activity=actChange.activity, name=actChange.name, description=actChange.description, grade=actChange.grade, date_start=actChange.date_start, date_finish=actChange.date_finish)
-        #Check the user project
-        check = db.user_project(project = request.vars['project'], period = request.vars['year'], assigned_user = auth.user.id)
-        #Message
-        users2 = db((db.auth_user.id==db.user_project.assigned_user)&(db.user_project.period == check.period) & (db.user_project.project==check.project)&(db.auth_membership.user_id==db.user_project.assigned_user)&(db.auth_membership.group_id==3)).select().first()
-        subject="Solicitud de cambio de actividades - "+project.name
-        
-        message2="<br>Por este medio se le informa que el(la) practicante "+check.assigned_user.first_name+" "+check.assigned_user.last_name+" ha creado una solicitud de cambio de actividades en la categoría \""+Draft.course_activity_category.category.category+"\" dentro de la ponderación de laboratorio del Curso de \""+project.name+"\"."
-        message2=message2+"<br>Para aceptar o rechazar dicha solicitud dirigirse al control de solicitudes o al siguiente link: "
-        message2=message2+"<br>Saludos.<br><br>Sistema de Seguimiento de La Escuela de Ciencias y Sistemas<br>Facultad de Ingeniería - Universidad de San Carlos de Guatemala</html>"
-
-        #Send Mail to the Teacher
-        message="<html>catedratico(a) "+users2.auth_user.first_name+" "+users2.auth_user.last_name+" reciba un cordial saludo.<br>"
-        message3=message+message2
-        fail1 = send_mail_to_students(message3,subject,users2.auth_user.email,check,year.period.name,year.yearp)
-        fail1=1
-        #Send Mail to the DTT Administrator
-        message="<html>Administrator de DTT reciba un cordial saludo.<br>"
-        message3=message+message2
-        fail2 = send_mail_to_students(message3,subject,'dtt.ecys@dtt-ecys.org',check,year.period.name,year.yearp)
-        fail2=1
-        #Refresh the var Draft
-        Draft=None
-        if fail1==1 and fail2==1:
-            session.flash='Se ha creado la solicitud de cambios con exito. No se ha podido informar por medio de correo electronico al administrador del sistema DTT ni al catedratico(a) a cargo del curso sobre la solicitud creada, se solicita informarle a cada uno de ellos para tener una rapida atención a la solicitud creada.'
-        elif fail1==1:
-            session.flash='Se ha creado la solicitud de cambios con exito. Se ha informado por medio de correo electronico al administrador del sistema DTT y fallo el aviso al catedratico(a) a cargo del curso.'
-        elif fail2==1:
-            session.flash='Se ha creado la solicitud de cambios con exito. Se ha informado por medio de correo electronico al catedratico(a) a cargo del curso y fallo el aviso al administrador del sistema DTT.'
+        if Draft==None:
+            stateRequest=-1
         else:
-            session.flash='Se ha creado la solicitud de cambios con exito. Se ha informado por medio de correo electronico al catedratico(a) a cargo del curso y al administrador del sistema DTT.'
+            if Draft.course_activity_category!=int(request.vars['category']):
+                stateRequest=-1
+            else:
+                #Update the request change activity
+                db(db.requestchange_activity.id==Draft.id).update(description=request.vars['activity_description_request_var'],status='Pending', date_request = datetime.datetime.now())
+                Draft = db((db.requestchange_activity.status=='Pending')&(db.requestchange_activity.semester==year.id)&(db.requestchange_activity.course==project.id)).select().first()
+                #Log of request change activity
+                nameP=None
+                nameS=None
+                try:
+                    (nameP, projectSection) = str(project.name).split('(')
+                    (nameS,garbage) = str(projectSection).split(')')
+                    (garbage,nameS) = str(nameS).split(' ')
+                except:
+                    nameP=project.name
+                idR = db.requestchange_activity_log.insert(user_request=Draft.user_id.username, roll_request='Student', status='Pending', description=request.vars['activity_description_request_var'], date_request=Draft.date_request, category_request=Draft.course_activity_category.category.category, semester=year.period.name, yearp=year.yearp, course=nameP, course_section=nameS)
+                activitiesChange = db(db.requestchange_course_activity.requestchange_activity==Draft.id).select()
+                for actChange in activitiesChange:
+                    db.requestchange_course_activity_log.insert(requestchange_activity=idR, operation_request=actChange.operation_request, activity=actChange.activity, name=actChange.name, description=actChange.description, grade=actChange.grade, date_start=actChange.date_start, date_finish=actChange.date_finish)
+                #Check the user project
+                check = db.user_project(project = request.vars['project'], period = request.vars['year'], assigned_user = auth.user.id)
+                #Message
+                users2 = db((db.auth_user.id==db.user_project.assigned_user)&(db.user_project.period == check.period) & (db.user_project.project==check.project)&(db.auth_membership.user_id==db.user_project.assigned_user)&(db.auth_membership.group_id==3)).select().first()
+                subject="Solicitud de cambio de actividades - "+project.name
+                
+                message2="<br>Por este medio se le informa que el(la) practicante "+check.assigned_user.first_name+" "+check.assigned_user.last_name+" ha creado una solicitud de cambio de actividades en la categoría \""+Draft.course_activity_category.category.category+"\" dentro de la ponderación de laboratorio del Curso de \""+project.name+"\"."
+                message2=message2+"<br>Para aceptar o rechazar dicha solicitud dirigirse al control de solicitudes o al siguiente link: "
+                message2=message2+"<br>Saludos.<br><br>Sistema de Seguimiento de La Escuela de Ciencias y Sistemas<br>Facultad de Ingeniería - Universidad de San Carlos de Guatemala</html>"
+
+                #Send Mail to the Teacher
+                message="<html>catedratico(a) "+users2.auth_user.first_name+" "+users2.auth_user.last_name+" reciba un cordial saludo.<br>"
+                message3=message+message2
+                fail1 = send_mail_to_students(message3,subject,users2.auth_user.email,check,year.period.name,year.yearp)
+                fail1=1
+                #Send Mail to the DTT Administrator
+                message="<html>Administrator de DTT reciba un cordial saludo.<br>"
+                message3=message+message2
+                fail2 = send_mail_to_students(message3,subject,'dtt.ecys@dtt-ecys.org',check,year.period.name,year.yearp)
+                fail2=1
+                #Refresh the var Draft
+                Draft=None
+                if fail1==1 and fail2==1:
+                    stateRequest=1
+                    session.flash='Se ha creado la solicitud de cambios con exito. No se ha podido informar por medio de correo electronico al administrador del sistema DTT ni al catedratico(a) a cargo del curso sobre la solicitud creada, se solicita informarle a cada uno de ellos para tener una rapida atención a la solicitud creada.'
+                elif fail1==1:
+                    stateRequest=2
+                    session.flash='Se ha creado la solicitud de cambios con exito. Se ha informado por medio de correo electronico al administrador del sistema DTT y fallo el aviso al catedratico(a) a cargo del curso.'
+                elif fail2==1:
+                    stateRequest=3
+                    session.flash='Se ha creado la solicitud de cambios con exito. Se ha informado por medio de correo electronico al catedratico(a) a cargo del curso y fallo el aviso al administrador del sistema DTT.'
+                else:
+                    stateRequest=4
+                    session.flash='Se ha creado la solicitud de cambios con exito. Se ha informado por medio de correo electronico al catedratico(a) a cargo del curso y al administrador del sistema DTT.'
+
 
     requestC=db((db.requestchange_activity.course==project.id)&(db.requestchange_activity.semester==year.id)&(db.requestchange_activity.status=='Pending')).select()
     tempCategories=[]
@@ -700,7 +712,8 @@ def requestchangeactivity():
                 categories=categories,
                 totalCategories=totalCategories,
                 cat=cat,
-                Draft=Draft)
+                Draft=Draft,
+                stateRequest=stateRequest)
 
 
 
