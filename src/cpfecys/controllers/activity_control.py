@@ -487,10 +487,20 @@ def control_students_modals():
 def weighting():
     import cpfecys
     project = request.vars['project']
+    rol_log=''
+    if auth.has_membership('Ecys-Administrator')==True:
+        rol_log='Ecys-Administrator'
+    elif auth.has_membership('Super-Administrator')==True:
+        rol_log='Super-Administrator'
+    elif auth.has_membership('Teacher')==True:
+        rol_log='Teacher'
+    elif auth.has_membership('Student')==True:
+        rol_log='Student'
+    pass
    
     year = db(db.period_year.id == request.vars['year']).select().first() 
     assigantion = db((db.user_project.assigned_user == auth.user.id) & (db.user_project.period == year.id) & (db.user_project.project == project)).select().first()
-    return dict(semestre2 = year, project = project, assigantion=assigantion)
+    return dict(semestre2 = year, project = project, assigantion=assigantion, rol_log = rol_log)
 
 
 
@@ -786,7 +796,17 @@ def activityRequest():
 def weighting_request():
     import cpfecys
     currentyear_period = cpfecys.current_year_period()
-    return dict(semestre2 = currentyear_period)
+    rol_log=''
+    if auth.has_membership('Ecys-Administrator')==True:
+        rol_log='Ecys-Administrator'
+    elif auth.has_membership('Super-Administrator')==True:
+        rol_log='Super-Administrator'
+    elif auth.has_membership('Teacher')==True:
+        rol_log='Teacher'
+    elif auth.has_membership('Student')==True:
+        rol_log='Student'
+    pass
+    return dict(semestre2 = currentyear_period,rol_log = rol_log)
 
 
 

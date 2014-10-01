@@ -89,20 +89,31 @@
                                                 category=request.vars['category_id_var']
                                             )}}
 	{{else:}}
+				
 		{{var_cac = db((db.course_activity.course_activity_category == request.vars['var_id']) & (db.course_activity.assignation == project) & (  db.course_activity.laboratory == True) & (db.course_activity.semester == (semestre2.id) ) ).select().first() }}
-
 		{{if var_cac != None:}}
-			<script type="text/javascript">
-			alert("{{=T('Unable to edit category because it already has some activity associated')}}");
-			</script>
-		{{else:}}
-			{{result = db.request_change_weighting_detail.insert(request_change_weighting=change.id,
+			{{if str(var_cac.course_activity_category.category) !=  str(request.vars['category_id_var']) :}}
+				<script type="text/javascript">
+				alert("{{=T('You must first delete the activities under the category to rename.')}}");
+				</script>
+			{{else:}}
+				{{result = db.request_change_weighting_detail.insert(request_change_weighting=change.id,
                                                 operation_request='update',
                                                 course_category=str(request.vars['var_id']),
                                                 grade=request.vars['grade_var'],
                                                 specific_grade=var_SG,
                                                 category=request.vars['category_id_var']
                                             )}}
+
+			{{pass}}
+		{{else:}}
+			{{result = db.request_change_weighting_detail.insert(request_change_weighting=change.id,
+                                            operation_request='update',
+                                            course_category=str(request.vars['var_id']),
+                                            grade=request.vars['grade_var'],
+                                            specific_grade=var_SG,
+                                            category=request.vars['category_id_var']
+                                        )}}			
         {{pass}}
 	{{pass}}
 	
@@ -285,7 +296,7 @@
 		    			<font color="{{=var_color}}">
 		    				{{if var_chang.operation_request == 'update':}}
 			    				{{var_SG = True}}
-								{{if str(var_chang.specific_grade) == "true":}}
+								{{if str(var_chang.specific_grade) == "True":}}
 									{{var_SG = False}}
 								{{pass}}
 								{{=var_SG}}						

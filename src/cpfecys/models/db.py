@@ -732,21 +732,25 @@ db.define_table('course_activity_category',
     )
 
 #Table of weighting log
-#db.define_table('course_activity_category_log',
-#    Field('before_category', 'string', notnull=True, label = T('before category')),
-#    Field('after_category', 'string', notnull=True, label = T('after category')),
-#    Field('before_grade', 'decimal(5,2)', notnull=False, label=T('before grade')),
-#    Field('after_grade', 'decimal(5,2)', notnull=False, label=T('after grade')),
-#    Field('before_specific_grade', 'boolean', notnull=True, label = T('before specific grade')),
-#    Field('after_specific_grade', 'boolean', notnull=True, label = T('after specific grade')),
-#    Field('semester', 'string', notnull=True, label = T('semester')),
-#    Field('yearp', 'string', notnull=True, label = T('year')),
-#    Field('assignation', 'string', notnull=True),
-#    Field('before_laboratory', 'boolean', notnull=True, label = T('before laboratory')),
-#    Field('after_laboratory', 'boolean', notnull=True, label = T('after laboratory')),
-#    Field('before_teacher_permition', 'boolean', notnull=True, label = T('before teacher permition'))
-#    Field('after_teacher_permition', 'boolean', notnull=True, label = T('after teacher permition'))
-#    )
+db.define_table('course_activity_category_log',
+    Field('user_name', 'string', notnull = True, label = T('User')),
+    Field('roll', 'string', notnull = True, label = T('Roll')),
+    Field('operation_log', 'string', notnull = True, label = T('Operation')),
+    Field('before_category', 'string', notnull=False, label = T('before category')),
+    Field('after_category', 'string', notnull=False, label = T('after category')),
+    Field('before_grade', 'decimal(5,2)', notnull=False, label=T('before grade')),
+    Field('after_grade', 'decimal(5,2)', notnull=False, label=T('after grade')),
+    Field('before_specific_grade', 'boolean', notnull=False, label = T('before specific grade')),
+    Field('after_specific_grade', 'boolean', notnull=False, label = T('after specific grade')),
+    Field('semester', 'string', notnull=False, label = T('semester')),
+    Field('yearp', 'string', notnull=False, label = T('year')),
+    Field('assignation', 'string', notnull=False),
+    Field('before_laboratory', 'boolean', notnull=False, label = T('before laboratory')),
+    Field('after_laboratory', 'boolean', notnull=False, label = T('after laboratory')),
+    Field('before_teacher_permition', 'boolean', notnull=False, label = T('before teacher permition')),
+    Field('after_teacher_permition', 'boolean', notnull=False, label = T('after teacher permition')),
+    Field('description', 'string', notnull=False, label = T('description'))
+    )
 
 db.define_table('student_control_period',
     Field('period_name', 'string', notnull=True, unique=False, label = T('period name')),

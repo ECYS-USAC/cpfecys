@@ -47,6 +47,23 @@
 			                                assignation = var_project_id, 
 			                                laboratory = var_labo,
 			                                teacher_permition = request.vars['TP'])}}
+
+		{{#Log}}
+		{{cat_temp = db(db.activity_category.id== int(request.vars['category_id_var'])).select().first()}}
+		
+		{{db.course_activity_category_log.insert(user_name = auth.user.username,
+													roll = rol_log,
+													operation_log = 'insert',
+													after_category = cat_temp.category,
+													after_grade =  request.vars['grade_var'], 
+													after_specific_grade = var_SG, 
+													semester = T(semestre2.period.name),
+													yearp = semestre2.yearp,
+													assignation = assigantion.project.name, 
+													after_laboratory = var_labo,
+													after_teacher_permition = request.vars['TP'],
+													description = T('Inserted from Weighting Edit page'))}}
+
 	{{pass}}
 
 		
@@ -63,8 +80,24 @@
 	{{pass}}
 
 	
-		{{for we_pass in db((db.course_activity_category.semester==int(semestre2.id)) & (db.course_activity_category.assignation==var_project_id) & (db.course_activity_category.laboratory==var_labo)).select():}}	
+		{{for we_pass in db((db.course_activity_category.semester==int(semestre2.id)) & (db.course_activity_category.assignation==var_project_id) & (db.course_activity_category.laboratory==var_labo)).select():}}			
+			{{query_temp = db(db.course_activity_category.id==we_pass.id).select().first()}}
+
 			{{db(db.course_activity_category.id==we_pass.id).delete()}}
+
+			{{#Log}}
+			{{db.course_activity_category_log.insert(user_name = auth.user.username,
+														roll = rol_log,
+														operation_log = 'delete',
+														before_category = query_temp.category.category,
+														before_grade =  query_temp.grade, 
+														before_specific_grade = query_temp.specific_grade, 
+														semester = T(semestre2.period.name),
+														yearp = semestre2.yearp,
+														assignation = assigantion.project.name, 
+														before_laboratory = query_temp.laboratory,
+														before_teacher_permition = query_temp.teacher_permition,
+														description = T('Delete from Weighting Get page'))}}
 		{{pass}}
 
 		{{for we in db((db.course_activity_category.semester==var_period_sel) & (db.course_activity_category.assignation==var_project_id) & (db.course_activity_category.laboratory==var_labo)).select():}}		
@@ -76,6 +109,21 @@
 		                                assignation = var_project_id, 
 		                                laboratory = we.laboratory,
 		                                teacher_permition = we.teacher_permition)}}
+
+			{{#Log}}
+			
+			{{db.course_activity_category_log.insert(user_name = auth.user.username,
+														roll = rol_log,
+														operation_log = 'insert',
+														after_category = we.category.category,
+														after_grade =  we.grade, 
+														after_specific_grade = we.specific_grade, 
+														semester = T(semestre2.period.name),
+														yearp = semestre2.yearp,
+														assignation = assigantion.project.name, 
+														after_laboratory = we.laboratory,
+														after_teacher_permition = we.teacher_permition,
+														description = T('Inserted from Weighting Get page'))}}
 		{{pass}}
 	
 	{{request.vars['op'] ="showTableNoEditable"}}
@@ -98,7 +146,24 @@
 		alert("{{=T('Unable to delete category because it already has some activity associated')}}");
 		</script>
 	{{else:}}
+		
+		{{query_temp = db(db.course_activity_category.id==request.vars['var_id']).select().first()}}
+
 		{{db(db.course_activity_category.id==request.vars['var_id']).delete()}}
+
+		{{#Log}}
+		{{db.course_activity_category_log.insert(user_name = auth.user.username,
+													roll = rol_log,
+													operation_log = 'delete',
+													before_category = query_temp.category.category,
+													before_grade =  query_temp.grade, 
+													before_specific_grade = query_temp.specific_grade, 
+													semester = T(semestre2.period.name),
+													yearp = semestre2.yearp,
+													assignation = assigantion.project.name, 
+													before_laboratory = query_temp.laboratory,
+													before_teacher_permition = query_temp.teacher_permition,
+													description = T('Delete from Weighting Edit page'))}}
 	{{pass}}
 	
 {{pass}}
@@ -109,47 +174,212 @@
 
 <!--UPDATE CATEGORY-->
 {{if request.vars['op'] == "updateCategory": }}
-	{{total_var2=float(request.vars['grade_var'])}}
-
-
-
 	{{if request.vars['type'] == 'course':}}
-		{{for project in db((db.course_activity_category.semester==semestre2.id) & (db.course_activity_category.assignation==var_project_id) & (db.course_activity_category.laboratory==False)).select():}}		
-			{{if str(project.id) != str(request.vars['var_id']):}}	
-				{{total_var2 = float(total_var2) + float(project.grade)}}
-			{{pass}}
-		{{pass}}
+		{{act_count = db((db.course_activity.course_activity_category == request.vars['var_id']) & (db.course_activity.assignation == var_project_id) & (  db.course_activity.laboratory == False) & (db.course_activity.semester == (semestre2.id) ) ).count() }}
 	{{else:}}
-		{{for project in db((db.course_activity_category.semester==semestre2.id) & (db.course_activity_category.assignation==var_project_id) & (db.course_activity_category.laboratory==True)).select():}}		
-			{{if str(project.id) != str(request.vars['var_id']):}}	
-				{{total_var2 = float(total_var2) + float(project.grade)}}
-			{{pass}}
-		{{pass}}
+		{{act_count = db((db.course_activity.course_activity_category == request.vars['var_id']) & (db.course_activity.assignation == var_project_id) & (  db.course_activity.laboratory == True) & (db.course_activity.semester == (semestre2.id) ) ).count() }}
 	{{pass}}
-
-
+	{{cat_temp2 = db(db.activity_category.id== int(request.vars['category_id_var'])).select().first()}}
 	
-	{{if float(total_var2) > 100:}}		
-		<center>
-			<span id="information_text" class="badge badge-important">{{=T('The total weighting exceeds 100 points.') }}</span>
-		</center>
+	
+
+	{{query_temp = db(db.course_activity_category.id==request.vars['var_id']).select().first()}}
+
+	{{if (act_count != 0) & (int(cat_temp2.id)!=int(query_temp.category)):}}
+		<script type="text/javascript">
+			alert("{{=T('You must first delete the activities under the category to rename.')}}");
+		</script>
 	{{else:}}
-		{{var_SG = True}}
-		{{if str(request.vars['SG_var']) == "true":}}
-			{{var_SG = False}}
-		{{pass}}
+		{{total_var2=float(request.vars['grade_var'])}}
 
-		{{var_TP = False}}
-		{{if str(request.vars['TP_var']) == "true":}}
-			{{var_TP = True}}
+		{{if request.vars['type'] == 'course':}}
+			{{for project in db((db.course_activity_category.semester==semestre2.id) & (db.course_activity_category.assignation==var_project_id) & (db.course_activity_category.laboratory==False)).select():}}		
+				{{if str(project.id) != str(request.vars['var_id']):}}	
+					{{total_var2 = float(total_var2) + float(project.grade)}}
+				{{pass}}
+			{{pass}}
+		{{else:}}
+			{{for project in db((db.course_activity_category.semester==semestre2.id) & (db.course_activity_category.assignation==var_project_id) & (db.course_activity_category.laboratory==True)).select():}}		
+				{{if str(project.id) != str(request.vars['var_id']):}}	
+					{{total_var2 = float(total_var2) + float(project.grade)}}
+				{{pass}}
+			{{pass}}
 		{{pass}}
+		
+		{{if float(total_var2) > 100:}}		
+			<center>
+				<span id="information_text" class="badge badge-important">{{=T('The total weighting exceeds 100 points.') }}</span>
+			</center>
+		{{else:}}
+			{{var_SG = True}}
+			{{if str(request.vars['SG_var']) == "true":}}
+				{{var_SG = False}}
+			{{pass}}
 
-		{{db(db.course_activity_category.id==request.vars['var_id']).update(category = int(request.vars['category_id_var']),
-			                                grade =  request.vars['grade_var'], 
-			                                specific_grade = var_SG,
-			                            	teacher_permition = var_TP)}}
+			{{var_TP = False}}
+			{{if str(request.vars['TP_var']) == "true":}}
+				{{var_TP = True}}
+			{{pass}}
+
+
+			{{#---------------Update-course-weighting------------}}
+			{{db(db.course_activity_category.id==request.vars['var_id']).update(category = int(request.vars['category_id_var']),
+				                                grade =  request.vars['grade_var'], 
+				                                specific_grade = var_SG,
+				                            	teacher_permition = var_TP)}}
+			
+			{{#---------------Specific-grades-to-Average-Grades------------}}
+			{{if (query_temp.specific_grade == True) & (var_SG == False) :}}
+				{{var_cac = db((db.course_activity.course_activity_category == request.vars['var_id']) & (db.course_activity.assignation == var_project_id) & (  db.course_activity.laboratory == query_temp.laboratory) & (db.course_activity.semester == (semestre2.id) ) ).select() }}
+				{{for act_temp in var_cac:}}
+					{{db(db.course_activity.id==act_temp.id).update(grade =  0)}}
+
+					{{#---------------Activity-LOG------------}}
+					{{db.course_activity_log.insert(user_name=auth.user.username,
+												roll=rol_log,
+												operation_log='update',
+												course= assigantion.project.name,
+												yearp=semestre2.yearp,
+												period=T(semestre2.period.name),
+												metric='T',
+												before_course_activity_category = act_temp.course_activity_category.category.category,
+												before_name = act_temp.name,
+												before_description = act_temp.description,
+												before_grade =  act_temp.grade,
+												before_laboratory = act_temp.laboratory,
+												before_teacher_permition = act_temp.teacher_permition,
+												before_date_start = act_temp.date_start,
+												before_date_finish = act_temp.date_finish,												
+												after_course_activity_category = act_temp.course_activity_category.category.category,
+												after_name = act_temp.name,
+												after_description =  act_temp.description,
+												after_grade =  0,
+												after_laboratory = act_temp.laboratory,
+												after_teacher_permition = act_temp.teacher_permition,
+												after_date_start =  act_temp.date_start,
+												after_date_finish = act_temp.date_finish)}}
+				{{pass}}
+			{{pass}}
+
+			{{#---------------Average-Grades-to-Specific-grades----------}}
+			{{if (query_temp.specific_grade == False) & (var_SG == True) :}}
+				{{act_count = db((db.course_activity.course_activity_category == request.vars['var_id']) & (db.course_activity.assignation == var_project_id) & (  db.course_activity.laboratory == query_temp.laboratory) & (db.course_activity.semester == (semestre2.id) ) ).count() }}
+				{{var_cac = db((db.course_activity.course_activity_category == request.vars['var_id']) & (db.course_activity.assignation == var_project_id) & (  db.course_activity.laboratory == query_temp.laboratory) & (db.course_activity.semester == (semestre2.id) ) ).select() }}
+
+				{{category_total=0}}
+				{{count = 0}}
+				{{cat_grade = round(float(request.vars['grade_var']),2)}}
+				{{for act_temp in var_cac:}}
+					{{count = count + 1}}
+					{{grade_var = round( ((cat_grade)/float(act_count)), 2) }}
+					{{category_total = category_total + grade_var}}
+					{{if (count == act_count) & (category_total != cat_grade) :}}
+						{{grade_var = grade_var + (cat_grade - category_total) }}
+					{{pass}}
+					{{db(db.course_activity.id==act_temp.id).update(grade = grade_var)}}
+
+					{{#---------------Activity-LOG------------}}
+					{{db.course_activity_log.insert(user_name=auth.user.username,
+												roll=rol_log,
+												operation_log='update',
+												course= assigantion.project.name,
+												yearp=semestre2.yearp,
+												period=T(semestre2.period.name),
+												metric='T',
+												before_course_activity_category = act_temp.course_activity_category.category.category,
+												before_name = act_temp.name,
+												before_description = act_temp.description,
+												before_grade =  act_temp.grade,
+												before_laboratory = act_temp.laboratory,
+												before_teacher_permition = act_temp.teacher_permition,
+												before_date_start = act_temp.date_start,
+												before_date_finish = act_temp.date_finish,												
+												after_course_activity_category = act_temp.course_activity_category.category.category,
+												after_name = act_temp.name,
+												after_description =  act_temp.description,
+												after_grade =  grade_var,
+												after_laboratory = act_temp.laboratory,
+												after_teacher_permition = act_temp.teacher_permition,
+												after_date_start =  act_temp.date_start,
+												after_date_finish = act_temp.date_finish)}}
+					
+				{{pass}}
+			{{pass}}
+
+
+			{{#---------------Change-of-grade----------}}
+			{{cat_grade_aft = round(float(request.vars['grade_var']),2)}}
+			{{cat_grade_bef = round(float(query_temp.grade),2)}}		
+			
+			{{if (cat_grade_bef != cat_grade_aft) & (query_temp.specific_grade == True) & (var_SG == True):}}
+				{{act_count = db((db.course_activity.course_activity_category == request.vars['var_id']) & (db.course_activity.assignation == var_project_id) & (  db.course_activity.laboratory == query_temp.laboratory) & (db.course_activity.semester == (semestre2.id) ) ).count() }}
+				{{var_cac = db((db.course_activity.course_activity_category == request.vars['var_id']) & (db.course_activity.assignation == var_project_id) & (  db.course_activity.laboratory == query_temp.laboratory) & (db.course_activity.semester == (semestre2.id) ) ).select() }}
+
+				{{category_total=0}}
+				{{count = 0}}
+				
+				{{for act_temp in var_cac:}}
+					{{count = count + 1}}
+					
+					{{grade_var_1 = round( (float(act_temp.grade)*(100)/cat_grade_bef), 2) }}
+					{{grade_var = round( ((grade_var_1)*cat_grade_aft/(100)), 2) }}
+
+					{{category_total = category_total + grade_var}}
+					{{if (count == act_count) & (category_total != cat_grade_aft) :}}
+						{{grade_var = grade_var + (cat_grade_aft - category_total) }}
+					{{pass}}
+					{{db(db.course_activity.id==act_temp.id).update(grade = grade_var)}}
+
+					{{#---------------Activity-LOG------------}}
+					{{db.course_activity_log.insert(user_name=auth.user.username,
+												roll=rol_log,
+												operation_log='update',
+												course= assigantion.project.name,
+												yearp=semestre2.yearp,
+												period=T(semestre2.period.name),
+												metric='T',
+												before_course_activity_category = act_temp.course_activity_category.category.category,
+												before_name = act_temp.name,
+												before_description = act_temp.description,
+												before_grade =  act_temp.grade,
+												before_laboratory = act_temp.laboratory,
+												before_teacher_permition = act_temp.teacher_permition,
+												before_date_start = act_temp.date_start,
+												before_date_finish = act_temp.date_finish,												
+												after_course_activity_category = act_temp.course_activity_category.category.category,
+												after_name = act_temp.name,
+												after_description =  act_temp.description,
+												after_grade =  grade_var,
+												after_laboratory = act_temp.laboratory,
+												after_teacher_permition = act_temp.teacher_permition,
+												after_date_start =  act_temp.date_start,
+												after_date_finish = act_temp.date_finish)}}
+					
+				{{pass}}
+			{{pass}}
+
+			{{#--------------------Log-Weighting---------------------}}
+			{{cat_temp = db(db.activity_category.id== int(request.vars['category_id_var'])).select().first()}}
+			
+			{{db.course_activity_category_log.insert(user_name = auth.user.username,
+														roll = rol_log,
+														operation_log = 'update',
+														after_category = cat_temp.category,
+														before_category = query_temp.category.category,
+														after_grade =  cat_grade_aft, 
+														before_grade =  cat_grade_bef, 
+														after_specific_grade = var_SG,
+														before_specific_grade = query_temp.specific_grade, 
+														semester = T(semestre2.period.name),
+														yearp = semestre2.yearp,
+														assignation = assigantion.project.name, 
+														after_laboratory = query_temp.laboratory,
+														before_laboratory = query_temp.laboratory,
+														after_teacher_permition = var_TP,
+														before_teacher_permition = query_temp.teacher_permition,
+														description = T('Edited from Weighting Edit page'))}}
+		{{pass}}	
 	{{pass}}
-
 {{pass}}
 
 
