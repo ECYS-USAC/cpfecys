@@ -711,20 +711,10 @@ def requestchangeactivity():
                 message="<html>catedratico(a) "+users2.auth_user.first_name+" "+users2.auth_user.last_name+" reciba un cordial saludo.<br>"
                 message3=message+message2
                 fail1 = send_mail_to_students(message3,subject,users2.auth_user.email,check,year.period.name,year.yearp)
-                fail1=1
-                #Send Mail to the DTT Administrator
-                message="<html>Administrator de DTT reciba un cordial saludo.<br>"
-                message3=message+message2
-                fail2 = send_mail_to_students(message3,subject,'dtt.ecys@dtt-ecys.org',check,year.period.name,year.yearp)
-                fail2=1
                 #Refresh the var Draft
                 Draft=None
-                if fail1==1 and fail2==1:
-                    stateRequest=1
-                elif fail1==1:
+                if fail1==1:
                     stateRequest=2
-                elif fail2==1:
-                    stateRequest=3
                 else:
                     stateRequest=4
 

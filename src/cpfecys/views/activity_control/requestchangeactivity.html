@@ -4,24 +4,14 @@
             alert("{{=T('The change request activities in which you are working has been deleted by another user')}}");
             window.location.href = "{{=URL('default', 'index')}}";
         </script>
-	{{elif stateRequest==1:}}
-		<script type="text/javascript">
-            alert("{{=T('You have created the change request successfully. Not able to report via email to the system administrator and teacher in charge of the course')}}");
-            window.location.href = "{{=URL('activity_control', 'request_change_activity',vars=dict(project=project.id, year=period.id))}}";
-        </script>
 	{{elif stateRequest==2:}}
 		<script type="text/javascript">
-            alert("{{=T('You have created the change request successfully. It is reported via email to the DTT system administrator and failure notice to teacher in charge of the course')}}");
-            window.location.href = "{{=URL('activity_control', 'request_change_activity',vars=dict(project=project.id, year=period.id))}}";
-        </script>
-	{{elif stateRequest==3:}}
-		<script type="text/javascript">
-            alert("{{=T('You have created the change request successfully. It is reported by email to teacher in charge of the course and fail to notice DTT system administrator')}}");
+            alert("{{=T('You have created the change request successfully. It is failure notice to teacher in charge of the course')}}");
             window.location.href = "{{=URL('activity_control', 'request_change_activity',vars=dict(project=project.id, year=period.id))}}";
         </script>
 	{{elif stateRequest==4:}}
 		<script type="text/javascript">
-            alert("{{=T('You have created the change request successfully. It is reported by email to teacher in charge of the course and DTT system administrator')}}");
+            alert("{{=T('You have created the change request successfully. It is reported by email to teacher in charge of the course')}}");
             window.location.href = "{{=URL('activity_control', 'request_change_activity',vars=dict(project=project.id, year=period.id))}}";
         </script>
 	{{pass}}
@@ -31,6 +21,13 @@
 
 {{if request.vars['op'] == "solveActivityRequestDetail":}}
 	{{Request = db(db.requestchange_activity.id==int(request.vars['Idrequest'])).select().first()}}
+	{{if Request is None:}}
+		<script type="text/javascript">
+			jQuery('#controlActivity').empty();
+            alert("{{=T('You do not have permission to view course requests')}}");
+            window.location.href = "{{=URL('default', 'index')}}";
+        </script>
+	{{else:}}
 		<label id="idR" value="{{=Request.id}}" style="display=none;"></label>
 		<table class="table table-striped table-bordered">
 			<tr>
@@ -42,26 +39,18 @@
 				<th>{{=T('Date Request')}}</th><td>{{=Request.date_request}}</td>
 			</tr>
 			<tr>
+				<th>{{=T('Category')}}:</th>
+				<td colspan="2"><center>{{=Request.course_activity_category.category.category}}</center></td>
 				<th>{{=T('Status')}}:</th>
-				{{if Request.status=='Pending':}}
-					<th><FONT COLOR="#5E610B">{{=T(Request.status)}}</font></th>
-				{{elif Request.status=='Accepted':}}
-					<th><FONT COLOR="Green">{{=T(Request.status)}}</font></th>
-				{{else:}}
-					<th><FONT COLOR="Red">{{=T(Request.status)}}</font></th>
-				{{pass}}
+				<th colspan="2"><FONT COLOR="#5E610B">{{=T(Request.status)}}</font></th>
+			</tr>
+			<tr>
+				<th>{{=T('User resolution')}}</th>
+				<td>---</td>
 				<th>{{=T('Date of resolution')}}</th>
-				{{if Request.status=='Pending':}}
-					<td>---</td>
-				{{else:}}
-					<td>{{=Request.date_request_resolve}}</td>
-				{{pass}}
+				<td>---</td>
 				<th>{{=T('Role resolution')}}</th>
-				{{if Request.status=='Pending':}}
-					<td>---</td>
-				{{else:}}
-					<td>{{=Request.roll_resolve}}</td>
-				{{pass}}
+				<td>---</td>
 			</tr>
 			<tr>
 				<th>{{=T('Description')}}:</th>
@@ -71,12 +60,12 @@
 				<th colspan="6"><center>{{=T('Detail of Request')}}</center></th>
 			</tr>
 			<tr>
-				<th>Operación</th>
-				<th>Nombre Actividad</th>
-				<th>Descripción Actividad</th>
-				<th>Nota de Actividad</th>
-				<th>Fecha de Inicio</th>
-				<th>Fecha de Finalización</th>
+				<th>{{=T('Operation')}}</th>
+				<th>{{=T('Name Activity')}}</th>
+				<th>{{=T('Description of Activity')}}</th>
+				<th>{{=T('Grade of Activity')}} </th>
+				<th>{{=T('Start Date')}}</th>
+				<th>{{=T('End Date')}}</th>
 			</tr>
 			{{for change in db(db.requestchange_course_activity.requestchange_activity==Request.id).select():}}
 				<tr>
@@ -100,6 +89,85 @@
 				</center></td>
 			</tr>
 		</table>
+	{{pass}}
+{{pass}}
+
+
+<!--Others-->
+{{if request.vars['op']=="solveActivityRequestDetailO":}}
+	{{Request = db(db.requestchange_activity_log.id==int(request.vars['Idrequest'])).select().first()}}
+	{{if Request is None:}}
+		<script type="text/javascript">
+			jQuery('#controlActivity').empty();
+            alert("{{=T('You do not have permission to view course requests')}}");
+            window.location.href = "{{=URL('default', 'index')}}";
+        </script>
+	{{else:}}
+		<table class="table table-striped table-bordered">
+			<tr>
+				<th colspan="6"><center>{{=T('Change Request')}}</center></th>
+			</tr>
+			<tr>
+				<th>{{=T('User')}}</th><td>{{=Request.user_request}}</td>
+				<th>{{=T('Role')}}</th><td>{{=T(Request.roll_request)}}</td>
+				<th>{{=T('Date Request')}}</th><td>{{=Request.date_request}}</td>
+			</tr>
+			<tr>
+				<th>{{=T('Category')}}:</th>
+				<td colspan="2"><center>{{=Request.category_request}}</center></td>
+				<th>{{=T('Status')}}:</th>
+				{{if Request.status=='Accepted':}}
+					<th colspan="2"><center><FONT COLOR="Green">{{=T(Request.status)}}</center></font></th>
+				{{else:}}
+					<th colspan="2"><center><FONT COLOR="Red">{{=T(Request.status)}}</center></font></th>
+				{{pass}}
+			</tr>
+			<tr>
+				<th>{{=T('User resolution')}}</th>
+				{{usuarioR = db(db.auth_user.username==Request.user_resolve).select().first()}}
+				{{if usuarioR==None:}}
+					<td>{{=usuarioR.first_name}} {{=usuarioR.last_name}}</td>
+				{{else:}}
+					<td>{{=Request.user_resolve}}</td>
+				{{pass}}
+				<th>{{=T('Role resolution')}}</th>
+				<td>{{=T(Request.roll_resolve)}}</td>
+				<th>{{=T('Date of resolution')}}</th>
+				<td>{{=Request.date_request_resolve}}</td>
+			</tr>
+			<tr>
+				<th>{{=T('Description')}}:</th>
+				<td colspan="5"><pre>{{=Request.description}}</pre></td>
+			</tr>
+			<tr>
+				<th colspan="6"><center>{{=T('Detail of Request')}}</center></th>
+			</tr>
+			<tr>
+				<th>{{=T('Operation')}}</th>
+				<th>{{=T('Name Activity')}}</th>
+				<th>{{=T('Description of Activity')}}</th>
+				<th>{{=T('Grade of Activity')}} </th>
+				<th>{{=T('Start Date')}}</th>
+				<th>{{=T('End Date')}}</th>
+			</tr>
+			{{for change in db(db.requestchange_course_activity_log.requestchange_activity==Request.id).select():}}
+				<tr>
+					<td>{{=change.operation_request}}</td>
+					<td>{{=change.name}}</td>
+					<td>{{=change.description}}</td>
+					<td>{{=change.grade}}</td>
+					<td>{{=change.date_start}}</td>
+					<td>{{=change.date_finish}}</td>
+				</tr>
+			{{pass}}
+			<tr>
+				<td colspan="5"></td>
+				<td><center>
+					<a class="btn" title="{{=T('Close the detail of the change request')}}" onclick="closeDetail();">{{=T('Close Detail')}}</a>
+				</center></td>
+			</tr>
+		</table>
+	{{pass}}
 {{pass}}
 <!--******************************************************************************************************************-->
 <!--******************************************************************************************************************-->
@@ -490,8 +558,33 @@
 
 
 {{if request.vars['op'] == "showRequestDone":}}
-	{{changes = db((db.requestchange_activity.status=='Pending')&(db.requestchange_activity.semester==period.id)&(db.requestchange_activity.course==project.id)).select()}}
-	{{if changes.first() != None:}}
+	{{RallRequestP=None}}
+	{{RallRequest=None}}
+	{{RnameP=None}}
+	{{RnameS=None}}
+	{{try:}}
+		{{(RnameP, RprojectSection) = str(project.name).split('(')}}
+		{{(RnameS,Rgarbage) = str(RprojectSection).split(')')}}
+		{{(Rgarbage,RnameS) = str(RnameS).split(' ')}}
+	{{except:}}
+		{{RnameP=project.name}}
+		{{RnameS=None}}
+	{{pass}}
+	{{if request.vars['tip']=="p" or request.vars['tip']=="t":}}
+			{{RallRequestP = db((db.requestchange_activity.status=='Pending')&(db.requestchange_activity.semester==int(period.id))&(db.requestchange_activity.course==project.id)).select()}}
+		{{pass}}
+	{{if request.vars['tip']=="a":}}
+		{{RallRequest = db((db.requestchange_activity_log.status=='Accepted')&(db.requestchange_activity_log.course==RnameP)&(db.requestchange_activity_log.course_section==RnameS)&(db.requestchange_activity_log.yearp==period.yearp)&(db.requestchange_activity_log.semester==period.period.name)).select()}}
+	{{pass}}
+	{{if request.vars['tip']=="r":}}
+		{{RallRequest = db((db.requestchange_activity_log.status=='Rejected')&(db.requestchange_activity_log.course==RnameP)&(db.requestchange_activity_log.course_section==RnameS)&(db.requestchange_activity_log.yearp==period.yearp)&(db.requestchange_activity_log.semester==period.period.name)).select()}}
+	{{pass}}
+	{{if request.vars['tip']=="t":}}
+		{{RallRequest = db((db.requestchange_activity_log.status!='Pending')&(db.requestchange_activity_log.course==RnameP)&(db.requestchange_activity_log.course_section==RnameS)&(db.requestchange_activity_log.yearp==period.yearp)&(db.requestchange_activity_log.semester==period.period.name)).select()}}
+	{{pass}}
+
+
+	{{if (request.vars['tip']=="p" and (RallRequestP != None and RallRequestP.first()!=None)) or (request.vars['tip']=="a" and (RallRequest != None and RallRequest.first()!=None)) or (request.vars['tip']=="r" and (RallRequest != None and RallRequest.first()!=None)) or (request.vars['tip']=="t" and ((RallRequest != None and RallRequest.first()!=None) or (RallRequestP != None and RallRequestP.first()!=None))):}}
 		<table class="table table-striped table-bordered">
 			<tr>
 				<th>{{=T('Category')}}</th>
@@ -501,17 +594,33 @@
 				<th>{{=T('Date Request')}}</th>
 				<th>{{=T('Action')}}</th>
 			</tr>
-		{{for change in changes:}}
-			<tr>
-				<td>{{=change.course_activity_category.category.category}}</td>
-				<td>{{=change.user_id.username}}</td>
-				<td>{{=T(change.roll)}}</td>
-				<td>{{=T(change.status)}}</td>
-				<td>{{=change.date_request}}</td>
-				<td>
-					<a class="btn" title="{{=T('View the change request')}}" onclick="detail({{=change.id}});">{{=T('Detail')}}</a>
-				</td>
-			</tr>
+		{{if RallRequestP!=None:}}
+			{{for change1 in RallRequestP:}}
+				<tr>
+					<td>{{=change1.course_activity_category.category.category}}</td>
+					<td>{{=change1.user_id.username}}</td>
+					<td>{{=T(change1.roll)}}</td>
+					<td>{{=T(change1.status)}}</td>
+					<td>{{=change1.date_request}}</td>
+					<td>
+						<a class="btn" title="{{=T('View the change request')}}" onclick="detail({{=change1.id}});">{{=T('Detail')}}</a>
+					</td>
+				</tr>
+			{{pass}}
+		{{pass}}
+		{{if RallRequest!=None:}}
+			{{for change in RallRequest:}}
+				<tr>
+					<td>{{=change.category_request}}</td>
+					<td>{{=change.user_request}}</td>
+					<td>{{=T(change.roll_request)}}</td>
+					<td>{{=T(change.status)}}</td>
+					<td>{{=change.date_request}}</td>
+					<td>
+						<a class="btn" title="{{=T('View the change request')}}" onclick="detailT({{=change.id}});">{{=T('Detail')}}</a>
+					</td>
+				</tr>
+			{{pass}}
 		{{pass}}
 		</table>
 	{{else:}}
@@ -522,60 +631,71 @@
 
 
 
+<!--******************************************************************************************************************-->
+<!--******************************************************************************************************************-->
+<!--******************************************************************************************************************-->
+<!--******************************************************************************************************************-->
+<!--******************************************************************************************************************-->
+
 
 {{if request.vars['op'] == "createRequest":}}
-	{{if Draft==None:}}
-		{{if totalCategories>0:}}
+	{{weighting = db((db.request_change_weighting.status=='pending')&(db.request_change_weighting.project==request.vars['project'])).select().first()}}
+	{{if weighting==None:}}
+		{{if Draft==None:}}
+			{{if totalCategories>0:}}
+				<table>
+					<tr>
+						<td colspan="2"><center>{{=T('Category')}}</center></td>
+					</tr>
+					<tr>
+						<td>
+							<select class="generic-widget" id="categoryID" style="width:140px;">
+							{{for category in categories:}}
+									<option value="{{=category.id}}">{{=category.category.category}}</option>
+							{{pass}}
+							</select>
+						</td>
+						<td>
+							<a id="loadActivity" role="button" class="btn btn-warning" title="{{=T('Load Category')}}" onclick="showCategory();"> 
+					            {{=T('Load Category')}}
+							</a>
+						</td>
+					</tr>
+				</table>
+			{{else:}}
+				<H1>{{=T('No categories for the change request')}}</H1>
+			{{pass}}
+		{{else:}}
+			<script type="text/javascript">
+				category={{=Draft.course_activity_category}};
+				alert(category);
+			</script>
 			<table>
 				<tr>
-					<td colspan="2"><center>{{=T('Category')}}</center></td>
+					<td colspan="2"><center>{{=T('There is a change request activities in draft state')}}</center></td>
 				</tr>
 				<tr>
-					<td>
-						<select class="generic-widget" id="categoryID" style="width:140px;">
-						{{for category in categories:}}
-								<option value="{{=category.id}}">{{=category.category.category}}</option>
-						{{pass}}
-						</select>
-					</td>
-					<td>
-						<a id="loadActivity" role="button" class="btn btn-warning" title="{{=T('Load Category')}}" onclick="showCategory();"> 
-				            {{=T('Load Category')}}
+					<td colspan="2"><center>{{=T('Category')}}: {{=Draft.course_activity_category.category.category}}</center></td>
+				</tr>
+				<tr>
+					<td colspan="2"><center>{{=T('User Creator')}}: {{=Draft.user_id.first_name}} {{=Draft.user_id.last_name}}</center></td>
+				</tr>
+				<tr>
+					<td><center>
+						<a class="btn btn-success" title="{{=T('Continue to request changes')}}" id="botonContinueRequest" onclick="createRequestChange();">
+							{{=T('Continue request')}}
 						</a>
-					</td>
+					</center></td>
+					<td><center>
+						<a class="btn btn-danger" title="{{=T('Cancel the change request')}}" href="{{=URL('activity_control', 'requestchangeactivity/cancelR', vars=dict(project=project.id, year=period.id))}}">
+							{{=T('Cancel request')}}
+						</a>
+					</center></td>
 				</tr>
 			</table>
-		{{else:}}
-			<H1>{{=T('No categories for the change request')}}</H1>
 		{{pass}}
 	{{else:}}
-		<script type="text/javascript">
-			category={{=Draft.course_activity_category}};
-			alert(category);
-		</script>
-		<table>
-			<tr>
-				<td colspan="2"><center>{{=T('There is a change request activities in draft state')}}</center></td>
-			</tr>
-			<tr>
-				<td colspan="2"><center>{{=T('Category')}}: {{=Draft.course_activity_category.category.category}}</center></td>
-			</tr>
-			<tr>
-				<td colspan="2"><center>{{=T('User Creator')}}: {{=Draft.user_id.first_name}} {{=Draft.user_id.last_name}}</center></td>
-			</tr>
-			<tr>
-				<td><center>
-					<a class="btn btn-success" title="{{=T('Continue to request changes')}}" id="botonContinueRequest" onclick="createRequestChange();">
-						{{=T('Continue request')}}
-					</a>
-				</center></td>
-				<td><center>
-					<a class="btn btn-danger" title="{{=T('Cancel the change request')}}" href="{{=URL('activity_control', 'requestchangeactivity/cancelR', vars=dict(project=project.id, year=period.id))}}">
-						{{=T('Cancel request')}}
-					</a>
-				</center></td>
-			</tr>
-		</table>
+		<H1>{{=T('You can not create a change request activity since there is a change request weighting is not answered.')}} </H1>
 	{{pass}}
 {{pass}}
 
@@ -1336,6 +1456,12 @@
 		$("#div_request_done").css("display", "none");
 		$("#div_request_detail").css("display", "block");
 		$("#div_request_detail").load("{{=URL('activity_control','requestchangeactivity.html')}}?op=solveActivityRequestDetail&amp;project={{=request.vars['project']}}&amp;year={{=request.vars['year']}}&amp;Idrequest="+var_id); 
+	}
+
+	function detailT(var_id){
+		$("#div_request_done").css("display", "none");
+		$("#div_request_detail").css("display", "block");
+		$("#div_request_detail").load("{{=URL('activity_control','requestchangeactivity.html')}}?op=solveActivityRequestDetailO&amp;project={{=request.vars['project']}}&amp;year={{=request.vars['year']}}&amp;Idrequest="+var_id); 
 	}
 
 	function closeDetail(){

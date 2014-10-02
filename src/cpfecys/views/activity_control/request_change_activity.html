@@ -21,7 +21,10 @@
 			<div align="center" id="controlActivity">
 				<ul id="myTab" class="nav nav-tabs">
 					<li class="active" id="var_requestCreate"><a href="#" data-toggle="tab">{{=T('Create Request')}}</a></li>
-					<li id="var_requestDone"><a href="#" data-toggle="tab">{{=T('Pending requests')}}</a></li>
+					<li id="request_var_pendingRequest"><a href="#" data-toggle="tab">{{=T('Pending requests')}}</a></li>
+					<li id="request_var_allRequest"><a href="#" data-toggle="tab">{{=T('All request')}}</a></li>
+					<li id="request_var_acceptedRequest"><a href="#" data-toggle="tab">{{=T('Accepted request')}}</a></li>
+					<li id="request_var_rejectedRequest"><a href="#" data-toggle="tab">{{=T('Rejected request')}}</a></li>
 				</ul>
 				<div id="content">
 					<div class="well span11" id="div_request_show" style="overflow:auto;">
@@ -38,16 +41,36 @@
 
 <script type="text/javascript">
 	$(document).ready(function(){
-		$("#div_request_show").load("{{=URL('activity_control','requestchangeactivity.html')}}?op=createRequest&amp;project={{=request.vars['project']}}&amp;year={{=request.vars['year']}}");
-
-		$("#var_requestDone").click(function(){
+		$("#request_var_pendingRequest").click(function(){
 			jQuery('#div_request_detail').empty();
 			$("#div_request_detail").css("display", "none");
 			$("#div_request_show").css("display", "none");
-			jQuery('#div_request_done').empty();
 			$("#div_request_done").css("display", "block");
-			$("#div_request_done").load("{{=URL('activity_control','requestchangeactivity.html')}}?op=showRequestDone&amp;project={{=request.vars['project']}}&amp;year={{=request.vars['year']}}");
+			$("#div_request_done").load("{{=URL('activity_control','requestchangeactivity.html')}}?op=showRequestDone&amp;tip=p&amp;project={{=request.vars['project']}}&amp;year={{=request.vars['year']}}");
 		});
+		$("#request_var_allRequest").click(function(){
+			jQuery('#div_request_detail').empty();
+			$("#div_request_detail").css("display", "none");
+			$("#div_request_show").css("display", "none");
+			$("#div_request_done").css("display", "block");
+			$("#div_request_done").load("{{=URL('activity_control','requestchangeactivity.html')}}?op=showRequestDone&amp;tip=t&amp;project={{=request.vars['project']}}&amp;year={{=request.vars['year']}}");
+		});
+		$("#request_var_acceptedRequest").click(function(){
+			jQuery('#div_request_detail').empty();
+			$("#div_request_detail").css("display", "none");
+			$("#div_request_show").css("display", "none");
+			$("#div_request_done").css("display", "block");
+			$("#div_request_done").load("{{=URL('activity_control','requestchangeactivity.html')}}?op=showRequestDone&amp;tip=a&amp;project={{=request.vars['project']}}&amp;year={{=request.vars['year']}}");
+		});
+		$("#request_var_rejectedRequest").click(function(){
+			jQuery('#div_request_detail').empty();
+			$("#div_request_detail").css("display", "none");
+			$("#div_request_show").css("display", "none");
+			$("#div_request_done").css("display", "block");
+			$("#div_request_done").load("{{=URL('activity_control','requestchangeactivity.html')}}?op=showRequestDone&amp;tip=r&amp;project={{=request.vars['project']}}&amp;year={{=request.vars['year']}}");
+		});
+
+		$("#div_request_show").load("{{=URL('activity_control','requestchangeactivity.html')}}?op=createRequest&amp;project={{=request.vars['project']}}&amp;year={{=request.vars['year']}}");
 
 		$("#var_requestCreate").click(function(){
 			jQuery('#div_request_detail').empty();
