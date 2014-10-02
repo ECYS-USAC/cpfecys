@@ -721,16 +721,12 @@ def requestchangeactivity():
                 Draft=None
                 if fail1==1 and fail2==1:
                     stateRequest=1
-                    session.flash='Se ha creado la solicitud de cambios con exito. No se ha podido informar por medio de correo electronico al administrador del sistema DTT ni al catedratico(a) a cargo del curso sobre la solicitud creada, se solicita informarle a cada uno de ellos para tener una rapida atención a la solicitud creada.'
                 elif fail1==1:
                     stateRequest=2
-                    session.flash='Se ha creado la solicitud de cambios con exito. Se ha informado por medio de correo electronico al administrador del sistema DTT y fallo el aviso al catedratico(a) a cargo del curso.'
                 elif fail2==1:
                     stateRequest=3
-                    session.flash='Se ha creado la solicitud de cambios con exito. Se ha informado por medio de correo electronico al catedratico(a) a cargo del curso y fallo el aviso al administrador del sistema DTT.'
                 else:
                     stateRequest=4
-                    session.flash='Se ha creado la solicitud de cambios con exito. Se ha informado por medio de correo electronico al catedratico(a) a cargo del curso y al administrador del sistema DTT.'
 
 
     requestC=db((db.requestchange_activity.course==project.id)&(db.requestchange_activity.semester==year.id)&(db.requestchange_activity.status=='Pending')).select()
@@ -799,6 +795,89 @@ def courses_list_request():
 @auth.requires(auth.has_membership('Super-Administrator') or auth.has_membership('Ecys-Administrator') or auth.has_membership('Teacher'))
 def solve_request_change_activity():
     import cpfecys
+    
+    import datetime
+    #Cancel the request made
+    if request.args(0) == 'reject':
+        Pending = db((db.requestchange_activity.id==int(request.vars['requestID']))&(db.requestchange_activity.status=='Pending')&(db.requestchange_activity.semester==cpfecys.current_year_period().id)&(db.requestchange_activity.course==int(request.vars['course']))).select().first()
+        if Pending is None:
+            session.flash=T('The plan change request has been answered by another user or is there a problem with the request')
+        else:
+            rol_temp=''
+            if auth.has_membership('Super-Administrator'):
+                rol_temp='Super-Administrator'
+            elif auth.has_membership('Ecys-Administrator'):
+                rol_temp='Ecys-Administrator'
+            else:
+                rol_temp='Teacher'
+
+            db(db.requestchange_activity.id==int(request.vars['requestID'])).update(status = 'Rejected', user_resolve = auth.user.id, roll_resolve =  rol_temp, date_request_resolve =  datetime.datetime.now())
+            #Log of request change activity
+            Rejected = db(db.requestchange_activity.id==int(request.vars['requestID'])).select().first()
+            if Rejected is not None:
+                nameP=None
+                nameS=None
+                try:
+                    (nameP, projectSection) = str(Rejected.course.name).split('(')
+                    (nameS,garbage) = str(projectSection).split(')')
+                    (garbage,nameS) = str(nameS).split(' ')
+                except:
+                    nameP=project.name
+                idR = db.requestchange_activity_log.insert(user_request=Rejected.user_id.username, roll_request=Rejected.roll, status='Rejected', user_resolve=Rejected.user_resolve.username, roll_resolve=Rejected.roll_resolve, description=Rejected.description, date_request=Rejected.date_request, date_request_resolve=Rejected.date_request_resolve, category_request=Rejected.course_activity_category.category.category, semester=Rejected.semester.period.name, yearp=Rejected.semester.yearp, course=nameP, course_section=nameS)
+                activitiesChange = db(db.requestchange_course_activity.requestchange_activity==Rejected.id).select()
+                for actChange in activitiesChange:
+                    db.requestchange_course_activity_log.insert(requestchange_activity=idR, operation_request=actChange.operation_request, activity=actChange.activity, name=actChange.name, description=actChange.description, grade=actChange.grade, date_start=actChange.date_start, date_finish=actChange.date_finish)
+            session.flash=T('The plan change request has been canceled')
+        redirect(URL('activity_control','solve_request_change_activity',vars=dict(course=request.vars['course'])))
+
+    #Solve the request made
+    if request.args(0) == 'solve':
+        Pending = db((db.requestchange_activity.id==int(request.vars['requestID']))&(db.requestchange_activity.status=='Pending')&(db.requestchange_activity.semester==cpfecys.current_year_period().id)&(db.requestchange_activity.course==int(request.vars['course']))).select().first()
+        if Pending is None:
+            session.flash=T('The plan change request has been answered by another user or is there a problem with the request')
+        else:
+            rol_temp=''
+            if auth.has_membership('Super-Administrator'):
+                rol_temp='Super-Administrator'
+            elif auth.has_membership('Ecys-Administrator'):
+                rol_temp='Ecys-Administrator'
+            else:
+                rol_temp='Teacher'
+
+            db(db.requestchange_activity.id==int(request.vars['requestID'])).update(status = 'Accepted', user_resolve = auth.user.id, roll_resolve =  rol_temp, date_request_resolve =  datetime.datetime.now())
+            #Log of request change activity
+            Accepted = db(db.requestchange_activity.id==int(request.vars['requestID'])).select().first()
+            if Accepted is not None:
+                nameP=None
+                nameS=None
+                try:
+                    (nameP, projectSection) = str(Accepted.course.name).split('(')
+                    (nameS,garbage) = str(projectSection).split(')')
+                    (garbage,nameS) = str(nameS).split(' ')
+                except:
+                    nameP=Accepted.course.name
+                idR = db.requestchange_activity_log.insert(user_request=Accepted.user_id.username, roll_request=Accepted.roll, status='Accepted', user_resolve=Accepted.user_resolve.username, roll_resolve=Accepted.roll_resolve, description=Accepted.description, date_request=Accepted.date_request, date_request_resolve=Accepted.date_request_resolve, category_request=Accepted.course_activity_category.category.category, semester=Accepted.semester.period.name, yearp=Accepted.semester.yearp, course=nameP, course_section=nameS)
+                activitiesChange = db(db.requestchange_course_activity.requestchange_activity==Accepted.id).select()
+                for actChange in activitiesChange:
+                    #Log request change activity
+                    db.requestchange_course_activity_log.insert(requestchange_activity=idR, operation_request=actChange.operation_request, activity=actChange.activity, name=actChange.name, description=actChange.description, grade=actChange.grade, date_start=actChange.date_start, date_finish=actChange.date_finish)
+                    #Log and changes in activities
+                    if actChange.operation_request=='insert':
+                        #Change in activities
+                        db.course_activity_log.insert(user_name=auth.user.username, roll=rol_temp, operation_log='insert', course= Accepted.course.name, yearp=cpfecys.current_year_period().yearp, period=cpfecys.current_year_period().period.name, metric='T', after_course_activity_category=Accepted.course_activity_category.category.category, after_name=actChange.name, after_description=actChange.description, after_grade =  actChange.grade, after_laboratory = 'T', after_teacher_permition = 'F', after_date_start = actChange.date_start, after_date_finish = actChange.date_finish)
+                        db.course_activity.insert(course_activity_category = Accepted.course_activity_category, name=actChange.name, description=actChange.description, grade =  actChange.grade, semester = cpfecys.current_year_period().id,  assignation = Accepted.course,  laboratory = 'T', teacher_permition = 'F', date_start = actChange.date_start, date_finish = actChange.date_finish)
+                    elif actChange.operation_request=='delete':
+                        db.course_activity_log.insert(user_name=auth.user.username, roll=rol_temp, operation_log='delete', course= Accepted.course.name, yearp=cpfecys.current_year_period().yearp, period=cpfecys.current_year_period().period.name, metric='T', before_course_activity_category=Accepted.course_activity_category.category.category, before_name=actChange.name, before_description=actChange.description, before_grade =  actChange.grade, before_laboratory = 'T', before_teacher_permition = 'F', before_date_start = actChange.date_start, before_date_finish = actChange.date_finish)
+                        db(db.course_activity.id==actChange.activity).delete()
+                    elif actChange.operation_request=='update':
+                        activityOldR=db(db.course_activity.id==actChange.activity).select().first()
+                        db.course_activity_log.insert(user_name=auth.user.username, roll=rol_temp, operation_log='update', course= Accepted.course.name, yearp=cpfecys.current_year_period().yearp, period=cpfecys.current_year_period().period.name, metric='T', before_course_activity_category=activityOldR.course_activity_category.category.category, before_name=activityOldR.name, before_description=activityOldR.description, before_grade =  activityOldR.grade, before_laboratory = activityOldR.laboratory, before_teacher_permition = activityOldR.teacher_permition, before_date_start = activityOldR.date_start, before_date_finish = activityOldR.date_finish, after_course_activity_category=Accepted.course_activity_category.category.category, after_name=actChange.name, after_description=actChange.description, after_grade =  actChange.grade, after_laboratory = 'T', after_teacher_permition = 'F', after_date_start = actChange.date_start, after_date_finish = actChange.date_finish)
+                        db(db.course_activity.id==actChange.activity).update(name=actChange.name, description=actChange.description, grade =  actChange.grade, date_start = actChange.date_start, date_finish = actChange.date_finish)
+            session.flash=T('The plan change request has been accepted')
+        redirect(URL('activity_control','solve_request_change_activity',vars=dict(course=request.vars['course'])))
+
+
+
     #Obtain the course that want to view the request
     courseCheck = request.vars['course']
 

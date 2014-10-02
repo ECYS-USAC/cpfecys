@@ -180,7 +180,7 @@
 								{{pass}}
 								{{db.course_activity_log.insert(user_name=auth.user.username,
 																		roll=rolLog,
-																		operation_log='insert',
+																		operation_log='update',
 																		course= project_var.name,
 																		yearp=semestre2.yearp,
 																		period=T(semestre2.period.name),
@@ -228,7 +228,7 @@
 						{{pass}}
 						{{db.course_activity_log.insert(user_name=auth.user.username,
 																roll=rolLog,
-																operation_log='insert',
+																operation_log='update',
 																course= project_var.name,
 																yearp=semestre2.yearp,
 																period=T(semestre2.period.name),
@@ -289,7 +289,7 @@
 
 		{{db.course_activity_log.insert(user_name=auth.user.username,
 												roll=rolLog,
-												operation_log='insert',
+												operation_log='delete',
 												course= project_var.name,
 												yearp=semestre2.yearp,
 												period=T(semestre2.period.name),
