@@ -1,5 +1,5 @@
 {{if op == "select_change":}}
-	{{select_change = db((db.request_change_weighting.period==int(semestre2.id))&(db.request_change_weighting.project==int(project))).select()}}
+	{{select_change = db((db.request_change_weighting.status!='edit')&(db.request_change_weighting.period==int(semestre2.id))&(db.request_change_weighting.project==int(project))).select()}}
 
 	{{if request.vars['tip']=="p":}}
 		{{select_change = db((db.request_change_weighting.status=='pending')&(db.request_change_weighting.period==int(semestre2.id))&(db.request_change_weighting.project==int(project))).select()}}
@@ -53,7 +53,7 @@
 		<button type="submit"  class="btn btn-success">{{=T('Change Request')}}</button>
 	{{pass}}
 	{{if (change.status != 'accepted') & (change.status != 'rejected'):}}
-		<a  class="btn" href="{{=URL('activity_control', 'request_change_weighting', vars=dict(project = request.vars['project'], year = request.vars['year'], operation = 'cancel'))}}">{{=T('Cancel')}}</a>
+		<a  class="btn btn-danger" href="{{=URL('activity_control', 'request_change_weighting', vars=dict(project = request.vars['project'], year = request.vars['year'], operation = 'cancel'))}}">{{=T('Cancel')}}</a>
 	{{pass}}
 </form>
 {{pass}}
@@ -91,6 +91,7 @@
 	{{else:}}
 				
 		{{var_cac = db((db.course_activity.course_activity_category == request.vars['var_id']) & (db.course_activity.assignation == project) & (  db.course_activity.laboratory == True) & (db.course_activity.semester == (semestre2.id) ) ).select().first() }}
+
 		{{if var_cac != None:}}
 			{{if str(var_cac.course_activity_category.category) !=  str(request.vars['category_id_var']) :}}
 				<script type="text/javascript">
@@ -160,6 +161,11 @@
 			    
 			    {{for project in db((~db.activity_category.id.belongs(categoriasP)) & (db.activity_category.hidden_academic_tutor != True) ).select():}}
 			        <option value="{{=project.id}}">{{=project.category}}</option>
+			    {{pass}}
+			    {{for project in db((db.request_change_weighting_detail.request_change_weighting ==  change.id) & (db.request_change_weighting_detail.operation_request ==  'update') ).select() :}}
+			    	{{if project.course_category.category != project.category:}}
+			        	<option value="{{=project.course_category.category}}">{{=project.course_category.category.category}}</option>
+			        {{pass}}
 			    {{pass}}
 			    {{for project in db((db.request_change_weighting_detail.request_change_weighting ==  change.id) & (db.request_change_weighting_detail.operation_request ==  'delete')  ).select():}}
 			    	{{do_it = True}}
@@ -338,6 +344,11 @@
 						    
 						    {{for cat_tempo in db((~db.activity_category.id.belongs(categoriasP)) & (db.activity_category.hidden_academic_tutor != True) ).select():}}
 						        <option value="{{=cat_tempo.id}}">{{=cat_tempo.category}}</option>
+						    {{pass}}
+						    {{for cat_tempo in db((db.request_change_weighting_detail.request_change_weighting ==  change.id) & (db.request_change_weighting_detail.operation_request ==  'update') ).select() :}}
+						    	{{if cat_tempo.course_category.category != cat_tempo.category:}}
+						        	<option value="{{=cat_tempo.course_category.category}}">{{=cat_tempo.course_category.category.category}}</option>
+						        {{pass}}
 						    {{pass}}
 						    {{for cat_tempo in db((db.request_change_weighting_detail.request_change_weighting ==  change.id) & (db.request_change_weighting_detail.operation_request ==  'delete')  ).select():}}
 						    	{{do_it = True}}

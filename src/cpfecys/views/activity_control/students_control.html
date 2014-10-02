@@ -1,6 +1,6 @@
 {{extend 'template.html'}}
 <script src="{{=URL('static','js')}}/jquery-migrate-1.2.1.js"></script>
-<div style=" left:0; width:100%;  left:25px; overflow:auto;" >
+<div style=" left:0; width:100%;  left:25px; " >
   <table style="width:100%;">
     <tr>
       <td style="width:25%;">
@@ -8,7 +8,7 @@
         <tr>
           <td>
           <!--CLASS WEIGHTING DIV-->
-          <div id="weighting_div" style=" width:100%; height:330px;">
+          <div id="weighting_div" style=" width:100%; ">
                 
                 <a type="button" class="close" title="{{=T('Help')}}" aria-hidden="true" role="button" class="btn btn-warning" data-toggle="modal" data-target="#help_modal_weighting" >
                     <span class="icon-black icon-question-sign"></span>
@@ -24,7 +24,7 @@
               </div>        
             </div>
 
-            <div id="weighting_inside" class="well" style="overflow:auto; background-color:white; height:250px; ">
+            <div id="weighting_inside" class="well" style="overflow:auto; background-color:white; ">
               {{=T('Loading')}}...
             </div>
           </div>
@@ -36,7 +36,7 @@
 
 
           <!--LAB WEIGHTING DIV-->
-          <div  id="weighting_lab_div" style=" width:100%; height:350px;">
+          <div  id="weighting_lab_div" style=" width:100%;">
                 
                 <a type="button" class="close" title="{{=T('Help')}}" aria-hidden="true" role="button" class="btn btn-warning" data-toggle="modal" data-target="#help_modal_weighting" >
                     <span class="icon-black icon-question-sign"></span>
@@ -55,7 +55,7 @@
             </div>
 
 
-            <div id="weighting_lab_inside" class="well" style="overflow:auto; background-color:white; height:250px; ">
+            <div id="weighting_lab_inside" class="well" style="overflow:auto; background-color:white;  ">
               {{=T('Loading')}}...
             </div>
           </div>
@@ -66,7 +66,7 @@
     </table>
   </td>
   <td style="width:74%;">
-    <table id="control_table" style="width:100%; right:2%; top:0; ">
+    <table id="control_table" style="width:100%; top:0; ">
       <tr>
       <td style=" width:100%;">
           <!--Menu of activity DIV Right-->

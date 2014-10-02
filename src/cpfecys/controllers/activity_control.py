@@ -291,7 +291,7 @@ def request_change_weighting():
                     if session.total_var != None:
                         response.flash = "Error. "+ T("The sum of the weighting is incorrect") + ": " + str(session.total_var)
                 else:
-                    response.flash = T("Request has been sent")
+                    
                     temp = db((db.request_change_weighting.period == year.id) & (db.request_change_weighting.project == request.vars['project']) & ((db.request_change_weighting.status != 'accepted') & (db.request_change_weighting.status != 'rejected')) ).select().first()
                     db((db.request_change_weighting.id == temp.id) ).update(status = 'pending',
                                             description = str(request.vars['description']),
@@ -336,6 +336,30 @@ def request_change_weighting():
                                                                 after_grade=var_temp.grade,
                                                                 before_specific_grade=cat_temp.specific_grade)
 
+                    project_name = check.name
+                    project_id = check.id
+                    check = db.user_project(project = check.id, period = year.id, assigned_user = auth.user.id)
+                    #Message
+                    users2 = db((db.auth_user.id==db.user_project.assigned_user)&(db.user_project.period == check.period) & (db.user_project.project==check.project)&(db.auth_membership.user_id==db.user_project.assigned_user)&(db.auth_membership.group_id==3)).select().first()
+                    subject="Solicitud de cambio de ponderación - "+project_name
+                    message2="<br>Por este medio se le informa que el(la) practicante "+check.assigned_user.first_name+" "+check.assigned_user.last_name+" ha creado una solicitud de cambio en la ponderación del laboratorio del Curso de \""+project_name+"\"."
+                    message2=message2+"<br>Para aceptar o rechazar dicha solicitud dirigirse al control de solicitudes o al siguiente link: " +cpfecys.get_domain()+ "cpfecys/activity_control/solve_request_change_weighting?course="+str(project_id)
+                    message2=message2+"<br>Saludos.<br><br>Sistema de Seguimiento de La Escuela de Ciencias y Sistemas<br>Facultad de Ingeniería - Universidad de San Carlos de Guatemala</html>"
+                    #Send Mail to the Teacher
+                    message="<html>catedratico(a) "+users2.auth_user.first_name+" "+users2.auth_user.last_name+" reciba un cordial saludo.<br>"
+                    message3=message+message2
+                    fail1 = send_mail_to_students(message3,subject,users2.auth_user.email,check,year_semester.name,year.yearp) 
+                    if fail1==1:
+                        response.flash = T("Request has been sent") + " - " + ("Sent email to teacher")
+                    else:
+                        response.flash = T("Request has been sent") + " - " + T("Failed to send email to teacher")
+                    return dict(name = project_name,
+                        semester = year_semester.name,
+                        year = year.yearp,
+                        semestre2 = year,
+                        project = request.vars['project'],
+                        assignation=assignation)
+
     except:
         None
 
@@ -360,13 +384,26 @@ def request_change_weighting_load():
     change = None
     if op != "select_change":
         if change_id is None:
+            change_activity = db((db.requestchange_activity.semester == year.id) & (db.requestchange_activity.course == project_id) & (db.requestchange_activity.status == 'Pending')).select().first()
             change = db((db.request_change_weighting.period == year.id) & (db.request_change_weighting.project == project_id) & ((db.request_change_weighting.status != 'accepted') & (db.request_change_weighting.status != 'rejected'))).select().first()
             if change is None:
-                change = db.request_change_weighting.insert(user_id=auth.user.id,
+                if change_activity is None:
+                    change = db.request_change_weighting.insert(user_id=auth.user.id,
                                                             roll='Student',
                                                             status='edit',
                                                             period=year.id,
                                                             project=project_id)
+                else:
+                    response.flash = T("Unable to send the request as long as other pending requests")
+                    return '<script type="text/javascript">$("#div_request_detail").css("display", "none");</script>'
+                
+            else:
+                if change_activity != None:
+                    response.flash = T("Unable to send the request as long as other pending requests")
+                    db(db.request_change_weighting.id == change.id).delete()
+                    return '<script type="text/javascript">$("#div_request_detail").css("display", "none");</script>'
+                
+                
         else:
             change = db((db.request_change_weighting.id == change_id)).select().first()
     
