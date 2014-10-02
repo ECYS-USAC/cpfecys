@@ -6,7 +6,7 @@
         </script>
 	{{elif stateRequest==1:}}
 		<script type="text/javascript">
-            alert("{{=T('=You have created the change request successfully. Not able to report via email to the system administrator and teacher in charge of the course')}}");
+            alert("{{=T('You have created the change request successfully. Not able to report via email to the system administrator and teacher in charge of the course')}}");
             window.location.href = "{{=URL('activity_control', 'request_change_activity',vars=dict(project=project.id, year=period.id))}}";
         </script>
 	{{elif stateRequest==2:}}
@@ -490,28 +490,33 @@
 
 
 {{if request.vars['op'] == "showRequestDone":}}
-	<table class="table table-striped table-bordered">
-		<tr>
-			<th>{{=T('Category')}}</th>
-			<th>{{=T('User')}}</th>
-			<th>{{=T('Role')}} </th>
-			<th>{{=T('Status')}}</th>
-			<th>{{=T('Date Request')}}</th>
-			<th>{{=T('Action')}}</th>
-		</tr>
-	{{for change in db((db.requestchange_activity.status=='Pending')&(db.requestchange_activity.semester==period.id)&(db.requestchange_activity.course==project.id)).select():}}
-		<tr>
-			<td>{{=change.course_activity_category.category.category}}</td>
-			<td>{{=change.user_id.username}}</td>
-			<td>{{=T(change.roll)}}</td>
-			<td>{{=T(change.status)}}</td>
-			<td>{{=change.date_request}}</td>
-			<td>
-				<a class="btn" title="{{=T('View the change request')}}" onclick="detail({{=change.id}});">{{=T('Detail')}}</a>
-			</td>
-		</tr>
+	{{changes = db((db.requestchange_activity.status=='Pending')&(db.requestchange_activity.semester==period.id)&(db.requestchange_activity.course==project.id)).select()}}
+	{{if changes.first() != None:}}
+		<table class="table table-striped table-bordered">
+			<tr>
+				<th>{{=T('Category')}}</th>
+				<th>{{=T('User')}}</th>
+				<th>{{=T('Role')}} </th>
+				<th>{{=T('Status')}}</th>
+				<th>{{=T('Date Request')}}</th>
+				<th>{{=T('Action')}}</th>
+			</tr>
+		{{for change in changes:}}
+			<tr>
+				<td>{{=change.course_activity_category.category.category}}</td>
+				<td>{{=change.user_id.username}}</td>
+				<td>{{=T(change.roll)}}</td>
+				<td>{{=T(change.status)}}</td>
+				<td>{{=change.date_request}}</td>
+				<td>
+					<a class="btn" title="{{=T('View the change request')}}" onclick="detail({{=change.id}});">{{=T('Detail')}}</a>
+				</td>
+			</tr>
+		{{pass}}
+		</table>
+	{{else:}}
+		<h1>{{=T('There is no request')}}</h1>
 	{{pass}}
-	</table>
 {{pass}}
 
 
