@@ -153,9 +153,9 @@ def auto_freeze():
 
 def funcionPrueba():
     import datetime
-    db.report.insert(project = 1, semester_repet=True, date_finish=datetime.datetime.now())
-    db.report.insert(project = 2, semester_repet=True, date_finish=datetime.datetime.now())
-    db.report.insert(project = 3, semester_repet=True, date_finish=datetime.datetime.now())
+    db.course_limit_exception.insert(project = 1, semester_repet=True, date_finish=datetime.datetime.now())
+    db.course_limit_exception.insert(project = 2, semester_repet=True, date_finish=datetime.datetime.now())
+    db.course_limit_exception.insert(project = 3, semester_repet=True, date_finish=datetime.datetime.now())
     db.commit()
 
 
