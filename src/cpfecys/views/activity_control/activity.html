@@ -72,24 +72,24 @@
 <!--UPDATE ACTIVITY-->
 {{if request.vars['op'] == "updateActivity": }}
 	{{controlUpdate='true'}}
-	{{weighting = db((db.request_change_weighting.status=='pending')&(db.request_change_weighting.project==var_project_id)&(db.request_change_weighting.period==semestre2.id)).select().first()}}
-	{{if weighting!=None:}}
-		<script type="text/javascript">
-			alert("{{=T('Action not allowed. There is a weighting request has not been answered.')}}");
-			window.location.href = "{{=URL('activity_control', 'students_control',vars=dict(project=var_project_id, period=semestre2.id))}}";
-		</script>
-	{{else:}}
-		{{activityTemp = db(db.course_activity.id==int(request.vars['var_id'])).select().first()}}
-		{{categoryTemp = db((db.course_activity_category.semester==semestre2.id) & (db.course_activity_category.assignation==var_project_id) & (db.course_activity_category.id==int(activityTemp.course_activity_category))).select().first()}}
-		{{Draft = db((db.requestchange_activity.status=='Draft')&(db.requestchange_activity.semester==semestre2.id)&(db.requestchange_activity.course==var_project_id)).select()}}
-		{{if Draft.first()!=None:}}
-			{{for d in Draft:}}
-				{{if d.course_activity_category==categoryTemp.id:}}
-					{{controlUpdate='false'}}
+	{{if type=="lab":}}
+		{{weighting = db((db.request_change_weighting.status=='pending')&(db.request_change_weighting.project==var_project_id)&(db.request_change_weighting.period==semestre2.id)).select().first()}}
+		{{if weighting!=None:}}
+			<script type="text/javascript">
+				alert("{{=T('Action not allowed. There is a weighting request has not been answered.')}}");
+				window.location.href = "{{=URL('activity_control', 'students_control',vars=dict(project=var_project_id, period=semestre2.id))}}";
+			</script>
+		{{else:}}
+			{{activityTemp = db(db.course_activity.id==int(request.vars['var_id'])).select().first()}}
+			{{categoryTemp = db((db.course_activity_category.semester==semestre2.id) & (db.course_activity_category.assignation==var_project_id) & (db.course_activity_category.id==int(activityTemp.course_activity_category))).select().first()}}
+			{{Draft = db((db.requestchange_activity.status=='Draft')&(db.requestchange_activity.semester==semestre2.id)&(db.requestchange_activity.course==var_project_id)).select()}}
+			{{if Draft.first()!=None:}}
+				{{for d in Draft:}}
+					{{if d.course_activity_category==categoryTemp.id:}}
+						{{controlUpdate='false'}}
+					{{pass}}
 				{{pass}}
 			{{pass}}
-		{{else:}}
-			{{controlUpdate='false'}}
 		{{pass}}
 	{{pass}}
 
@@ -291,24 +291,24 @@
 <!--DELETE ACTIVITY-->
 {{if request.vars['op'] == "removeActivity": }}
 	{{controlUpdate='true'}}
-	{{weighting = db((db.request_change_weighting.status=='pending')&(db.request_change_weighting.project==var_project_id)&(db.request_change_weighting.period==semestre2.id)).select().first()}}
-	{{if weighting!=None:}}
-		<script type="text/javascript">
-			alert("{{=T('Action not allowed. There is a weighting request has not been answered.')}}");
-			window.location.href = "{{=URL('activity_control', 'students_control',vars=dict(project=var_project_id, period=semestre2.id))}}";
-		</script>
-	{{else:}}
-		{{activityTemp = db(db.course_activity.id==int(request.vars['var_id'])).select().first()}}
-		{{categoryTemp = db((db.course_activity_category.semester==semestre2.id) & (db.course_activity_category.assignation==var_project_id) & (db.course_activity_category.id==int(activityTemp.course_activity_category))).select().first()}}
-		{{Draft = db((db.requestchange_activity.status=='Draft')&(db.requestchange_activity.semester==semestre2.id)&(db.requestchange_activity.course==var_project_id)).select()}}
-		{{if Draft.first()!=None:}}
-			{{for d in Draft:}}
-				{{if d.course_activity_category==categoryTemp.id:}}
-					{{controlUpdate='false'}}
+	{{if type=="lab":}}
+		{{weighting = db((db.request_change_weighting.status=='pending')&(db.request_change_weighting.project==var_project_id)&(db.request_change_weighting.period==semestre2.id)).select().first()}}
+		{{if weighting!=None:}}
+			<script type="text/javascript">
+				alert("{{=T('Action not allowed. There is a weighting request has not been answered.')}}");
+				window.location.href = "{{=URL('activity_control', 'students_control',vars=dict(project=var_project_id, period=semestre2.id))}}";
+			</script>
+		{{else:}}
+			{{activityTemp = db(db.course_activity.id==int(request.vars['var_id'])).select().first()}}
+			{{categoryTemp = db((db.course_activity_category.semester==semestre2.id) & (db.course_activity_category.assignation==var_project_id) & (db.course_activity_category.id==int(activityTemp.course_activity_category))).select().first()}}
+			{{Draft = db((db.requestchange_activity.status=='Draft')&(db.requestchange_activity.semester==semestre2.id)&(db.requestchange_activity.course==var_project_id)).select()}}
+			{{if Draft.first()!=None:}}
+				{{for d in Draft:}}
+					{{if d.course_activity_category==categoryTemp.id:}}
+						{{controlUpdate='false'}}
+					{{pass}}
 				{{pass}}
 			{{pass}}
-		{{else:}}
-			{{controlUpdate='false'}}
 		{{pass}}
 	{{pass}}
 
@@ -363,23 +363,23 @@
 <!--ADD ACTIVITY-->
 {{if request.vars['op'] == "addActivity":}}
 	{{controlUpdate='true'}}
-	{{weighting = db((db.request_change_weighting.status=='pending')&(db.request_change_weighting.project==var_project_id)&(db.request_change_weighting.period==semestre2.id)).select().first()}}
-	{{if weighting!=None:}}
-		<script type="text/javascript">
-			alert("{{=T('Action not allowed. There is a weighting request has not been answered.')}}");
-			window.location.href = "{{=URL('activity_control', 'students_control',vars=dict(project=var_project_id, period=semestre2.id))}}";
-		</script>
-	{{else:}}
-		{{categoryTemp = db((db.course_activity_category.semester==semestre2.id) & (db.course_activity_category.assignation==var_project_id) & (db.course_activity_category.id==int(request.vars['category_activity_id_var']))).select().first()}}
-		{{Draft = db((db.requestchange_activity.status=='Draft')&(db.requestchange_activity.semester==semestre2.id)&(db.requestchange_activity.course==var_project_id)).select()}}
-		{{if Draft.first()!=None:}}
-			{{for d in Draft:}}
-				{{if d.course_activity_category==categoryTemp.id:}}
-					{{controlUpdate='false'}}
+	{{if type=="lab":}}
+		{{weighting = db((db.request_change_weighting.status=='pending')&(db.request_change_weighting.project==var_project_id)&(db.request_change_weighting.period==semestre2.id)).select().first()}}
+		{{if weighting!=None:}}
+			<script type="text/javascript">
+				alert("{{=T('Action not allowed. There is a weighting request has not been answered.')}}");
+				window.location.href = "{{=URL('activity_control', 'students_control',vars=dict(project=var_project_id, period=semestre2.id))}}";
+			</script>
+		{{else:}}
+			{{categoryTemp = db((db.course_activity_category.semester==semestre2.id) & (db.course_activity_category.assignation==var_project_id) & (db.course_activity_category.id==int(request.vars['category_activity_id_var']))).select().first()}}
+			{{Draft = db((db.requestchange_activity.status=='Draft')&(db.requestchange_activity.semester==semestre2.id)&(db.requestchange_activity.course==var_project_id)).select()}}
+			{{if Draft.first()!=None:}}
+				{{for d in Draft:}}
+					{{if d.course_activity_category==categoryTemp.id:}}
+						{{controlUpdate='false'}}
+					{{pass}}
 				{{pass}}
 			{{pass}}
-		{{else:}}
-			{{controlUpdate='false'}}
 		{{pass}}
 	{{pass}}
 
@@ -605,7 +605,10 @@
 
 <!--ADD ACTIVITY DIV-->
 {{if request.vars['op'] == "showInsert": }}
-	{{weighting = db((db.request_change_weighting.status=='pending')&(db.request_change_weighting.project==var_project_id)&(db.request_change_weighting.period==semestre2.id)).select().first()}}
+	{{weighting = None}}
+	{{if type=="lab":}}
+		{{weighting = db((db.request_change_weighting.status=='pending')&(db.request_change_weighting.project==var_project_id)&(db.request_change_weighting.period==semestre2.id)).select().first()}}
+	{{pass}}
 	{{if weighting!=None:}}
 		<script type="text/javascript">
 			alert("{{=T('Action not allowed. There is a weighting request has not been answered.')}}");
