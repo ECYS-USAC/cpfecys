@@ -99,8 +99,19 @@
 		  	{{if no_menu == False:}}
 				  	<!--Create activity option-->
 			  		{{if float(total_var2) == 100:}}
-						<li>
-							<a  tabindex="-1" title="{{=T('Create activity')}}" id="menu_create_activity" href="{{=URL('activity_control', 'students_control_full',vars=dict(project = request.vars['project'], year = request.vars['year'], f_view='activity_edit',type=request.vars['type']))}}">
+			  			{{if request.vars['type']=="lab":}}
+			  				{{weighting = db((db.request_change_weighting.status=='pending')&(db.request_change_weighting.project==request.vars['project'])&(db.request_change_weighting.period==request.vars['year'])).select().first()}}
+							{{if weighting!=None:}}
+								<li class="disabled"> 
+									<a  tabindex="-1" title="{{=T('Create activity')}}" id="menu_create_activity">
+							{{else:}}
+								<li>
+									<a  tabindex="-1" title="{{=T('Create activity')}}" id="menu_create_activity" href="{{=URL('activity_control', 'students_control_full',vars=dict(project = request.vars['project'], year = request.vars['year'], f_view='activity_edit',type=request.vars['type']))}}">
+							{{pass}}
+			  			{{else:}}
+			  				<li>
+								<a  tabindex="-1" title="{{=T('Create activity')}}" id="menu_create_activity" href="{{=URL('activity_control', 'students_control_full',vars=dict(project = request.vars['project'], year = request.vars['year'], f_view='activity_edit',type=request.vars['type']))}}">
+			  			{{pass}}
 					{{else:}}
 						<li class="disabled"> 
 							<a  tabindex="-1" title="{{=T('Create activity')}}" id="menu_create_activity">
@@ -113,15 +124,32 @@
 					<!--Edit activity option-->
 			      	{{if float(total_var2) == 100 and auth.has_membership('Student')==True and request.vars['type']=="lab":}}
 			      		{{if var_do=='true':}}
-							<li>
-								<a tabindex="-1"  title="{{=T('Modify activity')}}" id="menu_edit_activity" href="{{=URL('activity_control', 'students_control_full',vars=dict(project = request.vars['project'], year = request.vars['year'], f_view='activity_edit',type=request.vars['type']))}}"> 
+			      			{{weighting = db((db.request_change_weighting.status=='pending')&(db.request_change_weighting.project==request.vars['project'])&(db.request_change_weighting.period==request.vars['year'])).select().first()}}
+							{{if weighting!=None:}}
+								<li class="disabled"> 
+									<a tabindex="-1"  title="{{=T('Modify activity')}}">
+							{{else:}}
+								<li>
+									<a tabindex="-1"  title="{{=T('Modify activity')}}" id="menu_edit_activity" href="{{=URL('activity_control', 'students_control_full',vars=dict(project = request.vars['project'], year = request.vars['year'], f_view='activity_edit',type=request.vars['type']))}}"> 
+							{{pass}}
 						{{else:}}
 							<li class="disabled"> 
 								<a tabindex="-1"  title="{{=T('Modify activity')}}">
 						{{pass}}
 					{{elif float(total_var2)==100:}}
-						<li>
-							<a tabindex="-1"  title="{{=T('Modify activity')}}" id="menu_edit_activity" href="{{=URL('activity_control', 'students_control_full',vars=dict(project = request.vars['project'], year = request.vars['year'], f_view='activity_edit',type=request.vars['type']))}}">
+						{{if request.vars['type']=="lab":}}
+			  				{{weighting = db((db.request_change_weighting.status=='pending')&(db.request_change_weighting.project==request.vars['project'])&(db.request_change_weighting.period==request.vars['year'])).select().first()}}
+							{{if weighting!=None:}}
+								<li class="disabled"> 
+									<a tabindex="-1"  title="{{=T('Modify activity')}}">
+							{{else:}}
+								<li>
+									<a tabindex="-1"  title="{{=T('Modify activity')}}" id="menu_edit_activity" href="{{=URL('activity_control', 'students_control_full',vars=dict(project = request.vars['project'], year = request.vars['year'], f_view='activity_edit',type=request.vars['type']))}}">
+							{{pass}}
+			  			{{else:}}
+			  				<li>
+								<a tabindex="-1"  title="{{=T('Modify activity')}}" id="menu_edit_activity" href="{{=URL('activity_control', 'students_control_full',vars=dict(project = request.vars['project'], year = request.vars['year'], f_view='activity_edit',type=request.vars['type']))}}">
+			  			{{pass}}
 					{{else:}}
 						<li class="disabled"> 
 							<a tabindex="-1"  title="{{=T('Modify activity')}}">

@@ -6,7 +6,7 @@
 </h2>
 
 <div class="row-fluid">
-    <div class="well span12" style="overflow:auto; width:120%">
+    <div class="well span12" style="overflow:auto;">
 		<div>
 			<a class="btn" href="{{=URL('activity_control', 'courses_list_request')}}">
 				<i class="icon-arrow-left"></i>{{=T('Back')}}
@@ -38,7 +38,11 @@
 									<tr>
 										<td>{{=change.course_activity_category.category.category}}</td>
 										<td>{{=change.user_id.username}}</td>
-										<td>{{=T(change.roll)}}</td>
+										{{if change.roll == "Student":}}
+											<td>{{=T('Tutor academico')}}</td>
+										{{else:}}
+											<td>{{=T(change.roll)}}</td>
+										{{pass}}
 										<td>{{=T(change.status)}}</td>
 										<td>{{=change.date_request}}</td>
 										<td>

@@ -47,7 +47,11 @@
 					<tr>
 						<td>{{=change1.course_activity_category.category.category}}</td>
 						<td>{{=change1.user_id.username}}</td>
-						<td>{{=T(change1.roll)}}</td>
+						{{if change1.roll == "Student":}}
+							<td>{{=T('Tutor academico')}}</td>
+						{{else:}}
+							<td>{{=T(change1.roll)}}</td>
+						{{pass}}
 						<td>{{=T(change1.status)}}</td>
 						<td>{{=change1.date_request}}</td>
 						<td>
@@ -61,7 +65,11 @@
 					<tr>
 						<td>{{=change.category_request}}</td>
 						<td>{{=change.user_request}}</td>
-						<td>{{=T(change.roll_request)}}</td>
+						{{if change.roll_request == "Student":}}
+							<td>{{=T('Tutor academico')}}</td>
+						{{else:}}
+							<td>{{=T(change.roll_request)}}</td>
+						{{pass}}
 						<td>{{=T(change.status)}}</td>
 						<td>{{=change.date_request}}</td>
 						<td>
@@ -101,7 +109,12 @@
 			</tr>
 			<tr>
 				<th>{{=T('User')}}</th><td>{{=Request.user_id.username}}</td>
-				<th>{{=T('Role')}}</th><td>{{=T(Request.roll)}}</td>
+				<th>{{=T('Role')}}</th>
+				{{if Request.roll == "Student":}}
+					<td>{{=T('Tutor academico')}}</td>
+				{{else:}}
+					<td>{{=T(Request.roll)}}</td>
+				{{pass}}
 				<th>{{=T('Date Request')}}</th><td>{{=Request.date_request}}</td>
 			</tr>
 			<tr>
@@ -178,7 +191,12 @@
 			</tr>
 			<tr>
 				<th>{{=T('User')}}</th><td>{{=Request.user_request}}</td>
-				<th>{{=T('Role')}}</th><td>{{=T(Request.roll_request)}}</td>
+				<th>{{=T('Role')}}</th>
+				{{if Request.roll_request == "Student":}}
+					<td>{{=T('Tutor academico')}}</td>
+				{{else:}}
+					<td>{{=T(Request.roll_request)}}</td>
+				{{pass}}
 				<th>{{=T('Date Request')}}</th><td>{{=Request.date_request}}</td>
 			</tr>
 			<tr>
@@ -200,7 +218,11 @@
 					<td>{{=Request.user_resolve}}</td>
 				{{pass}}
 				<th>{{=T('Role resolution')}}</th>
-				<td>{{=T(Request.roll_resolve)}}</td>
+				{{if Request.roll_resolve == "Student":}}
+					<td>{{=T('Tutor academico')}}</td>
+				{{else:}}
+					<td>{{=T(Request.roll_resolve)}}</td>
+				{{pass}}
 				<th>{{=T('Date of resolution')}}</th>
 				<td>{{=Request.date_request_resolve}}</td>
 			</tr>
