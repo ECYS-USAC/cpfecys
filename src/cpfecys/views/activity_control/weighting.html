@@ -1,6 +1,6 @@
 
 {{temp_op = request.vars['op']}}
-{{if (temp_op == "updateCategory" or temp_op == "addCategory" or temp_op == "getPreviousWeighting" or temp_op == "removeCategory") and (auth.has_membership('Academic') or ( auth.has_membership('Super-Administrator') == False and auth.has_membership('Ecys-Administrator') == False and assigantion == None)): }}
+{{if (temp_op == "updateCategory" or temp_op == "addCategory" or temp_op == "getPreviousWeighting" or temp_op == "removeCategory") and ((auth.has_membership('Academic') & (auth.has_membership('Teacher') == False)  & (auth.has_membership('Student') == False) ) or ( auth.has_membership('Super-Administrator') == False and auth.has_membership('Ecys-Administrator') == False and assigantion == None)): }}
 	{{response.flash = T('Not valid Action.')}}
 {{else:}}
 

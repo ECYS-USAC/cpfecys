@@ -1,6 +1,6 @@
 {{temp_op = request.vars['f_view']}}
-{{if (temp_op == "weighting_edit" or temp_op == "weighting_get") and (auth.has_membership('Academic') or ( auth.has_membership('Super-Administrator') == False and auth.has_membership('Ecys-Administrator') == False and assigantion == None)): }}
-	{{session.flash = T('Not valid Action.')}}
+{{if (temp_op == "weighting_edit" or temp_op == "weighting_get") and ((auth.has_membership('Academic') & (auth.has_membership('Teacher') == False)  & (auth.has_membership('Student') == False) ) or ( auth.has_membership('Super-Administrator') == False and auth.has_membership('Ecys-Administrator') == False and assigantion == None)): }}
+	{{session.flash = T('Not valid Action.')+"sdafs"}}
 	{{redirect(URL('default','index'))}}
 {{else:}}
 

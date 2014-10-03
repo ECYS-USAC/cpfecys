@@ -91,8 +91,7 @@
 		  		{{=T('Course Weighting') }}
 		  	{{else:}}
 		  		{{=T('Laboratory Weighting') }}
-		  	{{pass}}
-		      
+		  	{{pass}}		      
 		  </h3> 
 		  <ul class="dropdown-menu">  
 	  	          
@@ -242,7 +241,7 @@
 					{{pass}}
 
 			    {{pass}}
-			    	{{if request.vars['type'] == "course":}}
+			    	{{if (request.vars['type'] == "course"):}}
 				    <li class="disabled"> 
 						<a tabindex="-1"  title="{{=T('Modify course weighting')}}">
 						<span class="icon-edit" ></span>
@@ -250,12 +249,21 @@
 			        </a>
 			      	</li>
 			      	{{else:}}
-					<li>
-		    			<a role="button" title="{{=T('Request that the changes be reviewed by the professor or administrator')}}" aria-hidden="true" href="{{=URL('activity_control', 'request_change_weighting',vars=dict(project = request.vars['project'], year = request.vars['year']))}}" >
-							<span class="icon-black icon-random"></span>
-							{{=T('Change Request')}}
-						</a>
-					 </li>
+			      		{{if var_do =='false':}}
+							<li>
+				    			<a role="button" title="{{=T('Request that the changes be reviewed by the professor or administrator')}}" aria-hidden="true" href="{{=URL('activity_control', 'request_change_weighting',vars=dict(project = request.vars['project'], year = request.vars['year']))}}" >
+									<span class="icon-black icon-random"></span>
+									{{=T('Change Request')}}
+								</a>
+							 </li>
+						{{else:}}
+							<li class="disabled"> 
+								<a tabindex="-1"  title="{{=T('Modify course weighting')}}">
+								<span class="icon-edit" ></span>
+					          {{=T('Edit Weighting')}}
+					        </a>
+					      	</li>
+						{{pass}}
 					 {{pass}}
 			{{pass}}
 		          

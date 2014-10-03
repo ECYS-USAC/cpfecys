@@ -75,7 +75,7 @@ def courses_list():
 
 
 @auth.requires_login()
-@auth.requires(auth.has_membership('Student') or auth.has_membership('Teacher') or auth.has_membership('Super-Administrator') or auth.has_membership('Ecys-Administrator'))
+@auth.requires(auth.has_membership('Student') or auth.has_membership('Teacher')or auth.has_membership('Academic')  or auth.has_membership('Super-Administrator') or auth.has_membership('Ecys-Administrator'))
 def students_control():
     #vars
     year = None
