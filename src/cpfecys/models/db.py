@@ -924,20 +924,27 @@ db.define_table('course_limit_exception',
 
 db.define_table('grades',    
     Field('academic_assignation', 'reference academic_course_assignation', notnull=True, label = T('Academic Assignation')),
-    Field('activity', 'reference course_activity', notnull=True, label = T('Activity')),    
-    Field('grade', 'decimal(5,2)', notnull=False, label=T('Grade')),
+    Field('activity', 'reference course_activity', notnull=True, label = T('Activity')), 
+    Field('grade', 'decimal(5,2)', notnull=False, label=T('Grade'))
 )
 
-db.define_table('grades_log',
-    Field('user_name', 'text', notnull = False, label = 'Usuario'),
-    Field('roll', 'text', notnull = False, label = 'Rol'),
-    Field('operation_log', 'text', notnull = False, label = 'Operacion'),
-    Field('course', 'text', notnull=False, label='Curso'),
-    Field('yearp', 'text', notnull=False, label='yearp'),
-    Field('period', 'text', notnull=False, label='Periodo'),
-    Field('before_grade', 'decimal(5,2)', notnull=False, label='Nota Anterior'),
-    Field('after_grade', 'decimal(5,2)', notnull=False, label='Nota Actual'),
-    Field('date_log', 'datetime', notnull = True, default = datetime.datetime.now(), label = 'Fecha')
+db.define_table('grades_log',    
+    Field('user_name_before', 'string', notnull = False, label = T('User Name Before')),
+    Field('user_name_after', 'string', notnull = False, label = T('User Name After')),
+    Field('roll', 'string', notnull = False, label = T('Role')),
+    Field('operation_log', 'string', notnull = False, label = T('Operation')),
+    Field('academic_assignation_id', 'string', notnull = False, label = T('Academic Assignation Id')),
+    Field('academic', 'string', notnull=False, label=T('Academic')),
+    Field('activity', 'string', notnull=False, label=T('Activity')),
+    Field('activity_id', 'string', notnull=False, label=T('Activity Id')),
+    Field('category', 'string', notnull=False, label=T('Category')),
+    Field('project', 'string', notnull=False, label=T('Course')),
+    Field('yearp', 'string', notnull=False, label=T('Year')),
+    Field('period', 'string', notnull=False, label=T('Period')),
+    Field('before_grade', 'decimal(5,2)', notnull=False, label=T('Grade Before')),
+    Field('after_grade', 'decimal(5,2)', notnull=False, label=T('Grade After')),
+    Field('description', 'text', notnull=False, label=T('Description')),
+    Field('date_log', 'datetime', notnull = True, default = datetime.datetime.now(), label = T('Date'))
 )
 
 

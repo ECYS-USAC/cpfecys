@@ -14,6 +14,21 @@
                           grade =  request.vars['grade'])}}
 
       {{if grade != None:}}
+        {{#--------------------------------------------log-------------------------------------}}
+        {{db.grades_log.insert(user_name_after = auth.user.username,
+                          roll = rol_log,
+                          operation_log = 'insert',
+                          academic_assignation_id = assig_var.id,
+                          academic = assig_var.carnet.carnet,
+                          project = assig_var.assignation.name,
+                          activity = var_activity.name,
+                          activity_id = var_activity.id,
+                          category = var_activity.course_activity_category.category.category,
+                          period = T(assig_var.semester.period.name),
+                          yearp = assig_var.semester.yearp,
+                          after_grade = request.vars['grade'],
+                          description = T('Inserted from Grades page')
+                           )}}
         <script type="text/javascript">
           document.getElementById('information_text').className = "badge badge-success";
           jQuery("#information_text").append('{{=T('Grade added')}}'+" | Carnet: '{{=academic_var.carnet}}' {{=T('Grade')}}: '{{=grade.grade}}'");
@@ -42,7 +57,23 @@
 
 <!---------------------------DELETE---------------------------->
 {{if request.vars['op'] == "remove_grade": }}
+    {{grade_var = db(db.grades.id==request.vars['grade_id']).select().first()}}
     {{db(db.grades.id==request.vars['grade_id']).delete()}}
+    {{#--------------------------------------------log-------------------------------------}}
+    {{db.grades_log.insert(user_name_after = auth.user.username,
+                      roll = rol_log,
+                      operation_log = 'delete',
+                      academic_assignation_id = grade_var.academic_assignation.id,
+                      academic = grade_var.academic_assignation.carnet.carnet,
+                      project = grade_var.academic_assignation.assignation.name,
+                      activity = grade_var.activity.name,
+                      activity_id = grade_var.activity.id,
+                      category = grade_var.activity.course_activity_category.category.category,
+                      period = T(grade_var.academic_assignation.semester.period.name),
+                      yearp = grade_var.academic_assignation.semester.yearp,
+                      after_grade = grade_var.grade,
+                      description = T('Delete from Grades page')
+                       )}}
     {{request.vars['op']="view_grades"}}
 {{pass}}
 

@@ -163,9 +163,9 @@ def control_students_grades():
 @auth.requires_login()
 @auth.requires(auth.has_membership('Student') or auth.has_membership('Teacher') or auth.has_membership('Super-Administrator') or auth.has_membership('Ecys-Administrator'))
 def grades():
-    id_activity = role = request.vars['activity']
-    id_project = role = request.vars['project']
-    id_year = role = request.vars['year']
+    id_activity = request.vars['activity']
+    id_project = request.vars['project']
+    id_year = request.vars['year']
 
     var_period = db(db.period_year.id==id_year).select().first()
     if not var_period:
@@ -187,8 +187,17 @@ def grades():
     else:
         academic_assig =  db((db.academic_course_assignation.assignation==id_project) & (db.academic_course_assignation.semester==id_year)).select()
 
-
-    return dict(academic_assig=academic_assig, var_period=var_period, var_activity=var_activity, var_project=var_project)
+    rol_log=''
+    if auth.has_membership('Ecys-Administrator')==True:
+        rol_log='Ecys-Administrator'
+    elif auth.has_membership('Super-Administrator')==True:
+        rol_log='Super-Administrator'
+    elif auth.has_membership('Teacher')==True:
+        rol_log='Teacher'
+    elif auth.has_membership('Student')==True:
+        rol_log='Student'
+    pass
+    return dict(academic_assig=academic_assig, var_period=var_period, var_activity=var_activity, var_project=var_project, rol_log=rol_log)
 
 
 
