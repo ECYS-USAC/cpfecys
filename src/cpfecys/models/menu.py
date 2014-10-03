@@ -81,7 +81,7 @@ if auth.has_membership(role="Teacher"):
     ])
 
 if auth.has_membership(role="Student"):
-    response.menu.extend([(T('My Final Practice'), False, URL(),[
+    response.menu.extend([(T('Final Practice'), False, URL(),[
              (T('My Final Practice'), False, URL('student', 'index'), []),
              (T('Show Academic'), False, URL(), [
                 (T('Academic per Course'), False, URL('student_academic', 'student_courses'), []),

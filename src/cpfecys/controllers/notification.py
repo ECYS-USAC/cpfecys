@@ -230,8 +230,8 @@ def teacher_send_mail_to_students(users1, users2, message, subject, check, semes
                 else:
                     ListadoCorreos.append(user.email)
                     email_list_log=email_list_log+","+str(user.email)
-
-
+    
+    ListadoCorreos.append(auth.user.email)
     was_sent = mail.send(to='dtt.ecys@dtt-ecys.org',subject=subject,message=messageC, bcc=ListadoCorreos)
     ##Notification LOG GENERAL
     db.mailer_log.insert(sent_message = messageC, destination = email_list_log, result_log = str(mail.error or '') + ':' + str(mail.result), success = was_sent, emisor=str(check.assigned_user.username))
@@ -688,7 +688,7 @@ def send_mail_to_students(users, message, subject, check, semester, year):
                 ListadoCorreos.append(user.email)
                 ListadoCorreos.append(user.email)
                 email_list_log=email_list_log+","+str(user.email)
-
+    ListadoCorreos.append(auth.user.email)
     was_sent = mail.send(to='dtt.ecys@dtt-ecys.org',subject=subject,message=messageC, bcc=ListadoCorreos)
     #MAILER LOG
     db.mailer_log.insert(sent_message = messageC,

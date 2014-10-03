@@ -238,11 +238,11 @@
 	    		</td>
 	    		<td>
 	    			<font color="green">
-	    				{{var_SG = True}}
+	    				{{var_SG = "True"}}
 						{{if str(var_chang_ins.specific_grade) == "True":}}
-							{{var_SG = False}}
+							{{var_SG = "False"}}
 						{{pass}}
-	    				{{=var_SG}}
+	    				{{=T(var_SG)}}
 	    			</font>	    			
 	    		</td>
 	    		{{if change.status == 'edit':}}
@@ -301,11 +301,11 @@
 		    		<td>
 		    			<font color="{{=var_color}}">
 		    				{{if var_chang.operation_request == 'update':}}
-			    				{{var_SG = True}}
+			    				{{var_SG = "True"}}
 								{{if str(var_chang.specific_grade) == "True":}}
-									{{var_SG = False}}
+									{{var_SG = "False"}}
 								{{pass}}
-								{{=var_SG}}						
+								{{=T(var_SG)}}						
 							{{pass}}	    				
 		    			</font>	    			
 		    		</td>
@@ -391,7 +391,7 @@
 							<input type="checkbox" name="edit_SG_check"  id="edit_SG_check">
 						{{pass}}						
 					{{else:}}
-						{{=var_sg}}
+						{{=T(var_sg)}}
 					{{pass}}
 					</td>
 					{{if request.vars['op'] != "showTableNoEditable":}}
@@ -440,11 +440,11 @@
 											{{total_var = total_var + r_c_w_d_l.after_grade}}
 										</td>
 										<td>
-											{{var_SG = True}}
+											{{var_SG = "True"}}
 											{{if r_c_w_d_l.after_specific_grade == "true":}}
-												{{var_SG = False}}
+												{{var_SG = "False"}}
 											{{pass}}
-											{{=var_SG}}
+											{{=T(var_SG)}}
 
 										</td>
 									{{pass}}
@@ -462,11 +462,11 @@
 										</td>
 										<td>
 											<font color="blue">
-											{{var_SG = True}}
+											{{var_SG = "True"}}
 											{{if r_c_w_d_l.after_specific_grade == "true":}}
-												{{var_SG = False}}
+												{{var_SG = "False"}}
 											{{pass}}
-											{{=var_SG}}
+											{{=T(var_SG)}}
 											</font>
 										</td>
 									{{pass}}
@@ -537,9 +537,6 @@
 {{if (op != "description") & (op != "select_change"):}}
 <script type="text/javascript">
 	
-	function add_cagetory(){
-		alert("hola");
-	}
 	function editCategory(var_id){
 		$("#div_request_detail_view").load("{{=URL('activity_control','request_change_weighting_load.html')}}?op=create_request&amp;project={{=var_project_id}}&amp;year={{=semestre2.id}}&amp;var_id="+var_id); 
 

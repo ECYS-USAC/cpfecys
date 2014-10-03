@@ -556,7 +556,7 @@
 									<input type="checkbox" name="edit_SG_check"  id="edit_SG_check">
 								{{pass}}						
 							{{else:}}
-								{{=var_sg}}
+								{{=T(var_sg)}}
 							{{pass}}
 						</td>
 						<td>
@@ -567,7 +567,7 @@
 									<input type="checkbox" name="edit_TP_check"  id="edit_TP_check">
 								{{pass}}						
 							{{else:}}
-								{{=str(project.teacher_permition)}}
+								{{=T(str(project.teacher_permition))}}
 							{{pass}}
 						</td>
 						{{if request.vars['op'] != "showTableNoEditable":}}
@@ -661,7 +661,7 @@
 									<input type="checkbox" name="edit_SG_check"  id="edit_SG_check">
 								{{pass}}						
 							{{else:}}
-								{{=var_sg}}
+								{{=T(var_sg)}}
 							{{pass}}
 						</td>
 						{{if request.vars['op'] != "showTableNoEditable":}}

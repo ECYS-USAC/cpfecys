@@ -130,7 +130,7 @@
 									{{if str(project.specific_grade) == "True":}}
 										{{var_SG = False}}
 									{{pass}}
-				    				{{=var_SG}}
+				    				{{=T(var_SG)}}
 								</td>
 							</tr>
 						{{pass}}
@@ -198,7 +198,7 @@
 													{{if project.after_specific_grade == "true":}}
 														{{var_SG = False}}
 													{{pass}}
-													{{=var_SG}}
+													{{=T(var_SG)}}
 
 												</td>
 											{{pass}}
@@ -220,7 +220,7 @@
 													{{if project.after_specific_grade == "true":}}
 														{{var_SG = False}}
 													{{pass}}
-													{{=var_SG}}
+													{{=T(var_sg)}}
 													</font>
 												</td>
 											{{pass}}
@@ -242,7 +242,7 @@
 													{{if project.after_specific_grade == "true":}}
 														{{var_SG = False}}
 													{{pass}}
-													{{=var_SG}}
+													{{=T(var_sg)}}
 													</font>
 												</td>
 											{{pass}}

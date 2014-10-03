@@ -136,7 +136,7 @@
 
 
 	function detail(var_id){
-		//$("#div_request_show").css("display", "none");
+		$("#div_request_show").css("display", "none");
 		$("#div_request_detail").css("display", "block");
 		$("#div_request_detail_view").load("{{=URL('activity_control','request_change_weighting_load.html')}}?op=create_request&amp;project={{=project}}&amp;year={{=semestre2.id}}&amp;change_id="+var_id); 
 		$("#div_description").load("{{=URL('activity_control','request_change_weighting_load.html')}}?op=description&amp;project={{=project}}&amp;year={{=semestre2.id}}&amp;change_id="+var_id); 
