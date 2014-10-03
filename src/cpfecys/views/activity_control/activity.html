@@ -456,7 +456,7 @@
 
 					{{existName='false'}}
 					{{total_var2=0}}
-					{{totalCategory=0}}
+					{{totalCategory=float(0)}}
 					{{if request.vars['field_grade_var'] == "nada":}}
 						{{for acOnly in aC:}}
 							{{if request.vars['activity_name1_var'] == acOnly.name:}}
@@ -477,7 +477,7 @@
 
 					{{if totalCategory==0 and request.vars['field_grade_var']!="nada":}}
 						{{varCategory = db((db.course_activity_category.semester==semestre2.id) & (db.course_activity_category.assignation==var_project_id) & (db.course_activity_category.id==int(request.vars['category_activity_id_var']))).select().first()}}
-						{{totalCategory=varCategory.grade}}
+						{{totalCategory=float(varCategory.grade)}}
 					{{pass}}
 
 
