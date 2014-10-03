@@ -880,7 +880,36 @@
 										{{if editable_var=='true':}}
 											<textarea class="string" cols="40" type="text" id="edit_activity_description" style="width:240px; height:100px;">{{=tAct.description}}</textarea>
 										{{else:}}
-											{{=tAct.description}}
+											<div style="width:200px;">
+												{{=tAct.description[:100]}}{{if len(tAct.description) > 100:}}...
+
+													<br>
+													<div align="right">
+														<a type="button" style ="cursor:pointer;" role="button" data-toggle="modal" data-target="#des_modal_{{=tAct.id}}" >{{=T('View more')}}</span></a>
+													</div>
+											
+													<!--MODAL -->
+													<div id="des_modal_{{=tAct.id}}" class="modal hide fade" tabindex="-1" role="dialog"  aria-hidden="true"> 
+													  <div class="modal-header">
+													    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+													      <h3 id="myModalLabel">
+													          {{=tAct.name}}
+													      </h3>
+													  </div>
+													  <div class="modal-body">
+													    <div class="well">
+													        <pre>
+													           {{=tAct.description}}
+													        </pre>
+													    </div>
+													  </div>
+													  <div class="modal-footer">
+													      <button class="btn" data-dismiss="modal" aria-hidden="true">{{=T('Close')}}</button>
+													  </div>
+													</div>
+													<!--Finish MODaL-->
+													{{pass}}
+											</div>
 										{{pass}}
 									</td>
 									<td>
