@@ -150,6 +150,16 @@ def auto_freeze():
                     assignation.update_record()
     db.commit()
 
+
+def funcionPrueba():
+    import datetime
+    db.report.insert(project = 1, semester_repet=True, date_finish=datetime.datetime.now())
+    db.report.insert(project = 2, semester_repet=True, date_finish=datetime.datetime.now())
+    db.report.insert(project = 3, semester_repet=True, date_finish=datetime.datetime.now())
+    db.commit()
+
+
+
 #This thing kills reports that where never done to an empty report with score 0
 def auto_daily():
     ## Get current year period
