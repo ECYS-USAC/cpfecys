@@ -723,9 +723,13 @@
 				{{pass}}
 			{{pass}}
 			{{if showMessageError=='f':}}
-				<span class="label label-important"><b>Estas actividades no afectaran la nota del curso, puesto que no se encuentra la categoria laboratorio en la ponderación del curso</b></span><a type="button" class="close" title="{{=T('Help')}}" aria-hidden="true" role="button" class="btn btn-warning" data-toggle="modal" data-target="#help_modal_weighting" >
-	                    <span class="icon-black icon-question-sign"></span>
+				<span class="label label-important">
+					<a type="button" style ="cursor:pointer;" title="{{=T('Help')}}" role="button" data-toggle="modal" data-target="#help_modal_weighting"  >
+	                    <span class="icon-white icon-question-sign"></span>
 	                </a>
+					Estas actividades no afectaran la nota del curso,<br> puesto que no se encuentra la categoria laboratorio en la ponderación del curso
+					
+				</span>
 			{{pass}}
 		{{pass}}
 		{{if request.vars['op'] == "showTableNoEditable":}}
@@ -799,10 +803,10 @@
 									</th>
 									{{if request.vars['op'] == "showTableNoEditable":}}
 										{{if no_menu==False or assigned_to_project==True:}}
-										<th style="white-space:initial;">
+										<th style="white-space:normal;">
 											{{=T('Entered Grades')}}
 										</th>
-										<th style="white-space:initial;">
+										<th style="white-space:normal;">
 											{{=T('Average of Grades')}}
 										</th >
 										{{if no_menu==False:}}
@@ -920,7 +924,13 @@
 												<input class="string" id="edit_field_grade" type="text" value="{{=tAct.grade}}" style="width:40px;" disabled>
 											{{pass}}
 										{{else:}}
-											{{=tAct.grade}}
+											{{if tAct.grade == 0:}}
+												<label style ="cursor:help;" title="{{=T('The grade of')}} '{{=category.category.category}}' {{=T('is averaged.')}}">
+													{{=T('AG')}}
+												</label>
+											{{else:}}
+												{{=tAct.grade}}
+											{{pass}}
 										{{pass}}
 									</td>
 									<td>
@@ -1038,7 +1048,7 @@
 												{{else:}}
 												<span class="label label-success">
 												{{pass}}
-													{{=average}}
+													{{=round(average,2)}}
 													</span>
 												</center>
 												<!--Average of the grades of the activity-->

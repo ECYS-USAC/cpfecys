@@ -116,18 +116,20 @@ if auth.has_membership(role="Super-Administrator"):
     ]))
 
 if auth.has_membership(role="Super-Administrator"):
-    user_menu.append((T('Students control'), False, URL(), [
-    (T('Students control'), False, URL('activity_control','courses_list'), []),
-    (T('Request control'), False, URL('activity_control','courses_list_request'), []),
+    user_menu.append((T('Academic Control'), False, URL(), [
+        (T('Manage')+" "+T('Academic Control'), False, URL('activity_control','courses_list'), []),
+        (T('Pending Requests'), False, URL('activity_control','courses_list_request'), []),
+        ((T('Parameters'), False, URL(), [    
+            (T('Categories for weighting'), False, URL('activity_control','activity_category'), []),
+            (T('Period'), False, URL('activity_control','student_control_period'), [])
+        ])),
+        ((T('Exceptions'), False, URL(), [    
+            (T('Course and Laboratory Exceptions'), False, URL('activity_control','course_laboratory_exception'), []),
+            (T('Course Time Limit Exception'), False, URL('activity_control','course_limit_exception'), [])
+        ]))
     ]))
-if auth.has_membership(role="Super-Administrator"):
-    user_menu.append((T('Activity control'), False, URL(), [
-    (T('Students control'), False, URL('activity_control','admin_areas_list'), []),
-    (T('Activity category'), False, URL('activity_control','activity_category'), []),
-    (T('Course and Laboratory Exceptions'), False, URL('activity_control','course_laboratory_exception'), []),
-    (T('Course Time Limit Exception'), False, URL('activity_control','course_limit_exception'), []),
-    (T('Period'), False, URL('activity_control','student_control_period'), []),    
-    ]))   
+
+    
 if auth.has_membership(role="Student") or auth.has_membership(role="Teacher"):
     user_menu.append((T('Library'), False, URL('library','file_managers',vars=dict(tipo=0, pro=0)), []),)
 if auth.has_membership(role="Teacher"):
