@@ -59,7 +59,7 @@
 													after_specific_grade = var_SG, 
 													semester = T(semestre2.period.name),
 													yearp = semestre2.yearp,
-													assignation = project_variable.name, 
+													assignation = assigantion.project.name, 
 													after_laboratory = var_labo,
 													after_teacher_permition = request.vars['TP'],
 													description = T('Inserted from Weighting Edit page'))}}
@@ -94,7 +94,7 @@
 														before_specific_grade = query_temp.specific_grade, 
 														semester = T(semestre2.period.name),
 														yearp = semestre2.yearp,
-														assignation = project_variable.name, 
+														assignation = assigantion.project.name, 
 														before_laboratory = query_temp.laboratory,
 														before_teacher_permition = query_temp.teacher_permition,
 														description = T('Delete from Weighting Get page'))}}
@@ -120,7 +120,7 @@
 														after_specific_grade = we.specific_grade, 
 														semester = T(semestre2.period.name),
 														yearp = semestre2.yearp,
-														assignation = project_variable.name, 
+														assignation = assigantion.project.name, 
 														after_laboratory = we.laboratory,
 														after_teacher_permition = we.teacher_permition,
 														description = T('Inserted from Weighting Get page'))}}
@@ -150,7 +150,7 @@
 		{{query_temp = db(db.course_activity_category.id==request.vars['var_id']).select().first()}}
 
 		{{db(db.course_activity_category.id==request.vars['var_id']).delete()}}
-		
+
 		{{#Log}}
 		{{db.course_activity_category_log.insert(user_name = auth.user.username,
 													roll = rol_log,
@@ -160,7 +160,7 @@
 													before_specific_grade = query_temp.specific_grade, 
 													semester = T(semestre2.period.name),
 													yearp = semestre2.yearp,
-													assignation = project_variable.name, 
+													assignation = assigantion.project.name, 
 													before_laboratory = query_temp.laboratory,
 													before_teacher_permition = query_temp.teacher_permition,
 													description = T('Delete from Weighting Edit page'))}}
@@ -238,7 +238,7 @@
 					{{db.course_activity_log.insert(user_name=auth.user.username,
 												roll=rol_log,
 												operation_log='update',
-												course= project_variable.name,
+												course= assigantion.project.name,
 												yearp=semestre2.yearp,
 												period=T(semestre2.period.name),
 												metric='T',
@@ -282,7 +282,7 @@
 					{{db.course_activity_log.insert(user_name=auth.user.username,
 												roll=rol_log,
 												operation_log='update',
-												course= project_variable.name,
+												course= assigantion.project.name,
 												yearp=semestre2.yearp,
 												period=T(semestre2.period.name),
 												metric='T',
@@ -334,7 +334,7 @@
 					{{db.course_activity_log.insert(user_name=auth.user.username,
 												roll=rol_log,
 												operation_log='update',
-												course= project_variable.name,
+												course= assigantion.project.name,
 												yearp=semestre2.yearp,
 												period=T(semestre2.period.name),
 												metric='T',
@@ -372,7 +372,7 @@
 														before_specific_grade = query_temp.specific_grade, 
 														semester = T(semestre2.period.name),
 														yearp = semestre2.yearp,
-														assignation = project_variable.name, 
+														assignation = assigantion.project.name, 
 														after_laboratory = query_temp.laboratory,
 														before_laboratory = query_temp.laboratory,
 														after_teacher_permition = var_TP,
