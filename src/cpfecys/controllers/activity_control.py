@@ -75,7 +75,7 @@ def courses_list():
 
 
 @auth.requires_login()
-@auth.requires(auth.has_membership('Student') or auth.has_membership('Teacher')or auth.has_membership('Academic')  or auth.has_membership('Super-Administrator') or auth.has_membership('Ecys-Administrator'))
+@auth.requires(auth.has_membership('Student') or auth.has_membership('Teacher') or auth.has_membership('Super-Administrator') or auth.has_membership('Ecys-Administrator'))
 def students_control():
     #vars
     year = None
@@ -235,42 +235,6 @@ def student_control_period():
     return dict(grid=grid)
 
 
-@auth.requires_login()
-@auth.requires(auth.has_membership('Super-Administrator'))
-def admin_areas_list():
-    areas = db(db.area_level).select()
-    role = request.vars['role']
-    response.view='activity_control/admin_areas_list.html'
-    return dict(areas=areas, role=role)
-
-@auth.requires_login()
-@auth.requires_membership('Super-Administrator')
-def admin_courses_list():
-    #Obtain the current period of the system and all the register periods
-    period = cpfecys.current_year_period()
-    periods = db(db.period_year).select()
-    area = None
-    role = None
-
-    #Check if the period is change
-    #Obtain the select period
-    if request.vars['period'] != None:
-        period = request.vars['period']
-        area = request.vars['areas']
-        period = db(db.period_year.id==period).select().first()
-        if not period:
-            session.flash = T('Not valid Action.')
-            redirect(URL('default', 'index'))
-
-    if request.vars['area'] != None:
-        area = request.vars['area']        
-        response.view = 'activity_control/admin_courses_list.html'
-        projects = db(db.project.area_level==area).select()
-
-        return dict(projects=projects,area=area,periods =periods)
-    else:
-        session.flash = T("Action not allowed")
-        redirect(URL('default','index'))
 
 @auth.requires_login()
 @auth.requires(auth.has_membership('Student'))
@@ -543,10 +507,10 @@ def weighting():
     elif auth.has_membership('Student')==True:
         rol_log='Student'
     pass
-   
+    project_var = db(db.project.id == project).select().first() 
     year = db(db.period_year.id == request.vars['year']).select().first() 
     assigantion = db((db.user_project.assigned_user == auth.user.id) & (db.user_project.period == year.id) & (db.user_project.project == project)).select().first()
-    return dict(semestre2 = year, project = project, assigantion=assigantion, rol_log = rol_log)
+    return dict(semestre2 = year, project = project, project_variable= project_var,assigantion=assigantion, rol_log = rol_log)
 
 
 
