@@ -5,7 +5,7 @@
 	{{var_project_id=project}}
 {{pass}}
 
-{{exception_query = db(db.course_laboratory_exception.project == project).select().first()}}
+{{exception_query = db(db.course_laboratory_exception.project == request.vars['project']).select().first()}}
 	
 {{if exception_query is None:}}
 	{{exception_s_var = False}}
@@ -45,7 +45,7 @@
 					{{from datetime import datetime}}
 					{{enddate=None}}
 					{{for date_var in db((db.student_control_period.period_name==T(str(semester))+" "+str(year))).select():}}
-						{{var_exception = db((db.course_limit_exception.project == project) & (db.course_limit_exception.date_finish > datetime.now())).select().first()}}
+						{{var_exception = db((db.course_limit_exception.project == request.vars['project']) & (db.course_limit_exception.date_finish > datetime.now())).select().first()}}
 						{{if var_exception != None:}}
 							{{var_date_finish = var_exception.date_finish}}
 						{{else:}}
@@ -58,14 +58,14 @@
 					{{if enddate != None:}}
 						<br><font color="red">{{=T('Deadline for entry')}}: {{=enddate}}</font><br>
 						<br>
-						<a id="myButton" class="btn btn-warning" href="{{=URL('activity_control', 'students_control_full',vars=dict( project = project, year = request.vars['year'], f_view='weighting_edit', type = request.vars['type']))}}"> 
+						<a id="myButton" class="btn btn-warning" href="{{=URL('activity_control', 'students_control_full',vars=dict( project = request.vars['project'], year = request.vars['year'], f_view='weighting_edit', type = request.vars['type']))}}"> 
 							<span class="icon-plus-sign"></span>
 							{{=T('Create Weighting')}}
 						</a>
 					{{pass}}
 				{{else:}}
 					<br>
-					<a id="myButton" class="btn btn-warning" href="{{=URL('activity_control', 'students_control_full',vars=dict( project = project, year = request.vars['year'], f_view='weighting_edit', type = request.vars['type']))}}"> 
+					<a id="myButton" class="btn btn-warning" href="{{=URL('activity_control', 'students_control_full',vars=dict( project = request.vars['project'], year = request.vars['year'], f_view='weighting_edit', type = request.vars['type']))}}"> 
 						<span class="icon-plus-sign"></span>
 						{{=T('Create Weighting')}}
 					</a>
@@ -110,7 +110,7 @@
 				        </a>
 				    </li>
 					<li>
-						<a tabindex="-1"  title="{{=T('Modify course weighting')}}" href="{{=URL('activity_control', 'students_control_full',vars=dict( project = project, year = request.vars['year'], f_view='weighting_edit', type = request.vars['type']))}}" role="button"   id="edit_option"> 
+						<a tabindex="-1"  title="{{=T('Modify course weighting')}}" href="{{=URL('activity_control', 'students_control_full',vars=dict( project = request.vars['project'], year = request.vars['year'], f_view='weighting_edit', type = request.vars['type']))}}" role="button"   id="edit_option"> 
 							<span class="icon-edit" ></span>
 				          {{=T('Edit Weighting')}}
 				        </a>
@@ -120,7 +120,7 @@
 					{{from datetime import datetime}}
 					{{var_do='false'}}
 					{{for date_var in db((db.student_control_period.period_name==T(str(semester))+" "+str(year))).select():}}
-						{{var_exception = db((db.course_limit_exception.project == project) & (db.course_limit_exception.date_finish > datetime.now())).select().first()}}
+						{{var_exception = db((db.course_limit_exception.project == request.vars['project']) & (db.course_limit_exception.date_finish > datetime.now())).select().first()}}
 						{{if var_exception != None:}}
 							{{var_date_finish = var_exception.date_finish}}
 						{{else:}}
@@ -146,7 +146,7 @@
 					    </li>
 						<li>
 						<li>
-							<a tabindex="-1"  title="{{=T('Modify course weighting')}}" href="{{=URL('activity_control', 'students_control_full',vars=dict( project = project, year = request.vars['year'], f_view='weighting_edit', type = request.vars['type']))}}" role="button"   id="edit_option"> 
+							<a tabindex="-1"  title="{{=T('Modify course weighting')}}" href="{{=URL('activity_control', 'students_control_full',vars=dict( project = request.vars['project'], year = request.vars['year'], f_view='weighting_edit', type = request.vars['type']))}}" role="button"   id="edit_option"> 
 								<span class="icon-edit" ></span>
 				          		{{=T('Edit Weighting')}}
 				        	</a>
@@ -166,14 +166,14 @@
 					    </li>
 					    {{if request.vars['type'] == "course":}}
 					    <li>
-						<a tabindex="-1"  title="{{=T('Modify course weighting')}}" href="{{=URL('activity_control', 'students_control_full',vars=dict( project = project, year = request.vars['year'], f_view='weighting_edit', type = request.vars['type']))}}" role="button"   id="edit_option"> 
+						<a tabindex="-1"  title="{{=T('Modify course weighting')}}" href="{{=URL('activity_control', 'students_control_full',vars=dict( project = request.vars['project'], year = request.vars['year'], f_view='weighting_edit', type = request.vars['type']))}}" role="button"   id="edit_option"> 
 							<span class="icon-edit" ></span>
 				          {{=T('Edit Weighting')}}
 				        </a>
 				      </li>
 				      {{else:}}
 				      <li>
-		    			<a role="button" title="{{=T('Request that the changes be reviewed by the professor or administrator')}}" aria-hidden="true" href="{{=URL('activity_control', 'request_change_weighting',vars=dict(project = project, year = request.vars['year']))}}" >
+		    			<a role="button" title="{{=T('Request that the changes be reviewed by the professor or administrator')}}" aria-hidden="true" href="{{=URL('activity_control', 'request_change_weighting',vars=dict(project = request.vars['project'], year = request.vars['year']))}}" >
 							<span class="icon-black icon-random"></span>
 							{{=T('Change Request')}}
 						</a>
@@ -184,13 +184,13 @@
 			{{else:}}
 				{{if request.vars['type'] == "course":}}
 					<li>
-						<a  tabindex="-1" title="{{=T('Create course weighting')}}" id="menu_create_weighting" href="{{=URL('activity_control', 'students_control_full',vars=dict( project = project, year = request.vars['year'], f_view='weighting_edit', type = request.vars['type']))}}" role="button"   id="edit_option">
+						<a  tabindex="-1" title="{{=T('Create course weighting')}}" id="menu_create_weighting" href="{{=URL('activity_control', 'students_control_full',vars=dict( project = request.vars['project'], year = request.vars['year'], f_view='weighting_edit', type = request.vars['type']))}}" role="button"   id="edit_option">
 							<span class="icon-plus-sign"></span>
 			          		{{=T('Create Weighting')}}
 			        	</a>
 			      	</li>
 			      	<li> 
-						<a  tabindex="-1"  title="{{=T('Weighting of previous semesters')}}" href="{{=URL('activity_control', 'students_control_full',vars=dict( project = project, year = request.vars['year'], f_view='weighting_get', type = request.vars['type']))}}" role="button"   id="edit_option">
+						<a  tabindex="-1"  title="{{=T('Weighting of previous semesters')}}" href="{{=URL('activity_control', 'students_control_full',vars=dict( project = request.vars['project'], year = request.vars['year'], f_view='weighting_get', type = request.vars['type']))}}" role="button"   id="edit_option">
 							<span class="icon-repeat"></span>
 			        		{{=T('Get Weighting')}}
 				        </a>
@@ -201,7 +201,7 @@
 			      	{{from datetime import datetime}}
 					{{var_do='false'}}
 					{{for date_var in db((db.student_control_period.period_name==T(str(semester))+" "+str(year))).select():}}
-						{{var_exception = db((db.course_limit_exception.project == project) & (db.course_limit_exception.date_finish > datetime.now())).select().first()}}
+						{{var_exception = db((db.course_limit_exception.project == request.vars['project']) & (db.course_limit_exception.date_finish > datetime.now())).select().first()}}
 						{{if var_exception != None:}}
 							{{var_date_finish = var_exception.date_finish}}
 						{{else:}}
@@ -214,13 +214,13 @@
 					{{pass}}
 					{{if var_do =='true':}}
 						<li>
-							<a  tabindex="-1" title="{{=T('Create course weighting')}}" id="menu_create_weighting" href="{{=URL('activity_control', 'students_control_full',vars=dict( project = project, year = request.vars['year'], f_view='weighting_edit', type = request.vars['type']))}}" role="button"   id="edit_option">
+							<a  tabindex="-1" title="{{=T('Create course weighting')}}" id="menu_create_weighting" href="{{=URL('activity_control', 'students_control_full',vars=dict( project = request.vars['project'], year = request.vars['year'], f_view='weighting_edit', type = request.vars['type']))}}" role="button"   id="edit_option">
 								<span class="icon-plus-sign"></span>
 			          			{{=T('Create Weighting')}}
 			        		</a>
 				      	</li>
 				      	<li> 
-							<a  tabindex="-1"  title="{{=T('Get weighting of previous semesters')}}" href="{{=URL('activity_control', 'students_control_full',vars=dict( project = project, year = request.vars['year'], f_view='weighting_get', type = request.vars['type']))}}" role="button"   id="edit_option">
+							<a  tabindex="-1"  title="{{=T('Get weighting of previous semesters')}}" href="{{=URL('activity_control', 'students_control_full',vars=dict( project = request.vars['project'], year = request.vars['year'], f_view='weighting_get', type = request.vars['type']))}}" role="button"   id="edit_option">
 								<span class="icon-repeat"></span>
 				        		{{=T('Get Weighting')}}
 					        </a>
@@ -251,7 +251,7 @@
 			      	{{else:}}
 			      		{{if var_do =='false':}}
 							<li>
-				    			<a role="button" title="{{=T('Request that the changes be reviewed by the professor or administrator')}}" aria-hidden="true" href="{{=URL('activity_control', 'request_change_weighting',vars=dict(project = project, year = request.vars['year']))}}" >
+				    			<a role="button" title="{{=T('Request that the changes be reviewed by the professor or administrator')}}" aria-hidden="true" href="{{=URL('activity_control', 'request_change_weighting',vars=dict(project = request.vars['project'], year = request.vars['year']))}}" >
 									<span class="icon-black icon-random"></span>
 									{{=T('Change Request')}}
 								</a>
@@ -278,10 +278,10 @@
 
 <script type="text/javascript">
   	$(document).ready(function(){
-		$("#table_Weighting_{{=request.vars['type']}}").load("{{=URL('activity_control','weighting.html')}}?op=showTableNoEditable&amp;type={{=request.vars['type']}}&amp;project={{=project}}&amp;year={{=request.vars['year']}}");
+		$("#table_Weighting_{{=request.vars['type']}}").load("{{=URL('activity_control','weighting.html')}}?op=showTableNoEditable&amp;type={{=request.vars['type']}}&amp;project={{=request.vars['project']}}&amp;year={{=request.vars['year']}}");
 		
 		$("#edit_option").click(function(){
-	      $("#div_weighting_show").load("{{=URL('activity_control','weighting.html')}}?op=showEditTable&amp;project={{=project}}}&amp;year={{=request.vars['year']}}&amp;type={{=request.vars['type']}}&amp;"); 
+	      $("#div_weighting_show").load("{{=URL('activity_control','weighting.html')}}?op=showEditTable&amp;project={{=request.vars['project']}}}&amp;year={{=request.vars['year']}}&amp;type={{=request.vars['type']}}&amp;"); 
 	    })
 
 	    
@@ -289,4 +289,3 @@
 	});
 
 </script>
-
