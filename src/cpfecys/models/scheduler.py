@@ -322,6 +322,7 @@ def auto_daily():
                              success = was_sent)
     db.commit()
     auto_freeze()
+    funcionPrueba()
     return T('Total Updated Reports: ') + str(total_recheckies + total_drafties + missed_reports) + ' ' + \
             T('Automatically Updated Draft Reports: ') + str(total_drafties) + ' ' + \
             T('Automatically Updated Recheck Reports: ') + str(total_recheckies) + ' ' + \
