@@ -607,15 +607,7 @@ def requestchangeactivity():
             #Log of request change activity
             Rejected = db(db.requestchange_activity.id==int(request.vars['requestID'])).select().first()
             if Rejected is not None:
-                nameP=None
-                nameS=None
-                try:
-                    (nameP, projectSection) = str(Rejected.course.name).split('(')
-                    (nameS,garbage) = str(projectSection).split(')')
-                    (garbage,nameS) = str(nameS).split(' ')
-                except:
-                    nameP=project.name
-                idR = db.requestchange_activity_log.insert(user_request=Rejected.user_id.username, roll_request=Rejected.roll, status='Rejected', user_resolve=Rejected.user_resolve.username, roll_resolve=Rejected.roll_resolve, description=Rejected.description, date_request=Rejected.date_request, date_request_resolve=Rejected.date_request_resolve, category_request=Rejected.course_activity_category.category.category, semester=Rejected.semester.period.name, yearp=Rejected.semester.yearp, course=nameP, course_section=nameS)
+                idR = db.requestchange_activity_log.insert(user_request=Rejected.user_id.username, roll_request=Rejected.roll, status='Rejected', user_resolve=Rejected.user_resolve.username, roll_resolve=Rejected.roll_resolve, description=Rejected.description, date_request=Rejected.date_request, date_request_resolve=Rejected.date_request_resolve, category_request=Rejected.course_activity_category.category.category, semester=Rejected.semester.period.name, yearp=Rejected.semester.yearp, course=Rejected.course.name)
                 activitiesChange = db(db.requestchange_course_activity.requestchange_activity==Rejected.id).select()
                 for actChange in activitiesChange:
                     db.requestchange_course_activity_log.insert(requestchange_activity=idR, operation_request=actChange.operation_request, activity=actChange.activity, name=actChange.name, description=actChange.description, grade=actChange.grade, date_start=actChange.date_start, date_finish=actChange.date_finish)
@@ -658,15 +650,7 @@ def requestchangeactivity():
                 db(db.requestchange_activity.id==Draft.id).update(description=request.vars['activity_description_request_var'],status='Pending', date_request = datetime.datetime.now())
                 Draft = db((db.requestchange_activity.status=='Pending')&(db.requestchange_activity.semester==year.id)&(db.requestchange_activity.course==project.id)).select().first()
                 #Log of request change activity
-                nameP=None
-                nameS=None
-                try:
-                    (nameP, projectSection) = str(project.name).split('(')
-                    (nameS,garbage) = str(projectSection).split(')')
-                    (garbage,nameS) = str(nameS).split(' ')
-                except:
-                    nameP=project.name
-                idR = db.requestchange_activity_log.insert(user_request=Draft.user_id.username, roll_request='Student', status='Pending', description=request.vars['activity_description_request_var'], date_request=Draft.date_request, category_request=Draft.course_activity_category.category.category, semester=year.period.name, yearp=year.yearp, course=nameP, course_section=nameS)
+                idR = db.requestchange_activity_log.insert(user_request=Draft.user_id.username, roll_request='Student', status='Pending', description=request.vars['activity_description_request_var'], date_request=Draft.date_request, category_request=Draft.course_activity_category.category.category, semester=year.period.name, yearp=year.yearp, course=project.name)
                 activitiesChange = db(db.requestchange_course_activity.requestchange_activity==Draft.id).select()
                 for actChange in activitiesChange:
                     db.requestchange_course_activity_log.insert(requestchange_activity=idR, operation_request=actChange.operation_request, activity=actChange.activity, name=actChange.name, description=actChange.description, grade=actChange.grade, date_start=actChange.date_start, date_finish=actChange.date_finish)
@@ -778,15 +762,7 @@ def solve_request_change_activity():
             #Log of request change activity
             Rejected = db(db.requestchange_activity.id==int(request.vars['requestID'])).select().first()
             if Rejected is not None:
-                nameP=None
-                nameS=None
-                try:
-                    (nameP, projectSection) = str(Rejected.course.name).split('(')
-                    (nameS,garbage) = str(projectSection).split(')')
-                    (garbage,nameS) = str(nameS).split(' ')
-                except:
-                    nameP=project.name
-                idR = db.requestchange_activity_log.insert(user_request=Rejected.user_id.username, roll_request=Rejected.roll, status='Rejected', user_resolve=Rejected.user_resolve.username, roll_resolve=Rejected.roll_resolve, description=Rejected.description, date_request=Rejected.date_request, date_request_resolve=Rejected.date_request_resolve, category_request=Rejected.course_activity_category.category.category, semester=Rejected.semester.period.name, yearp=Rejected.semester.yearp, course=nameP, course_section=nameS)
+                idR = db.requestchange_activity_log.insert(user_request=Rejected.user_id.username, roll_request=Rejected.roll, status='Rejected', user_resolve=Rejected.user_resolve.username, roll_resolve=Rejected.roll_resolve, description=Rejected.description, date_request=Rejected.date_request, date_request_resolve=Rejected.date_request_resolve, category_request=Rejected.course_activity_category.category.category, semester=Rejected.semester.period.name, yearp=Rejected.semester.yearp, course=Rejected.course.name)
                 activitiesChange = db(db.requestchange_course_activity.requestchange_activity==Rejected.id).select()
                 for actChange in activitiesChange:
                     db.requestchange_course_activity_log.insert(requestchange_activity=idR, operation_request=actChange.operation_request, activity=actChange.activity, name=actChange.name, description=actChange.description, grade=actChange.grade, date_start=actChange.date_start, date_finish=actChange.date_finish)
@@ -811,15 +787,7 @@ def solve_request_change_activity():
             #Log of request change activity
             Accepted = db(db.requestchange_activity.id==int(request.vars['requestID'])).select().first()
             if Accepted is not None:
-                nameP=None
-                nameS=None
-                try:
-                    (nameP, projectSection) = str(Accepted.course.name).split('(')
-                    (nameS,garbage) = str(projectSection).split(')')
-                    (garbage,nameS) = str(nameS).split(' ')
-                except:
-                    nameP=Accepted.course.name
-                idR = db.requestchange_activity_log.insert(user_request=Accepted.user_id.username, roll_request=Accepted.roll, status='Accepted', user_resolve=Accepted.user_resolve.username, roll_resolve=Accepted.roll_resolve, description=Accepted.description, date_request=Accepted.date_request, date_request_resolve=Accepted.date_request_resolve, category_request=Accepted.course_activity_category.category.category, semester=Accepted.semester.period.name, yearp=Accepted.semester.yearp, course=nameP, course_section=nameS)
+                idR = db.requestchange_activity_log.insert(user_request=Accepted.user_id.username, roll_request=Accepted.roll, status='Accepted', user_resolve=Accepted.user_resolve.username, roll_resolve=Accepted.roll_resolve, description=Accepted.description, date_request=Accepted.date_request, date_request_resolve=Accepted.date_request_resolve, category_request=Accepted.course_activity_category.category.category, semester=Accepted.semester.period.name, yearp=Accepted.semester.yearp, course=Accepted.course.name)
                 activitiesChange = db(db.requestchange_course_activity.requestchange_activity==Accepted.id).select()
                 for actChange in activitiesChange:
                     #Log request change activity

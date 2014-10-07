@@ -76,8 +76,47 @@
 				<tr>
 					<td>{{=change.operation_request}}</td>
 					<td>{{=change.name}}</td>
-					<td>{{=change.description}}</td>
-					<td>{{=change.grade}}</td>
+					<td>
+						<div style="width:200px;">
+							{{=change.description[:100]}}
+							{{if len(change.description) > 100:}}...
+								<br>
+								<div align="right">
+									<a type="button" style ="cursor:pointer;" role="button" data-toggle="modal" data-target="#des_DetailCa_modal_{{=change.id}}" >{{=T('View more')}}</span></a>
+								</div>
+						
+								<!--MODAL -->
+								<div id="des_DetailCa_modal_{{=change.id}}" class="modal hide fade" tabindex="-1" role="dialog"  aria-hidden="true"> 
+								  <div class="modal-header">
+								    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+								      <h3 id="myModalLabel">
+								          {{=change.name}}
+								      </h3>
+								  </div>
+								  <div class="modal-body">
+								    <div class="well">
+								        <pre>
+								           {{=change.description}}
+								        </pre>
+								    </div>
+								  </div>
+								  <div class="modal-footer">
+								      <button class="btn" data-dismiss="modal" aria-hidden="true">{{=T('Close')}}</button>
+								  </div>
+								</div>
+								<!--Finish MODaL-->
+							{{pass}}
+						</div>
+					</td>
+					<td>
+						{{if change.grade == float(0):}}
+							<label style ="cursor:help;" title="{{=T('The grade of')}} '{{=Request.course_activity_category.category.category}}' {{=T('is averaged.')}}">
+								{{=T('AG')}}
+							</label>
+						{{else:}}
+							{{=change.grade}}
+						{{pass}}
+					</td>
 					<td>{{=change.date_start}}</td>
 					<td>{{=change.date_finish}}</td>
 				</tr>
@@ -168,8 +207,47 @@
 				<tr>
 					<td>{{=change.operation_request}}</td>
 					<td>{{=change.name}}</td>
-					<td>{{=change.description}}</td>
-					<td>{{=change.grade}}</td>
+					<td>
+						<div style="width:200px;">
+							{{=change.description[:100]}}
+							{{if len(change.description) > 100:}}...
+								<br>
+								<div align="right">
+									<a type="button" style ="cursor:pointer;" role="button" data-toggle="modal" data-target="#des_DetailCl_modal_{{=change.id}}" >{{=T('View more')}}</span></a>
+								</div>
+						
+								<!--MODAL -->
+								<div id="des_DetailCl_modal_{{=change.id}}" class="modal hide fade" tabindex="-1" role="dialog"  aria-hidden="true"> 
+								  <div class="modal-header">
+								    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+								      <h3 id="myModalLabel">
+								          {{=change.name}}
+								      </h3>
+								  </div>
+								  <div class="modal-body">
+								    <div class="well">
+								        <pre>
+								           {{=change.description}}
+								        </pre>
+								    </div>
+								  </div>
+								  <div class="modal-footer">
+								      <button class="btn" data-dismiss="modal" aria-hidden="true">{{=T('Close')}}</button>
+								  </div>
+								</div>
+								<!--Finish MODaL-->
+							{{pass}}
+						</div>
+					</td>
+					<td>
+						{{if change.grade == float(0):}}
+							<label style ="cursor:help;" title="{{=T('The grade of')}} '{{=Request.category_request}}' {{=T('is averaged.')}}">
+								{{=T('AG')}}
+							</label>
+						{{else:}}
+							{{=change.grade}}
+						{{pass}}
+					</td>
 					<td>{{=change.date_start}}</td>
 					<td>{{=change.date_finish}}</td>
 				</tr>
@@ -198,27 +276,17 @@
 {{if request.vars['op'] == "showRequestDone":}}
 	{{RallRequestP=None}}
 	{{RallRequest=None}}
-	{{RnameP=None}}
-	{{RnameS=None}}
-	{{try:}}
-		{{(RnameP, RprojectSection) = str(project.name).split('(')}}
-		{{(RnameS,Rgarbage) = str(RprojectSection).split(')')}}
-		{{(Rgarbage,RnameS) = str(RnameS).split(' ')}}
-	{{except:}}
-		{{RnameP=project.name}}
-		{{RnameS=None}}
-	{{pass}}
 	{{if request.vars['tip']=="p" or request.vars['tip']=="t":}}
 			{{RallRequestP = db((db.requestchange_activity.status=='Pending')&(db.requestchange_activity.semester==int(period.id))&(db.requestchange_activity.course==project.id)).select()}}
 		{{pass}}
 	{{if request.vars['tip']=="a":}}
-		{{RallRequest = db((db.requestchange_activity_log.status=='Accepted')&(db.requestchange_activity_log.course==RnameP)&(db.requestchange_activity_log.course_section==RnameS)&(db.requestchange_activity_log.yearp==period.yearp)&(db.requestchange_activity_log.semester==period.period.name)).select()}}
+		{{RallRequest = db((db.requestchange_activity_log.status=='Accepted')&(db.requestchange_activity_log.course==project.name)&(db.requestchange_activity_log.yearp==period.yearp)&(db.requestchange_activity_log.semester==period.period.name)).select()}}
 	{{pass}}
 	{{if request.vars['tip']=="r":}}
-		{{RallRequest = db((db.requestchange_activity_log.status=='Rejected')&(db.requestchange_activity_log.course==RnameP)&(db.requestchange_activity_log.course_section==RnameS)&(db.requestchange_activity_log.yearp==period.yearp)&(db.requestchange_activity_log.semester==period.period.name)).select()}}
+		{{RallRequest = db((db.requestchange_activity_log.status=='Rejected')&(db.requestchange_activity_log.course==project.name)&(db.requestchange_activity_log.yearp==period.yearp)&(db.requestchange_activity_log.semester==period.period.name)).select()}}
 	{{pass}}
 	{{if request.vars['tip']=="t":}}
-		{{RallRequest = db((db.requestchange_activity_log.status!='Pending')&(db.requestchange_activity_log.course==RnameP)&(db.requestchange_activity_log.course_section==RnameS)&(db.requestchange_activity_log.yearp==period.yearp)&(db.requestchange_activity_log.semester==period.period.name)).select()}}
+		{{RallRequest = db((db.requestchange_activity_log.status!='Pending')&(db.requestchange_activity_log.course==project.name)&(db.requestchange_activity_log.yearp==period.yearp)&(db.requestchange_activity_log.semester==period.period.name)).select()}}
 	{{pass}}
 
 
@@ -909,8 +977,47 @@
 				    					<tr>
 										{{if totalChanges==0:}}
 											<td>{{=act.name}}</td>
-											<td>{{=act.description}}</td>
-											<td>{{=act.grade}}</td>
+											<td>
+												<div style="width:200px;">
+													{{=act.description[:100]}}
+													{{if len(act.description) > 100:}}...
+														<br>
+														<div align="right">
+															<a type="button" style ="cursor:pointer;" role="button" data-toggle="modal" data-target="#des_ShowR_modal_{{=act.id}}_{{=act.name}}" >{{=T('View more')}}</span></a>
+														</div>
+												
+														<!--MODAL -->
+														<div id="des_ShowR_modal_{{=act.id}}_{{=act.name}}" class="modal hide fade" tabindex="-1" role="dialog"  aria-hidden="true"> 
+														  <div class="modal-header">
+														    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+														      <h3 id="myModalLabel">
+														          {{=act.name}}
+														      </h3>
+														  </div>
+														  <div class="modal-body">
+														    <div class="well">
+														        <pre>
+														           {{=act.description}}
+														        </pre>
+														    </div>
+														  </div>
+														  <div class="modal-footer">
+														      <button class="btn" data-dismiss="modal" aria-hidden="true">{{=T('Close')}}</button>
+														  </div>
+														</div>
+														<!--Finish MODaL-->
+													{{pass}}
+												</div>
+											</td>
+											<td>
+												{{if act.grade == float(0):}}
+													<label style ="cursor:help;" title="{{=T('The grade of')}} '{{=cat.category.category}}' {{=T('is averaged.')}}">
+														{{=T('AG')}}
+													</label>
+												{{else:}}
+													{{=act.grade}}
+												{{pass}}
+											</td>
 											<td>{{=act.date_start}}</td>
 											<td>{{=act.date_finish}}</td>
 										{{else:}}
@@ -919,14 +1026,92 @@
 													{{exist=1}}
 													{{if change.operation_request=='delete':}}
 														<td><FONT COLOR="Red">{{=act.name}}</font></td>
-														<td><FONT COLOR="Red">{{=act.description}}</font></td>
-														<td><FONT COLOR="Red">{{=act.grade}}</font></td>
+														<td><FONT COLOR="Red">
+															<div style="width:200px;">
+																{{=act.description[:100]}}
+																{{if len(act.description) > 100:}}...
+																	<br>
+																	<div align="right">
+																		<a type="button" style ="cursor:pointer;" role="button" data-toggle="modal" data-target="#des_ShowR_modal_{{=act.id}}_{{=act.name}}" >{{=T('View more')}}</span></a>
+																	</div>
+															
+																	<!--MODAL -->
+																	<div id="des_ShowR_modal_{{=act.id}}_{{=act.name}}" class="modal hide fade" tabindex="-1" role="dialog"  aria-hidden="true"> 
+																	  <div class="modal-header">
+																	    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+																	      <h3 id="myModalLabel">
+																	          {{=act.name}}
+																	      </h3>
+																	  </div>
+																	  <div class="modal-body">
+																	    <div class="well">
+																	        <pre>
+																	           {{=act.description}}
+																	        </pre>
+																	    </div>
+																	  </div>
+																	  <div class="modal-footer">
+																	      <button class="btn" data-dismiss="modal" aria-hidden="true">{{=T('Close')}}</button>
+																	  </div>
+																	</div>
+																	<!--Finish MODaL-->
+																{{pass}}
+															</div>
+														</font></td>
+														<td><FONT COLOR="Red">
+															{{if act.grade == float(0):}}
+																<label style ="cursor:help;" title="{{=T('The grade of')}} '{{=cat.category.category}}' {{=T('is averaged.')}}">
+																	{{=T('AG')}}
+																</label>
+															{{else:}}
+																{{=act.grade}}
+															{{pass}}
+														</font></td>
 														<td><FONT COLOR="Red">{{=act.date_start}}</font></td>
 														<td><FONT COLOR="Red">{{=act.date_finish}}</font></td>
 													{{else:}}
 														<td><FONT COLOR="Blue">{{=change.name}}</font></td>
-														<td><FONT COLOR="Blue">{{=change.description}}</font></td>
-														<td><FONT COLOR="Blue">{{=change.grade}}</font></td>
+														<td><FONT COLOR="Blue">
+															<div style="width:200px;">
+																{{=change.description[:100]}}
+																{{if len(change.description) > 100:}}...
+																	<br>
+																	<div align="right">
+																		<a type="button" style ="cursor:pointer;" role="button" data-toggle="modal" data-target="#des_ShowR_modal_{{=change.id}}_{{=change.name}}" >{{=T('View more')}}</span></a>
+																	</div>
+															
+																	<!--MODAL -->
+																	<div id="des_ShowR_modal_{{=change.id}}_{{=change.name}}" class="modal hide fade" tabindex="-1" role="dialog"  aria-hidden="true"> 
+																	  <div class="modal-header">
+																	    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+																	      <h3 id="myModalLabel">
+																	          {{=change.name}}
+																	      </h3>
+																	  </div>
+																	  <div class="modal-body">
+																	    <div class="well">
+																	        <pre>
+																	           {{=change.description}}
+																	        </pre>
+																	    </div>
+																	  </div>
+																	  <div class="modal-footer">
+																	      <button class="btn" data-dismiss="modal" aria-hidden="true">{{=T('Close')}}</button>
+																	  </div>
+																	</div>
+																	<!--Finish MODaL-->
+																{{pass}}
+															</div>
+														</font></td>
+														<td><FONT COLOR="Blue">
+															{{if change.grade == float(0):}}
+																<label style ="cursor:help;" title="{{=T('The grade of')}} '{{=cat.category.category}}' {{=T('is averaged.')}}">
+																	{{=T('AG')}}
+																</label>
+															{{else:}}
+																{{=change.grade}}
+															{{pass}}
+														</font></td>
 														<td><FONT COLOR="Blue">{{=change.date_start}}</font></td>
 														<td><FONT COLOR="Blue">{{=change.date_finish}}</font></td>
 													{{pass}}
@@ -934,8 +1119,47 @@
 											{{pass}}
 											{{if exist==0:}}
 												<td>{{=act.name}}</td>
-												<td>{{=act.description}}</td>
-												<td>{{=act.grade}}</td>
+												<td>
+													<div style="width:200px;">
+														{{=act.description[:100]}}
+														{{if len(act.description) > 100:}}...
+															<br>
+															<div align="right">
+																<a type="button" style ="cursor:pointer;" role="button" data-toggle="modal" data-target="#des_ShowR_modal_{{=act.id}}_{{=act.name}}" >{{=T('View more')}}</span></a>
+															</div>
+													
+															<!--MODAL -->
+															<div id="des_ShowR_modal_{{=act.id}}_{{=act.name}}" class="modal hide fade" tabindex="-1" role="dialog"  aria-hidden="true"> 
+															  <div class="modal-header">
+															    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+															      <h3 id="myModalLabel">
+															          {{=act.name}}
+															      </h3>
+															  </div>
+															  <div class="modal-body">
+															    <div class="well">
+															        <pre>
+															           {{=act.description}}
+															        </pre>
+															    </div>
+															  </div>
+															  <div class="modal-footer">
+															      <button class="btn" data-dismiss="modal" aria-hidden="true">{{=T('Close')}}</button>
+															  </div>
+															</div>
+															<!--Finish MODaL-->
+														{{pass}}
+													</div>
+												</td>
+												<td>
+													{{if act.grade == float(0):}}
+														<label style ="cursor:help;" title="{{=T('The grade of')}} '{{=cat.category.category}}' {{=T('is averaged.')}}">
+															{{=T('AG')}}
+														</label>
+													{{else:}}
+														{{=act.grade}}
+													{{pass}}
+												</td>
 												<td>{{=act.date_start}}</td>
 												<td>{{=act.date_finish}}</td>
 											{{pass}}
@@ -948,8 +1172,47 @@
 											{{if change.operation_request=='insert':}}
 												<tr>
 													<td><FONT COLOR="Green">{{=change.name}}</font></td>
-													<td><FONT COLOR="Green">{{=change.description}}</font></td>
-													<td><FONT COLOR="Green">{{=change.grade}}</font></td>
+													<td><FONT COLOR="Green">
+														<div style="width:200px;">
+															{{=change.description[:100]}}
+															{{if len(change.description) > 100:}}...
+																<br>
+																<div align="right">
+																	<a type="button" style ="cursor:pointer;" role="button" data-toggle="modal" data-target="#des_ShowR_modal_{{=change.id}}_{{=change.name}}" >{{=T('View more')}}</span></a>
+																</div>
+														
+																<!--MODAL -->
+																<div id="des_ShowR_modal_{{=change.id}}_{{=change.name}}" class="modal hide fade" tabindex="-1" role="dialog"  aria-hidden="true"> 
+																  <div class="modal-header">
+																    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+																      <h3 id="myModalLabel">
+																          {{=change.name}}
+																      </h3>
+																  </div>
+																  <div class="modal-body">
+																    <div class="well">
+																        <pre>
+																           {{=change.description}}
+																        </pre>
+																    </div>
+																  </div>
+																  <div class="modal-footer">
+																      <button class="btn" data-dismiss="modal" aria-hidden="true">{{=T('Close')}}</button>
+																  </div>
+																</div>
+																<!--Finish MODaL-->
+															{{pass}}
+														</div>
+													</font></td>
+													<td><FONT COLOR="Green">
+														{{if change.grade == float(0):}}
+															<label style ="cursor:help;" title="{{=T('The grade of')}} '{{=cat.category.category}}' {{=T('is averaged.')}}">
+																{{=T('AG')}}
+															</label>
+														{{else:}}
+															{{=change.grade}}
+														{{pass}}
+													</font></td>
 													<td><FONT COLOR="Green">{{=change.date_start}}</font></td>
 													<td><FONT COLOR="Green">{{=change.date_finish}}</font></td>
 												</tr>
@@ -1151,8 +1414,47 @@
 								</td>
 							{{else:}}
 								<td>{{=act.name}}</td>
-								<td>{{=act.description}}</td>
-								<td>{{=act.grade}}</td>
+								<td>
+									<div style="width:200px;">
+										{{=act.description[:100]}}
+										{{if len(act.description) > 100:}}...
+											<br>
+											<div align="right">
+												<a type="button" style ="cursor:pointer;" role="button" data-toggle="modal" data-target="#des_ShowC_modal_{{=act.id}}_{{=act.name}}" >{{=T('View more')}}</span></a>
+											</div>
+									
+											<!--MODAL -->
+											<div id="des_ShowC_modal_{{=act.id}}_{{=act.name}}" class="modal hide fade" tabindex="-1" role="dialog"  aria-hidden="true"> 
+											  <div class="modal-header">
+											    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+											      <h3 id="myModalLabel">
+											          {{=act.name}}
+											      </h3>
+											  </div>
+											  <div class="modal-body">
+											    <div class="well">
+											        <pre>
+											           {{=act.description}}
+											        </pre>
+											    </div>
+											  </div>
+											  <div class="modal-footer">
+											      <button class="btn" data-dismiss="modal" aria-hidden="true">{{=T('Close')}}</button>
+											  </div>
+											</div>
+											<!--Finish MODaL-->
+										{{pass}}
+									</div>
+								</td>
+								<td>
+									{{if act.grade == float(0):}}
+										<label style ="cursor:help;" title="{{=T('The grade of')}} '{{=cat.category.category}}' {{=T('is averaged.')}}">
+											{{=T('AG')}}
+										</label>
+									{{else:}}
+										{{=act.grade}}
+									{{pass}}
+								</td>
 								<td>{{=act.date_start}}</td>
 								<td>{{=act.date_finish}}</td>
 							{{pass}}
@@ -1231,8 +1533,47 @@
 											</td>
 										{{else:}}
 											<td><FONT COLOR="Blue">{{=change.name}}</font></td>
-											<td><FONT COLOR="Blue">{{=change.description}}</font></td>
-											<td><FONT COLOR="Blue">{{=change.grade}}</font></td>
+											<td><FONT COLOR="Blue">
+												<div style="width:200px;">
+													{{=change.description[:100]}}
+													{{if len(change.description) > 100:}}...
+														<br>
+														<div align="right">
+															<a type="button" style ="cursor:pointer;" role="button" data-toggle="modal" data-target="#des_ShowC_modal_{{=change.id}}_{{=change.name}}" >{{=T('View more')}}</span></a>
+														</div>
+												
+														<!--MODAL -->
+														<div id="des_ShowC_modal_{{=change.id}}_{{=change.name}}" class="modal hide fade" tabindex="-1" role="dialog"  aria-hidden="true"> 
+														  <div class="modal-header">
+														    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+														      <h3 id="myModalLabel">
+														          {{=change.name}}
+														      </h3>
+														  </div>
+														  <div class="modal-body">
+														    <div class="well">
+														        <pre>
+														           {{=change.description}}
+														        </pre>
+														    </div>
+														  </div>
+														  <div class="modal-footer">
+														      <button class="btn" data-dismiss="modal" aria-hidden="true">{{=T('Close')}}</button>
+														  </div>
+														</div>
+														<!--Finish MODaL-->
+													{{pass}}
+												</div>
+											</font></td>
+											<td><FONT COLOR="Blue">
+												{{if change.grade == float(0):}}
+													<label style ="cursor:help;" title="{{=T('The grade of')}} '{{=cat.category.category}}' {{=T('is averaged.')}}">
+														{{=T('AG')}}
+													</label>
+												{{else:}}
+													{{=change.grade}}
+												{{pass}}
+											</font></td>
 											<td><FONT COLOR="Blue">{{=change.date_start}}</font></td>
 											<td><FONT COLOR="Blue">{{=change.date_finish}}</font></td>
 										{{pass}}
@@ -1310,8 +1651,47 @@
 									</td>
 								{{else:}}
 									<td>{{=act.name}}</td>
-									<td>{{=act.description}}</td>
-									<td>{{=act.grade}}</td>
+									<td>
+										<div style="width:200px;">
+											{{=act.description[:100]}}
+											{{if len(act.description) > 100:}}...
+												<br>
+												<div align="right">
+													<a type="button" style ="cursor:pointer;" role="button" data-toggle="modal" data-target="#des_ShowC_modal_{{=act.id}}_{{=act.name}}" >{{=T('View more')}}</span></a>
+												</div>
+										
+												<!--MODAL -->
+												<div id="des_ShowC_modal_{{=act.id}}_{{=act.name}}" class="modal hide fade" tabindex="-1" role="dialog"  aria-hidden="true"> 
+												  <div class="modal-header">
+												    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+												      <h3 id="myModalLabel">
+												          {{=act.name}}
+												      </h3>
+												  </div>
+												  <div class="modal-body">
+												    <div class="well">
+												        <pre>
+												           {{=act.description}}
+												        </pre>
+												    </div>
+												  </div>
+												  <div class="modal-footer">
+												      <button class="btn" data-dismiss="modal" aria-hidden="true">{{=T('Close')}}</button>
+												  </div>
+												</div>
+												<!--Finish MODaL-->
+											{{pass}}
+										</div>
+									</td>
+									<td>
+										{{if act.grade == float(0):}}
+											<label style ="cursor:help;" title="{{=T('The grade of')}} '{{=cat.category.category}}' {{=T('is averaged.')}}">
+												{{=T('AG')}}
+											</label>
+										{{else:}}
+											{{=act.grade}}
+										{{pass}}
+									</td>
 									<td>{{=act.date_start}}</td>
 									<td>{{=act.date_finish}}</td>
 								{{pass}}
@@ -1396,8 +1776,47 @@
 										</td>
 									{{else:}}
 										<td><FONT COLOR="Green">{{=change.name}}</font></td>
-										<td><FONT COLOR="Green">{{=change.description}}</font></td>
-										<td><FONT COLOR="Green">{{=change.grade}}</font></td>
+										<td><FONT COLOR="Green">
+											<div style="width:200px;">
+												{{=change.description[:100]}}
+												{{if len(change.description) > 100:}}...
+													<br>
+													<div align="right">
+														<a type="button" style ="cursor:pointer;" role="button" data-toggle="modal" data-target="#des_ShowC_modal_{{=change.id}}_{{=change.name}}" >{{=T('View more')}}</span></a>
+													</div>
+											
+													<!--MODAL -->
+													<div id="des_ShowC_modal_{{=change.id}}_{{=change.name}}" class="modal hide fade" tabindex="-1" role="dialog"  aria-hidden="true"> 
+													  <div class="modal-header">
+													    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+													      <h3 id="myModalLabel">
+													          {{=change.name}}
+													      </h3>
+													  </div>
+													  <div class="modal-body">
+													    <div class="well">
+													        <pre>
+													           {{=change.description}}
+													        </pre>
+													    </div>
+													  </div>
+													  <div class="modal-footer">
+													      <button class="btn" data-dismiss="modal" aria-hidden="true">{{=T('Close')}}</button>
+													  </div>
+													</div>
+													<!--Finish MODaL-->
+												{{pass}}
+											</div>
+										</font></td>
+										<td><FONT COLOR="Green">
+											{{if change.grade == float(0):}}
+												<label style ="cursor:help;" title="{{=T('The grade of')}} '{{=cat.category.category}}' {{=T('is averaged.')}}">
+													{{=T('AG')}}
+												</label>
+											{{else:}}
+												{{=change.grade}}
+											{{pass}}
+										</font></td>
 										<td><FONT COLOR="Green">{{=change.date_start}}</font></td>
 										<td><FONT COLOR="Green">{{=change.date_finish}}</font></td>
 									{{pass}}

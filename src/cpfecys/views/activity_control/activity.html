@@ -82,7 +82,7 @@
 		{{else:}}
 			{{activityTemp = db(db.course_activity.id==int(request.vars['var_id'])).select().first()}}
 			{{categoryTemp = db((db.course_activity_category.semester==semestre2.id) & (db.course_activity_category.assignation==var_project_id) & (db.course_activity_category.id==int(activityTemp.course_activity_category))).select().first()}}
-			{{Draft = db((db.requestchange_activity.status=='Draft')&(db.requestchange_activity.semester==semestre2.id)&(db.requestchange_activity.course==var_project_id)).select()}}
+			{{Draft = db((db.requestchange_activity.status=='Pending')&(db.requestchange_activity.semester==semestre2.id)&(db.requestchange_activity.course==var_project_id)).select()}}
 			{{if Draft.first()!=None:}}
 				{{for d in Draft:}}
 					{{if d.course_activity_category==categoryTemp.id:}}
@@ -301,7 +301,7 @@
 		{{else:}}
 			{{activityTemp = db(db.course_activity.id==int(request.vars['var_id'])).select().first()}}
 			{{categoryTemp = db((db.course_activity_category.semester==semestre2.id) & (db.course_activity_category.assignation==var_project_id) & (db.course_activity_category.id==int(activityTemp.course_activity_category))).select().first()}}
-			{{Draft = db((db.requestchange_activity.status=='Draft')&(db.requestchange_activity.semester==semestre2.id)&(db.requestchange_activity.course==var_project_id)).select()}}
+			{{Draft = db((db.requestchange_activity.status=='Pending')&(db.requestchange_activity.semester==semestre2.id)&(db.requestchange_activity.course==var_project_id)).select()}}
 			{{if Draft.first()!=None:}}
 				{{for d in Draft:}}
 					{{if d.course_activity_category==categoryTemp.id:}}
@@ -372,7 +372,7 @@
 			</script>
 		{{else:}}
 			{{categoryTemp = db((db.course_activity_category.semester==semestre2.id) & (db.course_activity_category.assignation==var_project_id) & (db.course_activity_category.id==int(request.vars['category_activity_id_var']))).select().first()}}
-			{{Draft = db((db.requestchange_activity.status=='Draft')&(db.requestchange_activity.semester==semestre2.id)&(db.requestchange_activity.course==var_project_id)).select()}}
+			{{Draft = db((db.requestchange_activity.status=='Pending')&(db.requestchange_activity.semester==semestre2.id)&(db.requestchange_activity.course==var_project_id)).select()}}
 			{{if Draft.first()!=None:}}
 				{{for d in Draft:}}
 					{{if d.course_activity_category==categoryTemp.id:}}
@@ -961,7 +961,7 @@
 												<input type="checkbox" name="edit_TPA_check"  id="edit_TPA_check">
 											{{pass}}						
 										{{else:}}
-											{{=str(tAct.teacher_permition)}}
+											{{=T(str(tAct.teacher_permition))}}
 										{{pass}}
 									</td>
 									{{if request.vars['op'] != "showTableNoEditable" and no_menu==False:}}
@@ -1266,4 +1266,4 @@
       <button class="btn" data-dismiss="modal" aria-hidden="true">{{=T('Close')}}</button>
   </div>
 </div>
-<!--Finish help_modal_request_change_activity-->
+<!--Finish help_modal_request_change_activity-->s
