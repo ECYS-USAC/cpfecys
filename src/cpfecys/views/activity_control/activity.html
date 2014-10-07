@@ -82,7 +82,7 @@
 		{{else:}}
 			{{activityTemp = db(db.course_activity.id==int(request.vars['var_id'])).select().first()}}
 			{{categoryTemp = db((db.course_activity_category.semester==semestre2.id) & (db.course_activity_category.assignation==var_project_id) & (db.course_activity_category.id==int(activityTemp.course_activity_category))).select().first()}}
-			{{Draft = db((db.requestchange_activity.status=='Draft')&(db.requestchange_activity.semester==semestre2.id)&(db.requestchange_activity.course==var_project_id)).select()}}
+			{{Draft = db((db.requestchange_activity.status=='Pending')&(db.requestchange_activity.semester==semestre2.id)&(db.requestchange_activity.course==var_project_id)).select()}}
 			{{if Draft.first()!=None:}}
 				{{for d in Draft:}}
 					{{if d.course_activity_category==categoryTemp.id:}}
@@ -111,9 +111,9 @@
 		{{pass}}
 
 		{{if date1==None or date2==None:}}
-			<center>
-				<span id="information_text" class="badge badge-important">{{=T('One of the date or both are incorrect')}}</span>
-			</center>
+			<script type="text/javascript">
+				alert("{{=T('One of the date or both are incorrect')}}");
+			</script>
 		{{else:}}
 			{{actualSemester = db(db.period_year.id==semestre2).select().first()}}
 			{{comparacion = T(actualSemester.period.name)+" "+str(actualSemester.yearp)}}
@@ -135,18 +135,18 @@
 							{{dateC1=d0['fecha']}}
 						{{pass}}
 						{{if str(date2)>str(dateC1):}}
-							<center>
-								<span id="information_text" class="badge badge-important">{{=T('The maximum number of days of activities in this category is')}} {{=str(categoryTemp.category.timeout)}}</span>
-							</center>
+							<script type="text/javascript">
+								alert("{{=T('The maximum number of days of activities in this category is')}} {{=str(categoryTemp.category.timeout)}}");
+							</script>
 						{{else:}}
 							{{maximTimeCategory = db.executesql('SELECT DATE_ADD(\''+str(date2)+'\', INTERVAL '+str(date_var.timeout_income_notes)+' Day) as fecha;',as_dict=True)}}
 							{{for d0 in maximTimeCategory:}}
 								{{dateC2=d0['fecha']}}
 							{{pass}}
 							{{if str(dateC2)>str(date_var.date_finish_semester):}}
-								<center>
-									<span id="information_text" class="badge badge-important">{{=T('The end date of the activity over the time you have to enter notes exceeds timeout semester')}}</span>
-								</center>
+								<script type="text/javascript">
+									alert("{{=T('The end date of the activity over the time you have to enter notes exceeds timeout semester')}}");
+								</script>
 							{{else:}}
 								{{comprobation=True}}
 							{{pass}}
@@ -165,9 +165,9 @@
 					{{total_Names=0}}
 				    {{if activityOldR.course_activity_category.specific_grade==True:}}
 				    	{{if float(request.vars['edit_field_grade_var'])==float(0):}}
-					    	<center>
-								<span id="information_text" class="badge badge-important">{{=T('The grade can not be 0')}}</span>
-							</center>
+							<script type="text/javascript">
+								alert("{{=T('The grade can not be 0')}}");
+							</script>
 						{{else:}}
 							{{total_var2E=float(request.vars['edit_field_grade_var'])}}
 							{{totalCategoryE=float(activityOldR.course_activity_category.grade)}}
@@ -180,14 +180,14 @@
 								{{pass}}
 							{{pass}}
 							{{if total_Names>0:}}
-								<center>
-									<span id="information_text" class="badge badge-important">{{=T('the name of the registered activity already exists.')}}</span>
-								</center>
+								<script type="text/javascript">
+									alert("{{=T('the name of the registered activity already exists.')}}");
+								</script>
 							{{else:}}
 								{{if total_var2E>totalCategoryE:}}
-									<center>
-										<span id="information_text" class="badge badge-important">{{=T('The sum of the ratings of the activities exceeds the limit of the category') }}  ({{=str(total_var2E)}} / {{=str(totalCategoryE)}})</span>
-									</center>
+									<script type="text/javascript">
+										alert("{{=T('The sum of the ratings of the activities exceeds the limit of the category') }}  ({{=str(total_var2E)}} / {{=str(totalCategoryE)}})");
+									</script>
 								{{else:}}
 									{{rolLog=''}}
 									{{if auth.has_membership('Ecys-Administrator')==True:}}
@@ -233,9 +233,9 @@
 							{{pass}}
 						{{pass}}
 						{{if total_Names>0:}}
-							<center>
-								<span id="information_text" class="badge badge-important">{{=T('the name of the registered activity already exists.')}}</span>
-							</center>
+							<script type="text/javascript">
+								alert("{{=T('the name of the registered activity already exists.')}}");
+							</script>
 						{{else:}}
 							{{rolLog=''}}
 							{{if auth.has_membership('Ecys-Administrator')==True:}}
@@ -275,9 +275,9 @@
 				    {{pass}}
 				{{pass}}
 			{{else:}}
-				<center>
-					<span id="information_text" class="badge badge-important">{{=T('The date range of activities are not within the range of the semester')}} ({{=date_var.date_start_semester}} - {{=date_var.date_finish_semester}})</span>
-				</center>
+				<script type="text/javascript">
+					alert("{{=T('The date range of activities are not within the range of the semester')}} ({{=date_var.date_start_semester}} - {{=date_var.date_finish_semester}})");
+				</script>
 			{{pass}}
 		{{pass}}
 	{{pass}}
@@ -301,7 +301,7 @@
 		{{else:}}
 			{{activityTemp = db(db.course_activity.id==int(request.vars['var_id'])).select().first()}}
 			{{categoryTemp = db((db.course_activity_category.semester==semestre2.id) & (db.course_activity_category.assignation==var_project_id) & (db.course_activity_category.id==int(activityTemp.course_activity_category))).select().first()}}
-			{{Draft = db((db.requestchange_activity.status=='Draft')&(db.requestchange_activity.semester==semestre2.id)&(db.requestchange_activity.course==var_project_id)).select()}}
+			{{Draft = db((db.requestchange_activity.status=='Pending')&(db.requestchange_activity.semester==semestre2.id)&(db.requestchange_activity.course==var_project_id)).select()}}
 			{{if Draft.first()!=None:}}
 				{{for d in Draft:}}
 					{{if d.course_activity_category==categoryTemp.id:}}
@@ -372,7 +372,7 @@
 			</script>
 		{{else:}}
 			{{categoryTemp = db((db.course_activity_category.semester==semestre2.id) & (db.course_activity_category.assignation==var_project_id) & (db.course_activity_category.id==int(request.vars['category_activity_id_var']))).select().first()}}
-			{{Draft = db((db.requestchange_activity.status=='Draft')&(db.requestchange_activity.semester==semestre2.id)&(db.requestchange_activity.course==var_project_id)).select()}}
+			{{Draft = db((db.requestchange_activity.status=='Pending')&(db.requestchange_activity.semester==semestre2.id)&(db.requestchange_activity.course==var_project_id)).select()}}
 			{{if Draft.first()!=None:}}
 				{{for d in Draft:}}
 					{{if d.course_activity_category==categoryTemp.id:}}
@@ -401,9 +401,9 @@
 		{{pass}}
 
 		{{if date1==None or date2==None:}}
-			<center>
-				<span id="information_text" class="badge badge-important">{{=T('One of the date or both are incorrect')}}</span>
-			</center>
+			<script type="text/javascript"> 
+				alert("{{=T('One of the date or both are incorrect')}}"); 
+			</script>
 		{{else:}}
 			{{actualSemester = db(db.period_year.id==semestre2).select().first()}}
 			{{comparacion = T(actualSemester.period.name)+" "+str(actualSemester.yearp)}}
@@ -426,18 +426,18 @@
 							{{dateC1=d0['fecha']}}
 						{{pass}}
 						{{if str(date2)>str(dateC1):}}
-							<center>
-								<span id="information_text" class="badge badge-important">{{=T('The maximum number of days of activities in this category is')}} {{=str(categoryTemp.category.timeout)}}</span>
-							</center>
+							<script type="text/javascript"> 
+								alert("{{=T('The maximum number of days of activities in this category is')}} {{=str(categoryTemp.category.timeout)}}");
+							</script>
 						{{else:}}
 							{{maximTimeCategory = db.executesql('SELECT DATE_ADD(\''+str(date2)+'\', INTERVAL '+str(date_var.timeout_income_notes)+' Day) as fecha;',as_dict=True)}}
 							{{for d0 in maximTimeCategory:}}
 								{{dateC2=d0['fecha']}}
 							{{pass}}
 							{{if str(dateC2)>str(date_var.date_finish_semester):}}
-								<center>
-									<span id="information_text" class="badge badge-important">{{=T('The end date of the activity over the time you have to enter notes exceeds timeout semester')}}</span>
-								</center>
+								<script type="text/javascript"> 
+									alert("{{=T('The end date of the activity over the time you have to enter notes exceeds timeout semester')}}");
+								</script>
 							{{else:}}
 								{{comprobation=True}}
 							{{pass}}
@@ -561,19 +561,19 @@
 								                                after_date_start = request.vars['dateInit_var'],
 								                                after_date_finish = request.vars['dateEnd_var'])}}
 					{{elif request.vars['field_grade_var']!="nada" and total_var2>totalCategory:}}
-						<center>
-							<span id="information_text" class="badge badge-important">{{=T('The sum of the ratings of the activities exceeds the limit of the category') }}  ({{=str(total_var2)}} / {{=str(totalCategory)}})</span>
-						</center>
+						<script type="text/javascript"> 
+							alert("{{=T('The sum of the ratings of the activities exceeds the limit of the category') }}  ({{=str(total_var2)}} / {{=str(totalCategory)}})");
+						</script>
 					{{elif existName=='true':}}
-						<center>
-							<span id="information_text" class="badge badge-important">{{=T('the name of the registered activity already exists.')}}</span>
-						</center>
+						<script type="text/javascript"> 
+							alert("{{=T('the name of the registered activity already exists.')}}");
+						</script>
 					{{pass}}
 				{{pass}}
 			{{else:}}
-				<center>
-					<span id="information_text" class="badge badge-important">{{=T('The date range of activities are not within the range of the semester')}} ({{=date_var.date_start_semester}} - {{=date_var.date_finish_semester}})</span>
-				</center>
+				<script type="text/javascript"> 
+					alert("{{=T('The date range of activities are not within the range of the semester')}} ({{=date_var.date_start_semester}} - {{=date_var.date_finish_semester}})");
+				</script>
 			{{pass}}
 		{{pass}}
 	{{pass}}
@@ -961,7 +961,7 @@
 												<input type="checkbox" name="edit_TPA_check"  id="edit_TPA_check">
 											{{pass}}						
 										{{else:}}
-											{{=str(tAct.teacher_permition)}}
+											{{=T(str(tAct.teacher_permition))}}
 										{{pass}}
 									</td>
 									{{if request.vars['op'] != "showTableNoEditable" and no_menu==False:}}
@@ -1266,4 +1266,4 @@
       <button class="btn" data-dismiss="modal" aria-hidden="true">{{=T('Close')}}</button>
   </div>
 </div>
-<!--Finish help_modal_request_change_activity-->
+<!--Finish help_modal_request_change_activity-->s
