@@ -928,8 +928,7 @@ db.define_table('grades',
 )
 
 db.define_table('grades_log',    
-    Field('user_name_before', 'string', notnull = False, label = T('User Name Before')),
-    Field('user_name_after', 'string', notnull = False, label = T('User Name After')),
+    Field('user_name', 'string', notnull = False, label = T('User Name Before')),
     Field('roll', 'string', notnull = False, label = T('Role')),
     Field('operation_log', 'string', notnull = False, label = T('Operation')),
     Field('academic_assignation_id', 'string', notnull = False, label = T('Academic Assignation Id')),

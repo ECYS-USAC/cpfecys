@@ -15,7 +15,7 @@
 
       {{if grade != None:}}
         {{#--------------------------------------------log-------------------------------------}}
-        {{db.grades_log.insert(user_name_after = auth.user.username,
+        {{db.grades_log.insert(user_name = auth.user.username,
                           roll = rol_log,
                           operation_log = 'insert',
                           academic_assignation_id = assig_var.id,
@@ -60,7 +60,7 @@
     {{grade_var = db(db.grades.id==request.vars['grade_id']).select().first()}}
     {{db(db.grades.id==request.vars['grade_id']).delete()}}
     {{#--------------------------------------------log-------------------------------------}}
-    {{db.grades_log.insert(user_name_after = auth.user.username,
+    {{db.grades_log.insert(user_name = auth.user.username,
                       roll = rol_log,
                       operation_log = 'delete',
                       academic_assignation_id = grade_var.academic_assignation.id,
@@ -71,7 +71,7 @@
                       category = grade_var.activity.course_activity_category.category.category,
                       period = T(grade_var.academic_assignation.semester.period.name),
                       yearp = grade_var.academic_assignation.semester.yearp,
-                      after_grade = grade_var.grade,
+                      before_grade = grade_var.grade,
                       description = T('Delete from Grades page')
                        )}}
     {{request.vars['op']="view_grades"}}
