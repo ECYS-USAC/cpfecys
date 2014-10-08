@@ -189,40 +189,46 @@
 										alert("{{=T('The sum of the ratings of the activities exceeds the limit of the category') }}  ({{=str(total_var2E)}} / {{=str(totalCategoryE)}})");
 									</script>
 								{{else:}}
-									{{rolLog=''}}
-									{{if auth.has_membership('Ecys-Administrator')==True:}}
-										{{rolLog='Ecys-Administrator'}}
-									{{elif auth.has_membership('Super-Administrator')==True:}}
-										{{rolLog='Super-Administrator'}}
-									{{elif auth.has_membership('Teacher')==True:}}
-										{{rolLog='Teacher'}}
-									{{elif auth.has_membership('Student')==True:}}
-										{{rolLog='Student'}}
+									{{tipooo=True}}
+									{{if request.vars['edit_TPA_var']=='false':}}
+										{{tipooo=False}}
 									{{pass}}
-									{{db.course_activity_log.insert(user_name=auth.user.username,
-																			roll=rolLog,
-																			operation_log='update',
-																			course= project_var.name,
-																			yearp=semestre2.yearp,
-																			period=T(semestre2.period.name),
-																			metric='T',
-																			before_course_activity_category=activityOldR.course_activity_category.category.category,
-																			before_name=activityOldR.name,
-																			before_description=activityOldR.description,
-											                                before_grade =  activityOldR.grade,
-											                                before_laboratory = activityOldR.laboratory,
-											                                before_teacher_permition = activityOldR.teacher_permition,
-											                                before_date_start = activityOldR.date_start,
-											                                before_date_finish = activityOldR.date_finish,
-											                                after_course_activity_category=activityOldR.course_activity_category.category.category,
-											                                after_name = request.vars['edit_activity_name1_var'],
-											                                after_description =  request.vars['edit_activity_description_var'],
-											                                after_grade =  float(request.vars['edit_field_grade_var']),
-											                                after_laboratory = activityOldR.laboratory,
-											                                after_teacher_permition = request.vars['edit_TPA_var'],
-											                                after_date_start =  request.vars['edit_dateInit_var'],
-											                                after_date_finish = request.vars['edit_dateEnd_var'])}}
-									{{db(db.course_activity.id==request.vars['var_id']).update(name = request.vars['edit_activity_name1_var'], description =  request.vars['edit_activity_description_var'], grade =  float(request.vars['edit_field_grade_var']), date_start =  request.vars['edit_dateInit_var'], date_finish = request.vars['edit_dateEnd_var'], teacher_permition = request.vars['edit_TPA_var'])}}
+									{{if request.vars['edit_activity_name1_var']!=activityOldR.name or activityOldR.description!=request.vars['edit_activity_description_var'] or activityOldR.grade!=float(request.vars['edit_field_grade_var']) or activityOldR.teacher_permition!=tipooo or activityOldR.date_start!=date1 or activityOldR.date_finish!=date2:}}
+										{{rolLog=''}}
+										{{if auth.has_membership('Ecys-Administrator')==True:}}
+											{{rolLog='Ecys-Administrator'}}
+										{{elif auth.has_membership('Super-Administrator')==True:}}
+											{{rolLog='Super-Administrator'}}
+										{{elif auth.has_membership('Teacher')==True:}}
+											{{rolLog='Teacher'}}
+										{{elif auth.has_membership('Student')==True:}}
+											{{rolLog='Student'}}
+										{{pass}}
+										{{db.course_activity_log.insert(user_name=auth.user.username,
+																				roll=rolLog,
+																				operation_log='update',
+																				course= project_var.name,
+																				yearp=semestre2.yearp,
+																				period=T(semestre2.period.name),
+																				metric='T',
+																				before_course_activity_category=activityOldR.course_activity_category.category.category,
+																				before_name=activityOldR.name,
+																				before_description=activityOldR.description,
+												                                before_grade =  activityOldR.grade,
+												                                before_laboratory = activityOldR.laboratory,
+												                                before_teacher_permition = activityOldR.teacher_permition,
+												                                before_date_start = activityOldR.date_start,
+												                                before_date_finish = activityOldR.date_finish,
+												                                after_course_activity_category=activityOldR.course_activity_category.category.category,
+												                                after_name = request.vars['edit_activity_name1_var'],
+												                                after_description =  request.vars['edit_activity_description_var'],
+												                                after_grade =  float(request.vars['edit_field_grade_var']),
+												                                after_laboratory = activityOldR.laboratory,
+												                                after_teacher_permition = request.vars['edit_TPA_var'],
+												                                after_date_start =  request.vars['edit_dateInit_var'],
+												                                after_date_finish = request.vars['edit_dateEnd_var'])}}
+										{{db(db.course_activity.id==request.vars['var_id']).update(name = request.vars['edit_activity_name1_var'], description =  request.vars['edit_activity_description_var'], grade =  float(request.vars['edit_field_grade_var']), date_start =  request.vars['edit_dateInit_var'], date_finish = request.vars['edit_dateEnd_var'], teacher_permition = request.vars['edit_TPA_var'])}}
+									{{pass}}
 								{{pass}}
 							{{pass}}
 						{{pass}}
@@ -237,40 +243,46 @@
 								alert("{{=T('the name of the registered activity already exists.')}}");
 							</script>
 						{{else:}}
-							{{rolLog=''}}
-							{{if auth.has_membership('Ecys-Administrator')==True:}}
-								{{rolLog='Ecys-Administrator'}}
-							{{elif auth.has_membership('Super-Administrator')==True:}}
-								{{rolLog='Super-Administrator'}}
-							{{elif auth.has_membership('Teacher')==True:}}
-								{{rolLog='Teacher'}}
-							{{elif auth.has_membership('Student')==True:}}
-								{{rolLog='Student'}}
+							{{tipooo=True}}
+							{{if request.vars['edit_TPA_var']=='false':}}
+								{{tipooo=False}}
 							{{pass}}
-							{{db.course_activity_log.insert(user_name=auth.user.username,
-																	roll=rolLog,
-																	operation_log='update',
-																	course= project_var.name,
-																	yearp=semestre2.yearp,
-																	period=T(semestre2.period.name),
-																	metric='T',
-																	before_course_activity_category=activityOldR.course_activity_category.category.category,
-																	before_name=activityOldR.name,
-																	before_description=activityOldR.description,
-									                                before_grade =  activityOldR.grade,
-									                                before_laboratory = activityOldR.laboratory,
-									                                before_teacher_permition = activityOldR.teacher_permition,
-									                                before_date_start = activityOldR.date_start,
-									                                before_date_finish = activityOldR.date_finish,
-									                                after_course_activity_category=activityOldR.course_activity_category.category.category,
-									                                after_name = request.vars['edit_activity_name1_var'],
-									                                after_description =  request.vars['edit_activity_description_var'],
-									                                after_grade =  float(0),
-									                                after_laboratory = activityOldR.laboratory,
-									                                after_teacher_permition = request.vars['edit_TPA_var'],
-									                                after_date_start =  request.vars['edit_dateInit_var'],
-									                                after_date_finish = request.vars['edit_dateEnd_var'])}}
-							{{db(db.course_activity.id==request.vars['var_id']).update(name = request.vars['edit_activity_name1_var'], description =  request.vars['edit_activity_description_var'], grade =  float(0), date_start =  request.vars['edit_dateInit_var'], date_finish = request.vars['edit_dateEnd_var'], teacher_permition = request.vars['edit_TPA_var'])}}
+							{{if request.vars['edit_activity_name1_var']!=activityOldR.name or activityOldR.description!=request.vars['edit_activity_description_var'] or activityOldR.teacher_permition!=tipooo or activityOldR.date_start!=date1 or activityOldR.date_finish!=date2:}}
+								{{rolLog=''}}
+								{{if auth.has_membership('Ecys-Administrator')==True:}}
+									{{rolLog='Ecys-Administrator'}}
+								{{elif auth.has_membership('Super-Administrator')==True:}}
+									{{rolLog='Super-Administrator'}}
+								{{elif auth.has_membership('Teacher')==True:}}
+									{{rolLog='Teacher'}}
+								{{elif auth.has_membership('Student')==True:}}
+									{{rolLog='Student'}}
+								{{pass}}
+								{{db.course_activity_log.insert(user_name=auth.user.username,
+																		roll=rolLog,
+																		operation_log='update',
+																		course= project_var.name,
+																		yearp=semestre2.yearp,
+																		period=T(semestre2.period.name),
+																		metric='T',
+																		before_course_activity_category=activityOldR.course_activity_category.category.category,
+																		before_name=activityOldR.name,
+																		before_description=activityOldR.description,
+										                                before_grade =  activityOldR.grade,
+										                                before_laboratory = activityOldR.laboratory,
+										                                before_teacher_permition = activityOldR.teacher_permition,
+										                                before_date_start = activityOldR.date_start,
+										                                before_date_finish = activityOldR.date_finish,
+										                                after_course_activity_category=activityOldR.course_activity_category.category.category,
+										                                after_name = request.vars['edit_activity_name1_var'],
+										                                after_description =  request.vars['edit_activity_description_var'],
+										                                after_grade =  float(0),
+										                                after_laboratory = activityOldR.laboratory,
+										                                after_teacher_permition = request.vars['edit_TPA_var'],
+										                                after_date_start =  request.vars['edit_dateInit_var'],
+										                                after_date_finish = request.vars['edit_dateEnd_var'])}}
+								{{db(db.course_activity.id==request.vars['var_id']).update(name = request.vars['edit_activity_name1_var'], description =  request.vars['edit_activity_description_var'], grade =  float(0), date_start =  request.vars['edit_dateInit_var'], date_finish = request.vars['edit_dateEnd_var'], teacher_permition = request.vars['edit_TPA_var'])}}
+							{{pass}}
 						{{pass}}
 				    {{pass}}
 				{{pass}}
@@ -727,8 +739,7 @@
 					<a type="button" style ="cursor:pointer;" title="{{=T('Help')}}" role="button" data-toggle="modal" data-target="#help_modal_weighting"  >
 	                    <span class="icon-white icon-question-sign"></span>
 	                </a>
-					Estas actividades no afectaran la nota del curso,<br> puesto que no se encuentra la categoria laboratorio en la ponderación del curso
-					
+	                {{=T('These activities do not affect the course grade,')}}<br>{{=T('since there is the category weighting laboratory course')}}
 				</span>
 			{{pass}}
 		{{pass}}
@@ -737,20 +748,28 @@
 				<table>
 					<tr>
 						<td>
-							<span class="label label-success">&nbsp;&nbsp;&nbsp;</span>&nbsp;<b>Notas Arriba del Promedio</b>
+							<span class="label label-success">&nbsp;&nbsp;&nbsp;</span>&nbsp;<b>{{=T('Notes above average')}} </b>
 						</td>
 						<td></td>
 						<td>
-							<span class="label label-warning">&nbsp;&nbsp;&nbsp;</span>&nbsp;<b>Notas en el Promedio</b>
+							<span class="label label-warning">&nbsp;&nbsp;&nbsp;</span>&nbsp;<b>{{=T('Notes on the average')}} </b>
 						</td>
 						<td></td>
 				 		<td>
-				 			<span class="label label-important">&nbsp;&nbsp;&nbsp;</span>&nbsp;<b>Notas Abajo del Promedio</b>
+				 			<span class="label label-important">&nbsp;&nbsp;&nbsp;</span>&nbsp;<b>{{=T('Notes Below Average')}}</b>
 				 		</td>
 					</tr>
 				</table>
 			{{pass}}
 		{{pass}}
+		{{if request.vars['op'] == "showTableNoEditable":}}
+			<a id="activityButtonlecaja" role="button" onclick="visibleLecaJa();"> 
+	    		{{=T('Detail')}}
+	    	</a>
+	    	<a id="activityButtonlecaja2" role="button" onclick="visibleNoLecaJa();" style="display:none;"> 
+	    		{{=T('Close Detail')}}
+	    	</a>
+    	{{pass}}
 	  <center>
 	  	<table class="table table-striped table-bordered">
 			{{if type=="class":}}
@@ -786,7 +805,11 @@
 						  			<th>
 										{{=T('Name')}}
 									</th>
-									<th>
+									{{if request.vars['op'] == "showTableNoEditable":}}
+										<th class="showTableNoEditableDetail" style="display:none;">
+									{{else:}}
+										<th>
+									{{pass}}
 										{{=T('Description')}}
 									</th>
 									<th>
@@ -798,7 +821,11 @@
 									<th style="white-space:initial;">
 										{{=T('End Time')}}
 									</th>
-									<th title="{{=T('Teacher Permition')}}">
+									{{if request.vars['op'] == "showTableNoEditable":}}
+										<th class="showTableNoEditableDetail" style="display:none;" title="{{=T('Teacher Permition')}}">
+									{{else:}}
+										<th title="{{=T('Teacher Permition')}}">
+									{{pass}}
 										{{=T('TP')}}
 									</th>
 									{{if request.vars['op'] == "showTableNoEditable":}}
@@ -880,7 +907,11 @@
 											{{=tAct.name}}
 										{{pass}}
 									</td>
-									<td>
+									{{if request.vars['op'] == "showTableNoEditable":}}
+										<td class="showTableNoEditableDetail" style="display:none;">
+									{{else:}}
+										<td>
+									{{pass}}
 										{{if editable_var=='true':}}
 											<textarea class="string" cols="40" type="text" id="edit_activity_description" style="width:240px; height:100px;">{{=tAct.description}}</textarea>
 										{{else:}}
@@ -919,7 +950,11 @@
 									<td>
 										{{if editable_var=='true':}}
 											{{if tAct.course_activity_category.specific_grade==True:}}
-												<input class="string" id="edit_field_grade" type="text" value="{{=tAct.grade}}" style="width:40px;">
+												{{if tAct.name=='Examen Final':}}
+													<input class="string" id="edit_field_grade" type="text" value="{{=tAct.grade}}" style="width:40px;" disabled>
+												{{else:}}
+													<input class="string" id="edit_field_grade" type="text" value="{{=tAct.grade}}" style="width:40px;">
+												{{pass}}
 											{{else:}}
 												<input class="string" id="edit_field_grade" type="text" value="{{=tAct.grade}}" style="width:40px;" disabled>
 											{{pass}}
@@ -953,7 +988,11 @@
 											{{=tAct.date_finish}}
 										{{pass}}
 									</td>
-									<td>
+									{{if request.vars['op'] == "showTableNoEditable":}}
+										<td class="showTableNoEditableDetail" style="display:none;">
+									{{else:}}
+										<td>
+									{{pass}}
 										{{if editable_var=='true' and request.vars['type'] == 'class' and auth.has_membership('Student')==False:}}
 											{{if str(tAct.teacher_permition) =='True':}}
 												<input type="checkbox" name="edit_TPA_check"  id="edit_TPA_check" checked>
@@ -1036,7 +1075,6 @@
 														{{average=float(d0['average'])}}
 													{{pass}}
 												{{pass}}
-												
 												{{actualSemester = db(db.period_year.id==semestre2).select().first()}}
 												{{comparacion = T(actualSemester.period.name)+" "+str(actualSemester.yearp)}}
 												{{controlP = db((db.student_control_period.period_name==comparacion)).select().first()}}
@@ -1058,9 +1096,38 @@
 												<center>
 												{{if auth.has_membership('Student'):}}
 													{{if request.vars['type']=="lab" or exception_s_var == True or tAct.teacher_permition==True or tAct.course_activity_category.teacher_permition==True:}}
-														<a id="gradeButton" role="button" class="badge btn-info" href="{{=URL('activity_control','control_students_grades', vars=dict(project=project_var.id, year=semestre2.id, activity=tAct.id))}}">
-								                    		<span class="icon-white icon-edit"></span>{{=T('Grades')}}
-								                    	</a>
+														{{if request.vars['type']=="lab":}}
+															{{from datetime import datetime}}
+															{{var_do_Grade='false'}}
+															{{actualSemester = db(db.period_year.id==semestre2).select().first()}}
+															{{comparacion = T(actualSemester.period.name)+" "+str(actualSemester.yearp)}}
+															{{controlP = db((db.student_control_period.period_name==comparacion)).select().first()}}
+
+															{{maximTimeGrade = db.executesql('SELECT DATE_ADD(\''+str(tAct.date_finish)+'\', INTERVAL '+str(controlP.timeout_income_notes)+' Day) as fechaMaxGrade;',as_dict=True)}}
+															{{dateGrade0=''}}
+															{{for d0 in maximTimeGrade:}}
+																{{dateGrade0=d0['fechaMaxGrade']}}
+															{{pass}}
+															{{if str(datetime.now()) <= str(dateGrade0):}}
+																{{var_do_Grade='true'}}
+															{{pass}}
+															{{if var_do_Grade=='true':}}
+																<a id="gradeButton" role="button" class="badge btn-info" href="{{=URL('activity_control','control_students_grades', vars=dict(project=project_var.id, year=semestre2.id, activity=tAct.id))}}">
+										                    		<span class="showTableNoEditableNoDetail icon-white icon-edit"></span>
+										                    		<label class="showTableNoEditableDetail"  style="display:none;">{{=T('Grades')}} </label>
+										                    	</a>
+															{{else:}}
+																<a id="gradeButton" role="button" class="badge btn-warning" href="{{=URL('activity_control','control_students_grades', vars=dict(project=project_var.id, year=semestre2.id, activity=tAct.id))}}">
+																	<span  class="showTableNoEditableNoDetail icon-white icon-random"></span>
+																	<label class="showTableNoEditableDetail" style="display:none;">Solicitar<br>Cambio</label>
+										                    	</a>
+															{{pass}}
+														{{else:}}
+															<a id="gradeButton" role="button" class="badge btn-info" href="{{=URL('activity_control','control_students_grades', vars=dict(project=project_var.id, year=semestre2.id, activity=tAct.id))}}">
+									                    		<span class="showTableNoEditableNoDetail icon-white icon-edit"></span>
+										                    	<label class="showTableNoEditableDetail"  style="display:none;">{{=T('Grades')}} </label>
+									                    	</a>
+														{{pass}}
 													{{else:}}
 														<!--Grade of the activity-->
 														{{=T('No action')}}
@@ -1068,7 +1135,8 @@
 													{{pass}}
 												{{else:}}
 													<a id="gradeButton" role="button" class="badge btn-info" href="{{=URL('activity_control','control_students_grades', vars=dict(project=project_var.id, year=semestre2.id, activity=tAct.id))}}">
-							                    		<span class="icon-white icon-edit"></span>{{=T('Grades')}}
+							                    		<span class="showTableNoEditableNoDetail icon-white icon-edit"></span>
+										                <label class="showTableNoEditableDetail"  style="display:none;">{{=T('Grades')}} </label>
 							                    	</a>
 												{{pass}}
 												</center>
@@ -1240,6 +1308,22 @@
 			$("#activityDiv").load("{{=URL('activity_control','activity.html')}}?op=showInsert&amp;project={{=request.vars['project']}}&amp;year={{=request.vars['year']}}&amp;type={{=request.vars['type']}}");
 		}
 	}
+
+	{{if request.vars['op'] == "showTableNoEditable":}}
+		function visibleLecaJa(){
+			$("#activityButtonlecaja").css("display", "none");
+			$("#activityButtonlecaja2").css("display", "table-cell");
+			$(".showTableNoEditableDetail").css("display", "table-cell");
+			$(".showTableNoEditableNoDetail").css("display", "none");
+		}
+
+		function visibleNoLecaJa(){
+			$("#activityButtonlecaja").css("display", "table-cell");
+			$("#activityButtonlecaja2").css("display", "none");
+			$(".showTableNoEditableDetail").css("display", "none");
+			$(".showTableNoEditableNoDetail").css("display", "table-cell");
+		}
+	{{pass}}
 </script>
 
 <!--help_modal_request_change_activity -->

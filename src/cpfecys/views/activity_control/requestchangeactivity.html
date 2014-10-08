@@ -520,7 +520,9 @@
 									{{if change==0:}}
 										{{for c2 in tActivities:}}
 											{{if request.vars['var_id'] == str(c2.id) and request.vars['var_name'] == c2.name:}}
-												{{db.requestchange_course_activity.insert(requestchange_activity=Draft.id, operation_request = 'update', name=request.vars['edit_activity_name1_var'], description = request.vars['edit_activity_description_var'], grade = float(request.vars['edit_field_grade_var']), date_start = request.vars['edit_dateInit_var'], date_finish=request.vars['edit_dateEnd_var'],activity=c2.id)}}
+												{{if request.vars['edit_activity_name1_var']!=c2.name or c2.description!=request.vars['edit_activity_description_var'] or c2.grade!=float(request.vars['edit_field_grade_var']) or c2.date_start!=date1 or c2.date_finish!=date2:}}
+													{{db.requestchange_course_activity.insert(requestchange_activity=Draft.id, operation_request = 'update', name=request.vars['edit_activity_name1_var'], description = request.vars['edit_activity_description_var'], grade = float(request.vars['edit_field_grade_var']), date_start = request.vars['edit_dateInit_var'], date_finish=request.vars['edit_dateEnd_var'],activity=c2.id)}}
+												{{pass}}
 											{{pass}}
 										{{pass}}
 									{{pass}}
