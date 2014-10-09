@@ -1,0 +1,80 @@
+{{if request.vars['operation'] == "div_update": }}
+	<center>
+		<div id="table_activity_without_metric">
+		</div>
+	</center>
+{{pass}}
+
+
+
+
+
+
+{{if request.vars['operation'] == "menu_update": }}
+	{{var_do=False}}
+
+	<!--Check that the current date is in the period that de administrator has register-->
+	{{from datetime import datetime}}
+	{{date1=None}}
+	{{tiempo=str(datetime.now())}}
+	{{dateInicialP = db.executesql('SELECT date(\''+tiempo+'\');',as_dict=True)}}
+	{{for d0 in dateInicialP:}}
+		{{date1=d0['date(\''+tiempo+'\')']}}
+	{{pass}}
+
+		
+	{{actualSemester = db(db.period_year.id==semestre2.id).select().first()}}
+	{{comparacion = T(actualSemester.period.name)+" "+str(actualSemester.yearp)}}
+	{{date_var = db((db.student_control_period.period_name==comparacion)).select().first()}}
+
+	{{if date1 >= date_var.date_start_semester and date1 <= date_var.date_finish_semester:}}
+		{{var_do=True}}
+	{{pass}}
+	<!--End of the check of period-->
+
+	{{exception_query = db(db.course_laboratory_exception.project == project.id).select().first()}}
+	{{exception_s_var = False}}
+	{{exception_t_var = False}}
+	{{no_menu=True}}
+
+	{{if exception_query is not None:}}
+		{{exception_t_var = exception_query.t_edit_lab}}
+		{{exception_s_var = exception_query.s_edit_course}}
+	{{pass}}
+
+	{{if (auth.has_membership('Super-Administrator')) or (auth.has_membership('Ecys-Administrator')) or ((auth.has_membership('Teacher') or auth.has_membership('Student')) and assigned_to_project == True):}}
+		{{no_menu=False}}
+	{{pass}}
+
+	<ul class="dropdown"  class="close" aria-hidden="true"  style="height:10px;">
+		<a style="color:#f0ad4e;text-shadow:none;" class="dropdown-toggle" data-toggle="dropdown" href="">
+	    	<span class="icon-list"></span>
+	  	</a>
+	  	<h3 class="icon-white" style="text-shadow: -1px 0 white, 0 1px white, 1px 0 white, 0 -1px white;">
+			{{=T('Scheduler') }}
+		</h3> 
+		{{import cpfecys}}
+		{{if cpfecys.current_year_period().id==semestre2.id and var_do==True and no_menu==False:}}
+		<ul class="dropdown-menu">
+		  	<li>
+		  			<a tabindex="-1"  href="{{=URL('activity_control', 'activity_without_metric',vars=dict(project = request.vars['project'], year = request.vars['year']))}}"> 
+
+		  			<a tabindex="-1"  title="{{=T('Management activities without metric')}}" id="menu_management_activity_without_metric" href="{{=URL('activity_control', 'students_control_full',vars=dict(project = request.vars['project'], year = request.vars['year'], f_view='activity_without_metric_edit'))}}">
+					<span class="icon-black icon-edit"></span>
+					{{=T('Management Activities')}}
+				</a>
+			</li>
+		</ul>
+		{{pass}}
+	</ul> 
+{{pass}}
+
+<script type="text/javascript">
+  	$(document).ready(function(){
+		$("#table_activity_without_metric").load("{{=URL('activity_control','activity_without_metric.html')}}?op=showTableNoEditable&amp;project={{=request.vars['project']}}&amp;year={{=request.vars['year']}}&amp;type={{=request.vars['type']}}");
+
+		$("#menu_management_activity_without_metric").click(function(){
+	      $("#div_activity_show").load("{{=URL('activity_control','activity_without_metric.html')}}?op=showEditTable&amp;project={{=request.vars['project']}}&amp;year={{=request.vars['year']}}");
+	    })
+	});
+</script>
