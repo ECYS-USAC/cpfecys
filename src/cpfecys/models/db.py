@@ -776,6 +776,17 @@ db.define_table('course_activity',
     Field('date_finish', 'date', notnull = True, default = datetime.datetime.now(), label = T('Date Finish'))
     )
 
+db.define_table('course_activity_without_metric',
+    Field('name', 'string', notnull=True, unique=False, label = T('Name')),
+    Field('description', 'text', notnull=True, unique=False, label = T('Description')),
+    Field('fileReport', 'upload', notnull=False, label='Reporte', requires=[IS_UPLOAD_FILENAME(extension = '(pdf|zip)',error_message='Solo se aceptan archivos con extension zip|pdf'),IS_LENGTH(2097152,error_message='El tamaño máximo del archivo es 2MB')]),
+    Field('semester', 'reference period_year', notnull=True),
+    Field('assignation', 'reference project', notnull=True),
+    Field('laboratory', 'boolean', notnull=True, label = T('laboratory')),
+    Field('teacher_permition', 'boolean', notnull=True, label = T('teacher permition')),
+    Field('date_start', 'date', notnull = True, default = datetime.datetime.now(), label = T('Date Start'))
+    )
+
 db.define_table('course_activity_log',
     Field('user_name', 'string', notnull = False, label = 'Usuario'),
     Field('roll', 'string', notnull = False, label = 'Rol'),

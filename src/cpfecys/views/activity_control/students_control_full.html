@@ -8,19 +8,24 @@
 {{if request.vars['f_view'] == "weighting":}}
 	{{if request.vars['type'] == "course":}}
 		<h2>{{=T('Course Weighting')}} - {{=name}}
+			<br>
+		</h2>
 	{{else:}}
 		<h2>{{=T('Laboratory Weighting')}} - {{=name}}
+			<br>
+		</h2>
 	{{pass}}
 {{elif request.vars['f_view'] == "activity":}}
 	{{if request.vars['type'] == "class":}}
 		<h2>{{=T('Course Scheduler')}} - {{=name}}
+			<br>
+		</h2>
 	{{else:}}
 		<h2>{{=T('Laboratory Scheduler')}} - {{=name}}
+			<br>
+		</h2>
 	{{pass}}
 {{pass}}
-	<br>
-    
-</h2>
 
 
 <div class="well " id="principal_div" >
@@ -30,16 +35,19 @@
 <br>
 	{{if request.vars['f_view'] == "weighting" or request.vars['f_view'] == "weighting_edit" or request.vars['f_view'] == "weighting_get":}}
 		<div id="weighting_menu">
+		</div>
 	{{elif request.vars['f_view'] == "activity" or request.vars['f_view'] == "activity_edit":}}
 		<div id="activity_menu">
+		</div>
 	{{pass}}
-  	</div>
     
 
     {{if request.vars['f_view'] == "weighting" or request.vars['f_view'] == "weighting_edit" or request.vars['f_view'] == "weighting_get":}}
 		<div id="weighting_inside">
 	{{elif request.vars['f_view'] == "activity" or request.vars['f_view'] == "activity_edit":}}
 		<div id="activity_inside">
+	{{elif request.vars['f_view'] == "activity_without_metric_edit":}}
+		<div id="activity_without_metric_inside">
 	{{pass}}
 		{{=T('Loading')}}...
 	</div>
@@ -73,6 +81,9 @@ $(document).ready(function(){
 	if (f_view == 'activity_edit'){
 		
 		$("#activity_inside").load('{{=URL('activity_control','control_students_modals2.html',vars=dict( project = request.vars['project'], year = request.vars['year'],f_view = 'activity_get', type = request.vars['type']))}}');
+	}
+	if (f_view == 'activity_without_metric_edit'){
+		$("#activity_without_metric_inside").load('{{=URL('activity_control','control_students_modals3.html',vars=dict( project = request.vars['project'], year = request.vars['year'],f_view = 'activity_without_metric_edit'))}}');
 	}
   });
 </script>

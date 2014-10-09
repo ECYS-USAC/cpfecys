@@ -88,6 +88,7 @@
                   <ul id="myTabActivities" class="nav nav-tabs">
                     <li class="active" id="classActivities"><a href="#" data-toggle="tab">{{=T('Class Activities')}}</a></li>
                     <li id="laboratoryActivities"><a href="#" data-toggle="tab">{{=T('Laboratory Activities')}}</a></li>
+                    <li id="Activitywithoutmetric"><a href="#" data-toggle="tab">{{=T('Activity without metric')}}</a></li>
                   </ul>
                   <div id="activity_inside" class="well" style=" background-color:white;  ">
                   </div>
@@ -185,11 +186,12 @@ aria-hidden="true">{{=T('Close')}}</button>
       $("#activity_menu").load('{{=URL('activity_control','control_activity.html',vars=dict(operation="menu_update",year = year, project = project, type="lab"))}}');
     });
 
+    $("#Activitywithoutmetric").click(function(){
+      $("#activity_inside").load('{{=URL('activity_control','control_activity_without_metric.html',vars=dict(operation="div_update",year = year, project = project))}}' );
+      $("#activity_menu").load('{{=URL('activity_control','control_activity_without_metric.html',vars=dict(operation="menu_update",year = year, project = project))}}');
+    });
+
   });
-
-
-  
-  
 </script>
 <div id="modals">
 </div>

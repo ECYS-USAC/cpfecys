@@ -197,6 +197,46 @@ def grades():
     elif auth.has_membership('Student')==True:
         rol_log='Student'
     pass
+
+
+
+    #Permition to add grades
+    exception_query = db(db.course_laboratory_exception.project == id_project).select().first()
+    exception_s_var = False
+    exception_t_var = False
+    no_menu=True
+    request_change_var=False
+
+    if exception_query is not None:
+        exception_t_var = exception_query.t_edit_lab
+        exception_s_var = exception_query.s_edit_course
+
+    if auth.has_membership('Student')==True:
+        if var_activity.laboratory == True or exception_s_var == True or var_activity.teacher_permition==True or var_activity.course_activity_category.teacher_permition==True:
+            if var_activity.laboratory == True:
+                from datetime import datetime
+                comparacion = T(var_period.period.name)+" "+str(var_period.yearp)
+                controlP = db((db.student_control_period.period_name==comparacion)).select().first()
+
+                maximTimeGrade = db.executesql('SELECT DATE_ADD(\''+str(var_activity.date_finish)+'\', INTERVAL '+str(controlP.timeout_income_notes)+' Day) as fechaMaxGrade;',as_dict=True)
+                dateGrade0=''
+                for d0 in maximTimeGrade:
+                    dateGrade0=d0['fechaMaxGrade']
+
+                if str(datetime.now()) <= str(dateGrade0):
+                    request_change_var=True
+            else:
+                request_change_var=True
+    elif auth.has_membership('Teacher')==True:
+        if var_activity.laboratory == True:
+            if exception_t_var == True:
+                request_change_var=True
+        else:
+            request_change_var=True
+    elif auth.has_membership('Ecys-Administrator')==True:
+        request_change_var=True
+    elif auth.has_membership('Super-Administrator')==True:
+        request_change_var=True
     return dict(academic_assig=academic_assig, var_period=var_period, var_activity=var_activity, var_project=var_project, rol_log=rol_log)
 
 
@@ -874,7 +914,55 @@ def weighting_request():
 #------------------------------------------------------------------------------------------------------------------------
 #------------------------------------------------------------------------------------------------------------------------
 #------------------------------------------------------------------------------------------------------------------------
+@auth.requires_login()
+def control_activity_without_metric():
+    year = db(db.period_year.id == request.vars['year']).select().first() 
+    year_semester = year.period
+    project = db(db.project.id==request.vars['project']).select().first()
 
+    assigantion = db((db.user_project.assigned_user == auth.user.id) & (db.user_project.period == year.id) & (db.user_project.project == project.id)).select().first()
+    if assigantion is None:
+        assigned_to_project = False
+    else:
+        assigned_to_project = True
+
+    return dict(semester = year_semester.name,
+            year = year.yearp,
+            semestre2 = year,
+            project = project,
+            assigned_to_project = assigned_to_project)
+
+
+@auth.requires_login()
+def activity_without_metric():
+    import cpfecys
+    #Obteners la asignacion del estudiante
+    project = request.vars['project']
+    
+    year = db(db.period_year.id == request.vars['year']).select().first() 
+    assigantion = db((db.user_project.assigned_user == auth.user.id) & (db.user_project.period == year.id) & (db.user_project.project == project)).select().first()
+    if assigantion is None:
+        assigned_to_project = False
+    else:
+        assigned_to_project = True
+    
+    return dict(semestre2 = year, project = project, assigned_to_project = assigned_to_project)
+
+@auth.requires_login()
+def control_students_modals3():
+    #Obtener la asignacion del estudiante
+    project = request.vars['project']
+    year = db(db.period_year.id == request.vars['year']).select().first() 
+    project_var = db(db.project.id == request.vars['project']).select().first() 
+    return dict(semestre2 = year, name=project_var.name)
+
+
+
+
+#------------------------------------------------------------------------------------------------------------------------
+#------------------------------------------------------------------------------------------------------------------------
+#------------------------------------------------------------------------------------------------------------------------
+#------------------------------------------------------------------------------------------------------------------------
 
 @auth.requires_login()
 @auth.requires(auth.has_membership('Student') or auth.has_membership('Teacher') or auth.has_membership('Super-Administrator') or auth.has_membership('Academic') or auth.has_membership('Ecys-Administrator'))
