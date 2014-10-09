@@ -124,10 +124,15 @@
     {{pass}}
 {{pass}}
 
+{{request_change_var=False}}
 {{if request.vars['op'] == "view_grades": }}
 <div align="right">
-  <a onclick="edit_all();" style ="cursor:pointer;"><span class="icon-edit"></span> {{=T('Edit All')}}</a> -
-  <a onclick="delete_all();" style ="cursor:pointer;"><span class="icon-trash"></span>{{=T('Delete All')}}</a>
+  {{if request_change_var == False:}}
+    <a onclick="edit_all();" style ="cursor:pointer;"><span class="icon-edit"></span> {{=T('Edit All')}}</a> -
+    <a onclick="delete_all();" style ="cursor:pointer;"><span class="icon-trash"></span>{{=T('Delete All')}}</a>
+  {{else:}}
+    <a id="change_request_link" onclick="change_request();" style ="cursor:pointer;"><span class="icon-random"></span> {{=T('Change Request')}}</a>
+  {{pass}}
 </div>
 <table class="table table-striped table-bordered"  style="width:100%;">
   <tbody>
@@ -138,11 +143,13 @@
   <th style="width:40%;">
     {{=T('Grade')}}
   </th>
-  <th style="width:20px;">
-    <center>
-      {{=T('Actions')}}
-    </center>
-  </th>
+  {{if request_change_var == False:}}
+    <th style="width:20px;">
+      <center>
+        {{=T('Actions')}}
+      </center>
+    </th>
+  {{pass}}
 </tr>
   {{for academic in academic_assig:}}
     <tr>
@@ -213,25 +220,27 @@
             <input class="string" name="edit_grade_{{=academic.carnet.carnet}}" type="text" value="" id="edit_grade_{{=academic.carnet.carnet}}" style="width:100px;">
           </div>
         </td>
-        <td style="width:25px;">
-          <center>
-            <div id="div_view_button_{{=academic.carnet.carnet}}">
-              <a id="categoryButton" role="button" class="badge btn-info" onclick="update_grade({{=academic.carnet.carnet}});"  title="{{=T('Edit grade')}}"> 
-                <span class="icon-white icon-edit"></span>
-              </a>
-            </div>
-            <div id="div_edit_button_{{=academic.carnet.carnet}}" style="display:none;">
-              <a id="categoryButton" role="button" class="badge btn-danger" onclick="remove_grade();" title="{{=T('Delete grade')}}" > 
-                <span class="icon-white icon-remove-sign"></span>
-              </a>
-            </div>
-            <div id="div_check_button_{{=academic.carnet.carnet}}" style="display:none;">
-              <a id="categoryButton" role="button" class="badge btn-success" onclick="save_grade({{=academic.carnet.carnet}});" title="{{=T('Save grade')}}" > 
-                <span class="icon-white icon-check"></span>
-              </a>
-            </div>
-          </center>
-        </td>
+        {{if request_change_var == False:}}
+          <td style="width:25px;">
+            <center>
+              <div id="div_view_button_{{=academic.carnet.carnet}}">
+                <a id="categoryButton" role="button" class="badge btn-info" onclick="update_grade({{=academic.carnet.carnet}});"  title="{{=T('Edit grade')}}"> 
+                  <span class="icon-white icon-edit"></span>
+                </a>
+              </div>
+              <div id="div_edit_button_{{=academic.carnet.carnet}}" style="display:none;">
+                <a id="categoryButton" role="button" class="badge btn-danger" onclick="remove_grade();" title="{{=T('Delete grade')}}" > 
+                  <span class="icon-white icon-remove-sign"></span>
+                </a>
+              </div>
+              <div id="div_check_button_{{=academic.carnet.carnet}}" style="display:none;">
+                <a id="categoryButton" role="button" class="badge btn-success" onclick="save_grade({{=academic.carnet.carnet}});" title="{{=T('Save grade')}}" > 
+                  <span class="icon-white icon-check"></span>
+                </a>
+              </div>
+            </center>
+          </td>
+        {{pass}}
       {{else:}}
         <td style="width:25%;">
           <div id="div_edit_grade_{{=academic.carnet.carnet}}" style="display:none;">
@@ -241,28 +250,30 @@
             {{=var_grade.grade}}
           </div>
         </td>
-        <td style="width:25px;">
-          <center>
-            <div id="div_view_button_{{=academic.carnet.carnet}}">
-              <a id="categoryButton" role="button" class="badge btn-info" onclick="update_grade({{=academic.carnet.carnet}});"  title="{{=T('Edit grade')}}"> 
-                <span class="icon-white icon-edit"></span>
-              </a>
-              <a id="categoryButton" role="button" class="badge btn-danger" onclick="remove_grade({{=var_grade.id}});" title="{{=T('Delete grade')}}" > 
-                <span class="icon-white icon-remove-sign"></span>
-              </a>
-            </div>
-            <div id="div_edit_button_{{=academic.carnet.carnet}}" style="display:none;">
-              <a id="categoryButton" role="button" class="badge btn-danger" onclick="remove_grade({{=var_grade.id}});" title="{{=T('Delete grade')}}" > 
-                <span class="icon-white icon-remove-sign"></span>
-              </a>
-            </div>
-            <div id="div_check_button_{{=academic.carnet.carnet}}" style="display:none;">
-              <a id="categoryButton" role="button" class="badge btn-success" onclick="save_grade({{=academic.carnet.carnet}});" title="{{=T('Save grade')}}" > 
-                <span class="icon-white icon-check"></span>
-              </a>
-            </div>         
-          </center>
-        </td>
+        {{if request_change_var == False:}}
+          <td style="width:25px;">
+            <center>
+              <div id="div_view_button_{{=academic.carnet.carnet}}">
+                <a id="categoryButton" role="button" class="badge btn-info" onclick="update_grade({{=academic.carnet.carnet}});"  title="{{=T('Edit grade')}}"> 
+                  <span class="icon-white icon-edit"></span>
+                </a>
+                <a id="categoryButton" role="button" class="badge btn-danger" onclick="remove_grade({{=var_grade.id}});" title="{{=T('Delete grade')}}" > 
+                  <span class="icon-white icon-remove-sign"></span>
+                </a>
+              </div>
+              <div id="div_edit_button_{{=academic.carnet.carnet}}" style="display:none;">
+                <a id="categoryButton" role="button" class="badge btn-danger" onclick="remove_grade({{=var_grade.id}});" title="{{=T('Delete grade')}}" > 
+                  <span class="icon-white icon-remove-sign"></span>
+                </a>
+              </div>
+              <div id="div_check_button_{{=academic.carnet.carnet}}" style="display:none;">
+                <a id="categoryButton" role="button" class="badge btn-success" onclick="save_grade({{=academic.carnet.carnet}});" title="{{=T('Save grade')}}" > 
+                  <span class="icon-white icon-check"></span>
+                </a>
+              </div>         
+            </center>
+          </td>
+        {{pass}}
       {{pass}}
       
     </tr>
@@ -272,7 +283,11 @@
         <div align="right" id="table_foot" style="display:none;">
           <a  tabindex="3" role="button"  class="btn btn-success"  onclick="save_changes();">            
             <span class="icon-white icon-ok-sign"></span>
-            {{=T('Save Changes')}}
+              {{if request_change_var == False:}}
+                {{=T('Save Changes')}}
+              {{else:}}
+                {{=T('Change Request')}}
+              {{pass}}
           </a>
           <a  tabindex="3" role="button"  class="btn btn-danger" onclick="cancel_all();">            
             {{=T('Cancel')}}
@@ -283,8 +298,12 @@
   </tbody>
 </table>
 <div align="right">
-  <a onclick="edit_all();" style ="cursor:pointer;"><span class="icon-edit"></span> {{=T('Edit All')}}</a> -
-  <a onclick="delete_all();" style ="cursor:pointer;"><span class="icon-trash"></span>{{=T('Delete All')}}</a>
+  {{if request_change_var == False:}}
+    <a onclick="edit_all();" style ="cursor:pointer;"><span class="icon-edit"></span> {{=T('Edit All')}}</a> -
+    <a onclick="delete_all();" style ="cursor:pointer;"><span class="icon-trash"></span>{{=T('Delete All')}}</a>
+  {{else:}}
+    <a id="change_request_link_2" onclick="change_request();" style ="cursor:pointer;"><span class="icon-random"></span> {{=T('Change Request')}}</a>
+  {{pass}}
 </div>
 <script type="text/javascript">
   $("#div_loading").css("display", "none");
@@ -414,6 +433,27 @@
     }
   function cancel_all(){
     $("#grades_list").load("{{=URL('activity_control','grades.html')}}?op=view_grades&amp;activity={{=var_activity.id}}&amp;project={{=var_project.id}}&amp;year={{=var_period.id}}");
+  }
+
+  function change_request(){
+    {{for academic in academic_assig:}}
+      if (var_editable == false){
+          $("#change_request_link").css("display", "none");
+          $("#change_request_link_2").css("display", "none");
+
+          $("#div_edit_grade_{{=academic.carnet.carnet}}").css("display", "block");
+          $("#div_view_grade_{{=academic.carnet.carnet}}").css("display", "none");
+          $("#div_edit_button_{{=academic.carnet.carnet}}").css("display", "block");
+          $("#div_view_button_{{=academic.carnet.carnet}}").css("display", "none"); 
+          $("#table_foot").css("display", "block");
+            
+      }
+    {{pass}}
+    if (var_editable == false){
+      var_editable = true;
+    }else{
+      var_editable = false;
+    }
   }
 
   function edit_all(){
