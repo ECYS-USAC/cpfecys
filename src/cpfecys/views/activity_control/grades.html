@@ -53,13 +53,19 @@
               {{pass}}
             {{else:}}
               <script type="text/javascript">
-                jQuery("#information_text").append('{{=T('Failed to add grade')}}'+" | Carnet: '{{=academic_var.carnet}}' {{=T('Grade')}}: '{{=grade.grade}}'");
+                alert('{{=T('Failed to add grade')}}'+" | Carnet: '{{=academic_var.carnet}}' {{=T('Grade')}}: '{{=grade.grade}}'");
               </script>
+              <!--<script type="text/javascript">
+                jQuery("#information_text").append('{{=T('Failed to add grade')}}'+" | Carnet: '{{=academic_var.carnet}}' {{=T('Grade')}}: '{{=grade.grade}}'");
+              </script>-->
             {{pass}}  {{#----grade!=None---}}
           {{else:}}
             <script type="text/javascript">
-              jQuery("#information_text").append('{{=T('Failed to add grade')}}'+" | Carnet: '{{=request.vars['carnet']}}' {{=T('Already have an associated grade')}}");
+              alert('{{=T('Failed to add grade')}}'+" | Carnet: '{{=request.vars['carnet']}}' {{=T('Already have an associated grade')}}");
             </script>
+            <!--<script type="text/javascript">
+              jQuery("#information_text").append('{{=T('Failed to add grade')}}'+" | Carnet: '{{=request.vars['carnet']}}' {{=T('Already have an associated grade')}}");
+            </script>-->
           {{pass}} {{#-------grade_before-is-None---}}  
         {{pass}}  {{#------exist_request_change-==-True----}}
       {{#--------------------------------------------INSERT REQUEST-------------------------------------}}
@@ -94,12 +100,18 @@
     {{except:}}
       {{if academic_var is None:}}
         <script type="text/javascript">
-          jQuery("#information_text").append('{{=T('Failed to add grade')}}'+" | Carnet: '{{=request.vars['carnet']}}' {{=T('not exist')}}");
+          alert('{{=T('Failed to add grade')}}'+" | Carnet: '{{=request.vars['carnet']}}' {{=T('not exist')}}");
         </script>
+        <!--<script type="text/javascript">
+          jQuery("#information_text").append('{{=T('Failed to add grade')}}'+" | Carnet: '{{=request.vars['carnet']}}' {{=T('not exist')}}");
+        </script>-->
       {{else:}}
         <script type="text/javascript">
-          jQuery("#information_text").append('{{=T('Failed to add grade')}}');
+          alert('{{=T('Failed to add grade')}}');
         </script>
+        <!--<script type="text/javascript">
+          jQuery("#information_text").append('{{=T('Failed to add grade')}}');
+        </script>-->
       {{pass}}
     {{pass}}
     {{if request.vars['op'] == "add_grade":}}

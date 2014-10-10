@@ -1,4 +1,7 @@
 {{extend 'template.html'}}
+<div>
+	<a href="{{=URL('activity_control', 'students_control', vars=dict(project = project.id, period = year.id))}}" class="btn" ><i class="icon-arrow-left"></i> {{=T('Back')}}</a>
+</div>
 <h2>
     {{=project.name}}
     <br>
