@@ -43,44 +43,7 @@
 <!--***************************************************************************************************************************************************************************************************************************-->
 <!--***************************************************************************************************************************************************************************************************************************-->
 <!--***************************************************************************************************************************************************************************************************************************-->
-<!--ADD ACTIVITY DIV-->
-{{if request.vars['op'] == "showInsert": }}
-	{{if no_menu==False:}}
-		<label>{{=T('Category')}}:</label>
-	    <select class="generic-widget" id="category_activity_id" style="width:250px;">
-	    	<option value=""></option>
-	    	{{if (auth.has_membership('Super-Administrator')) or (auth.has_membership('Ecys-Administrator')) or (auth.has_membership('Student') and assigned_to_project == True) or (auth.has_membership('Teacher') and assigned_to_project == True and exception_t_var == True):}}
-	    		<option value="idLab">{{=T('Laboratory')}}</option>
-	    	{{pass}}
-	    	{{if (auth.has_membership('Super-Administrator')) or (auth.has_membership('Ecys-Administrator')) or (auth.has_membership('Teacher') and assigned_to_project == True) or (auth.has_membership('Student') and assigned_to_project == True and exception_s_var==True):}}
-	    		<option value="idClass">{{=T('Course')}}</option>
-	    	{{pass}}
-	    </select>
-	    <label>{{=T('Name')}}:</label>
-	    <input class="string" type="text" value="" id="activity_name1" style="width:240px;">
-	    <label>{{=T('Description')}}:</label>
-	    <textarea class="string" cols="40" type="text" value="" id="activity_description" style="width:240px; height:180px;"/>
-	    <label id="label_report">{{=T('Report')}}:</label>
-	    <input class="upload" name="field_report" type="file" id="field_report" style="width:240px;">
-	    <label>{{=T('Start Date')}}:</label>
-	    <input class="date" id="dateInit" name="log-date" placeholder="YYYY-MM-DD" type="text" value = "" style="width:240px;">
-	    <div align="justify"> 
-	    	{{=T('Do you want to give permissions to academic tutors so they can edit this activity?')}}
-	    	<label>
-	    		<div align="right"> 
-			    	{{=T('Yes')}}
-			    	<input type="checkbox" name="TP_check_activity"  id="TP_check_activity">
-		    	</div>
-	    	</label>
-	    </div>
-	{{else:}}
-		<h2><small>{{=T('No Action')}}</small></h2>
-	{{pass}}
-{{pass}}
-
-
-
-{{if  request.vars['op'] == "showTableNoEditable" or request.vars['op'] == "addActivity" or request.vars['op'] == "showTable" or request.vars['op'] == "removeActivity" or request.vars['op'] == "showEditTable" or request.vars['op'] == "showEditActivity": }}
+{{if  request.vars['op'] == "showTableNoEditable":}}
 	<div>
 		<center>
 		<table>
@@ -111,7 +74,7 @@
 					{{=T('TP')}}
 				</th>
 				<th>
-					{{=T('Start Date')}}
+					{{=T('Date')}}
 				</th>
 			</tr>
 			{{editable_var='false'}}
@@ -210,14 +173,10 @@
 						{{pass}}
 					</td>
 					<td>
-						{{if editable_var=='true':}}
-							Aun no se que hacer ahahaha xD
+						{{if tAct.fileReport=="":}}
+							{{=T('False')}} {{=T('Report')}}
 						{{else:}}
-							{{if tAct.fileReport is NULL:}}
-								{{=T('False')}} {{=T('Report')}}
-							{{else:}}
-								<a href="' + cpfecys.get_domain() + URL('default/download', tAct.fileReport) +'" target="blank"> '+ {{=T('Report')}} + '</a>
-							{{pass}}
+							<a href="' + cpfecys.get_domain() + URL('default/download', tAct.fileReport) +'" target="blank"> '+ {{=T('Report')}} + '</a>
 						{{pass}}
 					</td>
 					<td>

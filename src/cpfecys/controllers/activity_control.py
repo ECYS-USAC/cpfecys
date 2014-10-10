@@ -950,6 +950,99 @@ def control_activity_without_metric():
 
 
 @auth.requires_login()
+def management_activity_without_metric():
+    #Check if the period is correct
+    if request.vars['year'] is None or request.vars['year']=='':
+        session.flash = T('Not valid Action.')
+        redirect(URL('default','index'))
+    else:
+        year = request.vars['year']
+        year = db(db.period_year.id==year).select().first()
+        if year is None:
+            session.flash = T('Not valid Action.')
+            redirect(URL('default','index'))
+        else:
+            if cpfecys.current_year_period().id != year.id:
+                session.flash = T('Not valid Action.')
+                redirect(URL('default','index'))
+
+    #Check if the project is correct
+    if request.vars['project'] is None or request.vars['project']=='':
+        session.flash = T('Not valid Action.')
+        redirect(URL('default','index'))
+    else:
+        project = request.vars['project']
+        project = db(db.project.id==project).select().first()
+        if project is None:
+            session.flash = T('Not valid Action.')
+            redirect(URL('default','index'))
+
+    #Time limit of semester
+    from datetime import datetime
+    date1=None
+    tiempo=str(datetime.now())
+    dateInicialP = db.executesql('SELECT date(\''+tiempo+'\');',as_dict=True)
+    for d0 in dateInicialP:
+        date1=d0['date(\''+tiempo+'\')']
+    date_var = db((db.student_control_period.period_name==(T(year.period.name)+" "+str(year.yearp)))).select().first()
+    if date1 >= date_var.date_start_semester and date1 <= date_var.date_finish_semester:
+        #Exception of permition
+        exception_query = db(db.course_laboratory_exception.project == project.id).select().first()
+        exception_s_var = False
+        exception_t_var = False
+        if exception_query is not None:
+            exception_t_var = exception_query.t_edit_lab
+            exception_s_var = exception_query.s_edit_course
+
+        #Grid
+        grid=None
+        db.course_activity_without_metric.assignation.readable = False
+        db.course_activity_without_metric.assignation.writable = False
+        db.course_activity_without_metric.assignation.default = project.id
+        db.course_activity_without_metric.semester.readable = False
+        db.course_activity_without_metric.semester.writable = False
+        db.course_activity_without_metric.semester.default = year.id
+        if auth.has_membership('Super-Administrator') or auth.has_membership('Ecys-Administrator'):
+            query = ((db.course_activity_without_metric.semester==year.id) & (db.course_activity_without_metric.assignation==project.id))
+            grid = SQLFORM.grid(query, csv=False, paginate=5)
+        elif auth.has_membership('Teacher'):
+            assigantion = db((db.user_project.assigned_user == auth.user.id) & (db.user_project.period == year.id) & (db.user_project.project == project)).select().first()
+            if assigantion is None:
+                session.flash = T('Not valid Action.')
+                redirect(URL('default','index'))
+            else:
+                if exception_t_var==True:
+                    query = ((db.course_activity_without_metric.semester==year.id) & (db.course_activity_without_metric.assignation==project.id))
+                    grid = SQLFORM.grid(query, csv=False, paginate=10)
+                else:
+                    db.course_activity_without_metric.laboratory.writable = False
+                    db.course_activity_without_metric.laboratory.default = False
+                    query = ((db.course_activity_without_metric.semester==year.id) & (db.course_activity_without_metric.assignation==project.id)&(db.course_activity_without_metric.laboratory==False))
+                    grid = SQLFORM.grid(query, csv=False, paginate=10)
+        elif auth.has_membership('Student'):
+            assigantion = db((db.user_project.assigned_user == auth.user.id) & (db.user_project.period == year.id) & (db.user_project.project == project)).select().first()
+            if assigantion is None:
+                session.flash = T('Not valid Action.')
+                redirect(URL('default','index'))
+            else:
+                db.course_activity_without_metric.teacher_permition.writable = False
+                if exception_s_var==True:
+                    query = ((db.course_activity_without_metric.semester==year.id) & (db.course_activity_without_metric.assignation==project.id))
+                    grid = SQLFORM.grid(query, csv=False, paginate=10)
+                else:
+                    db.course_activity_without_metric.laboratory.writable = False
+                    db.course_activity_without_metric.laboratory.default = True
+                    query = ((db.course_activity_without_metric.semester==year.id) & (db.course_activity_without_metric.assignation==project.id)& ((db.course_activity_without_metric.laboratory==True) | ((db.course_activity_without_metric.laboratory== False)&(db.course_activity_without_metric.teacher_permition==True))))
+                    grid = SQLFORM.grid(query, csv=False, paginate=10)
+        else:
+            session.flash = T('Not valid Action.')
+            redirect(URL('default','index'))
+        return dict(year = year, project = project, grid=grid)
+    else:
+        session.flash = T('Not valid Action.')
+        redirect(URL('default','index'))
+
+@auth.requires_login()
 def activity_without_metric():
     import cpfecys
     #Obteners la asignacion del estudiante
@@ -963,15 +1056,6 @@ def activity_without_metric():
         assigned_to_project = True
     
     return dict(semestre2 = year, project = project, assigned_to_project = assigned_to_project)
-
-@auth.requires_login()
-def control_students_modals3():
-    #Obtener la asignacion del estudiante
-    project = request.vars['project']
-    year = db(db.period_year.id == request.vars['year']).select().first() 
-    project_var = db(db.project.id == request.vars['project']).select().first() 
-    return dict(semestre2 = year, name=project_var.name)
-
 
 
 
@@ -1005,7 +1089,7 @@ def General_report_activities():
     else:
         project_var = request.vars['project']
         project_var = db(db.project.id==project_var).select().first()
-        if year is None:
+        if project_var is None:
             session.flash = T('Not valid Action.')
             redirect(URL('default','index'))
 

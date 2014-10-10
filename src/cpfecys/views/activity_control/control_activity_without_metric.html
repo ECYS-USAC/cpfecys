@@ -59,7 +59,7 @@
 		  	<li>
 		  			<a tabindex="-1"  href="{{=URL('activity_control', 'activity_without_metric',vars=dict(project = request.vars['project'], year = request.vars['year']))}}"> 
 
-		  			<a tabindex="-1"  title="{{=T('Management activities without metric')}}" id="menu_management_activity_without_metric" href="{{=URL('activity_control', 'students_control_full',vars=dict(project = request.vars['project'], year = request.vars['year'], f_view='activity_without_metric_edit'))}}">
+		  			<a tabindex="-1"  title="{{=T('Management activities without metric')}}" id="menu_management_activity_without_metric" href="{{=URL('activity_control', 'management_activity_without_metric',vars=dict(project = request.vars['project'], year = request.vars['year']))}}">
 					<span class="icon-black icon-edit"></span>
 					{{=T('Management Activities')}}
 				</a>
@@ -72,9 +72,5 @@
 <script type="text/javascript">
   	$(document).ready(function(){
 		$("#table_activity_without_metric").load("{{=URL('activity_control','activity_without_metric.html')}}?op=showTableNoEditable&amp;project={{=request.vars['project']}}&amp;year={{=request.vars['year']}}&amp;type={{=request.vars['type']}}");
-
-		$("#menu_management_activity_without_metric").click(function(){
-	      $("#div_activity_show").load("{{=URL('activity_control','activity_without_metric.html')}}?op=showEditTable&amp;project={{=request.vars['project']}}&amp;year={{=request.vars['year']}}");
-	    })
 	});
 </script>
