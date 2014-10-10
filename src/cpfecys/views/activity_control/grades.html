@@ -210,63 +210,67 @@
   {{for academic in academic_assig:}}
     <tr>
       <td style="width:25%;">
-        <a type="button" style ="cursor:pointer;" role="button" data-toggle="modal" data-target="#historial_modal_{{=academic.carnet.id}}" >
+        {{if auth.has_membership('Student'):}}
           {{=academic.carnet.carnet}}
-        </a>
-        <!--MODAL -->
-          <div id="historial_modal_{{=academic.carnet.id}}" class="modal hide fade" tabindex="-1" role="dialog"  aria-hidden="true"> 
-            <div class="modal-header">
-              <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
-                <h3 id="myModalLabel">
-                    {{=T('History Grade')}} - {{=academic.carnet.carnet}}
-                </h3>
-            </div>
-            <div class="modal-body">
-              <div class="well">
-                    {{grade_log_var = db(db.grades_log.academic_assignation_id==academic.id).select()}}
-                    {{if grade_log_var.first() ==None:}}
-                      {{=T('No records')}}
-                    {{else:}}
-                      <table class="table table-striped table-bordered"  style="width:100%;">
-                        <tr>
-                          <th>
-                            {{=T('User')}}
-                          </th>
-                          <th>
-                            {{=T('Role')}}
-                          </th>
-                          <th>
-                            {{=T('Before')}}
-                          </th>
-                          <th >
-                            {{=T('After')}}
-                          </th>
-                        </tr>
-                        {{for var_grade in grade_log_var:}}
+        {{else:}}
+          <a type="button" style ="cursor:pointer;" role="button" data-toggle="modal" data-target="#historial_modal_{{=academic.carnet.id}}" >
+            {{=academic.carnet.carnet}}
+          </a>
+          <!--MODAL -->
+            <div id="historial_modal_{{=academic.carnet.id}}" class="modal hide fade" tabindex="-1" role="dialog"  aria-hidden="true"> 
+              <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+                  <h3 id="myModalLabel">
+                      {{=T('History Grade')}} - {{=academic.carnet.carnet}}
+                  </h3>
+              </div>
+              <div class="modal-body">
+                <div class="well">
+                      {{grade_log_var = db(db.grades_log.academic_assignation_id==academic.id).select()}}
+                      {{if grade_log_var.first() ==None:}}
+                        {{=T('No records')}}
+                      {{else:}}
+                        <table class="table table-striped table-bordered"  style="width:100%;">
                           <tr>
-                            <td>
-                              {{=var_grade.user_name}}
-                            </td>
-                            <td>
-                              {{=T('Rol '+var_grade.roll)}}
-                            </td>
-                            <td>
-                              {{=var_grade.before_grade}}
-                            </td>
-                            <td>
-                              {{=var_grade.after_grade}}
-                            </td>
-                          <tr>
-                        {{pass}}
-                      </table>
-                    {{pass}}
+                            <th>
+                              {{=T('User')}}
+                            </th>
+                            <th>
+                              {{=T('Role')}}
+                            </th>
+                            <th>
+                              {{=T('Before')}}
+                            </th>
+                            <th >
+                              {{=T('After')}}
+                            </th>
+                          </tr>
+                          {{for var_grade in grade_log_var:}}
+                            <tr>
+                              <td>
+                                {{=var_grade.user_name}}
+                              </td>
+                              <td>
+                                {{=T('Rol '+var_grade.roll)}}
+                              </td>
+                              <td>
+                                {{=var_grade.before_grade}}
+                              </td>
+                              <td>
+                                {{=var_grade.after_grade}}
+                              </td>
+                            <tr>
+                          {{pass}}
+                        </table>
+                      {{pass}}
+                </div>
+              </div>
+              <div class="modal-footer">
+                  <button class="btn" data-dismiss="modal" aria-hidden="true">{{=T('Close')}}</button>
               </div>
             </div>
-            <div class="modal-footer">
-                <button class="btn" data-dismiss="modal" aria-hidden="true">{{=T('Close')}}</button>
-            </div>
-          </div>
-          <!--Finish MODaL-->
+            <!--Finish MODaL-->
+          {{pass}}
       </td>
       
       {{var_grade = db((db.grades.academic_assignation==academic.id) & (db.grades.activity==var_activity.id)).select().first()}}
