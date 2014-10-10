@@ -1042,21 +1042,6 @@ def management_activity_without_metric():
         session.flash = T('Not valid Action.')
         redirect(URL('default','index'))
 
-@auth.requires_login()
-def activity_without_metric():
-    import cpfecys
-    #Obteners la asignacion del estudiante
-    project = request.vars['project']
-    
-    year = db(db.period_year.id == request.vars['year']).select().first() 
-    assigantion = db((db.user_project.assigned_user == auth.user.id) & (db.user_project.period == year.id) & (db.user_project.project == project)).select().first()
-    if assigantion is None:
-        assigned_to_project = False
-    else:
-        assigned_to_project = True
-    
-    return dict(semestre2 = year, project = project, assigned_to_project = assigned_to_project)
-
 
 
 #------------------------------------------------------------------------------------------------------------------------

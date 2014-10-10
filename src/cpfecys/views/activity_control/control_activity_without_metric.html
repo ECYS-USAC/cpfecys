@@ -1,6 +1,144 @@
+{{var_do=False}}
+<!--Check that the current date is in the period that de administrator has register-->
+{{from datetime import datetime}}
+{{date1=None}}
+{{tiempo=str(datetime.now())}}
+{{dateInicialP = db.executesql('SELECT date(\''+tiempo+'\');',as_dict=True)}}
+{{for d0 in dateInicialP:}}
+	{{date1=d0['date(\''+tiempo+'\')']}}
+{{pass}}
+
+	
+{{actualSemester = db(db.period_year.id==semestre2.id).select().first()}}
+{{comparacion = T(actualSemester.period.name)+" "+str(actualSemester.yearp)}}
+{{date_var = db((db.student_control_period.period_name==comparacion)).select().first()}}
+
+{{if date1 >= date_var.date_start_semester and date1 <= date_var.date_finish_semester:}}
+	{{var_do=True}}
+{{pass}}
+<!--End of the check of period-->
+
+{{exception_query = db(db.course_laboratory_exception.project == project.id).select().first()}}
+{{exception_s_var = False}}
+{{exception_t_var = False}}
+{{no_menu=True}}
+
+{{if exception_query is not None:}}
+	{{exception_t_var = exception_query.t_edit_lab}}
+	{{exception_s_var = exception_query.s_edit_course}}
+{{pass}}
+
+{{if (auth.has_membership('Super-Administrator')) or (auth.has_membership('Ecys-Administrator')) or ((auth.has_membership('Teacher') or auth.has_membership('Student')) and assigned_to_project == True):}}
+	{{no_menu=False}}
+{{pass}}
+
 {{if request.vars['operation'] == "div_update": }}
 	<center>
 		<div id="table_activity_without_metric">
+			<center>
+			<table>
+				<tr>
+					<td>
+						<a id="awmLB" role="button" class="badge btn-success" onclick="visible_lab_activities_wm();">
+                    		{{=T('Laboratory Activities')}}
+                    	</a>
+					</td>
+					<td></td>
+					<td>
+						<a id="awmCB" role="button" class="badge btn-warning" onclick="visible_class_activities_wm();">
+                    		{{=T('Class Activities')}}
+                    	</a>
+					</td>
+					<td></td>
+					<td>
+						<a id="awmAB" role="button" class="badge btn-info" onclick="visible_all_activities_wm();">
+                    		{{=T('All activities')}}
+                    	</a>
+					</td>
+				</tr>
+			</table>
+			</center>
+		  	<table class="table table-bordered">
+		  		<tr bgcolor="#E6E6E6">
+		  			<th>
+						{{=T('Name')}}
+					</th>
+					<th>
+						{{=T('Description')}}
+					</th>
+					{{if no_menu==False:}}
+						<th>
+							{{=T('Report')}}
+						</th>
+					{{pass}}
+					<th title="{{=T('Teacher Permition')}}">
+						{{=T('TP')}}
+					</th>
+					<th>
+						{{=T('Date')}}
+					</th>
+				</tr>
+				{{tActivitiesWM = db((db.course_activity_without_metric.semester==actualSemester.id)&(db.course_activity_without_metric.assignation==project.id)).select()}}
+				{{for tAct in tActivitiesWM:}}
+					{{if tAct.laboratory==True:}}
+						<tr class="label-success activity_without_metric_lab">
+					{{else:}}
+						<tr class="label-warning activity_without_metric_class">
+					{{pass}}
+						<td>
+							{{=tAct.name}}
+						</td>
+						<td>
+							<div style="width:200px;">
+								{{=tAct.description[:100]}}
+								{{if len(tAct.description) > 100:}}
+									...
+									<br>
+									<div align="right">
+										<a type="button" style ="cursor:pointer;" role="button" data-toggle="modal" data-target="#ac_wm_des_modal_{{=tAct.id}}" >{{=T('View more')}}</span></a>
+									</div>
+							
+									<!--MODAL -->
+									<div id="ac_wm_des_modal_{{=tAct.id}}" class="modal hide fade" tabindex="-1" role="dialog"  aria-hidden="true"> 
+									  <div class="modal-header">
+									    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+									      <h3 id="myModalLabel">
+									          {{=tAct.name}}
+									      </h3>
+									  </div>
+									  <div class="modal-body">
+									    <div class="well">
+									        <pre>
+									           {{=tAct.description}}
+									        </pre>
+									    </div>
+									  </div>
+									  <div class="modal-footer">
+									      <button class="btn" data-dismiss="modal" aria-hidden="true">{{=T('Close')}}</button>
+									  </div>
+									</div>
+									<!--Finish MODaL-->
+								{{pass}}
+							</div>
+						</td>
+						{{if no_menu==False:}}
+							<td>
+								{{if tAct.fileReport=="":}}
+									{{=T('False')}} {{=T('Report')}}
+								{{else:}}
+									<a href="' + cpfecys.get_domain() + URL('default/download', tAct.fileReport) +'" target="blank"> '+ {{=T('Report')}} + '</a>
+								{{pass}}
+							</td>
+						{{pass}}
+						<td>
+							{{=T(str(tAct.teacher_permition))}}
+						</td>
+						<td>
+							{{=tAct.date_start}}
+						</td>
+					</tr>
+				{{pass}}
+		  	</table>
 		</div>
 	</center>
 {{pass}}
@@ -11,41 +149,6 @@
 
 
 {{if request.vars['operation'] == "menu_update": }}
-	{{var_do=False}}
-
-	<!--Check that the current date is in the period that de administrator has register-->
-	{{from datetime import datetime}}
-	{{date1=None}}
-	{{tiempo=str(datetime.now())}}
-	{{dateInicialP = db.executesql('SELECT date(\''+tiempo+'\');',as_dict=True)}}
-	{{for d0 in dateInicialP:}}
-		{{date1=d0['date(\''+tiempo+'\')']}}
-	{{pass}}
-
-		
-	{{actualSemester = db(db.period_year.id==semestre2.id).select().first()}}
-	{{comparacion = T(actualSemester.period.name)+" "+str(actualSemester.yearp)}}
-	{{date_var = db((db.student_control_period.period_name==comparacion)).select().first()}}
-
-	{{if date1 >= date_var.date_start_semester and date1 <= date_var.date_finish_semester:}}
-		{{var_do=True}}
-	{{pass}}
-	<!--End of the check of period-->
-
-	{{exception_query = db(db.course_laboratory_exception.project == project.id).select().first()}}
-	{{exception_s_var = False}}
-	{{exception_t_var = False}}
-	{{no_menu=True}}
-
-	{{if exception_query is not None:}}
-		{{exception_t_var = exception_query.t_edit_lab}}
-		{{exception_s_var = exception_query.s_edit_course}}
-	{{pass}}
-
-	{{if (auth.has_membership('Super-Administrator')) or (auth.has_membership('Ecys-Administrator')) or ((auth.has_membership('Teacher') or auth.has_membership('Student')) and assigned_to_project == True):}}
-		{{no_menu=False}}
-	{{pass}}
-
 	<ul class="dropdown"  class="close" aria-hidden="true"  style="height:10px;">
 		<a style="color:#f0ad4e;text-shadow:none;" class="dropdown-toggle" data-toggle="dropdown" href="">
 	    	<span class="icon-list"></span>
@@ -69,8 +172,20 @@
 	</ul> 
 {{pass}}
 
+
 <script type="text/javascript">
-  	$(document).ready(function(){
-		$("#table_activity_without_metric").load("{{=URL('activity_control','activity_without_metric.html')}}?op=showTableNoEditable&amp;project={{=request.vars['project']}}&amp;year={{=request.vars['year']}}&amp;type={{=request.vars['type']}}");
-	});
+	function visible_lab_activities_wm(){
+		$(".activity_without_metric_lab").css("display", "");
+		$(".activity_without_metric_class").css("display", "none");
+	}
+
+	function visible_class_activities_wm(){
+		$(".activity_without_metric_class").css("display", "");
+		$(".activity_without_metric_lab").css("display", "none");
+	}
+
+	function visible_all_activities_wm(){
+		$(".activity_without_metric_class").css("display", "");
+		$(".activity_without_metric_lab").css("display", "");
+	}
 </script>
