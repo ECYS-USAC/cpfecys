@@ -1150,9 +1150,45 @@
 											{{pass}}
 										{{else:}}
 											<td>
+												<!--HAS TO BE CHECK
+													******************************************8******************************************8******************************************8
+													******************************************8******************************************8******************************************8
+													******************************************8******************************************8******************************************8
+													******************************************8******************************************8******************************************8
+												-->
 												<!--Grade of the activity-->
-												<center>0</center>
+												{{academicCourse = db(db.academic.carnet==auth.user.username).select().first()}}
+												{{if academicCourse is not None:}}
+													{{coursesStudent = db((db.academic_course_assignation.carnet == academicCourse.id) & (db.academic_course_assignation.semester == semestre2.id) & (db.academic_course_assignation.assignation==project_var.id)).select().first()}}
+													{{if coursesStudent is not None:}}
+														{{gradeStudent = db((db.grades.academic_assignation==coursesStudent.id) & (db.grades.activity==tAct.id)).select().first()}}
+														{{if gradeStudent is not None:}}
+															<center>
+																{{actualSemester = db(db.period_year.id==semestre2).select().first()}}
+																{{comparacion = T(actualSemester.period.name)+" "+str(actualSemester.yearp)}}
+																{{controlP = db((db.student_control_period.period_name==comparacion)).select().first()}}
+																<center>
+																{{if gradeStudent.grade < controlP.min_average:}}
+																<span class="label label-important">
+																{{elif gradeStudent.grade>controlP.min_average and gradeStudent.grade < controlP.max_average:}}
+																<span class="label label-warning">
+																{{else:}}
+																<span class="label label-success">
+																{{pass}}
+																	{{=str(gradeStudent.grade)}}
+																	</span>
+																</center>
+															</center>
+														{{pass}}
+													{{pass}}
+												{{pass}}
 												<!--Grade of the activity-->
+												<!--HAS TO BE CHECK
+													******************************************8******************************************8******************************************8
+													******************************************8******************************************8******************************************8
+													******************************************8******************************************8******************************************8
+													******************************************8******************************************8******************************************8
+												-->
 											</td>
 										{{pass}}
 									{{pass}}

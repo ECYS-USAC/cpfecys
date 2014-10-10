@@ -161,7 +161,51 @@ def control_students_grades():
     else:
         academic_assig =  db((db.academic_course_assignation.assignation==id_project) & (db.academic_course_assignation.semester==id_year)).select()
 
-    return dict(academic_assig=academic_assig, var_period=var_period, var_activity=var_activity, var_project=var_project)
+    #Permition to add grades
+    exception_query = db(db.course_laboratory_exception.project == id_project).select().first()
+    exception_s_var = False
+    exception_t_var = False
+    no_menu=True
+    request_change_var=False
+
+    if exception_query is not None:
+        exception_t_var = exception_query.t_edit_lab
+        exception_s_var = exception_query.s_edit_course
+
+    if auth.has_membership('Student')==True:
+        if var_activity.laboratory == True or exception_s_var == True or var_activity.teacher_permition==True or var_activity.course_activity_category.teacher_permition==True:
+            if var_activity.laboratory == True:
+                from datetime import datetime
+                comparacion = T(var_period.period.name)+" "+str(var_period.yearp)
+                controlP = db((db.student_control_period.period_name==comparacion)).select().first()
+
+                maximTimeGrade = db.executesql('SELECT DATE_ADD(\''+str(var_activity.date_finish)+'\', INTERVAL '+str(controlP.timeout_income_notes)+' Day) as fechaMaxGrade;',as_dict=True)
+                dateGrade0=''
+                for d0 in maximTimeGrade:
+                    dateGrade0=d0['fechaMaxGrade']
+
+                if str(datetime.now()) <= str(dateGrade0):
+                    request_change_var=True
+            else:
+                request_change_var=True
+    elif auth.has_membership('Teacher')==True:
+        if var_activity.laboratory == True:
+            if exception_t_var == True:
+                request_change_var=True
+        else:
+            request_change_var=True
+    elif auth.has_membership('Ecys-Administrator')==True:
+        request_change_var=True
+    elif auth.has_membership('Super-Administrator')==True:
+        request_change_var=True
+    
+    if request_change_var == False:
+        request_change_var = True
+    else:
+        request_change_var = False
+
+
+    return dict(academic_assig=academic_assig, var_period=var_period, var_activity=var_activity, var_project=var_project, request_change_var =request_change_var)
 
 
 @auth.requires_login()
@@ -1082,13 +1126,12 @@ def General_report_activities():
             session.flash = T('Not valid Action.')
             redirect(URL('default','index'))
 
-    project_var = project_var.id
-    if auth.has_membership('Super-Administrator') == False:
-        assigantion = db((db.user_project.assigned_user == auth.user.id) & (db.user_project.period == year.id) & (db.user_project.project == project_var)).select().first()
+    if auth.has_membership('Super-Administrator') == False or auth.has_membership('Ecys-Administrator')==False:
+        assigantion = db((db.user_project.assigned_user == auth.user.id) & (db.user_project.period == year.id) & (db.user_project.project == project_var.id)).select().first()
         if assigantion is None:
-            academic_var = db(db.academic.carnet==auth.user.username).select().first()
             try:
-                academic_assig = db((db.academic_course_assignation.carnet == academic_var.id) & (db.academic_course_assignation.semester == year.id) & (db.academic_course_assignation.assignation==project_var) ).select().first()
+                academic_var = db(db.academic.carnet==auth.user.username).select().first()
+                academic_assig = db((db.academic_course_assignation.carnet == academic_var.id) & (db.academic_course_assignation.semester == year.id) & (db.academic_course_assignation.assignation==project_var.id)).select().first()
                 if academic_assig is None:
                     session.flash=T('You do not have permission to view course requests')
                     redirect(URL('default','index'))
@@ -1097,8 +1140,25 @@ def General_report_activities():
                 redirect(URL('default','index'))
 
     
-    teacher = db((db.user_project.period == year.id) & (db.user_project.project == project_var)).select().first()
-    practice = db((db.user_project.period == year.id) & (db.user_project.project == project_var)).select()
-    students = db((db.academic_course_assignation.semester == year.id) & (db.academic_course_assignation.assignation==project_var) ).select()
-        
-    return dict(project = project_var, year = year.id, teacher=teacher, practice=practice, students=students)
+    teacher = db((db.user_project.period == year.id) & (db.user_project.project == project_var.id) & (db.user_project.assigned_user==db.auth_user.id)&(db.auth_user.id==db.auth_membership.user_id)&(db.auth_membership.group_id==3)).select().first()
+    practice = db((db.user_project.period == year.id) & (db.user_project.project == project_var.id) & (db.user_project.assigned_user==db.auth_user.id)&(db.auth_user.id==db.auth_membership.user_id)&(db.auth_membership.group_id==2)).select()
+    students = db((db.academic_course_assignation.semester == year.id) & (db.academic_course_assignation.assignation==project_var.id) ).select()
+
+    existLab=False
+    totalW=float(0)
+    CourseCategory = db((db.course_activity_category.semester==year.id)&(db.course_activity_category.assignation==project_var.id)&(db.course_activity_category.laboratory==False)).select()
+    CourseActivities = []
+    for categoryC in CourseCategory:
+        totalW=totalW+float(categoryC.grade)
+        if categoryC.category=="Laboratorio":
+            existLab=True
+        else:
+            CourseActivities.append(db((db.course_activity.semester==year.id)&(db.course_activity.assignation==project_var.id)&(db.course_activity.laboratory==False)&(db.course_activity.course_activity_category==categoryC.id)).select())
+
+
+    if totalW!=float(100):
+        session.flash= "No se encuentra definida la ponderación correcta en el curso. No puede visualizar esta función"
+        redirect(URL('default','index'))
+
+
+    return dict(project = project_var, year = year, teacher=teacher, practice=practice, students=students, CourseCategory=CourseCategory, CourseActivities=CourseActivities)

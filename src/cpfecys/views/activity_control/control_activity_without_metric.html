@@ -39,19 +39,22 @@
 			<table>
 				<tr>
 					<td>
-						<a id="awmLB" role="button" class="badge btn-success" onclick="visible_lab_activities_wm();">
+						<span class="label label-success">&nbsp;&nbsp;&nbsp;</span>
+						<a id="awmLB" style="cursor:pointer;" onclick="visible_lab_activities_wm();">
                     		{{=T('Laboratory Activities')}}
                     	</a>
 					</td>
 					<td></td>
 					<td>
-						<a id="awmCB" role="button" class="badge btn-warning" onclick="visible_class_activities_wm();">
+						<span class="label label-warning">&nbsp;&nbsp;&nbsp;</span>
+						<a id="awmCB" style="cursor:pointer;" onclick="visible_class_activities_wm();">
                     		{{=T('Class Activities')}}
                     	</a>
 					</td>
 					<td></td>
 					<td>
-						<a id="awmAB" role="button" class="badge btn-info" onclick="visible_all_activities_wm();">
+						<span class="label label-info">&nbsp;&nbsp;&nbsp;</span>
+						<a id="awmAB" style="cursor:pointer;" onclick="visible_all_activities_wm();">
                     		{{=T('All activities')}}
                     	</a>
 					</td>
@@ -65,6 +68,9 @@
 					</th>
 					<th>
 						{{=T('Description')}}
+					</th>
+					<th>
+						{{=T('Type')}}
 					</th>
 					{{if no_menu==False:}}
 						<th>
@@ -81,9 +87,9 @@
 				{{tActivitiesWM = db((db.course_activity_without_metric.semester==actualSemester.id)&(db.course_activity_without_metric.assignation==project.id)).select()}}
 				{{for tAct in tActivitiesWM:}}
 					{{if tAct.laboratory==True:}}
-						<tr class="label-success activity_without_metric_lab">
+						<tr class="activity_without_metric_lab">
 					{{else:}}
-						<tr class="label-warning activity_without_metric_class">
+						<tr class="activity_without_metric_class">
 					{{pass}}
 						<td>
 							{{=tAct.name}}
@@ -121,12 +127,24 @@
 								{{pass}}
 							</div>
 						</td>
+						<td>
+							<center>
+							{{if tAct.laboratory==True:}}
+								<span class="label label-success activity_without_metric_lab">
+									{{=T('Laboratory')}}
+							{{else:}}
+								<span class="label label-warning activity_without_metric_class">
+									{{=T('Course')}}
+							{{pass}}
+								</span>
+							</center>
+						</td>
 						{{if no_menu==False:}}
 							<td>
 								{{if tAct.fileReport=="":}}
-									{{=T('False')}} {{=T('Report')}}
+									{{=T('Without')}} {{=T('Report')}}
 								{{else:}}
-									<a href="' + cpfecys.get_domain() + URL('default/download', tAct.fileReport) +'" target="blank"> '+ {{=T('Report')}} + '</a>
+									<a href="{{=cpfecys.get_domain()}}default/download/{{=tAct.fileReport}}" target="blank">{{=T('Report')}}</a>
 								{{pass}}
 							</td>
 						{{pass}}

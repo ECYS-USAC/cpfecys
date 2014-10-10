@@ -94,10 +94,11 @@
       </pre>
     </td>
   </tr>
-  
+  {{if request_change_var==False:}}
     <td>
       <b>{{=T('Add New Grade')}}</b>
     </td>
+
     <td colspan="3">
       <center>
         <table class="table table-striped table-bordered" >
@@ -126,6 +127,7 @@
         </center>
     </td>
   </tr>
+  {{pass}}
   <tr>
     <td>
       <b>{{=T('Academic List')}}</b>
@@ -211,15 +213,21 @@ aria-hidden="true">{{=T('Close')}}</button>
           document.getElementById('grade_input').focus();
           document.getElementById('grade_input').select();
         }else{
-          if (!regex.test(grade_var) && !regex2.test(grade_var) ){
-            alert("{{=T('The grade value is not a decimal')}}"); 
-            document.getElementById('grade_input').focus(); 
-            document.getElementById('grade_input').select();
+          if (!regex2.test(carnet_var) ){
+            alert("{{=T('The id value is not a numeric')}}"); 
+            document.getElementById('carnet_input').focus(); 
+            document.getElementById('carnet_input').select();
           }else{
-            $("#grades_list").load("{{=URL('activity_control','grades.html')}}?op=add_grade&amp;activity={{=var_activity.id}}&amp;project={{=var_project.id}}&amp;year={{=var_period.id}}&amp;carnet="+carnet_var+"&amp;grade="+grade_var);
-            document.getElementById('carnet_input').focus();
-            document.getElementById('grade_input').value = "";
-            document.getElementById('carnet_input').value = "";
+            if (!regex.test(grade_var) && !regex2.test(grade_var) ){
+              alert("{{=T('The grade value is not a decimal')}}");
+              document.getElementById('grade_input').focus(); 
+              document.getElementById('grade_input').select();
+            }else{
+              $("#grades_list").load("{{=URL('activity_control','grades.html')}}?op=add_grade&amp;activity={{=var_activity.id}}&amp;project={{=var_project.id}}&amp;year={{=var_period.id}}&amp;carnet="+carnet_var+"&amp;grade="+grade_var);
+              document.getElementById('carnet_input').focus();
+              document.getElementById('grade_input').value = "";
+              document.getElementById('carnet_input').value = "";
+            }
           }
         }
       }
