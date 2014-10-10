@@ -129,6 +129,7 @@
 'Ajax Recipes': 'Recetas AJAX',
 'Alert': 'Alerta',
 'All': 'Todos',
+'All activities': 'Todas las Actividades',
 'All fields are mandatory, please check and try again.': 'Todos los campos son obligatorios, intente nuevamente.',
 'All fields are required.': 'Todos los campos son requeridos.',
 'All files': 'Todos los Archivos',
