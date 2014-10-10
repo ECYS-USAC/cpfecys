@@ -93,6 +93,8 @@ def students_control():
 
 
     project_var = request.vars['project']
+    
+
     if auth.has_membership('Super-Administrator') == False and auth.has_membership('Ecys-Administrator') == False :
         assigantion = db((db.user_project.assigned_user == auth.user.id) & (db.user_project.period == year.id) & (db.user_project.project == project_var)).select().first()
         
@@ -100,15 +102,17 @@ def students_control():
             academic_var = db(db.academic.carnet==auth.user.username).select().first()
             try:
                 academic_assig = db((db.academic_course_assignation.carnet == academic_var.id) & (db.academic_course_assignation.semester == year.id) & (db.academic_course_assignation.assignation==project_var) ).select().first()
-            
+                
                 if academic_assig is None:
                     session.flash=T('You do not have permission to view course requests')
                     redirect(URL('default','index'))
+                
+                    
             except:
                 session.flash=T('You do not have permission to view course requests')
                 redirect(URL('default','index'))
         
-    return dict(project = project_var, year = year.id)
+    return dict(project = project_var, year = year.id )
 
 
 
