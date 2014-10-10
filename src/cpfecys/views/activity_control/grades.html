@@ -1,3 +1,9 @@
+<!---------------------------Cancel Request---------------------------->
+{{if (request.vars['op'] == "cancel_request") : }}
+  {{request_change = db((db.request_change_grades.activity== var_activity.id) & (db.request_change_grades.status=='pending') ).select().first() }}
+  {{db(db.request_change_grades.id==request_change.id).delete()}}
+{{pass}}
+
 <!---------------------------INSERT---------------------------->
 {{if (request.vars['op'] == "add_grade") | (request.vars['op'] == "add_grade_list"): }}
   <script type="text/javascript">
@@ -9,45 +15,81 @@
 
       {{assig_var =  db((db.academic_course_assignation.assignation==var_project.id) & (db.academic_course_assignation.semester==var_period.id) & (db.academic_course_assignation.carnet == academic_var.id)).select().first()}}
 
-      {{grade_before = db((db.grades.academic_assignation==assig_var.id) & (db.grades.activity==var_activity.id) ).select().first() }}
-      {{if grade_before is None:}}
-        {{grade = db.grades.insert(academic_assignation = assig_var.id,
-                            activity = var_activity.id,
-                            grade =  request.vars['grade'])}}
-
-        {{if grade != None:}}
-          {{#--------------------------------------------log-------------------------------------}}
-          {{db.grades_log.insert(user_name = auth.user.username,
-                            roll = rol_log,
-                            operation_log = 'insert',
-                            academic_assignation_id = assig_var.id,
-                            academic = assig_var.carnet.carnet,
-                            project = assig_var.assignation.name,
-                            activity = var_activity.name,
-                            activity_id = var_activity.id,
-                            category = var_activity.course_activity_category.category.category,
-                            period = T(assig_var.semester.period.name),
-                            yearp = assig_var.semester.yearp,
-                            after_grade = request.vars['grade'],
-                            description = T('Inserted from Grades page')
-                             )}}
-          {{if request.vars['op'] == "add_grade":}}
-            <script type="text/javascript">
-              document.getElementById('information_text').className = "badge badge-success";
-              jQuery("#information_text").append('{{=T('Grade added')}}'+" | Carnet: '{{=academic_var.carnet}}' {{=T('Grade')}}: '{{=grade.grade}}'");
-            </script>
-          {{pass}}
-        {{else:}}
+      
+      {{#--------------------------------------------INSERT GRADE-------------------------------------}}
+      {{if request_change_var == False:}}
+        {{if exist_request_change == True:}}
           <script type="text/javascript">
-            jQuery("#information_text").append('{{=T('Failed to add grade')}}'+" | Carnet: '{{=academic_var.carnet}}' {{=T('Grade')}}: '{{=grade.grade}}'");
+            alert("{{=T('Can not make operation because there is a pending request change. Please resolve it before proceeding.')}}");
           </script>
-        {{pass}}
-      {{else:}}
-        <script type="text/javascript">
-          jQuery("#information_text").append('{{=T('Failed to add grade')}}'+" | Carnet: '{{=request.vars['carnet']}}' {{=T('Already have an associated grade')}}");
-        </script>
-      {{pass}}
+        {{else:}}
+          {{grade_before = db((db.grades.academic_assignation==assig_var.id) & (db.grades.activity==var_activity.id) ).select().first() }}
+          {{if grade_before is None:}}
+            {{grade = db.grades.insert(academic_assignation = assig_var.id,
+                                activity = var_activity.id,
+                                grade =  request.vars['grade'])}}
 
+            {{if grade != None:}}
+              {{#--------------------------------------------log-------------------------------------}}
+              {{db.grades_log.insert(user_name = auth.user.username,
+                                roll = rol_log,
+                                operation_log = 'insert',
+                                academic_assignation_id = assig_var.id,
+                                academic = assig_var.carnet.carnet,
+                                project = assig_var.assignation.name,
+                                activity = var_activity.name,
+                                activity_id = var_activity.id,
+                                category = var_activity.course_activity_category.category.category,
+                                period = T(assig_var.semester.period.name),
+                                yearp = assig_var.semester.yearp,
+                                after_grade = request.vars['grade'],
+                                description = T('Inserted from Grades page')
+                                 )}}
+              {{if request.vars['op'] == "add_grade":}}
+                <script type="text/javascript">
+                  document.getElementById('information_text').className = "badge badge-success";
+                  jQuery("#information_text").append('{{=T('Grade added')}}'+" | Carnet: '{{=academic_var.carnet}}' {{=T('Grade')}}: '{{=grade.grade}}'");
+                </script>
+              {{pass}}
+            {{else:}}
+              <script type="text/javascript">
+                jQuery("#information_text").append('{{=T('Failed to add grade')}}'+" | Carnet: '{{=academic_var.carnet}}' {{=T('Grade')}}: '{{=grade.grade}}'");
+              </script>
+            {{pass}}  {{#----grade!=None---}}
+          {{else:}}
+            <script type="text/javascript">
+              jQuery("#information_text").append('{{=T('Failed to add grade')}}'+" | Carnet: '{{=request.vars['carnet']}}' {{=T('Already have an associated grade')}}");
+            </script>
+          {{pass}} {{#-------grade_before-is-None---}}  
+        {{pass}}  {{#------exist_request_change-==-True----}}
+      {{#--------------------------------------------INSERT REQUEST-------------------------------------}}
+      {{else:}}
+        {{grade_before = db((db.grades.academic_assignation==assig_var.id) & (db.grades.activity==var_activity.id) ).select().first() }}
+        
+        {{var_grade_before = None}}
+        {{var_operation = 'insert'}}
+        {{if grade_before != None:}}
+          {{var_grade_before = grade_before.grade}}
+          {{var_operation = 'update'}}
+        {{pass}}
+        
+        {{request_change = db((db.request_change_grades.activity== var_activity.id) & (db.request_change_grades.status=='pending') ).select().first() }}
+        {{if request_change is None:}}
+          {{grade = db.request_change_grades.insert(user_id = auth.user.id,
+                                                  activity = var_activity.id,
+                                                  status =  'pending',
+                                                  roll = rol_log,
+                                                  description = request.vars['description_var'])}}
+        {{pass}} {{#--------request_change-is-None----}}
+        {{request_change = db((db.request_change_grades.activity== var_activity.id) & (db.request_change_grades.status=='pending') ).select().first() }}
+        {{rq_grade = db.request_change_grades_detail.insert(request_change_grades = request_change.id,
+                                                              academic_assignation = assig_var.id,
+                                                              before_grade = var_grade_before,
+                                                              operation_request = var_operation,
+                                                              after_grade = request.vars['grade'])}}
+        
+      {{pass}} {{#-------request_change_var-==-False---}}
+    
       
     {{except:}}
       {{if academic_var is None:}}
@@ -67,71 +109,85 @@
 {{pass}}
 <!---------------------------UPDATE---------------------------->
 {{if (request.vars['op'] == "update_grade") | (request.vars['op'] == "update_grade_list"): }}
-  
-  {{academic_var =  db(db.academic.carnet==request.vars['carnet']).select().first()}}
-  
-  {{assig_var =  db((db.academic_course_assignation.assignation==var_project.id) & (db.academic_course_assignation.semester==var_period.id) & (db.academic_course_assignation.carnet == academic_var.id)).select().first()}}
+  {{if exist_request_change == True:}}
+          <script type="text/javascript">
+            alert("{{=T('Can not make operation because there is a pending request change. Please resolve it before proceeding.')}}");
+          </script>
+  {{else:}}
+    {{academic_var =  db(db.academic.carnet==request.vars['carnet']).select().first()}}
+    
+    {{assig_var =  db((db.academic_course_assignation.assignation==var_project.id) & (db.academic_course_assignation.semester==var_period.id) & (db.academic_course_assignation.carnet == academic_var.id)).select().first()}}
 
-  {{grade_before = db((db.grades.academic_assignation==assig_var.id) & (db.grades.activity==var_activity.id) ).select().first() }}
-  
-  {{grade = db(db.grades.id==grade_before.id).update(grade =  request.vars['grade'])}}
+    {{grade_before = db((db.grades.academic_assignation==assig_var.id) & (db.grades.activity==var_activity.id) ).select().first() }}
+    
+    {{grade = db(db.grades.id==grade_before.id).update(grade =  request.vars['grade'])}}
 
-  {{#--------------------------------------------log-------------------------------------}}
-  {{db.grades_log.insert(user_name = auth.user.username,
-                          roll = rol_log,
-                          operation_log = 'update',
-                          academic_assignation_id = assig_var.id,
-                          academic = assig_var.carnet.carnet,
-                          project = assig_var.assignation.name,
-                          activity = var_activity.name,
-                          activity_id = var_activity.id,
-                          category = var_activity.course_activity_category.category.category,
-                          period = T(assig_var.semester.period.name),
-                          yearp = assig_var.semester.yearp,
-                          after_grade = request.vars['grade'],
-                          before_grade = grade_before.grade,
-                          description = T('Edited from Grades page')
-                       )}}
+    {{#--------------------------------------------log-------------------------------------}}
+    {{db.grades_log.insert(user_name = auth.user.username,
+                            roll = rol_log,
+                            operation_log = 'update',
+                            academic_assignation_id = assig_var.id,
+                            academic = assig_var.carnet.carnet,
+                            project = assig_var.assignation.name,
+                            activity = var_activity.name,
+                            activity_id = var_activity.id,
+                            category = var_activity.course_activity_category.category.category,
+                            period = T(assig_var.semester.period.name),
+                            yearp = assig_var.semester.yearp,
+                            after_grade = request.vars['grade'],
+                            before_grade = grade_before.grade,
+                            description = T('Edited from Grades page')
+                         )}}
 
-    {{if request.vars['op'] == "update_grade":}}
-      {{request.vars['op']="view_grades"}}
+      {{if request.vars['op'] == "update_grade":}}
+        {{request.vars['op']="view_grades"}}
+      {{pass}}
     {{pass}}
 {{pass}}
 
 <!---------------------------DELETE---------------------------->
 {{if (request.vars['op'] == "remove_grade") | (request.vars['op'] == "remove_grade_list"): }}
-    
-    {{grade_var = db(db.grades.id==request.vars['grade_id']).select().first()}}
-    {{db(db.grades.id==request.vars['grade_id']).delete()}}
-    {{#--------------------------------------------log-------------------------------------}}
-    {{db.grades_log.insert(user_name = auth.user.username,
-                      roll = rol_log,
-                      operation_log = 'delete',
-                      academic_assignation_id = grade_var.academic_assignation.id,
-                      academic = grade_var.academic_assignation.carnet.carnet,
-                      project = grade_var.academic_assignation.assignation.name,
-                      activity = grade_var.activity.name,
-                      activity_id = grade_var.activity.id,
-                      category = grade_var.activity.course_activity_category.category.category,
-                      period = T(grade_var.academic_assignation.semester.period.name),
-                      yearp = grade_var.academic_assignation.semester.yearp,
-                      before_grade = grade_var.grade,
-                      description = T('Delete from Grades page')
-                       )}}
-    
+    {{if exist_request_change == True:}}
+          <script type="text/javascript">
+            alert("{{=T('Can not make operation because there is a pending request change. Please resolve it before proceeding.')}}");
+          </script>
+    {{else:}}
+      {{grade_var = db(db.grades.id==request.vars['grade_id']).select().first()}}
+      {{db(db.grades.id==request.vars['grade_id']).delete()}}
+      {{#--------------------------------------------log-------------------------------------}}
+      {{db.grades_log.insert(user_name = auth.user.username,
+                        roll = rol_log,
+                        operation_log = 'delete',
+                        academic_assignation_id = grade_var.academic_assignation.id,
+                        academic = grade_var.academic_assignation.carnet.carnet,
+                        project = grade_var.academic_assignation.assignation.name,
+                        activity = grade_var.activity.name,
+                        activity_id = grade_var.activity.id,
+                        category = grade_var.activity.course_activity_category.category.category,
+                        period = T(grade_var.academic_assignation.semester.period.name),
+                        yearp = grade_var.academic_assignation.semester.yearp,
+                        before_grade = grade_var.grade,
+                        description = T('Delete from Grades page')
+                         )}}
+      
+      
+    {{pass}}
     {{if request.vars['op'] == "remove_grade":}}
       {{request.vars['op']="view_grades"}}
     {{pass}}
 {{pass}}
 
-{{request_change_var=False}}
 {{if request.vars['op'] == "view_grades": }}
 <div align="right">
   {{if request_change_var == False:}}
     <a onclick="edit_all();" style ="cursor:pointer;"><span class="icon-edit"></span> {{=T('Edit All')}}</a> -
     <a onclick="delete_all();" style ="cursor:pointer;"><span class="icon-trash"></span>{{=T('Delete All')}}</a>
   {{else:}}
-    <a id="change_request_link" onclick="change_request();" style ="cursor:pointer;"><span class="icon-random"></span> {{=T('Change Request')}}</a>
+    <a id="change_request_link" onclick="change_request();" style ="cursor:pointer;"><span class="icon-random"></span> {{=T('Change Request')}}
+      {{if exist_request_change == True:}}
+        (1)
+      {{pass}}
+    </a>
   {{pass}}
 </div>
 <table class="table table-striped table-bordered"  style="width:100%;">
@@ -217,7 +273,28 @@
       {{if var_grade is None:}}
         <td style="width:25%;">
           <div id="div_edit_grade_{{=academic.carnet.carnet}}" style="display:none;">
-            <input class="string" name="edit_grade_{{=academic.carnet.carnet}}" type="text" value="" id="edit_grade_{{=academic.carnet.carnet}}" style="width:100px;">
+            {{if (exist_request_change == False) | (request_change_var == False):}}
+              <input class="string" name="edit_grade_{{=academic.carnet.carnet}}" type="text" value="" id="edit_grade_{{=academic.carnet.carnet}}" style="width:100px;">
+            {{else:}}
+              {{request_change = db((db.request_change_grades.activity== var_activity.id) & (db.request_change_grades.status=='pending') ).select().first() }}
+
+              {{grade_rc_var = db((db.request_change_grades_detail.request_change_grades== request_change.id) & (db.request_change_grades_detail.academic_assignation==academic.id) ).select().first() }}
+
+              {{try:}}
+                {{if grade_rc_var.operation_request == 'insert':}}
+                  <font color="green">{{=grade_rc_var.after_grade}}</font>
+                {{pass}}
+                {{if grade_rc_var.operation_request == 'update':}}
+                  <font color="blue">{{=grade_rc_var.after_grade}}</font>
+                {{pass}}
+                {{if grade_rc_var.operation_request == 'delete':}}
+                  <font color="red">{{=grade_rc_var.after_grade}}</font>
+                {{pass}}
+              {{except:}}
+                {{None}}
+              {{pass}}
+
+            {{pass}}
           </div>
         </td>
         {{if request_change_var == False:}}
@@ -244,7 +321,27 @@
       {{else:}}
         <td style="width:25%;">
           <div id="div_edit_grade_{{=academic.carnet.carnet}}" style="display:none;">
-            <input class="string" name="edit_grade_{{=academic.carnet.carnet}}" type="text" value="{{=var_grade.grade}}" id="edit_grade_{{=academic.carnet.carnet}}" style="width:100px;">
+           {{if (exist_request_change == False) | (request_change_var == False):}}
+              <input class="string" name="edit_grade_{{=academic.carnet.carnet}}" type="text" value="{{=var_grade.grade}}" id="edit_grade_{{=academic.carnet.carnet}}" style="width:100px;">
+            {{else:}}
+              {{request_change = db((db.request_change_grades.activity== var_activity.id) & (db.request_change_grades.status=='pending') ).select().first() }}
+
+              {{grade_rc_var = db((db.request_change_grades_detail.request_change_grades== request_change.id) & (db.request_change_grades_detail.academic_assignation==academic.id) ).select().first() }}
+
+              {{try:}}
+                {{if grade_rc_var.operation_request == 'insert':}}
+                  <font color="green">{{=grade_rc_var.after_grade}}</font>                
+                {{elif grade_rc_var.operation_request == 'update':}}
+                  <font color="blue">{{=grade_rc_var.after_grade}}</font>
+                {{elif grade_rc_var.operation_request == 'delete':}}
+                  <font color="red">{{=grade_rc_var.after_grade}}</font>
+                {{pass}}
+                
+              {{except:}}
+                {{=var_grade.grade}}
+              {{pass}}
+
+            {{pass}}
           </div>
           <div id="div_view_grade_{{=academic.carnet.carnet}}">
             {{=var_grade.grade}}
@@ -281,16 +378,39 @@
     <tr >
       <td colspan='3' >
         <div align="right" id="table_foot" style="display:none;">
-          <a  tabindex="3" role="button"  class="btn btn-success"  onclick="save_changes();">            
-            <span class="icon-white icon-ok-sign"></span>
-              {{if request_change_var == False:}}
+          {{if request_change_var == False:}}
+            <a  tabindex="3" role="button"  class="btn btn-success"  onclick="save_changes();">            
+              <span class="icon-white icon-ok-sign"></span>
                 {{=T('Save Changes')}}
-              {{else:}}
+              </a>
+          {{else:}}
+            <div align="left">
+              <label>{{=T('Description')}}:</label>
+            </div>
+            {{if exist_request_change == False:}}
+              <textarea class="string" cols="40" type="text" value="" id="request_description" style="width:95%;"/>
+              <a  tabindex="3" role="button"  class="btn btn-success"  onclick="save__request_changes();">            
+              <span class="icon-white icon-ok-sign"></span>
                 {{=T('Change Request')}}
-              {{pass}}
-          </a>
-          <a  tabindex="3" role="button"  class="btn btn-danger" onclick="cancel_all();">            
-            {{=T('Cancel')}}
+              </a>
+            {{else:}}
+              <textarea class="string" cols="40" type="text" value="" id="request_description" style="width:95%;" disabled>
+                {{request_change = db((db.request_change_grades.activity== var_activity.id) & (db.request_change_grades.status=='pending') ).select().first() }}
+                {{=request_change.description}}
+              </textarea>
+            {{pass}}
+            
+          {{pass}}
+          {{if (exist_request_change == False) | (request_change_var == False):}}
+            <a  tabindex="3" role="button"  class="btn btn-danger" onclick="cancel_all();">            
+              {{=T('Cancel')}}
+          {{else:}}
+            <a  tabindex="3" role="button"  class="btn btn-danger" onclick="cancel_request();">            
+              {{=T('Cancel Request')}}
+            </a>
+            <a  tabindex="3" role="button"  class="btn" onclick="cancel_all();">            
+              {{=T('Close')}}
+          {{pass}}
           </a>
         </div>
       </td>
@@ -300,9 +420,13 @@
 <div align="right">
   {{if request_change_var == False:}}
     <a onclick="edit_all();" style ="cursor:pointer;"><span class="icon-edit"></span> {{=T('Edit All')}}</a> -
-    <a onclick="delete_all();" style ="cursor:pointer;"><span class="icon-trash"></span>{{=T('Delete All')}}</a>
+    <a onclick="delete_all();" style ="cursor:pointer;"><span class="icon-trash"></span>{{=T('Delete All')}}  </a>
   {{else:}}
-    <a id="change_request_link_2" onclick="change_request();" style ="cursor:pointer;"><span class="icon-random"></span> {{=T('Change Request')}}</a>
+    <a id="change_request_link_2" onclick="change_request();" style ="cursor:pointer;"><span class="icon-random"></span> {{=T('Change Request')}}
+      {{if exist_request_change == True:}}
+        (1)
+      {{pass}}
+    </a>
   {{pass}}
 </div>
 <script type="text/javascript">
@@ -329,7 +453,14 @@
         $("#grades_list").load("{{=URL('activity_control','grades.html')}}?op=view_grades&amp;activity={{=var_activity.id}}&amp;project={{=var_project.id}}&amp;year={{=var_period.id}}");
     }
   }
-  
+  function cancel_request(){    
+    var r = confirm("{{=T('Do you want to cancel the change request?')}}");
+    if (r == true) {
+      $("#grades_list").load("{{=URL('activity_control','grades.html')}}?op=cancel_request&amp;activity={{=var_activity.id}}&amp;project={{=var_project.id}}&amp;year={{=var_period.id}}");
+      $("#grades_list").load("{{=URL('activity_control','grades.html')}}?op=view_grades&amp;activity={{=var_activity.id}}&amp;project={{=var_project.id}}&amp;year={{=var_period.id}}");
+    }
+  }
+
   function update_grade(var_carnet){
     $("#div_edit_grade_"+var_carnet).css("display", "block");
     $("#div_view_grade_"+var_carnet).css("display", "none");
@@ -384,45 +515,107 @@
     
   }
 
-  function save_changes(){
-    $("#div_loading").css("display", "block");
-    var regex = /^\d+(?:\.\d{0,2})$/; 
-    var regex2 = /^([0-9])*$/;
-    jQuery('#errors_div').empty();
-    string_error = "";
-    
-    {{for academic in academic_assig:}}
-      var carnet_var = "{{=academic.carnet.carnet}}"
-      var grade_var = document.getElementById('edit_grade_{{=academic.carnet.carnet}}').value;
-      if (grade_var=="" || parseInt(grade_var) < 0 || parseInt(grade_var) > 100){
-        if( parseInt(grade_var) < 0){
-          string_error = (string_error+'<tr><td>'+carnet_var+'</td><td>'+grade_var+'</td><td>{{=T("The grade is less than 0")}}</td></tr>');
-        }
-        if( parseInt(grade_var) > 100){
-          string_error = (string_error+'<tr><td>'+carnet_var+'</td><td>'+grade_var+'</td><td>{{=T("The grade is greater than 100")}}</td></tr>');
-        }
-      }else{
-        if (!regex.test(grade_var) && !regex2.test(grade_var) ){
-            string_error = (string_error+'<tr><td>'+carnet_var+'</td><td>'+grade_var+'</td><td>{{=T("Grade is not number")}}</td></tr>');
-        }else{
-          {{var_grade = db((db.grades.academic_assignation==academic.id) & (db.grades.activity==var_activity.id)).select().first()}}
-          {{if var_grade != None:}}
-            if (grade_var != {{=var_grade.grade}}){
-              //Update
-              $("#grades_list").load("{{=URL('activity_control','grades.html')}}?op=update_grade_list&amp;activity={{=var_activity.id}}&amp;project={{=var_project.id}}&amp;year={{=var_period.id}}&amp;carnet="+carnet_var+"&amp;grade="+grade_var);
+  function save__request_changes(){
+    {{if exist_request_change == True:}}
+      alert("{{=T('Can not make operation because there is a pending request change. Please resolve it before proceeding.')}}");
+    {{else:}}
+      var regex = /^\d+(?:\.\d{0,2})$/; 
+      var regex2 = /^([0-9])*$/;
+      jQuery('#errors_div').empty();
+      string_error = "";
+      
+      var description_var = document.getElementById('request_description').value;
+      
+      if (description_var != ""){
+        {{for academic in academic_assig:}}
+          var carnet_var = "{{=academic.carnet.carnet}}"
+          var grade_var = document.getElementById('edit_grade_{{=academic.carnet.carnet}}').value;
+          if (grade_var=="" || parseInt(grade_var) < 0 || parseInt(grade_var) > 100){
+            if( parseInt(grade_var) < 0){
+              string_error = (string_error+'<tr><td>'+carnet_var+'</td><td>'+grade_var+'</td><td>{{=T("The grade is less than 0")}}</td></tr>');
             }
-          {{else:}}
-            $("#grades_list").load("{{=URL('activity_control','grades.html')}}?op=add_grade_list&amp;activity={{=var_activity.id}}&amp;project={{=var_project.id}}&amp;year={{=var_period.id}}&amp;carnet="+carnet_var+"&amp;grade="+grade_var);
-          {{pass}}
-        }
-      }
-    {{pass}}
-    if(string_error!=""){
-      jQuery("#errors_div").append('<table class="table table-striped table-bordered"><tr><th>{{=T("Carnet")}}</th><th>{{=T("Grade")}}</th><th>{{=T("Description")}}</th></tr>'+string_error+'</table>');
-      $("#error_modal").modal('show');
-    }
+            if( parseInt(grade_var) > 100){
+              string_error = (string_error+'<tr><td>'+carnet_var+'</td><td>'+grade_var+'</td><td>{{=T("The grade is greater than 100")}}</td></tr>');
+            }
+          }else{
+            if (!regex.test(grade_var) && !regex2.test(grade_var) ){
+                string_error = (string_error+'<tr><td>'+carnet_var+'</td><td>'+grade_var+'</td><td>{{=T("Grade is not number")}}</td></tr>');
+            }
+          }
+        {{pass}}
 
-    $("#grades_list").load("{{=URL('activity_control','grades.html')}}?op=view_grades&amp;activity={{=var_activity.id}}&amp;project={{=var_project.id}}&amp;year={{=var_period.id}}");
+        if(string_error!=""){
+          jQuery("#errors_div").append('<table class="table table-striped table-bordered"><tr><th>{{=T("Carnet")}}</th><th>{{=T("Grade")}}</th><th>{{=T("Description")}}</th></tr>'+string_error+'</table>');
+          $("#error_modal").modal('show');
+        }else{
+            $("#div_loading").css("display", "block");
+            {{for academic in academic_assig:}}
+              var carnet_var = "{{=academic.carnet.carnet}}"
+              var grade_var = document.getElementById('edit_grade_{{=academic.carnet.carnet}}').value;
+              if (grade_var!=""){
+                {{var_grade = db((db.grades.academic_assignation==academic.id) & (db.grades.activity==var_activity.id)).select().first()}}
+                {{if var_grade != None:}}
+                  if (grade_var != {{=var_grade.grade}}){
+                    $("#grades_list").load("{{=URL('activity_control','grades.html')}}?op=add_grade_list&amp;activity={{=var_activity.id}}&amp;project={{=var_project.id}}&amp;year={{=var_period.id}}&amp;carnet="+carnet_var+"&amp;grade="+grade_var+"&amp;description_var="+encodeURIComponent(description_var));  
+                  }
+                {{else:}}
+                  $("#grades_list").load("{{=URL('activity_control','grades.html')}}?op=add_grade_list&amp;activity={{=var_activity.id}}&amp;project={{=var_project.id}}&amp;year={{=var_period.id}}&amp;carnet="+carnet_var+"&amp;grade="+grade_var+"&amp;description_var="+encodeURIComponent(description_var));  
+                {{pass}}
+                
+              }            
+            {{pass}}
+        }
+
+        $("#grades_list").load("{{=URL('activity_control','grades.html')}}?op=view_grades&amp;activity={{=var_activity.id}}&amp;project={{=var_project.id}}&amp;year={{=var_period.id}}");
+      }else{
+        alert('{{=T("You must enter a description")}}');
+      }
+    {{pass}} 
+  }
+
+  function save_changes(){
+    {{if exist_request_change == True:}}
+      alert("{{=T('Can not make operation because there is a pending request change. Please resolve it before proceeding.')}}");
+    {{else:}}
+      $("#div_loading").css("display", "block");
+      var regex = /^\d+(?:\.\d{0,2})$/; 
+      var regex2 = /^([0-9])*$/;
+      jQuery('#errors_div').empty();
+      string_error = "";
+      
+      {{for academic in academic_assig:}}
+        var carnet_var = "{{=academic.carnet.carnet}}"
+        var grade_var = document.getElementById('edit_grade_{{=academic.carnet.carnet}}').value;
+        if (grade_var=="" || parseInt(grade_var) < 0 || parseInt(grade_var) > 100){
+          if( parseInt(grade_var) < 0){
+            string_error = (string_error+'<tr><td>'+carnet_var+'</td><td>'+grade_var+'</td><td>{{=T("The grade is less than 0")}}</td></tr>');
+          }
+          if( parseInt(grade_var) > 100){
+            string_error = (string_error+'<tr><td>'+carnet_var+'</td><td>'+grade_var+'</td><td>{{=T("The grade is greater than 100")}}</td></tr>');
+          }
+        }else{
+          if (!regex.test(grade_var) && !regex2.test(grade_var) ){
+              string_error = (string_error+'<tr><td>'+carnet_var+'</td><td>'+grade_var+'</td><td>{{=T("Grade is not number")}}</td></tr>');
+          }else{
+            {{var_grade = db((db.grades.academic_assignation==academic.id) & (db.grades.activity==var_activity.id)).select().first()}}
+            {{if var_grade != None:}}
+              if (grade_var != {{=var_grade.grade}}){
+                //Update
+                $("#grades_list").load("{{=URL('activity_control','grades.html')}}?op=update_grade_list&amp;activity={{=var_activity.id}}&amp;project={{=var_project.id}}&amp;year={{=var_period.id}}&amp;carnet="+carnet_var+"&amp;grade="+grade_var);
+              }
+            {{else:}}
+              $("#grades_list").load("{{=URL('activity_control','grades.html')}}?op=add_grade_list&amp;activity={{=var_activity.id}}&amp;project={{=var_project.id}}&amp;year={{=var_period.id}}&amp;carnet="+carnet_var+"&amp;grade="+grade_var);
+            {{pass}}
+          }
+        }
+      {{pass}}
+      if(string_error!=""){
+        jQuery("#errors_div").append('<table class="table table-striped table-bordered"><tr><th>{{=T("Carnet")}}</th><th>{{=T("Grade")}}</th><th>{{=T("Description")}}</th></tr>'+string_error+'</table>');
+        $("#error_modal").modal('show');
+      }
+
+      $("#grades_list").load("{{=URL('activity_control','grades.html')}}?op=view_grades&amp;activity={{=var_activity.id}}&amp;project={{=var_project.id}}&amp;year={{=var_period.id}}");
+    {{pass}}
   }
 
   function remove_grade(var_id){
@@ -436,6 +629,9 @@
   }
 
   function change_request(){
+    {{if exist_request_change == True:}}
+      alert("{{=T('There is already a pending request')}}")
+    {{pass}}
     {{for academic in academic_assig:}}
       if (var_editable == false){
           $("#change_request_link").css("display", "none");
@@ -446,6 +642,7 @@
           $("#div_edit_button_{{=academic.carnet.carnet}}").css("display", "block");
           $("#div_view_button_{{=academic.carnet.carnet}}").css("display", "none"); 
           $("#table_foot").css("display", "block");
+          
             
       }
     {{pass}}

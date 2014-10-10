@@ -956,7 +956,25 @@ db.define_table('grades_log',
     Field('date_log', 'datetime', notnull = True, default = datetime.datetime.now(), label = T('Date'))
 )
 
+db.define_table('request_change_grades',
+    Field('activity', 'reference course_activity', notnull=True, label = T('Activity')),
+    Field('user_id', 'reference auth_user', notnull = True, label = T('User')),
+    Field('roll', 'string', notnull = False, label = 'Rol'),
+    Field('status', 'string', notnull = True, label = T('Status')),
+    Field('resolve_user', 'reference auth_user', notnull = False, label = T('Resolve User')),
+    Field('roll_resolve', 'string', notnull = False, label = 'Rol'),
+    Field('description', 'text', notnull=False,  label = T('Description')),
+    Field('date_request', 'datetime', notnull = True, default = datetime.datetime.now(), label = T('Date')),
+    Field('date_request_resolve', 'datetime', notnull = False, label = T('Resolve Date'))
+)
 
+db.define_table('request_change_grades_detail',    
+    Field('request_change_grades', 'reference request_change_grades', notnull=True, label = T('Request Change Grades')),
+    Field('academic_assignation', 'reference academic_course_assignation', notnull=True, label = T('Academic Assignation')),
+    Field('operation_request', 'string', notnull = False, label = T('Operation')),
+    Field('before_grade', 'decimal(5,2)', notnull=False, label=T('Before Grade')),
+    Field('after_grade', 'decimal(5,2)', notnull=False, label=T('After Grade'))
+)
 
 
 ## after defining tables, uncomment below to enable auditing

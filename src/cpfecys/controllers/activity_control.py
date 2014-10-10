@@ -198,6 +198,10 @@ def grades():
         rol_log='Student'
     pass
 
+    #Request change
+    exist_request_change = False
+    if db(db.request_change_grades.activity==var_activity.id).select().first() != None:
+        exist_request_change = True
 
 
     #Permition to add grades
@@ -237,7 +241,19 @@ def grades():
         request_change_var=True
     elif auth.has_membership('Super-Administrator')==True:
         request_change_var=True
-    return dict(academic_assig=academic_assig, var_period=var_period, var_activity=var_activity, var_project=var_project, rol_log=rol_log)
+    
+    if request_change_var == False:
+        request_change_var = True
+    else:
+        request_change_var = False
+
+    return dict(academic_assig=academic_assig, 
+        var_period=var_period, 
+        var_activity=var_activity, 
+        var_project=var_project, 
+        rol_log=rol_log, 
+        request_change_var = request_change_var, 
+        exist_request_change = exist_request_change)
 
 
 
