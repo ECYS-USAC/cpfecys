@@ -112,6 +112,8 @@
                                                   activity = var_activity.id,
                                                   status =  'pending',
                                                   roll = rol_log,
+                                                  period = assig_var.semester.id,
+                                                  project = assig_var.assignation.id,
                                                   description = request.vars['description_var'])}}
         
           {{#-------------------------------------LOG-----------------------------------------------}}
@@ -391,7 +393,6 @@
               <input class="string" name="edit_grade_{{=academic.carnet.carnet}}" type="text" value="{{=var_grade.grade}}" id="edit_grade_{{=academic.carnet.carnet}}" style="width:100px;">
             {{else:}}
               {{request_change = db((db.request_change_grades.activity== var_activity.id) & (db.request_change_grades.status=='pending') ).select().first() }}
-
               {{grade_rc_var = db((db.request_change_grades_detail.request_change_grades== request_change.id) & (db.request_change_grades_detail.academic_assignation==academic.id) ).select().first() }}
 
               {{try:}}
