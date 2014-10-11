@@ -2,6 +2,33 @@
 {{if (request.vars['op'] == "cancel_request") : }}
   {{request_change = db((db.request_change_grades.activity== var_activity.id) & (db.request_change_grades.status=='pending') ).select().first() }}
   {{db(db.request_change_grades.id==request_change.id).delete()}}
+
+  {{# -------------------------------------------LOG -----------------------------------------}}
+  {{log_id = db.request_change_g_log.insert(r_c_g_id = request_change.id,
+                                          username = auth.user.username,
+                                          roll = rol_log,
+                                          before_status = 'pending',
+                                          after_status = 'canceled',
+                                          description = request_change.description,
+                                          description_log = T('Deleted from Grades page'),
+                                          semester = T(request_change.activity.semester.period.name),
+                                          yearp = request_change.activity.semester.yearp,
+                                          activity = request_change.activity.name,
+                                          category = request_change.activity.course_activity_category.category.category,
+                                          project = request_change.activity.assignation.name
+                                        )}}
+  {{log_before = db((db.request_change_g_log.r_c_g_id== request_change.id) & (db.request_change_g_log.after_status=='pending') ).select().first() }}
+  
+  {{for detail_var in db(db.request_change_grade_d_log.request_change_g_log == log_before.id ).select(): }}
+
+    {{db.request_change_grade_d_log.insert(request_change_g_log = log_id,
+                                            operation_request = detail_var.operation_request,
+                                            academic = detail_var.academic,
+                                            before_grade = detail_var.before_grade,
+                                            after_grade = detail_var.after_grade
+                                          )}}
+  {{pass}}
+
 {{pass}}
 
 <!---------------------------INSERT---------------------------->
@@ -86,6 +113,20 @@
                                                   status =  'pending',
                                                   roll = rol_log,
                                                   description = request.vars['description_var'])}}
+        
+          {{#-------------------------------------LOG-----------------------------------------------}}
+          {{log_id = db.request_change_g_log.insert(r_c_g_id = grade,
+                                          username = auth.user.username,
+                                          roll = rol_log,
+                                          after_status = 'pending',
+                                          description = request.vars['description_var'],
+                                          description_log = T('Inserted from Grades page'),
+                                          semester = T(assig_var.semester.period.name),
+                                          yearp = assig_var.semester.yearp,
+                                          activity = var_activity.name,
+                                          category = var_activity.course_activity_category.category.category,
+                                          project = assig_var.assignation.name
+                                        )}}
         {{pass}} {{#--------request_change-is-None----}}
         {{request_change = db((db.request_change_grades.activity== var_activity.id) & (db.request_change_grades.status=='pending') ).select().first() }}
         {{rq_grade = db.request_change_grades_detail.insert(request_change_grades = request_change.id,
@@ -93,7 +134,16 @@
                                                               before_grade = var_grade_before,
                                                               operation_request = var_operation,
                                                               after_grade = request.vars['grade'])}}
-        
+
+        {{log_id = db((db.request_change_g_log.r_c_g_id== request_change.id) & (db.request_change_g_log.after_status=='pending') ).select().first() }}
+
+        {{db.request_change_grade_d_log.insert(request_change_g_log = log_id.id,
+                                          operation_request = var_operation,
+                                          academic = academic_var.carnet,
+                                          before_grade = var_grade_before,
+                                          after_grade = request.vars['grade']
+                                          )}}
+
       {{pass}} {{#-------request_change_var-==-False---}}
     
       
