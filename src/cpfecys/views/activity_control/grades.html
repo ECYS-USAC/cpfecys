@@ -446,7 +446,7 @@
       <td colspan='3' >
         <div align="right" id="table_foot" style="display:none;">
           {{if request_change_var == False:}}
-            <a  tabindex="3" role="button"  class="btn btn-success"  onclick="save_changes();">            
+            <a  tabindex="501" role="button"  class="btn btn-success"  onclick="save_changes();">            
               <span class="icon-white icon-ok-sign"></span>
                 {{=T('Save Changes')}}
               </a>
@@ -456,7 +456,7 @@
             </div>
             {{if exist_request_change == False:}}
               <textarea class="string" cols="40" type="text" value="" id="request_description" style="width:95%;"/>
-              <a  tabindex="3" role="button"  class="btn btn-success"  onclick="save__request_changes();">            
+              <a  tabindex="502" role="button"  class="btn btn-success"  onclick="save__request_changes();">            
               <span class="icon-white icon-ok-sign"></span>
                 {{=T('Change Request')}}
               </a>
@@ -469,10 +469,10 @@
             
           {{pass}}
           {{if (exist_request_change == False) | (request_change_var == False):}}
-            <a  tabindex="3" role="button"  class="btn btn-danger" onclick="cancel_all();">            
+            <a  tabindex="503" role="button"  class="btn btn-danger" onclick="cancel_all();">            
               {{=T('Cancel')}}
           {{else:}}
-            <a  tabindex="3" role="button"  class="btn btn-danger" onclick="cancel_request();">            
+            <a  tabindex="503" role="button"  class="btn btn-danger" onclick="cancel_request();">            
               {{=T('Cancel Request')}}
             </a>
             <a  tabindex="3" role="button"  class="btn" onclick="cancel_all();">            

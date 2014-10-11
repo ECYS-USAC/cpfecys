@@ -1,159 +1,172 @@
 {{extend 'template.html'}}
 <script src="{{=URL('static','js')}}/jquery-migrate-1.2.1.js"></script>
-<div style=" left:0; width:100%;  left:25px; " >
-  <table style="width:100%;">
-    <tr>
-      <td style="width:25%;">
-      <table style="width:100%; left:0;">
-        <tr>
-          <td>
-          <!--CLASS WEIGHTING DIV-->
-          <div id="weighting_div" style=" width:100%; ">
-                
-                <a type="button" class="close" title="{{=T('Help')}}" aria-hidden="true" role="button" class="btn btn-warning" data-toggle="modal" data-target="#help_modal_weighting" >
-                    <span class="icon-black icon-question-sign"></span>
-                </a>
-
-                <a type="button" class="close" title="{{=T('View in full page the weighting')}}" aria-hidden="true" href="{{=URL('activity_control', 'students_control_full',vars=dict( year = year, type='course', project = request.vars['project'], f_view='weighting'))}}" >
-                    <span class="icon-black icon-fullscreen"></span>
-                </a>              
-
-            <div id="h_weighting_h" class="navbar-inner" >  
-              <div id="weighting_menu">          
-                
-              </div>        
-            </div>
-
-            <div id="weighting_inside" class="well" style="overflow:auto; background-color:white; ">
-              {{=T('Loading')}}...
-            </div>
-          </div>
-          <!--FINISH CLASS WEIGHTING DIV-->
-
-
-          </td></tr><tr><td>
-          <br>
-
-
-          <!--LAB WEIGHTING DIV-->
-          <div  id="weighting_lab_div" style=" width:100%;">
-                
-                <a type="button" class="close" title="{{=T('Help')}}" aria-hidden="true" role="button" class="btn btn-warning" data-toggle="modal" data-target="#help_modal_weighting" >
-                    <span class="icon-black icon-question-sign"></span>
-                </a>
-                
-
-                <a type="button" class="close" title="{{=T('View in full page the weighting')}}" aria-hidden="true" href="{{=URL('activity_control', 'students_control_full',vars=dict( year = year, type='lab', project = request.vars['project'], f_view='weighting'))}}" >
-                    <span class="icon-black icon-fullscreen"></span>
-                </a>              
-            
-
-            <div id="h_weighting_lab_h" class="navbar-inner" >  
-                <div id="weighting_lab_menu">          
-                  
-                </div>  
-            </div>
-
-
-            <div id="weighting_lab_inside" class="well" style="overflow:auto; background-color:white;  ">
-              {{=T('Loading')}}...
-            </div>
-          </div>
-          <!--FINISH LAB WEIGHTING DIV-->
-
-        </td>
-      </tr>
-    </table>
-  </td>
-  <td style="width:74%;">
-    <table id="control_table" style="width:100%; top:0; ">
+<div style=" width:100%; overflow:auto;">
+  <div style=" left:0; width:100%;  left:25px;" >
+    <center>
+    <h3>
+        {{=name}}
+    </h3>
+    </center>    
+    <table style="width:100%;">
       <tr>
-      <td style=" width:100%;">
-          <!--Menu of activity DIV Right-->
-          <a type="button" class="close" title="{{=T('Help')}}" aria-hidden="true" role="button" class="btn btn-warning" data-toggle="modal" data-target="#help_modal_activity" >
-            <span class="icon-black icon-question-sign"></span>
-          </a>
-          <a type="button" class="close" title="{{=T('View in full page the activities')}}" aria-hidden="true" href="{{=URL('activity_control', 'students_control_full',vars=dict( year = year, project = request.vars['project'], f_view='activity'))}}" >
-            <span class="icon-black icon-fullscreen"></span>
-          </a>
-          <!--Menu of activity DIV Right-->
-           <!--Menu of activity DIV left-->
-            <div id="h_activity_h" class="navbar-inner">
-              <div id="activity_menu">
+        <td style="width:25%;">
+        <table style="width:100%; left:0;">
+          <tr>
+            <td>
+            <!--CLASS WEIGHTING DIV-->
+            <div id="weighting_div" style=" width:100%; ">
+                  
+                  <a type="button" class="close" title="{{=T('Help')}}" aria-hidden="true" role="button" class="btn btn-warning" data-toggle="modal" data-target="#help_modal_weighting" >
+                      <span class="icon-black icon-question-sign"></span>
+                  </a>
+
+                  <a type="button" class="close" title="{{=T('View in full page the weighting')}}" aria-hidden="true" href="{{=URL('activity_control', 'students_control_full',vars=dict( year = year, type='course', project = request.vars['project'], f_view='weighting'))}}" >
+                      <span class="icon-black icon-fullscreen"></span>
+                  </a>              
+
+              <div id="h_weighting_h" class="navbar-inner" >  
+                <div id="weighting_menu">          
+                  
+                </div>        
+              </div>
+
+              <div id="weighting_inside" class="well" style="overflow:auto; background-color:white; ">
+                {{=T('Loading')}}...
               </div>
             </div>
-            <!--Menu of the activity DIV lett-->
-               <!--Cuadro donde sale la información-->
-                <div id="activity_insideMaster" class="well" style=" background-color:white;  ">
-                  <ul id="myTabActivities" class="nav nav-tabs">
-                    <li class="active" id="classActivities"><a href="#" data-toggle="tab">{{=T('Class Activities')}}</a></li>
-                    <li id="laboratoryActivities"><a href="#" data-toggle="tab">{{=T('Laboratory Activities')}}</a></li>
-                    <li id="Activitywithoutmetric"><a href="#" data-toggle="tab">{{=T('Activity without metric')}}</a></li>
-                  </ul>
-                  <div id="activity_inside" class="well" style=" background-color:white;  ">
-                  </div>
-                </div>
-                <!--Cuadro donde sale la información-->
+            <!--FINISH CLASS WEIGHTING DIV-->
+
+
+            </td></tr><tr><td>
+            <br>
+
+
+            <!--LAB WEIGHTING DIV-->
+            <div  id="weighting_lab_div" style=" width:100%;">
+                  
+                  <a type="button" class="close" title="{{=T('Help')}}" aria-hidden="true" role="button" class="btn btn-warning" data-toggle="modal" data-target="#help_modal_weighting" >
+                      <span class="icon-black icon-question-sign"></span>
+                  </a>
+                  
+
+                  <a type="button" class="close" title="{{=T('View in full page the weighting')}}" aria-hidden="true" href="{{=URL('activity_control', 'students_control_full',vars=dict( year = year, type='lab', project = request.vars['project'], f_view='weighting'))}}" >
+                      <span class="icon-black icon-fullscreen"></span>
+                  </a>              
+              
+
+              <div id="h_weighting_lab_h" class="navbar-inner" >  
+                  <div id="weighting_lab_menu">          
+                    
+                  </div>  
               </div>
-              <!--FINISH CONTROL DIV-->
-      </td>
-      </tr>
-    </table>
-  </td>
-</tr>
-</table>
-</div>
 
 
-<!--Help modal weighting -->
-<div id="help_modal_weighting" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true"> 
-  <div class="modal-header">
-    <button type="button" class="close" data-dismiss="modal"
-aria-hidden="true">×</button>
-      <h3 id="myModalLabel">
-          <span class="icon-question-sign"></span>
-          {{=T('Weighting help')}}
-      </h3>
+              <div id="weighting_lab_inside" class="well" style="overflow:auto;  background-color:white;  ">
+                {{=T('Loading')}}...
+              </div>
+            </div>
+            <!--FINISH LAB WEIGHTING DIV-->
+
+          </td>
+        </tr>
+      </table>
+    </td>
+    <td style="width:74%;">
+
+      <table id="control_table" style="width:100%; top:0; ">
+        <tr>
+        <td >
+          
+            <!--Menu of activity DIV Right-->
+            <a type="button" class="close" title="{{=T('Help')}}" aria-hidden="true" role="button" class="btn btn-warning" data-toggle="modal" data-target="#help_modal_activity" >
+              <span class="icon-black icon-question-sign"></span>
+            </a>
+            <a type="button" class="close" title="{{=T('View in full page the activities')}}" aria-hidden="true" href="{{=URL('activity_control', 'students_control_full',vars=dict( year = year, project = request.vars['project'], f_view='activity'))}}" >
+              <span class="icon-black icon-fullscreen"></span>
+            </a>
+            <!--Menu of activity DIV Right-->
+             <!--Menu of activity DIV left-->
+              <div id="h_activity_h" class="navbar-inner">
+                <div id="activity_menu">
+                </div>
+              </div style="width:100%;">
+              <!--Menu of the activity DIV lett-->
+                 <!--Cuadro donde sale la información-->
+                  <div id="activity_insideMaster" class="well" style=" background-color:white;  ">
+                    <ul id="myTabActivities" class="nav nav-tabs">
+                      <li class="active" id="classActivities"><a href="#" data-toggle="tab">{{=T('Class Activities')}}</a></li>
+                      <li id="laboratoryActivities"><a href="#" data-toggle="tab">{{=T('Laboratory Activities')}}</a></li>
+                      <li id="Activitywithoutmetric"><a href="#" data-toggle="tab">{{=T('Activity without metric')}}</a></li>
+                    </ul>
+                    <div  style=" width:800px; overflow:auto;">
+                      <div style=" width:100%;" >
+                        <div id="activity_inside" class="well" style=" overflow:auto; background-color:white;  ">
+                          {{=T('Loading')}}...
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <!--Cuadro donde sale la información-->
+                </div>
+                <!--FINISH CONTROL DIV-->
+              
+        </td>
+        </tr>
+      </table>
+    </td>
+  </tr>
+  </table>
   </div>
-  <div class="modal-body">
-    <div class="well">
-        <p>
-            {{=T('In this area you can manage the weighting of the course / lab. The actions that can be performed are: Create weighting, Get weighting, Edit weighting and request a change of weighting (academic supervisor).')}}
-        </p>
+
+
+  <!--Help modal weighting -->
+  <div id="help_modal_weighting" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true"> 
+    <div class="modal-header">
+      <button type="button" class="close" data-dismiss="modal"
+  aria-hidden="true">×</button>
+        <h3 id="myModalLabel">
+            <span class="icon-question-sign"></span>
+            {{=T('Weighting help')}}
+        </h3>
+    </div>
+    <div class="modal-body">
+      <div class="well">
+          <p>
+              {{=T('In this area you can manage the weighting of the course / lab. The actions that can be performed are: Create weighting, Get weighting, Edit weighting and request a change of weighting (academic supervisor).')}}
+          </p>
+      </div>
+    </div>
+    <div class="modal-footer">
+        <button class="btn" data-dismiss="modal"
+  aria-hidden="true">{{=T('Close')}}</button>
     </div>
   </div>
-  <div class="modal-footer">
-      <button class="btn" data-dismiss="modal"
-aria-hidden="true">{{=T('Close')}}</button>
-  </div>
-</div>
-<!--Finish help modal weighting-->
+  <!--Finish help modal weighting-->
 
-<!--Help modal activity -->
-<div id="help_modal_activity" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true"> 
-  <div class="modal-header">
-    <button type="button" class="close" data-dismiss="modal"
-aria-hidden="true">×</button>
-      <h3 id="myModalLabel">
-          <span class="icon-question-sign"></span>
-          {{=T('Scheduler help')}}
-      </h3>
-  </div>
-  <div class="modal-body">
-    <div class="well">
-        <p>
-            {{=T('In this area you can manage the activities of the course / lab. The actions that can be performed are: Create activity, Edit activity and request a change of activity (academic supervisor).')}}
-        </p>
+  <!--Help modal activity -->
+  <div id="help_modal_activity" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true"> 
+    <div class="modal-header">
+      <button type="button" class="close" data-dismiss="modal"
+  aria-hidden="true">×</button>
+        <h3 id="myModalLabel">
+            <span class="icon-question-sign"></span>
+            {{=T('Scheduler help')}}
+        </h3>
     </div>
-  </div>
-  <div class="modal-footer">
-      <button class="btn" data-dismiss="modal"
-aria-hidden="true">{{=T('Close')}}</button>
+    <div class="modal-body">
+      <div class="well">
+          <p>
+              {{=T('In this area you can manage the activities of the course / lab. The actions that can be performed are: Create activity, Edit activity and request a change of activity (academic supervisor).')}}
+          </p>
+      </div>
+    </div>
+    <div class="modal-footer">
+        <button class="btn" data-dismiss="modal"
+  aria-hidden="true">{{=T('Close')}}</button>
+    </div>
   </div>
 </div>
 <!--Finish help modal activity-->
-
-
 
 <script type="text/javascript">
   
