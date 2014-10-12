@@ -20,7 +20,7 @@
     <tr>
       <td>
         <div >
-          <a onclick="window.history.back()" class="btn" ><i class="icon-arrow-left"></i>{{=T('Back')}}</a>
+          <a href="{{=URL('activity_control', 'students_control', vars=dict(project = request.vars['project'], period = request.vars['year']))}}" class="btn" ><i class="icon-arrow-left"></i> {{=T('Back')}}</a>
         </div>
       </td>
       

@@ -83,7 +83,7 @@
 		<ul class="dropdown"  class="close" aria-hidden="true"  style="height:10px;">
 		{{if (no_menu == False):}}
 		  <a style="color:#f0ad4e;text-shadow:none;" class="dropdown-toggle" data-toggle="dropdown" href="">
-		    <span class="icon-list"></span>
+		   <span class="icon-list" ></span>
 		  </a>
 	 	{{pass}}
 		  <h3 class="icon-white" style="white-space:nowrap;">
@@ -99,7 +99,7 @@
 	      		{{if auth.has_membership('Student') == False:}}
 	      			<li class="disabled"> 
 						<a  tabindex="-1" title="{{=T('Create course weighting')}}" id="menu_create_weighting" >
-							<span class="icon-plus-sign"></span>
+							<span class="icon-list"></span>
 			        		{{=T('Create Weighting')}}
 				        </a>
 				    </li>

@@ -94,6 +94,7 @@ def students_control():
 
     project_var = request.vars['project']
     
+    project_select = db(db.project.id==project_var).select().first()
 
     if auth.has_membership('Super-Administrator') == False and auth.has_membership('Ecys-Administrator') == False :
         assigantion = db((db.user_project.assigned_user == auth.user.id) & (db.user_project.period == year.id) & (db.user_project.project == project_var)).select().first()
@@ -112,7 +113,7 @@ def students_control():
                 session.flash=T('You do not have permission to view course requests')
                 redirect(URL('default','index'))
         
-    return dict(project = project_var, year = year.id )
+    return dict(project = project_var, year = year.id , name = project_select.name)
 
 
 
@@ -248,7 +249,7 @@ def grades():
 
     #Request change
     exist_request_change = False
-    if db(db.request_change_grades.activity==var_activity.id).select().first() != None:
+    if db((db.request_change_grades.activity==var_activity.id)&(db.request_change_grades.status=='pending')).select().first() != None:
         exist_request_change = True
 
 
@@ -536,6 +537,45 @@ def solve_request_change_weighting():
                     semestre2 = currentyear_period,
                     year = currentyear_period.yearp,
                     course=courseCheck)
+
+@auth.requires_login()
+@auth.requires(auth.has_membership('Super-Administrator') or auth.has_membership('Ecys-Administrator') or auth.has_membership('Teacher'))
+def solve_request_change_grades():
+    import cpfecys
+    #Obtain the course that want to view the request
+    courseCheck = request.vars['course']
+
+    #Check that the request vars contain something
+    if (courseCheck is None):
+        redirect(URL('default','index'))
+    else:
+        #Check if teacher or other role
+        course=None
+        if auth.has_membership('Teacher'):
+            course = db((db.user_project.assigned_user == auth.user.id) & (db.user_project.period == cpfecys.current_year_period().id) & (db.user_project.project==courseCheck)).select().first()
+            if (course is None):
+                session.flash=T('You do not have permission to view course requests')
+                redirect(URL('default','index'))
+        else:
+            course=db.project(id=courseCheck)
+
+        #Check that the course exist
+        name=None
+        if (course is None):
+            redirect(URL('default','index'))
+        else:
+            if auth.has_membership('Teacher'):
+                name=course.project.name
+            else:
+                name=course.name
+
+        currentyear_period = cpfecys.current_year_period()
+        return dict(name = name,
+                    semester = currentyear_period.period.name,
+                    semestre2 = currentyear_period,
+                    year = currentyear_period.yearp,
+                    course=courseCheck)
+
 
 
 @auth.requires_login()
@@ -958,6 +998,23 @@ def activityRequest():
 @auth.requires_login()
 @auth.requires(auth.has_membership('Super-Administrator') or auth.has_membership('Ecys-Administrator') or auth.has_membership('Teacher'))
 def weighting_request():
+    import cpfecys
+    currentyear_period = cpfecys.current_year_period()
+    rol_log=''
+    if auth.has_membership('Ecys-Administrator')==True:
+        rol_log='Ecys-Administrator'
+    elif auth.has_membership('Super-Administrator')==True:
+        rol_log='Super-Administrator'
+    elif auth.has_membership('Teacher')==True:
+        rol_log='Teacher'
+    elif auth.has_membership('Student')==True:
+        rol_log='Student'
+    pass
+    return dict(semestre2 = currentyear_period,rol_log = rol_log)
+
+@auth.requires_login()
+@auth.requires(auth.has_membership('Super-Administrator') or auth.has_membership('Ecys-Administrator') or auth.has_membership('Teacher'))
+def grades_request():
     import cpfecys
     currentyear_period = cpfecys.current_year_period()
     rol_log=''

@@ -1,0 +1,119 @@
+{{extend 'template.html'}}
+<h2>
+	{{=T('Request Control')}}
+	<br>
+    <small>{{=name}} - {{=T(semester)}}, {{=year}}</small>
+</h2>
+
+<div class="row-fluid">
+    <div class="well span12" style="overflow:auto; width:100%">
+		<div>
+			<a class="btn" href="{{=URL('activity_control', 'courses_list_request')}}">
+				<i class="icon-arrow-left"></i>{{=T('Back')}}
+			</a>
+		</div>
+		<br>
+		<div id="content">
+		        <center>
+		        	<div align="center" id="controlActivity">
+        				<ul id="myTab" class="nav nav-tabs">
+							<li class="active" id="pendingRequest"><a href="#" data-toggle="tab">{{=T('Pending requests')}}</a></li>
+							<li id="allRequest"><a href="#" data-toggle="tab">{{=T('All request')}}</a></li>
+							<li id="acceptedRequest"><a href="#" data-toggle="tab">{{=T('Accepted request')}}</a></li>
+							<li id="rejectedRequest"><a href="#" data-toggle="tab">{{=T('Rejected request')}}</a></li>
+						</ul>
+            			<div class="well span11" id="div_request_show">
+            				{{query = db((db.request_change_grades.status=='Pending')&(db.request_change_grades.period==int(semestre2.id))&(db.request_change_grades.project==int(course))).select()}}
+            				{{if query.first() != None:}}
+            				<table class="table table-striped table-bordered">
+								<tr>
+									<th>{{=T('User')}}</th>
+									<th>{{=T('Role')}} </th>
+									<th>{{=T('Status')}}</th>
+									<th>{{=T('Date Request')}}</th>
+									<th><center>{{=T('Action')}}</center></th>
+								</tr>
+							{{for change in query:}}
+								<tr>
+									<td>{{=change.user_id.username}}</td>
+									{{if change.roll == "Student":}}
+										<td>{{=T('Tutor academico')}}</td>
+									{{else:}}
+										<td>{{=T(change.roll)}}</td>
+									{{pass}}
+									<td>{{=T(change.status)}}</td>
+									<td>{{=change.date_request}}</td>
+									<td>
+										<center>
+											<a class="btn" title="{{=T('View the change request')}}" onclick="detail({{=change.id}});">{{=T('Detail')}}</a>
+										</center>
+									</td>
+								</tr>
+							{{pass}}
+							</table>
+							{{else:}}
+								{{=T('There is no request')}}
+							{{pass}}
+	                  	</div>
+		                  	<div class="well span11" id="div_request_detail" style="display: none;">
+		                  	</div>
+        			</div>
+        		</center>
+		</div>
+	</div>
+</div>
+<script type="text/javascript">
+	$(document).ready(function(){
+		$("#pendingRequest").click(function(){
+			jQuery('#div_request_detail').empty();
+			$("#div_request_detail").css("display", "none");
+			$("#div_request_show").css("display", "block");
+			$("#div_request_show").load("{{=URL('activity_control','grades_request.html')}}?op=solve_grades_request&amp;tip=p&amp;project={{=course}}"); 
+		});
+		$("#allRequest").click(function(){
+			jQuery('#div_request_detail').empty();
+			$("#div_request_detail").css("display", "none");
+			$("#div_request_show").css("display", "block");
+			$("#div_request_show").load("{{=URL('activity_control','grades_request.html')}}?op=solve_grades_request&amp;tip=t&amp;project={{=course}}"); 
+		});
+		$("#acceptedRequest").click(function(){
+			jQuery('#div_request_detail').empty();
+			$("#div_request_detail").css("display", "none");
+			$("#div_request_show").css("display", "block");
+			$("#div_request_show").load("{{=URL('activity_control','grades_request.html')}}?op=solve_grades_request&amp;tip=a&amp;project={{=course}}"); 
+		});
+		$("#rejectedRequest").click(function(){
+			jQuery('#div_request_detail').empty();
+			$("#div_request_detail").css("display", "none");
+			$("#div_request_show").css("display", "block");
+			$("#div_request_show").load("{{=URL('activity_control','grades_request.html')}}?op=solve_grades_request&amp;tip=r&amp;project={{=course}}"); 
+		});
+	});
+
+	function detail(var_id){
+		$("#div_request_show").css("display", "none");
+		$("#div_request_detail").css("display", "block");
+		$("#div_request_detail").load("{{=URL('activity_control','grades_request.html')}}?op=solve_request_detail&amp;year={{=semestre2.id}}&amp;project={{=course}}&amp;Idrequest="+var_id); 
+		//$("#div_request_detail").load("{{=URL('activity_control','request_change_grades_load.html')}}?op=create_request&amp;project={{=course}}&amp;year={{=semestre2.id}}&amp;change_id="+var_id); 
+	}
+
+	function closeDetail(){
+		jQuery('#div_request_detail').empty();
+		$("#div_request_detail").css("display", "none");
+		$("#div_request_show").css("display", "block");
+	}
+
+	function rejectRequestChange(var_id){
+		jQuery('#div_request_detail').empty();
+		$("#div_request_detail").css("display", "none");
+		$("#div_request_show").css("display", "block");
+		$("#div_request_show").load("{{=URL('activity_control','grades_request.html')}}?op=rejectRequestChange&amp;Idrequest="+var_id+"&amp;project={{=course}}"); 
+	}
+
+	function acceptRequestChange(var_id){
+		jQuery('#div_request_detail').empty();
+		$("#div_request_detail").css("display", "none");
+		$("#div_request_show").css("display", "block");
+		$("#div_request_show").load("{{=URL('activity_control','grades_request.html')}}?op=acceptRequestChange&amp;Idrequest="+var_id+"&amp;project={{=course}}"); 
+	}
+</script>

@@ -39,31 +39,33 @@
 			{{var_SG = False}}
 		{{pass}}
 
+		{{cat_tempo = db((db.course_activity_category.category==int(request.vars['category_id_var'])) & (db.course_activity_category.semester==int(semestre2.id)) & (db.course_activity_category.assignation==var_project_id) & (db.course_activity_category.laboratory==var_labo) ).select().first()}}
+		{{if cat_tempo is None:}}
+			{{db.course_activity_category.insert(category = int(request.vars['category_id_var']),
+				                                grade =  request.vars['grade_var'], 
+				                                specific_grade = var_SG, 
+				                                semester = int(semestre2.id), 
+				                                assignation = var_project_id, 
+				                                laboratory = var_labo,
+				                                teacher_permition = request.vars['TP'])}}
 
-		{{db.course_activity_category.insert(category = int(request.vars['category_id_var']),
-			                                grade =  request.vars['grade_var'], 
-			                                specific_grade = var_SG, 
-			                                semester = int(semestre2.id), 
-			                                assignation = var_project_id, 
-			                                laboratory = var_labo,
-			                                teacher_permition = request.vars['TP'])}}
+			{{#Log}}
+			{{cat_temp = db(db.activity_category.id== int(request.vars['category_id_var'])).select().first()}}
+			
+			{{db.course_activity_category_log.insert(user_name = auth.user.username,
+														roll = rol_log,
+														operation_log = 'insert',
+														after_category = cat_temp.category,
+														after_grade =  request.vars['grade_var'], 
+														after_specific_grade = var_SG, 
+														semester = T(semestre2.period.name),
+														yearp = semestre2.yearp,
+														assignation = project_variable.name, 
+														after_laboratory = var_labo,
+														after_teacher_permition = request.vars['TP'],
+														description = T('Inserted from Weighting Edit page'))}}
 
-		{{#Log}}
-		{{cat_temp = db(db.activity_category.id== int(request.vars['category_id_var'])).select().first()}}
-		
-		{{db.course_activity_category_log.insert(user_name = auth.user.username,
-													roll = rol_log,
-													operation_log = 'insert',
-													after_category = cat_temp.category,
-													after_grade =  request.vars['grade_var'], 
-													after_specific_grade = var_SG, 
-													semester = T(semestre2.period.name),
-													yearp = semestre2.yearp,
-													assignation = project_variable.name, 
-													after_laboratory = var_labo,
-													after_teacher_permition = request.vars['TP'],
-													description = T('Inserted from Weighting Edit page'))}}
-
+		{{pass}}
 	{{pass}}
 
 		

@@ -25,7 +25,7 @@
                     
                   </div>
                   <div align="right">
-                    <a id="categoryButton" href="#information_text" role="button" class="btn btn-info"  
+                    <a id="categoryButton" href="#information_text" role="button" class="btn btn-success"  
                     title="{{=T('Add category to weighting')}}"> 
                     <span class="icon-plus-sign"></span>
                     {{=T('Add Category')}}
@@ -35,6 +35,13 @@
                 <td align="left"  >
                   <div class="well span11" id="div_weighting_show" style="overflow:auto;  width:400px;">
                     
+                  </div>
+                  <br>
+                  <div align="right">
+                  <a href="{{=URL('activity_control', 'students_control', vars=dict(project = request.vars['project'], period = request.vars['year']))}}" role="button" class="btn btn-info"  > 
+                    <span class="icon-ok-circle"></span>
+                    {{=T('Finalize')}}
+                     </a>
                   </div>
                 </td>
               </tr>

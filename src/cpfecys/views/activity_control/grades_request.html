@@ -1,0 +1,347 @@
+
+
+{{if request.vars['op']=="solve_grades_request":}}
+	{{if request.vars['tip']=="p":}}
+		{{allRequest = db((db.request_change_grades.status=='pending')&(db.request_change_grades.period==int(semestre2.id))&(db.request_change_grades.project==int(request.vars['project']))).select()}}
+	{{pass}}
+	{{if request.vars['tip']=="a":}}
+		{{allRequest = db((db.request_change_grades.status=='accepted')&(db.request_change_grades.period==int(semestre2.id))&(db.request_change_grades.project==int(request.vars['project']))).select()}}
+	{{pass}}
+	{{if request.vars['tip']=="r":}}
+		{{allRequest = db((db.request_change_grades.status=='rejected')&(db.request_change_grades.period==int(semestre2.id))&(db.request_change_grades.project==int(request.vars['project']))).select()}}
+	{{pass}}
+	{{if request.vars['tip']=="t":}}
+		{{allRequest = db((db.request_change_grades.status!='edit')&(db.request_change_grades.period==int(semestre2.id))&(db.request_change_grades.project==int(request.vars['project']))).select()}}
+	{{pass}}
+	{{if allRequest.first() !=None:}}
+	<table class="table table-striped table-bordered">
+	
+		<tr>
+			<th>{{=T('User')}}</th>
+			<th>{{=T('Role')}} </th>
+			<th>{{=T('Status')}}</th>
+			<th>Fecha Solicitud</th>
+			<th><center>{{=T('Action')}}</center></th>
+		</tr>
+	
+	{{for change in allRequest:}}
+		<tr>
+			<td>{{=change.user_id.username}}</td>
+			{{if change.roll == "Student":}}
+				<td>{{=T('Tutor academico')}}</td>
+			{{else:}}
+				<td>{{=T(change.roll)}}</td>
+			{{pass}}
+			<td>{{=T(change.status)}}</td>
+			<td>{{=change.date_request}}</td>
+			<td>
+				<center>
+					<a class="btn" title="{{=T('View the change request')}}" onclick="detail({{=change.id}});">{{=T('Detail')}}</a>
+				</center>
+			</td>
+		</tr>
+	{{pass}}
+	</table>
+	{{else:}}
+		{{=T('There is no request')}}
+	{{pass}}
+{{pass}}
+
+
+
+{{if request.vars['op']=="solve_request_detail":}}
+	{{Request = db(db.request_change_grades.id==int(request.vars['Idrequest'])).select().first()}}
+	<table class="table table-striped table-bordered">
+		<tr>
+			<th colspan="6"><center>{{=T('Request Change')}}</center></th>
+		</tr>
+		<tr>
+			<th>{{=T('User')}}</th><td>{{=Request.user_id.username}}</td>
+			<th>{{=T('Date Request')}}</th><td>{{=Request.date_request}}</td>
+			<th>{{=T('Roll')}}</th>
+			{{if Request.roll == "Student":}}
+				<td>{{=T('Tutor academico')}}</td>
+			{{else:}}
+				<td>{{=T(Request.roll)}}</td>
+			{{pass}}
+		</tr>
+		<tr>
+			<th>{{=T('Status')}}:</th>
+			{{if Request.status=='pending':}}
+				<th><FONT COLOR="#5E610B">{{=T(Request.status)}}</font></th>
+			{{elif Request.status=='accepted':}}
+				<th><FONT COLOR="Green">{{=T(Request.status)}}</font></th>
+			{{else:}}
+				<th><FONT COLOR="Red">{{=T(Request.status)}}</font></th>
+			{{pass}}
+			<th>{{=T('Date of resolution')}}</th>
+			{{if Request.status=='pending':}}
+				<td>---</td>
+			{{else:}}
+				<td>{{=Request.date_request_resolve}}</td>
+			{{pass}}
+			<th>{{=T('Role resolution')}}</th>
+			{{if Request.status=='pending':}}
+				<td>---</td>
+			{{else:}}
+				<td>{{=Request.roll_resolve}}</td>
+			{{pass}}
+		</tr>
+		<tr>
+			<th>{{=T('Description')}}:</th>
+			<td colspan="5"><pre>{{=Request.description}}</pre></td>
+		</tr>
+		<tr>
+			<th colspan="6"><center>{{=T('Changes Requested')}}</center></th>
+		</tr>
+		<tr>
+			
+			<td colspan="6">
+				<center>
+					<table class="table table-striped table-bordered">
+						<tr>
+							<th>
+								{{=T('Carnet')}}
+							</th>
+							<th>
+								{{=T('Before Grade')}}
+							</th>
+							<th >
+								{{=T('Request Grade')}}
+							</th>
+						</tr>
+						{{log_request = db(db.request_change_g_log.r_c_g_id==Request.id).select().first()}}
+						{{for log_request_detail in db((db.request_change_grade_d_log.request_change_g_log==log_request.id)).select():}}
+							<tr>
+								<td>
+									{{=log_request_detail.academic}}
+								</td>
+								<td>
+									{{if log_request_detail.before_grade != None:}}
+										{{=log_request_detail.before_grade}}
+									{{pass}}									
+								</td>
+								<td>
+									{{if log_request_detail.after_grade != None:}}
+										{{if log_request_detail.operation_request == 'insert':}}
+						                  <font color="green">{{=log_request_detail.after_grade}}</font>
+						                {{pass}}
+						                {{if log_request_detail.operation_request == 'update':}}
+						                  <font color="blue">{{=log_request_detail.after_grade}}</font>
+						                {{pass}}
+						                {{if log_request_detail.operation_request == 'delete':}}
+						                  <font color="red">{{=log_request_detail.after_grade}}</font>
+						                {{pass}}
+											
+									{{pass}}
+								</td>
+							</tr>
+						{{pass}}
+						
+						<tr >
+							<td colspan="3">
+								<div align="left">
+								<br>
+									<b>{{=T('Legend')}}:</b>
+								<br>
+									<span class="label label-success">&nbsp;&nbsp;&nbsp;</span> {{=T('Grade inserted')}}
+								<br>
+									<span class="label label-info">&nbsp;&nbsp;&nbsp;</span> {{=T('Grade edited')}}
+								<br>
+									<span class="label label-important">&nbsp;&nbsp;&nbsp;</span> {{=T('Grade deleted')}}
+								<br>
+								</div>
+							</td>
+						</tr>
+						
+						
+						
+					</table>
+
+				</center>
+			</th>
+			
+		</tr>
+		
+		<tr>
+			{{if Request.status=='pending':}}
+				<td colspan="3"></td>
+				<td><center>
+					<a role="button" onclick="acceptRequestChange({{=Request.id}});" class="btn btn-success"  title="{{=T('Accept the change request planning')}}"> <span class="icon-white icon-ok"></span>{{=T('Accept Request')}}</a>
+				</center></td>
+				<td><center>
+					<a role="button" onclick="rejectRequestChange({{=Request.id}});" class="btn btn-danger"  title="{{=T('Reject the change request planning')}}"> <span class="icon-white icon-remove-sign"></span>{{=T('Reject Request')}}</a>
+				</center></td>
+			{{else:}}
+				<td colspan="5"></td>
+			{{pass}}
+			<td><center>
+				<a class="btn" title="{{=T('Close the detail of the change request')}}" onclick="closeDetail();">{{=T('Close Detail')}}</a>
+			</center></td>
+		</tr>
+	</table>
+{{pass}}
+
+
+
+{{if request.vars['op']=="rejectRequestChange":}}
+	{{from datetime import datetime}}
+	{{nombreRol=rol_log}}
+	{{db(db.request_change_grades.id==int(request.vars['Idrequest'])).update(status = 'rejected', 
+																		resolve_user = auth.user.id, 
+																		roll_resolve =  nombreRol, 
+																		date_request_resolve = str(datetime.now())
+																	)}}
+
+	{{#---------------------------------LOG-----------------------------------------------}}
+																		
+	{{temp2 = db(db.request_change_g_log.r_c_g_id == request.vars['Idrequest']).select().first()}}
+	
+	{{temp3 = db.request_change_g_log.insert(r_c_g_id=request.vars['Idrequest'],
+										username=temp2.username,
+										roll=temp2.roll,
+										before_status='pending',
+										after_status='rejected',
+										description=temp2.description,
+										semester=temp2.semester,
+										yearp=temp2.yearp,
+										project=temp2.project,
+										category=temp2.activity,
+										activity=temp2.category,
+										resolve_user=auth.user.username,
+										roll_resolve=nombreRol,
+										date_request=temp2.date_request,
+										date_request_resolve=str(datetime.now())
+									) }}
+	{{for var_chang_ins in db((db.request_change_grades_detail.request_change_grades ==  request.vars['Idrequest'])).select():}}
+	    {{db.request_change_grade_d_log.insert(request_change_g_log=temp3,
+	                                            operation_request=var_chang_ins.operation_request,
+	                                            academic=var_chang_ins.academic_assignation.carnet.carnet,
+	                                            after_grade=var_chang_ins.after_grade,
+	                                            before_grade=var_chang_ins.before_grade
+	                                           )}}
+	{{pass}}
+
+	
+	<script type="text/javascript">
+		location.href="{{=URL('activity_control','solve_request_change_grades.html')}}?course={{=request.vars['project']}}";
+	</script>
+{{pass}}
+
+
+
+
+{{if request.vars['op']=="acceptRequestChange":}}
+	{{from datetime import datetime}}
+	{{nombreRol=rol_log}}
+	
+	{{db(db.request_change_grades.id==int(request.vars['Idrequest'])).update(status = 'accepted', 
+																			resolve_user = auth.user.id, 
+																			roll_resolve =  nombreRol, 
+																			date_request_resolve = str(datetime.now())
+																		)}}
+	{{temp2 = db(db.request_change_g_log.r_c_g_id == request.vars['Idrequest']).select().first()}}
+
+	{{temp3 = db.request_change_g_log.insert(r_c_g_id=request.vars['Idrequest'],
+										username=temp2.username,
+										roll=temp2.roll,
+										before_status='pending',
+										after_status='accepted',
+										description=temp2.description,
+										semester=temp2.semester,
+										yearp=temp2.yearp,
+										project=temp2.project,
+										category=temp2.activity,
+										activity=temp2.category,
+										resolve_user=auth.user.username,
+										roll_resolve=nombreRol,
+										date_request=temp2.date_request,
+										date_request_resolve=str(datetime.now())
+									) }}
+
+	{{request_change_var = db(db.request_change_grades.id == request.vars['Idrequest']).select().first()}}
+	{{for var_chang_ins in db((db.request_change_grades_detail.request_change_grades ==  request.vars['Idrequest'])).select():}}
+	    
+	    {{db.request_change_grade_d_log.insert(request_change_g_log=temp3,
+	                                            operation_request=var_chang_ins.operation_request,
+	                                            academic=var_chang_ins.academic_assignation.carnet.carnet,
+	                                            after_grade=var_chang_ins.after_grade,
+	                                            before_grade=var_chang_ins.before_grade
+	                                           )}}
+
+
+		{{grade_before = db((db.grades.academic_assignation==var_chang_ins.academic_assignation) & (db.grades.activity==request_change_var.activity) ).select().first() }}
+
+	    {{if var_chang_ins.operation_request == 'insert':}}
+        	{{grade = db.grades.insert(academic_assignation = var_chang_ins.academic_assignation,
+                                activity = request_change_var.activity,
+                                grade =  var_chang_ins.after_grade)}}
+
+			{{#--------------------------------------------log-------------------------------------}}
+			{{db.grades_log.insert(user_name = auth.user.username,
+                            roll = rol_log,
+                            operation_log = 'insert',
+                            academic_assignation_id = var_chang_ins.academic_assignation.id,
+                            academic = var_chang_ins.academic_assignation.carnet.carnet,
+                            project = var_chang_ins.academic_assignation.assignation.name,
+                            activity = request_change_var.activity.name,
+                            activity_id = request_change_var.activity.id,
+                            category = request_change_var.activity.course_activity_category.category.category,
+                            period = T(var_chang_ins.academic_assignation.semester.period.name),
+                            yearp = var_chang_ins.academic_assignation.semester.yearp,
+                            after_grade = var_chang_ins.after_grade,
+                            description = T('Inserted from Acept Request Change Grades page')
+                             )}}
+	    {{pass}}
+	    {{if var_chang_ins.operation_request == 'update':}}
+	    	
+	    	{{db((db.grades.academic_assignation==var_chang_ins.academic_assignation) & (db.grades.activity==request_change_var.activity) ).delete()}}
+	    	
+        	{{grade = db.grades.insert(academic_assignation = var_chang_ins.academic_assignation,
+                                activity = request_change_var.activity,
+                                grade =  var_chang_ins.after_grade)}}
+            
+			{{#--------------------------------------------log-------------------------------------}}
+			{{db.grades_log.insert(user_name = auth.user.username,
+                            roll = rol_log,
+                            operation_log = 'update',
+                            academic_assignation_id = var_chang_ins.academic_assignation.id,
+                            academic = var_chang_ins.academic_assignation.carnet.carnet,
+                            project = var_chang_ins.academic_assignation.assignation.name,
+                            activity = request_change_var.activity.name,
+                            activity_id = request_change_var.activity.id,
+                            category = request_change_var.activity.course_activity_category.category.category,
+                            period = T(var_chang_ins.academic_assignation.semester.period.name),
+                            yearp = var_chang_ins.academic_assignation.semester.yearp,
+                            before_grade = grade_before.grade,
+                            after_grade = var_chang_ins.after_grade,
+                            description = T('Edited from Acept Request Change Grades page')
+                             )}}
+	    {{pass}}
+	    {{if var_chang_ins.operation_request == 'delete':}}
+	    	
+	    	{{db((db.grades.academic_assignation==var_chang_ins.academic_assignation) & (db.grades.activity==request_change_var.activity) ).delete()}}
+	    	
+			{{#--------------------------------------------log-------------------------------------}}
+			{{db.grades_log.insert(user_name = auth.user.username,
+                            roll = rol_log,
+                            operation_log = 'update',
+                            academic_assignation_id = var_chang_ins.academic_assignation.id,
+                            academic = var_chang_ins.academic_assignation.carnet.carnet,
+                            project = var_chang_ins.academic_assignation.assignation.name,
+                            activity = request_change_var.activity.name,
+                            activity_id = request_change_var.activity.id,
+                            category = request_change_var.activity.course_activity_category.category.category,
+                            period = T(var_chang_ins.academic_assignation.semester.period.name),
+                            yearp = var_chang_ins.academic_assignation.semester.yearp,
+                            before_grade = grade_before.grade,
+                            description = T('Delete from Acept Request Change Grades page')
+                             )}}
+	    {{pass}}
+	{{pass}}
+	
+	
+	<script type="text/javascript">
+		location.href="{{=URL('activity_control','solve_request_change_grades.html')}}?course={{=request.vars['project']}}";
+	</script>
+{{pass}}
