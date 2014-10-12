@@ -741,7 +741,7 @@
 					{{activity_var = db(db.course_activity.id == request.vars['var_id']).select().first()}}
 					{{var_act = db(db.grades.activity == request.vars['var_id']).select().first()}}
 					{{if var_act != None:}} 
-						<script type="text/javascript"> 
+						<script type="text/javascript">
 							alert("{{=T('Unable to delete activity because it already has some grade associated')}}"); 
 						</script>
 					{{else:}}

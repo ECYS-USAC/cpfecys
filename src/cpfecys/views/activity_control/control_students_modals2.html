@@ -4,9 +4,9 @@
       <center>
         <h3>          
             {{if request.vars['type'] == "class":}}
-              <h2><small>{{=T('Class Scheduler')}} - {{=name}}</small></h2>
+              <h2>{{=T('Class Scheduler')}}<br><small>{{=name}} - {{=T(semestre2.period.name)}} {{=str(semestre2.yearp)}}</small></h2>
             {{else:}}
-              <h2><small>{{=T('Laboratory Scheduler')}} - {{=name}}</small></h2>
+              <h2>{{=T('Laboratory Scheduler')}}<br><small>{{=name}} - {{=T(semestre2.period.name)}} {{=str(semestre2.yearp)}}</small></h2>
             {{pass}}
           
         </h3>
@@ -14,31 +14,44 @@
     </div>
     <div id="actions_activity"  style="overflow:auto; height:100%; width:100%;">
       <form action="" enctype="multipart/form-data" method="post" >
+        <div align="right">
+          <a id="btn_divActivityAddV" role="button" class="btn btn-warning" title="{{=T('Add activity to scheduler')}}" onclick="visible_add_activity();"> 
+            <span class="icon-plus-sign"></span>
+            {{=T('Add Activity')}}
+           </a>
+        </div>
         <center>
-          <table >
+          <table>
               <tr>
-                <td align="left">                	
-                  <div align="center" id="activityDiv" value="activityDiv" class="well span12" style="overflow:auto;  width:300px;">    
-                    
+                <td align="left">                 
+                  <div id="divActivityAddV" class="well span11" style="width:1000px; overflow:auto; display:none;">
+                      <div align="center" id="activityDiv" value="activityDiv">    
+                      {{=T('Loading')}}...
+                    </div>
+                    <div align="right">
+                      <a role="button" class="btn btn-warning" title="{{=T('Hide add activities')}}" onclick="no_visible_add_activity();"> 
+                        <span class="icon-remove-sign"></span>
+                        {{=T('Hide')}}
+                      </a>
+                      <a id="activityButton" href="#information_text" role="button" class="btn btn-success"  
+                      title="{{=T('Add activity to scheduler')}}"> 
+                        <span class="icon-plus-sign"></span>
+                        {{=T('Add Activity')}}
+                       </a>
+                    </div>
                   </div>
-                   <div align="right">
-                    <a id="activityButton" href="#information_text" role="button" class="btn btn-info"  
-                    title="{{=T('Add activity to scheduler')}}"> 
-                    <span class="icon-plus-sign"></span>
-                    {{=T('Add Activity')}}
-                     </a>
-                  </div>
-                  
                 </td>
+              </tr>
+              <tr>
                 <td align="left">
-                  <div class="well span11" id="div_activity_show" style="width:1000px">
-            	      
+                  <div class="well span11" id="div_activity_show" style="width:1000px; overflow:auto;">
+                    {{=T('Loading')}}...
                   </div>
-              	</td>
+                </td>
               </tr>
               
           </table>
-			   </center>     	
+         </center>      
         </div>
 
         <div align="center">
@@ -48,6 +61,32 @@
   </div>
 </div>
   <!--Finish Create Activity Modal -->
+
+<!--help_modal_request_change_activity -->
+<div id="help_modal_activity" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true"> 
+  <div class="modal-header">
+    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+      <h3 id="myModalLabel">
+          <span class="icon-question-sign"></span>
+          {{=T('Maximum days of activity:')}}
+      </h3>
+  </div>
+  <div class="modal-body">
+    <div class="well">
+        <p>
+            {{=T('Maximum days for the activity is the number of days in the academic tutor for activities that fall within the category in which you are working.')}}
+            <br><br>
+            {{=T('For example:')}}
+            <br>
+            {{=T('If the category has 0 days maximum for activity, means that the day you start is the day activity must finish it.')}}
+        </p>
+    </div>
+  </div>
+  <div class="modal-footer">
+      <button class="btn" data-dismiss="modal" aria-hidden="true">{{=T('Close')}}</button>
+  </div>
+</div>
+<!--Finish help_modal_request_change_activity-->
 
   <script type="text/javascript">
   $(document).ready(function(){
@@ -111,4 +150,13 @@
     })
   });
 
+  function visible_add_activity(){
+    $("#divActivityAddV").css("display", "block");
+    $("#btn_divActivityAddV").css("display", "none");
+  }
+
+  function no_visible_add_activity(){
+    $("#divActivityAddV").css("display", "none");
+    $("#btn_divActivityAddV").css("display", "table-cell");
+  }
   </script>

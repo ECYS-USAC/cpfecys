@@ -628,91 +628,108 @@
 		</script>
 	{{else:}}
 		{{if no_menu==False:}}
-			<label>{{=T('Category')}}:</label>
-		    <!--Fill the select of the categorys-->
-		    <select class="generic-widget" id="category_activity_id" style="width:250px;">
-		    	<option value=""></option>
-		    	{{cR=None}}
-		    	{{if request.vars['type'] == "class":}}
-		    		{{if auth.has_membership('Student')==True:}}
-		    			{{if exception_s_var == True:}}
-		    				{{cR = db((db.course_activity_category.semester==semestre2.id) & (db.course_activity_category.assignation==var_project_id)&(db.course_activity_category.laboratory=='F')).select()}}
-		    			{{else:}}
-		    				{{cR = db((db.course_activity_category.semester==semestre2.id) & (db.course_activity_category.assignation==var_project_id)&(db.course_activity_category.laboratory=='F')&(db.course_activity_category.teacher_permition=='T')).select()}}
-		    			{{pass}}
-		    		{{else:}}
-		    			{{cR = db((db.course_activity_category.semester==semestre2.id) & (db.course_activity_category.assignation==var_project_id)&(db.course_activity_category.laboratory=='F')).select()}}
-		    		{{pass}}
-		    	{{else:}}
-		    		{{if auth.has_membership('Student')==True:}}
-		    			{{if var_do =='true':}}
-		    				{{cR = db((db.course_activity_category.semester==semestre2.id) & (db.course_activity_category.assignation==var_project_id)&(db.course_activity_category.laboratory=='T')).select()}}
-		    			{{else:}}
-		    				{{cR = db((db.course_activity_category.semester==semestre2.id) & (db.course_activity_category.assignation==var_project_id)&(db.course_activity_category.laboratory=='T')&(db.course_activity_category.specific_grade=='F')).select()}}
-		    			{{pass}}
-		    		{{else:}}
-		    			{{cR = db((db.course_activity_category.semester==semestre2.id) & (db.course_activity_category.assignation==var_project_id)&(db.course_activity_category.laboratory=='T')).select()}}
-		    		{{pass}}
-		    	{{pass}}
-				<script type="text/javascript">
-					var varParciales = 0;
-					var varFinal = 0;
-					var actividadPromedio = [];
-					var categorysAll = [];
-					var categoryOnly = [];
-				</script>
-				{{for c in cR:}}
-					{{if c.category.category != 'Laboratorio':}}
-						<option value="{{=c.id}}" title="Dias máximo de actividad: {{=c.category.timeout}} dias">{{=c.category.category}}</option>
-						<script type="text/javascript">
-							categoryOnly=[];
-							categoryOnly.push({{=c.id}});
-							categoryOnly.push({{=c.category.timeout}});
-							categoryOnly.push({{=c.grade}});
-							categorysAll.push(categoryOnly);
-							if("{{=c.category.category}}"=="Parciales"){
-								varParciales={{=c.id}};
-							}else{
-								if("{{=c.category.category}}"=="Examen Final"){
-									varFinal={{=c.id}};
-								}
-							}
-							if('{{=c.specific_grade}}'=='True'){
-								actividadPromedio.push('{{=c.id}}');
-							}
-						</script>
-					{{pass}}
-				{{pass}}
-		    </select>
-		    <!--Fill the select of the categorys-->
-		    <label>{{=T('Name')}}:</label>
-		    <input class="string" type="text" value="" id="activity_name1" style="width:140px; display:none;">
-		    <select class="generic-widget" id="activity_name2" style="width:140px; display:none;">
-		    </select>
-		    <label>{{=T('Description')}}:</label>
-		    <textarea class="string" cols="40" type="text" value="" id="activity_description" style="width:240px; height:100px;"/>
-
-		    <label style="display:none;" id="label_grade">{{=T('Grade')}}:</label>
-		    <input class="string" id="field_grade" type="text" value="" style="width:30px; display:none;">
-		    {{if auth.has_membership('Student')==True:}}
-		    	<div id="timeoutCategory"></div>
-		    {{pass}}
-		    <label>{{=T('Start Date')}}:</label>
-		    <input class="date" id="dateInit" name="log-date" placeholder="YYYY-MM-DD" type="text" value = "" style="width:90px;">
-		    <label>{{=T('End Date')}}:</label>
-		    <input class="date" id="dateEnd" name="log-date" placeholder="YYYY-MM-DD" type="text" value = "" style="width:90px;">
-		    {{if request.vars['type'] == "class" and auth.has_membership('Student')==False:}}
-		    	<div align="justify"> 
-			    	{{=T('Do you want to give permissions to academic tutors so they can edit this activity?')}}
-			    </div>
-			    
-		    	<label>
-		    		<div align="right"> 
-				    	{{=T('Yes')}}
-				    	<input type="checkbox" name="TP_check_activity"  id="TP_check_activity">
-			    	</div>
-		    	</label>
-		    {{pass}}
+			<table class="table table-striped table-bordered">
+				<tr>
+					<td colspan="3">
+						<center><b>{{=T('Add Activity')}}</b></center>
+					</td>
+				</tr>
+				<tr>
+					<td>
+						<label>{{=T('Category')}}:</label>
+						<!--Fill the select of the categorys-->
+					    <select class="generic-widget" id="category_activity_id" style="width:250px;">
+					    	<option value=""></option>
+					    	{{cR=None}}
+					    	{{if request.vars['type'] == "class":}}
+					    		{{if auth.has_membership('Student')==True:}}
+					    			{{if exception_s_var == True:}}
+					    				{{cR = db((db.course_activity_category.semester==semestre2.id) & (db.course_activity_category.assignation==var_project_id)&(db.course_activity_category.laboratory=='F')).select()}}
+					    			{{else:}}
+					    				{{cR = db((db.course_activity_category.semester==semestre2.id) & (db.course_activity_category.assignation==var_project_id)&(db.course_activity_category.laboratory=='F')&(db.course_activity_category.teacher_permition=='T')).select()}}
+					    			{{pass}}
+					    		{{else:}}
+					    			{{cR = db((db.course_activity_category.semester==semestre2.id) & (db.course_activity_category.assignation==var_project_id)&(db.course_activity_category.laboratory=='F')).select()}}
+					    		{{pass}}
+					    	{{else:}}
+					    		{{if auth.has_membership('Student')==True:}}
+					    			{{if var_do =='true':}}
+					    				{{cR = db((db.course_activity_category.semester==semestre2.id) & (db.course_activity_category.assignation==var_project_id)&(db.course_activity_category.laboratory=='T')).select()}}
+					    			{{else:}}
+					    				{{cR = db((db.course_activity_category.semester==semestre2.id) & (db.course_activity_category.assignation==var_project_id)&(db.course_activity_category.laboratory=='T')&(db.course_activity_category.specific_grade=='F')).select()}}
+					    			{{pass}}
+					    		{{else:}}
+					    			{{cR = db((db.course_activity_category.semester==semestre2.id) & (db.course_activity_category.assignation==var_project_id)&(db.course_activity_category.laboratory=='T')).select()}}
+					    		{{pass}}
+					    	{{pass}}
+							<script type="text/javascript">
+								var varParciales = 0;
+								var varFinal = 0;
+								var actividadPromedio = [];
+								var categorysAll = [];
+								var categoryOnly = [];
+							</script>
+							{{for c in cR:}}
+								{{if c.category.category != 'Laboratorio':}}
+									<option value="{{=c.id}}" title="Dias máximo de actividad: {{=c.category.timeout}} dias">{{=c.category.category}}</option>
+									<script type="text/javascript">
+										categoryOnly=[];
+										categoryOnly.push({{=c.id}});
+										categoryOnly.push({{=c.category.timeout}});
+										categoryOnly.push({{=c.grade}});
+										categorysAll.push(categoryOnly);
+										if("{{=c.category.category}}"=="Parciales"){
+											varParciales={{=c.id}};
+										}else{
+											if("{{=c.category.category}}"=="Examen Final"){
+												varFinal={{=c.id}};
+											}
+										}
+										if('{{=c.specific_grade}}'=='True'){
+											actividadPromedio.push('{{=c.id}}');
+										}
+									</script>
+								{{pass}}
+							{{pass}}
+					    </select>
+					    <!--Fill the select of the categorys-->
+					    <br>
+					    <label style="display:none;" id="labelName">{{=T('Name')}}:</label>
+					    <input class="string" type="text" value="" id="activity_name1" style="width:140px; display:none;">
+					    <select class="generic-widget" id="activity_name2" style="width:140px; display:none;">
+					    </select>
+					    <br>
+					</td>
+					<td>
+						<label>{{=T('Description')}}:</label>
+		    			<textarea class="string" cols="40" type="text" value="" id="activity_description" style="width:240px; height:100px;"/>
+					</td>
+					<td>
+						<div id="labelgradeCategory" style="display:none;"></div>
+						<label style="display:none;" id="label_grade">{{=T('Grade')}}:</label>
+					    <input class="string" id="field_grade" type="text" value="" style="width:30px; display:none;">
+					    {{if auth.has_membership('Student')==True:}}
+					    	<div id="timeoutCategory"></div>
+					    {{pass}}
+					    <label>{{=T('Start Date')}}:</label>
+					    <input class="date" id="dateInit" name="log-date" placeholder="YYYY-MM-DD" type="text" value = "" style="width:120px;">
+					    <label>{{=T('End Date')}}:</label>
+					    <input class="date" id="dateEnd" name="log-date" placeholder="YYYY-MM-DD" type="text" value = "" style="width:120px;">
+					    {{if request.vars['type'] == "class" and auth.has_membership('Student')==False:}}
+					    	<div align="justify"> 
+						    	{{=T('Do you want to give permissions to academic tutors so they can edit this activity?')}}
+						    </div>
+						    
+					    	<label>
+					    		<div align="right"> 
+							    	{{=T('Yes')}}
+							    	<input type="checkbox" name="TP_check_activity"  id="TP_check_activity">
+						    	</div>
+					    	</label>
+					    {{pass}}
+					</td>
+				</tr>
+			</table>
 		{{else:}}
 			<h2><small>{{=T('No Action')}}</small></h2>
 		{{pass}}
@@ -783,7 +800,7 @@
 			{{if category.category.category != 'Laboratorio':}}
 				<tr>
 					<th><center>
-						{{=category.category.category}}
+						{{=category.category.category}} ( {{=str(category.grade)}} pts )
 					</center></th>
 				</tr>
 				<tr>
@@ -800,6 +817,10 @@
 							{{total_var2E=float(0)}}
 							{{for acOnlyE in tActivities:}}
 								{{total_var2E = float(total_var2E) + float(acOnlyE.grade)}}
+							{{pass}}
+						{{else:}}
+							{{for acOnlyE in tActivities:}}
+								{{total_var2E = total_var2E + 1}}
 							{{pass}}
 						{{pass}}
 							<table class="table table-striped table-bordered">
@@ -981,7 +1002,7 @@
 										{{if editable_var=='true':}}
 											{{if auth.has_membership('Student'):}}
 												{{if request.vars['type'] != 'class':}}
-													{{=T('Maximum days of activity:')}} {{=tAct.course_activity_category.category.timeout}} {{=T('days')}}
+													<FONT COLOR="Red"><b>{{=T('Maximum days of activity:')}} {{=tAct.course_activity_category.category.timeout}} {{=T('days')}}</b></font>&nbsp;&nbsp;<a type="button" title="{{=T('Help')}}" aria-hidden="true" role="button" data-toggle="modal" data-target="#help_modal_activity" ><span class="icon-black icon-question-sign"></span></a>
 													<br>
 												{{pass}}
 											{{pass}}
@@ -1209,6 +1230,16 @@
 											</td>
 										</tr>
 									{{pass}}
+								{{else:}}
+									{{if total_var2E == 0:}}
+										<tr>
+											<td colspan="9">
+												<center>
+													<span id="information_text_fail" class="badge badge-important">{{=T('Category has not activities')}}</span>
+												</center>
+											</td>
+										</tr>
+									{{pass}}
 								{{pass}}
 							</table>
 						</div>
@@ -1230,61 +1261,84 @@
   			if (category_create!=document.getElementById('category_activity_id').value){
   				document.getElementById("field_grade").disabled = false;
 				category_create=document.getElementById('category_activity_id').value;
+				if (category_create==""){
+					$("#field_grade").css("display", "none");
+		  			$("#label_grade").css("display", "none");
+		  			$("#labelgradeCategory").css("display", "none");
+		  			jQuery('#timeoutCategory').empty();
 
-				$("#field_grade").css("display", "none");
-	  			$("#label_grade").css("display", "none");
+					$("#labelName").css("display", "none");
+					document.getElementById('activity_name1').value="";
+					$("#activity_name2").find('option').remove().end();
+					var lista=document.getElementById("activity_name2");
+					$("#activity_name2").css("display", "none");
+					$("#activity_name1").css("display", "none");
+				}else{
+					$("#field_grade").css("display", "none");
+		  			$("#label_grade").css("display", "none");
+		  			$("#labelgradeCategory").css("display", "none");
+		  			$("#labelName").css("display", "block");
 
-	  			{{if auth.has_membership('Student')==True:}}
+		  			{{if auth.has_membership('Student')==True:}}
+			  			for (var i=0; i < categorysAll.length; i++){
+			  				if(categorysAll[i][0]==category_create){
+			  					jQuery('#timeoutCategory').empty();
+			  					jQuery('#timeoutCategory').append("<FONT COLOR=\"Red\"><b>{{=T('Maximum days of activity:')}} "+categorysAll[i][1]+"</b></font>&nbsp;&nbsp;<a type=\"button\" title=\"{{=T('Help')}}\" aria-hidden=\"true\" role=\"button\" data-toggle=\"modal\" data-target=\"#help_modal_activity\" ><span class=\"icon-black icon-question-sign\"></span></a>");
+			  				}
+			  			}
+		  			{{pass}}
+
 		  			for (var i=0; i < categorysAll.length; i++){
 		  				if(categorysAll[i][0]==category_create){
-		  					jQuery('#timeoutCategory').empty();
-		  					jQuery('#timeoutCategory').append("<FONT COLOR=\"Red\"><b>{{=T('Maximum days of activity:')}} "+categorysAll[i][1]+"</b></font>&nbsp;&nbsp;<a type=\"button\" title=\"{{=T('Help')}}\" aria-hidden=\"true\" role=\"button\" data-toggle=\"modal\" data-target=\"#help_modal_activity\" ><span class=\"icon-black icon-question-sign\"></span></a>");
+		  					jQuery('#labelgradeCategory').empty();
+		  					jQuery('#labelgradeCategory').append("<FONT COLOR=\"Red\"><b>{{=T('Grade of Category:')}} "+categorysAll[i][2]+" pts</b></font>");
 		  				}
 		  			}
-	  			{{pass}}
 
-  				if (category_create==varParciales){
-  					document.getElementById('activity_name1').value="";
-  					$("#activity_name2").find('option').remove().end();
-
-  					var lista=document.getElementById("activity_name2");
-  					lista.options.add(new Option("Primer Parcial","Primer Parcial"));
-  					lista.options.add(new Option("Segundo Parcial","Segundo Parcial"));
-  					lista.options.add(new Option("Tercer Parcial","Tercer Parcial"));
-
-  					$("#activity_name1").css("display", "none");
-  					$("#activity_name2").css("display", "block");
-  				}else{
-  					if(category_create==varFinal){
-  						document.getElementById('activity_name1').value="";
-  						$("#activity_name2").find('option').remove().end();
-
-  						var lista=document.getElementById("activity_name2");
+	  				if (category_create==varParciales){
 	  					document.getElementById('activity_name1').value="";
-	  					lista.options.add(new Option("Examen Final","Examen Final"));
+	  					$("#activity_name2").find('option').remove().end();
 
-  						$("#activity_name1").css("display", "none");
+	  					var lista=document.getElementById("activity_name2");
+	  					lista.options.add(new Option("Primer Parcial","Primer Parcial"));
+	  					lista.options.add(new Option("Segundo Parcial","Segundo Parcial"));
+	  					lista.options.add(new Option("Tercer Parcial","Tercer Parcial"));
+
+	  					$("#activity_name1").css("display", "none");
 	  					$("#activity_name2").css("display", "block");
-  					}else{
-  						document.getElementById('activity_name1').value="";
-  						$("#activity_name2").find('option').remove().end();
-  						var lista=document.getElementById("activity_name2");
-  						$("#activity_name2").css("display", "none");
-  						$("#activity_name1").css("display", "block");
-  					}
-  				}
-  				document.getElementById('field_grade').value="nada";
-  				for (var i=0; i < actividadPromedio.length; i++){
-					if(actividadPromedio[i]==category_create){
-						document.getElementById('field_grade').value="";
-  						$("#field_grade").css("display", "block");
-  						$("#label_grade").css("display", "block");
-  						if(category_create==varFinal){
-  							for (var i1=0; i1 < categorysAll.length; i1++){
-  								document.getElementById('field_grade').value=categorysAll[i1][2];
-  								document.getElementById("field_grade").disabled = true;
-  							}
-  						}
+	  				}else{
+	  					if(category_create==varFinal){
+	  						document.getElementById('activity_name1').value="";
+	  						$("#activity_name2").find('option').remove().end();
+
+	  						var lista=document.getElementById("activity_name2");
+		  					document.getElementById('activity_name1').value="";
+		  					lista.options.add(new Option("Examen Final","Examen Final"));
+
+	  						$("#activity_name1").css("display", "none");
+		  					$("#activity_name2").css("display", "block");
+	  					}else{
+	  						document.getElementById('activity_name1').value="";
+	  						$("#activity_name2").find('option').remove().end();
+	  						var lista=document.getElementById("activity_name2");
+	  						$("#activity_name2").css("display", "none");
+	  						$("#activity_name1").css("display", "block");
+	  					}
+	  				}
+	  				document.getElementById('field_grade').value="nada";
+	  				for (var i=0; i < actividadPromedio.length; i++){
+						if(actividadPromedio[i]==category_create){
+							document.getElementById('field_grade').value="";
+	  						$("#field_grade").css("display", "block");
+	  						$("#label_grade").css("display", "block");
+	  						$("#labelgradeCategory").css("display", "block");
+	  						if(category_create==varFinal){
+	  							for (var i1=0; i1 < categorysAll.length; i1++){
+	  								document.getElementById('field_grade').value=categorysAll[i1][2];
+	  								document.getElementById("field_grade").disabled = true;
+	  							}
+	  						}
+						}
 					}
 				}
   			}
@@ -1367,29 +1421,3 @@
 		}
 	{{pass}}
 </script>
-
-<!--help_modal_request_change_activity -->
-<div id="help_modal_activity" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true"> 
-  <div class="modal-header">
-    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
-      <h3 id="myModalLabel">
-          <span class="icon-question-sign"></span>
-          {{=T('Maximum days of activity:')}}
-      </h3>
-  </div>
-  <div class="modal-body">
-    <div class="well">
-        <p>
-            {{=T('Maximum days for the activity is the number of days in the academic tutor for activities that fall within the category in which you are working.')}}
-            <br><br>
-            {{=T('For example:')}}
-            <br>
-            {{=T('If the category has 0 days maximum for activity, means that the day you start is the day activity must finish it.')}}
-        </p>
-    </div>
-  </div>
-  <div class="modal-footer">
-      <button class="btn" data-dismiss="modal" aria-hidden="true">{{=T('Close')}}</button>
-  </div>
-</div>
-<!--Finish help_modal_request_change_activity-->

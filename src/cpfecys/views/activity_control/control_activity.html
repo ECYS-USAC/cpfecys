@@ -31,6 +31,7 @@
 	<center>
 		{{if float(total_var2) == 100:}}
 			<div id="table_activity">
+				{{=T('Loading')}}...
 			</div>
 		{{else:}}
 			{{if (auth.has_membership('Student') or auth.has_membership('Teacher')) and assigned_to_project == True:}}
@@ -159,6 +160,21 @@
 				        </a>
 				     </li>
 				     <!--Edit activity option-->
+
+				     <!--Validate Laboratory option-->
+					{{if request.vars['type']=="lab":}}
+						{{if float(total_var2) == 100:}}
+			  				<li>
+								<a  tabindex="-1" title="{{=T('Validate Laboratory')}}" aria-hidden="true" href="{{=URL('activity_control', 'validate_laboratory',vars=dict(project = request.vars['project'], year = request.vars['year']))}}" >
+						{{else:}}
+							<li class="disabled">
+								<a  tabindex="-1" title="{{=T('Validate Laboratory')}}">
+						{{pass}}
+							<span class="icon-plus-sign"></span>{{=T('Validate Laboratory')}}
+							</a>
+						</li>
+					{{pass}}
+					<!--Validate Laboratory option-->
 
 				{{if auth.has_membership('Student') and request.vars['type']=="lab":}}
 				     <!--Change request option-->

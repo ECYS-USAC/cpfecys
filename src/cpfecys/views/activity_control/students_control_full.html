@@ -29,10 +29,12 @@
 <br>
 	{{if request.vars['f_view'] == "weighting" or request.vars['f_view'] == "weighting_edit" or request.vars['f_view'] == "weighting_get":}}
 		<div id="weighting_menu">
-	{{elif request.vars['f_view'] == "activity" or request.vars['f_view'] == "activity_edit":}}
+		</div>
+	{{elif request.vars['f_view'] == "activity":}}
 		<div id="activity_menu">
+		</div>
 	{{pass}}
-	</div>
+	
     
 
     {{if request.vars['f_view'] == "weighting" or request.vars['f_view'] == "weighting_edit" or request.vars['f_view'] == "weighting_get":}}
@@ -80,7 +82,9 @@ $(document).ready(function(){
 	$(document).ready(function(){
 	    $("#weighting_menu").load('{{=URL('activity_control','control_weighting.html',vars=dict(operation="menu_update", type=request.vars['type'], project = request.vars['project'], year = request.vars['year']))}}');
 
-	    $("#activity_menu").load('{{=URL('activity_control','control_activity.html',vars=dict(operation="menu_update", project = request.vars['project'], year = request.vars['year'], type = request.vars['type']))}}');
+	    {{if request.vars['f_view'] == "activity":}}
+	    	$("#activity_menu").load('{{=URL('activity_control','control_activity.html',vars=dict(operation="menu_update", project = request.vars['project'], year = request.vars['year'], type = request.vars['type']))}}');
+	    {{pass}}
 	  });
 </script>
 {{pass}}

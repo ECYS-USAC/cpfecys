@@ -1150,7 +1150,7 @@ def General_report_activities():
     CourseActivities = []
     for categoryC in CourseCategory:
         totalW=totalW+float(categoryC.grade)
-        if categoryC.category=="Laboratorio":
+        if categoryC.category.category=="Laboratorio":
             existLab=True
         else:
             CourseActivities.append(db((db.course_activity.semester==year.id)&(db.course_activity.assignation==project_var.id)&(db.course_activity.laboratory==False)&(db.course_activity.course_activity_category==categoryC.id)).select())
@@ -1160,5 +1160,97 @@ def General_report_activities():
         session.flash= "No se encuentra definida la ponderación correcta en el curso. No puede visualizar esta función"
         redirect(URL('default','index'))
 
+    totalW=float(0)
+    LabCategory=None
+    LabActivities = None
+    if existLab == True:
+        LabCategory = db((db.course_activity_category.semester==year.id)&(db.course_activity_category.assignation==project_var.id)&(db.course_activity_category.laboratory==True)).select()
+        LabActivities = []
+        for categoryL in LabCategory:
+            totalW=totalW+float(categoryL.grade)
+            CourseActivities.append(db((db.course_activity.semester==year.id)&(db.course_activity.assignation==project_var.id)&(db.course_activity.laboratory==True)&(db.course_activity.course_activity_category==categoryC.id)).select())
 
-    return dict(project = project_var, year = year, teacher=teacher, practice=practice, students=students, CourseCategory=CourseCategory, CourseActivities=CourseActivities)
+    if totalW!=float(100):
+        session.flash= "No se encuentra definida la ponderación correcta en el laboratorio. No puede visualizar esta función"
+        redirect(URL('default','index'))
+
+    return dict(project = project_var, year = year, teacher=teacher, practice=practice, students=students, CourseCategory=CourseCategory, CourseActivities=CourseActivities, existLab=existLab, LabCategory=LabCategory, LabActivities=LabActivities)
+
+
+@auth.requires_login()
+def validate_laboratory():
+    #Check if the period is correct
+    if request.vars['year'] is None or request.vars['year']=='':
+        session.flash = T('Not valid Action.')
+        redirect(URL('default','index'))
+    else:
+        year = request.vars['year']
+        year = db(db.period_year.id==year).select().first()
+        if year is None:
+            session.flash = T('Not valid Action.')
+            redirect(URL('default','index'))
+        else:
+            if cpfecys.current_year_period().id != year.id:
+                session.flash = T('Not valid Action.')
+                redirect(URL('default','index'))
+
+    #Check if the project is correct
+    if request.vars['project'] is None or request.vars['project']=='':
+        session.flash = T('Not valid Action.')
+        redirect(URL('default','index'))
+    else:
+        project = request.vars['project']
+        project = db(db.project.id==project).select().first()
+        if project is None:
+            session.flash = T('Not valid Action.')
+            redirect(URL('default','index'))
+
+    #Time limit of semester
+    from datetime import datetime
+    date1=None
+    tiempo=str(datetime.now())
+    dateInicialP = db.executesql('SELECT date(\''+tiempo+'\');',as_dict=True)
+    for d0 in dateInicialP:
+        date1=d0['date(\''+tiempo+'\')']
+    date_var = db((db.student_control_period.period_name==(T(year.period.name)+" "+str(year.yearp)))).select().first()
+    if date1 >= date_var.date_start_semester and date1 <= date_var.date_finish_semester:
+        #Exception of permition
+        exception_query = db(db.course_laboratory_exception.project == project.id).select().first()
+        exception_s_var = False
+        exception_t_var = False
+        if exception_query is not None:
+            exception_t_var = exception_query.t_edit_lab
+            exception_s_var = exception_query.s_edit_course
+
+        #Grid
+        grid=None
+        if auth.has_membership('Super-Administrator') or auth.has_membership('Ecys-Administrator'):
+            query = (db.grades)
+            grid = SQLFORM.grid(query, csv=False, paginate=5)
+        elif auth.has_membership('Teacher'):
+            assigantion = db((db.user_project.assigned_user == auth.user.id) & (db.user_project.period == year.id) & (db.user_project.project == project)).select().first()
+            if assigantion is None:
+                session.flash = T('Not valid Action.')
+                redirect(URL('default','index'))
+            else:
+                if exception_t_var==True:
+                    query = (db.grades)
+                    grid = SQLFORM.grid(query, csv=False, paginate=10)
+                else:
+                    session.flash = T('Not valid Action.')
+                    redirect(URL('default','index'))
+        elif auth.has_membership('Student'):
+            assigantion = db((db.user_project.assigned_user == auth.user.id) & (db.user_project.period == year.id) & (db.user_project.project == project)).select().first()
+            if assigantion is None:
+                session.flash = T('Not valid Action.')
+                redirect(URL('default','index'))
+            else:
+                query = (db.grades)
+                grid = SQLFORM.grid(query, csv=False, paginate=10)
+        else:
+            session.flash = T('Not valid Action.')
+            redirect(URL('default','index'))
+        return dict(year = year, project = project, grid=grid)
+    else:
+        session.flash = T('Not valid Action.')
+        redirect(URL('default','index'))    

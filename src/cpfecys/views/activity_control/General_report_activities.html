@@ -1,75 +1,151 @@
 {{extend 'template.html'}}
 <div class="row-fluid">
     <div class="well span12"  style="overflow:auto;">
-		<a onclick="window.history.back()" class="btn" ><i class="icon-arrow-left"></i>{{=T('Back')}}</a>
-        <h2>{{=T('General Report of Activities')}}
-			<br>
-			<small>{{=project.name}} - {{=T(year.period.name)}} {{=str(year.yearp)}}</small></small>
-        </h2>
+        <a onclick="window.history.back()" class="btn" ><i class="icon-arrow-left"></i>{{=T('Back')}}</a>
+        <table>
+            <tr>
+                <td colspan="4">
+                    <b>{{=T('General Report of Activities')}}</b>
+                </td>
+            </tr>
+            <tr>
+                <td colspan="4">
+                    <b>Datos Generales del Curso</b>
+                </td>
+            </tr>
+            <tr>
+                <td><b>Curso</b></td>
+                <td>{{=project.name}}</td>
+            
+                <td><b>Semestre</b></td>
+                <td>{{=T(year.period.name)}} {{=str(year.yearp)}}</td>
+            </tr>
+            <tr>
+                <td><b>{{=T('Teacher')}}</b></td>
+                <td>{{=str(teacher.auth_user.first_name)}} {{=str(teacher.auth_user.last_name)}}</td>
+                <td><b>{{=T('Rol Student')}}</b></td>
+                {{for t1 in practice:}}
+                    <td>{{=str(t1.auth_user.first_name)}} {{=str(t1.auth_user.last_name)}}</td>
+                    <br>
+                {{pass}}
+            </tr>
+        </table>
 
         <table class="table-striped table-bordered">
             <THEAD>
                 <tr>
-                    <th>{{=T('Teacher')}}</th>
-                    <th>{{=str(teacher.auth_user.first_name)}} {{=str(teacher.auth_user.last_name)}}</th>
-                </tr>
-                {{for t1 in practice:}}
-                    <tr>
-                        <th>{{=T('Rol Student')}}</th>
-                        <th>{{=str(t1.auth_user.first_name)}} {{=str(t1.auth_user.last_name)}}</th>
-                    </tr>
-                {{pass}}
-            </THEAD>
-            <TBODY>
-                <tr>
-                    <th Colspan="2"><center>{{=T('Academic')}}</center></th>
-                </tr>
-                <tr>
-                    <th>{{=T('Carnet')}}</th>
+                    <td bgcolor="Gray">
+                        <b>
+                            {{=T('Carnet')}}
+                            <br>
+                            &nbsp;
+                        </b>
+                    </td>
                     {{posVCC=0}}
                     {{for category in CourseCategory:}}
-                        {{for c in CourseActivities[posVCC]:}}
-                        <th>
-                            <center>
-                                {{=str(c.name)}}
-                            </center>
-                        </th>
-                        {{pass}}
-                        <th>
-                            <center>
-                                {{=str(category.category.category)}}
-                                <br>
-                                {{=str(category.grade)}}
-                            </center>
-                        </th>
-                        {{posVCC=posVCC+1}}
-                    {{pass}}
-                    <th>{{=T('Total')}}</th>
-                </tr>
-                {{for t1 in students:}}
-                    <tr>
-                        <td>{{=t1.carnet.carnet}}</td>
-                        {{posVCC=0}}
-                        {{for category in CourseCategory:}}
                             {{for c in CourseActivities[posVCC]:}}
-                            <td>
+                            <td bgcolor="Green">
                                 <center>
-                                    {{=str(c.name)}}
+                                    <b>
+                                        <font Color="White">
+                                            {{=str(c.name)}}
+                                            <br>
+                                            &nbsp;
+                                        </font>
+                                    </b>
                                 </center>
                             </td>
                             {{pass}}
-                            <td>
+                            <td bgcolor="Green">
                                 <center>
-                                    {{=str(category.category.category)}}
-                                    <br>
-                                    {{=str(category.grade)}}
+                                    <b>
+                                        <font Color="White">
+                                            {{=str(category.category.category)}}
+                                            <br>
+                                            {{=str(category.grade)}} pts
+                                        </font>
+                                    </b>
                                 </center>
                             </td>
+                        {{posVCC=posVCC+1}}
+                    {{pass}}
+                    <td bgcolor="DarkBlue">
+                        <center>
+                            <b>
+                                <font Color="White">
+                                    {{=T('Final Grade')}}
+                                    <br>
+                                    100 pts
+                                </font>
+                            </b>
+                        </center>
+                    </td>
+                </tr>
+            </THEAD>
+            <TBODY>
+                {{for t1 in students:}}
+                    <tr>
+                        <td>{{=t1.carnet.carnet}}</td>
+
+                        <!--Position in the vector of activities-->
+                        {{posVCC=0}}
+                        <!--Vars to the control of grade of the student-->
+                        {{totalCategory=float(0)}}
+                        {{totalActivities=0}}
+                        {{totalCarry=float(0)}}
+                        <!--****************************************FILL THE GRADES OF THE STUDENT****************************************-->
+                        <!--COURSE ACTIVITIES-->
+                        {{for category in CourseCategory:}}
+                                {{totalCategory=float(0)}}
+                                {{totalActivities=0}}
+                                {{for c in CourseActivities[posVCC]:}}
+                                    <td>
+                                        <center>
+                                            {{studentGrade = db((db.grades.activity==c.id)&(db.grades.academic_assignation==t1.id)).select().first()}}
+                                            {{if studentGrade is None:}}
+                                                {{totalCategory=totalCategory+float(0)}}
+                                            {{else:}}
+                                                {{if category.specific_grade==True:}}
+                                                    {{=studentGrade.grade}}
+                                                    {{totalCategory=totalCategory+float((studentGrade.grade*c.grade)/100)}}
+                                                {{else:}}
+                                                    {{=studentGrade.grade}}
+                                                    {{totalCategory=totalCategory+float(studentGrade.grade)}}
+                                                {{pass}}
+                                            {{pass}}
+                                        </center>
+                                    </td>
+                                    {{totalActivities=totalActivities+1}}
+                                {{pass}}
+                                <td>
+                                    <center>
+                                    {{if category.specific_grade==True:}}
+                                        {{=str(totalCategory)}}
+                                    {{else:}}
+                                        {{if totalActivities==0:}}
+                                            {{totalActivities=1}}
+                                        {{pass}}
+                                        {{totalActivities=totalActivities*100}}
+                                        {{totalCategory=float((totalCategory*float(category.grade))/float(totalActivities))}}
+                                        {{=str(totalCategory)}}
+                                    {{pass}}
+                                    {{totalCarry=totalCarry+totalCategory}}
+                                    </center>
+                                </td>
                             {{posVCC=posVCC+1}}
                         {{pass}}
+                        <td>
+                            <center>
+                                {{=str(totalCarry)}}
+                            </center>
+                        </td>
                     </tr>
+                    {{posVCC=0}}
+                    {{totalCategory=float(0)}}
+                    {{totalActivities=0}}
+                    {{totalCarry=float(0)}}
                 {{pass}}
             </TBODY>
         </table>
-	</div>
+    </div>
 </div>
