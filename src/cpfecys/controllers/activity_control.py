@@ -113,7 +113,7 @@ def students_control():
                 session.flash=T('You do not have permission to view course requests')
                 redirect(URL('default','index'))
         
-    return dict(project = project_var, year = year.id , name = project_select.name)
+    return dict(project = project_var, year = year.id , name = project_select.name, nameP=(T(year.period.name)+" "+str(year.yearp)))
 
 
 
@@ -802,22 +802,25 @@ def requestchangeactivity():
                 check = db.user_project(project = request.vars['project'], period = request.vars['year'], assigned_user = auth.user.id)
                 #Message
                 users2 = db((db.auth_user.id==db.user_project.assigned_user)&(db.user_project.period == check.period) & (db.user_project.project==check.project)&(db.auth_membership.user_id==db.user_project.assigned_user)&(db.auth_membership.group_id==3)).select().first()
-                subject="Solicitud de cambio de actividades - "+project.name
-                
-                message2="<br>Por este medio se le informa que el(la) practicante "+check.assigned_user.first_name+" "+check.assigned_user.last_name+" ha creado una solicitud de cambio de actividades en la categoría \""+Draft.course_activity_category.category.category+"\" dentro de la ponderación de laboratorio del Curso de \""+project.name+"\"."
-                message2=message2+"<br>Para aceptar o rechazar dicha solicitud dirigirse al control de solicitudes o al siguiente link: "
-                message2=message2+"<br>Saludos.<br><br>Sistema de Seguimiento de La Escuela de Ciencias y Sistemas<br>Facultad de Ingeniería - Universidad de San Carlos de Guatemala</html>"
+                try:
+                    subject="Solicitud de cambio de actividades - "+project.name
+                    
+                    message2="<br>Por este medio se le informa que el(la) practicante "+check.assigned_user.first_name+" "+check.assigned_user.last_name+" ha creado una solicitud de cambio de actividades en la categoría \""+Draft.course_activity_category.category.category+"\" dentro de la ponderación de laboratorio del Curso de \""+project.name+"\"."
+                    message2=message2+"<br>Para aceptar o rechazar dicha solicitud dirigirse al control de solicitudes o al siguiente link: "
+                    message2=message2+"<br>Saludos.<br><br>Sistema de Seguimiento de La Escuela de Ciencias y Sistemas<br>Facultad de Ingeniería - Universidad de San Carlos de Guatemala</html>"
 
-                #Send Mail to the Teacher
-                message="<html>catedratico(a) "+users2.auth_user.first_name+" "+users2.auth_user.last_name+" reciba un cordial saludo.<br>"
-                message3=message+message2
-                fail1 = send_mail_to_students(message3,subject,users2.auth_user.email,check,year.period.name,year.yearp)
-                #Refresh the var Draft
-                Draft=None
-                if fail1==1:
+                    #Send Mail to the Teacher
+                    message="<html>catedratico(a) "+users2.auth_user.first_name+" "+users2.auth_user.last_name+" reciba un cordial saludo.<br>"
+                    message3=message+message2
+                    fail1 = send_mail_to_students(message3,subject,users2.auth_user.email,check,year.period.name,year.yearp)
+                    #Refresh the var Draft
+                    Draft=None
+                    if fail1==1:
+                        stateRequest=2
+                    else:
+                        stateRequest=4
+                except:
                     stateRequest=2
-                else:
-                    stateRequest=4
 
 
     requestC=db((db.requestchange_activity.course==project.id)&(db.requestchange_activity.semester==year.id)&(db.requestchange_activity.status=='Pending')).select()

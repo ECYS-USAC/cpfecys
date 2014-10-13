@@ -2,11 +2,11 @@
 <script src="{{=URL('static','js')}}/jquery-migrate-1.2.1.js"></script>
 <div style=" width:100%; overflow:auto;">
   <div style=" left:0; width:100%;  left:25px;" >
-    <center>
-    <h3>
-        {{=name}}
-    </h3>
-    </center>    
+    <h1>
+      {{=name}}
+      <br>
+      <small>{{=nameP}}</small>
+    </h1>
     <table style="width:100%;">
       <tr>
         <td style="width:25%;">
@@ -101,7 +101,7 @@
                     <div  style=" width:800px; overflow:auto;">
                       <div style=" width:100%;" >
                         <div id="activity_inside" class="well" style=" overflow:auto; background-color:white;  ">
-                          {{=T('Loading')}}...
+                          <center>{{=T('Loading')}}...</center>
                         </div>
                       </div>
                     </div>

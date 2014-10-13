@@ -31,7 +31,7 @@
 	<center>
 		{{if float(total_var2) == 100:}}
 			<div id="table_activity">
-				{{=T('Loading')}}...
+				<center>{{=T('Loading')}}...</center>
 			</div>
 		{{else:}}
 			{{if (auth.has_membership('Student') or auth.has_membership('Teacher')) and assigned_to_project == True:}}

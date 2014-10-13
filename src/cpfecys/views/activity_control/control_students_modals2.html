@@ -57,6 +57,12 @@
         <div align="center">
 
       </div>
+      <div align="right">
+        <a href="{{=URL('activity_control', 'students_control', vars=dict(project = request.vars['project'], period = request.vars['year']))}}" role="button" class="btn btn-info"  > 
+          <span class="icon-ok-circle"></span>
+          {{=T('Finalize')}}
+        </a>
+      </div>
     </form>
   </div>
 </div>
