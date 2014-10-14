@@ -296,13 +296,147 @@ def grades():
     else:
         request_change_var = False
 
+    add_grade_flash = False
+    add_grade_error = False
+    message_var = ""
+    
+    carnet_list = str(request.vars['carnet']).split(',')
+    grade_list = str(request.vars['grade']).split(',')
+    cont_temp = 0
+    for carnet_id in carnet_list: 
+        if (request.vars['op'] == "add_grade"):
+            carnet_list = request.vars['carnet']
+            grade_list = request.vars['grade']
+            request.vars['grade'] = grade_list
+        else:
+            request.vars['grade'] = grade_list[cont_temp]
+            cont_temp = cont_temp+1
+        request.vars['carnet'] = carnet_id
+        
+        #<!---------------------------INSERT---------------------------->
+        if (request.vars['op'] == "add_grade") | (request.vars['op'] == "add_grade_list"):
+            try:
+                academic_var =  db(db.academic.carnet==request.vars['carnet']).select().first()
+
+                assig_var =  db((db.academic_course_assignation.assignation==var_project.id) & (db.academic_course_assignation.semester==var_period.id) & (db.academic_course_assignation.carnet == academic_var.id)).select().first()
+                  #--------------------------------------------INSERT GRADE-------------------------------------
+                if request_change_var == False:
+                    if exist_request_change == True:
+                        add_grade_error = True
+                        message_var = T('Can not make operation because there is a pending request change. Please resolve it before proceeding.')
+                    else:
+                        grade_before = db((db.grades.academic_assignation==assig_var.id) & (db.grades.activity==var_activity.id) ).select().first() 
+                        if grade_before is None:
+                            grade = db.grades.insert(academic_assignation = assig_var.id,
+                                            activity = var_activity.id,
+                                            grade =  request.vars['grade'])
+
+                            if grade != None:
+                                #--------------------------------------------log-------------------------------------
+                                db.grades_log.insert(user_name = auth.user.username,
+                                                roll = rol_log,
+                                                operation_log = 'insert',
+                                                academic_assignation_id = assig_var.id,
+                                                academic = assig_var.carnet.carnet,
+                                                project = assig_var.assignation.name,
+                                                activity = var_activity.name,
+                                                activity_id = var_activity.id,
+                                                category = var_activity.course_activity_category.category.category,
+                                                period = T(assig_var.semester.period.name),
+                                                yearp = assig_var.semester.yearp,
+                                                after_grade = request.vars['grade'],
+                                                description = T('Inserted from Grades page')
+                                                 )
+                                if request.vars['op'] == "add_grade":
+                                    add_grade_flash = True
+                                    message_var = T('Grade added') + " | Carnet: "+ str(academic_var.carnet) +" "+ T('Grade')+ ": " + str(grade.grade)
+                                pass
+                            else:
+                                add_grade_error = True
+                                message_var = T('Failed to add grade') + " | Carnet: "+ str(academic_var.carnet)+" " + T('Grade')+": " + str(grade.grade)
+                            pass  #----grade!=None---
+                        else:
+                            add_grade_error = True
+                            message_var = T('Failed to add grade') + " | Carnet: "+ request.vars['carnet']+" " + T('Already have an associated grade')
+                        pass #-------grade_before-is-None---  
+                    pass  #------exist_request_change-==-True----
+                  #--------------------------------------------INSERT REQUEST-------------------------------------
+                else:
+                    grade_before = db((db.grades.academic_assignation==assig_var.id) & (db.grades.activity==var_activity.id) ).select().first() 
+                    
+                    var_grade_before = None
+                    var_operation = 'insert'
+                    if grade_before != None:
+                        var_grade_before = grade_before.grade
+                        var_operation = 'update'
+                    pass
+                    
+                    request_change = db((db.request_change_grades.activity== var_activity.id) & (db.request_change_grades.status=='pending') ).select().first() 
+                    if request_change is None:
+                        grade = db.request_change_grades.insert(user_id = auth.user.id,
+                                                              activity = var_activity.id,
+                                                              status =  'pending',
+                                                              roll = rol_log,
+                                                              period = assig_var.semester.id,
+                                                              project = assig_var.assignation.id,
+                                                              description = request.vars['description_var'])
+                    
+                        #-------------------------------------LOG-----------------------------------------------
+                        log_id = db.request_change_g_log.insert(r_c_g_id = grade,
+                                                      username = auth.user.username,
+                                                      roll = rol_log,
+                                                      after_status = 'pending',
+                                                      description = request.vars['description_var'],
+                                                      description_log = T('Inserted from Grades page'),
+                                                      semester = T(assig_var.semester.period.name),
+                                                      yearp = assig_var.semester.yearp,
+                                                      activity = var_activity.name,
+                                                      category = var_activity.course_activity_category.category.category,
+                                                      project = assig_var.assignation.name
+                                                    )
+                    pass #--------request_change-is-None----
+                    request_change = db((db.request_change_grades.activity== var_activity.id) & (db.request_change_grades.status=='pending') ).select().first() 
+                    rq_grade = db.request_change_grades_detail.insert(request_change_grades = request_change.id,
+                                                                          academic_assignation = assig_var.id,
+                                                                          before_grade = var_grade_before,
+                                                                          operation_request = var_operation,
+                                                                          after_grade = request.vars['grade'])
+
+                    log_id = db((db.request_change_g_log.r_c_g_id== request_change.id) & (db.request_change_g_log.after_status=='pending') ).select().first() 
+
+                    db.request_change_grade_d_log.insert(request_change_g_log = log_id.id,
+                                                      operation_request = var_operation,
+                                                      academic = academic_var.carnet,
+                                                      before_grade = var_grade_before,
+                                                      after_grade = request.vars['grade']
+                                                      )
+
+                pass #-------request_change_var-==-False---
+                
+                  
+            except:
+                if academic_var is None:
+                    add_grade_error = True
+                    message_var = T('Failed to add grade') + " | Carnet: "+ request.vars['carnet'] +" " + T('not exist')
+                else:
+                    add_grade_error = True
+                    message_var = T('Failed to add grade')
+                pass
+            pass
+
+        pass
+    pass
     return dict(academic_assig=academic_assig, 
         var_period=var_period, 
         var_activity=var_activity, 
         var_project=var_project, 
         rol_log=rol_log, 
         request_change_var = request_change_var, 
-        exist_request_change = exist_request_change)
+        exist_request_change = exist_request_change,
+        message_var = message_var,
+        add_grade_error = add_grade_error,
+        add_grade_flash = add_grade_flash
+        )
 
 
 
@@ -1030,6 +1164,8 @@ def grades_request():
     elif auth.has_membership('Student')==True:
         rol_log='Student'
     pass
+
+
     return dict(semestre2 = currentyear_period,rol_log = rol_log)
 
 
