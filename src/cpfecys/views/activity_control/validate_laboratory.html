@@ -3,8 +3,20 @@
 	<a href="{{=URL('activity_control', 'students_control', vars=dict(project = project.id, period = year.id))}}" class="btn" ><i class="icon-arrow-left"></i> {{=T('Back')}}</a>
 </div>
 <h2>
-    {{=project.name}}
-    <br>
-    <small>{{=T(year.period.name)}} {{=str(year.yearp)}} </small>
+	{{=T('Laboratory revalidation')}}
+	<br>
+	<small>
+		{{=project.name}} - {{=T(year.period.name)}} {{=str(year.yearp)}}
+    </small>
 </h2>
 {{=grid}}
+<script type="text/javascript">
+	$(document).ready(function(){
+		$("#validate_laboratory_carnet").find('option').remove().end();
+		var lista=document.getElementById("validate_laboratory_carnet");
+		lista.options.add(new Option("",""));
+		{{for students in db((db.academic_course_assignation.semester==request.vars['year'])&(db.academic_course_assignation.assignation==request.vars['project'])).select():}}
+			lista.options.add(new Option({{=str(students.carnet.carnet)}},{{=students.carnet}}));
+		{{pass}}
+	});
+</script>

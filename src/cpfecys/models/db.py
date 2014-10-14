@@ -1006,6 +1006,29 @@ db.define_table('request_change_grade_d_log',
     Field('after_grade', 'decimal(5,2)', notnull=False, label=T('After Grade'))
     )
 
+db.define_table('validate_laboratory',
+    Field('carnet', 'reference academic', notnull=True, label=T('Carnet')),
+    Field('semester', 'reference period_year', notnull=True, label=T('Period')),
+    Field('project', 'reference project', notnull=True, label=T('Course')),
+    Field('grade', 'integer', notnull=True, label=T('Grade'), requires=IS_DECIMAL_IN_RANGE(61, 100))
+)
+
+db.define_table('validate_laboratory_log',    
+    Field('user_name', 'string', notnull = False, label = T('User Name Before')),
+    Field('roll', 'string', notnull = False, label = T('Role')),
+    Field('operation_log', 'string', notnull = False, label = T('Operation')),
+    Field('academic_id', 'string', notnull = False, label = T('Academic Assignation Id')),
+    Field('academic', 'string', notnull=False, label=T('Academic')),
+    Field('project', 'string', notnull=False, label=T('Course')),
+    Field('yearp', 'string', notnull=False, label=T('Year')),
+    Field('period', 'string', notnull=False, label=T('Period')),
+    Field('before_grade', 'integer', notnull=False, label=T('Grade Before')),
+    Field('after_grade', 'integer', notnull=False, label=T('Grade After')),
+    Field('description', 'text', notnull=False, label=T('Description')),
+    Field('id_validate_laboratory', 'text',notnull = False, label = T('id_validate_laboratory')),
+    Field('date_log', 'datetime', notnull = True, default = datetime.datetime.now(), label = T('Date'))
+)
+
 ## after defining tables, uncomment below to enable auditing
     # auth.enable_record_versioning(db)
 # automatic forcing spanish language
