@@ -1,3 +1,8 @@
+{{if alert_message == True:}}
+  <script type="text/javascript">
+    alert("{{=message_var2}}");
+  </script>
+{{pass}}
 <!---------------------------Cancel Request---------------------------->
 {{if (request.vars['op'] == "cancel_request") : }}
   {{request_change = db((db.request_change_grades.activity== var_activity.id) & (db.request_change_grades.status=='pending') ).select().first() }}

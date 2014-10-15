@@ -299,7 +299,9 @@ def grades():
     add_grade_flash = False
     add_grade_error = False
     message_var = ""
-    
+    message_var2 = ""
+    alert_message = False
+
     carnet_list = str(request.vars['carnet']).split(',')
     grade_list = str(request.vars['grade']).split(',')
     cont_temp = 0
@@ -411,6 +413,30 @@ def grades():
                                                       before_grade = var_grade_before,
                                                       after_grade = request.vars['grade']
                                                       )
+                                    
+                    #send mail
+                    project_name = var_project.name
+                    project_id = id_project
+                    check = db.user_project(project = project_id, period = var_period.id, assigned_user = auth.user.id)
+                    #Message
+                    users2 = db((db.auth_user.id==db.user_project.assigned_user)&(db.user_project.period == check.period) & (db.user_project.project==check.project)&(db.auth_membership.user_id==db.user_project.assigned_user)&(db.auth_membership.group_id==3)).select().first()
+                    subject="Solicitud de cambio de ponderación - "+project_name
+                    message2="<br>Por este medio se le informa que el(la) practicante "+check.assigned_user.first_name+" "+check.assigned_user.last_name+" ha creado una solicitud de cambio en las notas del laboratorio del Curso de \""+project_name+"\"."
+                    message2=message2+"<br>Para aceptar o rechazar dicha solicitud dirigirse al control de solicitudes o al siguiente link: " +cpfecys.get_domain()+ "cpfecys/activity_control/solve_request_change_grades?course="+str(project_id)
+                    message2=message2+"<br>Saludos.<br><br>Sistema de Seguimiento de La Escuela de Ciencias y Sistemas<br>Facultad de Ingeniería - Universidad de San Carlos de Guatemala</html>"
+                    #Send Mail to the Teacher
+                    message="<html>catedratico(a) "+users2.auth_user.first_name+" "+users2.auth_user.last_name+" reciba un cordial saludo.<br>"
+                    message3=message+message2
+
+                    fail1 = send_mail_to_students(message3,subject,users2.auth_user.email,check,var_period.period.name,var_period.yearp) 
+                    if fail1==1:
+                        alert_message = True
+                        message_var2 = T("Request has been sent") + ". " + T("Sent email to teacher")
+                    
+                    else:
+                        alert_message = True
+                        message_var2 = T("Request has been sent") + ". " + T("Failed to send email to teacher")
+                        
 
                 pass #-------request_change_var-==-False---
                 
@@ -435,6 +461,8 @@ def grades():
         request_change_var = request_change_var, 
         exist_request_change = exist_request_change,
         message_var = message_var,
+        message_var2 = message_var2,
+        alert_message = alert_message,
         add_grade_error = add_grade_error,
         add_grade_flash = add_grade_flash
         )
@@ -563,7 +591,7 @@ def request_change_weighting():
                     message3=message+message2
                     fail1 = send_mail_to_students(message3,subject,users2.auth_user.email,check,year_semester.name,year.yearp) 
                     if fail1==1:
-                        response.flash = T("Request has been sent") + " - " + ("Sent email to teacher")
+                        response.flash = T("Request has been sent") + " - " + T("Sent email to teacher")
                     else:
                         response.flash = T("Request has been sent") + " - " + T("Failed to send email to teacher")
                     return dict(name = project_name,
