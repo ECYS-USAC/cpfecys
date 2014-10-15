@@ -641,6 +641,8 @@
 'Entrega de Pañales': 'Entrega de Pañales',
 'Entrega de pañales': 'Entrega de pañales',
 'Entregable de prueba': 'Entregable de prueba',
+'entro 1.': 'entro 1.',
+'entro 2.': 'entro 2.',
 'Entry Date:': 'Fecha de Ingreso:',
 'entry_date': 'Fecha de entrada',
 'Enviar': 'Enviar',

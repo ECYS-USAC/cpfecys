@@ -303,18 +303,19 @@ def grades():
     carnet_list = str(request.vars['carnet']).split(',')
     grade_list = str(request.vars['grade']).split(',')
     cont_temp = 0
-    for carnet_id in carnet_list: 
-        if (request.vars['op'] == "add_grade"):
-            carnet_list = request.vars['carnet']
-            grade_list = request.vars['grade']
-            request.vars['grade'] = grade_list
-        else:
-            request.vars['grade'] = grade_list[cont_temp]
-            cont_temp = cont_temp+1
-        request.vars['carnet'] = carnet_id
+    #<!---------------------------INSERT---------------------------->
+    if (request.vars['op'] == "add_grade") | (request.vars['op'] == "add_grade_list"):
+        for carnet_id in carnet_list: 
+            if (request.vars['op'] == "add_grade"):
+                carnet_list = request.vars['carnet']
+                grade_list = request.vars['grade']
+                request.vars['grade'] = grade_list
+            else:
+                request.vars['grade'] = grade_list[cont_temp]
+                cont_temp = cont_temp+1
+            request.vars['carnet'] = carnet_id
         
-        #<!---------------------------INSERT---------------------------->
-        if (request.vars['op'] == "add_grade") | (request.vars['op'] == "add_grade_list"):
+        
             try:
                 academic_var =  db(db.academic.carnet==request.vars['carnet']).select().first()
 
