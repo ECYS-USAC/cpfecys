@@ -546,11 +546,13 @@
                                         <span class="label label-important">&nbsp;&nbsp;&nbsp;</span>&nbsp;<b>{{=T('Notes Below Average')}}</b>
                                     </td>
 
+                                    {{if request.vars['type'] == 'class':}}
                                     <td>
                                         <span class="label label-inverse">&nbsp;&nbsp;&nbsp;</span>&nbsp;<b>{{=T('Laboratory lost or Missing requirement')}}</b>
                                         <br>
                                         &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<i class="icon-flag"></i><font color="red">{{=T('Only applies to final mark')}}</font>
                                     </td>
+                                    {{pass}}
                                 </tr>
                             </table>
                         </center>
