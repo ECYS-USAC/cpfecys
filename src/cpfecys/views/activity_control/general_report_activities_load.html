@@ -1,3 +1,167 @@
+{{exception_query = db(db.course_laboratory_exception.project == project.id).select().first()}}
+{{exception_s_var = False}}
+{{exception_t_var = False}}
+{{no_menu=True}}
+
+{{if exception_query is not None:}}
+    {{exception_t_var = exception_query.t_edit_lab}}
+    {{exception_s_var = exception_query.s_edit_course}}
+{{pass}}
+
+{{activityPermition=db((db.course_requirement.semester==year.id)&(db.course_requirement.project==project.id)&(db.course_requirement.teacher_permition==True)).count()}}
+{{if request.vars['type'] == 'class' and (auth.has_membership('Ecys-Administrator') or auth.has_membership('Super-Administrator') or (auth.has_membership('Teacher') and assignation!=None) or (auth.has_membership('Student') and assignation!=None and (exception_s_var == True  or activityPermition>0))):}}
+    {{no_menu=False}}
+{{pass}}
+
+{{if cpfecys.current_year_period().id != semestre2.id:}}
+	{{no_menu=True}}
+{{pass}}
+
+
+<!--***************************************************************************************************************************************************************************************************************************-->
+<!--***************************************************************************************************************************************************************************************************************************-->
+<!--***************************************************************************************************************************************************************************************************************************-->
+<!--***************************************************************************************************************************************************************************************************************************-->
+<!--***************************************************************************************************************************************************************************************************************************-->
+<!--***************************************************************************************************************************************************************************************************************************-->
+<!--***************************************************************************************************************************************************************************************************************************-->
+<!--***************************************************************************************************************************************************************************************************************************-->
+
+asASaA
+
+
+<!--UPDATE ACTIVITY-->
+{{if request.vars['op'] == "loadDiv": }}
+	{{if no_menu==True:}}
+		<script type="text/javascript">
+			alert("{{=T('Not valid Action.')}}");
+			window.location.href = "{{=URL('activity_control', 'General_report_activities',vars=dict(project=project.id, period=year.id, type=class))}}";
+		</script>
+	{{else:}}
+		{{requeriment=db((db.course_requirement.semester==year.id)&(db.course_requirement.project==project.id)).select().first()}}
+		{{if requeriment is None:}}
+			<form action="" enctype="multipart/form-data" method="post" >
+                <div align="center">
+                    <table >
+                        <tr>
+                            <td align="left">
+                                <input name="_formname" type="hidden" value="upload_form">
+                                <label>{{=T('File name')}}</label>
+                                <input class="string" name="file_name" type="text" value="">
+                                <label>{{=T('Select file')}}</label>
+                                <input class="upload" name="file_upload" type="file" id="upload_button">
+                                <div id="uploadError" style="display: none;" class="alert-error">
+                                    {{=T('File size must be 2MB or below with pdf or zip extension')}}
+                                </div>
+                                <label>{{=T('Description')}}</label>
+                                <input class="string" name="file_description" type="text" value="">
+                                <label>{{=T('Visible')}}&nbsp &nbsp<input type="checkbox" name="file_visible"></label>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <div align="right"> 
+                                    <input type="submit" class="btn btn-primary" value="{{=T('Upload file')}}">
+                                </div>
+                            </td>
+                        </tr>
+                    </table>
+                </div>
+            </form>
+		{{else:}}
+			Hola
+		{{pass}}
+	{{pass}}
+{{pass}}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 {{extend 'template.html'}}
 {{exception_query = db(db.course_laboratory_exception.project == project.id).select().first()}}
 {{exception_s_var = False}}
@@ -21,9 +185,8 @@
         <a href="{{=URL('activity_control', 'students_control', vars=dict(project = project.id, period = year.id))}}" class="btn" ><i class="icon-arrow-left"></i> {{=T('Back')}}</a>
         <div align="right">
             {{if no_menu==False and cpfecys.current_year_period().id == year.id:}}
-                <a class="btn btn-primary" title="{{=T('Management activities without metric')}}" href="{{=URL('activity_control', 'course_requirement',vars=dict(project = request.vars['project'], period = request.vars['period']))}}">
-                    <span class="icon-black icon-edit"></span>
-                    Requerimiento Curso
+                <a href="#course_requirementModal" role="button" class="btn btn-primary" data-toggle="modal" onclick="showCourseRequirement();">
+                    Requerimiento Curso <span class="icon-white icon-upload">
                 </a>
             {{pass}}
             {{if (auth.has_membership('Super-Administrator') or auth.has_membership('Ecys-Administrator') or auth.has_membership('Teacher') or auth.has_membership('Student')):}}
@@ -71,12 +234,11 @@
                 {{pass}}
             </tr>
         </table>
-        {{totalColumnsTable=0}}
+
         <table class="table table-bordered">
             <THEAD>
                 <tr>
                     <td bgcolor="#E6E6E6">
-                        {{totalColumnsTable=totalColumnsTable+1}}
                         <b>
                             {{=T('Carnet')}}
                             <br>
@@ -89,7 +251,6 @@
                             {{if category.category.category!="Laboratorio":}}
                                 {{for c in CourseActivities[posVCC]:}}
                                 <td bgcolor="#E6E6E6" class="rcat{{=category.category}}" style="display:none;">
-                                    {{totalColumnsTable=totalColumnsTable+1}}
                                     <center>
                                         <b>
                                             {{=str(c.name)}}
@@ -100,7 +261,6 @@
                                 </td>
                                 {{pass}}
                                 <td bgcolor="#E6E6E6">
-                                    {{totalColumnsTable=totalColumnsTable+1}}
                                     <center>
                                         <b>
                                             <a id="btV_{{=str(category.category)}}" style="cursor:pointer;" onclick="visible_activities_gr('{{=str(category.category)}}');">
@@ -124,7 +284,6 @@
                             {{if category.category.category!="Laboratorio":}}
                                 {{for c in LabActivities[posVCC]:}}
                                 <td bgcolor="#E6E6E6" class="rcat{{=str(category.category)}}" style="display:none;">
-                                    {{totalColumnsTable=totalColumnsTable+1}}
                                     <center>
                                         <b>
                                             {{=str(c.name)}}
@@ -135,7 +294,6 @@
                                 </td>
                                 {{pass}}
                                 <td bgcolor="#E6E6E6">
-                                    {{totalColumnsTable=totalColumnsTable+1}}
                                     <center>
                                         <b>
                                             <a id="btV_{{=str(category.category)}}" style="cursor:pointer;" onclick="visible_activities_gr('{{=str(category.category)}}');">
@@ -157,7 +315,6 @@
                     {{pass}}
                     {{if request.vars['type'] == 'class' and existLab==True:}}
                         <td bgcolor="#E6E6E6">
-                            {{totalColumnsTable=totalColumnsTable+1}}
                             <center>
                                 <b>
                                     {{=T('Laboratory')}}
@@ -167,20 +324,7 @@
                             </center>
                         </td>
                     {{pass}}
-                    {{if request.vars['type'] == 'class' and requirement is not None:}}
-                        <td bgcolor="#E6E6E6">
-                            {{totalColumnsTable=totalColumnsTable+1}}
-                            <center>
-                                <b>
-                                    {{=T('Course Requeriment')}}
-                                    <br>
-                                    {{=requirement.name}}
-                                </b>
-                            </center>
-                        </td>
-                    {{pass}}
                     <td bgcolor="DarkBlue">
-                        {{totalColumnsTable=totalColumnsTable+1}}
                         <center>
                             <b>
                                 <font Color="White">
@@ -345,61 +489,10 @@
                                     </center>
                                 </td>
                             {{pass}}
-                            {{if request.vars['type'] == 'class' and requirement is not None:}}
-                                <td bgcolor="#F4FA58">
-                                    <center>
-                                        <b>
-                                            {{if db((db.course_requirement_student.carnet==t1.carnet)&(db.course_requirement_student.requirement==requirement.id)).select().first() is not None:}}
-                                                <i class="icon-ok"></i>
-                                            {{pass}}
-                                        </b>
-                                    </center>
-                                </td>
-                            {{pass}}
                             <td>
                                 <center>
                                     {{if request.vars['type'] == 'class' and existLab==True:}}
-                                        {{if request.vars['type'] == 'class' and requirement is None:}}
-                                            {{if totalCategory>=float((61*totalLab)/100):}}
-                                                {{if totalCarry < controlP.min_average:}}
-                                                    <span class="label label-important">
-                                                {{elif totalCarry>controlP.min_average and totalCarry < controlP.max_average:}}
-                                                    <span class="label label-warning">
-                                                {{else:}}
-                                                    <span class="label label-success">
-                                                {{pass}}
-                                                {{=str(totalCarry)}}
-                                                </span>
-                                            {{else:}}
-                                                <span class="label label-inverse">
-                                                    {{=str(totalCarry)}}
-                                                </span>
-                                            {{pass}}
-                                        {{else:}}
-                                            {{if db((db.course_requirement_student.carnet==t1.carnet)&(db.course_requirement_student.requirement==requirement.id)).select().first() is not None:}}
-                                                {{if totalCategory>=float((61*totalLab)/100):}}
-                                                    {{if totalCarry < controlP.min_average:}}
-                                                        <span class="label label-important">
-                                                    {{elif totalCarry>controlP.min_average and totalCarry < controlP.max_average:}}
-                                                        <span class="label label-warning">
-                                                    {{else:}}
-                                                        <span class="label label-success">
-                                                    {{pass}}
-                                                    {{=str(totalCarry)}}
-                                                    </span>
-                                                {{else:}}
-                                                    <span class="label label-inverse">
-                                                        {{=str(totalCarry)}}
-                                                    </span>
-                                                {{pass}}
-                                            {{else:}}
-                                                <span class="label label-inverse">
-                                                    {{=str(totalCarry)}}
-                                                </span>
-                                            {{pass}}
-                                        {{pass}}
-                                    {{else:}}
-                                        {{if request.vars['type'] == 'class' and requirement is None:}}
+                                        {{if totalCategory>=float((61*totalLab)/100):}}
                                             {{if totalCarry < controlP.min_average:}}
                                                 <span class="label label-important">
                                             {{elif totalCarry>controlP.min_average and totalCarry < controlP.max_average:}}
@@ -410,22 +503,20 @@
                                             {{=str(totalCarry)}}
                                             </span>
                                         {{else:}}
-                                            {{if db((db.course_requirement_student.carnet==t1.carnet)&(db.course_requirement_student.requirement==requirement.id)).select().first() is not None:}}
-                                                {{if totalCarry < controlP.min_average:}}
-                                                    <span class="label label-important">
-                                                {{elif totalCarry>controlP.min_average and totalCarry < controlP.max_average:}}
-                                                    <span class="label label-warning">
-                                                {{else:}}
-                                                    <span class="label label-success">
-                                                {{pass}}
+                                            <span class="label label-inverse">
                                                 {{=str(totalCarry)}}
-                                                </span>
-                                            {{else:}}
-                                                <span class="label label-inverse">
-                                                    {{=str(totalCarry)}}
-                                                </span>
-                                            {{pass}}
+                                            </span>
                                         {{pass}}
+                                    {{else:}}
+                                        {{if totalCarry < controlP.min_average:}}
+                                            <span class="label label-important">
+                                        {{elif totalCarry>controlP.min_average and totalCarry < controlP.max_average:}}
+                                            <span class="label label-warning">
+                                        {{else:}}
+                                            <span class="label label-success">
+                                        {{pass}}
+                                        {{=str(totalCarry)}}
+                                        </span>
                                     {{pass}}
                                 </center>
                             </td>
@@ -528,38 +619,31 @@
                     {{pass}}
                 {{pass}}
             </TBODY>
-            <TFOOT>
-                <tr>
-                    <td colspan="{{=totalColumnsTable}}">
-                        <center>
-                            <table class="table table-striped table-bordered">
-                                <tr>
-                                    <td>
-                                        <span class="label label-success">&nbsp;&nbsp;&nbsp;</span>&nbsp;<b>{{=T('Notes above average')}} </b>
-                                    </td>
-                                    
-                                    <td>
-                                        <span class="label label-warning">&nbsp;&nbsp;&nbsp;</span>&nbsp;<b>{{=T('Notes on the average')}} </b>
-                                    </td>
-                                    
-                                    <td>
-                                        <span class="label label-important">&nbsp;&nbsp;&nbsp;</span>&nbsp;<b>{{=T('Notes Below Average')}}</b>
-                                    </td>
-
-                                    <td>
-                                        <span class="label label-inverse">&nbsp;&nbsp;&nbsp;</span>&nbsp;<b>{{=T('Laboratory lost or Missing requirement')}}</b>
-                                        <br>
-                                        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<i class="icon-flag"></i><font color="red">{{=T('Only applies to final mark')}}</font>
-                                    </td>
-                                </tr>
-                            </table>
-                        </center>
-                    </td>
-                </tr>
-            </TFOOT>
         </table>
     </div>
 </div>
+
+
+{{if no_menu==False and cpfecys.current_year_period().id == year.id:}}
+    <!-- course_requirement Div-->
+    <div id="course_requirementModal" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true" > 
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+          <h3 id="myModalLabel">
+              <span class="icon-upload"></span>
+              Requerimiento Curso
+          </h3>
+      </div>
+      <div class="modal-body" style="overflow:auto; height:500px;">
+        <div id="div_CourseRequirement">
+        </div>
+      </div>
+      <div class="modal-footer" align="right">
+        <button class="btn" data-dismiss="modal" aria-hidden="true">{{=T('Close')}}</button>
+      </div>
+    </div>
+<!--Finish course_requirement Div-->
+{{pass}}
 
 <script type="text/javascript">
     function no_visible_activities_gr(var_name){

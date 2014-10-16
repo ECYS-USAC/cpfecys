@@ -1,0 +1,52 @@
+{{extend 'template.html'}}
+<div>
+    <a href="{{=URL('activity_control', 'General_report_activities', vars=dict(project = project.id, period = year.id, type="class"))}}" class="btn" ><i class="icon-arrow-left"></i> {{=T('Back')}}</a>
+</div>
+<h2>
+    {{=T('Course Requeriment')}} <a href="#myModal" role="button" class="btn btn-primary"data-toggle="modal"><span class="icon-white icon-question-sign"></span></a>
+    <br>
+    <small>
+        {{=project.name}} - {{=T(year.period.name)}} {{=str(year.yearp)}}
+    </small>
+</h2>
+<div id="myModal" class="modal hide fade" tabindex="-1" role="dialog"
+aria-labelledby="myModalLabel" aria-hidden="true">
+
+  <!--Inicia el boton de ayuda y el contenido de la ayuda-->
+  <div class="modal-header">
+    <button type="button" class="close" data-dismiss="modal"
+aria-hidden="true">×</button>
+      <h3 id="myModalLabel">
+          <span class="icon-question-sign"></span>
+          {{=T('Help')}} {{=T('Course Requeriment')}}
+      </h3>
+  </div>
+  <div class="modal-body">
+    <div class="well">
+        <p>
+            Dentro de este espacio puede crear, editar o eliminar un requisito que desee aplicar al curso.
+        </p>
+        <p>
+            Al existir un requisito creado, este se aplicara a todos los estudiantes del curso y solo los estudiantes que tengan aprobado el requisito podrán aprobar el curso.
+        </p>
+        <p>
+            Ejemplo de requisitos:
+            <br>
+            *) ISE
+            <br>
+            *) SQM
+            <br>
+            *) SA
+            <br>
+            *) Laboratorio de Contabilidad
+        </p>
+    </div>
+  </div>
+  <!--Termina el boton de ayuda y su contenido-->
+
+  <div class="modal-footer">
+      <button class="btn" data-dismiss="modal"
+aria-hidden="true">{{=T('Close')}}</button>
+  </div>
+</div>
+{{=grid}}

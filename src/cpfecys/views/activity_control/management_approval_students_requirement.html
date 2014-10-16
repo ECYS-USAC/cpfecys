@@ -1,0 +1,55 @@
+{{extend 'template.html'}}
+<div>
+    <a href="{{=URL('activity_control', 'course_requirement', vars=dict(project = project.id, period = year.id))}}" class="btn" ><i class="icon-arrow-left"></i> {{=T('Back')}}</a>
+</div>
+<h2>
+    {{=T('Course Requeriment')}} - {{=T('Management approval of students')}} <a href="#myModal" role="button" class="btn btn-primary"data-toggle="modal"><span class="icon-white icon-question-sign"></span></a>
+    <br>
+    <small>
+        {{=project.name}} - {{=T(year.period.name)}} {{=str(year.yearp)}}
+        <br>
+        {{=T('Name')}}: {{=requirement.name}}
+    </small>
+</h2>
+<h3>  
+</h3>
+<div id="myModal" class="modal hide fade" tabindex="-1" role="dialog"
+aria-labelledby="myModalLabel" aria-hidden="true">
+
+  <!--Inicia el boton de ayuda y el contenido de la ayuda-->
+  <div class="modal-header">
+    <button type="button" class="close" data-dismiss="modal"
+aria-hidden="true">×</button>
+      <h3 id="myModalLabel">
+          <span class="icon-question-sign"></span>
+          {{=T('Help')}} {{=T('Course Requeriment')}} - {{=T('Management approval of students')}}
+      </h3>
+  </div>
+  <div class="modal-body">
+    <div class="well">
+        <p>
+            Dentro de este espacio puede crear o eliminar la aprobación del estudiante del requisito que se encuentro aplicado al curso.
+        </p>
+        <p>
+            Para que los alumnos puedan aprobar el curso, deben de tener aprobado el requisito que se encuentra aplicado al curso.
+        </p>
+    </div>
+  </div>
+  <!--Termina el boton de ayuda y su contenido-->
+
+  <div class="modal-footer">
+      <button class="btn" data-dismiss="modal"
+aria-hidden="true">{{=T('Close')}}</button>
+  </div>
+</div>
+{{=grid}}
+<script type="text/javascript">
+  $(document).ready(function(){
+    $("#course_requirement_student_carnet").find('option').remove().end();
+    var lista=document.getElementById("course_requirement_student_carnet");
+    lista.options.add(new Option("",""));
+    {{for students in db((db.academic_course_assignation.semester==request.vars['period'])&(db.academic_course_assignation.assignation==request.vars['project'])).select():}}
+      lista.options.add(new Option({{=str(students.carnet.carnet)}},{{=students.carnet}}));
+    {{pass}}
+  });
+</script>

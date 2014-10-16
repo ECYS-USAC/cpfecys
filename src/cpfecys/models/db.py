@@ -1029,6 +1029,19 @@ db.define_table('validate_laboratory_log',
     Field('date_log', 'datetime', notnull = True, default = datetime.datetime.now(), label = T('Date'))
 )
 
+db.define_table('course_requirement',
+    Field('name', 'string', label = T('name')),
+    Field('semester', 'reference period_year', notnull=True, label=T('Period')),
+    Field('project', 'reference project', notnull=True, label=T('Course')),
+    Field('teacher_permition', 'boolean', notnull=True, label = T('Teacher Permition'))
+)
+
+
+db.define_table('course_requirement_student',
+    Field('carnet', 'reference academic', notnull=True, label=T('Carnet')),
+    Field('requirement', 'reference course_requirement', notnull=True, label=T('Requirement'))
+)
+
 ## after defining tables, uncomment below to enable auditing
     # auth.enable_record_versioning(db)
 # automatic forcing spanish language
