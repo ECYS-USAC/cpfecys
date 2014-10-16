@@ -1197,7 +1197,7 @@
 'Old password': 'Contraseña anterior',
 'One of the date or both are incorrect': 'One of the date or both are incorrect',
 'Online examples': 'Ejemplos en línea',
-'Only applies to final mark': 'Solo aplica para nota final',
+'Only applies to final mark': 'Solo aplica para Nota Final',
 'Operacion': 'Operación',
 'Operation': 'Operación',
 'Operation not allowed.': 'Operación no permitida.',
