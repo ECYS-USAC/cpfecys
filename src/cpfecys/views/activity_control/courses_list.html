@@ -26,12 +26,14 @@
 			<small>{{=T(periodo.period.name)}} {{=str(periodo.yearp)}}</small>
         </h1>
         
-        {{if auth.has_membership('Teacher') or auth.has_membership('Super-Administrator'):}}
+        {{if auth.has_membership('Teacher') or auth.has_membership('Super-Administrator') or auth.has_membership('Ecys-Administrator'):}}
 		<table class="table table-striped table-bordered">
 			<thead>
-				<th>{{=T('Course')}}</th>
-				<th>{{=T('Section')}}</th>
-				<th><center>{{=T('View')}}</center></th>
+				<th width="50%">{{=T('Course')}}<br><br></th>
+				<th width="20%">{{=T('Section')}}<br><br></th>
+				<th width="10%" style="white-space:inherit;"><center>{{=T('Course Average')}}</center></th>
+				<th  width="10%" style="white-space:inherit;"><center>{{=T('Laboratory Average')}}</center></th>
+				<th width="10%"><center>{{=T('View')}}<br><br></center></th>
 			</thead>
 			<tbody>
 				{{for course in coursesAdmin:}}
@@ -39,9 +41,45 @@
 					{{if auth.has_membership('Teacher'):}}
 						<td>{{=split_name(course.user_project.project.name)}}</td>
 						<td>{{=split_section(course.user_project.project.name)}}</td>
+						<td>
+							<div id="label_average_{{=course.user_project.project.id}}"><center>{{=T('Calculating')}}...</center></div>
+							<script type="text/javascript">
+								 $("#label_average_{{=course.user_project.project.id}}").load("{{=URL('activity_control','semaphore.load')}}?project={{=course.user_project.project.id}}&amp;period={{=periodo.id}}&amp;laboratory=False");
+							</script>
+							<center>
+								<span id="average_course_{{=course.user_project.project.id}}" >
+
+          						</span>
+							</center>
+						</td>
+						<td>
+							<center>
+								<span id="average_lab_{{=course.user_project.project.id}}" >
+									{{=T('Calculating')}}
+	          					</span>
+          					</center>
+						</td>
 					{{else:}}
 						<td>{{=split_name(course.name)}}</td>
 						<td>{{=split_section(course.name)}}</td>
+						<td>
+							<div id="label_average_{{=course.id}}"><center>{{=T('Calculating')}}...</center></div>
+							<script type="text/javascript">
+								 $("#label_average_{{=course.id}}").load("{{=URL('activity_control','semaphore.load')}}?project={{=course.id}}&amp;period={{=periodo.id}}&amp;laboratory=False");
+							</script>
+							<center>
+								<span id="average_course_{{=course.id}}" >
+
+          						</span>
+							</center>
+						</td>
+						<td>
+							<center>
+								<span id="average_lab_{{=course.id}}" >
+									{{=T('Calculating')}}...
+	          					</span>
+          					</center>
+						</td>
 					{{pass}}
 					<td>
 						<center>
@@ -56,22 +94,63 @@
 				</tr>
 				{{pass}}
 			</tbody>
+			<tfoot>
+				<tr>
+					<td colspan='6'>
+						<div align="left">
+							
+								<b>{{=T('Legend')}}:</b>
+
+							<br>
+								{{=T('The performance of students')}}:
+							<br>
+								<span class="label label-success">&nbsp;&nbsp;&nbsp;</span> {{=T('Is excellent')}}
+							<br>
+								<span class="label label-warning">&nbsp;&nbsp;&nbsp;</span> {{=T('Is average')}}
+							<br>
+								<span class="label label-important">&nbsp;&nbsp;&nbsp;</span> {{=T('Below average')}}
+							<br>
+							
+						</div>
+					</td>
+				</tr>
+			</tfoot>
 		</table>
 		{{else:}}
 			{{if countcoursesAdminT>0:}}
 				<table class="table table-striped table-bordered">
 				<tr>
-					<th colspan="3"><center>Practica Final</center></th>
+					<th colspan="5"><center>Practica Final</center></th>
 				</tr>
 				<tr>
-					<th>{{=T('Course')}}</th>
-					<th><center>{{=T('Section')}}</center></th>
-					<th><center>{{=T('View')}}</center></th>
+					<th width="50%">{{=T('Course')}}<br><br></th>
+					<th width="20%"><center>{{=T('Section')}}<br><br></center></th>
+					<th width="10%" style="white-space:inherit;"><center>{{=T('Course Average')}}</center></th>
+					<th width="10%" style="white-space:inherit;"><center>{{=T('Laboratory Average')}}</center></th>
+					<th width="10%"><center>{{=T('View')}}<br><br></center></th>
 				</tr>
 				{{for course in coursesAdmin:}}
 					<tr>
 						<td>{{=split_name(course.user_project.project.name)}}</td>
 						<td><center>{{=split_section(course.user_project.project.name)}}</center></td>
+						<td>
+							<div id="label_average_{{=course.user_project.project.id}}"><center>{{=T('Calculating')}}...</center></div>
+							<script type="text/javascript">
+								 $("#label_average_{{=course.user_project.project.id}}").load("{{=URL('activity_control','semaphore.load')}}?project={{=course.user_project.project.id}}&amp;period={{=periodo.id}}");
+							</script>
+							<center>
+								<span id="average_course_{{=course.user_project.project.id}}" >
+
+          						</span>
+							</center>
+						</td>
+						<td>
+							<center>
+								<span id="average_lab_{{=course.user_project.project.id}}" >
+									{{=T('Calculating')}}...
+	          					</span>
+          					</center>
+						</td>
 						<td>
 							<center>
 								<a class="btn btn-primary" href="{{=URL('activity_control', 'students_control', vars=dict( project = course.user_project.project, period=periodo.id))}}">{{=T('Sign in')}}
@@ -80,6 +159,27 @@
 						</td>
 					</tr>
 				{{pass}}
+					<tfoot>
+						<tr>
+							<td colspan='6'>
+								<div align="left">
+									
+										<b>{{=T('Legend')}}:</b>
+
+									<br>
+										{{=T('The performance of students')}}:
+									<br>
+										<span class="label label-success">&nbsp;&nbsp;&nbsp;</span> {{=T('Is excellent')}}
+									<br>
+										<span class="label label-warning">&nbsp;&nbsp;&nbsp;</span> {{=T('Is average')}}
+									<br>
+										<span class="label label-important">&nbsp;&nbsp;&nbsp;</span> {{=T('Below average')}}
+									<br>
+									
+								</div>
+							</td>
+						</tr>
+					</tfoot>
 				</table>
 			{{pass}}
 
@@ -90,17 +190,37 @@
 			{{if coursesStudentT>0:}}
 				<table class="table table-striped table-bordered">
 				<tr>
-					<th colspan="3"><center>Cursos Asignados</center></th>
+					<th colspan="5"><center>Cursos Asignados</center></th>
 				</tr>
 				<tr>
-					<th>{{=T('Course')}}</th>
-					<th><center>{{=T('Section')}}</center></th>
-					<th><center>{{=T('View')}}</center></th>
+					<th width="50%">{{=T('Course')}}</th>
+					<th width="20%"><center>{{=T('Section')}}</center></th>
+					<th width="10%" style="white-space:inherit;"><center>{{=T('Course Average')}}</center></th>
+					<th  width="10%" style="white-space:inherit;"><center>{{=T('Laboratory Average')}}</center></th>
+					<th width="10%"><center>{{=T('View')}}</center></th>
 				</tr>
 				{{for course in coursesStudent:}}
 					<tr>
 						<td>{{=split_name(course.academic_course_assignation.assignation.name)}}</td>
 						<td><center>{{=split_section(course.academic_course_assignation.assignation.name)}}</center></td>
+						<td>
+							<div id="label_average_course_{{=course.academic_course_assignation.assignation}}"><center>{{=T('Calculating')}}...</center></div>
+							<script type="text/javascript">
+								 $("#label_average_course_{{=course.academic_course_assignation.assignation}}").load("{{=URL('activity_control','semaphore.load')}}?project={{=course.academic_course_assignation.assignation}}&amp;period={{=periodo.id}}&amp;op=1&amp;academic={{=course.academic_course_assignation.id}}");
+							</script>
+							<center>
+								<span id="average_course_{{=course.academic_course_assignation.assignation}}" >
+
+          						</span>
+							</center>
+						</td>
+						<td>
+							<center>
+								<span id="average_lab_{{=course.academic_course_assignation.assignation}}" >
+									{{=T('Calculating')}}...
+	          					</span>
+          					</center>
+						</td>
 						<td>
 							<center>
 								<a class="btn btn-info" href="{{=URL('activity_control', 'students_control', vars=dict( project = course.academic_course_assignation.assignation, period=periodo.id))}}">{{=T('Sign in')}}
@@ -109,6 +229,27 @@
 						</td>
 					</tr>
 				{{pass}}
+				<tfoot>
+				<tr>
+					<td colspan='6'>
+						<div align="left">
+							
+								<b>{{=T('Legend')}}:</b>
+
+							<br>
+								{{=T('The performance of students')}}:
+							<br>
+								<span class="label label-success">&nbsp;&nbsp;&nbsp;</span> {{=T('Is excellent')}}
+							<br>
+								<span class="label label-warning">&nbsp;&nbsp;&nbsp;</span> {{=T('Is average')}}
+							<br>
+								<span class="label label-important">&nbsp;&nbsp;&nbsp;</span> {{=T('Below average')}}
+							<br>
+							
+						</div>
+					</td>
+				</tr>
+			</tfoot>
 				</table>
 			{{pass}}
 
