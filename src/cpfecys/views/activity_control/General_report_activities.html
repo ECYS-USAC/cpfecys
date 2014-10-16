@@ -28,7 +28,7 @@
                 </a>
             {{pass}}
             {{if (auth.has_membership('Super-Administrator') or auth.has_membership('Ecys-Administrator') or auth.has_membership('Teacher') or auth.has_membership('Student')):}}
-                <a class="btn btn-success" href="{{=URL(vars=dict(project = project.id, period = year.id, listado='True', type=request.vars['type']))}}"><i class="icon-download icon-white"></i>{{=T('Export Report')}} (CSV)</a>
+                <a class="btn btn-success" href="{{=URL(vars=dict(project = project.id, period = year.id, list='True', type=request.vars['type']))}}"><i class="icon-download icon-white"></i>{{=T('Export Report')}} (CSV)</a>
             {{pass}}
             {{if no_menu==False:}}
                 <a class="btn btn-warning" onclick="click_botton();"><i class="icon-warning-sign icon-white"></i>Generar Documento<br>Formato de Escuela Tecnica (CSV)</a>
@@ -610,10 +610,10 @@
     }
 
     function click_botton(){
-        {{#URL(vars=dict(project = project.id, period = year.id, listado='True', type=request.vars['type']))}}
+        {{#URL(vars=dict(project = project.id, period = year.id, list='True', type=request.vars['type']))}}
         var r = confirm("{{=T('After generating the file will no longer be allowed to make changes within the course and the lab. Are you sure you want to continue?')}}");
         if (r == true) {
-            
+            window.location.href = "{{=URL(vars=dict(project = project.id, period = year.id, list='False', type=request.vars['type']))}}";
         }
     }
 </script>

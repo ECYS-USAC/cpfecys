@@ -1044,6 +1044,7 @@ db.define_table('course_requirement_student',
 
 db.define_table('course_ended',
     Field('project', 'reference project', notnull=True, label=T('Course')),
+    Field('period', 'string', notnull=False, label=T('Period')),
     Field('finish', 'boolean', notnull=True, label = T('Finish'))
 )
 

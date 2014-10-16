@@ -1116,57 +1116,77 @@
 											</td>
 											{{if no_menu==False:}}
 											<td>
-												<center>
-												{{if auth.has_membership('Student'):}}
-													{{if request.vars['type']=="lab" or exception_s_var == True or tAct.teacher_permition==True or tAct.course_activity_category.teacher_permition==True:}}
-														{{if request.vars['type']=="lab":}}
-															{{from datetime import datetime}}
-															{{var_do_Grade='false'}}
-															{{actualSemester = db(db.period_year.id==semestre2).select().first()}}
-															{{comparacion = T(actualSemester.period.name)+" "+str(actualSemester.yearp)}}
-															{{controlP = db((db.student_control_period.period_name==comparacion)).select().first()}}
+												{{no_actions=False}}
+												{{course_ended_var = db((db.course_ended.project==project) & (db.course_ended.period==semestre2.id) ).select().first() }}
+												{{if course_ended_var != None:}}
+													{{if course_ended_var.finish == True:}}
+														{{no_actions=True}}
+													{{pass}}
+												{{pass}}
 
-															{{maximTimeGrade = db.executesql('SELECT DATE_ADD(\''+str(tAct.date_finish)+'\', INTERVAL '+str(controlP.timeout_income_notes)+' Day) as fechaMaxGrade;',as_dict=True)}}
-															{{dateGrade0=''}}
-															{{for d0 in maximTimeGrade:}}
-																{{dateGrade0=d0['fechaMaxGrade']}}
-															{{pass}}
-															{{if str(datetime.now()) <= str(dateGrade0):}}
-																{{var_do_Grade='true'}}
-															{{pass}}
-															{{if var_do_Grade=='true':}}
-																<a id="gradeButton" role="button" title="{{=T('Insert Grades')}}" class="badge btn-info" href="{{=URL('activity_control','control_students_grades', vars=dict(project=project_var.id, year=semestre2.id, activity=tAct.id))}}">
-										                    		<span  class="showTableNoEditableNoDetail icon-white icon-edit"></span>
-										                    		<label class="showTableNoEditableDetail"  style="display:none;">
-										                    			<span  class="icon-white icon-edit"></span>
-										                    			{{=T('Grades')}} </label>
-										                    	</a>
+												{{if no_actions == False:}}
+													<center>
+													{{if auth.has_membership('Student'):}}
+														{{if request.vars['type']=="lab" or exception_s_var == True or tAct.teacher_permition==True or tAct.course_activity_category.teacher_permition==True:}}
+															{{if request.vars['type']=="lab":}}
+																{{from datetime import datetime}}
+																{{var_do_Grade='false'}}
+																{{actualSemester = db(db.period_year.id==semestre2).select().first()}}
+																{{comparacion = T(actualSemester.period.name)+" "+str(actualSemester.yearp)}}
+																{{controlP = db((db.student_control_period.period_name==comparacion)).select().first()}}
+
+																{{maximTimeGrade = db.executesql('SELECT DATE_ADD(\''+str(tAct.date_finish)+'\', INTERVAL '+str(controlP.timeout_income_notes)+' Day) as fechaMaxGrade;',as_dict=True)}}
+																{{dateGrade0=''}}
+																{{for d0 in maximTimeGrade:}}
+																	{{dateGrade0=d0['fechaMaxGrade']}}
+																{{pass}}
+																{{if str(datetime.now()) <= str(dateGrade0):}}
+																	{{var_do_Grade='true'}}
+																{{pass}}
+																{{if var_do_Grade=='true':}}
+																	<a id="gradeButton" role="button" title="{{=T('Insert Grades')}}" class="badge btn-info" href="{{=URL('activity_control','control_students_grades', vars=dict(project=project_var.id, year=semestre2.id, activity=tAct.id))}}">
+											                    		<span  class="showTableNoEditableNoDetail icon-white icon-edit"></span>
+											                    		<label class="showTableNoEditableDetail"  style="display:none;">
+											                    			<span  class="icon-white icon-edit"></span>
+											                    			{{=T('Grades')}} </label>
+											                    	</a>
+																{{else:}}
+																	<a id="gradeButton" role="button" title="{{=T('Change Request')}}" class="badge btn-warning" href="{{=URL('activity_control','control_students_grades', vars=dict(project=project_var.id, year=semestre2.id, activity=tAct.id))}}">
+																		<span  class="showTableNoEditableNoDetail icon-white icon-random"></span>
+																		<label class="showTableNoEditableDetail" style="display:none;">
+																			<span  class="icon-white icon-random"></span>
+																				{{=T('C.R.')}}
+																			</label>
+											                    	</a>
+																{{pass}}
 															{{else:}}
-																<a id="gradeButton" role="button" title="{{=T('Change Request')}}" class="badge btn-warning" href="{{=URL('activity_control','control_students_grades', vars=dict(project=project_var.id, year=semestre2.id, activity=tAct.id))}}">
-																	<span  class="showTableNoEditableNoDetail icon-white icon-random"></span>
-																	<label class="showTableNoEditableDetail" style="display:none;">
-																		<span  class="icon-white icon-random"></span>
-																		S.C.</label>
+																<a id="gradeButton" role="button" title="{{=T('Insert Grades')}}" class="badge btn-info" href="{{=URL('activity_control','control_students_grades', vars=dict(project=project_var.id, year=semestre2.id, activity=tAct.id))}}">
+										                    		<span class="showTableNoEditableNoDetail icon-white icon-edit"></span>
+											                    	<label class="showTableNoEditableDetail"  style="display:none;">
+											                    		<span  class="icon-white icon-edit"></span>
+											                    		{{=T('Grades')}} </label>
 										                    	</a>
 															{{pass}}
 														{{else:}}
-															<a id="gradeButton" role="button" title="{{=T('Insert Grades')}}" class="badge btn-info" href="{{=URL('activity_control','control_students_grades', vars=dict(project=project_var.id, year=semestre2.id, activity=tAct.id))}}">
-									                    		<span class="showTableNoEditableNoDetail icon-white icon-edit"></span>
-										                    	<label class="showTableNoEditableDetail"  style="display:none;">{{=T('Grades')}} </label>
-									                    	</a>
+															<!--Grade of the activity-->
+															{{=T('No action')}}
+															<!--Grade of the activity-->
 														{{pass}}
 													{{else:}}
-														<!--Grade of the activity-->
-														{{=T('No action')}}
-														<!--Grade of the activity-->
+														<a id="gradeButton" role="button" class="badge btn-info" href="{{=URL('activity_control','control_students_grades', vars=dict(project=project_var.id, year=semestre2.id, activity=tAct.id))}}">
+								                    		<span class="showTableNoEditableNoDetail icon-white icon-edit"></span>
+											                <label class="showTableNoEditableDetail"  style="display:none;"><span  class="icon-white icon-edit"></span>
+											                	{{=T('Grades')}} </label>
+								                    	</a>
 													{{pass}}
+													</center>
 												{{else:}}
-													<a id="gradeButton" role="button" class="badge btn-info" href="{{=URL('activity_control','control_students_grades', vars=dict(project=project_var.id, year=semestre2.id, activity=tAct.id))}}">
-							                    		<span class="showTableNoEditableNoDetail icon-white icon-edit"></span>
-										                <label class="showTableNoEditableDetail"  style="display:none;">{{=T('Grades')}} </label>
-							                    	</a>
+													<center>
+														<label title="{{=T('The course has already been completed')}}">
+															{{=T('No action')}}
+														</label>
+													</center>
 												{{pass}}
-												</center>
 											</td>
 											{{pass}}
 										{{else:}}

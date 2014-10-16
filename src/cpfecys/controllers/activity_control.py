@@ -144,6 +144,14 @@ def control_students_grades():
         session.flash = T('Not valid Action.')
         redirect(URL('default', 'index'))
 
+    course_ended_var = db((db.course_ended.project==var_project.id) & (db.course_ended.period==var_period.id) ).select().first()
+
+    if course_ended_var != None:
+        if course_ended_var.finish == True:
+            session.flash = T('Not valid Action.')
+            redirect(URL('default', 'index'))
+    
+
     if auth.has_membership('Super-Administrator') == False and auth.has_membership('Ecys-Administrator') == False :
         assigantion = db((db.user_project.assigned_user == auth.user.id) & (db.user_project.period == var_period.id) & (db.user_project.project == var_project.id)).select().first()
         #exception_query = db(db.course_laboratory_exception.project == id_project).select().first()
@@ -2140,8 +2148,15 @@ def General_report_activities():
         redirect(URL('default','index'))
 
 
-    if request.vars['listado'] =='True':
+    if request.vars['list'] =='True':
         redirect(URL('activity_control','general_report_activities_export',vars=dict(project = project_var.id, period = year.id, type=request.vars['type'])))
+    
+    if request.vars['list'] =='False':
+        course_ended_var = db((db.course_ended.project==project_var.id) & (db.course_ended.period==year.id) ).select().first() 
+        if course_ended_var is None:
+            db.course_ended.insert(project = project_var.id,
+                            period = year.id,
+                            finish =  True)
 
     controlP = db((db.student_control_period.period_name==(T(year.period.name)+" "+str(year.yearp)))).select().first()
     requirement = db((db.course_requirement.semester==year.id)&(db.course_requirement.project==project_var.id)).select().first()

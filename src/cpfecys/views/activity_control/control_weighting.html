@@ -22,6 +22,14 @@
 	{{pass}}
 {{pass}}
 
+{{#-------------------------------------------Course ended---------------------------------------------------------}}
+{{course_ended_var = db((db.course_ended.project==project) & (db.course_ended.period==semestre2.id) ).select().first() }}
+
+{{if course_ended_var != None:}}
+	{{if course_ended_var.finish == True:}}
+		{{no_menu=True}}
+	{{pass}}
+{{pass}}
 
 {{total_var2=0}}
 {{if request.vars['type'] == 'course':}}
