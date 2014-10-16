@@ -1774,14 +1774,24 @@ def general_report_activities_export():
     totalLab=float(0)
     totalW=float(0)
     CourseCategory = db((db.course_activity_category.semester==year.id)&(db.course_activity_category.assignation==project_var.id)&(db.course_activity_category.laboratory==False)).select()
+    catCourseTemp=None
+    catVecCourseTemp=[]
     CourseActivities = []
     for categoryC in CourseCategory:
         totalW=totalW+float(categoryC.grade)
         if categoryC.category.category=="Laboratorio":
             existLab=True
             totalLab=float(categoryC.grade)
+            catVecCourseTemp.append(categoryC)
+        elif categoryC.category.category=="Examen Final":
+            catCourseTemp=categoryC
         else:
+            catVecCourseTemp.append(categoryC)
             CourseActivities.append(db((db.course_activity.semester==year.id)&(db.course_activity.assignation==project_var.id)&(db.course_activity.laboratory==False)&(db.course_activity.course_activity_category==categoryC.id)).select())
+    if catCourseTemp != None:
+        catVecCourseTemp.append(catCourseTemp)
+        CourseActivities.append(db((db.course_activity.semester==year.id)&(db.course_activity.assignation==project_var.id)&(db.course_activity.laboratory==True)&(db.course_activity.course_activity_category==catCourseTemp.id)).select())
+    CourseCategory=catVecCourseTemp
 
 
     if totalW!=float(100):
@@ -1790,14 +1800,25 @@ def general_report_activities_export():
 
     totalW=float(0)
     LabCategory=None
+    catLabTemp=None
+    catVecLabTemp=[]
     LabActivities = None
     if existLab == True:
         validateLaboratory = db((db.validate_laboratory.semester==year.id)&(db.validate_laboratory.project==project_var.id)).select()
         LabCategory = db((db.course_activity_category.semester==year.id)&(db.course_activity_category.assignation==project_var.id)&(db.course_activity_category.laboratory==True)).select()
         LabActivities = []
         for categoryL in LabCategory:
-            totalW=totalW+float(categoryL.grade)
-            LabActivities.append(db((db.course_activity.semester==year.id)&(db.course_activity.assignation==project_var.id)&(db.course_activity.laboratory==True)&(db.course_activity.course_activity_category==categoryL.id)).select())
+            if categoryL.category.category=="Examen Final":
+                totalW=totalW+float(categoryL.grade)
+                catLabTemp=categoryL
+            else:
+                catVecLabTemp.append(categoryL)
+                totalW=totalW+float(categoryL.grade)
+                LabActivities.append(db((db.course_activity.semester==year.id)&(db.course_activity.assignation==project_var.id)&(db.course_activity.laboratory==True)&(db.course_activity.course_activity_category==categoryL.id)).select())
+        if catLabTemp != None:
+            catVecLabTemp.append(catLabTemp)
+            LabActivities.append(db((db.course_activity.semester==year.id)&(db.course_activity.assignation==project_var.id)&(db.course_activity.laboratory==True)&(db.course_activity.course_activity_category==catLabTemp.id)).select())
+        LabCategory=catVecLabTemp
 
     if totalW!=float(100):
         session.flash= T('Can not find the correct weighting defined in the laboratory. You can not use this function')
@@ -2110,15 +2131,24 @@ def General_report_activities():
     totalLab=float(0)
     totalW=float(0)
     CourseCategory = db((db.course_activity_category.semester==year.id)&(db.course_activity_category.assignation==project_var.id)&(db.course_activity_category.laboratory==False)).select()
+    catCourseTemp=None
+    catVecCourseTemp=[]
     CourseActivities = []
     for categoryC in CourseCategory:
         totalW=totalW+float(categoryC.grade)
         if categoryC.category.category=="Laboratorio":
             existLab=True
             totalLab=float(categoryC.grade)
+            catVecCourseTemp.append(categoryC)
+        elif categoryC.category.category=="Examen Final":
+            catCourseTemp=categoryC
         else:
+            catVecCourseTemp.append(categoryC)
             CourseActivities.append(db((db.course_activity.semester==year.id)&(db.course_activity.assignation==project_var.id)&(db.course_activity.laboratory==False)&(db.course_activity.course_activity_category==categoryC.id)).select())
-
+    if catCourseTemp != None:
+        catVecCourseTemp.append(catCourseTemp)
+        CourseActivities.append(db((db.course_activity.semester==year.id)&(db.course_activity.assignation==project_var.id)&(db.course_activity.laboratory==True)&(db.course_activity.course_activity_category==catCourseTemp.id)).select())
+    CourseCategory=catVecCourseTemp
 
     if totalW!=float(100):
         session.flash= T('Can not find the correct weighting defined in the course. You can not use this function')
@@ -2126,14 +2156,25 @@ def General_report_activities():
 
     totalW=float(0)
     LabCategory=None
+    catLabTemp=None
+    catVecLabTemp=[]
     LabActivities = None
     if existLab == True:
         validateLaboratory = db((db.validate_laboratory.semester==year.id)&(db.validate_laboratory.project==project_var.id)).select()
         LabCategory = db((db.course_activity_category.semester==year.id)&(db.course_activity_category.assignation==project_var.id)&(db.course_activity_category.laboratory==True)).select()
         LabActivities = []
         for categoryL in LabCategory:
-            totalW=totalW+float(categoryL.grade)
-            LabActivities.append(db((db.course_activity.semester==year.id)&(db.course_activity.assignation==project_var.id)&(db.course_activity.laboratory==True)&(db.course_activity.course_activity_category==categoryL.id)).select())
+            if categoryL.category.category=="Examen Final":
+                totalW=totalW+float(categoryL.grade)
+                catLabTemp=categoryL
+            else:
+                catVecLabTemp.append(categoryL)
+                totalW=totalW+float(categoryL.grade)
+                LabActivities.append(db((db.course_activity.semester==year.id)&(db.course_activity.assignation==project_var.id)&(db.course_activity.laboratory==True)&(db.course_activity.course_activity_category==categoryL.id)).select())
+        if catLabTemp != None:
+            catVecLabTemp.append(catLabTemp)
+            LabActivities.append(db((db.course_activity.semester==year.id)&(db.course_activity.assignation==project_var.id)&(db.course_activity.laboratory==True)&(db.course_activity.course_activity_category==catLabTemp.id)).select())
+        LabCategory=catVecLabTemp
 
     if totalW!=float(100):
         session.flash= T('Can not find the correct weighting defined in the laboratory. You can not use this function')
