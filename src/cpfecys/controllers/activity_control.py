@@ -1790,7 +1790,7 @@ def general_report_activities_export():
             CourseActivities.append(db((db.course_activity.semester==year.id)&(db.course_activity.assignation==project_var.id)&(db.course_activity.laboratory==False)&(db.course_activity.course_activity_category==categoryC.id)).select())
     if catCourseTemp != None:
         catVecCourseTemp.append(catCourseTemp)
-        CourseActivities.append(db((db.course_activity.semester==year.id)&(db.course_activity.assignation==project_var.id)&(db.course_activity.laboratory==True)&(db.course_activity.course_activity_category==catCourseTemp.id)).select())
+        CourseActivities.append(db((db.course_activity.semester==year.id)&(db.course_activity.assignation==project_var.id)&(db.course_activity.laboratory==False)&(db.course_activity.course_activity_category==catCourseTemp.id)).select())
     CourseCategory=catVecCourseTemp
 
 
@@ -2147,7 +2147,7 @@ def General_report_activities():
             CourseActivities.append(db((db.course_activity.semester==year.id)&(db.course_activity.assignation==project_var.id)&(db.course_activity.laboratory==False)&(db.course_activity.course_activity_category==categoryC.id)).select())
     if catCourseTemp != None:
         catVecCourseTemp.append(catCourseTemp)
-        CourseActivities.append(db((db.course_activity.semester==year.id)&(db.course_activity.assignation==project_var.id)&(db.course_activity.laboratory==True)&(db.course_activity.course_activity_category==catCourseTemp.id)).select())
+        CourseActivities.append(db((db.course_activity.semester==year.id)&(db.course_activity.assignation==project_var.id)&(db.course_activity.laboratory==False)&(db.course_activity.course_activity_category==catCourseTemp.id)).select())
     CourseCategory=catVecCourseTemp
 
     if totalW!=float(100):
