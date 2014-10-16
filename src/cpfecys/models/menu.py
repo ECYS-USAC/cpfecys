@@ -19,6 +19,18 @@ response.meta.keywords = 'usac'
 ## your http://google.com/analytics id
 response.google_analytics_id = 'UA-50474874-1'
 
+def current_year_period():
+    import datetime
+    cdate = datetime.datetime.now()
+    cyear = cdate.year
+    cmonth = cdate.month
+    period = db.period(name = 'Second Semester')
+    #current period depends if we are in dates between jan-jun and jul-dec
+    if cmonth < 6 :
+        period = db.period(name = 'First Semester')
+    return db((db.period_year.yearp == cyear)&
+                          (db.period_year.period == period)).select().first()
+
 #########################################################################
 ## this is the main application menu add/remove items as required
 #########################################################################
@@ -66,18 +78,33 @@ if auth.has_membership(role="Super-Administrator"):
              (T('Scheduler Report'), False, URL('admin', 'scheduler_activity'), []),
              ]),
     ])
+
+
+
 if auth.has_membership(role="Teacher"):
+    var_count = 0
+    var_count_report = 0
+    projects = db(db.user_project.assigned_user == auth.user.id).select()
+    for project in projects:
+        var_count = var_count + db((db.request_change_weighting.status=='pending')&(db.request_change_weighting.period==current_year_period().id)&(db.request_change_weighting.project==project.project)).count()
+        var_count = var_count + db((db.requestchange_activity.status=='pending')&(db.requestchange_activity.semester==current_year_period().id)&(db.requestchange_activity.course==project.project)).count()
+        var_count = var_count + db((db.request_change_grades.status=='pending')&(db.request_change_grades.period==current_year_period().id)&(db.request_change_grades.project==project.project)).count()
+        var_count_report = db((db.report.status == db.report_status.id)&((db.report_status.name == 'Grading')|(db.report_status.name == 'EnabledForTeacher'))&(db.report.assignation == project.project)&(db.user_project.assigned_user == auth.user.id)).count()
+    pass
+
     response.menu.extend([(T('Courses'), False, URL(),[
              (T('Show Students'), False, URL('teacher', 'courses'), []),
              (T('Show Academic'), False, URL(), [
                 (T('Academic per Course'), False, URL('student_academic', 'student_courses'), []),
                 (T('General List of Academic'), False, URL('student_academic','academic'), []),    
              ]),
-             (T('Academic Control')+"", False, URL(), [
+             
                 (T('Academic Control'), False, URL('activity_control','courses_list'), []),
-                (T('Request control'), False, URL('activity_control','courses_list_request'), []),]),
-             ]),
-        (T('Reports Pending Grading'), False, URL('teacher', 'todo_reports'), []),
+                ]),
+        (T('Requests')+" ("+str(var_count + var_count_report)+")", False, URL(), [
+                (T('Reports Pending Grading')+ " ("+str(var_count_report)+")", False, URL('teacher', 'todo_reports'), []),
+                (T('Request control')+" ("+str(var_count)+")", False, URL('activity_control','courses_list_request'), []),]),
+        
     ])
 
 if auth.has_membership(role="Student"):
@@ -256,3 +283,4 @@ def _():
 if DEVELOPMENT_MENU: _()
 
 if "auth" in locals(): auth.wikimenu()
+

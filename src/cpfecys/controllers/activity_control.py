@@ -503,6 +503,10 @@ def student_control_period():
     return dict(grid=grid)
 
 
+@auth.requires_login()
+def semaphore():
+    period = db(db.period_year.id==request.vars['period']).select().first()
+    return dict(period=period)
 
 @auth.requires_login()
 @auth.requires(auth.has_membership('Student'))
