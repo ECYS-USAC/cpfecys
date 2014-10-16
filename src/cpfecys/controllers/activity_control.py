@@ -2195,6 +2195,180 @@ def General_report_activities():
     if request.vars['list'] =='False':
         course_ended_var = db((db.course_ended.project==project_var.id) & (db.course_ended.period==year.id) ).select().first() 
         if course_ended_var is None:
+            
+            #ROL FOR LOG
+            nombreRol=''
+            if auth.has_membership('Ecys-Administrator')==True:
+                nombreRol='Ecys-Administrator'
+            elif auth.has_membership('Super-Administrator')==True:
+                nombreRol='Super-Administrator'
+            elif auth.has_membership('Teacher')==True:
+                nombreRol='Teacher'
+            elif auth.has_membership('Student')==True:
+                nombreRol='Student'
+            pass
+            
+            #GRADES CHANGE REQUEST
+            request_change = db((db.request_change_grades.status=='pending')&(db.request_change_grades.period==int(year.id))&(db.request_change_grades.project==int(project_var.id))).select()
+            for change in request_change:
+                from datetime import datetime
+                
+                db(db.request_change_grades.id==change.id).update(status = 'rejected', 
+                                                                    resolve_user = auth.user.id, 
+                                                                    roll_resolve =  nombreRol, 
+                                                                    date_request_resolve = str(datetime.now())
+                                                                )
+
+                #---------------------------------LOG-----------------------------------------------
+                                                                                    
+                temp2 = db(db.request_change_g_log.r_c_g_id == change.id).select().first()
+                
+                temp3 = db.request_change_g_log.insert(r_c_g_id=change.id,
+                                                    username=temp2.username,
+                                                    roll=temp2.roll,
+                                                    before_status='pending',
+                                                    after_status='rejected',
+                                                    description=temp2.description,
+                                                    semester=temp2.semester,
+                                                    yearp=temp2.yearp,
+                                                    project=temp2.project,
+                                                    category=temp2.activity,
+                                                    activity=temp2.category,
+                                                    resolve_user=auth.user.username,
+                                                    roll_resolve=nombreRol,
+                                                    date_request=temp2.date_request,
+                                                    date_request_resolve=str(datetime.now())
+                                                ) 
+                for var_chang_ins in db((db.request_change_grades_detail.request_change_grades ==  change.id)).select():
+                    db.request_change_grade_d_log.insert(request_change_g_log=temp3,
+                                                            operation_request=var_chang_ins.operation_request,
+                                                            academic=var_chang_ins.academic_assignation.carnet.carnet,
+                                                            after_grade=var_chang_ins.after_grade,
+                                                            before_grade=var_chang_ins.before_grade
+                                                           )
+                pass
+            pass
+
+            #Weighting CHANGE REQUEST
+            request_change = db((db.request_change_weighting.status=='pending')&(db.request_change_weighting.period==int(year.id))&(db.request_change_weighting.project==int(project_var.id))).select()
+            for change in request_change:
+                from datetime import datetime
+                db(db.request_change_weighting.id==change.id).update(status = 'rejected', 
+                                                                    resolve_user = auth.user.id, 
+                                                                    roll_resolve =  nombreRol, 
+                                                                    date_request_resolve = str(datetime.now())
+                                                                )
+                temp2 = db(db.request_change_w_log.r_c_w_id == change.id).select().first()
+                temp3 = db.request_change_w_log.insert(r_c_w_id=change.id,
+                                                    username=temp2.username,
+                                                    roll=temp2.roll,
+                                                    before_status='pending',
+                                                    after_status='rejected',
+                                                    description=temp2.description,
+                                                    semester=temp2.semester,
+                                                    yearp=temp2.yearp,
+                                                    project=temp2.project,
+                                                    resolve_user=auth.user.username,
+                                                    roll_resolve=nombreRol,
+                                                    date_request=temp2.date_request,
+                                                    date_request_resolve=str(datetime.now())
+                                                ) 
+                temp4 = db(db.request_change_weighting.id == change.id).select().first() 
+                
+                for var_chang_ins in db((db.request_change_weighting_detail.request_change_weighting ==  temp4.id) & (db.request_change_weighting_detail.operation_request == 'insert')).select():
+                    if var_chang_ins.operation_request == 'insert':
+                        db.request_change_w_detail_log.insert(request_change_w_log=temp3,
+                                                                operation_request=var_chang_ins.operation_request,
+                                                                category=var_chang_ins.category.category,
+                                                                after_grade=var_chang_ins.grade,
+                                                                after_specific_grade=var_chang_ins.specific_grade)
+                    pass
+
+                pass
+
+                for categories in db((db.course_activity_category.semester==int(temp4.period)) & (db.course_activity_category.assignation==temp4.project) & (db.course_activity_category.laboratory==True)).select():
+                    var_chang = db(db.request_change_weighting_detail.course_category ==  str(categories.id)).select().first()
+                    if var_chang != None:
+                        if var_chang.operation_request == 'delete':
+                            
+                            cat_temp = db(db.course_activity_category.id == var_chang.course_category).select().first()
+
+                            temp44 = db(db.request_change_w_log.id == str(temp3) ).select().first() 
+                            db.request_change_w_detail_log.insert(request_change_w_log = str(temp3),
+                                                                    operation_request = str(var_chang.operation_request),
+                                                                    course_category = str(cat_temp.category.category),
+                                                                    before_grade = str(cat_temp.grade),
+                                                                    before_specific_grade = str(cat_temp.specific_grade) )
+
+                        pass
+                        if var_chang.operation_request == 'update':
+                            cat_temp = db(db.course_activity_category.id==var_chang.course_category).select().first()
+                            cat_temp2 = db(db.activity_category.id==var_chang.category).select().first()
+
+                            db.request_change_w_detail_log.insert(request_change_w_log=temp3,
+                                                                    operation_request=var_chang.operation_request,
+                                                                    course_category=cat_temp.category.category,
+                                                                    category=cat_temp2.category,
+                                                                    before_grade=cat_temp.grade,                                                                
+                                                                    after_specific_grade=var_chang.specific_grade,
+                                                                    after_grade=var_chang.grade,
+                                                                    before_specific_grade=cat_temp.specific_grade)
+
+                        pass
+                        db(db.request_change_weighting_detail.id==var_chang.id).update(course_category = None)
+                    else:
+                        add_to_log = True
+                        for req_c_w_d_l in db(db.request_change_w_detail_log.request_change_w_log==temp3).select():
+                            if categories.category.category == req_c_w_d_l.category:
+                                add_to_log = False
+                            pass
+                        pass
+                        if add_to_log == True:
+                            db.request_change_w_detail_log.insert(request_change_w_log=temp3,
+                                                                    operation_request='none',
+                                                                    category=categories.category.category,
+                                                                    after_grade=categories.grade,
+                                                                    after_specific_grade=categories.specific_grade)
+                        pass                                                        
+                    pass
+                pass
+            pass
+
+            #Weighting CHANGE REQUEST
+            request_change = db((db.requestchange_activity.status=='Pending')&(db.requestchange_activity.semester==int(year.id))&(db.requestchange_activity.course==int(project_var.id))).select()
+            for change in request_change:
+                from datetime import datetime
+                Pending = change
+                rol_temp = nombreRol
+                
+                db(db.requestchange_activity.id==int(change.id)).update(status = 'Rejected', user_resolve = auth.user.id, roll_resolve =  rol_temp, date_request_resolve =  datetime.now())
+                #Log of request change activity
+                Rejected = db(db.requestchange_activity.id==int(change.id)).select().first()
+                if Rejected is not None:
+                    idR = db.requestchange_activity_log.insert(user_request=Rejected.user_id.username, 
+                                                                roll_request=Rejected.roll, status='Rejected', 
+                                                                user_resolve=Rejected.user_resolve.username, 
+                                                                roll_resolve=Rejected.roll_resolve,
+                                                                description=Rejected.description,
+                                                                date_request=Rejected.date_request, 
+                                                                date_request_resolve=Rejected.date_request_resolve, 
+                                                                category_request=Rejected.course_activity_category.category.category, 
+                                                                semester=Rejected.semester.period.name, 
+                                                                yearp=Rejected.semester.yearp, 
+                                                                course=Rejected.course.name)
+                    activitiesChange = db(db.requestchange_course_activity.requestchange_activity==Rejected.id).select()
+                    for actChange in activitiesChange:
+                        db.requestchange_course_activity_log.insert(requestchange_activity=idR, 
+                                                                    operation_request=actChange.operation_request, 
+                                                                    activity=actChange.activity, 
+                                                                    name=actChange.name, 
+                                                                    description=actChange.description, 
+                                                                    grade=actChange.grade, 
+                                                                    date_start=actChange.date_start, 
+                                                                    date_finish=actChange.date_finish)
+            pass#hola
+
+            #Insert to course_ended           
             db.course_ended.insert(project = project_var.id,
                             period = year.id,
                             finish =  True)
