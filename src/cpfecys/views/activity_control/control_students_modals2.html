@@ -1,3 +1,12 @@
+<!--Check if the course has endend-->
+{{no_actionsAll=False}}
+{{course_ended_var = db((db.course_ended.project==project_var.id) & (db.course_ended.period==semestre2.id) ).select().first() }}
+{{if course_ended_var != None:}}
+  {{if course_ended_var.finish == True:}}
+    {{no_actionsAll=True}}
+  {{pass}}
+{{pass}}
+
 <!--Create Activity Modal -->
 <div id="createActivity" > 
     <div>
@@ -15,10 +24,12 @@
     <div id="actions_activity"  style="overflow:auto; height:100%; width:100%;">
       <form action="" enctype="multipart/form-data" method="post" >
         <div align="right">
-          <a id="btn_divActivityAddV" role="button" class="btn btn-warning" title="{{=T('Add activity to scheduler')}}" onclick="visible_add_activity();"> 
-            <span class="icon-plus-sign"></span>
-            {{=T('Add Activity')}}
-           </a>
+          {{if no_actionsAll==False:}}
+            <a id="btn_divActivityAddV" role="button" class="btn btn-warning" title="{{=T('Add activity to scheduler')}}" onclick="visible_add_activity();"> 
+              <span class="icon-plus-sign"></span>
+              {{=T('Add Activity')}}
+             </a>
+           {{pass}}
         </div>
         <center>
           <table>
@@ -58,10 +69,12 @@
 
       </div>
       <div align="right">
-        <a href="{{=URL('activity_control', 'students_control', vars=dict(project = request.vars['project'], period = request.vars['year']))}}" role="button" class="btn btn-info"  > 
-          <span class="icon-ok-circle"></span>
-          {{=T('Finalize')}}
-        </a>
+        {{if no_actionsAll==False:}}
+          <a href="{{=URL('activity_control', 'students_control', vars=dict(project = request.vars['project'], period = request.vars['year']))}}" role="button" class="btn btn-info"  > 
+            <span class="icon-ok-circle"></span>
+            {{=T('Finalize')}}
+          </a>
+        {{pass}}
       </div>
     </form>
   </div>

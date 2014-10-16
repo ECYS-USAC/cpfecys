@@ -877,7 +877,7 @@ def control_students_modals2():
     project = request.vars['project']
     year = db(db.period_year.id == request.vars['year']).select().first() 
     project_var = db(db.project.id == request.vars['project']).select().first() 
-    return dict(semestre2 = year, name=project_var.name)
+    return dict(semestre2 = year, name=project_var.name, project_var=project_var)
 
 @auth.requires_login()
 @auth.requires(auth.has_membership('Student'))
@@ -1382,6 +1382,13 @@ def validate_laboratory():
             exception_t_var = exception_query.t_edit_lab
             exception_s_var = exception_query.s_edit_course
 
+        #Check if the course has endend
+        no_actionsAll=False
+        course_ended_var = db((db.course_ended.project==project.id) & (db.course_ended.period==year.id) ).select().first()
+        if course_ended_var != None:
+            if course_ended_var.finish == True:
+                no_actionsAll=True
+
         #Grid
         grid=None
         db.validate_laboratory.id.readable = False
@@ -1394,39 +1401,46 @@ def validate_laboratory():
         db.validate_laboratory.semester.default = year.id
         if auth.has_membership('Super-Administrator') or auth.has_membership('Ecys-Administrator'):
             query = ((db.validate_laboratory.semester==year.id)&(db.validate_laboratory.project==project.id))
-            if 'edit' in request.args:
-                db.validate_laboratory.carnet.writable = False
-                grid = SQLFORM.grid(query, csv=False, paginate=10, oncreate=oncreate_validate_laboratory, onupdate=onupdate_validate_laboratory, ondelete=ondelete_validate_laboratory)
+            if no_actionsAll==False:
+                if 'edit' in request.args:
+                    db.validate_laboratory.carnet.writable = False
+                    grid = SQLFORM.grid(query, csv=False, paginate=10, oncreate=oncreate_validate_laboratory, onupdate=onupdate_validate_laboratory, ondelete=ondelete_validate_laboratory, searchable=False)
+                else:
+                    grid = SQLFORM.grid(query, csv=False, paginate=10, oncreate=oncreate_validate_laboratory, onupdate=onupdate_validate_laboratory, ondelete=ondelete_validate_laboratory, searchable=False)
             else:
-                grid = SQLFORM.grid(query, csv=False, paginate=10, oncreate=oncreate_validate_laboratory, onupdate=onupdate_validate_laboratory, ondelete=ondelete_validate_laboratory)
+                grid = SQLFORM.grid(query, csv=False, create=False, editable=False, deletable=False, paginate=10, searchable=False)
         elif auth.has_membership('Teacher'):
             assigantion = db((db.user_project.assigned_user == auth.user.id) & (db.user_project.period == year.id) & (db.user_project.project == project)).select().first()
             if assigantion is None:
                 session.flash = T('Not valid Action.')
                 redirect(URL('default','index'))
             else:
-                if exception_t_var==True:
+                if exception_t_var==True and no_actionsAll==False:
                     query = ((db.validate_laboratory.semester==year.id)&(db.validate_laboratory.project==project.id))
                     if 'edit' in request.args:
                         db.validate_laboratory.carnet.writable = False
-                        grid = SQLFORM.grid(query, csv=False, paginate=10, oncreate=oncreate_validate_laboratory, onupdate=onupdate_validate_laboratory, ondelete=ondelete_validate_laboratory)
+                        grid = SQLFORM.grid(query, csv=False, paginate=10, oncreate=oncreate_validate_laboratory, onupdate=onupdate_validate_laboratory, ondelete=ondelete_validate_laboratory, searchable=False)
                     else:
-                        grid = SQLFORM.grid(query, csv=False, paginate=10, oncreate=oncreate_validate_laboratory, onupdate=onupdate_validate_laboratory, ondelete=ondelete_validate_laboratory)
+                        grid = SQLFORM.grid(query, csv=False, paginate=10, oncreate=oncreate_validate_laboratory, onupdate=onupdate_validate_laboratory, ondelete=ondelete_validate_laboratory, searchable=False)
                 else:
                     query = ((db.validate_laboratory.semester==year.id)&(db.validate_laboratory.project==project.id))
-                    grid = SQLFORM.grid(query, csv=False, create=False, editable=False, deletable=False, paginate=10)
+                    grid = SQLFORM.grid(query, csv=False, create=False, editable=False, deletable=False, paginate=10, searchable=False)
         elif auth.has_membership('Student'):
             assigantion = db((db.user_project.assigned_user == auth.user.id) & (db.user_project.period == year.id) & (db.user_project.project == project)).select().first()
             if assigantion is None:
                 session.flash = T('Not valid Action.')
                 redirect(URL('default','index'))
             else:
-                query = ((db.validate_laboratory.semester==year.id)&(db.validate_laboratory.project==project.id))
-                if 'edit' in request.args:
-                    db.validate_laboratory.carnet.writable = False
-                    grid = SQLFORM.grid(query, csv=False, paginate=10, oncreate=oncreate_validate_laboratory, onupdate=onupdate_validate_laboratory, ondelete=ondelete_validate_laboratory)
+                if no_actionsAll==False:
+                    query = ((db.validate_laboratory.semester==year.id)&(db.validate_laboratory.project==project.id))
+                    if 'edit' in request.args:
+                        db.validate_laboratory.carnet.writable = False
+                        grid = SQLFORM.grid(query, csv=False, paginate=10, oncreate=oncreate_validate_laboratory, onupdate=onupdate_validate_laboratory, ondelete=ondelete_validate_laboratory, searchable=False)
+                    else:
+                        grid = SQLFORM.grid(query, csv=False, paginate=10, oncreate=oncreate_validate_laboratory, onupdate=onupdate_validate_laboratory, ondelete=ondelete_validate_laboratory, searchable=False)
                 else:
-                    grid = SQLFORM.grid(query, csv=False, paginate=10, oncreate=oncreate_validate_laboratory, onupdate=onupdate_validate_laboratory, ondelete=ondelete_validate_laboratory)
+                    query = ((db.validate_laboratory.semester==year.id)&(db.validate_laboratory.project==project.id))
+                    grid = SQLFORM.grid(query, csv=False, create=False, editable=False, deletable=False, paginate=10, searchable=False)
         else:
             session.flash = T('Not valid Action.')
             redirect(URL('default','index'))
@@ -1444,7 +1458,7 @@ def validate_laboratory():
         db.validate_laboratory.semester.default = year.id
         if auth.has_membership('Super-Administrator') or auth.has_membership('Ecys-Administrator'):
             query = ((db.validate_laboratory.semester==year.id)&(db.validate_laboratory.project==project.id))
-            grid = SQLFORM.grid(query, csv=False, create=False, editable=False, deletable=False, paginate=10)
+            grid = SQLFORM.grid(query, csv=False, create=False, editable=False, deletable=False, paginate=10, searchable=False)
         elif auth.has_membership('Teacher'):
             assigantion = db((db.user_project.assigned_user == auth.user.id) & (db.user_project.period == year.id) & (db.user_project.project == project)).select().first()
             if assigantion is None:
@@ -1452,7 +1466,7 @@ def validate_laboratory():
                 redirect(URL('default','index'))
             else:
                 query = ((db.validate_laboratory.semester==year.id)&(db.validate_laboratory.project==project.id))
-                grid = SQLFORM.grid(query, csv=False, create=False, editable=False, deletable=False, paginate=10)
+                grid = SQLFORM.grid(query, csv=False, create=False, editable=False, deletable=False, paginate=10, searchable=False)
         elif auth.has_membership('Student'):
             assigantion = db((db.user_project.assigned_user == auth.user.id) & (db.user_project.period == year.id) & (db.user_project.project == project)).select().first()
             if assigantion is None:
@@ -1460,7 +1474,7 @@ def validate_laboratory():
                 redirect(URL('default','index'))
             else:
                 query = ((db.validate_laboratory.semester==year.id)&(db.validate_laboratory.project==project.id))
-                grid = SQLFORM.grid(query, csv=False, create=False, editable=False, deletable=False, paginate=10)
+                grid = SQLFORM.grid(query, csv=False, create=False, editable=False, deletable=False, paginate=10, searchable=False)
         else:
             session.flash = T('Not valid Action.')
             redirect(URL('default','index'))
@@ -2422,6 +2436,12 @@ def course_requirement():
     exception_s_var = False
     if exception_query is not None:
         exception_s_var = exception_query.s_edit_course
+    #Check if the course has endend
+    no_actionsAll=False
+    course_ended_var = db((db.course_ended.project==project_var.id) & (db.course_ended.period==year.id) ).select().first()
+    if course_ended_var != None:
+        if course_ended_var.finish == True:
+            no_actionsAll=True
     #Grid
     activityPermition=db((db.course_requirement.semester==year.id)&(db.course_requirement.project==project_var.id)).select().first()
     grid=None
@@ -2434,7 +2454,6 @@ def course_requirement():
     db.course_requirement.semester.writable = False
     db.course_requirement.semester.default = year.id
     #
-    varTypeP='class'
     links = [lambda row: A(T('Management approval of students'),
         _role='button',
         _class='btn btn-success',
@@ -2443,27 +2462,36 @@ def course_requirement():
     #
     if auth.has_membership('Super-Administrator') or auth.has_membership('Ecys-Administrator'):
         query = ((db.course_requirement.semester==year.id)&(db.course_requirement.project==project_var.id))
-        if activityPermition is None:
-            grid = SQLFORM.grid(query, csv=False, paginate=1, searchable=False, links=links)
-        else:
-            grid = SQLFORM.grid(query, csv=False, paginate=1, create=False, searchable=False, links=links)
-    elif auth.has_membership('Teacher'):
-        query = ((db.course_requirement.semester==year.id)&(db.course_requirement.project==project_var.id))
-        if activityPermition is None:
-            grid = SQLFORM.grid(query, csv=False, paginate=1, searchable=False, links=links)
-        else:
-            grid = SQLFORM.grid(query, csv=False, paginate=1, create=False, searchable=False, links=links)
-    elif auth.has_membership('Student'):
-        query = ((db.course_requirement.semester==year.id)&(db.course_requirement.project==project_var.id))
-        if exception_s_var==True or activityPermition.teacher_permition==True:
-            db.course_requirement.teacher_permition.default = False
-            db.course_requirement.teacher_permition.writable = False
+        if no_actionsAll==False:
             if activityPermition is None:
                 grid = SQLFORM.grid(query, csv=False, paginate=1, searchable=False, links=links)
             else:
                 grid = SQLFORM.grid(query, csv=False, paginate=1, create=False, searchable=False, links=links)
         else:
-            grid = SQLFORM.grid(query, csv=False, create=False, editable=False, deletable=False, searchable=False)
+            grid = SQLFORM.grid(query, csv=False, create=False, editable=False, deletable=False, searchable=False, links=links)
+    elif auth.has_membership('Teacher'):
+        query = ((db.course_requirement.semester==year.id)&(db.course_requirement.project==project_var.id))
+        if no_actionsAll==False:
+            if activityPermition is None:
+                grid = SQLFORM.grid(query, csv=False, paginate=1, searchable=False, links=links)
+            else:
+                grid = SQLFORM.grid(query, csv=False, paginate=1, create=False, searchable=False, links=links)
+        else:
+            grid = SQLFORM.grid(query, csv=False, create=False, editable=False, deletable=False, searchable=False, links=links)
+    elif auth.has_membership('Student'):
+        query = ((db.course_requirement.semester==year.id)&(db.course_requirement.project==project_var.id))
+        if no_actionsAll==False:
+            if exception_s_var==True or activityPermition.teacher_permition==True:
+                db.course_requirement.teacher_permition.default = False
+                db.course_requirement.teacher_permition.writable = False
+                if activityPermition is None:
+                    grid = SQLFORM.grid(query, csv=False, paginate=1, searchable=False, links=links)
+                else:
+                    grid = SQLFORM.grid(query, csv=False, paginate=1, create=False, searchable=False, links=links)
+            else:
+                grid = SQLFORM.grid(query, csv=False, create=False, editable=False, deletable=False, searchable=False, links=links)
+        else:
+            grid = SQLFORM.grid(query, csv=False, create=False, editable=False, deletable=False, searchable=False, links=links)
     else:
         session.flash = T('Not valid Action.')
         redirect(URL('default','index'))
@@ -2530,6 +2558,12 @@ def management_approval_students_requirement():
     exception_s_var = False
     if exception_query is not None:
         exception_s_var = exception_query.s_edit_course
+    #Check if the course has endend
+    no_actionsAll=False
+    course_ended_var = db((db.course_ended.project==project_var.id) & (db.course_ended.period==year.id) ).select().first()
+    if course_ended_var != None:
+        if course_ended_var.finish == True:
+            no_actionsAll=True
     #Grid
     grid=None
     db.course_requirement_student.id.readable = False
@@ -2539,14 +2573,23 @@ def management_approval_students_requirement():
     db.course_requirement_student.requirement.default = requirement.id
     if auth.has_membership('Super-Administrator') or auth.has_membership('Ecys-Administrator'):
         query = (db.course_requirement_student.requirement==requirement.id)
-        grid = SQLFORM.grid(query, csv=False, paginate=10, editable=False, searchable=False)
+        if no_actionsAll==False:
+            grid = SQLFORM.grid(query, csv=False, paginate=10, editable=False, searchable=False)
+        else:
+            grid = SQLFORM.grid(query, csv=False, create=False, editable=False, deletable=False, searchable=False)
     elif auth.has_membership('Teacher'):
         query = (db.course_requirement_student.requirement==requirement.id)
-        grid = SQLFORM.grid(query, csv=False, paginate=10, editable=False, searchable=False)
+        if no_actionsAll==False:
+            grid = SQLFORM.grid(query, csv=False, paginate=10, editable=False, searchable=False)
+        else:
+            grid = SQLFORM.grid(query, csv=False, create=False, editable=False, deletable=False, searchable=False)
     elif auth.has_membership('Student'):
         query = (db.course_requirement_student.requirement==requirement.id)
-        if exception_s_var==True or requirement.teacher_permition==True:
-            grid = SQLFORM.grid(query, csv=False, paginate=10, editable=False, details=False, searchable=False)
+        if no_actionsAll==False:
+            if exception_s_var==True or requirement.teacher_permition==True:
+                grid = SQLFORM.grid(query, csv=False, paginate=10, editable=False, details=False, searchable=False)
+            else:
+                grid = SQLFORM.grid(query, csv=False, create=False, editable=False, deletable=False, searchable=False)
         else:
             grid = SQLFORM.grid(query, csv=False, create=False, editable=False, deletable=False, searchable=False)
     else:

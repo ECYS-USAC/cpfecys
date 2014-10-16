@@ -10,7 +10,7 @@
 {{pass}}
 
 {{activityPermition=db((db.course_requirement.semester==year.id)&(db.course_requirement.project==project.id)&(db.course_requirement.teacher_permition==True)).count()}}
-{{if request.vars['type'] == 'class' and (auth.has_membership('Ecys-Administrator') or auth.has_membership('Super-Administrator') or auth.has_membership('Teacher') or (auth.has_membership('Student') and (exception_s_var == True  or activityPermition>0))):}}
+{{if request.vars['type'] == 'class' and (auth.has_membership('Ecys-Administrator') or auth.has_membership('Super-Administrator') or auth.has_membership('Teacher') or (auth.has_membership('Student') and exception_s_var == True)):}}
     {{no_menu=False}}
 {{pass}}
 
@@ -21,7 +21,7 @@
         <a href="{{=URL('activity_control', 'students_control', vars=dict(project = project.id, period = year.id))}}" class="btn" ><i class="icon-arrow-left"></i> {{=T('Back')}}</a>
         <div align="right">
 
-            {{if no_menu==False and cpfecys.current_year_period().id == year.id:}}
+            {{if (no_menu==False or (request.vars['type'] == 'class' and auth.has_membership('Student') and activityPermition>0)) and cpfecys.current_year_period().id == year.id:}}
                 <a class="btn btn-primary" href="{{=URL('activity_control', 'course_requirement',vars=dict(project = request.vars['project'], period = request.vars['period']))}}">
                     <span class="icon-black icon-edit"></span>
                     {{=T('Course requirement')}}
@@ -31,7 +31,7 @@
                 <a class="btn btn-success" href="{{=URL(vars=dict(project = project.id, period = year.id, list='True', type=request.vars['type']))}}"><i class="icon-download icon-white"></i>{{=T('Export Report')}} (CSV)</a>
             {{pass}}
             {{if no_menu==False:}}
-                <a class="btn btn-warning" onclick="click_botton();"><i class="icon-warning-sign icon-white"></i>Generar Documento<br>Formato de Escuela Tecnica (CSV)</a>
+                <a class="btn btn-warning" onclick="click_botton();"><i class="icon-warning-sign icon-white"></i>{{=T('Generate Document')}}<br>{{=T('Format Technical School')}} (CSV)</a>
             {{pass}}
         </div>
         <table>

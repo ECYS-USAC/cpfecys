@@ -52,6 +52,16 @@
 
 
 
+<!--Check if the course has endend-->
+{{no_actionsAll=False}}
+{{course_ended_var = db((db.course_ended.project==var_project_id) & (db.course_ended.period==semestre2.id) ).select().first() }}
+{{if course_ended_var != None:}}
+	{{if course_ended_var.finish == True:}}
+		{{no_actionsAll=True}}
+	{{pass}}
+{{pass}}
+
+
 
 
 
@@ -1029,11 +1039,43 @@
 									{{if request.vars['op'] != "showTableNoEditable" and no_menu==False:}}
 										{{if auth.has_membership('Student'):}}
 											{{if (request.vars['type']=="lab" and var_do =='true') or (request.vars['type']=="class" and (exception_s_var == True or tAct.teacher_permition==True or tAct.course_activity_category.teacher_permition==True)):}}
+												{{if no_actionsAll==False:}}
+													<td>
+														<center>
+															{{if editable_var=='true':}}
+																<a id="activityButton" role="button" class="badge btn-success"  
+																onclick="updateActivity({{=tAct.id}});">
+										                    		<span class="icon-white icon-check"></span>
+										                    	</a>
+									                    	{{else:}}
+									                    		<a id="activityButton" role="button" class="badge btn-info"  
+																onclick="editActivity({{=tAct.id}});"> 
+										                    		<span class="icon-white icon-edit"></span>
+										                    	</a>
+									                    	{{pass}}
+									                    	<a id="activityButton" role="button" class="badge btn-danger" 
+									                    	onclick="removeActivity({{=tAct.id}});" title="{{=T('Remove Activity')}}" > 
+									                    		<span class="icon-white icon-remove-sign"></span>
+									                    	</a>
+														</center>
+													</td>
+												{{else:}}
+													<td>
+														{{=T('No Action')}}
+													</td>
+												{{pass}}
+											{{else:}}
+												<td>
+													{{=T('No Action')}}
+												</td>
+											{{pass}}
+										{{else:}}
+											{{if no_actionsAll==False:}}
 												<td>
 													<center>
 														{{if editable_var=='true':}}
 															<a id="activityButton" role="button" class="badge btn-success"  
-															onclick="updateActivity({{=tAct.id}});">
+															onclick="updateActivity({{=tAct.id}});"> 
 									                    		<span class="icon-white icon-check"></span>
 									                    	</a>
 								                    	{{else:}}
@@ -1053,26 +1095,6 @@
 													{{=T('No Action')}}
 												</td>
 											{{pass}}
-										{{else:}}
-											<td>
-												<center>
-													{{if editable_var=='true':}}
-														<a id="activityButton" role="button" class="badge btn-success"  
-														onclick="updateActivity({{=tAct.id}});"> 
-								                    		<span class="icon-white icon-check"></span>
-								                    	</a>
-							                    	{{else:}}
-							                    		<a id="activityButton" role="button" class="badge btn-info"  
-														onclick="editActivity({{=tAct.id}});"> 
-								                    		<span class="icon-white icon-edit"></span>
-								                    	</a>
-							                    	{{pass}}
-							                    	<a id="activityButton" role="button" class="badge btn-danger" 
-							                    	onclick="removeActivity({{=tAct.id}});" title="{{=T('Remove Activity')}}" > 
-							                    		<span class="icon-white icon-remove-sign"></span>
-							                    	</a>
-												</center>
-											</td>
 										{{pass}}
 									{{else:}}
 										{{if no_menu==False or assigned_to_project==True:}}
