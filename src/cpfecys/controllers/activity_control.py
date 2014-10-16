@@ -1815,10 +1815,10 @@ def general_report_activities_export():
         CourseActivities.append(db((db.course_activity.semester==year.id)&(db.course_activity.assignation==project_var.id)&(db.course_activity.laboratory==False)&(db.course_activity.course_activity_category==catCourseTemp.id)).select())
     CourseCategory=catVecCourseTemp
 
-
-    if totalW!=float(100):
-        session.flash= T('Can not find the correct weighting defined in the course. You can not use this function')
-        redirect(URL('default','index'))
+    if request.vars['type'] == 'class':
+        if totalW!=float(100):
+            session.flash= T('Can not find the correct weighting defined in the course. You can not use this function')
+            redirect(URL('default','index'))
 
     totalW=float(0)
     LabCategory=None
@@ -1842,9 +1842,9 @@ def general_report_activities_export():
             LabActivities.append(db((db.course_activity.semester==year.id)&(db.course_activity.assignation==project_var.id)&(db.course_activity.laboratory==True)&(db.course_activity.course_activity_category==catLabTemp.id)).select())
         LabCategory=catVecLabTemp
 
-    if totalW!=float(100):
-        session.flash= T('Can not find the correct weighting defined in the laboratory. You can not use this function')
-        redirect(URL('default','index'))
+        if totalW!=float(100):
+            session.flash= T('Can not find the correct weighting defined in the laboratory. You can not use this function')
+            redirect(URL('default','index'))
 
     requirement = db((db.course_requirement.semester==year.id)&(db.course_requirement.project==project_var.id)).select().first()
 
@@ -2138,7 +2138,7 @@ def General_report_activities():
 
     #Check the correct parameters
     if (request.vars['type'] != 'class' and request.vars['type']!='lab'):
-        session.flash = lab
+        session.flash = T('Not valid Action.')
         redirect(URL('default','index'))
 
     teacher = db((db.user_project.period == year.id) & (db.user_project.project == project_var.id) & (db.user_project.assigned_user==db.auth_user.id)&(db.auth_user.id==db.auth_membership.user_id)&(db.auth_membership.group_id==3)).select().first()
@@ -2172,9 +2172,11 @@ def General_report_activities():
         CourseActivities.append(db((db.course_activity.semester==year.id)&(db.course_activity.assignation==project_var.id)&(db.course_activity.laboratory==False)&(db.course_activity.course_activity_category==catCourseTemp.id)).select())
     CourseCategory=catVecCourseTemp
 
-    if totalW!=float(100):
-        session.flash= T('Can not find the correct weighting defined in the course. You can not use this function')
-        redirect(URL('default','index'))
+
+    if request.vars['type'] == 'class':
+        if totalW!=float(100):
+            session.flash= T('Can not find the correct weighting defined in the course. You can not use this function')
+            redirect(URL('default','index'))
 
     totalW=float(0)
     LabCategory=None
@@ -2198,9 +2200,9 @@ def General_report_activities():
             LabActivities.append(db((db.course_activity.semester==year.id)&(db.course_activity.assignation==project_var.id)&(db.course_activity.laboratory==True)&(db.course_activity.course_activity_category==catLabTemp.id)).select())
         LabCategory=catVecLabTemp
 
-    if totalW!=float(100):
-        session.flash= T('Can not find the correct weighting defined in the laboratory. You can not use this function')
-        redirect(URL('default','index'))
+        if totalW!=float(100):
+            session.flash= T('Can not find the correct weighting defined in the laboratory. You can not use this function')
+            redirect(URL('default','index'))
 
 
     if request.vars['list'] =='True':
@@ -2596,3 +2598,118 @@ def management_approval_students_requirement():
         session.flash = T('Not valid Action.')
         redirect(URL('default','index'))
     return dict(project = project_var, year = year, requirement=requirement, grid=grid)
+
+
+#********************************************************************************************************************************************************************************************************
+#********************************************************************************************************************************************************************************************************
+#********************************************************************************************************************************************************************************************************
+#********************************************************************************************************************************************************************************************************
+@auth.requires_login()
+def grades_management():
+    #vars
+    year = None
+    project = None
+    #Check if the period is correct
+    if request.vars['period'] is None or request.vars['period']=='':
+        session.flash = T('Not valid Action.')
+        redirect(URL('sdefault','index'))
+    else:
+        year = request.vars['period']
+        year = db(db.period_year.id==year).select().first()
+        if year is None:
+            session.flash = T('Not valid Action.')
+            redirect(URL('default','index'))
+
+    #Check if the period is correct
+    if request.vars['project'] is None or request.vars['project']=='':
+        session.flash = T('Not valid Action.')
+        redirect(URL('default','index'))
+    else:
+        project = request.vars['project']
+        project = db(db.project.id==project_var).select().first()
+        if project is None:
+            session.flash = T('Not valid Action.')
+            redirect(URL('default','index'))
+
+    #Check if the user is assigned to the course
+    assigantion = db((db.user_project.assigned_user == auth.user.id) & (db.user_project.period == year.id) & (db.user_project.project == project.id)).select().first()
+    if assigantion is None:
+        session.flash = T('Not valid Action.')
+        redirect(URL('default','index'))
+
+    vecMonth=[]
+    tmpMonth=[]
+    if year.period == 1:
+        tmpMonth=[]
+        tmpMonth.append(1)
+        tmpMonth.append('Enero')
+        tmpMonth.append(2)
+        vecMonth.append(tmpMonth)
+
+        tmpMonth=[]
+        tmpMonth.append(2)
+        tmpMonth.append('Febrero')
+        tmpMonth.append(3)
+        vecMonth.append(tmpMonth)
+
+        tmpMonth=[]
+        tmpMonth.append(3)
+        tmpMonth.append('Marzo')
+        tmpMonth.append(4)
+        vecMonth.append(tmpMonth)
+
+        tmpMonth=[]
+        tmpMonth.append(4)
+        tmpMonth.append('Abril')
+        tmpMonth.append(5)
+        vecMonth.append(tmpMonth)
+
+        tmpMonth=[]
+        tmpMonth.append(5)
+        tmpMonth.append('Mayo')
+        tmpMonth.append(6)
+        vecMonth.append(tmpMonth)
+    else:
+        tmpMonth=[]
+        tmpMonth.append(6)
+        tmpMonth.append('Junio')
+        tmpMonth.append(7)
+        vecMonth.append(tmpMonth)
+
+        tmpMonth=[]
+        tmpMonth.append(7)
+        tmpMonth.append('Julio')
+        tmpMonth.append(8)
+        vecMonth.append(tmpMonth)
+
+        tmpMonth=[]
+        tmpMonth.append(8)
+        tmpMonth.append('Agosto')
+        tmpMonth.append(9)
+        vecMonth.append(tmpMonth)
+
+        tmpMonth=[]
+        tmpMonth.append(9)
+        tmpMonth.append('Septiembre')
+        tmpMonth.append(10)
+        vecMonth.append(tmpMonth)
+
+        tmpMonth=[]
+        tmpMonth.append(10)
+        tmpMonth.append('Octubre')
+        tmpMonth.append(11)
+        vecMonth.append(tmpMonth)
+
+        tmpMonth=[]
+        tmpMonth.append(11)
+        tmpMonth.append('Noviembre')
+        tmpMonth.append(12)
+        vecMonth.append(tmpMonth)
+
+        tmpMonth=[]
+        tmpMonth.append(12)
+        tmpMonth.append('Diciembre')
+        tmpMonth.append(1)
+        vecMonth.append(tmpMonth)
+
+    return dict(project = project, year = year, vecMonth=vecMonth)
