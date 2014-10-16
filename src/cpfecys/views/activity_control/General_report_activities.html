@@ -4,7 +4,7 @@
         <a href="{{=URL('activity_control', 'students_control', vars=dict(project = project.id, period = year.id))}}" class="btn" ><i class="icon-arrow-left"></i> {{=T('Back')}}</a>
         <div align="right">
             <a class="btn btn-success" href="{{=URL(vars=dict(project = project.id, period = year.id, listado='True', type=request.vars['type']))}}"><i class="icon-download icon-white"></i>{{=T('Export Report')}} (CSV)</a>
-            <a class="btn btn-warning" href="{{=URL(vars=dict(listado='True'))}}"><i class="icon-warning-sign icon-white"></i>Generar Documento<br>Formato de Escuela Tecnica (CSV)</a>
+            <a class="btn btn-warning" onclick="click_botton();"><i class="icon-warning-sign icon-white"></i>Generar Documento<br>Formato de Escuela Tecnica (CSV)</a>
         </div>
         <table>
             <tr>
@@ -475,5 +475,13 @@
                 }
             {{pass}}
         {{pass}}
+    }
+
+    function click_botton(){
+        {{#URL(vars=dict(project = project.id, period = year.id, listado='True', type=request.vars['type']))}}
+        var r = confirm("{{=T('After generating the file will no longer be allowed to make changes within the course and the lab. Are you sure you want to continue?')}}");
+        if (r == true) {
+
+        }
     }
 </script>

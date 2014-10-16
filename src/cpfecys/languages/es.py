@@ -126,6 +126,7 @@
 'Administrative Interface': 'Interfaz Administrativa',
 'Administrator Password:': 'Contraseña del Administrador:',
 'After': 'Después',
+'After generating the file will no longer be allowed to make changes within the course and the lab. Are you sure you want to continue?': 'Luego de generar el archivo csv ya no se permitirá realizar cambios dentro del curso y el laboratorio. ¿Esta seguro que desea continuar?',
 'AG': 'P.N.',
 'Ajax Recipes': 'Recetas AJAX',
 'Alert': 'Alerta',
