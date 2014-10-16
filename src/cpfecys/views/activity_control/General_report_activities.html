@@ -22,9 +22,9 @@
         <div align="right">
 
             {{if no_menu==False and cpfecys.current_year_period().id == year.id:}}
-                <a class="btn btn-primary" title="{{=T('Management activities without metric')}}" href="{{=URL('activity_control', 'course_requirement',vars=dict(project = request.vars['project'], period = request.vars['period']))}}">
+                <a class="btn btn-primary" href="{{=URL('activity_control', 'course_requirement',vars=dict(project = request.vars['project'], period = request.vars['period']))}}">
                     <span class="icon-black icon-edit"></span>
-                    Requerimiento Curso
+                    {{=T('Course requirement')}}
                 </a>
             {{pass}}
             {{if (auth.has_membership('Super-Administrator') or auth.has_membership('Ecys-Administrator') or auth.has_membership('Teacher') or auth.has_membership('Student')):}}
@@ -173,8 +173,8 @@
                             {{totalColumnsTable=totalColumnsTable+1}}
                             <center>
                                 <b>
-                                    {{=T('Course Requeriment')}}
-                                    <br>
+                                    {{#T('Course Requeriment')}}
+                                    
                                     {{=requirement.name}}
                                 </b>
                             </center>
@@ -347,7 +347,7 @@
                                 </td>
                             {{pass}}
                             {{if request.vars['type'] == 'class' and requirement is not None:}}
-                                <td bgcolor="#F4FA58">
+                                <td width="10px" bgcolor="#F2F5A9">
                                     <center>
                                         <b>
                                             {{if db((db.course_requirement_student.carnet==t1.carnet)&(db.course_requirement_student.requirement==requirement.id)).select().first() is not None:}}
@@ -613,7 +613,7 @@
         {{#URL(vars=dict(project = project.id, period = year.id, listado='True', type=request.vars['type']))}}
         var r = confirm("{{=T('After generating the file will no longer be allowed to make changes within the course and the lab. Are you sure you want to continue?')}}");
         if (r == true) {
-
+            
         }
     }
 </script>

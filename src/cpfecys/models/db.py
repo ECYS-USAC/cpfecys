@@ -1042,6 +1042,11 @@ db.define_table('course_requirement_student',
     Field('requirement', 'reference course_requirement', notnull=True, label=T('Requirement'))
 )
 
+db.define_table('course_ended',
+    Field('project', 'reference project', notnull=True, label=T('Course')),
+    Field('finish', 'boolean', notnull=True, label = T('Finish'))
+)
+
 ## after defining tables, uncomment below to enable auditing
     # auth.enable_record_versioning(db)
 # automatic forcing spanish language
