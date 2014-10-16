@@ -1,0 +1,63 @@
+{{extend 'template.html'}}
+<div class="row-fluid">
+	<h1>Report management student management</h1>
+	<div style="overflow:auto; width:100%;">
+		<table class="table table-striped table-bordered">
+			<thead>
+				<tr>
+					<th><center>{{=T('Semester')}}</center></th>
+					<th><center>{{=T('Total inserted')}}</center></th>
+					<th><center>{{=T('Total modified')}}</center></th>
+					<th><center>{{=T('Total out')}}</center></th>
+				</tr>
+			</thead>
+			<tbody>
+			{{for semestre in obtenerSemestres():}}
+				<tr>
+					<td>
+						<a id="s{{=semestre.id}}_all" style="white-space:nowrap;">{{=T(semestre.period.name)}} {{=semestre.yearp}}</a>
+					</td>
+					<td>
+						<center><a id="s{{=semestre.id}}_i" class="badge badge-success" style="white-space:nowrap;">{{=obtenerTotalNivel('i',semestre.id)}}</a></center>
+					</td>
+					<td>
+						<center><a id="s{{=semestre.id}}_u" class="badge badge-info" style="white-space:nowrap;">{{=obtenerTotalNivel('u',semestre.id)}}</a></center>
+					</td>
+					<td>
+						<center><a id="s{{=semestre.id}}_d" class="badge badge-important" style="white-space:nowrap;">{{=obtenerTotalNivel('d',semestre.id)}}</a></center>
+					</td>
+				</tr>
+				<tr>
+					<td colspan="4">
+						<div id="div_s{{=semestre.id}}" style="display: none;">
+							Cargando
+						</div>
+					</td>
+				</tr>
+			{{pass}}
+			</tbody>
+		</table>
+	</div>
+</div>
+<script type="text/javascript">
+    $(document).ready(function(){
+        {{for semestre in obtenerSemestres():}}
+            $("#s{{=semestre.id}}_all").click(function(){
+                $("#div_s{{=semestre.id}}").toggle();
+                $("#div_s{{=semestre.id}}").load("{{=URL('report_management','student_management_n2.load')}}?tipo=all&amp;semestre="+{{=semestre.id}});
+            })
+            $("#s{{=semestre.id}}_i").click(function(){
+                $("#div_s{{=semestre.id}}").toggle();
+                $("#div_s{{=semestre.id}}").load("{{=URL('report_management','student_management_n2.load')}}?tipo=i&amp;semestre="+{{=semestre.id}});
+            })
+            $("#s{{=semestre.id}}_u").click(function(){
+                $("#div_s{{=semestre.id}}").toggle();
+                $("#div_s{{=semestre.id}}").load("{{=URL('report_management','student_management_n2.load')}}?tipo=u&amp;semestre="+{{=semestre.id}});
+            })
+            $("#s{{=semestre.id}}_d").click(function(){
+                $("#div_s{{=semestre.id}}").toggle();
+                $("#div_s{{=semestre.id}}").load("{{=URL('report_management','student_management_n2.load')}}?tipo=d&amp;semestre="+{{=semestre.id}});
+            })
+        {{pass}}
+    })
+</script>
