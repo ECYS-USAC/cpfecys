@@ -11,7 +11,16 @@
 	{{var_project_id=project}}
 {{pass}}
 
-{{if request.vars['op'] == "addCategory": }}
+{{no_actionsAll=False}}
+{{course_ended_var = db((db.course_ended.project==var_project_id) & (db.course_ended.period==semestre2.id) ).select().first() }}
+{{if course_ended_var != None:}}
+	{{if course_ended_var.finish == True:}}
+		{{no_actionsAll=True}}
+	{{pass}}
+{{pass}}
+
+{{#--------------------------------------ADD CATEGORY----------------------------}}
+{{if (request.vars['op'] == "addCategory") & (no_actionsAll==False): }}
 
 	{{total_var2=float(request.vars['grade_var'])}}
 
@@ -73,7 +82,7 @@
 
 
 <!--GET  WEIGHTING-->
-{{if request.vars['op'] == "getPreviousWeighting": }}
+{{if (request.vars['op'] == "getPreviousWeighting") & (no_actionsAll==False): }}
 	{{var_period_sel=str(request.vars['period_par'])}}
 
 	{{var_labo = 'true'}}
@@ -135,7 +144,7 @@
 
 
 <!--DELETE CATEGORY-->
-{{if request.vars['op'] == "removeCategory": }}
+{{if (request.vars['op'] == "removeCategory") & (no_actionsAll==False): }}
 	{{var_labo = True}}
 	{{if request.vars['type'] == 'course':}}
 		{{var_labo = False}}
@@ -175,7 +184,7 @@
 	
 
 <!--UPDATE CATEGORY-->
-{{if request.vars['op'] == "updateCategory": }}
+{{if (request.vars['op'] == "updateCategory")& (no_actionsAll==False): }}
 	{{if request.vars['type'] == 'course':}}
 		{{act_count = db((db.course_activity.course_activity_category == request.vars['var_id']) & (db.course_activity.assignation == var_project_id) & (  db.course_activity.laboratory == False) & (db.course_activity.semester == (semestre2.id) ) ).count() }}
 	{{else:}}
@@ -395,7 +404,7 @@
 
 
 <!--ADD CATEGORY DIV-->
-{{if request.vars['op'] == "showInsert": }}
+{{if (request.vars['op'] == "showInsert")& (no_actionsAll==False): }}
 	<label>{{=T('Category')}}:</label>
     <select class="generic-widget" id="category_id" name="category" style="width:250px;">
 
