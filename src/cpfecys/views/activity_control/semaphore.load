@@ -114,9 +114,9 @@
 
 
 <script type="text/javascript">
-	{{if average_class < controlP.min_average:}}
+	{{if average_class < float(controlP.min_average):}}
 		document.getElementById('average_course_{{=request.vars['project']}}').className = "label label-important";
-	{{elif average_class>controlP.min_average and average_class < controlP.max_average:}}
+	{{elif average_class>=float(controlP.min_average) and average_class <= float(controlP.max_average):}}
 		document.getElementById('average_course_{{=request.vars['project']}}').className = "label label-warning";
 	{{else:}}
 		document.getElementById('average_course_{{=request.vars['project']}}').className = "label label-success";
@@ -125,9 +125,9 @@
 </script>
 
 <script type="text/javascript">
-	{{if average_laboratory < controlP.min_average:}}
+	{{if average_laboratory < float(controlP.min_average):}}
 		document.getElementById('average_lab_{{=request.vars['project']}}').className = "label label-important";
-	{{elif average_laboratory>controlP.min_average and average_laboratory < controlP.max_average:}}
+	{{elif average_laboratory >= float(controlP.min_average) and average_laboratory <= float(controlP.max_average):}}
 		document.getElementById('average_lab_{{=request.vars['project']}}').className = "label label-warning";
 	{{else:}}
 		document.getElementById('average_lab_{{=request.vars['project']}}').className = "label label-success";

@@ -1124,9 +1124,9 @@
 												{{comparacion = T(actualSemester.period.name)+" "+str(actualSemester.yearp)}}
 												{{controlP = db((db.student_control_period.period_name==comparacion)).select().first()}}
 												<center>
-												{{if average < controlP.min_average:}}
+												{{if average < float(controlP.min_average):}}
 												<span class="label label-important">
-												{{elif average>controlP.min_average and average < controlP.max_average:}}
+												{{elif average>=float(controlP.min_average) and average <= float(controlP.max_average):}}
 												<span class="label label-warning">
 												{{else:}}
 												<span class="label label-success">
@@ -1231,9 +1231,9 @@
 																{{comparacion = T(actualSemester.period.name)+" "+str(actualSemester.yearp)}}
 																{{controlP = db((db.student_control_period.period_name==comparacion)).select().first()}}
 																<center>
-																{{if gradeStudent.grade < controlP.min_average:}}
+																{{if gradeStudent.grade < float(controlP.min_average):}}
 																<span class="label label-important">
-																{{elif gradeStudent.grade>controlP.min_average and gradeStudent.grade < controlP.max_average:}}
+																{{elif gradeStudent.grade>=float(controlP.min_average) and gradeStudent.grade <= float(controlP.max_average):}}
 																<span class="label label-warning">
 																{{else:}}
 																<span class="label label-success">
