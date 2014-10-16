@@ -201,14 +201,14 @@
 
 		{{if float(total_var2) == 100:}}
 		    <li>
-				<a tabindex="-1"  title="{{=T('General Report of Activities')}}" href="{{=URL('activity_control', 'General_report_activities',vars=dict(project = request.vars['project'], period = request.vars['year']))}}"> 
+				<a tabindex="-1"  title="{{=T('General Report of Activities')}}" href="{{=URL('activity_control', 'General_report_activities',vars=dict(project = request.vars['project'], period = request.vars['year'], type=request.vars['type']))}}"> 
 					<span class="icon-file"></span>
 				{{=T('General Report of Activities')}}
 				</a>
 			</li>
 		{{else:}}
 			<li class="disabled"> 
-				<a tabindex="-1"  title="{{=T('General Report of Activities')}}" href="{{=URL('activity_control', 'General_report_activities',vars=dict(project = request.vars['project'], period = request.vars['year']))}}"> 
+				<a tabindex="-1"  title="{{=T('General Report of Activities')}}" href="{{=URL('activity_control', 'General_report_activities',vars=dict(project = request.vars['project'], period = request.vars['year'], type=request.vars['type']))}}"> 
 					<span class="icon-file"></span>
 				{{=T('General Report of Activities')}}
 				</a>

@@ -1,28 +1,42 @@
 {{extend 'template.html'}}
 <div class="row-fluid">
     <div class="well span12"  style="overflow:auto;">
-        <a onclick="window.history.back()" class="btn" ><i class="icon-arrow-left"></i>{{=T('Back')}}</a>
+        <a href="{{=URL('activity_control', 'students_control', vars=dict(project = project.id, period = year.id))}}" class="btn" ><i class="icon-arrow-left"></i> {{=T('Back')}}</a>
+        <div align="right">
+            <a class="btn btn-success" href="{{=URL(vars=dict(project = project.id, period = year.id, listado='True', type=request.vars['type']))}}"><i class="icon-download icon-white"></i>{{=T('Export Report')}} (CSV)</a>
+            <a class="btn btn-warning" href="{{=URL(vars=dict(listado='True'))}}"><i class="icon-warning-sign icon-white"></i>Generar Documento<br>Formato de Escuela Tecnica (CSV)</a>
+        </div>
         <table>
             <tr>
                 <td colspan="4">
-                    <b>{{=T('General Report of Activities')}}</b>
+                    <b>{{=T('General Report of Activities')}}
+                        {{if request.vars['type'] == 'class':}}
+                            - {{=T('Course')}}
+                        {{else:}}
+                            - {{=T('Laboratory')}}
+                        {{pass}}
+                    </b>
                 </td>
             </tr>
             <tr>
                 <td colspan="4">
-                    <b>Datos Generales del Curso</b>
+                    <b>{{=T('General Course Data')}}</b>
                 </td>
             </tr>
             <tr>
-                <td><b>Curso</b></td>
+                <td><b>{{=T('Course')}}</b></td>
                 <td>{{=project.name}}</td>
             
-                <td><b>Semestre</b></td>
+                <td><b>{{=T('Semester')}}</b></td>
                 <td>{{=T(year.period.name)}} {{=str(year.yearp)}}</td>
             </tr>
             <tr>
                 <td><b>{{=T('Teacher')}}</b></td>
-                <td>{{=str(teacher.auth_user.first_name)}} {{=str(teacher.auth_user.last_name)}}</td>
+                {{if teacher is not None:}}
+                    <td>{{=str(teacher.auth_user.first_name)}} {{=str(teacher.auth_user.last_name)}}</td>
+                {{else:}}
+                    <td>{{=T('Not Assigned')}}</td>
+                {{pass}}
                 <td><b>{{=T('Rol Student')}}</b></td>
                 {{for t1 in practice:}}
                     <td>{{=str(t1.auth_user.first_name)}} {{=str(t1.auth_user.last_name)}}</td>
@@ -31,10 +45,10 @@
             </tr>
         </table>
 
-        <table class="table-striped table-bordered">
+        <table class="table table-bordered">
             <THEAD>
                 <tr>
-                    <td bgcolor="Gray">
+                    <td bgcolor="#E6E6E6">
                         <b>
                             {{=T('Carnet')}}
                             <br>
@@ -42,32 +56,83 @@
                         </b>
                     </td>
                     {{posVCC=0}}
-                    {{for category in CourseCategory:}}
-                            {{for c in CourseActivities[posVCC]:}}
-                            <td bgcolor="Green">
-                                <center>
-                                    <b>
-                                        <font Color="White">
+                    {{if request.vars['type'] == 'class':}}
+                        {{for category in CourseCategory:}}
+                            {{if category.category.category!="Laboratorio":}}
+                                {{for c in CourseActivities[posVCC]:}}
+                                <td bgcolor="#E6E6E6" class="rcat{{=category.category}}" style="display:none;">
+                                    <center>
+                                        <b>
                                             {{=str(c.name)}}
                                             <br>
                                             &nbsp;
-                                        </font>
-                                    </b>
-                                </center>
-                            </td>
+                                        </b>
+                                    </center>
+                                </td>
+                                {{pass}}
+                                <td bgcolor="#E6E6E6">
+                                    <center>
+                                        <b>
+                                            <a id="btV_{{=str(category.category)}}" style="cursor:pointer;" onclick="visible_activities_gr('{{=str(category.category)}}');">
+                                                {{=str(category.category.category)}}
+                                                <br>
+                                                {{=str(category.grade)}} pts
+                                            </a>
+                                            <a id="btnNV_{{=str(category.category)}}" style="cursor:pointer; display:none;" onclick="no_visible_activities_gr('{{=str(category.category)}}');">
+                                                {{=str(category.category.category)}}
+                                                <br>
+                                                {{=str(category.grade)}} pts
+                                            </a>
+                                        </b>
+                                    </center>
+                                </td>
+                                {{posVCC=posVCC+1}}
                             {{pass}}
-                            <td bgcolor="Green">
-                                <center>
-                                    <b>
-                                        <font Color="White">
-                                            {{=str(category.category.category)}}
+                        {{pass}}
+                    {{else:}}
+                        {{for category in LabCategory:}}
+                            {{if category.category.category!="Laboratorio":}}
+                                {{for c in LabActivities[posVCC]:}}
+                                <td bgcolor="#E6E6E6" class="rcat{{=str(category.category)}}" style="display:none;">
+                                    <center>
+                                        <b>
+                                            {{=str(c.name)}}
                                             <br>
-                                            {{=str(category.grade)}} pts
-                                        </font>
-                                    </b>
-                                </center>
-                            </td>
-                        {{posVCC=posVCC+1}}
+                                            &nbsp;
+                                        </b>
+                                    </center>
+                                </td>
+                                {{pass}}
+                                <td bgcolor="#E6E6E6">
+                                    <center>
+                                        <b>
+                                            <a id="btV_{{=str(category.category)}}" style="cursor:pointer;" onclick="visible_activities_gr('{{=str(category.category)}}');">
+                                                {{=str(category.category.category)}}
+                                                <br>
+                                                {{=str(category.grade)}} pts
+                                            </a>
+                                            <a id="btnNV_{{=str(category.category)}}" style="cursor:pointer; display:none;" onclick="no_visible_activities_gr('{{=str(category.category)}}');">
+                                                {{=str(category.category.category)}}
+                                                <br>
+                                                {{=str(category.grade)}} pts
+                                            </a>
+                                        </b>
+                                    </center>
+                                </td>
+                                {{posVCC=posVCC+1}}
+                            {{pass}}
+                        {{pass}}
+                    {{pass}}
+                    {{if request.vars['type'] == 'class' and existLab==True:}}
+                        <td bgcolor="#E6E6E6">
+                            <center>
+                                <b>
+                                    {{=T('Laboratory')}}
+                                    <br>
+                                    {{=str(totalLab)}} pts
+                                </b>
+                            </center>
+                        </td>
                     {{pass}}
                     <td bgcolor="DarkBlue">
                         <center>
@@ -84,22 +149,209 @@
             </THEAD>
             <TBODY>
                 {{for t1 in students:}}
-                    <tr>
-                        <td>{{=t1.carnet.carnet}}</td>
+                    {{if request.vars['type'] == 'class':}}
+                        <tr>
+                            <td>{{=t1.carnet.carnet}}</td>
 
-                        <!--Position in the vector of activities-->
+                            <!--Position in the vector of activities-->
+                            {{posVCC=0}}
+                            <!--Vars to the control of grade of the student-->
+                            {{totalCategory=float(0)}}
+                            {{totalActivities=0}}
+                            {{totalCarry=float(0)}}
+                            <!--****************************************FILL THE GRADES OF THE STUDENT****************************************-->
+                            <!--COURSE ACTIVITIES-->
+                            {{for category in CourseCategory:}}
+                                {{if category.category.category!="Laboratorio":}}
+                                    {{totalCategory=float(0)}}
+                                    {{totalActivities=0}}
+                                    {{for c in CourseActivities[posVCC]:}}
+                                        <td class="rcat{{=str(category.category)}}" style="display:none;" bgcolor="#CEECF5">
+                                            <center>
+                                                {{studentGrade = db((db.grades.activity==c.id)&(db.grades.academic_assignation==t1.id)).select().first()}}
+                                                {{if studentGrade is None:}}
+                                                    {{totalCategory=totalCategory+float(0)}}
+                                                {{else:}}
+                                                    {{if category.specific_grade==True:}}
+                                                        {{=studentGrade.grade}}
+                                                        {{totalCategory=totalCategory+float((studentGrade.grade*c.grade)/100)}}
+                                                    {{else:}}
+                                                        {{=studentGrade.grade}}
+                                                        {{totalCategory=totalCategory+float(studentGrade.grade)}}
+                                                    {{pass}}
+                                                {{pass}}
+                                            </center>
+                                        </td>
+                                        {{totalActivities=totalActivities+1}}
+                                    {{pass}}
+                                    <td>
+                                        <center>
+                                        {{if category.specific_grade==True:}}
+                                            {{checkGrade = float((totalCategory*float(100))/float(category.grade))}}
+                                            {{if checkGrade < controlP.min_average:}}
+                                                <FONT COLOR="Red">
+                                            {{elif checkGrade>controlP.min_average and checkGrade < controlP.max_average:}}
+                                                <FONT COLOR="#5E610B">
+                                            {{else:}}
+                                                <FONT COLOR="Green">
+                                            {{pass}}
+                                            <b>
+                                            {{=str(totalCategory)}}
+                                            </b>
+                                            </font>
+                                        {{else:}}
+                                            {{if totalActivities==0:}}
+                                                {{totalActivities=1}}
+                                            {{pass}}
+                                            {{totalActivities=totalActivities*100}}
+                                            {{totalCategory=float((totalCategory*float(category.grade))/float(totalActivities))}}
+                                            {{checkGrade = float((totalCategory*float(100))/float(category.grade))}}
+                                            {{if checkGrade < controlP.min_average:}}
+                                                <FONT COLOR="Red">
+                                            {{elif checkGrade>controlP.min_average and checkGrade < controlP.max_average:}}
+                                                <FONT COLOR="#5E610B">
+                                            {{else:}}
+                                                <FONT COLOR="Green">
+                                            {{pass}}
+                                            <b>
+                                            {{=str(totalCategory)}}
+                                            </b>
+                                            </font>
+                                        {{pass}}
+                                        {{totalCarry=totalCarry+totalCategory}}
+                                        </center>
+                                    </td>
+                                    {{posVCC=posVCC+1}}
+                                {{pass}}
+                            {{pass}}
+                            {{if request.vars['type'] == 'class' and existLab==True:}}
+                                <td>
+                                    <center>
+                                        {{totalCategory=float(0)}}
+                                        {{isValidate=False}}
+                                        <!--Revalidation of laboratory-->
+                                        {{for validate in validateLaboratory:}}
+                                            {{if validate.carnet==t1.carnet:}}
+                                                {{isValidate=True}}
+                                                {{totalCategory=float((validate.grade*totalLab)/100)}}
+                                            {{pass}}
+                                        {{pass}}
+
+
+                                        <!--Doesnt has a revalidation-->
+                                        {{if isValidate==False:}}
+                                            <!--Position in the vector of activities-->
+                                            {{posVCC_Lab=0}}
+                                            <!--Vars to the control of grade of the student-->
+                                            {{totalCategory_Lab=float(0)}}
+                                            {{totalActivities_Lab=0}}
+                                            {{totalCarry_Lab=float(0)}}
+
+                                            <!--****************************************FILL THE GRADES OF THE STUDENT****************************************-->
+                                            <!--LAB ACTIVITIES-->
+                                            {{for category_Lab in LabCategory:}}
+                                                {{totalCategory_Lab=float(0)}}
+                                                {{totalActivities_Lab=0}}
+                                                {{for c_Lab in LabActivities[posVCC_Lab]:}}
+                                                            {{studentGrade = db((db.grades.activity==c_Lab.id)&(db.grades.academic_assignation==t1.id)).select().first()}}
+                                                            {{if studentGrade is None:}}
+                                                                {{totalCategory_Lab=totalCategory_Lab+float(0)}}
+                                                            {{else:}}
+                                                                {{if category_Lab.specific_grade==True:}}
+                                                                    {{totalCategory_Lab=totalCategory_Lab+float((studentGrade.grade*c_Lab.grade)/100)}}
+                                                                {{else:}}
+                                                                    {{totalCategory_Lab=totalCategory_Lab+float(studentGrade.grade)}}
+                                                                {{pass}}
+                                                            {{pass}}
+                                                    {{totalActivities_Lab=totalActivities_Lab+1}}
+                                                {{pass}}
+                                                
+
+                                                    {{if category_Lab.specific_grade==False:}}
+                                                        {{if totalActivities_Lab==0:}}
+                                                            {{totalActivities_Lab=1}}
+                                                        {{pass}}
+                                                        {{totalActivities_Lab=totalActivities_Lab*100}}
+                                                        {{totalCategory_Lab=float((totalCategory_Lab*float(category_Lab.grade))/float(totalActivities_Lab))}}
+                                                    {{pass}}
+                                                    {{totalCarry_Lab=totalCarry_Lab+totalCategory_Lab}}
+                                                {{posVCC_Lab=posVCC_Lab+1}}
+                                            {{pass}}
+                                            {{totalCategory=float((totalCarry_Lab*totalLab)/100)}}
+                                        {{pass}}
+
+
+                                        <!--Show grade of laboratory-->
+                                        {{checkGrade = float((totalCategory*float(100))/float(totalLab))}}
+                                        {{if checkGrade < controlP.min_average:}}
+                                            <FONT COLOR="Red">
+                                        {{elif checkGrade>controlP.min_average and checkGrade < controlP.max_average:}}
+                                            <FONT COLOR="#5E610B">
+                                        {{else:}}
+                                            <FONT COLOR="Green">
+                                        {{pass}}
+                                        <b>
+                                        {{=str(totalCategory)}}
+                                        </b>
+                                        </font>
+                                        <!--Plus the laboratory to the carry-->
+                                        {{totalCarry=totalCarry+totalCategory}}
+                                    </center>
+                                </td>
+                            {{pass}}
+                            <td>
+                                <center>
+                                    {{if request.vars['type'] == 'class' and existLab==True:}}
+                                        {{if totalCategory>=float((61*totalLab)/100):}}
+                                            {{if totalCarry < controlP.min_average:}}
+                                                <span class="label label-important">
+                                            {{elif totalCarry>controlP.min_average and totalCarry < controlP.max_average:}}
+                                                <span class="label label-warning">
+                                            {{else:}}
+                                                <span class="label label-success">
+                                            {{pass}}
+                                            {{=str(totalCarry)}}
+                                            </span>
+                                        {{else:}}
+                                            <span class="label label-inverse">
+                                                {{=str(totalCarry)}}
+                                            </span>
+                                        {{pass}}
+                                    {{else:}}
+                                        {{if totalCarry < controlP.min_average:}}
+                                            <span class="label label-important">
+                                        {{elif totalCarry>controlP.min_average and totalCarry < controlP.max_average:}}
+                                            <span class="label label-warning">
+                                        {{else:}}
+                                            <span class="label label-success">
+                                        {{pass}}
+                                        {{=str(totalCarry)}}
+                                        </span>
+                                    {{pass}}
+                                </center>
+                            </td>
+                        </tr>
                         {{posVCC=0}}
-                        <!--Vars to the control of grade of the student-->
                         {{totalCategory=float(0)}}
                         {{totalActivities=0}}
                         {{totalCarry=float(0)}}
-                        <!--****************************************FILL THE GRADES OF THE STUDENT****************************************-->
-                        <!--COURSE ACTIVITIES-->
-                        {{for category in CourseCategory:}}
+                    {{else:}}
+                        <tr>
+                            <td>{{=t1.carnet.carnet}}</td>
+
+                            <!--Position in the vector of activities-->
+                            {{posVCC=0}}
+                            <!--Vars to the control of grade of the student-->
+                            {{totalCategory=float(0)}}
+                            {{totalActivities=0}}
+                            {{totalCarry=float(0)}}
+                            <!--****************************************FILL THE GRADES OF THE STUDENT****************************************-->
+                            <!--COURSE ACTIVITIES-->
+                            {{for category in LabCategory:}}
                                 {{totalCategory=float(0)}}
                                 {{totalActivities=0}}
-                                {{for c in CourseActivities[posVCC]:}}
-                                    <td>
+                                {{for c in LabActivities[posVCC]:}}
+                                    <td class="rcat{{=str(category.category)}}" style="display:none;"  bgcolor="#CEECF5">
                                         <center>
                                             {{studentGrade = db((db.grades.activity==c.id)&(db.grades.academic_assignation==t1.id)).select().first()}}
                                             {{if studentGrade is None:}}
@@ -120,32 +372,108 @@
                                 <td>
                                     <center>
                                     {{if category.specific_grade==True:}}
+                                        {{checkGrade = float((totalCategory*float(100))/float(category.grade))}}
+                                        {{if checkGrade < controlP.min_average:}}
+                                            <FONT COLOR="Red">
+                                        {{elif checkGrade>controlP.min_average and checkGrade < controlP.max_average:}}
+                                            <FONT COLOR="#5E610B">
+                                        {{else:}}
+                                            <FONT COLOR="Green">
+                                        {{pass}}
+                                        <b>
                                         {{=str(totalCategory)}}
+                                        </b>
+                                        </font>
                                     {{else:}}
                                         {{if totalActivities==0:}}
                                             {{totalActivities=1}}
                                         {{pass}}
                                         {{totalActivities=totalActivities*100}}
                                         {{totalCategory=float((totalCategory*float(category.grade))/float(totalActivities))}}
+                                        {{checkGrade = float((totalCategory*float(100))/float(category.grade))}}
+                                        {{if checkGrade < controlP.min_average:}}
+                                            <FONT COLOR="Red">
+                                        {{elif checkGrade>controlP.min_average and checkGrade < controlP.max_average:}}
+                                            <FONT COLOR="#5E610B">
+                                        {{else:}}
+                                            <FONT COLOR="Green">
+                                        {{pass}}
+                                        <b>
                                         {{=str(totalCategory)}}
+                                        </b>
+                                        </font>
                                     {{pass}}
                                     {{totalCarry=totalCarry+totalCategory}}
                                     </center>
                                 </td>
-                            {{posVCC=posVCC+1}}
-                        {{pass}}
-                        <td>
-                            <center>
-                                {{=str(totalCarry)}}
-                            </center>
-                        </td>
-                    </tr>
-                    {{posVCC=0}}
-                    {{totalCategory=float(0)}}
-                    {{totalActivities=0}}
-                    {{totalCarry=float(0)}}
+                                {{posVCC=posVCC+1}}
+                            {{pass}}
+                            <td>
+                                <center>
+                                    {{if totalCarry < controlP.min_average:}}
+                                        <span class="label label-important">
+                                    {{elif totalCarry>controlP.min_average and totalCarry < controlP.max_average:}}
+                                        <span class="label label-warning">
+                                    {{else:}}
+                                        <span class="label label-success">
+                                    {{pass}}
+                                    {{=str(totalCarry)}}
+                                    </span>
+                                </center>
+                            </td>
+                        </tr>
+                        {{posVCC=0}}
+                        {{totalCategory=float(0)}}
+                        {{totalActivities=0}}
+                        {{totalCarry=float(0)}}
+                    {{pass}}
                 {{pass}}
             </TBODY>
         </table>
     </div>
 </div>
+<script type="text/javascript">
+    function no_visible_activities_gr(var_name){
+        {{if request.vars['type'] == 'class':}}
+            {{for category in CourseCategory:}}
+                {{if category.category.category!="Laboratorio":}}
+                    if (var_name=="{{=str(category.category)}}"){
+                        $("#btnNV_{{=str(category.category)}}").css("display", "none");
+                        $("#btV_{{=str(category.category)}}").css("display", "");
+                        $(".rcat{{=str(category.category)}}").css("display", "none");
+                    }
+                {{pass}}
+            {{pass}}    
+        {{else:}}
+            {{for category in LabCategory:}}
+                if (var_name=="{{=str(category.category)}}"){
+                    $("#btnNV_{{=str(category.category)}}").css("display", "none");
+                    $("#btV_{{=str(category.category)}}").css("display", "");
+                    $(".rcat{{=str(category.category)}}").css("display", "none");
+                }
+            {{pass}}
+        {{pass}}
+    }
+
+    function visible_activities_gr(var_name){
+        {{if request.vars['type'] == 'class':}}
+            {{for category in CourseCategory:}}
+                {{if category.category.category!="Laboratorio":}}
+                    if (var_name=="{{=str(category.category)}}"){
+                        $("#btnNV_{{=str(category.category)}}").css("display", "");
+                        $("#btV_{{=str(category.category)}}").css("display", "none");
+                        $(".rcat{{=str(category.category)}}").css("display", "");
+                    }
+                {{pass}}
+            {{pass}}    
+        {{else:}}
+            {{for category in LabCategory:}}
+                if (var_name=="{{=str(category.category)}}"){
+                    $("#btnNV_{{=str(category.category)}}").css("display", "");
+                    $("#btV_{{=str(category.category)}}").css("display", "none");
+                    $(".rcat{{=str(category.category)}}").css("display", "");
+                }
+            {{pass}}
+        {{pass}}
+    }
+</script>
