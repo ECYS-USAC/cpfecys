@@ -9,27 +9,17 @@
 	{{else:}}
 		{{allRequestP=None}}
 		{{allRequest=None}}
-		{{nameP=None}}
-		{{nameS=None}}
-		{{try:}}
-			{{(nameP, projectSection) = str(course.name).split('(')}}
-			{{(nameS,garbage) = str(projectSection).split(')')}}
-			{{(garbage,nameS) = str(nameS).split(' ')}}
-		{{except:}}
-			{{nameP=course.name}}
-			{{nameS=None}}
-		{{pass}}
 		{{if request.vars['tip']=="p" or request.vars['tip']=="t":}}
 			{{allRequestP = db((db.requestchange_activity.status=='Pending')&(db.requestchange_activity.semester==int(semestre2.id))&(db.requestchange_activity.course==int(request.vars['course']))).select()}}
 		{{pass}}
 		{{if request.vars['tip']=="a":}}
-			{{allRequest = db((db.requestchange_activity_log.status=='Accepted')&(db.requestchange_activity_log.course==nameP)&(db.requestchange_activity_log.course_section==nameS)&(db.requestchange_activity_log.yearp==semestre2.yearp)&(db.requestchange_activity_log.semester==semestre2.period.name)).select()}}
+			{{allRequest = db((db.requestchange_activity_log.status=='Accepted')&(db.requestchange_activity_log.course==course.name)&(db.requestchange_activity_log.yearp==semestre2.yearp)&(db.requestchange_activity_log.semester==semestre2.period.name)).select()}}
 		{{pass}}
 		{{if request.vars['tip']=="r":}}
-			{{allRequest = db((db.requestchange_activity_log.status=='Rejected')&(db.requestchange_activity_log.course==nameP)&(db.requestchange_activity_log.course_section==nameS)&(db.requestchange_activity_log.yearp==semestre2.yearp)&(db.requestchange_activity_log.semester==semestre2.period.name)).select()}}
+			{{allRequest = db((db.requestchange_activity_log.status=='Rejected')&(db.requestchange_activity_log.course==course.name)&(db.requestchange_activity_log.yearp==semestre2.yearp)&(db.requestchange_activity_log.semester==semestre2.period.name)).select()}}
 		{{pass}}
 		{{if request.vars['tip']=="t":}}
-			{{allRequest = db((db.requestchange_activity_log.status!='Pending')&(db.requestchange_activity_log.course==nameP)&(db.requestchange_activity_log.course_section==nameS)&(db.requestchange_activity_log.yearp==semestre2.yearp)&(db.requestchange_activity_log.semester==semestre2.period.name)).select()}}
+			{{allRequest = db((db.requestchange_activity_log.status!='Pending')&(db.requestchange_activity_log.course==course.name)&(db.requestchange_activity_log.yearp==semestre2.yearp)&(db.requestchange_activity_log.semester==semestre2.period.name)).select()}}
 		{{pass}}
 
 		{{if (request.vars['tip']=="p" and (allRequestP != None and allRequestP.first()!=None)) or (request.vars['tip']=="a" and (allRequest != None and allRequest.first()!=None)) or (request.vars['tip']=="r" and (allRequest != None and allRequest.first()!=None)) or (request.vars['tip']=="t" and ((allRequest != None and allRequest.first()!=None) or (allRequestP != None and allRequestP.first()!=None))):}}
