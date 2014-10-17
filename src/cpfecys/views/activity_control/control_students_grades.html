@@ -208,7 +208,7 @@ aria-hidden="true">{{=T('Close')}}</button>
         document.getElementById('carnet_input').focus();
         document.getElementById('carnet_input').select();
       }else{
-        if (grade_var=="" || parseInt(grade_var) < 0 || parseInt(grade_var) > 100){
+        if (grade_var=="" || parseFloat(grade_var) < 0 || parseFloat(grade_var) > parseFloat(100)){
           alert("{{=T('The grade value is not correct')}}");
           document.getElementById('grade_input').focus();
           document.getElementById('grade_input').select();

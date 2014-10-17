@@ -472,11 +472,11 @@
     
       var grade_var = document.getElementById('edit_grade_'+var_carnet).value;
 
-      if (grade_var=="" || parseInt(grade_var) < 0 || parseInt(grade_var) > 100){
-        if( parseInt(grade_var) < 0){
+      if (grade_var=="" || parseFloat(grade_var) < 0 || parseFloat(grade_var) > parseFloat(100)){
+        if( parseFloat(grade_var) < 0){
           string_error = (string_error+'<tr><td>'+var_carnet+'</td><td>'+grade_var+'</td><td>{{=T("The grade is less than 0")}}</td></tr>');
         }
-        if( parseInt(grade_var) > 100){
+        if( parseFloat(grade_var) > parseFloat(100)){
           string_error = (string_error+'<tr><td>'+var_carnet+'</td><td>'+grade_var+'</td><td>{{=T("The grade is greater than 100")}}</td></tr>');
         }
       }else{
@@ -524,11 +524,11 @@
         {{for academic in academic_assig:}}
           var carnet_var = "{{=academic.carnet.carnet}}"
           var grade_var = document.getElementById('edit_grade_{{=academic.carnet.carnet}}').value;
-          if (grade_var=="" || parseInt(grade_var) < 0 || parseInt(grade_var) > 100){
-            if( parseInt(grade_var) < 0){
+          if (grade_var=="" || parseFloat(grade_var) < 0 || parseFloat(grade_var) > parseFloat(100)){
+            if( parseFloat(grade_var) < 0){
               string_error = (string_error+'<tr><td>'+carnet_var+'</td><td>'+grade_var+'</td><td>{{=T("The grade is less than 0")}}</td></tr>');
             }
-            if( parseInt(grade_var) > 100){
+            if( parseFloat(grade_var) > parseFloat(100)){
               string_error = (string_error+'<tr><td>'+carnet_var+'</td><td>'+grade_var+'</td><td>{{=T("The grade is greater than 100")}}</td></tr>');
             }
           }else{
@@ -601,11 +601,11 @@
       {{for academic in academic_assig:}}
         var carnet_var = "{{=academic.carnet.carnet}}"
         var grade_var = document.getElementById('edit_grade_{{=academic.carnet.carnet}}').value;
-        if (grade_var=="" || parseInt(grade_var) < 0 || parseInt(grade_var) > 100){
-          if( parseInt(grade_var) < 0){
+        if (grade_var=="" || parseFloat(grade_var) < 0 || parseFloat(grade_var) > parseFloat(100)){
+          if( parseFloat(grade_var) < 0){
             string_error = (string_error+'<tr><td>'+carnet_var+'</td><td>'+grade_var+'</td><td>{{=T("The grade is less than 0")}}</td></tr>');
           }
-          if( parseInt(grade_var) > 100){
+          if( parseFloat(grade_var) > parseFloat(100)){
             string_error = (string_error+'<tr><td>'+carnet_var+'</td><td>'+grade_var+'</td><td>{{=T("The grade is greater than 100")}}</td></tr>');
           }
         }else{
