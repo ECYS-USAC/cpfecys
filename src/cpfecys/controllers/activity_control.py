@@ -338,30 +338,35 @@ def grades():
                     else:
                         grade_before = db((db.grades.academic_assignation==assig_var.id) & (db.grades.activity==var_activity.id) ).select().first() 
                         if grade_before is None:
-                            grade = db.grades.insert(academic_assignation = assig_var.id,
-                                            activity = var_activity.id,
-                                            grade =  request.vars['grade'])
+                            if (var_activity.laboratory == False) | (assig_var.laboratorio == var_activity.laboratory):
+                                grade = db.grades.insert(academic_assignation = assig_var.id,
+                                                activity = var_activity.id,
+                                                grade =  request.vars['grade'])
 
-                            if grade != None:
-                                #--------------------------------------------log-------------------------------------
-                                db.grades_log.insert(user_name = auth.user.username,
-                                                roll = rol_log,
-                                                operation_log = 'insert',
-                                                academic_assignation_id = assig_var.id,
-                                                academic = assig_var.carnet.carnet,
-                                                project = assig_var.assignation.name,
-                                                activity = var_activity.name,
-                                                activity_id = var_activity.id,
-                                                category = var_activity.course_activity_category.category.category,
-                                                period = T(assig_var.semester.period.name),
-                                                yearp = assig_var.semester.yearp,
-                                                after_grade = request.vars['grade'],
-                                                description = T('Inserted from Grades page')
-                                                 )
-                                if request.vars['op'] == "add_grade":
-                                    add_grade_flash = True
-                                    message_var = T('Grade added') + " | Carnet: "+ str(academic_var.carnet) +" "+ T('Grade')+ ": " + str(grade.grade)
-                                pass
+                                if grade != None:
+                                    #--------------------------------------------log-------------------------------------
+                                    db.grades_log.insert(user_name = auth.user.username,
+                                                    roll = rol_log,
+                                                    operation_log = 'insert',
+                                                    academic_assignation_id = assig_var.id,
+                                                    academic = assig_var.carnet.carnet,
+                                                    project = assig_var.assignation.name,
+                                                    activity = var_activity.name,
+                                                    activity_id = var_activity.id,
+                                                    category = var_activity.course_activity_category.category.category,
+                                                    period = T(assig_var.semester.period.name),
+                                                    yearp = assig_var.semester.yearp,
+                                                    after_grade = request.vars['grade'],
+                                                    description = T('Inserted from Grades page')
+                                                     )
+                                    if request.vars['op'] == "add_grade":
+                                        add_grade_flash = True
+                                        message_var = T('Grade added') + " | Carnet: "+ str(academic_var.carnet) +" "+ T('Grade')+ ": " + str(grade.grade)
+                                    pass
+                                else:
+                                    add_grade_error = True
+                                    message_var = T('Failed to add grade') + " | Carnet: "+ str(academic_var.carnet)+" " + T('Grade')+": " + str(grade.grade)
+                                pass  #----grade!=None---
                             else:
                                 add_grade_error = True
                                 message_var = T('Failed to add grade') + " | Carnet: "+ str(academic_var.carnet)+" " + T('Grade')+": " + str(grade.grade)
