@@ -235,9 +235,9 @@
                                         <center>
                                         {{if category.specific_grade==True:}}
                                             {{checkGrade = float((totalCategory*float(100))/float(category.grade))}}
-                                            {{if checkGrade < controlP.min_average:}}
+                                            {{if checkGrade < float(controlP.min_average):}}
                                                 <FONT COLOR="Red">
-                                            {{elif checkGrade>controlP.min_average and checkGrade < controlP.max_average:}}
+                                            {{elif checkGrade>=float(controlP.min_average) and checkGrade <= float(controlP.max_average):}}
                                                 <FONT COLOR="#5E610B">
                                             {{else:}}
                                                 <FONT COLOR="Green">
@@ -253,9 +253,9 @@
                                             {{totalActivities=totalActivities*100}}
                                             {{totalCategory=float((totalCategory*float(category.grade))/float(totalActivities))}}
                                             {{checkGrade = float((totalCategory*float(100))/float(category.grade))}}
-                                            {{if checkGrade < controlP.min_average:}}
+                                            {{if checkGrade < float(controlP.min_average):}}
                                                 <FONT COLOR="Red">
-                                            {{elif checkGrade>controlP.min_average and checkGrade < controlP.max_average:}}
+                                            {{elif checkGrade>=float(controlP.min_average) and checkGrade <= float(controlP.max_average):}}
                                                 <FONT COLOR="#5E610B">
                                             {{else:}}
                                                 <FONT COLOR="Green">
@@ -330,9 +330,9 @@
 
                                         <!--Show grade of laboratory-->
                                         {{checkGrade = float((totalCategory*float(100))/float(totalLab))}}
-                                        {{if checkGrade < controlP.min_average:}}
+                                        {{if checkGrade < float(controlP.min_average):}}
                                             <FONT COLOR="Red">
-                                        {{elif checkGrade>controlP.min_average and checkGrade < controlP.max_average:}}
+                                        {{elif checkGrade>=float(controlP.min_average) and checkGrade <= float(controlP.max_average):}}
                                             <FONT COLOR="#5E610B">
                                         {{else:}}
                                             <FONT COLOR="Green">
@@ -362,9 +362,9 @@
                                     {{if request.vars['type'] == 'class' and existLab==True:}}
                                         {{if request.vars['type'] == 'class' and requirement is None:}}
                                             {{if totalCategory>=float((61*totalLab)/100):}}
-                                                {{if totalCarry < controlP.min_average:}}
+                                                {{if totalCarry < float(controlP.min_average):}}
                                                     <span class="label label-important">
-                                                {{elif totalCarry>controlP.min_average and totalCarry < controlP.max_average:}}
+                                                {{elif totalCarry>=float(controlP.min_average) and totalCarry <= float(controlP.max_average):}}
                                                     <span class="label label-warning">
                                                 {{else:}}
                                                     <span class="label label-success">
@@ -379,9 +379,9 @@
                                         {{else:}}
                                             {{if db((db.course_requirement_student.carnet==t1.carnet)&(db.course_requirement_student.requirement==requirement.id)).select().first() is not None:}}
                                                 {{if totalCategory>=float((61*totalLab)/100):}}
-                                                    {{if totalCarry < controlP.min_average:}}
+                                                    {{if totalCarry < float(controlP.min_average):}}
                                                         <span class="label label-important">
-                                                    {{elif totalCarry>controlP.min_average and totalCarry < controlP.max_average:}}
+                                                    {{elif totalCarry>=float(controlP.min_average) and totalCarry <= float(controlP.max_average):}}
                                                         <span class="label label-warning">
                                                     {{else:}}
                                                         <span class="label label-success">
@@ -401,9 +401,9 @@
                                         {{pass}}
                                     {{else:}}
                                         {{if request.vars['type'] == 'class' and requirement is None:}}
-                                            {{if totalCarry < controlP.min_average:}}
+                                            {{if totalCarry < float(controlP.min_average):}}
                                                 <span class="label label-important">
-                                            {{elif totalCarry>controlP.min_average and totalCarry < controlP.max_average:}}
+                                            {{elif totalCarry>=float(controlP.min_average) and totalCarry <= float(controlP.max_average):}}
                                                 <span class="label label-warning">
                                             {{else:}}
                                                 <span class="label label-success">
@@ -412,9 +412,9 @@
                                             </span>
                                         {{else:}}
                                             {{if db((db.course_requirement_student.carnet==t1.carnet)&(db.course_requirement_student.requirement==requirement.id)).select().first() is not None:}}
-                                                {{if totalCarry < controlP.min_average:}}
+                                                {{if totalCarry < float(controlP.min_average):}}
                                                     <span class="label label-important">
-                                                {{elif totalCarry>controlP.min_average and totalCarry < controlP.max_average:}}
+                                                {{elif totalCarry>=float(controlP.min_average) and totalCarry <= float(controlP.max_average):}}
                                                     <span class="label label-warning">
                                                 {{else:}}
                                                     <span class="label label-success">
@@ -473,9 +473,9 @@
                                     <center>
                                     {{if category.specific_grade==True:}}
                                         {{checkGrade = float((totalCategory*float(100))/float(category.grade))}}
-                                        {{if checkGrade < controlP.min_average:}}
+                                        {{if checkGrade < float(controlP.min_average):}}
                                             <FONT COLOR="Red">
-                                        {{elif checkGrade>controlP.min_average and checkGrade < controlP.max_average:}}
+                                        {{elif checkGrade>=float(controlP.min_average) and checkGrade <= float(controlP.max_average):}}
                                             <FONT COLOR="#5E610B">
                                         {{else:}}
                                             <FONT COLOR="Green">
@@ -491,9 +491,9 @@
                                         {{totalActivities=totalActivities*100}}
                                         {{totalCategory=float((totalCategory*float(category.grade))/float(totalActivities))}}
                                         {{checkGrade = float((totalCategory*float(100))/float(category.grade))}}
-                                        {{if checkGrade < controlP.min_average:}}
+                                        {{if checkGrade < float(controlP.min_average):}}
                                             <FONT COLOR="Red">
-                                        {{elif checkGrade>controlP.min_average and checkGrade < controlP.max_average:}}
+                                        {{elif checkGrade>=float(controlP.min_average) and checkGrade <= float(controlP.max_average):}}
                                             <FONT COLOR="#5E610B">
                                         {{else:}}
                                             <FONT COLOR="Green">
@@ -510,9 +510,9 @@
                             {{pass}}
                             <td>
                                 <center>
-                                    {{if totalCarry < controlP.min_average:}}
+                                    {{if totalCarry < float(controlP.min_average):}}
                                         <span class="label label-important">
-                                    {{elif totalCarry>controlP.min_average and totalCarry < controlP.max_average:}}
+                                    {{elif totalCarry>=float(controlP.min_average) and totalCarry <= float(controlP.max_average):}}
                                         <span class="label label-warning">
                                     {{else:}}
                                         <span class="label label-success">
