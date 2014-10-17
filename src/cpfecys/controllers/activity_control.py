@@ -2183,6 +2183,7 @@ def General_report_activities():
     catLabTemp=None
     catVecLabTemp=[]
     LabActivities = None
+    validateLaboratory=None
     if existLab == True:
         validateLaboratory = db((db.validate_laboratory.semester==year.id)&(db.validate_laboratory.project==project_var.id)).select()
         LabCategory = db((db.course_activity_category.semester==year.id)&(db.course_activity_category.assignation==project_var.id)&(db.course_activity_category.laboratory==True)).select()
