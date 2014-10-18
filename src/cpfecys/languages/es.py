@@ -964,6 +964,7 @@
 'Laboratory Average': 'Promedio de Laboratorio',
 'Laboratory lost or Missing requirement': 'Laboratorio perdido o Requisito perdido',
 'Laboratory Results': 'Laboratory Results',
+'Laboratory Revalidation': 'Revalidación Laboratorio',
 'Laboratory revalidation': 'Revalidación Laboratorio',
 'Laboratory Scheduler': 'Planificación de Laboratorio',
 'Laboratory Weighting': 'Ponderación de Laboratorio',

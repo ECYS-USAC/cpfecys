@@ -142,13 +142,7 @@ def student_management_n4():
     operaciones = None
     if request.vars['semestre'] != None and request.vars['tipo']!=None  and request.vars['rol']!=None and request.vars['user']!=None:
         if request.vars['consulta'] != None:
-            #consulta = db(request.vars['consulta']).select()
-            campo=''
-            for a in request.vars['consulta']:
-                if a=='.'
-                
-            session.flash=str(request.vars['consulta'])
-            redirect(URL('default','index'))
+            None
         else:
             periodo=request.vars['semestre']
             tipo=request.vars['tipo']
