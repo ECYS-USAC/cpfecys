@@ -214,7 +214,7 @@
               </div>
               <div class="modal-body">
                 <div class="well">
-                      {{grade_log_var = db(db.grades_log.academic_assignation_id==academic.id).select()}}
+                      {{grade_log_var = db((db.grades_log.academic_assignation_id==academic.id) & (db.grades_log.activity_id==var_activity.id)).select()}}
                       {{if grade_log_var.first() ==None:}}
                         {{=T('No records')}}
                       {{else:}}
