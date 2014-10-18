@@ -2633,7 +2633,7 @@ def grades_management():
         redirect(URL('default','index'))
     else:
         project = request.vars['project']
-        project = db(db.project.id==project_var).select().first()
+        project = db(db.project.id==project).select().first()
         if project is None:
             session.flash = T('Not valid Action.')
             redirect(URL('default','index'))

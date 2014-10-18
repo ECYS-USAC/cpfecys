@@ -1,35 +1,56 @@
 {{extend 'template.html'}}
+{{from datetime import datetime}}
 <div class="row-fluid">
-	<h1>Report management student management</h1>
+	<h1>Report management grades</h1>
 	<div style="overflow:auto; width:100%;">
 		<table class="table table-striped table-bordered">
 			<thead>
 				<tr>
-					<th><center>{{=T('Semester')}}</center></th>
+					<th><center>{{=T('Month')}}</center></th>
 					<th><center>{{=T('Total inserted')}}</center></th>
 					<th><center>{{=T('Total modified')}}</center></th>
 					<th><center>{{=T('Total out')}}</center></th>
 				</tr>
 			</thead>
 			<tbody>
-			{{for semestre in obtenerSemestres():}}
+			{{for month in vecMonth:}}
+				{{start = datetime.strptime(str(year.yearp) + '-' + str(month[0]) +'-01', "%Y-%m-%d")}}
+				{{if month[2]==1:}}
+        			{{end = datetime.strptime(str(year.yearp+1) + '-' + str(month[2]) +'-01', "%Y-%m-%d")}}
+        		{{else:}}
+        			{{end = datetime.strptime(str(year.yearp) + '-' + str(month[2]) +'-01', "%Y-%m-%d")}}
+        		{{pass}}
 				<tr>
 					<td>
-						<a id="s{{=semestre.id}}_all" style="white-space:nowrap;">{{=T(semestre.period.name)}} {{=semestre.yearp}}</a>
+						<center>
+							<a id="m{{=month[0]}}_all" style="white-space:nowrap; cursor:pointer;">{{=month[1]}}</a>
+						</center>
 					</td>
 					<td>
-						<center><a id="s{{=semestre.id}}_i" class="badge badge-success" style="white-space:nowrap;">{{=obtenerTotalNivel('i',semestre.id)}}</a></center>
+						<center>
+							<a class="badge badge-success" style="white-space:nowrap;">
+								{{=db((db.grades_log.project==project.name)&(db.grades_log.yearp==year.yearp)&(db.grades_log.period==T(year.period.name))&(db.grades_log.operation_log=='insert')).count()}}
+							</a>
+						</center>
 					</td>
 					<td>
-						<center><a id="s{{=semestre.id}}_u" class="badge badge-info" style="white-space:nowrap;">{{=obtenerTotalNivel('u',semestre.id)}}</a></center>
+						<center>
+							<a class="badge badge-info" style="white-space:nowrap;">
+								{{=db((db.grades_log.project==project.name)&(db.grades_log.yearp==year.yearp)&(db.grades_log.period==T(year.period.name))&(db.grades_log.operation_log=='update')).count()}}
+							</a>
+						</center>
 					</td>
 					<td>
-						<center><a id="s{{=semestre.id}}_d" class="badge badge-important" style="white-space:nowrap;">{{=obtenerTotalNivel('d',semestre.id)}}</a></center>
+						<center>
+							<a class="badge badge-important" style="white-space:nowrap;">
+								{{=db((db.grades_log.project==project.name)&(db.grades_log.yearp==year.yearp)&(db.grades_log.period==T(year.period.name))&(db.grades_log.operation_log=='delete')).count()}}
+							</a>
+						</center>
 					</td>
 				</tr>
 				<tr>
 					<td colspan="4">
-						<div id="div_s{{=semestre.id}}" style="display: none;">
+						<div id="div_m{{=month[0]}}" style="display: none;">
 							Cargando
 						</div>
 					</td>
@@ -39,25 +60,3 @@
 		</table>
 	</div>
 </div>
-<script type="text/javascript">
-    $(document).ready(function(){
-        {{for semestre in obtenerSemestres():}}
-            $("#s{{=semestre.id}}_all").click(function(){
-                $("#div_s{{=semestre.id}}").toggle();
-                $("#div_s{{=semestre.id}}").load("{{=URL('report_management','student_management_n2.load')}}?tipo=all&amp;semestre="+{{=semestre.id}});
-            })
-            $("#s{{=semestre.id}}_i").click(function(){
-                $("#div_s{{=semestre.id}}").toggle();
-                $("#div_s{{=semestre.id}}").load("{{=URL('report_management','student_management_n2.load')}}?tipo=i&amp;semestre="+{{=semestre.id}});
-            })
-            $("#s{{=semestre.id}}_u").click(function(){
-                $("#div_s{{=semestre.id}}").toggle();
-                $("#div_s{{=semestre.id}}").load("{{=URL('report_management','student_management_n2.load')}}?tipo=u&amp;semestre="+{{=semestre.id}});
-            })
-            $("#s{{=semestre.id}}_d").click(function(){
-                $("#div_s{{=semestre.id}}").toggle();
-                $("#div_s{{=semestre.id}}").load("{{=URL('report_management','student_management_n2.load')}}?tipo=d&amp;semestre="+{{=semestre.id}});
-            })
-        {{pass}}
-    })
-</script>

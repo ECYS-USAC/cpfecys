@@ -919,18 +919,18 @@
 												</select>
 											{{elif tAct.name=='Primer Parcial' or tAct.name=='Segundo Parcial' or tAct.name=='Tercer Parcial':}}
 												<select class="generic-widget" id="edit_activity_name1" style="width:140px;">
-												{{if tAct.name=='Primer parcial':}}
+												{{if tAct.name=='Primer Parcial':}}
 													<option value="{{=tAct.name}}">{{=tAct.name}}</option>
 													<option value="Segundo Parcial">Segundo Parcial</option>
 													<option value="Tercer Parcial">Tercer Parcial</option>
-												{{elif tAct.name=='Segundo parcial':}}
-													<option value="Primer Parcial">Primer Parcial</option>
+												{{elif tAct.name=='Segundo Parcial':}}
 													<option value="{{=tAct.name}}">{{=tAct.name}}</option>
+													<option value="Primer Parcial">Primer Parcial</option>
 													<option value="Tercer Parcial">Tercer Parcial</option>
 												{{else:}}
+													<option value="{{=tAct.name}}">{{=tAct.name}}</option>
 													<option value="Primer Parcial">Primer Parcial</option>
 													<option value="Segundo Parcial">Segundo Parcial</option>
-													<option value="{{=tAct.name}}">{{=tAct.name}}</option>
 												{{pass}}
 												</select>
 											{{else:}}
