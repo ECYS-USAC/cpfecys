@@ -1920,6 +1920,8 @@
 				createRequest=0;
 				jQuery('#div_request_detail').empty();
 				$("#div_request_detail").css("display", "none");
+				$("#div_request_show").empty();
+				$("#div_request_show").append("{{=T('Loading')}}...");
 				$("#div_request_show").load("{{=URL('activity_control','requestchangeactivity.html')}}?op=createRequestChangeL&amp;create=y&amp;project={{=request.vars['project']}}&amp;year={{=request.vars['year']}}&amp;activity_description_request_var="+encodeURIComponent(activity_description_request_var)+"&amp;category="+category);
 			}
 		}
