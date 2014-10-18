@@ -105,12 +105,12 @@ def students_control():
                 academic_assig = db((db.academic_course_assignation.carnet == academic_var.id) & (db.academic_course_assignation.semester == year.id) & (db.academic_course_assignation.assignation==project_var) ).select().first()
                 
                 if academic_assig is None:
-                    session.flash=T('You do not have permission to view course requests')
+                    session.flash=T('Not valid Action.')
                     redirect(URL('default','index'))
                 
                     
             except:
-                session.flash=T('You do not have permission to view course requests')
+                session.flash=T('Not valid Action.')
                 redirect(URL('default','index'))
         
     return dict(project = project_var, year = year.id , name = project_select.name, nameP=(T(year.period.name)+" "+str(year.yearp)))
@@ -795,10 +795,10 @@ def students_control_full():
                 academic_assig = db((db.academic_course_assignation.carnet == academic_var.id) & (db.academic_course_assignation.semester == year.id) & (db.academic_course_assignation.assignation==project_var) ).select().first()
             
                 if academic_assig is None:
-                    session.flash=T('You do not have permission to view course requests')
+                    session.flash=T('Not valid Action.')
                     redirect(URL('default','index'))
             except:
-                session.flash=T('You do not have permission to view course requests')
+                session.flash=T('Not valid Action.')
                 redirect(URL('default','index'))
     
 

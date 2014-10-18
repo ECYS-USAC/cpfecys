@@ -55,7 +55,7 @@
 						<td>
 							<center>
 								<span id="average_lab_{{=course.user_project.project.id}}" >
-									{{=T('Calculating')}}
+									{{=T('Calculating')}}...
 	          					</span>
           					</center>
 						</td>
@@ -209,14 +209,14 @@
 								 $("#label_average_course_{{=course.academic_course_assignation.assignation}}").load("{{=URL('activity_control','semaphore.load')}}?project={{=course.academic_course_assignation.assignation}}&amp;period={{=periodo.id}}&amp;op=1&amp;academic={{=course.academic_course_assignation.id}}");
 							</script>
 							<center>
-								<span id="average_course_{{=course.academic_course_assignation.assignation}}" >
+								<span id="average_course_{{=course.academic_course_assignation.assignation}}_academic" >
 
           						</span>
 							</center>
 						</td>
 						<td>
 							<center>
-								<span id="average_lab_{{=course.academic_course_assignation.assignation}}" >
+								<span id="average_lab_{{=course.academic_course_assignation.assignation}}_academic" >
 									{{=T('Calculating')}}...
 	          					</span>
           					</center>
