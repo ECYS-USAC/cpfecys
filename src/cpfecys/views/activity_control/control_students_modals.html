@@ -123,7 +123,7 @@
                   
                 </td>
                 <td align="left"  >
-                  <div class="well span11" id="getViewDiv" style="overflow:auto; height:200px; width:300px;">
+                  <div class="well span11" id="getViewDiv" style="overflow:auto; width:300px;">
                     
                   </div>
                 </td>
@@ -131,7 +131,7 @@
               <tr >
                 <td>
                   <div align="right">
-                    <a id="getWeightingButton" role="button" class="btn btn-info"  
+                    <a id="getWeightingButton" role="button" class="btn btn-success"  
                     title="{{=T('Get weighting of the chosen semester')}}"> 
                     <span class="icon-plus-sign"></span>
                     {{=T('Get Weighting')}}
@@ -139,7 +139,12 @@
                   </div>
                 </td>
                 <td >
-                 
+                  <div align="right">
+                    <a href="{{=URL('activity_control', 'students_control', vars=dict(project = request.vars['project'], period = request.vars['year']))}}" role="button" class="btn btn-info"  > 
+                      <span class="icon-ok-circle"></span>
+                      {{=T('Finalize')}}
+                       </a>
+                  </div>
                 </td>
               </tr>
           </table>
