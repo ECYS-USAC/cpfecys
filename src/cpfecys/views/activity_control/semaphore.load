@@ -113,38 +113,48 @@
 {{controlP = db((db.student_control_period.period_name==comparation)).select().first()}}
 
 
+{{string_temp=""}}
+{{try:}}
+	{{if request.vars['academic'] != None:}}
+		{{string_temp="_academic"}}
+	{{pass}}
+{{except:}}
+	{{string_temp=""}}
+{{pass}}
+
 <script type="text/javascript">
 	{{if average_class < float(controlP.min_average):}}
-		document.getElementById('average_course_{{=request.vars['project']}}').className = "label label-important";
+		document.getElementById('average_course_{{=request.vars['project']}}{{=string_temp}}').className = "label label-important";
 	{{elif average_class>=float(controlP.min_average) and average_class <= float(controlP.max_average):}}
-		document.getElementById('average_course_{{=request.vars['project']}}').className = "label label-warning";
+		document.getElementById('average_course_{{=request.vars['project']}}{{=string_temp}}').className = "label label-warning";
 	{{else:}}
-		document.getElementById('average_course_{{=request.vars['project']}}').className = "label label-success";
+		document.getElementById('average_course_{{=request.vars['project']}}{{=string_temp}}').className = "label label-success";
 	{{pass}}
-		jQuery("#average_course_{{=request.vars['project']}}").append("{{=round(average_class,2)}}");
+		jQuery("#average_course_{{=request.vars['project']}}{{=string_temp}}").append("{{=round(average_class,2)}}");
 </script>
 
 <script type="text/javascript">
 	{{if average_laboratory < float(controlP.min_average):}}
-		document.getElementById('average_lab_{{=request.vars['project']}}').className = "label label-important";
+		document.getElementById('average_lab_{{=request.vars['project']}}{{=string_temp}}').className = "label label-important";
 	{{elif average_laboratory >= float(controlP.min_average) and average_laboratory <= float(controlP.max_average):}}
-		document.getElementById('average_lab_{{=request.vars['project']}}').className = "label label-warning";
+		document.getElementById('average_lab_{{=request.vars['project']}}{{=string_temp}}').className = "label label-warning";
 	{{else:}}
-		document.getElementById('average_lab_{{=request.vars['project']}}').className = "label label-success";
+		document.getElementById('average_lab_{{=request.vars['project']}}{{=string_temp}}').className = "label label-success";
 	{{pass}}
 		{{if request.vars['op'] =='1':}}
 			{{academic_var = db(db.academic_course_assignation.id == request.vars['academic']).select().first()}}
 			{{if academic_var.laboratorio == False:}}
-				jQuery('#average_lab_{{=request.vars['project']}}').empty();
-				document.getElementById('average_lab_{{=request.vars['project']}}').className = "label label-inverse";
-				jQuery("#average_lab_{{=request.vars['project']}}").append("{{=T('Not assigned')}}");
+				jQuery('#average_lab_{{=request.vars['project']}}{{=string_temp}}').empty();
+				document.getElementById('average_lab_{{=request.vars['project']}}{{=string_temp}}').className = "label label-inverse";
+				jQuery("#average_lab_{{=request.vars['project']}}_academic").append("{{=T('Not assigned')}}");
 			{{else:}}
-				jQuery("#average_lab_{{=request.vars['project']}}").append("{{=round(average_laboratory,2)}}");
+				jQuery('#average_lab_{{=request.vars['project']}}{{=string_temp}}').empty();
+				jQuery("#average_lab_{{=request.vars['project']}}{{=string_temp}}").append("{{=round(average_laboratory,2)}}");
 			{{pass}}
 			
 		{{else:}}
-			jQuery('#average_lab_{{=request.vars['project']}}').empty();
-			jQuery("#average_lab_{{=request.vars['project']}}").append("{{=round(average_laboratory,2)}}");
+			jQuery('#average_lab_{{=request.vars['project']}}{{=string_temp}}').empty();
+			jQuery("#average_lab_{{=request.vars['project']}}{{=string_temp}}").append("{{=round(average_laboratory,2)}}");
 		{{pass}}
 </script>
 			
