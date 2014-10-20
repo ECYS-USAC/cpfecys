@@ -1034,37 +1034,63 @@ def requestchangeactivity():
             if Draft.course_activity_category!=int(request.vars['category']):
                 stateRequest=-1
             else:
-                #Update the request change activity
-                db(db.requestchange_activity.id==Draft.id).update(description=request.vars['activity_description_request_var'],status='Pending', date_request = datetime.datetime.now())
-                Draft = db((db.requestchange_activity.status=='Pending')&(db.requestchange_activity.semester==year.id)&(db.requestchange_activity.course==project.id)).select().first()
-                #Log of request change activity
-                idR = db.requestchange_activity_log.insert(user_request=Draft.user_id.username, roll_request='Student', status='Pending', description=request.vars['activity_description_request_var'], date_request=Draft.date_request, category_request=Draft.course_activity_category.category.category, semester=year.period.name, yearp=year.yearp, course=project.name)
-                activitiesChange = db(db.requestchange_course_activity.requestchange_activity==Draft.id).select()
-                for actChange in activitiesChange:
-                    db.requestchange_course_activity_log.insert(requestchange_activity=idR, operation_request=actChange.operation_request, activity=actChange.activity, name=actChange.name, description=actChange.description, grade=actChange.grade, date_start=actChange.date_start, date_finish=actChange.date_finish)
-                #Check the user project
-                check = db.user_project(project = request.vars['project'], period = request.vars['year'], assigned_user = auth.user.id)
-                #Message
-                users2 = db((db.auth_user.id==db.user_project.assigned_user)&(db.user_project.period == check.period) & (db.user_project.project==check.project)&(db.auth_membership.user_id==db.user_project.assigned_user)&(db.auth_membership.group_id==3)).select().first()
-                try:
-                    subject="Solicitud de cambio de actividades - "+project.name
-                    
-                    message2="<br>Por este medio se le informa que el(la) practicante "+check.assigned_user.first_name+" "+check.assigned_user.last_name+" ha creado una solicitud de cambio de actividades en la categoría \""+Draft.course_activity_category.category.category+"\" dentro de la ponderación de laboratorio del Curso de \""+project.name+"\"."
-                    message2=message2+"<br>Para aceptar o rechazar dicha solicitud dirigirse al control de solicitudes o al siguiente link: " + cpfecys.get_domain()+ "cpfecys/activity_control/solve_request_change_activity?course="+str(request.vars['project'])
-                    message2=message2+"<br>Saludos.<br><br>Sistema de Seguimiento de La Escuela de Ciencias y Sistemas<br>Facultad de Ingeniería - Universidad de San Carlos de Guatemala</html>"
-
-                    #Send Mail to the Teacher
-                    message="<html>Catedratico(a) "+users2.auth_user.first_name+" "+users2.auth_user.last_name+" reciba un cordial saludo.<br>"
-                    message3=message+message2
-                    fail1 = send_mail_to_students(message3,subject,users2.auth_user.email,check,year.period.name,year.yearp)
-                    #Refresh the var Draft
-                    Draft=None
-                    if fail1==1:
-                        stateRequest=2
+                functionAction=False
+                rgrades = db((db.request_change_grades.status=='pending')&(db.request_change_grades.period==int(year.id))&(db.request_change_grades.project==int(project.id))).select()
+                if rgrades.first()==None:
+                    functionAction=True
+                else:
+                    validation_change=False
+                    acrc_t = db((db.course_activity.course_activity_category==int(request.vars['category']))&(db.course_activity.semester==int(year.id))&(db.course_activity.assignation==int(project.id))&(db.course_activity.laboratory==True)).select()
+                    for rgrades_iterator in rgrades:
+                        for acrc in acrc_t:
+                            if rgrades_iterator.activity==acrc.id:
+                                validation_change=True
+                            pass
+                        pass
+                    pass
+                    if validation_change==False:
+                        functionAction=True
                     else:
-                        stateRequest=4
-                except:
-                    stateRequest=2
+                        if Draft!=None:
+                            db(db.requestchange_activity.id==Draft.id).delete()
+                        pass
+                    pass
+                pass
+                if functionAction==True:
+                    #Update the request change activity
+                    db(db.requestchange_activity.id==Draft.id).update(description=request.vars['activity_description_request_var'],status='Pending', date_request = datetime.datetime.now())
+                    Draft = db((db.requestchange_activity.status=='Pending')&(db.requestchange_activity.semester==year.id)&(db.requestchange_activity.course==project.id)).select().first()
+                    #Log of request change activity
+                    idR = db.requestchange_activity_log.insert(user_request=Draft.user_id.username, roll_request='Student', status='Pending', description=request.vars['activity_description_request_var'], date_request=Draft.date_request, category_request=Draft.course_activity_category.category.category, semester=year.period.name, yearp=year.yearp, course=project.name)
+                    activitiesChange = db(db.requestchange_course_activity.requestchange_activity==Draft.id).select()
+                    for actChange in activitiesChange:
+                        db.requestchange_course_activity_log.insert(requestchange_activity=idR, operation_request=actChange.operation_request, activity=actChange.activity, name=actChange.name, description=actChange.description, grade=actChange.grade, date_start=actChange.date_start, date_finish=actChange.date_finish)
+                    #Check the user project
+                    check = db.user_project(project = request.vars['project'], period = request.vars['year'], assigned_user = auth.user.id)
+                    #Message
+                    users2 = db((db.auth_user.id==db.user_project.assigned_user)&(db.user_project.period == check.period) & (db.user_project.project==check.project)&(db.auth_membership.user_id==db.user_project.assigned_user)&(db.auth_membership.group_id==3)).select().first()
+                    try:
+                        subject="Solicitud de cambio de actividades - "+project.name
+                        
+                        message2="<br>Por este medio se le informa que el(la) practicante "+check.assigned_user.first_name+" "+check.assigned_user.last_name+" ha creado una solicitud de cambio de actividades en la categoría \""+Draft.course_activity_category.category.category+"\" dentro de la ponderación de laboratorio del Curso de \""+project.name+"\"."
+                        message2=message2+"<br>Para aceptar o rechazar dicha solicitud dirigirse al control de solicitudes o al siguiente link: " +  +cpfecys.get_domain()+ "cpfecys/activity_control/solve_request_change_activity?course="+str(request.vars['project'])
+                        message2=message2+"<br>Saludos.<br><br>Sistema de Seguimiento de La Escuela de Ciencias y Sistemas<br>Facultad de Ingeniería - Universidad de San Carlos de Guatemala</html>"
+
+                        #Send Mail to the Teacher
+                        message="<html>catedratico(a) "+users2.auth_user.first_name+" "+users2.auth_user.last_name+" reciba un cordial saludo.<br>"
+                        message3=message+message2
+                        fail1 = send_mail_to_students(message3,subject,users2.auth_user.email,check,year.period.name,year.yearp)
+                        #Refresh the var Draft
+                        Draft=None
+                        if fail1==1:
+                            stateRequest=2
+                        else:
+                            stateRequest=4
+                    except:
+                        stateRequest=2
+                else:
+                    Draft=None
+                    stateRequest=5
 
 
     requestC=db((db.requestchange_activity.course==project.id)&(db.requestchange_activity.semester==year.id)&(db.requestchange_activity.status=='Pending')).select()

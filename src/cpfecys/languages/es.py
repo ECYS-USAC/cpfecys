@@ -1946,6 +1946,7 @@
 'You can download the example file example pressing the download button.': 'Puede descargar el archivo de ejemplo para cargar estudiantes presionando el botón "Descargar Ejemplo".',
 'You can modify this application and adapt it to your needs': 'Usted puede modificar esta aplicación y adaptarla a sus necesidades',
 'You can not create a change request activity since there is a change request weighting is not answered.': 'No puede crearse una solicitud de cambio de actividad puesto que existe una solicitud de cambio de ponderación que no ha sido resuelta.',
+'You can not create a change request activity while there is a change request notes in an activity that is within the category to which you want to apply the changes.': 'You can not create a change request activity while there is a change request notes in an activity that is within the category to which you want to apply the changes.',
 'You do not have permission to view course requests': 'No tiene permisos para visualizar la solicitud de cambios',
 'You have created the change request successfully. It is failure notice to teacher in charge of the course': 'Ha creado la solicitud de cambio con éxito. Ha fallado la notificación al Catedratico a cargo del curso',
 'You have created the change request successfully. It is reported by email to teacher in charge of the course': 'Ha creado la solicitud de cambio con éxito. Se ha reportado por correo electrónico al catedrático a cargo del curso',
