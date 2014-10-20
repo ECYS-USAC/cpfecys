@@ -266,9 +266,7 @@ def grades():
         exist_activity_request_change = True
 
 
-    print "entrooooooooooo exist_request_change:"+str(exist_request_change)  
-    print "entrooooooooooo exist_activity_request_change:"+str(exist_activity_request_change)    
-
+    
     #Permition to add grades
     exception_query = db(db.course_laboratory_exception.project == id_project).select().first()
     exception_s_var = False
@@ -1073,7 +1071,7 @@ def requestchangeactivity():
                         subject="Solicitud de cambio de actividades - "+project.name
                         
                         message2="<br>Por este medio se le informa que el(la) practicante "+check.assigned_user.first_name+" "+check.assigned_user.last_name+" ha creado una solicitud de cambio de actividades en la categoría \""+Draft.course_activity_category.category.category+"\" dentro de la ponderación de laboratorio del Curso de \""+project.name+"\"."
-                        message2=message2+"<br>Para aceptar o rechazar dicha solicitud dirigirse al control de solicitudes o al siguiente link: " +  +cpfecys.get_domain()+ "cpfecys/activity_control/solve_request_change_activity?course="+str(request.vars['project'])
+                        message2=message2+"<br>Para aceptar o rechazar dicha solicitud dirigirse al control de solicitudes o al siguiente link: " +  cpfecys.get_domain()+ "cpfecys/activity_control/solve_request_change_activity?course="+str(request.vars['project'])
                         message2=message2+"<br>Saludos.<br><br>Sistema de Seguimiento de La Escuela de Ciencias y Sistemas<br>Facultad de Ingeniería - Universidad de San Carlos de Guatemala</html>"
 
                         #Send Mail to the Teacher
