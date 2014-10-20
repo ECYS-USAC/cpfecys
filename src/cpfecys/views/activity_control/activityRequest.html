@@ -155,18 +155,16 @@
 				</tr>
 			{{pass}}
 			<tr>
-				<td colspan="3"></td>
-				<td><center>
-					<a role="button" class="btn btn-success"  title="{{=T('Accept the change request planning')}}" href="{{=URL('activity_control', 'solve_request_change_activity/solve', vars=dict(requestID=Request.id, course=Request.course))}}"> <span class="icon-white icon-remove-sign"></span>{{=T('Accept Request')}}</a>
-				</center></td>
-				<td><center>
-					<a class="btn btn-danger" title="{{=T('Cancel the change request')}}" href="{{=URL('activity_control', 'solve_request_change_activity/reject', vars=dict(requestID=Request.id, course=Request.course))}}">
-						{{=T('Cancel request')}}
-					</a>
-				</center></td>
-				<td><center>
-					<a class="btn" title="{{=T('Close the detail of the change request')}}" onclick="closeDetail();">{{=T('Close Detail')}}</a>
-				</center></td>
+				<td colspan="6">
+					<div align="right">
+						<a role="button" class="btn btn-success"  title="{{=T('Accept the change request planning')}}" href="{{=URL('activity_control', 'solve_request_change_activity/solve', vars=dict(requestID=Request.id, course=Request.course))}}"> <span class="icon-white icon-ok"></span>{{=T('Accept Request')}}</a>
+					
+						<a class="btn btn-danger" title="{{=T('Cancel the change request')}}" href="{{=URL('activity_control', 'solve_request_change_activity/reject', vars=dict(requestID=Request.id, course=Request.course))}}"><span class="icon-white icon-remove-sign"></span> {{=T('Cancel request')}}
+						</a>
+					
+						<a class="btn" title="{{=T('Close the detail of the change request')}}" onclick="closeDetail();">{{=T('Close Detail')}}</a>
+					</div>
+				</td>
 			</tr>
 		</table>
 	{{pass}}

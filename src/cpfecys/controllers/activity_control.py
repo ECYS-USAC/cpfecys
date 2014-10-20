@@ -472,7 +472,7 @@ def grades():
             message="<html>Catedratico(a) "+users2.auth_user.first_name+" "+users2.auth_user.last_name+" reciba un cordial saludo.<br>"
             message3=message+message2
 
-            fail1 = send_mail_to_students(message3,subject,users2.auth_user.email,check,var_period.period.name,var_period.yearp) 
+            #fail1 = send_mail_to_students(message3,subject,users2.auth_user.email,check,var_period.period.name,var_period.yearp) 
             if fail1==1:
                 alert_message = True
                 message_var2 = T("Request has been sent") + ". " + T("Failed to send email to teacher")
@@ -623,7 +623,7 @@ def request_change_weighting():
                     #Send Mail to the Teacher
                     message="<html>Catedratico(a) "+users2.auth_user.first_name+" "+users2.auth_user.last_name+" reciba un cordial saludo.<br>"
                     message3=message+message2
-                    fail1 = send_mail_to_students(message3,subject,users2.auth_user.email,check,year_semester.name,year.yearp) 
+                    #fail1 = send_mail_to_students(message3,subject,users2.auth_user.email,check,year_semester.name,year.yearp) 
                     if fail1==1:
                         response.flash = T("Request has been sent") + " - " + T("Failed to send email to teacher")
                     else:
@@ -1077,7 +1077,7 @@ def requestchangeactivity():
                         #Send Mail to the Teacher
                         message="<html>catedratico(a) "+users2.auth_user.first_name+" "+users2.auth_user.last_name+" reciba un cordial saludo.<br>"
                         message3=message+message2
-                        fail1 = send_mail_to_students(message3,subject,users2.auth_user.email,check,year.period.name,year.yearp)
+                        #fail1 = send_mail_to_students(message3,subject,users2.auth_user.email,check,year.period.name,year.yearp)
                         #Refresh the var Draft
                         Draft=None
                         if fail1==1:
