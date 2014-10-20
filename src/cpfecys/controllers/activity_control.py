@@ -473,6 +473,7 @@ def grades():
             message3=message+message2
 
             #fail1 = send_mail_to_students(message3,subject,users2.auth_user.email,check,var_period.period.name,var_period.yearp) 
+            fail1=0#Esto hay que quitarlo****************************************************************************************************************!!!!!!!
             if fail1==1:
                 alert_message = True
                 message_var2 = T("Request has been sent") + ". " + T("Failed to send email to teacher")
@@ -558,13 +559,26 @@ def request_change_weighting():
             db((db.request_change_weighting.period == year.id) & (db.request_change_weighting.project == request.vars['project']) & ((db.request_change_weighting.status != 'accepted') & (db.request_change_weighting.status != 'rejected'))).delete()
             response.flash = T("Request has been canceled")
         if (request.args(0) == 'request'):
+            
             if str(request.vars['description']) == "":
                 response.flash = "Error. "+ T("Please enter a description")
             else:
-                
-                if session.total_var != 100:
-                    if session.total_var != None:
-                        response.flash = "Error. "+ T("The sum of the weighting is incorrect") + ": " + str(session.total_var)
+
+                total_var2 = 0
+                if request.vars['type'] == 'course':
+                    for project in db((db.course_activity_category.semester==year.id) & (db.course_activity_category.assignation==request.vars['project']) & (db.course_activity_category.laboratory==False)).select():     
+                        total_var2 = float(total_var2) + float(project.grade)               
+                    pass
+                else:
+                    for project in db((db.course_activity_category.semester==year.id) & (db.course_activity_category.assignation==request.vars['project']) & (db.course_activity_category.laboratory==True)).select():      
+                        total_var2 = float(total_var2) + float(project.grade)               
+                    pass
+                pass
+
+                if float(total_var2) != float(100):
+                    if total_var2 != None:
+                        response.flash = "Error. "+ T("The sum of the weighting is incorrect") + ": " + str(total_var2)
+                   
                 else:
                     
                     temp = db((db.request_change_weighting.period == year.id) & (db.request_change_weighting.project == request.vars['project']) & ((db.request_change_weighting.status != 'accepted') & (db.request_change_weighting.status != 'rejected')) ).select().first()
@@ -624,6 +638,7 @@ def request_change_weighting():
                     message="<html>Catedratico(a) "+users2.auth_user.first_name+" "+users2.auth_user.last_name+" reciba un cordial saludo.<br>"
                     message3=message+message2
                     #fail1 = send_mail_to_students(message3,subject,users2.auth_user.email,check,year_semester.name,year.yearp) 
+                    fail1=0#Esto hay que quitarlo****************************************************************************************************************!!!!!!!
                     if fail1==1:
                         response.flash = T("Request has been sent") + " - " + T("Failed to send email to teacher")
                     else:
@@ -638,7 +653,6 @@ def request_change_weighting():
     except:
         None
 
-    session.total_var = None
     return dict(name = check.name,
         semester = year_semester.name,
         year = year.yearp,
@@ -649,7 +663,6 @@ def request_change_weighting():
 @auth.requires_login()
 @auth.requires(auth.has_membership('Student') or auth.has_membership('Super-Administrator') or auth.has_membership('Ecys-Administrator') or auth.has_membership('Teacher'))
 def request_change_weighting_load():
-    session.total_var = None
     import cpfecys
     year = db(db.period_year.id == request.vars['year']).select().first() 
     year_semester = year.period
@@ -1078,6 +1091,7 @@ def requestchangeactivity():
                         message="<html>catedratico(a) "+users2.auth_user.first_name+" "+users2.auth_user.last_name+" reciba un cordial saludo.<br>"
                         message3=message+message2
                         #fail1 = send_mail_to_students(message3,subject,users2.auth_user.email,check,year.period.name,year.yearp)
+                        fail1=0#Esto hay que quitarlo****************************************************************************************************************!!!!!!!
                         #Refresh the var Draft
                         Draft=None
                         if fail1==1:
