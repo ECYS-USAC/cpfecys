@@ -65,7 +65,7 @@
     document.getElementById('information_text').className = "badge badge-important";
     jQuery('#information_text').empty();
   </script>
-  {{if exist_request_change == True:}}
+  {{if (exist_request_change == True) or (exist_activity_request_change == True):}}
           <script type="text/javascript">
             alert("{{=T('Can not make operation because there is a pending request change. Please resolve it before proceeding.')}}");
           </script>
@@ -125,7 +125,7 @@
     document.getElementById('information_text').className = "badge badge-important";
     jQuery('#information_text').empty();
   </script>
-    {{if exist_request_change == True:}}
+    {{if (exist_request_change == True) or (exist_activity_request_change == True):}}
           <script type="text/javascript">
             alert("{{=T('Can not make operation because there is a pending request change. Please resolve it before proceeding.')}}");
           </script>

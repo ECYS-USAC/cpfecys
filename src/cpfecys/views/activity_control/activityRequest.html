@@ -141,7 +141,15 @@
 					<td>{{=change.operation_request}}</td>
 					<td>{{=change.name}}</td>
 					<td>{{=change.description}}</td>
-					<td>{{=change.grade}}</td>
+					<td>
+						{{if change.grade == 0:}}
+							<label style ="cursor:help;" title="{{=T('Average Grade')}}">
+								{{=T('AG')}}
+							</label>
+						{{else:}}
+							{{=change.grade}}
+						{{pass}}
+					</td>
 					<td>{{=change.date_start}}</td>
 					<td>{{=change.date_finish}}</td>
 				</tr>
@@ -236,7 +244,15 @@
 					<td>{{=change.operation_request}}</td>
 					<td>{{=change.name}}</td>
 					<td>{{=change.description}}</td>
-					<td>{{=change.grade}}</td>
+					<td>
+					{{if change.grade == 0:}}
+						<label style ="cursor:help;" title="{{=T('Average Grade')}}">
+							{{=T('AG')}}
+						</label>
+					{{else:}}
+						{{=change.grade}}
+					{{pass}}
+					</td>
 					<td>{{=change.date_start}}</td>
 					<td>{{=change.date_finish}}</td>
 				</tr>
