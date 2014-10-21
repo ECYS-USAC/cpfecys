@@ -9,6 +9,7 @@ def index():
 @auth.requires_membership('Teacher')
 def todo_reports():
     #show the reports that haven't already been checked based on current assignations of the teacher
+    
     data = db((db.report.status == db.report_status.id)&
        ((db.report_status.name == 'Grading')|(db.report_status.name == 'EnabledForTeacher'))&
        (db.report.assignation == db.user_project.id)&
