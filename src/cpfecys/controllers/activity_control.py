@@ -2822,3 +2822,14 @@ def grades_management():
         vecMonth.append(tmpMonth)
 
     return dict(project = project, year = year, vecMonth=vecMonth)
+
+@auth.requires_login()
+@auth.requires(auth.has_membership('Teacher'))
+def grades_report():
+    return "<b>En construcción disculpe las molestias.</b>"
+    
+@auth.requires_login()
+@auth.requires(auth.has_membership('Teacher'))
+def laboratory_revalidation():
+    return "<b>En construcción disculpe las molestias.</b>"
+    

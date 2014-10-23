@@ -109,8 +109,8 @@ if auth.has_membership(role="Teacher"):
                 (T('Academic Control'), False, URL('activity_control','courses_list'), []),
 
                 (T('Reports'), False, URL(), [
-                    (T('Grades'), False, URL('student_academic', 'student_courses'), []),
-                    (T('Laboratory Revalidation'), False, URL('student_academic','academic'), []),    
+                    (T('Grades'), False, URL('activity_control', 'grades_report'), []),
+                    (T('Laboratory Revalidation'), False, URL('activity_control','laboratory_revalidation'), []),    
                  ]),
 
                 ]),
