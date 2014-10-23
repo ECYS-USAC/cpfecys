@@ -66,13 +66,11 @@
 			{{pass}}
 		</tr>
 		<tr>
-			<th>{{=T('Status')}}:</th>
+			<th>{{=T('User resolution')}}</th>
 			{{if Request.status=='pending':}}
-				<th><FONT COLOR="#5E610B">{{=T(Request.status)}}</font></th>
-			{{elif Request.status=='accepted':}}
-				<th><FONT COLOR="Green">{{=T(Request.status)}}</font></th>
+				<td>---</td>
 			{{else:}}
-				<th><FONT COLOR="Red">{{=T(Request.status)}}</font></th>
+				<td>{{=Request.resolve_user.username}}</td>
 			{{pass}}
 			<th>{{=T('Date of resolution')}}</th>
 			{{if Request.status=='pending':}}
@@ -85,6 +83,16 @@
 				<td>---</td>
 			{{else:}}
 				<td>{{=Request.roll_resolve}}</td>
+			{{pass}}
+		</tr>
+		<tr>
+			<th>{{=T('Status')}}:</th>
+			{{if Request.status=='pending':}}
+				<th colspan="5"><FONT COLOR="#5E610B">{{=T(Request.status)}}</font></th>
+			{{elif Request.status=='accepted':}}
+				<th colspan="5"><FONT COLOR="Green">{{=T(Request.status)}}</font></th>
+			{{else:}}
+				<th colspan="5"><FONT COLOR="Red">{{=T(Request.status)}}</font></th>
 			{{pass}}
 		</tr>
 		<tr>
@@ -198,7 +206,7 @@
 													{{if project.after_specific_grade == "true":}}
 														{{var_SG = False}}
 													{{pass}}
-													{{=T(var_SG)}}
+													{{=T(str(var_SG))}}
 
 												</td>
 											{{pass}}
@@ -220,7 +228,7 @@
 													{{if project.after_specific_grade == "true":}}
 														{{var_SG = False}}
 													{{pass}}
-													{{=T(var_sg)}}
+													{{=T(str(var_SG))}}
 													</font>
 												</td>
 											{{pass}}
@@ -242,7 +250,7 @@
 													{{if project.after_specific_grade == "true":}}
 														{{var_SG = False}}
 													{{pass}}
-													{{=T(var_sg)}}
+													{{=T(str(var_SG))}}
 													</font>
 												</td>
 											{{pass}}

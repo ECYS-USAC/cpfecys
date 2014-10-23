@@ -66,13 +66,11 @@
 			{{pass}}
 		</tr>
 		<tr>
-			<th>{{=T('Status')}}:</th>
+			<th>{{=T('User resolution')}}</th>
 			{{if Request.status=='pending':}}
-				<th><FONT COLOR="#5E610B">{{=T(Request.status)}}</font></th>
-			{{elif Request.status=='accepted':}}
-				<th><FONT COLOR="Green">{{=T(Request.status)}}</font></th>
+				<td>---</td>
 			{{else:}}
-				<th><FONT COLOR="Red">{{=T(Request.status)}}</font></th>
+				<td>{{=Request.resolve_user.username}}</td>
 			{{pass}}
 			<th>{{=T('Date of resolution')}}</th>
 			{{if Request.status=='pending':}}
@@ -86,6 +84,29 @@
 			{{else:}}
 				<td>{{=Request.roll_resolve}}</td>
 			{{pass}}
+		</tr>
+		<tr>
+			<th>{{=T('Status')}}</th>
+			{{if Request.status=='pending':}}
+				<th><FONT COLOR="#5E610B">{{=T(Request.status)}}</font></th>
+			{{elif Request.status=='accepted':}}
+				<th><FONT COLOR="Green">{{=T(Request.status)}}</font></th>
+			{{else:}}
+				<th><FONT COLOR="Red">{{=T(Request.status)}}</font></th>
+			{{pass}}
+			<tH>
+				{{=T('Activity')}}
+			</tH>
+			<td >
+				{{=Request.activity.name}}
+			</td>
+			<tH>
+				{{=T('Category')}}
+			</tH>
+			<td >
+				{{=Request.activity.course_activity_category.category.category}}
+			</td>
+			
 		</tr>
 		<tr>
 			<th>{{=T('Description')}}:</th>

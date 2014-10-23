@@ -682,7 +682,8 @@ def courses_report():
                 reports = db(db.report.assignation==assignation.id
                     ).select()
                 for report in reports:
-                    hours += report.hours
+                    if report.hours != None:
+                        hours += report.hours
                 sub_response = [assignation.assigned_user.first_name +\
                     ' ' + assignation.assigned_user.last_name + \
                     ', ' + assignation.assigned_user.username, hours]

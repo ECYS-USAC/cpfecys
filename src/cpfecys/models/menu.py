@@ -89,8 +89,15 @@ if auth.has_membership(role="Teacher"):
         var_count = var_count + db((db.request_change_weighting.status=='pending')&(db.request_change_weighting.period==current_year_period().id)&(db.request_change_weighting.project==project.project)).count()
         var_count = var_count + db((db.requestchange_activity.status=='pending')&(db.requestchange_activity.semester==current_year_period().id)&(db.requestchange_activity.course==project.project)).count()
         var_count = var_count + db((db.request_change_grades.status=='pending')&(db.request_change_grades.period==current_year_period().id)&(db.request_change_grades.project==project.project)).count()
-        var_count_report = db((db.report.status == db.report_status.id)&((db.report_status.name == 'Grading')|(db.report_status.name == 'EnabledForTeacher'))&(db.report.assignation == project.project)&(db.user_project.assigned_user == auth.user.id)).count()
+
     pass
+
+    my_projects = db((db.user_project.assigned_user == auth.user.id)&(db.project.id == db.user_project.project)).select()
+    for project in my_projects:
+        for assignation in project.project.user_project.select():
+            q=((assignation.report((db.report.status == db.report_status.id)&((db.report_status.name == 'Grading')|(db.report_status.name == 'EnabledForTeacher')))))
+            var_count_report = var_count_report + q.count()
+
 
     response.menu.extend([(T('Courses'), False, URL(),[
              (T('Show Students'), False, URL('teacher', 'courses'), []),
@@ -102,8 +109,8 @@ if auth.has_membership(role="Teacher"):
                 (T('Academic Control'), False, URL('activity_control','courses_list'), []),
 
                 (T('Reports'), False, URL(), [
-                    (T('Grades'), False, URL('student_academic', 'student_courses'), []),
-                    (T('Laboratory Revalidation'), False, URL('student_academic','academic'), []),    
+                    (T('Grades'), False, URL('activity_control', 'grades_report'), []),
+                    (T('Laboratory Revalidation'), False, URL('activity_control','laboratory_revalidation'), []),    
                  ]),
 
                 ]),

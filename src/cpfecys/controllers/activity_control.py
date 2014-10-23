@@ -112,8 +112,12 @@ def students_control():
             except:
                 session.flash=T('Not valid Action.')
                 redirect(URL('default','index'))
-        
-    return dict(project = project_var, year = year.id , name = project_select.name, nameP=(T(year.period.name)+" "+str(year.yearp)))
+    assigantion = db((db.user_project.assigned_user == auth.user.id) & (db.user_project.period == year.id) & (db.user_project.project == project_var)).select().first()
+    if assigantion is None:
+        assigned_to_project = False
+    else:
+        assigned_to_project = True
+    return dict(project = project_var, year = year.id , name = project_select.name, nameP=(T(year.period.name)+" "+str(year.yearp)), assigned_to_project = assigned_to_project)
 
 
 
@@ -260,7 +264,13 @@ def grades():
     if db((db.request_change_grades.activity==var_activity.id)&(db.request_change_grades.status=='pending')).select().first() != None:
         exist_request_change = True
 
+    #Request exist_activity_request_change
+    exist_activity_request_change = False
+    if db((db.requestchange_course_activity.activity==var_activity.id)&(db.requestchange_activity.status=='pending')&(db.requestchange_course_activity.requestchange_activity==db.requestchange_activity.id)).select().first() != None:
+        exist_activity_request_change = True
 
+
+    
     #Permition to add grades
     exception_query = db(db.course_laboratory_exception.project == id_project).select().first()
     exception_s_var = False
@@ -315,6 +325,7 @@ def grades():
     cont_temp = 0
     #<!---------------------------INSERT---------------------------->
     if (request.vars['op'] == "add_grade") | (request.vars['op'] == "add_grade_list"):
+        send_mail_var = False
         for carnet_id in carnet_list: 
             if (request.vars['op'] == "add_grade"):
                 carnet_list = request.vars['carnet']
@@ -332,7 +343,7 @@ def grades():
                 assig_var =  db((db.academic_course_assignation.assignation==var_project.id) & (db.academic_course_assignation.semester==var_period.id) & (db.academic_course_assignation.carnet == academic_var.id)).select().first()
                   #--------------------------------------------INSERT GRADE-------------------------------------
                 if request_change_var == False:
-                    if exist_request_change == True:
+                    if (exist_request_change == True or exist_activity_request_change == True ):
                         add_grade_error = True
                         message_var = T('Can not make operation because there is a pending request change. Please resolve it before proceeding.')
                     else:
@@ -378,77 +389,62 @@ def grades():
                     pass  #------exist_request_change-==-True----
                   #--------------------------------------------INSERT REQUEST-------------------------------------
                 else:
-                    grade_before = db((db.grades.academic_assignation==assig_var.id) & (db.grades.activity==var_activity.id) ).select().first() 
-                    
-                    var_grade_before = None
-                    var_operation = 'insert'
-                    if grade_before != None:
-                        var_grade_before = grade_before.grade
-                        var_operation = 'update'
-                    pass
-                    
-                    request_change = db((db.request_change_grades.activity== var_activity.id) & (db.request_change_grades.status=='pending') ).select().first() 
-                    if request_change is None:
-                        grade = db.request_change_grades.insert(user_id = auth.user.id,
-                                                              activity = var_activity.id,
-                                                              status =  'pending',
-                                                              roll = rol_log,
-                                                              period = assig_var.semester.id,
-                                                              project = assig_var.assignation.id,
-                                                              description = request.vars['description_var'])
-                    
-                        #-------------------------------------LOG-----------------------------------------------
-                        log_id = db.request_change_g_log.insert(r_c_g_id = grade,
-                                                      username = auth.user.username,
-                                                      roll = rol_log,
-                                                      after_status = 'pending',
-                                                      description = request.vars['description_var'],
-                                                      description_log = T('Inserted from Grades page'),
-                                                      semester = T(assig_var.semester.period.name),
-                                                      yearp = assig_var.semester.yearp,
-                                                      activity = var_activity.name,
-                                                      category = var_activity.course_activity_category.category.category,
-                                                      project = assig_var.assignation.name
-                                                    )
-                    pass #--------request_change-is-None----
-                    request_change = db((db.request_change_grades.activity== var_activity.id) & (db.request_change_grades.status=='pending') ).select().first() 
-                    rq_grade = db.request_change_grades_detail.insert(request_change_grades = request_change.id,
-                                                                          academic_assignation = assig_var.id,
-                                                                          before_grade = var_grade_before,
-                                                                          operation_request = var_operation,
-                                                                          after_grade = request.vars['grade'])
-
-                    log_id = db((db.request_change_g_log.r_c_g_id== request_change.id) & (db.request_change_g_log.after_status=='pending') ).select().first() 
-
-                    db.request_change_grade_d_log.insert(request_change_g_log = log_id.id,
-                                                      operation_request = var_operation,
-                                                      academic = academic_var.carnet,
-                                                      before_grade = var_grade_before,
-                                                      after_grade = request.vars['grade']
-                                                      )
-                                    
-                    #send mail
-                    project_name = var_project.name
-                    project_id = id_project
-                    check = db.user_project(project = project_id, period = var_period.id, assigned_user = auth.user.id)
-                    #Message
-                    users2 = db((db.auth_user.id==db.user_project.assigned_user)&(db.user_project.period == check.period) & (db.user_project.project==check.project)&(db.auth_membership.user_id==db.user_project.assigned_user)&(db.auth_membership.group_id==3)).select().first()
-                    subject="Solicitud de cambio de ponderación - "+project_name
-                    message2="<br>Por este medio se le informa que el(la) practicante "+check.assigned_user.first_name+" "+check.assigned_user.last_name+" ha creado una solicitud de cambio en las notas del laboratorio del Curso de \""+project_name+"\"."
-                    message2=message2+"<br>Para aceptar o rechazar dicha solicitud dirigirse al control de solicitudes o al siguiente link: " +cpfecys.get_domain()+ "cpfecys/activity_control/solve_request_change_grades?course="+str(project_id)
-                    message2=message2+"<br>Saludos.<br><br>Sistema de Seguimiento de La Escuela de Ciencias y Sistemas<br>Facultad de Ingeniería - Universidad de San Carlos de Guatemala</html>"
-                    #Send Mail to the Teacher
-                    message="<html>catedratico(a) "+users2.auth_user.first_name+" "+users2.auth_user.last_name+" reciba un cordial saludo.<br>"
-                    message3=message+message2
-
-                    fail1 = send_mail_to_students(message3,subject,users2.auth_user.email,check,var_period.period.name,var_period.yearp) 
-                    if fail1==1:
+                    if (exist_activity_request_change == True ):
                         alert_message = True
-                        message_var2 = T("Request has been sent") + ". " + T("Sent email to teacher")
-                    
+                        message_var2 = T('Can not make operation because there is a pending request change. Please resolve it before proceeding.')
+                        
                     else:
-                        alert_message = True
-                        message_var2 = T("Request has been sent") + ". " + T("Failed to send email to teacher")
+                        grade_before = db((db.grades.academic_assignation==assig_var.id) & (db.grades.activity==var_activity.id) ).select().first() 
+                        
+                        var_grade_before = None
+                        var_operation = 'insert'
+                        if grade_before != None:
+                            var_grade_before = grade_before.grade
+                            var_operation = 'update'
+                        pass
+                        
+                        request_change = db((db.request_change_grades.activity== var_activity.id) & (db.request_change_grades.status=='pending') ).select().first() 
+                        if request_change is None:
+                            grade = db.request_change_grades.insert(user_id = auth.user.id,
+                                                                  activity = var_activity.id,
+                                                                  status =  'pending',
+                                                                  roll = rol_log,
+                                                                  period = assig_var.semester.id,
+                                                                  project = assig_var.assignation.id,
+                                                                  description = request.vars['description_var'])
+                        
+                            #-------------------------------------LOG-----------------------------------------------
+                            log_id = db.request_change_g_log.insert(r_c_g_id = grade,
+                                                          username = auth.user.username,
+                                                          roll = rol_log,
+                                                          after_status = 'pending',
+                                                          description = request.vars['description_var'],
+                                                          description_log = T('Inserted from Grades page'),
+                                                          semester = T(assig_var.semester.period.name),
+                                                          yearp = assig_var.semester.yearp,
+                                                          activity = var_activity.name,
+                                                          category = var_activity.course_activity_category.category.category,
+                                                          project = assig_var.assignation.name
+                                                        )
+                        pass #--------request_change-is-None----
+                        request_change = db((db.request_change_grades.activity== var_activity.id) & (db.request_change_grades.status=='pending') ).select().first() 
+                        rq_grade = db.request_change_grades_detail.insert(request_change_grades = request_change.id,
+                                                                              academic_assignation = assig_var.id,
+                                                                              before_grade = var_grade_before,
+                                                                              operation_request = var_operation,
+                                                                              after_grade = request.vars['grade'])
+
+                        log_id = db((db.request_change_g_log.r_c_g_id== request_change.id) & (db.request_change_g_log.after_status=='pending') ).select().first() 
+
+                        db.request_change_grade_d_log.insert(request_change_g_log = log_id.id,
+                                                          operation_request = var_operation,
+                                                          academic = academic_var.carnet,
+                                                          before_grade = var_grade_before,
+                                                          after_grade = request.vars['grade']
+                                                          )
+                                        
+                        send_mail_var = True
+                    
                         
 
                 pass #-------request_change_var-==-False---
@@ -465,6 +461,31 @@ def grades():
             pass
 
         pass
+        if send_mail_var == True:
+            #send mail
+            project_name = var_project.name
+            project_id = id_project
+            check = db.user_project(project = project_id, period = var_period.id, assigned_user = auth.user.id)
+            #Message
+            users2 = db((db.auth_user.id==db.user_project.assigned_user)&(db.user_project.period == check.period) & (db.user_project.project==check.project)&(db.auth_membership.user_id==db.user_project.assigned_user)&(db.auth_membership.group_id==3)).select().first()
+            subject="Solicitud de cambio de notas - "+project_name
+            message2="<br>Por este medio se le informa que el(la) practicante "+check.assigned_user.first_name+" "+check.assigned_user.last_name+" ha creado una solicitud de cambio en las notas del laboratorio del Curso de \""+project_name+"\"."
+            message2=message2+"<br>Para aceptar o rechazar dicha solicitud dirigirse al control de solicitudes o al siguiente link: " +cpfecys.get_domain()+ "cpfecys/activity_control/solve_request_change_grades?course="+str(project_id)
+            message2=message2+"<br>Saludos.<br><br>Sistema de Seguimiento de La Escuela de Ciencias y Sistemas<br>Facultad de Ingeniería - Universidad de San Carlos de Guatemala</html>"
+            #Send Mail to the Teacher
+            message="<html>Catedratico(a) "+users2.auth_user.first_name+" "+users2.auth_user.last_name+" reciba un cordial saludo.<br>"
+            message3=message+message2
+
+            #fail1 = send_mail_to_students(message3,subject,users2.auth_user.email,check,var_period.period.name,var_period.yearp) 
+            fail1=0#Esto hay que quitarlo****************************************************************************************************************!!!!!!!
+            if fail1==1:
+                alert_message = True
+                message_var2 = T("Request has been sent") + ". " + T("Failed to send email to teacher")
+            
+            else:
+                alert_message = True
+                message_var2 = T("Request has been sent") + ". " + T("Sent email to teacher")
+            
     pass
     return dict(academic_assig=academic_assig, 
         var_period=var_period, 
@@ -477,7 +498,8 @@ def grades():
         message_var2 = message_var2,
         alert_message = alert_message,
         add_grade_error = add_grade_error,
-        add_grade_flash = add_grade_flash
+        add_grade_flash = add_grade_flash,
+        exist_activity_request_change = exist_activity_request_change
         )
 
 
@@ -541,13 +563,26 @@ def request_change_weighting():
             db((db.request_change_weighting.period == year.id) & (db.request_change_weighting.project == request.vars['project']) & ((db.request_change_weighting.status != 'accepted') & (db.request_change_weighting.status != 'rejected'))).delete()
             response.flash = T("Request has been canceled")
         if (request.args(0) == 'request'):
+            
             if str(request.vars['description']) == "":
                 response.flash = "Error. "+ T("Please enter a description")
             else:
-                
-                if session.total_var != 100:
-                    if session.total_var != None:
-                        response.flash = "Error. "+ T("The sum of the weighting is incorrect") + ": " + str(session.total_var)
+
+                total_var2 = 0
+                if request.vars['type'] == 'course':
+                    for project in db((db.course_activity_category.semester==year.id) & (db.course_activity_category.assignation==request.vars['project']) & (db.course_activity_category.laboratory==False)).select():     
+                        total_var2 = float(total_var2) + float(project.grade)               
+                    pass
+                else:
+                    for project in db((db.course_activity_category.semester==year.id) & (db.course_activity_category.assignation==request.vars['project']) & (db.course_activity_category.laboratory==True)).select():      
+                        total_var2 = float(total_var2) + float(project.grade)               
+                    pass
+                pass
+
+                if float(total_var2) != float(100):
+                    if total_var2 != None:
+                        response.flash = "Error. "+ T("The sum of the weighting is incorrect") + ": " + str(total_var2)
+                   
                 else:
                     
                     temp = db((db.request_change_weighting.period == year.id) & (db.request_change_weighting.project == request.vars['project']) & ((db.request_change_weighting.status != 'accepted') & (db.request_change_weighting.status != 'rejected')) ).select().first()
@@ -604,13 +639,14 @@ def request_change_weighting():
                     message2=message2+"<br>Para aceptar o rechazar dicha solicitud dirigirse al control de solicitudes o al siguiente link: " +cpfecys.get_domain()+ "cpfecys/activity_control/solve_request_change_weighting?course="+str(project_id)
                     message2=message2+"<br>Saludos.<br><br>Sistema de Seguimiento de La Escuela de Ciencias y Sistemas<br>Facultad de Ingeniería - Universidad de San Carlos de Guatemala</html>"
                     #Send Mail to the Teacher
-                    message="<html>catedratico(a) "+users2.auth_user.first_name+" "+users2.auth_user.last_name+" reciba un cordial saludo.<br>"
+                    message="<html>Catedratico(a) "+users2.auth_user.first_name+" "+users2.auth_user.last_name+" reciba un cordial saludo.<br>"
                     message3=message+message2
-                    fail1 = send_mail_to_students(message3,subject,users2.auth_user.email,check,year_semester.name,year.yearp) 
+                    #fail1 = send_mail_to_students(message3,subject,users2.auth_user.email,check,year_semester.name,year.yearp) 
+                    fail1=0#Esto hay que quitarlo****************************************************************************************************************!!!!!!!
                     if fail1==1:
-                        response.flash = T("Request has been sent") + " - " + T("Sent email to teacher")
-                    else:
                         response.flash = T("Request has been sent") + " - " + T("Failed to send email to teacher")
+                    else:
+                        response.flash = T("Request has been sent") + " - " + T("Sent email to teacher")                        
                     return dict(name = project_name,
                         semester = year_semester.name,
                         year = year.yearp,
@@ -621,7 +657,6 @@ def request_change_weighting():
     except:
         None
 
-    session.total_var = None
     return dict(name = check.name,
         semester = year_semester.name,
         year = year.yearp,
@@ -632,7 +667,6 @@ def request_change_weighting():
 @auth.requires_login()
 @auth.requires(auth.has_membership('Student') or auth.has_membership('Super-Administrator') or auth.has_membership('Ecys-Administrator') or auth.has_membership('Teacher'))
 def request_change_weighting_load():
-    session.total_var = None
     import cpfecys
     year = db(db.period_year.id == request.vars['year']).select().first() 
     year_semester = year.period
@@ -793,13 +827,15 @@ def students_control_full():
             academic_var = db(db.academic.carnet==auth.user.username).select().first()
             try:
                 academic_assig = db((db.academic_course_assignation.carnet == academic_var.id) & (db.academic_course_assignation.semester == year.id) & (db.academic_course_assignation.assignation==project_var) ).select().first()
-            
+                
                 if academic_assig is None:
                     session.flash=T('Not valid Action.')
                     redirect(URL('default','index'))
             except:
                 session.flash=T('Not valid Action.')
                 redirect(URL('default','index'))
+        else:
+           None
     
 
     return dict(name = '',
@@ -814,7 +850,8 @@ def control_students_modals():
     
     year = db(db.period_year.id == request.vars['year']).select().first() 
     
-    project_var = db(db.project.id == request.vars['project']).select().first() 
+    project_var = db(db.project.id == request.vars['project']).select().first()
+
     return dict(semestre2 = year, name=project_var.name)
 
 @auth.requires_login()
@@ -834,6 +871,58 @@ def weighting():
     project_var = db(db.project.id == project).select().first() 
     year = db(db.period_year.id == request.vars['year']).select().first() 
     assigantion = db((db.user_project.assigned_user == auth.user.id) & (db.user_project.period == year.id) & (db.user_project.project == project)).select().first()
+    
+    if assigantion is None:
+        assigned_to_project = False
+    else:
+        assigned_to_project = True
+
+
+    exception_query = db(db.course_laboratory_exception.project == request.vars['project']).select().first()
+    
+    if exception_query is None:
+        exception_s_var = False
+        exception_t_var = False
+    else:
+        exception_t_var = exception_query.t_edit_lab
+        exception_s_var = exception_query.s_edit_course
+        
+    pass
+    no_menu=True
+    if (auth.has_membership('Super-Administrator')) or (auth.has_membership('Ecys-Administrator')) or (auth.has_membership('Teacher') and request.vars['type'] == "course"  and assigned_to_project == True) or (auth.has_membership('Student') and request.vars['type'] == "lab"  and assigned_to_project == True) or (auth.has_membership('Student')  and request.vars['type'] == "course" and exception_s_var == True  and assigned_to_project == True) or (auth.has_membership('Teacher')  and request.vars['type'] == "lab" and exception_t_var == True  and assigned_to_project == True):
+        if str(request.vars['year']) == str(cpfecys.current_year_period().id):
+            no_menu=False
+        pass
+    pass
+
+    from datetime import datetime
+    enddate=None
+    for date_var in db((db.student_control_period.period_name==T(str(year.period.name))+" "+str(year.yearp))).select():
+        var_exception = db((db.course_limit_exception.project == request.vars['project']) & (db.course_limit_exception.date_finish > datetime.now())).select().first()
+        if var_exception != None:
+            var_date_finish = var_exception.date_finish
+        else:
+            var_date_finish = date_var.date_finish
+        pass
+        if datetime.now() > date_var.date_start and datetime.now() < var_date_finish:
+            enddate=var_date_finish                 
+        pass
+    pass
+
+
+    exception_query = db(db.course_laboratory_exception.project == request.vars['project']).select().first()
+    if exception_query is None:
+      exception_s_var = False
+      exception_t_var = False
+    else:
+      exception_t_var = exception_query.t_edit_lab
+      exception_s_var = exception_query.s_edit_course
+    pass
+
+    temp_op = request.vars['op']
+    if ((auth.has_membership('Super-Administrator') == False) & (auth.has_membership('Ecys-Administrator') == False)) & ( (((auth.has_membership('Teacher') == False) & (no_menu==True or enddate == None) & (exception_s_var == False)) or ((auth.has_membership('Teacher') == True) & (no_menu==True))) & (temp_op == "updateCategory" or temp_op == "addCategory" or temp_op == "getPreviousWeighting" or temp_op == "removeCategory")):
+        return "<center>"+T("Action not allowed")+"</center>"
+
     return dict(semestre2 = year, project = project, project_variable= project_var,assigantion=assigantion, rol_log = rol_log)
 
 
@@ -970,37 +1059,64 @@ def requestchangeactivity():
             if Draft.course_activity_category!=int(request.vars['category']):
                 stateRequest=-1
             else:
-                #Update the request change activity
-                db(db.requestchange_activity.id==Draft.id).update(description=request.vars['activity_description_request_var'],status='Pending', date_request = datetime.datetime.now())
-                Draft = db((db.requestchange_activity.status=='Pending')&(db.requestchange_activity.semester==year.id)&(db.requestchange_activity.course==project.id)).select().first()
-                #Log of request change activity
-                idR = db.requestchange_activity_log.insert(user_request=Draft.user_id.username, roll_request='Student', status='Pending', description=request.vars['activity_description_request_var'], date_request=Draft.date_request, category_request=Draft.course_activity_category.category.category, semester=year.period.name, yearp=year.yearp, course=project.name)
-                activitiesChange = db(db.requestchange_course_activity.requestchange_activity==Draft.id).select()
-                for actChange in activitiesChange:
-                    db.requestchange_course_activity_log.insert(requestchange_activity=idR, operation_request=actChange.operation_request, activity=actChange.activity, name=actChange.name, description=actChange.description, grade=actChange.grade, date_start=actChange.date_start, date_finish=actChange.date_finish)
-                #Check the user project
-                check = db.user_project(project = request.vars['project'], period = request.vars['year'], assigned_user = auth.user.id)
-                #Message
-                users2 = db((db.auth_user.id==db.user_project.assigned_user)&(db.user_project.period == check.period) & (db.user_project.project==check.project)&(db.auth_membership.user_id==db.user_project.assigned_user)&(db.auth_membership.group_id==3)).select().first()
-                try:
-                    subject="Solicitud de cambio de actividades - "+project.name
-                    
-                    message2="<br>Por este medio se le informa que el(la) practicante "+check.assigned_user.first_name+" "+check.assigned_user.last_name+" ha creado una solicitud de cambio de actividades en la categoría \""+Draft.course_activity_category.category.category+"\" dentro de la ponderación de laboratorio del Curso de \""+project.name+"\"."
-                    message2=message2+"<br>Para aceptar o rechazar dicha solicitud dirigirse al control de solicitudes o al siguiente link: "
-                    message2=message2+"<br>Saludos.<br><br>Sistema de Seguimiento de La Escuela de Ciencias y Sistemas<br>Facultad de Ingeniería - Universidad de San Carlos de Guatemala</html>"
-
-                    #Send Mail to the Teacher
-                    message="<html>catedratico(a) "+users2.auth_user.first_name+" "+users2.auth_user.last_name+" reciba un cordial saludo.<br>"
-                    message3=message+message2
-                    fail1 = send_mail_to_students(message3,subject,users2.auth_user.email,check,year.period.name,year.yearp)
-                    #Refresh the var Draft
-                    Draft=None
-                    if fail1==1:
-                        stateRequest=2
+                functionAction=False
+                rgrades = db((db.request_change_grades.status=='pending')&(db.request_change_grades.period==int(year.id))&(db.request_change_grades.project==int(project.id))).select()
+                if rgrades.first()==None:
+                    functionAction=True
+                else:
+                    validation_change=False
+                    acrc_t = db((db.course_activity.course_activity_category==int(request.vars['category']))&(db.course_activity.semester==int(year.id))&(db.course_activity.assignation==int(project.id))&(db.course_activity.laboratory==True)).select()
+                    for rgrades_iterator in rgrades:
+                        for acrc in acrc_t:
+                            if rgrades_iterator.activity==acrc.id:
+                                validation_change=True
+                            pass
+                        pass
+                    pass
+                    if validation_change==False:
+                        functionAction=True
                     else:
-                        stateRequest=4
-                except:
-                    stateRequest=2
+                        if Draft!=None:
+                            db(db.requestchange_activity.id==Draft.id).delete()
+                        pass
+                    pass
+                pass
+                if functionAction==True:
+                    #Update the request change activity
+                    db(db.requestchange_activity.id==Draft.id).update(description=request.vars['activity_description_request_var'],status='Pending', date_request = datetime.datetime.now())
+                    Draft = db((db.requestchange_activity.status=='Pending')&(db.requestchange_activity.semester==year.id)&(db.requestchange_activity.course==project.id)).select().first()
+                    #Log of request change activity
+                    idR = db.requestchange_activity_log.insert(user_request=Draft.user_id.username, roll_request='Student', status='Pending', description=request.vars['activity_description_request_var'], date_request=Draft.date_request, category_request=Draft.course_activity_category.category.category, semester=year.period.name, yearp=year.yearp, course=project.name)
+                    activitiesChange = db(db.requestchange_course_activity.requestchange_activity==Draft.id).select()
+                    for actChange in activitiesChange:
+                        db.requestchange_course_activity_log.insert(requestchange_activity=idR, operation_request=actChange.operation_request, activity=actChange.activity, name=actChange.name, description=actChange.description, grade=actChange.grade, date_start=actChange.date_start, date_finish=actChange.date_finish)
+                    #Check the user project
+                    check = db.user_project(project = request.vars['project'], period = request.vars['year'], assigned_user = auth.user.id)
+                    #Message
+                    users2 = db((db.auth_user.id==db.user_project.assigned_user)&(db.user_project.period == check.period) & (db.user_project.project==check.project)&(db.auth_membership.user_id==db.user_project.assigned_user)&(db.auth_membership.group_id==3)).select().first()
+                    try:
+                        subject="Solicitud de cambio de actividades - "+project.name
+                        
+                        message2="<br>Por este medio se le informa que el(la) practicante "+check.assigned_user.first_name+" "+check.assigned_user.last_name+" ha creado una solicitud de cambio de actividades en la categoría \""+Draft.course_activity_category.category.category+"\" dentro de la ponderación de laboratorio del Curso de \""+project.name+"\"."
+                        message2=message2+"<br>Para aceptar o rechazar dicha solicitud dirigirse al control de solicitudes o al siguiente link: " +  cpfecys.get_domain()+ "cpfecys/activity_control/solve_request_change_activity?course="+str(request.vars['project'])
+                        message2=message2+"<br>Saludos.<br><br>Sistema de Seguimiento de La Escuela de Ciencias y Sistemas<br>Facultad de Ingeniería - Universidad de San Carlos de Guatemala</html>"
+
+                        #Send Mail to the Teacher
+                        message="<html>catedratico(a) "+users2.auth_user.first_name+" "+users2.auth_user.last_name+" reciba un cordial saludo.<br>"
+                        message3=message+message2
+                        #fail1 = send_mail_to_students(message3,subject,users2.auth_user.email,check,year.period.name,year.yearp)
+                        fail1=0#Esto hay que quitarlo****************************************************************************************************************!!!!!!!
+                        #Refresh the var Draft
+                        Draft=None
+                        if fail1==1:
+                            stateRequest=2
+                        else:
+                            stateRequest=4
+                    except:
+                        stateRequest=2
+                else:
+                    Draft=None
+                    stateRequest=5
 
 
     requestC=db((db.requestchange_activity.course==project.id)&(db.requestchange_activity.semester==year.id)&(db.requestchange_activity.status=='Pending')).select()
@@ -1294,7 +1410,7 @@ def management_activity_without_metric():
         db.course_activity_without_metric.semester.default = year.id
         if auth.has_membership('Super-Administrator') or auth.has_membership('Ecys-Administrator'):
             query = ((db.course_activity_without_metric.semester==year.id) & (db.course_activity_without_metric.assignation==project.id))
-            grid = SQLFORM.grid(query, csv=False, paginate=5)
+            grid = SQLFORM.grid(query, csv=False, paginate=10, searchable=False)
         elif auth.has_membership('Teacher'):
             assigantion = db((db.user_project.assigned_user == auth.user.id) & (db.user_project.period == year.id) & (db.user_project.project == project)).select().first()
             if assigantion is None:
@@ -1303,12 +1419,12 @@ def management_activity_without_metric():
             else:
                 if exception_t_var==True:
                     query = ((db.course_activity_without_metric.semester==year.id) & (db.course_activity_without_metric.assignation==project.id))
-                    grid = SQLFORM.grid(query, csv=False, paginate=10)
+                    grid = SQLFORM.grid(query, csv=False, paginate=10, searchable=False)
                 else:
                     db.course_activity_without_metric.laboratory.writable = False
                     db.course_activity_without_metric.laboratory.default = False
                     query = ((db.course_activity_without_metric.semester==year.id) & (db.course_activity_without_metric.assignation==project.id)&(db.course_activity_without_metric.laboratory==False))
-                    grid = SQLFORM.grid(query, csv=False, paginate=10)
+                    grid = SQLFORM.grid(query, csv=False, paginate=10, searchable=False)
         elif auth.has_membership('Student'):
             assigantion = db((db.user_project.assigned_user == auth.user.id) & (db.user_project.period == year.id) & (db.user_project.project == project)).select().first()
             if assigantion is None:
@@ -1318,12 +1434,12 @@ def management_activity_without_metric():
                 db.course_activity_without_metric.teacher_permition.writable = False
                 if exception_s_var==True:
                     query = ((db.course_activity_without_metric.semester==year.id) & (db.course_activity_without_metric.assignation==project.id))
-                    grid = SQLFORM.grid(query, csv=False, paginate=10)
+                    grid = SQLFORM.grid(query, csv=False, paginate=10, searchable=False)
                 else:
                     db.course_activity_without_metric.laboratory.writable = False
                     db.course_activity_without_metric.laboratory.default = True
                     query = ((db.course_activity_without_metric.semester==year.id) & (db.course_activity_without_metric.assignation==project.id)& ((db.course_activity_without_metric.laboratory==True) | ((db.course_activity_without_metric.laboratory== False)&(db.course_activity_without_metric.teacher_permition==True))))
-                    grid = SQLFORM.grid(query, csv=False, paginate=10)
+                    grid = SQLFORM.grid(query, csv=False, paginate=10, searchable=False)
         else:
             session.flash = T('Not valid Action.')
             redirect(URL('default','index'))
@@ -2389,7 +2505,7 @@ def General_report_activities():
                                                                     grade=actChange.grade, 
                                                                     date_start=actChange.date_start, 
                                                                     date_finish=actChange.date_finish)
-            pass#hola
+            pass
 
             #Insert to course_ended           
             db.course_ended.insert(project = project_var.id,
@@ -2619,7 +2735,7 @@ def grades_management():
     #Check if the period is correct
     if request.vars['period'] is None or request.vars['period']=='':
         session.flash = T('Not valid Action.')
-        redirect(URL('sdefault','index'))
+        redirect(URL('default','index'))
     else:
         year = request.vars['period']
         year = db(db.period_year.id==year).select().first()
@@ -2633,7 +2749,7 @@ def grades_management():
         redirect(URL('default','index'))
     else:
         project = request.vars['project']
-        project = db(db.project.id==project_var).select().first()
+        project = db(db.project.id==project).select().first()
         if project is None:
             session.flash = T('Not valid Action.')
             redirect(URL('default','index'))
@@ -2720,3 +2836,14 @@ def grades_management():
         vecMonth.append(tmpMonth)
 
     return dict(project = project, year = year, vecMonth=vecMonth)
+
+@auth.requires_login()
+@auth.requires(auth.has_membership('Teacher'))
+def grades_report():
+    return "<b>En construcción disculpe las molestias.</b>"
+    
+@auth.requires_login()
+@auth.requires(auth.has_membership('Teacher'))
+def laboratory_revalidation():
+    return "<b>En construcción disculpe las molestias.</b>"
+    
