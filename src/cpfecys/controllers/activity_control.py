@@ -906,7 +906,7 @@ def weighting():
     pass
 
     temp_op = request.vars['op']
-    if (no_menu==True or enddate == None) & (temp_op == "updateCategory" or temp_op == "addCategory" or temp_op == "getPreviousWeighting" or temp_op == "removeCategory"):
+    if ((auth.has_membership('Super-Administrator') == False) & (auth.has_membership('Ecys-Administrator') == False)) & ((no_menu==True or enddate == None) & (temp_op == "updateCategory" or temp_op == "addCategory" or temp_op == "getPreviousWeighting" or temp_op == "removeCategory")):
         return None
 
     return dict(semestre2 = year, project = project, project_variable= project_var,assigantion=assigantion, rol_log = rol_log)
