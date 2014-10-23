@@ -1396,7 +1396,7 @@ def management_activity_without_metric():
         db.course_activity_without_metric.semester.default = year.id
         if auth.has_membership('Super-Administrator') or auth.has_membership('Ecys-Administrator'):
             query = ((db.course_activity_without_metric.semester==year.id) & (db.course_activity_without_metric.assignation==project.id))
-            grid = SQLFORM.grid(query, csv=False, paginate=5)
+            grid = SQLFORM.grid(query, csv=False, paginate=10, searchable=False)
         elif auth.has_membership('Teacher'):
             assigantion = db((db.user_project.assigned_user == auth.user.id) & (db.user_project.period == year.id) & (db.user_project.project == project)).select().first()
             if assigantion is None:
@@ -1405,12 +1405,12 @@ def management_activity_without_metric():
             else:
                 if exception_t_var==True:
                     query = ((db.course_activity_without_metric.semester==year.id) & (db.course_activity_without_metric.assignation==project.id))
-                    grid = SQLFORM.grid(query, csv=False, paginate=10)
+                    grid = SQLFORM.grid(query, csv=False, paginate=10, searchable=False)
                 else:
                     db.course_activity_without_metric.laboratory.writable = False
                     db.course_activity_without_metric.laboratory.default = False
                     query = ((db.course_activity_without_metric.semester==year.id) & (db.course_activity_without_metric.assignation==project.id)&(db.course_activity_without_metric.laboratory==False))
-                    grid = SQLFORM.grid(query, csv=False, paginate=10)
+                    grid = SQLFORM.grid(query, csv=False, paginate=10, searchable=False)
         elif auth.has_membership('Student'):
             assigantion = db((db.user_project.assigned_user == auth.user.id) & (db.user_project.period == year.id) & (db.user_project.project == project)).select().first()
             if assigantion is None:
@@ -1420,12 +1420,12 @@ def management_activity_without_metric():
                 db.course_activity_without_metric.teacher_permition.writable = False
                 if exception_s_var==True:
                     query = ((db.course_activity_without_metric.semester==year.id) & (db.course_activity_without_metric.assignation==project.id))
-                    grid = SQLFORM.grid(query, csv=False, paginate=10)
+                    grid = SQLFORM.grid(query, csv=False, paginate=10, searchable=False)
                 else:
                     db.course_activity_without_metric.laboratory.writable = False
                     db.course_activity_without_metric.laboratory.default = True
                     query = ((db.course_activity_without_metric.semester==year.id) & (db.course_activity_without_metric.assignation==project.id)& ((db.course_activity_without_metric.laboratory==True) | ((db.course_activity_without_metric.laboratory== False)&(db.course_activity_without_metric.teacher_permition==True))))
-                    grid = SQLFORM.grid(query, csv=False, paginate=10)
+                    grid = SQLFORM.grid(query, csv=False, paginate=10, searchable=False)
         else:
             session.flash = T('Not valid Action.')
             redirect(URL('default','index'))

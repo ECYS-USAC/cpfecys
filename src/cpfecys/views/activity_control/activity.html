@@ -762,8 +762,30 @@
 				{{pass}}
 			{{pass}}
 			{{if showMessageError=='f':}}
+				<div id="help_modal_no_lab_activity" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true"> 
+				  <div class="modal-header">
+				    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+				      <h3 id="myModalLabel">
+				          <span class="icon-question-sign"></span>
+				          {{=T('There is no laboratory in the weight category class:')}}
+				      </h3>
+				  </div>
+				  <div class="modal-body">
+				    <div class="well">
+				        <p>
+				            {{=T('This message is displayed because there are activities in the planning of the laboratory, not lab created category in the weight class is.')}}
+				            <br>
+				            {{=T('The activities within the laboratory planning not affect the students grade.')}}
+				        </p>
+				    </div>
+				  </div>
+				  <div class="modal-footer">
+				      <button class="btn" data-dismiss="modal" aria-hidden="true">{{=T('Close')}}</button>
+				  </div>
+				</div>
+				
 				<span class="label label-important">
-					<a type="button" style ="cursor:pointer;" title="{{=T('Help')}}" role="button" data-toggle="modal" data-target="#help_modal_weighting"  >
+					<a type="button" style ="cursor:pointer;" title="{{=T('Help')}}" role="button" data-toggle="modal" data-target="#help_modal_no_lab_activity"  >
 	                    <span class="icon-white icon-question-sign"></span>
 	                </a>
 	                {{=T('These activities do not affect the course grade,')}}<br>{{=T('since there is the category weighting laboratory course')}}
