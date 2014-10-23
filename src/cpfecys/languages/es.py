@@ -1139,6 +1139,7 @@
 'New Search': 'Nueva Búsqueda',
 'News': 'Noticias',
 'next 100 rows': '100 filas siguientes',
+'No': 'No',
 'No Action': 'No Acción',
 'No action': 'No acción',
 'No actions available': 'No hay acciones disponibles',

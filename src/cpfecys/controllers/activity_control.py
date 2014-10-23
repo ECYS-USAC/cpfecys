@@ -112,8 +112,12 @@ def students_control():
             except:
                 session.flash=T('Not valid Action.')
                 redirect(URL('default','index'))
-        
-    return dict(project = project_var, year = year.id , name = project_select.name, nameP=(T(year.period.name)+" "+str(year.yearp)))
+    assigantion = db((db.user_project.assigned_user == auth.user.id) & (db.user_project.period == year.id) & (db.user_project.project == project_var)).select().first()
+    if assigantion is None:
+        assigned_to_project = False
+    else:
+        assigned_to_project = True
+    return dict(project = project_var, year = year.id , name = project_select.name, nameP=(T(year.period.name)+" "+str(year.yearp)), assigned_to_project = assigned_to_project)
 
 
 
@@ -905,9 +909,19 @@ def weighting():
         pass
     pass
 
+
+    exception_query = db(db.course_laboratory_exception.project == request.vars['project']).select().first()
+    if exception_query is None:
+      exception_s_var = False
+      exception_t_var = False
+    else:
+      exception_t_var = exception_query.t_edit_lab
+      exception_s_var = exception_query.s_edit_course
+    pass
+
     temp_op = request.vars['op']
-    if ((auth.has_membership('Super-Administrator') == False) & (auth.has_membership('Ecys-Administrator') == False)) & ((no_menu==True or enddate == None) & (temp_op == "updateCategory" or temp_op == "addCategory" or temp_op == "getPreviousWeighting" or temp_op == "removeCategory")):
-        return None
+    if ((auth.has_membership('Super-Administrator') == False) & (auth.has_membership('Ecys-Administrator') == False)) & ( (((auth.has_membership('Teacher') == False) & (no_menu==True or enddate == None) & (exception_s_var == False)) or ((auth.has_membership('Teacher') == True) & (no_menu==True))) & (temp_op == "updateCategory" or temp_op == "addCategory" or temp_op == "getPreviousWeighting" or temp_op == "removeCategory")):
+        return "<center>"+T("Action not allowed")+"</center>"
 
     return dict(semestre2 = year, project = project, project_variable= project_var,assigantion=assigantion, rol_log = rol_log)
 
