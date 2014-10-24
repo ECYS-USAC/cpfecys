@@ -98,7 +98,7 @@
 						{{if check_activityOldR is None:}}
 							{{no_doAction=True}}
 						{{else:}}
-							{{if check_activityOldR.assignation!=var_project_id or check_activityOldR.semester!=semestre2.id:}}
+							{{if check_activityOldR.assignation!=project_var.id or check_activityOldR.semester!=semestre2.id:}}
 								{{no_doAction=True}}
 							{{else:}}
 								{{if auth.has_membership('Student')==True and request.vars['type'] == "class":}}
@@ -1026,25 +1026,18 @@
 							        	<tr>
 											<td>
 												{{if editable_var=='true':}}
-													{{if tAct.name=='Examen Final':}}
+													{{if "Examen Final"==tAct.course_activity_category.category.category:}}
 														<select class="generic-widget" id="edit_activity_name1" style="width:140px;">
 															<option value="{{=tAct.name}}">{{=tAct.name}}</option>
 														</select>
-													{{elif tAct.name=='Primer Parcial' or tAct.name=='Segundo Parcial' or tAct.name=='Tercer Parcial':}}
+													{{elif "Parciales"==tAct.course_activity_category.category.category:}}
 														<select class="generic-widget" id="edit_activity_name1" style="width:140px;">
-														{{if tAct.name=='Primer Parcial':}}
 															<option value="{{=tAct.name}}">{{=tAct.name}}</option>
-															<option value="Segundo Parcial">Segundo Parcial</option>
-															<option value="Tercer Parcial">Tercer Parcial</option>
-														{{elif tAct.name=='Segundo Parcial':}}
-															<option value="{{=tAct.name}}">{{=tAct.name}}</option>
-															<option value="Primer Parcial">Primer Parcial</option>
-															<option value="Tercer Parcial">Tercer Parcial</option>
-														{{else:}}
-															<option value="{{=tAct.name}}">{{=tAct.name}}</option>
-															<option value="Primer Parcial">Primer Parcial</option>
-															<option value="Segundo Parcial">Segundo Parcial</option>
-														{{pass}}
+															{{for parcial1 in db(db.partials).select():}}
+																{{if tAct.name!=parcial1.name:}}
+																	<option value="{{=parcial1.name}}">{{=parcial1.name}}</option>
+																{{pass}}
+															{{pass}}
 														</select>
 													{{else:}}
 														<input class="string" name="edit_activity_name1" type="text" value="{{=tAct.name}}" id="edit_activity_name1" style="width:140px;">
@@ -1060,7 +1053,7 @@
 											{{pass}}
 												{{if editable_var=='true':}}
 													<textarea class="string" cols="40" type="text" id="edit_activity_description" style="width:240px; height:100px;">{{=tAct.description}}</textarea>
-												{{else:}}*
+												{{else:}}
 													<div style="width:200px;">
 														{{=tAct.description[:100]}}{{if len(tAct.description) > 100:}}...
 
@@ -1464,9 +1457,9 @@
 			  					$("#activity_name2").find('option').remove().end();
 
 			  					var lista=document.getElementById("activity_name2");
-			  					lista.options.add(new Option("Primer Parcial","Primer Parcial"));
-			  					lista.options.add(new Option("Segundo Parcial","Segundo Parcial"));
-			  					lista.options.add(new Option("Tercer Parcial","Tercer Parcial"));
+			  					{{for parcial in db(db.partials).select():}}
+			  						lista.options.add(new Option("{{=parcial.name}}","{{=parcial.name}}"));
+			  					{{pass}}
 
 			  					$("#activity_name1").css("display", "none");
 			  					$("#activity_name2").css("display", "block");
