@@ -97,21 +97,25 @@ def students_control():
     project_select = db(db.project.id==project_var).select().first()
 
     if auth.has_membership('Super-Administrator') == False and auth.has_membership('Ecys-Administrator') == False :
-        assigantion = db((db.user_project.assigned_user == auth.user.id) & (db.user_project.period == year.id) & (db.user_project.project == project_var)).select().first()
-        
-        if assigantion is None:
-            academic_var = db(db.academic.carnet==auth.user.username).select().first()
-            try:
-                academic_assig = db((db.academic_course_assignation.carnet == academic_var.id) & (db.academic_course_assignation.semester == year.id) & (db.academic_course_assignation.assignation==project_var) ).select().first()
-                
-                if academic_assig is None:
+        try:
+            assigantion = db((db.user_project.assigned_user == auth.user.id) & (db.user_project.period == year.id) & (db.user_project.project == project_var)).select().first()
+            
+            if assigantion is None:
+                academic_var = db(db.academic.carnet==auth.user.username).select().first()
+                try:
+                    academic_assig = db((db.academic_course_assignation.carnet == academic_var.id) & (db.academic_course_assignation.semester == year.id) & (db.academic_course_assignation.assignation==project_var) ).select().first()
+                    
+                    if academic_assig is None:
+                        session.flash=T('Not valid Action.')
+                        redirect(URL('default','index'))
+                    
+                        
+                except:
                     session.flash=T('Not valid Action.')
                     redirect(URL('default','index'))
-                
-                    
-            except:
-                session.flash=T('Not valid Action.')
-                redirect(URL('default','index'))
+        except:
+            session.flash=T('Not valid Action.')
+            redirect(URL('default','index'))
     assigantion = db((db.user_project.assigned_user == auth.user.id) & (db.user_project.period == year.id) & (db.user_project.project == project_var)).select().first()
     if assigantion is None:
         assigned_to_project = False
@@ -963,7 +967,7 @@ def activity():
     typ = request.vars['type']
     
     year = db(db.period_year.id == request.vars['year']).select().first() 
-    assigantion = db((db.user_project.assigned_user == auth.user.id) & (db.user_project.period == year.id) & (db.user_project.project == project)).select().first()
+    assigantion = db((db.user_project.assigned_user == auth.user.id) & (db.user_project.period == request.vars['year']) & (db.user_project.project == project)).select().first()
     if assigantion is None:
         assigned_to_project = False
     else:
