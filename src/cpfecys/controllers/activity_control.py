@@ -172,7 +172,7 @@ def control_students_grades():
         #if (assigantion is None): #or (auth.has_membership('Teacher') and var_activity.laboratory == True and exception_t_var == False) or (auth.has_membership('Student') and var_activity.laboratory == False and exception_s_var == False):
         #    session.flash=T('You do not have permission to view course requests')
         #    redirect(URL('default','index'))
-        
+    
     if var_activity.laboratory == True:
         academic_assig =  db((db.academic_course_assignation.assignation==id_project) & (db.academic_course_assignation.semester==id_year) &  (db.academic_course_assignation.laboratorio==True)).select()
     else:
@@ -248,9 +248,14 @@ def grades():
         redirect(URL('default', 'index'))
 
     if var_activity.laboratory == True:
-        academic_assig =  db((db.academic_course_assignation.assignation==id_project) & (db.academic_course_assignation.semester==id_year) &  (db.academic_course_assignation.laboratorio==True)).select()
+        academic_assig =  db((db.academic.id==db.academic_course_assignation.carnet)&(db.academic_course_assignation.assignation==id_project) & (db.academic_course_assignation.semester==id_year) &  (db.academic_course_assignation.laboratorio==True)).select(orderby=db.academic.carnet)
     else:
-        academic_assig =  db((db.academic_course_assignation.assignation==id_project) & (db.academic_course_assignation.semester==id_year)).select()
+        academic_assig =  db((db.academic.id==db.academic_course_assignation.carnet)&(db.academic_course_assignation.assignation==id_project) & (db.academic_course_assignation.semester==id_year)).select(orderby=db.academic.carnet)
+
+    tempAcademic=[]
+    for acaT in academic_assig:
+        tempAcademic.append(acaT.academic_course_assignation)
+
 
     rol_log=''
     if auth.has_membership('Ecys-Administrator')==True:
@@ -491,7 +496,7 @@ def grades():
                 message_var2 = T("Request has been sent") + ". " + T("Sent email to teacher")
             
     pass
-    return dict(academic_assig=academic_assig, 
+    return dict(academic_assig=tempAcademic, 
         var_period=var_period, 
         var_activity=var_activity, 
         var_project=var_project, 
@@ -2749,6 +2754,7 @@ def grades_management():
     if assigantions.first() is None:
         session.flash = T('Not valid Action.')
         redirect(URL('default','index'))
+
     #Vec with the months of the current period
     vecMonth=[]
     tmpMonth=[]
@@ -2825,10 +2831,68 @@ def grades_management():
         tmpMonth.append(1)
         vecMonth.append(tmpMonth)
 
-        query = ((db.user_project.assigned_user == auth.user.id) & (db.user_project.period == period.id))
+
+        #****************************************************************************************************
+        #****************************************************************************************************
+        #***********************************************SEARCH***********************************************
+        #****************************************************************************************************
+        #****************************************************************************************************
+        #Courses
+        courses=[]
+        for assigantion in assigantions:
+            courses.append(assigantion.project.name)
+        #Fields to search
+        optionSearch=[]
+        vecOptionSearch=[]
+        optionSearch.append('=')
+        optionSearch.append('=')
+        vecOptionSearch.append(optionSearch)
+        optionSearch=[]
+        optionSearch.append('!=')
+        optionSearch.append('!=')
+        vecOptionSearch.append(optionSearch)
+        optionSearch=[]
+        optionSearch.append('<')
+        optionSearch.append('<')
+        vecOptionSearch.append(optionSearch)
+        optionSearch=[]
+        optionSearch.append('>')
+        optionSearch.append('>')
+        vecOptionSearch.append(optionSearch)
+        optionSearch=[]
+        optionSearch.append('<=')
+        optionSearch.append('<=')
+        vecOptionSearch.append(optionSearch)
+        optionSearch=[]
+        optionSearch.append('>=')
+        optionSearch.append('>=')
+        vecOptionSearch.append(optionSearch)
+        optionSearch=[]
+
+
+        vecFieldsSearch=[]
+        optionSearch=[]
+        tmpMonth=[]
+        optionSearch.append('Usuario Registro')
+        optionSearch.append('grades_log.user_name')
+        # projects = db(db.project.id.belongs(dest)).select()
+        tmpMonth.append(optionSearch)
+        optionSearch=[]
+        optionSearch.append('=')
+        optionSearch.append('!=')
+        optionSearch.append('<')
+        optionSearch.append('>')
+        optionSearch.append('<=')
+        optionSearch.append('>=')
+
+        optionSearch
+        tmpMonth.append(db().select(db.grades_log.user_name, distinct=True))
+        vecFieldsSearch.append(tmpMonth)
+
+        query=(db.grades_log)
         grid = SQLFORM.grid(query, csv=False, paginate=10, editable=False)
 
-    return dict(year=period, assigantions=assigantions, vecMonth=vecMonth, grid=grid)
+    return dict(year=period, assigantions=assigantions, vecMonth=vecMonth, grid=grid, vecOptionSearch=vecOptionSearch, vecFieldsSearch=vecFieldsSearch)
 
 @auth.requires_login()
 @auth.requires(auth.has_membership('Teacher'))

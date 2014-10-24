@@ -35,9 +35,19 @@
 	<!--Search in report-->
 	
 
+	{{=str(vecOptionSearch)}}
 
 
 
+
+
+	{{=str(vecFieldsSearch)}}
+	{{for field in vecFieldsSearch:}}
+		{{=str(field[0])}}
+		{{for field_option in field[1]:}}
+			{{=str(field_option.user_name)}}
+		{{pass}}
+	{{pass}}
 
 	{{=grid}}
 	<div style="overflow:auto; width:100%;">
