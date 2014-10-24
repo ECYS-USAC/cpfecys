@@ -884,18 +884,18 @@
 										{{=T('TP')}}
 									</th>
 									{{if request.vars['op'] == "showTableNoEditable":}}
-										{{if no_menu==False or assigned_to_project==True:}}
-										<th style="white-space:normal;">
-											{{=T('Entered Grades')}}
-										</th>
-										<th style="white-space:normal;">
-											{{=T('Average of Grades')}}
-										</th >
-										{{if no_menu==False:}}
-										<th>
-											{{=T('Actions')}}
-										</th>
-										{{pass}}
+										{{if assigned_to_project==True or auth.has_membership('Ecys-Administrator')==True or auth.has_membership('Super-Administrator')==True:}}
+											<th style="white-space:normal;">
+												{{=T('Entered Grades')}}
+											</th>
+											<th style="white-space:normal;">
+												{{=T('Average of Grades')}}
+											</th >
+											{{if no_menu==False or auth.has_membership('Ecys-Administrator')==True or auth.has_membership('Super-Administrator')==True:}}
+											<th>
+												{{=T('Actions')}}
+											</th>
+											{{pass}}
 										{{else:}}
 										<th>
 											{{=T('Grade')}}
@@ -1119,7 +1119,7 @@
 											{{pass}}
 										{{pass}}
 									{{else:}}
-										{{if no_menu==False or assigned_to_project==True:}}
+										{{if no_menu==False or assigned_to_project==True  or auth.has_membership('Ecys-Administrator')==True or auth.has_membership('Super-Administrator')==True:}}
 											<td>
 												<!--Total number of grades in the activity-->
 												{{countTA = db.grades.id.count()}}
@@ -1231,6 +1231,15 @@
 														</label>
 													</center>
 												{{pass}}
+											</td>
+											{{elif auth.has_membership('Ecys-Administrator')==True or auth.has_membership('Super-Administrator')==True:}}
+											<td>
+												<a id="gradeButton" role="button" title="{{=T('Insert Grades')}}" class="badge btn-info" href="{{=URL('activity_control','control_students_grades', vars=dict(project=project_var.id, year=semestre2.id, activity=tAct.id))}}">
+						                    		<span class="showTableNoEditableNoDetail icon-white icon-edit"></span>
+							                    	<label class="showTableNoEditableDetail"  style="display:none;">
+							                    		<span  class="icon-white icon-edit"></span>
+							                    		{{=T('Grades')}} </label>
+						                    	</a>
 											</td>
 											{{pass}}
 										{{else:}}

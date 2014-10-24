@@ -2734,41 +2734,21 @@ def management_approval_students_requirement():
 #********************************************************************************************************************************************************************************************************
 #********************************************************************************************************************************************************************************************************
 @auth.requires_login()
+@auth.requires(auth.has_membership('Teacher'))
 def grades_management():
-    #vars
-    year = None
-    project = None
-    #Check if the period is correct
-    if request.vars['period'] is None or request.vars['period']=='':
-        session.flash = T('Not valid Action.')
-        redirect(URL('default','index'))
-    else:
-        year = request.vars['period']
-        year = db(db.period_year.id==year).select().first()
-        if year is None:
-            session.flash = T('Not valid Action.')
-            redirect(URL('default','index'))
-
-    #Check if the period is correct
-    if request.vars['project'] is None or request.vars['project']=='':
-        session.flash = T('Not valid Action.')
-        redirect(URL('default','index'))
-    else:
-        project = request.vars['project']
-        project = db(db.project.id==project).select().first()
-        if project is None:
-            session.flash = T('Not valid Action.')
-            redirect(URL('default','index'))
+    import cpfecys
+    #Obtain the current period of the system and all the register periods
+    period = cpfecys.current_year_period()
 
     #Check if the user is assigned to the course
-    assigantion = db((db.user_project.assigned_user == auth.user.id) & (db.user_project.period == year.id) & (db.user_project.project == project.id)).select().first()
-    if assigantion is None:
+    assigantions = db((db.user_project.assigned_user == auth.user.id) & (db.user_project.period == period.id)).select()
+    if assigantions.first() is None:
         session.flash = T('Not valid Action.')
         redirect(URL('default','index'))
-
+    #Vec with the months of the current period
     vecMonth=[]
     tmpMonth=[]
-    if year.period == 1:
+    if period.period == 1:
         tmpMonth=[]
         tmpMonth.append(1)
         tmpMonth.append('Enero')
@@ -2841,7 +2821,10 @@ def grades_management():
         tmpMonth.append(1)
         vecMonth.append(tmpMonth)
 
-    return dict(project = project, year = year, vecMonth=vecMonth)
+        query = ((db.user_project.assigned_user == auth.user.id) & (db.user_project.period == period.id))
+        grid = SQLFORM.grid(query, csv=False, paginate=10, editable=False)
+
+    return dict(year=period, assigantions=assigantions, vecMonth=vecMonth, grid=grid)
 
 @auth.requires_login()
 @auth.requires(auth.has_membership('Teacher'))
