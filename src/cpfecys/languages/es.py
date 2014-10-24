@@ -1962,7 +1962,7 @@
 'You must first delete the activities under the category to rename.': 'Primero debe eliminar las actividades dentro de la categoría para poder cambiar la categoría',
 'You must select only one group of students': 'Debe de seleccionar solo un grupo de estudiantes',
 'You visited the url %s': 'Usted visitó la url %s',
-'Your performance is': 'Su desempeño es',
+'Your performance is': 'Su desempeño',
 'Your username is: %(username)s': 'Your username is: %(username)s',
 'YYYY-MM-DD': 'YYYY-MM-DD',
 }
