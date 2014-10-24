@@ -362,68 +362,68 @@
                                     {{if request.vars['type'] == 'class' and existLab==True:}}
                                         {{if request.vars['type'] == 'class' and requirement is None:}}
                                             {{if totalCategory>=float((61*totalLab)/100):}}
-                                                {{if totalCarry < float(controlP.min_average):}}
+                                                {{if round(totalCarry,0) < float(controlP.min_average):}}
                                                     <span class="label label-important">
-                                                {{elif totalCarry>=float(controlP.min_average) and totalCarry <= float(controlP.max_average):}}
+                                                {{elif round(totalCarry,0)>=float(controlP.min_average) and round(totalCarry,0) <= float(controlP.max_average):}}
                                                     <span class="label label-warning">
                                                 {{else:}}
                                                     <span class="label label-success">
                                                 {{pass}}
-                                                {{=str(totalCarry)}}
+                                                {{=str(int(round(totalCarry,0)))}}
                                                 </span>
                                             {{else:}}
                                                 <span class="label label-inverse">
-                                                    {{=str(totalCarry)}}
+                                                    {{=str(int(round(totalCarry,0)))}}
                                                 </span>
                                             {{pass}}
                                         {{else:}}
                                             {{if db((db.course_requirement_student.carnet==t1.carnet)&(db.course_requirement_student.requirement==requirement.id)).select().first() is not None:}}
                                                 {{if totalCategory>=float((61*totalLab)/100):}}
-                                                    {{if totalCarry < float(controlP.min_average):}}
+                                                    {{if round(totalCarry,0) < float(controlP.min_average):}}
                                                         <span class="label label-important">
-                                                    {{elif totalCarry>=float(controlP.min_average) and totalCarry <= float(controlP.max_average):}}
+                                                    {{elif round(totalCarry,0)>=float(controlP.min_average) and round(totalCarry,0) <= float(controlP.max_average):}}
                                                         <span class="label label-warning">
                                                     {{else:}}
                                                         <span class="label label-success">
                                                     {{pass}}
-                                                    {{=str(totalCarry)}}
+                                                    {{=str(int(round(totalCarry,0)))}}
                                                     </span>
                                                 {{else:}}
                                                     <span class="label label-inverse">
-                                                        {{=str(totalCarry)}}
+                                                        {{=str(int(round(totalCarry,0)))}}
                                                     </span>
                                                 {{pass}}
                                             {{else:}}
                                                 <span class="label label-inverse">
-                                                    {{=str(totalCarry)}}
+                                                    {{=str(int(round(totalCarry,0)))}}
                                                 </span>
                                             {{pass}}
                                         {{pass}}
                                     {{else:}}
                                         {{if request.vars['type'] == 'class' and requirement is None:}}
-                                            {{if totalCarry < float(controlP.min_average):}}
+                                            {{if round(totalCarry,0) < float(controlP.min_average):}}
                                                 <span class="label label-important">
-                                            {{elif totalCarry>=float(controlP.min_average) and totalCarry <= float(controlP.max_average):}}
+                                            {{elif round(totalCarry,0)>=float(controlP.min_average) and round(totalCarry,0) <= float(controlP.max_average):}}
                                                 <span class="label label-warning">
                                             {{else:}}
                                                 <span class="label label-success">
                                             {{pass}}
-                                            {{=str(totalCarry)}}
+                                            {{=str(int(round(totalCarry,0)))}}
                                             </span>
                                         {{else:}}
                                             {{if db((db.course_requirement_student.carnet==t1.carnet)&(db.course_requirement_student.requirement==requirement.id)).select().first() is not None:}}
-                                                {{if totalCarry < float(controlP.min_average):}}
+                                                {{if round(totalCarry,0) < float(controlP.min_average):}}
                                                     <span class="label label-important">
-                                                {{elif totalCarry>=float(controlP.min_average) and totalCarry <= float(controlP.max_average):}}
+                                                {{elif round(totalCarry,0)>=float(controlP.min_average) and round(totalCarry,0) <= float(controlP.max_average):}}
                                                     <span class="label label-warning">
                                                 {{else:}}
                                                     <span class="label label-success">
                                                 {{pass}}
-                                                {{=str(totalCarry)}}
+                                                {{=str(int(round(totalCarry,0)))}}
                                                 </span>
                                             {{else:}}
                                                 <span class="label label-inverse">
-                                                    {{=str(totalCarry)}}
+                                                    {{=str(int(round(totalCarry,0)))}}
                                                 </span>
                                             {{pass}}
                                         {{pass}}
@@ -517,7 +517,7 @@
                                     {{else:}}
                                         <span class="label label-success">
                                     {{pass}}
-                                    {{=str(totalCarry)}}
+                                    {{=str(int(round(totalCarry,0)))}}
                                     </span>
                                 </center>
                             </td>

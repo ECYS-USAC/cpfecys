@@ -1,0 +1,31 @@
+{{extend 'template.html'}}
+<h1>
+	{{=T('Partials')}}
+	<a href="#myModal" role="button" class="btn btn-primary" data-toggle="modal">
+		<span class="icon-white icon-question-sign"></span>
+	</a>
+</h1>
+{{=grid}}
+<!--Help modal-->
+<div id="myModal" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true"> 
+  <div class="modal-header">
+    <button type="button" class="close" data-dismiss="modal"
+aria-hidden="true">×</button>
+      <h3 id="myModalLabel">
+          <span class="icon-question-sign"></span>
+          {{=T('Partials help')}}
+      </h3>
+  </div>
+  <div class="modal-body">
+    <div class="well">
+        <p>
+            {{=T('In this area you can manage partial list of available activities.')}}
+        </p>
+    </div>
+  </div>
+  <div class="modal-footer">
+      <button class="btn" data-dismiss="modal"
+aria-hidden="true">{{=T('Close')}}</button>
+  </div>
+</div>
+<!--Finish help modal-->

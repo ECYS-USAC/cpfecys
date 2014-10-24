@@ -537,6 +537,12 @@ def student_control_period():
     grid = SQLFORM.grid(db.student_control_period, maxtextlength=100,csv=False,create=False,deletable=False,)
     return dict(grid=grid)
 
+@auth.requires_login()
+@auth.requires_membership('Super-Administrator')
+def partials():
+    grid = SQLFORM.grid(db.partials, maxtextlength=100,csv=False,deletable=False,)
+    return dict(grid=grid)
+
 
 @auth.requires_login()
 def semaphore():
