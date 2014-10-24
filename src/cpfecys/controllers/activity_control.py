@@ -158,20 +158,26 @@ def control_students_grades():
         if course_ended_var.finish == True:
             session.flash = T('Not valid Action.')
             redirect(URL('default', 'index'))
-    
+    print "---------------->"+str(auth.has_membership('Super-Administrator'))
+    for date_var in db((db.student_control_period.period_name==T(str(cpfecys.current_year_period().period.name))+" "+str(cpfecys.current_year_period().yearp))).select():
+        if (auth.has_membership('Super-Administrator') == False and auth.has_membership('Ecys-Administrator') == False) and ( (var_activity.date_start < date_var.date_start_semester) or (var_activity.date_finish < date_var.date_start_semester) ):
+            session.flash = T('The activity date is out of this semester.')
+            redirect(URL('default', 'index'))
+        pass      
+    pass
 
-    if auth.has_membership('Super-Administrator') == False and auth.has_membership('Ecys-Administrator') == False :
+    if (auth.has_membership('Super-Administrator') == False and auth.has_membership('Ecys-Administrator') == False):
         assigantion = db((db.user_project.assigned_user == auth.user.id) & (db.user_project.period == var_period.id) & (db.user_project.project == var_project.id)).select().first()
-        #exception_query = db(db.course_laboratory_exception.project == id_project).select().first()
-        #if exception_query is None:
-        #    exception_s_var = False
-        #    exception_t_var = False
-        #else:
-        #    exception_t_var = exception_query.t_edit_lab
-        #    exception_s_var = exception_query.s_edit_course
-        #if (assigantion is None): #or (auth.has_membership('Teacher') and var_activity.laboratory == True and exception_t_var == False) or (auth.has_membership('Student') and var_activity.laboratory == False and exception_s_var == False):
-        #    session.flash=T('You do not have permission to view course requests')
-        #    redirect(URL('default','index'))
+        exception_query = db(db.course_laboratory_exception.project == id_project).select().first()
+        if exception_query is None:
+            exception_s_var = False
+            exception_t_var = False
+        else:
+            exception_t_var = exception_query.t_edit_lab
+            exception_s_var = exception_query.s_edit_course
+        if (assigantion is None) or (auth.has_membership('Teacher') and var_activity.laboratory == True and exception_t_var == False) or (auth.has_membership('Student') and var_activity.laboratory == False and exception_s_var == False and var_activity.teacher_permition==False and var_activity.course_activity_category.teacher_permition==False):
+            session.flash=T('You do not have permission to view course requests')
+            redirect(URL('default','index'))
         
     if var_activity.laboratory == True:
         academic_assig =  db((db.academic_course_assignation.assignation==id_project) & (db.academic_course_assignation.semester==id_year) &  (db.academic_course_assignation.laboratorio==True)).select()
