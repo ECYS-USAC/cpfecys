@@ -1976,4 +1976,5 @@
 'Your performance is': 'Su desempeño',
 'Your username is: %(username)s': 'Your username is: %(username)s',
 'YYYY-MM-DD': 'YYYY-MM-DD',
+'The activity date is out of this semester.':'La fecha de la actividad esta fuera del semestre.',
 }
