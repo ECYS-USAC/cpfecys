@@ -158,7 +158,7 @@ def control_students_grades():
         if course_ended_var.finish == True:
             session.flash = T('Not valid Action.')
             redirect(URL('default', 'index'))
-    print "---------------->"+str(auth.has_membership('Super-Administrator'))
+    #print "---------------->"+str(auth.has_membership('Super-Administrator'))
     for date_var in db((db.student_control_period.period_name==T(str(cpfecys.current_year_period().period.name))+" "+str(cpfecys.current_year_period().yearp))).select():
         if (auth.has_membership('Super-Administrator') == False and auth.has_membership('Ecys-Administrator') == False) and ( (var_activity.date_start < date_var.date_start_semester) or (var_activity.date_finish < date_var.date_start_semester) ):
             session.flash = T('The activity date is out of this semester.')
