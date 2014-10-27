@@ -1506,8 +1506,10 @@
 			  						$("#labelgradeCategory").css("display", "block");
 			  						if(category_create==varFinal){
 			  							for (var i1=0; i1 < categorysAll.length; i1++){
-			  								document.getElementById('field_grade').value=categorysAll[i1][2];
-			  								document.getElementById("field_grade").disabled = true;
+			  								if(categorysAll[i1][0]==category_create){
+				  								document.getElementById('field_grade').value=categorysAll[i1][2];
+				  								document.getElementById("field_grade").disabled = true;
+				  							}
 			  							}
 			  						}
 								}

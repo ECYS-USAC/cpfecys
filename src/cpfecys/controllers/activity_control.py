@@ -2842,10 +2842,6 @@ def grades_management():
         #***********************************************SEARCH***********************************************
         #****************************************************************************************************
         #****************************************************************************************************
-        #Courses
-        courses=[]
-        for assigantion in assigantions:
-            courses.append(assigantion.project.name)
         #Fields to search
         optionSearch=[]
         vecOptionSearch=[]
@@ -2872,32 +2868,124 @@ def grades_management():
         optionSearch.append('>=')
         optionSearch.append('>=')
         vecOptionSearch.append(optionSearch)
-        optionSearch=[]
+        
+
+        #Courses
+        courses=[]
+        coursesID=[]
+        for assigantion in assigantions:
+            courses.append(assigantion.project.name)
+            coursesID.append(assigantion.project)
 
 
         vecFieldsSearch=[]
-        optionSearch=[]
         tmpMonth=[]
-        optionSearch.append('Usuario Registro')
-        optionSearch.append('grades_log.user_name')
-        # projects = db(db.project.id.belongs(dest)).select()
-        tmpMonth.append(optionSearch)
+        tmpMonth.append('Usuario Registro')
+        tmpMonth.append('user_name')
+        tmpMonth.append('1')
+        #Administrators and principal of the school
+        tempAdministrators=[]
+        for value in db((db.auth_group.role=='Super-Administrator')|(db.auth_group.role=='Ecys-Administrator')).select():
+            tempAdministrators.append(value.id)
         optionSearch=[]
-        optionSearch.append('=')
-        optionSearch.append('!=')
-        optionSearch.append('<')
-        optionSearch.append('>')
-        optionSearch.append('<=')
-        optionSearch.append('>=')
-
-        optionSearch
-        tmpMonth.append(db().select(db.grades_log.user_name, distinct=True))
+        for value in db((db.auth_membership.group_id.belongs(tempAdministrators))).select(db.auth_membership.user_id, distinct=True):
+            optionSearch.append(value.user_id.username)
+        #Teacher and final practices
+        #for value in db((db.grades_log.yearp==period.yearp)&(db.grades_log.period==T(period.period.name))&(db.grades_log.project.belongs(courses))).select(db.grades_log.user_name, distinct=True):
+        for value in db((db.user_project.period==period.id)&(db.user_project.project.belongs(coursesID))).select(db.user_project.assigned_user, distinct=True):
+            optionSearch.append(value.assigned_user.username)
+        tmpMonth.append(optionSearch)
         vecFieldsSearch.append(tmpMonth)
 
-        query=(db.grades_log)
-        grid = SQLFORM.grid(query, csv=False, paginate=10, editable=False)
 
-    return dict(year=period, assigantions=assigantions, vecMonth=vecMonth, grid=grid, vecOptionSearch=vecOptionSearch, vecFieldsSearch=vecFieldsSearch)
+        tmpMonth=[]
+        tmpMonth.append('Rol')
+        tmpMonth.append('roll')
+        tmpMonth.append('1')
+        optionSearch=[]
+        for value in db((db.auth_group.role!='Academic')&(db.auth_group.role!='DSI')).select():
+            optionSearch.append(value.role)
+        tmpMonth.append(optionSearch)
+        vecFieldsSearch.append(tmpMonth)
+
+
+        tmpMonth=[]
+        tmpMonth.append('Operación')
+        tmpMonth.append('operation_log')
+        tmpMonth.append('1')
+        optionSearch=[]
+        optionSearch.append('insert')
+        optionSearch.append('update')
+        optionSearch.append('delete')
+        tmpMonth.append(optionSearch)
+        vecFieldsSearch.append(tmpMonth)
+
+
+        tmpMonth=[]
+        tmpMonth.append('Estudiante')
+        tmpMonth.append('academic')
+        tmpMonth.append('1')
+        #tmpMonth.append(db((db.academic_course_assignation.assignation.belongs(coursesID))&(db.academic_course_assignation.semester==period.id)).select())
+        optionSearch=[]
+        for value in db((db.academic_course_assignation.assignation.belongs(coursesID))&(db.academic_course_assignation.semester==period.id)).select():
+            optionSearch.append(value.carnet.carnet)
+        tmpMonth.append(optionSearch)
+        vecFieldsSearch.append(tmpMonth)
+
+
+        tmpMonth=[]
+        tmpMonth.append('Categoría')
+        tmpMonth.append('category')
+        tmpMonth.append('1')
+        catLab=0
+        catLabTemp = db(db.activity_category.category=='Laboratorio').select().first()
+        if catLabTemp is not None:
+            catLab=catLabTemp.id
+        #tmpMonth.append(db((db.course_activity_category.category!=catLab)&(db.course_activity_category.assignation.belongs(coursesID))&(db.course_activity_category.semester==period.id)).select())
+        optionSearch=[]
+        for value in db((db.course_activity_category.category!=catLab)&(db.course_activity_category.assignation.belongs(coursesID))&(db.course_activity_category.semester==period.id)).select(db.course_activity_category.category, distinct=True):
+            optionSearch.append(value.category.category)
+        tmpMonth.append(optionSearch)
+        vecFieldsSearch.append(tmpMonth)
+
+
+        tmpMonth=[]
+        tmpMonth.append('Actividad')
+        tmpMonth.append('activity')
+        tmpMonth.append('1')
+        #tmpMonth.append(db((db.course_activity.assignation.belongs(coursesID))&(db.course_activity.semester==period.id)).select())
+        optionSearch=[]
+        for value in db((db.course_activity.assignation.belongs(coursesID))&(db.course_activity.semester==period.id)).select(db.course_activity.name, distinct=True):
+            optionSearch.append(value.name)
+        tmpMonth.append(optionSearch)
+        vecFieldsSearch.append(tmpMonth)
+
+
+        tmpMonth=[]
+        tmpMonth.append('Nota Anterior')
+        tmpMonth.append('before_grade')
+        tmpMonth.append('2')
+        vecFieldsSearch.append(tmpMonth)
+
+
+        tmpMonth=[]
+        tmpMonth.append('Nota Actual')
+        tmpMonth.append('after_grade')
+        tmpMonth.append('2')
+        vecFieldsSearch.append(tmpMonth)
+
+
+        tmpMonth=[]
+        tmpMonth.append('Fecha Modificación')
+        tmpMonth.append('date_log')
+        tmpMonth.append('3')
+        vecFieldsSearch.append(tmpMonth)
+
+
+        #query=(db.grades_log)
+        #grid = SQLFORM.grid(query, csv=False, paginate=10, editable=False)
+
+    return dict(year=period, assigantions=assigantions, vecMonth=vecMonth, vecOptionSearch=vecOptionSearch, vecFieldsSearch=vecFieldsSearch)
 
 @auth.requires_login()
 @auth.requires(auth.has_membership('Teacher'))

@@ -1603,6 +1603,7 @@
 'Successful assignment to the course, the student is already registered in the system': 'Asignación exitosa al curso, el estudiante ya se encuentra registrado en el sistema',
 'Sum graded': 'Suma calificados',
 'Sunday': 'Domingo',
+'Super-Administrator': 'Super-Administrator',
 'Support': 'Soporte',
 'Sure you want to delete this object?': '¿Está seguro que desea eliminar este objeto?',
 'System Configuration': 'Configuración del sistema',
@@ -1635,6 +1636,7 @@
 'Testing application': 'Probando aplicación',
 'The "query" is a condition like "db.table1.field1==\'value\'". Something like "db.table1.field1==db.table2.field2" results in a SQL JOIN.': 'La "consulta" es una condición como "db.tabla1.campo1==\'valor\'". Algo como "db.tabla1.campo1==db.tabla2.campo2" resulta en un JOIN SQL.',
 'The activities within the laboratory planning not affect the students grade.': 'Las actividades dentro de la planificación de laboratorio no afectan la nota del estudiante.',
+'The activity date is out of this semester.': 'La fecha de la actividad esta fuera del semestre.',
 'the application logic, each URL path is mapped in one exposed function in the controller': 'la lógica de la aplicación, cada ruta URL se mapea en una función expuesta en el controlador',
 'The category has not activities.': 'The category has not activities.',
 'The category has: ': 'The category has: ',
@@ -1976,5 +1978,4 @@
 'Your performance is': 'Su desempeño',
 'Your username is: %(username)s': 'Your username is: %(username)s',
 'YYYY-MM-DD': 'YYYY-MM-DD',
-'The activity date is out of this semester.':'La fecha de la actividad esta fuera del semestre.',
 }
