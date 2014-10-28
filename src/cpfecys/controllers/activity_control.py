@@ -158,11 +158,14 @@ def control_students_grades():
         if course_ended_var.finish == True:
             session.flash = T('Not valid Action.')
             redirect(URL('default', 'index'))
-    #print "---------------->"+str(auth.has_membership('Super-Administrator'))
+    
+    actual_period = True
     for date_var in db((db.student_control_period.period_name==T(str(cpfecys.current_year_period().period.name))+" "+str(cpfecys.current_year_period().yearp))).select():
-        if (auth.has_membership('Super-Administrator') == False and auth.has_membership('Ecys-Administrator') == False) and ( (var_activity.date_start < date_var.date_start_semester) or (var_activity.date_finish < date_var.date_start_semester) ):
-            session.flash = T('The activity date is out of this semester.')
-            redirect(URL('default', 'index'))
+        if  ( (var_activity.date_start < date_var.date_start_semester) or (var_activity.date_finish < date_var.date_start_semester) ):
+            actual_period = False
+            if (auth.has_membership('Super-Administrator') == False and auth.has_membership('Ecys-Administrator') == False) :
+                session.flash = T('The activity date is out of this semester.')
+                redirect(URL('default', 'index'))
         pass      
     pass
 
@@ -227,7 +230,7 @@ def control_students_grades():
         request_change_var = False
 
 
-    return dict(academic_assig=academic_assig, var_period=var_period, var_activity=var_activity, var_project=var_project, request_change_var =request_change_var)
+    return dict(academic_assig=academic_assig, var_period=var_period, var_activity=var_activity, var_project=var_project, request_change_var =request_change_var, actual_period = actual_period)
 
 
 @auth.requires_login()
@@ -236,6 +239,11 @@ def grades():
     id_activity = request.vars['activity']
     id_project = request.vars['project']
     id_year = request.vars['year']
+    coment = request.vars['coment']
+    if coment is None:
+        coment = ""
+    
+    
 
     var_period = db(db.period_year.id==id_year).select().first()
     if not var_period:
@@ -261,7 +269,13 @@ def grades():
     for acaT in academic_assig:
         tempAcademic.append(acaT.academic_course_assignation)
 
-
+    actual_period = True
+    for date_var in db((db.student_control_period.period_name==T(str(cpfecys.current_year_period().period.name))+" "+str(cpfecys.current_year_period().yearp))).select():
+        if  ( (var_activity.date_start < date_var.date_start_semester) or (var_activity.date_finish < date_var.date_start_semester) ):
+            actual_period = False
+        pass      
+    pass
+    
     rol_log=''
     if auth.has_membership('Ecys-Administrator')==True:
         rol_log='Ecys-Administrator'
@@ -382,7 +396,7 @@ def grades():
                                                     period = T(assig_var.semester.period.name),
                                                     yearp = assig_var.semester.yearp,
                                                     after_grade = request.vars['grade'],
-                                                    description = T('Inserted from Grades page')
+                                                    description = T('Inserted from Grades page')+" - "+coment
                                                      )
                                     if request.vars['op'] == "add_grade":
                                         add_grade_flash = True
@@ -513,7 +527,9 @@ def grades():
         alert_message = alert_message,
         add_grade_error = add_grade_error,
         add_grade_flash = add_grade_flash,
-        exist_activity_request_change = exist_activity_request_change
+        exist_activity_request_change = exist_activity_request_change,
+        coment = coment,
+        actual_period = actual_period
         )
 
 

@@ -1978,4 +1978,5 @@
 'Your performance is': 'Su desempeño',
 'Your username is: %(username)s': 'Your username is: %(username)s',
 'YYYY-MM-DD': 'YYYY-MM-DD',
+'Please enter the reason for the change.':'Por favor ingrese la razón del cambio.',
 }

@@ -223,7 +223,13 @@ aria-hidden="true">{{=T('Close')}}</button>
               document.getElementById('grade_input').focus(); 
               document.getElementById('grade_input').select();
             }else{
-              $("#grades_list").load("{{=URL('activity_control','grades.html')}}?op=add_grade&amp;activity={{=var_activity.id}}&amp;project={{=var_project.id}}&amp;year={{=var_period.id}}&amp;carnet="+carnet_var+"&amp;grade="+grade_var);
+              var coment = ""
+              {{if actual_period == False:}}                
+                while (coment == ""){
+                  coment = prompt("{{=T('Please enter the reason for the change.')}}","");  
+                }                
+              {{pass}}
+              $("#grades_list").load("{{=URL('activity_control','grades.html')}}?op=add_grade&amp;activity={{=var_activity.id}}&amp;project={{=var_project.id}}&amp;year={{=var_period.id}}&amp;carnet="+carnet_var+"&amp;grade="+grade_var+"&amp;coment="+encodeURIComponent(coment));
               document.getElementById('carnet_input').focus();
               document.getElementById('grade_input').value = "";
               document.getElementById('carnet_input').value = "";
