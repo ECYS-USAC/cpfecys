@@ -22,7 +22,10 @@
 				{{if request.vars['op'] !='1':}}
 					{{total_grades = db(db.grades.activity==activity_var.id).count()}}
 				{{else:}}
-					{{total_grades = db((db.grades.activity==activity_var.id)&(db.grades.academic_assignation == request.vars['academic'])).count()}}
+					{{#total_grades = db((db.grades.activity==activity_var.id)&(db.grades.academic_assignation == request.vars['academic'])).count()}}
+
+					{{total_grades = db(db.grades.activity==activity_var.id).count()}}
+					
 				{{pass}}
 				{{if total_grades != 0:}}
 					
@@ -35,7 +38,12 @@
 						{{pass}}
 					{{else:}}
 						{{averageA = db((db.grades.activity==activity_var.id)&(db.grades.academic_assignation == request.vars['academic'])).select().first()}}
-						{{average=float(averageA.grade)}}
+						{{if averageA!=  None:}}
+							{{average=float(averageA.grade)}}
+						{{else:}}
+							{{average=float(00.001)}}
+						{{pass}}
+
 					{{pass}}
 
 					{{if category_var.specific_grade==False:}}

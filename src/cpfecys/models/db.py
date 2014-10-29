@@ -761,7 +761,11 @@ db.define_table('student_control_period',
     Field('max_average', 'decimal(5,2)', notnull=False, default=85.00, label=T('Max Average')),
     Field('date_start_semester', 'date', notnull = True, label = T('Date Start Semester')),
     Field('date_finish_semester', 'date', notnull = True, label = T('Date Finish Semester'))
-    )    
+    )
+
+db.define_table('partials',
+    Field('name', 'string', notnull=True, unique=False, label = T('name')),
+    )  
 
 db.define_table('course_activity',
     Field('course_activity_category', 'reference course_activity_category', notnull=True, label = T('category')),

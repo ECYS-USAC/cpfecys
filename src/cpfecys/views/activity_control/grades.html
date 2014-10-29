@@ -109,7 +109,7 @@
                                   yearp = assig_var.semester.yearp,
                                   after_grade = request.vars['grade'],
                                   before_grade = grade_before.grade,
-                                  description = T('Edited from Grades page')
+                                  description = T('Edited from Grades page')+" - "+coment
                                )}}
       {{pass}}
     {{pass}}
@@ -154,7 +154,7 @@
                               period = T(grade_var.academic_assignation.semester.period.name),
                               yearp = grade_var.academic_assignation.semester.yearp,
                               before_grade = grade_var.grade,
-                              description = T('Delete from Grades page')
+                              description = T('Delete from Grades page')+" - "+coment
                                )}}
           {{pass}}
       {{pass}}
@@ -442,9 +442,15 @@
             grade_id_list = '{{=var_grade.id}}' + ',' + grade_id_list
           {{pass}}
         {{pass}}
-        $("#grades_list").load("{{=URL('activity_control','grades.html')}}?op=remove_grade_list&amp;activity={{=var_activity.id}}&amp;grade_id="+ grade_id_list +"&amp;project={{=var_project.id}}&amp;year={{=var_period.id}}");
+        var coment = ""
+        {{if actual_period == False:}}                
+          while (coment == ""){
+            coment = prompt("{{=T('Please enter the reason for the change.')}}","");  
+          }                
+        {{pass}}
+        $("#grades_list").load("{{=URL('activity_control','grades.html')}}?op=remove_grade_list&amp;activity={{=var_activity.id}}&amp;grade_id="+ grade_id_list +"&amp;project={{=var_project.id}}&amp;year={{=var_period.id}}"+"&amp;coment="+encodeURIComponent(coment) );
 
-        $("#grades_list").load("{{=URL('activity_control','grades.html')}}?op=view_grades&amp;activity={{=var_activity.id}}&amp;project={{=var_project.id}}&amp;year={{=var_period.id}}");
+        $("#grades_list").load("{{=URL('activity_control','grades.html')}}?op=view_grades&amp;activity={{=var_activity.id}}&amp;project={{=var_project.id}}&amp;year={{=var_period.id}}"+"&amp;coment="+encodeURIComponent(coment));
     }
   }
   function cancel_request(){    
@@ -483,17 +489,23 @@
         if (!regex.test(grade_var) && !regex2.test(grade_var) ){
             string_error = (string_error+'<tr><td>'+var_carnet+'</td><td>'+grade_var+'</td><td>{{=T("Grade is not number")}}</td></tr>');
         }else{
+          var coment = ""
+          {{if actual_period == False:}}                
+            while (coment == ""){
+              coment = prompt("{{=T('Please enter the reason for the change.')}}","");  
+            }                
+          {{pass}}
           {{for academic in academic_assig:}}
             if ({{=academic.carnet.carnet}} == var_carnet){
               {{var_grade = db((db.grades.academic_assignation==academic.id) & (db.grades.activity==var_activity.id)).select().first()}}
               {{if var_grade != None:}}
                 if (grade_var != {{=var_grade.grade}}){
                   //Update
-                  $("#grades_list").load("{{=URL('activity_control','grades.html')}}?op=update_grade&amp;activity={{=var_activity.id}}&amp;project={{=var_project.id}}&amp;year={{=var_period.id}}&amp;carnet="+var_carnet+"&amp;grade="+grade_var);
-                  $("#grades_list").load("{{=URL('activity_control','grades.html')}}?op=view_grades&amp;activity={{=var_activity.id}}&amp;project={{=var_project.id}}&amp;year={{=var_period.id}}");
+                  $("#grades_list").load("{{=URL('activity_control','grades.html')}}?op=update_grade&amp;activity={{=var_activity.id}}&amp;project={{=var_project.id}}&amp;year={{=var_period.id}}&amp;carnet="+var_carnet+"&amp;grade="+grade_var+"&amp;coment="+encodeURIComponent(coment));
+                  $("#grades_list").load("{{=URL('activity_control','grades.html')}}?op=view_grades&amp;activity={{=var_activity.id}}&amp;project={{=var_project.id}}&amp;year={{=var_period.id}}"+"&amp;coment="+encodeURIComponent(coment));
                 }
               {{else:}}
-                $("#grades_list").load("{{=URL('activity_control','grades.html')}}?op=add_grade&amp;activity={{=var_activity.id}}&amp;project={{=var_project.id}}&amp;year={{=var_period.id}}&amp;carnet="+var_carnet+"&amp;grade="+grade_var);
+                $("#grades_list").load("{{=URL('activity_control','grades.html')}}?op=add_grade&amp;activity={{=var_activity.id}}&amp;project={{=var_project.id}}&amp;year={{=var_period.id}}&amp;carnet="+var_carnet+"&amp;grade="+grade_var+"&amp;coment="+encodeURIComponent(coment));
               {{pass}}
             } 
           {{pass}}
@@ -568,11 +580,22 @@
                 
               }            
             {{pass}}
+            var coment = ""
             if (carnet_list != '' ){
+              {{if actual_period == False:}}                
+                while (coment == ""){
+                  coment = prompt("{{=T('Please enter the reason for the change.')}}","");  
+                }                
+              {{pass}}
               $("#grades_list").load("{{=URL('activity_control','grades.html')}}?op=add_grade_list&amp;activity={{=var_activity.id}}&amp;project={{=var_project.id}}&amp;year={{=var_period.id}}&amp;carnet="+carnet_list+"&amp;grade="+grade_list+"&amp;description_var="+encodeURIComponent(description_var)); 
             }
             
             if (update_carnet_list != '' ){
+              {{if actual_period == False:}}                
+                while (coment == ""){
+                  coment = prompt("{{=T('Please enter the reason for the change.')}}","");  
+                }                
+              {{pass}}
               $("#grades_list").load("{{=URL('activity_control','grades.html')}}?op=add_grade_list&amp;activity={{=var_activity.id}}&amp;project={{=var_project.id}}&amp;year={{=var_period.id}}&amp;carnet="+update_carnet_list+"&amp;grade="+update_grade_list+"&amp;description_var="+encodeURIComponent(description_var)); 
             }
              
@@ -629,12 +652,26 @@
           }
         }
       {{pass}}
+
+      var coment = ""
+        
+
       if (carnet_list != '' ){
-        $("#grades_list").load("{{=URL('activity_control','grades.html')}}?op=add_grade_list&amp;activity={{=var_activity.id}}&amp;project={{=var_project.id}}&amp;year={{=var_period.id}}&amp;carnet="+carnet_list+"&amp;grade="+grade_list);
+        {{if actual_period == False:}}                
+          while (coment == ""){
+            coment = prompt("{{=T('Please enter the reason for the change.')}}","");  
+          }                
+        {{pass}}
+        $("#grades_list").load("{{=URL('activity_control','grades.html')}}?op=add_grade_list&amp;activity={{=var_activity.id}}&amp;project={{=var_project.id}}&amp;year={{=var_period.id}}&amp;carnet="+carnet_list+"&amp;grade="+grade_list+"&amp;coment="+encodeURIComponent(coment));
       }
       
       if (update_carnet_list != '' ){
-        $("#grades_list").load("{{=URL('activity_control','grades.html')}}?op=update_grade_list&amp;activity={{=var_activity.id}}&amp;project={{=var_project.id}}&amp;year={{=var_period.id}}&amp;carnet="+update_carnet_list+"&amp;grade="+update_grade_list);
+        {{if actual_period == False:}}                
+          while (coment == ""){
+            coment = prompt("{{=T('Please enter the reason for the change.')}}","");  
+          }                
+        {{pass}}
+        $("#grades_list").load("{{=URL('activity_control','grades.html')}}?op=update_grade_list&amp;activity={{=var_activity.id}}&amp;project={{=var_project.id}}&amp;year={{=var_period.id}}&amp;carnet="+update_carnet_list+"&amp;grade="+update_grade_list+"&amp;coment="+encodeURIComponent(coment));
       }
 
       $("#grades_list").load("{{=URL('activity_control','grades.html')}}?op=view_grades&amp;activity={{=var_activity.id}}&amp;project={{=var_project.id}}&amp;year={{=var_period.id}}");
@@ -651,7 +688,13 @@
   function remove_grade(var_id){
     var r = confirm("{{=T('Do you want to delete this record?')}}");
     if (r == true) {
-       $("#grades_list").load("{{=URL('activity_control','grades.html')}}?op=remove_grade&amp;activity={{=var_activity.id}}&amp;grade_id="+var_id+"&amp;project={{=var_project.id}}&amp;year={{=var_period.id}}");
+      var coment = ""
+        {{if actual_period == False:}}                
+          while (coment == ""){
+            coment = prompt("{{=T('Please enter the reason for the change.')}}","");  
+          }                
+        {{pass}}
+       $("#grades_list").load("{{=URL('activity_control','grades.html')}}?op=remove_grade&amp;activity={{=var_activity.id}}&amp;grade_id="+var_id+"&amp;project={{=var_project.id}}&amp;year={{=var_period.id}}"+"&amp;coment="+encodeURIComponent(coment));
         }
     }
   function cancel_all(){

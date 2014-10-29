@@ -1,0 +1,148 @@
+{{if showLevel==False:}}
+	<center>{{=T('Action not allowed')}}</center>
+	<script type="text/javascript">
+		alert("{{=T('Action not allowed')}}");
+		window.location.href = "{{=URL('default', 'index.html')}}";
+	</script>
+{{else:}}
+	<table class="table table-striped table-bordered">
+		<thead>
+			<th width="480px">
+				<center>{{=T('Role')}}</center>
+			</th>
+			{{if ((tipo=='all') or (tipo=='i')):}}
+				<th>
+					<center>{{=T('Total inserted')}}</center>
+				</th>
+			{{pass}}
+			{{if ((tipo=='all') or (tipo=='u')):}}
+				<th>
+					<center>{{=T('Total modified')}}</center>
+				</th>
+			{{pass}}
+			{{if ((tipo=='all') or (tipo=='d')):}}
+				<th>
+					<center>{{=T('Total out')}}</center>
+				</th>
+			{{pass}}
+		</thead>
+		<tbody>
+			{{for ror in vecRoleMonth:}}
+				<tr>
+					<td>
+						<a id="p{{=str(project.id)}}_all_m{{=month}}_all_r{{=ror[0]}}_all" style="white-space:nowrap; cursor:pointer;">
+							{{if ror[0]=='Student':}}
+								{{=T('Rol Student')}}
+							{{else:}}
+								{{=T(ror[0])}}
+							{{pass}}
+						</a>
+					</td>
+					{{if tipo=='all':}}
+						<td>
+							<center>
+								<a id="p{{=str(project.id)}}_all_m{{=month}}_all_r{{=ror[0]}}_i" style="white-space:nowrap; cursor:pointer;" class="badge badge-success">{{=ror[1]}}</a>
+							</center>
+						</td>
+						<td>
+							<center>
+								<a id="p{{=str(project.id)}}_all_m{{=month}}_all_r{{=ror[0]}}_u" style="white-space:nowrap; cursor:pointer;" class="badge badge-info">{{=ror[2]}}</a>
+							</center>
+						</td>
+						<td>
+							<center>
+								<a id="p{{=str(project.id)}}_all_m{{=month}}_all_r{{=ror[0]}}_d" style="white-space:nowrap; cursor:pointer;" class="badge badge-important">{{=ror[3]}}</a>
+							</center>
+						</td>
+					{{elif tipo=='i':}}
+						<td>
+							<center>
+								<a id="p{{=str(project.id)}}_all_m{{=month}}_all_r{{=ror[0]}}_i" style="white-space:nowrap; cursor:pointer;" class="badge badge-success">{{=ror[1]}}</a>
+							</center>
+						</td>
+					{{elif tipo=='u':}}
+						<td>
+							<center>
+								<a id="p{{=str(project.id)}}_all_m{{=month}}_all_r{{=ror[0]}}_u" style="white-space:nowrap; cursor:pointer;" class="badge badge-info">{{=ror[1]}}</a>
+							</center>
+						</td>
+					{{elif tipo=='d':}}
+						<td>
+							<center>
+								<a id="p{{=str(project.id)}}_all_m{{=month}}_all_r{{=ror[0]}}_d" style="white-space:nowrap; cursor:pointer;" class="badge badge-important">{{=ror[1]}}</a>
+							</center>
+						</td>
+					{{pass}}
+				</tr>
+				<tr>
+					{{if tipo=='all':}}
+						<td colspan="4">
+					{{elif tipo=='i' or tipo=='u' or tipo=='d':}}
+						<td colspan="2">
+					{{pass}}
+						<div id="div_p{{=str(project.id)}}_m{{=month}}_r{{=ror[0]}}" style="display: none;">
+							<center>{{=T('Loading')}}...</center>
+						</div>
+					</td>
+				</tr>
+			{{pass}}
+		</tbody>
+	</table>
+	<script type="text/javascript">
+		$(document).ready(function(){
+			{{for ror in vecRoleMonth:}}
+				$("#p{{=str(project.id)}}_all_m{{=month}}_all_r{{=ror[0]}}_all").click(function(){
+					$("#div_p{{=str(project.id)}}_m{{=month}}_r{{=ror[0]}}").toggle();
+					jQuery('#div_p{{=str(project.id)}}_m{{=month}}_r{{=ror[0]}}').empty();
+					jQuery('#div_p{{=str(project.id)}}_m{{=month}}_r{{=ror[0]}}').append("{{=T('Loading')}}...");
+					$("#div_p{{=str(project.id)}}_m{{=month}}_r{{=ror[0]}}").load("{{=URL('activity_control','grades_management_n3.load')}}?tipo=all&amp;month={{=month}}&amp;roll="+encodeURIComponent("{{=ror[0]}}")+"&amp;project="+encodeURIComponent({{=project.id}}));
+				});
+
+				
+				{{if tipo=='all':}}
+					$("#p{{=str(project.id)}}_all_m{{=month}}_all_r{{=ror[0]}}_i").click(function(){
+						$("#div_p{{=str(project.id)}}_m{{=month}}_r{{=ror[0]}}").toggle();
+						jQuery('#div_p{{=str(project.id)}}_m{{=month}}_r{{=ror[0]}}').empty();
+						jQuery('#div_p{{=str(project.id)}}_m{{=month}}_r{{=ror[0]}}').append("{{=T('Loading')}}...");
+						$("#div_p{{=str(project.id)}}_m{{=month}}_r{{=ror[0]}}").load("{{=URL('activity_control','grades_management_n3.load')}}?tipo=i&amp;month={{=month}}&amp;roll="+encodeURIComponent("{{=ror[0]}}")+"&amp;project="+encodeURIComponent({{=project.id}}));
+					});
+
+					$("#p{{=str(project.id)}}_all_m{{=month}}_all_r{{=ror[0]}}_u").click(function(){
+						$("#div_p{{=str(project.id)}}_m{{=month}}_r{{=ror[0]}}").toggle();
+						jQuery('#div_p{{=str(project.id)}}_m{{=month}}_r{{=ror[0]}}').empty();
+						jQuery('#div_p{{=str(project.id)}}_m{{=month}}_r{{=ror[0]}}').append("{{=T('Loading')}}...");
+						$("#div_p{{=str(project.id)}}_m{{=month}}_r{{=ror[0]}}").load("{{=URL('activity_control','grades_management_n3.load')}}?tipo=u&amp;month={{=month}}&amp;roll="+encodeURIComponent("{{=ror[0]}}")+"&amp;project="+encodeURIComponent({{=project.id}}));
+					});
+
+					$("#p{{=str(project.id)}}_all_m{{=month}}_all_r{{=ror[0]}}_d").click(function(){
+						$("#div_p{{=str(project.id)}}_m{{=month}}_r{{=ror[0]}}").toggle();
+						jQuery('#div_p{{=str(project.id)}}_m{{=month}}_r{{=ror[0]}}').empty();
+						jQuery('#div_p{{=str(project.id)}}_m{{=month}}_r{{=ror[0]}}').append("{{=T('Loading')}}...");
+						$("#div_p{{=str(project.id)}}_m{{=month}}_r{{=ror[0]}}").load("{{=URL('activity_control','grades_management_n3.load')}}?tipo=d&amp;month={{=month}}&amp;roll="+encodeURIComponent("{{=ror[0]}}")+"&amp;project="+encodeURIComponent({{=project.id}}));
+					});
+				{{elif tipo=='i':}}
+					$("#p{{=str(project.id)}}_all_m{{=month}}_all_r{{=ror[0]}}_i").click(function(){
+						$("#div_p{{=str(project.id)}}_m{{=month}}_r{{=ror[0]}}").toggle();
+						jQuery('#div_p{{=str(project.id)}}_m{{=month}}_r{{=ror[0]}}').empty();
+						jQuery('#div_p{{=str(project.id)}}_m{{=month}}_r{{=ror[0]}}').append("{{=T('Loading')}}...");
+						$("#div_p{{=str(project.id)}}_m{{=month}}_r{{=ror[0]}}").load("{{=URL('activity_control','grades_management_n3.load')}}?tipo=i&amp;month={{=month}}&amp;roll="+encodeURIComponent("{{=ror[0]}}")+"&amp;project="+encodeURIComponent({{=project.id}}));
+					});
+				{{elif tipo=='u':}}
+					$("#p{{=str(project.id)}}_all_m{{=month}}_all_r{{=ror[0]}}_u").click(function(){
+						$("#div_p{{=str(project.id)}}_m{{=month}}_r{{=ror[0]}}").toggle();
+						jQuery('#div_p{{=str(project.id)}}_m{{=month}}_r{{=ror[0]}}').empty();
+						jQuery('#div_p{{=str(project.id)}}_m{{=month}}_r{{=ror[0]}}').append("{{=T('Loading')}}...");
+						$("#div_p{{=str(project.id)}}_m{{=month}}_r{{=ror[0]}}").load("{{=URL('activity_control','grades_management_n3.load')}}?tipo=u&amp;month={{=month}}&amp;roll="+encodeURIComponent("{{=ror[0]}}")+"&amp;project="+encodeURIComponent({{=project.id}}));
+					});
+				{{elif tipo=='d':}}
+					$("#p{{=str(project.id)}}_all_m{{=month}}_all_r{{=ror[0]}}_d").click(function(){
+						$("#div_p{{=str(project.id)}}_m{{=month}}_r{{=ror[0]}}").toggle();
+						jQuery('#div_p{{=str(project.id)}}_m{{=month}}_r{{=ror[0]}}').empty();
+						jQuery('#div_p{{=str(project.id)}}_m{{=month}}_r{{=ror[0]}}').append("{{=T('Loading')}}...");
+						$("#div_p{{=str(project.id)}}_m{{=month}}_r{{=ror[0]}}").load("{{=URL('activity_control','grades_management_n3.load')}}?tipo=d&amp;month={{=month}}&amp;roll="+encodeURIComponent("{{=ror[0]}}")+"&amp;project="+encodeURIComponent({{=project.id}}));
+					});
+				{{pass}}
+			{{pass}}
+		});
+	</script>
+{{pass}}

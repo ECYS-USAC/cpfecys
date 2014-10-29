@@ -1,0 +1,142 @@
+{{if showLevel==False:}}
+	<center>{{=T('Action not allowed')}}</center>
+	<script type="text/javascript">
+		alert("{{=T('Action not allowed')}}");
+		window.location.href = "{{=URL('default', 'index.html')}}";
+	</script>
+{{else:}}
+	<table class="table table-striped table-bordered">
+		<thead>
+			<th width="470px">
+				<center>{{=T('User')}}</center>
+			</th>
+			{{if ((tipo=='all') or (tipo=='i')):}}
+				<th>
+					<center>{{=T('Total inserted')}}</center>
+				</th>
+			{{pass}}
+			{{if ((tipo=='all') or (tipo=='u')):}}
+				<th>
+					<center>{{=T('Total modified')}}</center>
+				</th>
+			{{pass}}
+			{{if ((tipo=='all') or (tipo=='d')):}}
+				<th>
+					<center>{{=T('Total out')}}</center>
+				</th>
+			{{pass}}
+		</thead>
+		<tbody>
+			{{for userr in vecUserRoleMonth:}}
+				<tr>
+					<td>
+						<a id="p{{=str(project.id)}}_all_m{{=month}}_all_r{{=roll}}_all_r{{=userr[0]}}_all" style="white-space:nowrap; cursor:pointer;">{{=userr[0]}}</a>
+					</td>
+					{{if tipo=='all':}}
+						<td>
+							<center>
+								<a id="p{{=str(project.id)}}_all_m{{=month}}_all_r{{=roll}}_all_U{{=userr[0]}}_i" style="white-space:nowrap; cursor:pointer;" class="badge badge-success">{{=userr[1]}}</a>
+							</center>
+						</td>
+						<td>
+							<center>
+								<a id="p{{=str(project.id)}}_all_m{{=month}}_all_r{{=roll}}_all_U{{=userr[0]}}_u" style="white-space:nowrap; cursor:pointer;" class="badge badge-info">{{=userr[2]}}</a>
+							</center>
+						</td>
+						<td>
+							<center>
+								<a id="p{{=str(project.id)}}_all_m{{=month}}_all_r{{=roll}}_all_U{{=userr[0]}}_d" style="white-space:nowrap; cursor:pointer;" class="badge badge-important">{{=userr[3]}}</a>
+							</center>
+						</td>
+					{{elif tipo=='i':}}
+						<td>
+							<center>
+								<a id="p{{=str(project.id)}}_all_m{{=month}}_all_r{{=roll}}_all_U{{=userr[0]}}_i" style="white-space:nowrap; cursor:pointer;" class="badge badge-success">{{=userr[1]}}</a>
+							</center>
+						</td>
+					{{elif tipo=='u':}}
+						<td>
+							<center>
+								<a id="p{{=str(project.id)}}_all_m{{=month}}_all_r{{=roll}}_all_U{{=userr[0]}}_u" style="white-space:nowrap; cursor:pointer;" class="badge badge-info">{{=userr[1]}}</a>
+							</center>
+						</td>
+					{{elif tipo=='d':}}
+						<td>
+							<center>
+								<a id="p{{=str(project.id)}}_all_m{{=month}}_all_r{{=roll}}_all_U{{=userr[0]}}_d" style="white-space:nowrap; cursor:pointer;" class="badge badge-important">{{=userr[1]}}</a>
+							</center>
+						</td>
+					{{pass}}
+				</tr>
+				<tr>
+					{{if tipo=='all':}}
+						<td colspan="4">
+					{{elif tipo=='i' or tipo=='u' or tipo=='d':}}
+						<td colspan="2">
+					{{pass}}
+						<div id="div_p{{=str(project.id)}}_m{{=month}}_r{{=roll}}_u{{=userr[0]}}" style="display: none;">
+							<center>{{=T('Loading')}}...</center>
+						</div>
+					</td>
+				</tr>
+			{{pass}}
+		</tbody>
+	</table>
+	<script type="text/javascript">
+		$(document).ready(function(){
+			{{for userr in vecUserRoleMonth:}}
+				$("#p{{=str(project.id)}}_all_m{{=month}}_all_r{{=roll}}_all_r{{=userr[0]}}_all").click(function(){
+					$("#div_p{{=str(project.id)}}_m{{=month}}_r{{=roll}}_u{{=userr[0]}}").toggle();
+					jQuery('#div_p{{=str(project.id)}}_m{{=month}}_r{{=roll}}_u{{=userr[0]}}').empty();
+					jQuery('#div_p{{=str(project.id)}}_m{{=month}}_r{{=roll}}_u{{=userr[0]}}').append("{{=T('Loading')}}...");
+					$("#div_p{{=str(project.id)}}_m{{=month}}_r{{=roll}}_u{{=userr[0]}}").load("{{=URL('activity_control','grades_management_n4.load')}}?tipo=all&amp;userr="+encodeURIComponent("{{=userr[0]}}")+"&amp;month={{=month}}&amp;roll="+encodeURIComponent("{{=roll}}")+"&amp;project="+encodeURIComponent({{=project.id}}));
+				});
+
+				
+				{{if tipo=='all':}}
+					$("#p{{=str(project.id)}}_all_m{{=month}}_all_r{{=roll}}_all_U{{=userr[0]}}_i").click(function(){
+						$("#div_p{{=str(project.id)}}_m{{=month}}_r{{=roll}}_u{{=userr[0]}}").toggle();
+						jQuery('#div_p{{=str(project.id)}}_m{{=month}}_r{{=roll}}_u{{=userr[0]}}').empty();
+						jQuery('#div_p{{=str(project.id)}}_m{{=month}}_r{{=roll}}_u{{=userr[0]}}').append("{{=T('Loading')}}...");
+						$("#div_p{{=str(project.id)}}_m{{=month}}_r{{=roll}}_u{{=userr[0]}}").load("{{=URL('activity_control','grades_management_n4.load')}}?tipo=i&amp;userr="+encodeURIComponent("{{=userr[0]}}")+"&amp;month={{=month}}&amp;roll="+encodeURIComponent("{{=roll}}")+"&amp;project="+encodeURIComponent({{=project.id}}));
+					});
+
+					$("#p{{=str(project.id)}}_all_m{{=month}}_all_r{{=roll}}_all_U{{=userr[0]}}_u").click(function(){
+						$("#div_p{{=str(project.id)}}_m{{=month}}_r{{=roll}}_u{{=userr[0]}}").toggle();
+						jQuery('#div_p{{=str(project.id)}}_m{{=month}}_r{{=roll}}_u{{=userr[0]}}').empty();
+						jQuery('#div_p{{=str(project.id)}}_m{{=month}}_r{{=roll}}_u{{=userr[0]}}').append("{{=T('Loading')}}...");
+						$("#div_p{{=str(project.id)}}_m{{=month}}_r{{=roll}}_u{{=userr[0]}}").load("{{=URL('activity_control','grades_management_n4.load')}}?tipo=u&amp;userr="+encodeURIComponent("{{=userr[0]}}")+"&amp;month={{=month}}&amp;roll="+encodeURIComponent("{{=roll}}")+"&amp;project="+encodeURIComponent({{=project.id}}));
+					});
+
+					$("#p{{=str(project.id)}}_all_m{{=month}}_all_r{{=roll}}_all_U{{=userr[0]}}_d").click(function(){
+						$("#div_p{{=str(project.id)}}_m{{=month}}_r{{=roll}}_u{{=userr[0]}}").toggle();
+						jQuery('#div_p{{=str(project.id)}}_m{{=month}}_r{{=roll}}_u{{=userr[0]}}').empty();
+						jQuery('#div_p{{=str(project.id)}}_m{{=month}}_r{{=roll}}_u{{=userr[0]}}').append("{{=T('Loading')}}...");
+						$("#div_p{{=str(project.id)}}_m{{=month}}_r{{=roll}}_u{{=userr[0]}}").load("{{=URL('activity_control','grades_management_n4.load')}}?tipo=d&amp;userr="+encodeURIComponent("{{=userr[0]}}")+"&amp;month={{=month}}&amp;roll="+encodeURIComponent("{{=roll}}")+"&amp;project="+encodeURIComponent({{=project.id}}));
+					});
+				{{elif tipo=='i':}}
+					$("#p{{=str(project.id)}}_all_m{{=month}}_all_r{{=roll}}_all_U{{=userr[0]}}_i").click(function(){
+						$("#div_p{{=str(project.id)}}_m{{=month}}_r{{=roll}}_u{{=userr[0]}}").toggle();
+						jQuery('#div_p{{=str(project.id)}}_m{{=month}}_r{{=roll}}_u{{=userr[0]}}').empty();
+						jQuery('#div_p{{=str(project.id)}}_m{{=month}}_r{{=roll}}_u{{=userr[0]}}').append("{{=T('Loading')}}...");
+						$("#div_p{{=str(project.id)}}_m{{=month}}_r{{=roll}}_u{{=userr[0]}}").load("{{=URL('activity_control','grades_management_n4.load')}}?tipo=i&amp;userr="+encodeURIComponent("{{=userr[0]}}")+"&amp;month={{=month}}&amp;roll="+encodeURIComponent("{{=roll}}")+"&amp;project="+encodeURIComponent({{=project.id}}));
+					});
+				{{elif tipo=='u':}}
+					$("#p{{=str(project.id)}}_all_m{{=month}}_all_r{{=roll}}_all_U{{=userr[0]}}_u").click(function(){
+						$("#div_p{{=str(project.id)}}_m{{=month}}_r{{=roll}}_u{{=userr[0]}}").toggle();
+						jQuery('#div_p{{=str(project.id)}}_m{{=month}}_r{{=roll}}_u{{=userr[0]}}').empty();
+						jQuery('#div_p{{=str(project.id)}}_m{{=month}}_r{{=roll}}_u{{=userr[0]}}').append("{{=T('Loading')}}...");
+						$("#div_p{{=str(project.id)}}_m{{=month}}_r{{=roll}}_u{{=userr[0]}}").load("{{=URL('activity_control','grades_management_n4.load')}}?tipo=u&amp;userr="+encodeURIComponent("{{=userr[0]}}")+"&amp;month={{=month}}&amp;roll="+encodeURIComponent("{{=roll}}")+"&amp;project="+encodeURIComponent({{=project.id}}));
+					});
+				{{elif tipo=='d':}}
+					$("#p{{=str(project.id)}}_all_m{{=month}}_all_r{{=roll}}_all_U{{=userr[0]}}_d").click(function(){
+						$("#div_p{{=str(project.id)}}_m{{=month}}_r{{=roll}}_u{{=userr[0]}}").toggle();
+						jQuery('#div_p{{=str(project.id)}}_m{{=month}}_r{{=roll}}_u{{=userr[0]}}').empty();
+						jQuery('#div_p{{=str(project.id)}}_m{{=month}}_r{{=roll}}_u{{=userr[0]}}').append("{{=T('Loading')}}...");
+						$("#div_p{{=str(project.id)}}_m{{=month}}_r{{=roll}}_u{{=userr[0]}}").load("{{=URL('activity_control','grades_management_n4.load')}}?tipo=d&amp;userr="+encodeURIComponent("{{=userr[0]}}")+"&amp;month={{=month}}&amp;roll="+encodeURIComponent("{{=roll}}")+"&amp;project="+encodeURIComponent({{=project.id}}));
+					});
+				{{pass}}
+			{{pass}}
+		});
+	</script>
+{{pass}}

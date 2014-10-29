@@ -162,6 +162,7 @@ if auth.has_membership(role="Super-Administrator"):
         (T('Pending Requests'), False, URL('activity_control','courses_list_request'), []),
         ((T('Parameters'), False, URL(), [    
             (T('Categories for weighting'), False, URL('activity_control','activity_category'), []),
+            (T('Partials Management'), False, URL('activity_control','partials'), []),
             (T('Period'), False, URL('activity_control','student_control_period'), [])
         ])),
         ((T('Exceptions'), False, URL(), [    
