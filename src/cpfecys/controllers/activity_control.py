@@ -2325,11 +2325,18 @@ def General_report_activities():
     teacher = db((db.user_project.period == year.id) & (db.user_project.project == project_var.id) & (db.user_project.assigned_user==db.auth_user.id)&(db.auth_user.id==db.auth_membership.user_id)&(db.auth_membership.group_id==3)).select().first()
     practice = db((db.user_project.period == year.id) & (db.user_project.project == project_var.id) & (db.user_project.assigned_user==db.auth_user.id)&(db.auth_user.id==db.auth_membership.user_id)&(db.auth_membership.group_id==2)).select()
     if request.vars['type'] == 'class':
-        students = db((db.academic_course_assignation.semester == year.id) & (db.academic_course_assignation.assignation==project_var.id)).select()
+        students =  db((db.academic.id==db.academic_course_assignation.carnet)&(db.academic_course_assignation.assignation==project_var.id) & (db.academic_course_assignation.semester==year.id)).select(orderby=db.academic.carnet)
+        #students = db((db.academic_course_assignation.semester == year.id) & (db.academic_course_assignation.assignation==project_var.id)).select(orderby )
     else:
-        students = db((db.academic_course_assignation.semester == year.id) & (db.academic_course_assignation.assignation==project_var.id) & (db.academic_course_assignation.laboratorio==True)).select()
+        students =  db((db.academic.id==db.academic_course_assignation.carnet)&(db.academic_course_assignation.assignation==project_var.id) & (db.academic_course_assignation.semester==year.id) & (db.academic_course_assignation.laboratorio==True)).select(orderby=db.academic.carnet)
+        #students = db((db.academic_course_assignation.semester == year.id) & (db.academic_course_assignation.assignation==project_var.id) & (db.academic_course_assignation.laboratorio==True)).select()
 
+    tempAcademic=[]
+    for acaT in students:
+        tempAcademic.append(acaT.academic_course_assignation)
 
+    students = tempAcademic
+    
     existLab=False
     totalLab=float(0)
     totalW=float(0)
