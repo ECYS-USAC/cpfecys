@@ -3947,11 +3947,7 @@ def grades_management_n4():
             vecAllUserRoleMonth.append(tD)
     return dict(showLevel=showLevel, project=project, tipo=tipo, month=month, vecAllUserRoleMonth=vecAllUserRoleMonth, roll=roll, userr=userr)
 
-@auth.requires_login()
-@auth.requires(auth.has_membership('Teacher'))
-def grades_report():
-    return "<b>En construcción disculpe las molestias.</b>"
-    
+  
 @auth.requires_login()
 @auth.requires(auth.has_membership('Teacher'))
 def laboratory_revalidation():
