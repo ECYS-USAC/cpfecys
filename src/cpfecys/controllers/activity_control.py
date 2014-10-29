@@ -1379,6 +1379,13 @@ def grades_request():
         rol_log='Student'
     pass
 
+    if request.vars['op']=="acceptRequestChange":
+        request_change_var = db(db.request_change_grades.id == request.vars['Idrequest']).select().first()
+        if request_change_var.status != 'pending':
+            return T('Request Change has been resolved.')
+            
+
+
 
     return dict(semestre2 = currentyear_period,rol_log = rol_log)
 

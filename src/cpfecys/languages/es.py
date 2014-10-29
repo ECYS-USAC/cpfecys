@@ -1269,6 +1269,7 @@
 'Physical Location': 'Ubicación Física',
 'physical_location': 'Ubicación Física',
 'Please enter a description': 'Por favor ingrese una descripción',
+'Please enter the reason for the change.': 'Por favor ingrese la razón del cambio.',
 'Please fill home address field': 'Por favor llene el campo dirección de casa',
 'please fill the form': 'por favor llene el formulario',
 'Please fill working information fields': 'Por favor llene los campos relacionados con la Información laboral',
@@ -1419,6 +1420,7 @@
 'Request change activities': 'Request change activities',
 'Request change gradeses(resolve_user)': 'Request change gradeses(resolve_user)',
 'Request change gradeses(user_id)': 'Request change gradeses(user_id)',
+'Request Change has been resolved.': 'La solicitud de cambios ha sido resolvida por otro usuario. Favor recargar la página.',
 'Request change weightings(resolve_user)': 'Request change weightings(resolve_user)',
 'Request change weightings(user_id)': 'Request change weightings(user_id)',
 'Request Changes': 'Request Changes',
@@ -1978,5 +1980,4 @@
 'Your performance is': 'Su desempeño',
 'Your username is: %(username)s': 'Your username is: %(username)s',
 'YYYY-MM-DD': 'YYYY-MM-DD',
-'Please enter the reason for the change.':'Por favor ingrese la razón del cambio.',
 }
