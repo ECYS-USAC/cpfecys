@@ -2759,13 +2759,178 @@ def management_approval_students_requirement():
     return dict(project = project_var, year = year, requirement=requirement, grid=grid)
 
 
+
 #********************************************************************************************************************************************************************************************************
 #********************************************************************************************************************************************************************************************************
 #********************************************************************************************************************************************************************************************************
 #********************************************************************************************************************************************************************************************************
 @auth.requires_login()
 @auth.requires(auth.has_membership('Teacher'))
+def grades_management_export():
+    #Vars of the report
+    report=[]
+    tempRemport1=[]
+    tempRemport2=[]
+    tempRemport3=[]
+    tempRemport4=[]
+    tempRemport5=[]
+    #Obtain the current period of the system and all the register periods
+    import cpfecys
+    year = cpfecys.current_year_period()
+
+    #Check if the user is assigned to the course
+    assigantions = db((db.user_project.assigned_user == auth.user.id) & (db.user_project.period == year.id)).select()
+    if assigantions.first() is None:
+        session.flash = T('Not valid Action.')
+        redirect(URL('default','index'))
+
+    #Vec with the months of the current period
+    vecMonth=[]
+    tmpMonth=[]
+    if year.period == 1:
+        tmpMonth=[]
+        tmpMonth.append(1)
+        tmpMonth.append('Enero')
+        tmpMonth.append(2)
+        vecMonth.append(tmpMonth)
+
+        tmpMonth=[]
+        tmpMonth.append(2)
+        tmpMonth.append('Febrero')
+        tmpMonth.append(3)
+        vecMonth.append(tmpMonth)
+
+        tmpMonth=[]
+        tmpMonth.append(3)
+        tmpMonth.append('Marzo')
+        tmpMonth.append(4)
+        vecMonth.append(tmpMonth)
+
+        tmpMonth=[]
+        tmpMonth.append(4)
+        tmpMonth.append('Abril')
+        tmpMonth.append(5)
+        vecMonth.append(tmpMonth)
+
+        tmpMonth=[]
+        tmpMonth.append(5)
+        tmpMonth.append('Mayo')
+        tmpMonth.append(6)
+        vecMonth.append(tmpMonth)
+    else:
+        tmpMonth=[]
+        tmpMonth.append(6)
+        tmpMonth.append('Junio')
+        tmpMonth.append(7)
+        vecMonth.append(tmpMonth)
+
+        tmpMonth=[]
+        tmpMonth.append(7)
+        tmpMonth.append('Julio')
+        tmpMonth.append(8)
+        vecMonth.append(tmpMonth)
+
+        tmpMonth=[]
+        tmpMonth.append(8)
+        tmpMonth.append('Agosto')
+        tmpMonth.append(9)
+        vecMonth.append(tmpMonth)
+
+        tmpMonth=[]
+        tmpMonth.append(9)
+        tmpMonth.append('Septiembre')
+        tmpMonth.append(10)
+        vecMonth.append(tmpMonth)
+
+        tmpMonth=[]
+        tmpMonth.append(10)
+        tmpMonth.append('Octubre')
+        tmpMonth.append(11)
+        vecMonth.append(tmpMonth)
+
+        tmpMonth=[]
+        tmpMonth.append(11)
+        tmpMonth.append('Noviembre')
+        tmpMonth.append(12)
+        vecMonth.append(tmpMonth)
+
+        tmpMonth=[]
+        tmpMonth.append(12)
+        tmpMonth.append('Diciembre')
+        tmpMonth.append(1)
+        vecMonth.append(tmpMonth)
+
+    #report.append()
+
+    #Report heading
+    tempRemport1=[]
+    tempRemport1.append('Reporte Gestion de Notas')
+    report.append(tempRemport1)
+    tempRemport1=[]
+    tempRemport1.append(T(year.period.name)+' '+str(year.yearp))
+    report.append(tempRemport1)
+
+    #LEVEL 1
+    #Heading Level 1
+    tempRemport1=[]
+    tempRemport1.append(T('Course'))
+    tempRemport1.append(T('Total inserted'))
+    tempRemport1.append(T('Total modified'))
+    tempRemport1.append(T('Total out'))
+    report.append(tempRemport1)
+    for assigantion in assigantions:
+        tempRemport1=[]
+        tempRemport1.append(assigantion.project.name)
+        if session.search_grades_management == "":
+            tI = db.executesql('SELECT count(id) as total from grades_log where project=\'' + assigantion.project.name + '\' and yearp=\'' + str(year.yearp) +'\' and period=\'' + str(T(year.period.name))+ '\' and operation_log=\'insert\'' + session.search_grades_management +';' ,as_dict=True)
+            for dI in tI:
+                dIT=dI['total']
+            pass
+            tempRemport1.append(str(dIT))
+            tI = db.executesql('SELECT count(id) as total from grades_log where project=\'' + assigantion.project.name + '\' and yearp=\'' + str(year.yearp) +'\' and period=\'' + str(T(year.period.name))+ '\' and operation_log=\'update\'' + session.search_grades_management +';' ,as_dict=True)
+            for dI in tI:
+                dIT=dI['total']
+            pass
+            tempRemport1.append(str(dIT))
+            tI = db.executesql('SELECT count(id) as total from grades_log where project=\'' + assigantion.project.name + '\' and yearp=\'' + str(year.yearp) +'\' and period=\'' + str(T(year.period.name))+ '\' and operation_log=\'delete\'' + session.search_grades_management +';' ,as_dict=True)
+            for dI in tI:
+                dIT=dI['total']
+            pass
+            tempRemport1.append(str(dIT))
+        else:
+            tI = db.executesql('SELECT count(id) as total from grades_log where project=\'' + assigantion.project.name + '\' and yearp=\'' + str(year.yearp) +'\' and period=\'' + str(T(year.period.name))+ '\' and operation_log=\'insert\' and ' + session.search_grades_management +';' ,as_dict=True)
+            for dI in tI:
+                dIT=dI['total']
+            pass
+            tempRemport1.append(str(dIT))
+            tI = db.executesql('SELECT count(id) as total from grades_log where project=\'' + assigantion.project.name + '\' and yearp=\'' + str(year.yearp) +'\' and period=\'' + str(T(year.period.name))+ '\' and operation_log=\'update\' and ' + session.search_grades_management +';' ,as_dict=True)
+            for dI in tI:
+                dIT=dI['total']
+            pass
+            tempRemport1.append(str(dIT))
+            tI = db.executesql('SELECT count(id) as total from grades_log where project=\'' + assigantion.project.name + '\' and yearp=\'' + str(year.yearp) +'\' and period=\'' + str(T(year.period.name))+ '\' and operation_log=\'delete\' and ' + session.search_grades_management +';' ,as_dict=True)
+            for dI in tI:
+                dIT=dI['total']
+            pass
+            tempRemport1.append(str(dIT))
+        pass
+        report.append(tempRemport1)
+
+        #LEVEL 2
+        
+    pass
+
+    return dict(filename='ReporteGestionNotas', csvdata=report)
+
+
+@auth.requires_login()
+@auth.requires(auth.has_membership('Teacher'))
 def grades_management():
+    #Export Report to CSV
+    if request.vars['list'] =='True':
+        redirect(URL('activity_control','grades_management_export'))
+
+
     import cpfecys
     #Obtain the current period of the system and all the register periods
     period = cpfecys.current_year_period()
@@ -2910,6 +3075,9 @@ def grades_management():
         #for value in db((db.grades_log.yearp==period.yearp)&(db.grades_log.period==T(period.period.name))&(db.grades_log.project.belongs(courses))).select(db.grades_log.user_name, distinct=True):
         for value in db((db.user_project.period==period.id)&(db.user_project.project.belongs(coursesID))).select(db.user_project.assigned_user, distinct=True):
             optionSearch.append(value.assigned_user.username)
+        #Check if the log has an username that is not register
+        for value in db((db.grades_log.yearp==period.yearp)&(db.grades_log.period==T(period.period.name))&(db.grades_log.project.belongs(courses))&(~db.grades_log.user_name.belongs(optionSearch))).select(db.grades_log.user_name, distinct=True):
+            optionSearch.append(value.user_name)
         tmpMonth.append(optionSearch)
         vecFieldsSearch.append(tmpMonth)
 
@@ -2919,8 +3087,12 @@ def grades_management():
         tmpMonth.append('roll')
         tmpMonth.append('1')
         optionSearch=[]
+        #Get out all the roles that are register in the system
         for value in db((db.auth_group.role!='Academic')&(db.auth_group.role!='DSI')).select():
             optionSearch.append(value.role)
+        #Check if the log has a roll that is not register
+        for value in db((db.grades_log.yearp==period.yearp)&(db.grades_log.period==T(period.period.name))&(db.grades_log.project.belongs(courses))&(~db.grades_log.roll.belongs(optionSearch))).select(db.grades_log.roll, distinct=True):
+            optionSearch.append(value.roll)
         tmpMonth.append(optionSearch)
         vecFieldsSearch.append(tmpMonth)
 
@@ -2945,6 +3117,9 @@ def grades_management():
         optionSearch=[]
         for value in db((db.academic_course_assignation.assignation.belongs(coursesID))&(db.academic_course_assignation.semester==period.id)).select():
             optionSearch.append(value.carnet.carnet)
+        #Check if the log has a record of an student that is not register
+        for value in db((db.grades_log.yearp==period.yearp)&(db.grades_log.period==T(period.period.name))&(db.grades_log.project.belongs(courses))&(~db.grades_log.academic.belongs(optionSearch))).select(db.grades_log.academic, distinct=True):
+            optionSearch.append(value.academic)
         tmpMonth.append(optionSearch)
         vecFieldsSearch.append(tmpMonth)
 
@@ -2961,6 +3136,9 @@ def grades_management():
         optionSearch=[]
         for value in db((db.course_activity_category.category!=catLab)&(db.course_activity_category.assignation.belongs(coursesID))&(db.course_activity_category.semester==period.id)).select(db.course_activity_category.category, distinct=True):
             optionSearch.append(value.category.category)
+        #Check if the log has a category that is not register
+        for value in db((db.grades_log.yearp==period.yearp)&(db.grades_log.period==T(period.period.name))&(db.grades_log.project.belongs(courses))&(~db.grades_log.category.belongs(optionSearch))).select(db.grades_log.category, distinct=True):
+            optionSearch.append(value.category)
         tmpMonth.append(optionSearch)
         vecFieldsSearch.append(tmpMonth)
 
@@ -2973,6 +3151,9 @@ def grades_management():
         optionSearch=[]
         for value in db((db.course_activity.assignation.belongs(coursesID))&(db.course_activity.semester==period.id)).select(db.course_activity.name, distinct=True):
             optionSearch.append(value.name)
+        #Check if the log has an activity that is not register
+        for value in db((db.grades_log.yearp==period.yearp)&(db.grades_log.period==T(period.period.name))&(db.grades_log.project.belongs(courses))&(~db.grades_log.activity.belongs(optionSearch))).select(db.grades_log.activity, distinct=True):
+            optionSearch.append(value.activity)
         tmpMonth.append(optionSearch)
         vecFieldsSearch.append(tmpMonth)
 
@@ -3001,7 +3182,475 @@ def grades_management():
         #query=(db.grades_log)
         #grid = SQLFORM.grid(query, csv=False, paginate=10, editable=False)
 
+        if (request.args(0) == 'search'):
+            if str(request.vars['querySearch']) == "":
+                session.search_grades_management = ""
+            else:
+                session.search_grades_management = str(request.vars['querySearch'])
+        else:
+            session.search_grades_management = ""
+
     return dict(year=period, assigantions=assigantions, vecMonth=vecMonth, vecOptionSearch=vecOptionSearch, vecFieldsSearch=vecFieldsSearch)
+
+
+
+@auth.requires_login()
+@auth.requires(auth.has_membership('Teacher'))
+def grades_management_n2():
+    import cpfecys
+    #Obtain the current period of the system and all the register periods
+    period = cpfecys.current_year_period()
+    showLevel = True
+    project = None
+    tipo = None
+    month=None
+    vecRoleMonth=None
+
+    #Check if the project is correct
+    if request.vars['tipo'] is None or request.vars['tipo']=='':
+        showLevel = False
+    else:
+        if str(request.vars['tipo'])!='all' and str(request.vars['tipo'])!='i' and str(request.vars['tipo'])!='u' and str(request.vars['tipo'])!='d':
+            showLevel = False
+        else:
+            tipo = str(request.vars['tipo'])
+
+
+    #Check if the project is correct
+    if request.vars['project'] is None or request.vars['project']=='':
+        showLevel = False
+    else:
+        project = request.vars['project']
+        project = db(db.project.id==project).select().first()
+        if project is None:
+            showLevel = False
+
+
+    #Check if the user is assigned to the project
+    if project is None or tipo is None:
+        showLevel = False
+    else:
+        if auth.has_membership('Teacher'):
+            course = db((db.user_project.assigned_user == auth.user.id) & (db.user_project.period == period.id) & (db.user_project.project==project.id)).select().first()
+            if course is None:
+                showLevel = False
+        else:
+            showLevel = False
+
+
+    #Check if the month is correct
+    if showLevel==True:
+        if request.vars['month'] is None or request.vars['month']=='':
+            showLevel = False
+        else:
+            if period.period == 1:
+                if int(request.vars['month']) >= 1 and int(request.vars['month']) <=5:
+                    month=str(request.vars['month'])
+                else:
+                    showLevel = False
+            else:
+                if int(request.vars['month']) >= 6 and int(request.vars['month']) <=12:
+                    month=str(request.vars['month'])
+                else:
+                    showLevel = False
+
+
+    #***************************************************************************************************************************************************************************************************************
+    #***************************************************************************************************************************************************************************************************************
+    #***************************************************************************************************************************************************************************************************************
+    #***************************************************************************************************************************************************************************************************************
+
+
+    #All the parameters are ok, start to build the report level 2
+    if showLevel==True:
+        from datetime import datetime
+        start = datetime.strptime(str(period.yearp) + '-' + month +'-01', "%Y-%m-%d")
+        if month=='12':
+            end = datetime.strptime(str(period.yearp+1) + '-' + '01-01', "%Y-%m-%d")
+        else:
+            end = datetime.strptime(str(period.yearp) + '-' + str(int(month)+1) +'-01', "%Y-%m-%d")
+        pass
+        vecRoleMonth=[]
+        roleTemp=[]
+        for value in db((db.auth_group.role!='Academic')&(db.auth_group.role!='DSI')).select():
+            optionSearch=[]
+            optionSearch.append(value.role)
+            roleTemp.append(value.role)
+            if str(request.vars['tipo'])=='all' or str(request.vars['tipo'])=='i':
+                if session.search_grades_management == "":
+                    tD = db.executesql('SELECT count(id) as total from grades_log where project=\'' + project.name + '\' and yearp=\'' + str(period.yearp) +'\' and period=\'' + str(T(period.period.name))+ '\' and operation_log=\'insert\' and date_log>=\'' + str(start) +'\' and date_log <= \''+ str(end) +'\' and roll=\''+ value.role +'\';' ,as_dict=True)
+                else:
+                    tD = db.executesql('SELECT count(id) as total from grades_log where project=\'' + project.name + '\' and yearp=\'' + str(period.yearp) +'\' and period=\'' + str(T(period.period.name))+ '\' and operation_log=\'insert\' and date_log>=\'' + str(start) +'\' and date_log <= \''+ str(end) +'\' and roll=\''+ value.role +'\' and ' + session.search_grades_management +';' ,as_dict=True)
+                pass
+                for dD in tD:
+                    dDT=dD['total']
+                pass
+                optionSearch.append(dDT)
+            if str(request.vars['tipo'])=='all' or str(request.vars['tipo'])=='u':
+                if session.search_grades_management == "":
+                    tD = db.executesql('SELECT count(id) as total from grades_log where project=\'' + project.name + '\' and yearp=\'' + str(period.yearp) +'\' and period=\'' + str(T(period.period.name))+ '\' and operation_log=\'update\' and date_log>=\'' + str(start) +'\' and date_log <= \''+ str(end) +'\' and roll=\''+ value.role +'\';' ,as_dict=True)
+                else:
+                    tD = db.executesql('SELECT count(id) as total from grades_log where project=\'' + project.name + '\' and yearp=\'' + str(period.yearp) +'\' and period=\'' + str(T(period.period.name))+ '\' and operation_log=\'update\' and date_log>=\'' + str(start) +'\' and date_log <= \''+ str(end) +'\' and roll=\''+ value.role +'\' and ' + session.search_grades_management +';' ,as_dict=True)
+                pass
+                for dD in tD:
+                    dDT=dD['total']
+                pass
+                optionSearch.append(dDT)
+            if str(request.vars['tipo'])=='all' or str(request.vars['tipo'])=='d':
+                if session.search_grades_management == "":
+                    tD = db.executesql('SELECT count(id) as total from grades_log where project=\'' + project.name + '\' and yearp=\'' + str(period.yearp) +'\' and period=\'' + str(T(period.period.name))+ '\' and operation_log=\'delete\' and date_log>=\'' + str(start) +'\' and date_log <= \''+ str(end) +'\' and roll=\''+ value.role +'\';' ,as_dict=True)
+                else:
+                    tD = db.executesql('SELECT count(id) as total from grades_log where project=\'' + project.name + '\' and yearp=\'' + str(period.yearp) +'\' and period=\'' + str(T(period.period.name))+ '\' and operation_log=\'delete\' and date_log>=\'' + str(start) +'\' and date_log <= \''+ str(end) +'\' and roll=\''+ value.role +'\' and ' + session.search_grades_management +';' ,as_dict=True)
+                pass
+                for dD in tD:
+                    dDT=dD['total']
+                pass
+                optionSearch.append(dDT)
+            vecRoleMonth.append(optionSearch)
+        #Check if the log has a roll that is not register
+        for value in db((db.grades_log.yearp==period.yearp)&(db.grades_log.period==T(period.period.name))&(db.grades_log.project==project.name)&(~db.grades_log.roll.belongs(roleTemp))).select(db.grades_log.roll, distinct=True):
+            optionSearch=[]
+            optionSearch.append(value.roll)
+            if str(request.vars['tipo'])=='all' or str(request.vars['tipo'])=='i':
+                if session.search_grades_management == "":
+                    tD = db.executesql('SELECT count(id) as total from grades_log where project=\'' + project.name + '\' and yearp=\'' + str(period.yearp) +'\' and period=\'' + str(T(period.period.name))+ '\' and operation_log=\'insert\' and date_log>=\'' + str(start) +'\' and date_log <= \''+ str(end) +'\' and roll=\''+ value.roll +'\';' ,as_dict=True)
+                else:
+                    tD = db.executesql('SELECT count(id) as total from grades_log where project=\'' + project.name + '\' and yearp=\'' + str(period.yearp) +'\' and period=\'' + str(T(period.period.name))+ '\' and operation_log=\'insert\' and date_log>=\'' + str(start) +'\' and date_log <= \''+ str(end) +'\' and roll=\''+ value.roll +'\' and ' + session.search_grades_management +';' ,as_dict=True)
+                pass
+                for dD in tD:
+                    dDT=dD['total']
+                pass
+                optionSearch.append(dDT)
+            if str(request.vars['tipo'])=='all' or str(request.vars['tipo'])=='u':
+                if session.search_grades_management == "":
+                    tD = db.executesql('SELECT count(id) as total from grades_log where project=\'' + project.name + '\' and yearp=\'' + str(period.yearp) +'\' and period=\'' + str(T(period.period.name))+ '\' and operation_log=\'update\' and date_log>=\'' + str(start) +'\' and date_log <= \''+ str(end) +'\' and roll=\''+ value.roll +'\';' ,as_dict=True)
+                else:
+                    tD = db.executesql('SELECT count(id) as total from grades_log where project=\'' + project.name + '\' and yearp=\'' + str(period.yearp) +'\' and period=\'' + str(T(period.period.name))+ '\' and operation_log=\'update\' and date_log>=\'' + str(start) +'\' and date_log <= \''+ str(end) +'\' and roll=\''+ value.roll +'\' and ' + session.search_grades_management +';' ,as_dict=True)
+                pass
+                for dD in tD:
+                    dDT=dD['total']
+                pass
+                optionSearch.append(dDT)
+            if str(request.vars['tipo'])=='all' or str(request.vars['tipo'])=='d':
+                if session.search_grades_management == "":
+                    tD = db.executesql('SELECT count(id) as total from grades_log where project=\'' + project.name + '\' and yearp=\'' + str(period.yearp) +'\' and period=\'' + str(T(period.period.name))+ '\' and operation_log=\'delete\' and date_log>=\'' + str(start) +'\' and date_log <= \''+ str(end) +'\' and roll=\''+ value.roll +'\';' ,as_dict=True)
+                else:
+                    tD = db.executesql('SELECT count(id) as total from grades_log where project=\'' + project.name + '\' and yearp=\'' + str(period.yearp) +'\' and period=\'' + str(T(period.period.name))+ '\' and operation_log=\'delete\' and date_log>=\'' + str(start) +'\' and date_log <= \''+ str(end) +'\' and roll=\''+ value.roll +'\' and ' + session.search_grades_management +';' ,as_dict=True)
+                pass
+                for dD in tD:
+                    dDT=dD['total']
+                pass
+                optionSearch.append(dDT)
+            vecRoleMonth.append(optionSearch)
+    return dict(showLevel=showLevel, project=project, tipo=tipo, month=month, vecRoleMonth=vecRoleMonth)
+
+
+
+
+@auth.requires_login()
+@auth.requires(auth.has_membership('Teacher'))
+def grades_management_n3():
+    import cpfecys
+    #Obtain the current period of the system and all the register periods
+    period = cpfecys.current_year_period()
+    showLevel = True
+    project = None
+    tipo = None
+    month=None
+    roll=None
+    vecUserRoleMonth=None
+
+    #Check if the project is correct
+    if request.vars['tipo'] is None or request.vars['tipo']=='':
+        showLevel = False
+    else:
+        if str(request.vars['tipo'])!='all' and str(request.vars['tipo'])!='i' and str(request.vars['tipo'])!='u' and str(request.vars['tipo'])!='d':
+            showLevel = False
+        else:
+            tipo = str(request.vars['tipo'])
+
+
+    #Check if the project is correct
+    if request.vars['project'] is None or request.vars['project']=='':
+        showLevel = False
+    else:
+        project = request.vars['project']
+        project = db(db.project.id==project).select().first()
+        if project is None:
+            showLevel = False
+
+
+    #Check if the user is assigned to the project
+    if project is None or tipo is None:
+        showLevel = False
+    else:
+        if auth.has_membership('Teacher'):
+            course = db((db.user_project.assigned_user == auth.user.id) & (db.user_project.period == period.id) & (db.user_project.project==project.id)).select().first()
+            if course is None:
+                showLevel = False
+        else:
+            showLevel = False
+
+
+    #Check if the month is correct
+    if showLevel==True:
+        if request.vars['month'] is None or request.vars['month']=='':
+            showLevel = False
+        else:
+            if period.period == 1:
+                if int(request.vars['month']) >= 1 and int(request.vars['month']) <=5:
+                    month=str(request.vars['month'])
+                else:
+                    showLevel = False
+            else:
+                if int(request.vars['month']) >= 6 and int(request.vars['month']) <=12:
+                    month=str(request.vars['month'])
+                else:
+                    showLevel = False
+
+
+    #Check if the roll is correct
+    if showLevel==True:
+        if request.vars['roll'] is None or request.vars['roll']=='':
+            showLevel = False
+        else:
+            value = db(db.auth_group.role==str(request.vars['roll'])).select().first()
+            if value is None:
+                #Check if the log has a roll that is not register
+                value = db((db.grades_log.yearp==period.yearp)&(db.grades_log.period==T(period.period.name))&(db.grades_log.project==project.name)&(db.grades_log.roll==str(request.vars['roll']))).select(db.grades_log.roll, distinct=True).first()
+                if value is None:
+                    showLevel = False
+                else:
+                    roll=str(value.roll)
+            else:
+                roll=str(value.role)
+
+
+    #***************************************************************************************************************************************************************************************************************
+    #***************************************************************************************************************************************************************************************************************
+    #***************************************************************************************************************************************************************************************************************
+    #***************************************************************************************************************************************************************************************************************
+
+
+    #All the parameters are ok, start to build the report level 2
+    if showLevel==True:
+        from datetime import datetime
+        start = datetime.strptime(str(period.yearp) + '-' + month +'-01', "%Y-%m-%d")
+        if month=='12':
+            end = datetime.strptime(str(period.yearp+1) + '-' + '01-01', "%Y-%m-%d")
+        else:
+            end = datetime.strptime(str(period.yearp) + '-' + str(int(month)+1) +'-01', "%Y-%m-%d")
+        pass
+
+        #Users in the actual registers
+        tempUsers=[]
+        tempUsers2=[]
+        registerRol = db(db.auth_group.role==roll).select().first()
+        if registerRol is not None:
+            if ((roll=='Super-Administrator') or (roll=='Ecys-Administrator')):
+                for value in db((db.auth_membership.group_id==registerRol.id)).select(db.auth_membership.user_id, distinct=True):
+                    tempUsers.append(value.user_id.username)
+            else:
+                for value in db((db.auth_membership.group_id==registerRol.id)).select(db.auth_membership.user_id, distinct=True):
+                    tempUsers2.append(value.user_id)
+                for value in db((db.user_project.period==period.id)&(db.user_project.project==project.id)&(db.user_project.assigned_user.belongs(tempUsers2))).select(db.user_project.assigned_user, distinct=True):
+                    tempUsers.append(value.assigned_user.username)
+            pass
+        pass
+        #Check if the log has an username that is not register
+        for value in db((db.grades_log.yearp==period.yearp)&(db.grades_log.period==T(period.period.name))&(db.grades_log.project==project.name)&(db.grades_log.roll==roll)&(~db.grades_log.user_name.belongs(tempUsers))).select(db.grades_log.user_name, distinct=True):
+            tempUsers.append(value.user_name)
+        
+        vecUserRoleMonth=[]
+        for value in tempUsers:
+            optionSearch=[]
+            optionSearch.append(value)
+            if str(request.vars['tipo'])=='all' or str(request.vars['tipo'])=='i':
+                if session.search_grades_management == "":
+                    tD = db.executesql('SELECT count(id) as total from grades_log where project=\'' + project.name + '\' and yearp=\'' + str(period.yearp) +'\' and period=\'' + str(T(period.period.name))+ '\' and operation_log=\'insert\' and date_log>=\'' + str(start) +'\' and date_log <= \''+ str(end) +'\' and roll=\''+ roll +'\' and user_name=\''+ value +'\';' ,as_dict=True)
+                else:
+                    tD = db.executesql('SELECT count(id) as total from grades_log where project=\'' + project.name + '\' and yearp=\'' + str(period.yearp) +'\' and period=\'' + str(T(period.period.name))+ '\' and operation_log=\'insert\' and date_log>=\'' + str(start) +'\' and date_log <= \''+ str(end) +'\' and roll=\''+ roll +'\' and user_name=\''+ value +'\' and ' + session.search_grades_management +';' ,as_dict=True)
+                pass
+                for dD in tD:
+                    dDT=dD['total']
+                pass
+                optionSearch.append(dDT)
+            if str(request.vars['tipo'])=='all' or str(request.vars['tipo'])=='u':
+                if session.search_grades_management == "":
+                    tD = db.executesql('SELECT count(id) as total from grades_log where project=\'' + project.name + '\' and yearp=\'' + str(period.yearp) +'\' and period=\'' + str(T(period.period.name))+ '\' and operation_log=\'update\' and date_log>=\'' + str(start) +'\' and date_log <= \''+ str(end) +'\' and roll=\''+ roll +'\' and user_name=\''+ value +'\';' ,as_dict=True)
+                else:
+                    tD = db.executesql('SELECT count(id) as total from grades_log where project=\'' + project.name + '\' and yearp=\'' + str(period.yearp) +'\' and period=\'' + str(T(period.period.name))+ '\' and operation_log=\'update\' and date_log>=\'' + str(start) +'\' and date_log <= \''+ str(end) +'\' and roll=\''+ roll +'\' and user_name=\''+ value +'\' and ' + session.search_grades_management +';' ,as_dict=True)
+                pass
+                for dD in tD:
+                    dDT=dD['total']
+                pass
+                optionSearch.append(dDT)
+            if str(request.vars['tipo'])=='all' or str(request.vars['tipo'])=='d':
+                if session.search_grades_management == "":
+                    tD = db.executesql('SELECT count(id) as total from grades_log where project=\'' + project.name + '\' and yearp=\'' + str(period.yearp) +'\' and period=\'' + str(T(period.period.name))+ '\' and operation_log=\'delete\' and date_log>=\'' + str(start) +'\' and date_log <= \''+ str(end) +'\' and roll=\''+ roll +'\' and user_name=\''+ value +'\';' ,as_dict=True)
+                else:
+                    tD = db.executesql('SELECT count(id) as total from grades_log where project=\'' + project.name + '\' and yearp=\'' + str(period.yearp) +'\' and period=\'' + str(T(period.period.name))+ '\' and operation_log=\'delete\' and date_log>=\'' + str(start) +'\' and date_log <= \''+ str(end) +'\' and roll=\''+ roll +'\' and user_name=\''+ value +'\' and ' + session.search_grades_management +';' ,as_dict=True)
+                pass
+                for dD in tD:
+                    dDT=dD['total']
+                pass
+                optionSearch.append(dDT)
+            vecUserRoleMonth.append(optionSearch)
+    return dict(showLevel=showLevel, project=project, tipo=tipo, month=month, vecUserRoleMonth=vecUserRoleMonth, roll=roll)
+
+
+@auth.requires_login()
+@auth.requires(auth.has_membership('Teacher'))
+def grades_management_n4():
+    import cpfecys
+    #Obtain the current period of the system and all the register periods
+    period = cpfecys.current_year_period()
+    showLevel = True
+    project = None
+    tipo = None
+    month=None
+    roll=None
+    userr=None
+    vecAllUserRoleMonth=None
+
+    #Check if the project is correct
+    if request.vars['tipo'] is None or request.vars['tipo']=='':
+        showLevel = False
+    else:
+        if str(request.vars['tipo'])!='all' and str(request.vars['tipo'])!='i' and str(request.vars['tipo'])!='u' and str(request.vars['tipo'])!='d':
+            showLevel = False
+        else:
+            tipo = str(request.vars['tipo'])
+
+
+    #Check if the project is correct
+    if request.vars['project'] is None or request.vars['project']=='':
+        showLevel = False
+    else:
+        project = request.vars['project']
+        project = db(db.project.id==project).select().first()
+        if project is None:
+            showLevel = False
+
+
+    #Check if the user is assigned to the project
+    if project is None or tipo is None:
+        showLevel = False
+    else:
+        if auth.has_membership('Teacher'):
+            course = db((db.user_project.assigned_user == auth.user.id) & (db.user_project.period == period.id) & (db.user_project.project==project.id)).select().first()
+            if course is None:
+                showLevel = False
+        else:
+            showLevel = False
+
+
+    #Check if the month is correct
+    if showLevel==True:
+        if request.vars['month'] is None or request.vars['month']=='':
+            showLevel = False
+        else:
+            if period.period == 1:
+                if int(request.vars['month']) >= 1 and int(request.vars['month']) <=5:
+                    month=str(request.vars['month'])
+                else:
+                    showLevel = False
+            else:
+                if int(request.vars['month']) >= 6 and int(request.vars['month']) <=12:
+                    month=str(request.vars['month'])
+                else:
+                    showLevel = False
+
+
+    #Check if the roll is correct
+    if showLevel==True:
+        if request.vars['roll'] is None or request.vars['roll']=='':
+            showLevel = False
+        else:
+            value = db(db.auth_group.role==str(request.vars['roll'])).select().first()
+            if value is None:
+                #Check if the log has a roll that is not register
+                value = db((db.grades_log.yearp==period.yearp)&(db.grades_log.period==T(period.period.name))&(db.grades_log.project==project.name)&(db.grades_log.roll==str(request.vars['roll']))).select(db.grades_log.roll, distinct=True).first()
+                if value is None:
+                    showLevel = False
+                else:
+                    roll=value
+            else:
+                roll=value
+
+    #Check if the user is correct
+    if showLevel==True:
+        if request.vars['userr'] is None or request.vars['userr']=='':
+            showLevel = False
+        else:
+            flagCheck = False
+            #User Temp of auth_user where the username is equal
+            userr = db(db.auth_user.username==str(request.vars['userr'])).select().first()
+            if ((roll.role=='Super-Administrator') or (roll.role=='Ecys-Administrator')):
+                if userr is not None:
+                    #Check if the user has the rol specific
+                    userrT = db((db.auth_membership.user_id==userr.id)&(db.auth_membership.group_id==roll.id)).select().first()
+                    if userrT is not None:
+                        flagCheck = True
+            else:
+                if userr is not None:
+                    #Check if the user has the rol specific
+                    userrT = db((db.auth_membership.user_id==userr.id)&(db.auth_membership.group_id==roll.id)).select().first()
+                    if userrT is not None:
+                        userrT = db((db.user_project.period==period.id)&(db.user_project.project==project.id)&(db.user_project.assigned_user==userr.id)).select().first()
+                        if userrT is not None:
+                            flagCheck = True
+
+            if flagCheck==False:
+                #Check if the log has a roll that is not register
+                userr = db((db.grades_log.yearp==period.yearp)&(db.grades_log.period==T(period.period.name))&(db.grades_log.project==project.name)&(db.grades_log.roll==roll.role)&(db.grades_log.user_name==str(request.vars['userr']))).select().first()
+                if value is None:
+                    showLevel = False
+                else:
+                    userr=userr.user_name
+            else:
+                userr=userr.username
+
+
+    #***************************************************************************************************************************************************************************************************************
+    #***************************************************************************************************************************************************************************************************************
+    #***************************************************************************************************************************************************************************************************************
+    #***************************************************************************************************************************************************************************************************************
+
+
+    #All the parameters are ok, start to build the report level 2
+    if showLevel==True:
+        from datetime import datetime
+        start = datetime.strptime(str(period.yearp) + '-' + month +'-01', "%Y-%m-%d")
+        if month=='12':
+            end = datetime.strptime(str(period.yearp+1) + '-' + '01-01', "%Y-%m-%d")
+        else:
+            end = datetime.strptime(str(period.yearp) + '-' + str(int(month)+1) +'-01', "%Y-%m-%d")
+        pass
+        
+        vecAllUserRoleMonth=[]
+        if str(request.vars['tipo'])=='all' or str(request.vars['tipo'])=='i':
+            if session.search_grades_management == "":
+                tD = db.executesql('SELECT * from grades_log where project=\'' + project.name + '\' and yearp=\'' + str(period.yearp) +'\' and period=\'' + str(T(period.period.name))+ '\' and operation_log=\'insert\' and date_log>=\'' + str(start) +'\' and date_log <= \''+ str(end) +'\' and roll=\''+ roll.role +'\' and user_name=\''+ userr +'\';' ,as_dict=True)
+            else:
+                tD = db.executesql('SELECT * from grades_log where project=\'' + project.name + '\' and yearp=\'' + str(period.yearp) +'\' and period=\'' + str(T(period.period.name))+ '\' and operation_log=\'insert\' and date_log>=\'' + str(start) +'\' and date_log <= \''+ str(end) +'\' and roll=\''+ roll.role +'\' and user_name=\''+ userr +'\' and ' + session.search_grades_management +';' ,as_dict=True)
+            pass
+            vecAllUserRoleMonth.append(tD)
+        if str(request.vars['tipo'])=='all' or str(request.vars['tipo'])=='u':
+            if session.search_grades_management == "":
+                tD = db.executesql('SELECT * from grades_log where project=\'' + project.name + '\' and yearp=\'' + str(period.yearp) +'\' and period=\'' + str(T(period.period.name))+ '\' and operation_log=\'update\' and date_log>=\'' + str(start) +'\' and date_log <= \''+ str(end) +'\' and roll=\''+ roll.role +'\' and user_name=\''+ userr +'\';' ,as_dict=True)
+            else:
+                tD = db.executesql('SELECT * from grades_log where project=\'' + project.name + '\' and yearp=\'' + str(period.yearp) +'\' and period=\'' + str(T(period.period.name))+ '\' and operation_log=\'update\' and date_log>=\'' + str(start) +'\' and date_log <= \''+ str(end) +'\' and roll=\''+ roll.role +'\' and user_name=\''+ userr +'\' and ' + session.search_grades_management +';' ,as_dict=True)
+            pass
+            vecAllUserRoleMonth.append(tD)
+        if str(request.vars['tipo'])=='all' or str(request.vars['tipo'])=='d':
+            if session.search_grades_management == "":
+                tD = db.executesql('SELECT * from grades_log where project=\'' + project.name + '\' and yearp=\'' + str(period.yearp) +'\' and period=\'' + str(T(period.period.name))+ '\' and operation_log=\'delete\' and date_log>=\'' + str(start) +'\' and date_log <= \''+ str(end) +'\' and roll=\''+ roll.role +'\' and user_name=\''+ userr +'\';' ,as_dict=True)
+            else:
+                tD = db.executesql('SELECT * from grades_log where project=\'' + project.name + '\' and yearp=\'' + str(period.yearp) +'\' and period=\'' + str(T(period.period.name))+ '\' and operation_log=\'delete\' and date_log>=\'' + str(start) +'\' and date_log <= \''+ str(end) +'\' and roll=\''+ roll.role +'\' and user_name=\''+ userr +'\' and ' + session.search_grades_management +';' ,as_dict=True)
+            pass
+            vecAllUserRoleMonth.append(tD)
+    return dict(showLevel=showLevel, project=project, tipo=tipo, month=month, vecAllUserRoleMonth=vecAllUserRoleMonth, roll=roll, userr=userr)
 
 @auth.requires_login()
 @auth.requires(auth.has_membership('Teacher'))
@@ -3012,4 +3661,3 @@ def grades_report():
 @auth.requires(auth.has_membership('Teacher'))
 def laboratory_revalidation():
     return "<b>En construcción disculpe las molestias.</b>"
-    
