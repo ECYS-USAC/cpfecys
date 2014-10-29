@@ -605,57 +605,32 @@ def request_change_weighting():
             else:
 
                                
-                lista2 = []
+                total_var2 = float(0)
                 if request.vars['type'] == 'course':
                    None
                 else:
                     for project in db((db.course_activity_category.semester==year.id) & (db.course_activity_category.assignation==request.vars['project']) & (db.course_activity_category.laboratory==True)).select():
-                        lista1 = []  
-                        lista1.append(project.id)
-                        lista1.append(project.grade)
-                        lista2.append(lista1)            
+
+                        total_var2 = float(total_var2) +float(project.grade)
                     pass
                 pass   
 
-                
                 select_change = db((db.request_change_weighting.status=='edit')&(db.request_change_weighting.period==int(year.id))&(db.request_change_weighting.project==request.vars['project'])).select().first()
                 
                 for detail_rc in db((db.request_change_weighting_detail.request_change_weighting==select_change.id) ).select():
                     
                     if detail_rc.operation_request == 'insert':
-                        lista1 = []  
-                        lista1.append(-1)
-                        lista1.append(detail_rc.grade)
-                        lista2.append(lista1) 
-                        
+                        total_var2 = float(total_var2) + float(detail_rc.grade)
 
-                    if detail_rc.operation_request == 'update':
-                        #total_var2 = float(total_var2) - float(detail_rc.course_category.grade)
-                        #total_var2 = float(total_var2) + float(detail_rc.grade)
-                        lista1 = []  
-                        lista1.append(project.id)
-                        lista1.append(project.grade)
-                        lista2.append(lista1) 
+                    if detail_rc.operation_request == 'update':                        
+                        total_var2 = float(total_var2) - float(detail_rc.course_category.grade)
+                        total_var2 = float(total_var2) + float(detail_rc.grade)
 
                     if detail_rc.operation_request == 'delete':
-                        lista3 = []
-                        for l2 in lista2:
-                            if int(l2[0]) == int(detail_rc.course_category):
-                                None
-                            else:
-                                lista3.append(l2)
-                            pass
-                        pass
-                        lista2 = lista3
-                                
-                        
+                        total_var2 = float(total_var2) - float(detail_rc.course_category.grade)
                 pass
 
                
-                total_var2 = float(0);
-                for l2 in lista2:
-                    total_var2 = float(total_var2) + float(l2[1])
-
                 if float(total_var2) != float(100):
                     if total_var2 != None:
                         response.flash = "Error. "+ T("The sum of the weighting is incorrect") + ": " + str(total_var2)
@@ -777,7 +752,7 @@ def request_change_weighting_load():
             change = db((db.request_change_weighting.id == change_id)).select().first()
     
     assignation = db((db.user_project.assigned_user == auth.user.id) & (db.user_project.period == year.id) & (db.user_project.project == project_id)).select().first()
-    if assignation is None:
+    if (assignation is None) & (auth.has_membership('Super-Administrator') == False) & (auth.has_membership('Ecys-Administrator') == False):
         session.flash = T("Action not allowed")
         redirect(URL('default','index'))    
     check = db(db.project.id == request.vars['project']).select().first()
