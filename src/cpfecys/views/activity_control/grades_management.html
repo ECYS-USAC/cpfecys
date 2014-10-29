@@ -101,7 +101,7 @@
 			<tbody>
 				{{for assigantion in assigantions:}}
 					<tr>
-						<td>
+						<td width="500px">
 							<a id="p{{=str(assigantion.project)}}_all" style="white-space:nowrap; cursor:pointer;">{{=str(assigantion.project.name)}}</a>
 						</td>
 						<td>
@@ -156,7 +156,7 @@
 								<table class="table table-striped table-bordered">
 									<thead>
 										<tr>
-											<th><center>{{=T('Month')}}</center></th>
+											<th width="490px"><center>{{=T('Month')}}</center></th>
 											<th><center>{{=T('Total inserted')}}</center></th>
 											<th><center>{{=T('Total modified')}}</center></th>
 											<th><center>{{=T('Total out')}}</center></th>
@@ -172,9 +172,7 @@
 							        		{{pass}}
 							        		<tr>
 												<td>
-													<center>
 														<a id="p{{=str(assigantion.project)}}_all_m{{=month[0]}}_all" style="white-space:nowrap; cursor:pointer;">{{=month[1]}}</a>
-													</center>
 												</td>
 												<td>
 													<center>
