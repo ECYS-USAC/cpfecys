@@ -727,6 +727,7 @@
 'Fill all fields to save.': 'Llenar todos los campos para guardar.',
 'Filter': 'Filtrar',
 'Final': 'Final',
+'Assigned Courses':'Cursos Asignados',
 'Final Grade': 'Nota Final',
 'Final practice': 'Práctica Final',
 'Final Practice': 'Práctica Final',
