@@ -1,0 +1,70 @@
+{{if showLevel==False:}}
+	<center>{{=T('Action not allowed')}}</center>
+	<script type="text/javascript">
+		alert("{{=T('Action not allowed')}}");
+		window.location.href = "{{=URL('default', 'index.html')}}";
+	</script>
+{{else:}}
+	<table class="table table-bordered">
+		<tr bgcolor="#D7DF01">
+			<th>
+				{{=T('User resolution')}}
+			</th>
+			<th>
+				{{=T('Role resolution')}}
+			</th>
+			<th>
+				{{=T('Date of resolution')}}
+			</th>
+			<th>
+				{{=T('Operation')}}
+			</th>
+			<th>
+				{{=T('Description')}}
+			</th>
+			<th>
+				{{=T('Rol Academic')}}
+			</th>
+			<th>
+				{{=T('Before Grade')}}
+			</th>
+			<th>
+				{{=T('Grade edited')}}
+			</th>
+		</tr>
+		{{for field in vecAllUserRoleMonth:}}
+			{{for camp in field:}}
+				<tr bgcolor="#FFFF00">
+					<td>
+						{{=str(camp['user_name'])}}
+					</td>
+					<td>
+						{{if str(camp['roll'])=='Student':}}
+							{{=T('Rol Student')}}
+						{{else:}}
+							{{=T(str(camp['roll']))}}
+						{{pass}}
+					</td>
+					<td>
+						{{=str(camp['date_log'])}}
+					</td>
+					<td>
+						{{=str(camp['operation_log'])}}
+					</td>
+					<td>
+						{{=camp['description']}}
+					</td>
+					<td>
+						{{=str(camp['academic'])}}
+					</td>
+					<td>
+						{{=str(camp['before_grade'])}}
+					</td>
+					<td>
+						{{=str(camp['after_grade'])}}
+					</td>
+				</tr>
+			{{pass}}
+		{{pass}}
+	</table>
+{{pass}}

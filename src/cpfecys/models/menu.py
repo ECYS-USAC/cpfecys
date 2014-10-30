@@ -110,7 +110,7 @@ if auth.has_membership(role="Teacher"):
 
                 (T('Reports'), False, URL(), [
                     (T('Grades'), False, URL('activity_control', 'grades_management'), []),
-                    (T('Laboratory Revalidation'), False, URL('activity_control','laboratory_revalidation'), []),    
+                    (T('Laboratory Revalidation'), False, URL('activity_control','validate_laboratory_management'), []),    
                  ]),
 
                 ]),

@@ -1,0 +1,472 @@
+{{extend 'template.html'}}
+{{from datetime import datetime}}
+<div class="row-fluid">
+	<h1>
+		{{=T('Management Reports Laboratory Revalidations')}}
+		<br>
+		<small>
+			{{=T(year.period.name)}} {{=str(year.yearp)}}
+		</small>
+	</h1>
+	<div align="right">
+		<a class="btn btn-success" href="{{=URL(vars=dict(list='True'))}}"><i class="icon-download icon-white"></i>{{=T('Export Report')}} (CSV)</a>
+    </div>
+	<!--Search in report-->
+	<div>
+		<div>
+			<form action="{{=URL('activity_control', 'validate_laboratory_management/search')}}" method="post">
+				<input type="text" id="querySearch" name="querySearch" value="{{=session.search_validate_laboratory_management}}" readonly="readonly"/>
+				<a id="buildSearch" class="btn">{{=T('Build Search')}}</a>
+				<button type="submit"  class="btn">{{=T('Search')}}</button>
+				<a id="cancelSearch" class="btn">{{=T('Clear')}}</a>
+			</form>
+		</div>
+		<div id="div_search" style="display: none;">
+			<table>
+				<tr>
+					<td>
+						<select class="generic-widget" id="fieldSearch">
+						{{for field in vecFieldsSearch:}}
+							<option value="{{=str(field[1])}}">{{=str(field[0])}}</option>
+						{{pass}}
+						</select>
+					</td>
+					<td>
+						<select class="generic-widget" id="optionSearch">
+						{{for option in vecOptionSearch:}}
+							<option value="{{=str(option[0])}}">{{=str(option[0])}}</option>
+						{{pass}}
+						</select>
+					</td>
+					<td>
+						{{contadorT=0}}
+						{{for fieldSearch in vecFieldsSearch:}}
+							{{valuesSearch = 'valuesSearch_'+fieldSearch[1]}}
+							{{if fieldSearch[2]=='1':}}
+								{{if contadorT==0:}}
+									<select class="generic-widget" id="{{=valuesSearch}}">
+								{{else:}}
+									<select class="generic-widget" id="{{=valuesSearch}}" style="display:none;">
+								{{pass}}
+									<option value=""></option>
+								{{for values in fieldSearch[3]:}}
+									{{if fieldSearch[1]=='roll':}}
+										{{if values=='Student':}}
+											<option value="{{=values}}">{{=T('Rol Student')}}</option>
+										{{else:}}
+											<option value="{{=values}}">{{=T(values)}}</option>
+										{{pass}}
+									{{else:}}
+										<option value="{{=values}}">{{=values}}</option>
+									{{pass}}
+								{{pass}}
+								{</select>
+							{{elif fieldSearch[2]=='2':}}
+								{{if contadorT==0:}}
+									<input id="{{=valuesSearch}}" type="text"/>
+								{{else:}}
+									<input id="{{=valuesSearch}}" type="text" style="display:none;"/>
+								{{pass}}
+							{{elif fieldSearch[2]=='3':}}
+								{{if contadorT==0:}}
+									<input id="{{=valuesSearch}}" class="date" placeholder="YYYY-MM-DD" type="text" value = ""/>
+								{{else:}}
+									<input id="{{=valuesSearch}}" class="date" placeholder="YYYY-MM-DD" type="text" value = "" style="display:none;"/>
+								{{pass}}
+							{{pass}}
+							{{contadorT=1}}
+						{{pass}}
+					</td>
+					<td>
+						<a id="newSearch" class="btn" title="{{=T('Start building a new search')}}">{{=T('New Search')}}</a>
+						<a id="andSearch" class="btn" title="{{=T('Add this to the search as an AND term')}}">{{=T('+ And')}}</a>
+						<a id="orSearch" class="btn" title="{{=T('Add this to the search as an OR term')}}">{{=T('+ Or')}}</a>
+						<a id="closeSearch" class="btn">{{=T('Close')}}</a>
+					</td>
+				</tr>
+			</table>
+		</div>
+	</div>
+	<!--Search in report-->
+	<div style="overflow:auto; width:100%;">
+		<table class="table table-bordered">
+			<thead>
+				<tr bgcolor="#585858">
+					<th><center><font Color="White">{{=T('Course')}}</font></center></th>
+					<th><center><font Color="White">{{=T('Total inserted')}}</font></center></th>
+					<th><center><font Color="White">{{=T('Total modified')}}</font></center></th>
+					<th><center><font Color="White">{{=T('Total out')}}</font></center></th>
+				</tr>
+			</thead>
+			<tbody>
+				{{for assigantion in assigantions:}}
+					<tr bgcolor="#848484">
+						<td width="500px">
+							<font Color="White">
+							<a id="p{{=str(assigantion.project)}}_all" style="white-space:nowrap; cursor:pointer; color:white;"><b>{{=str(assigantion.project.name)}}</b></a>
+							</font>
+						</td>
+						<td>
+							<center>
+								<a class="badge badge-success" style="white-space:nowrap;">
+									{{if session.search_validate_laboratory_management == "":}}
+										{{tI = db.executesql('SELECT count(id) as total from validate_laboratory_log where project=\'' + assigantion.project.name + '\' and yearp=\'' + str(year.yearp) +'\' and period=\'' + str(T(year.period.name))+ '\' and operation_log=\'insert\'' + session.search_validate_laboratory_management +';' ,as_dict=True)}}
+									{{else:}}
+										{{tI = db.executesql('SELECT count(id) as total from validate_laboratory_log where project=\'' + assigantion.project.name + '\' and yearp=\'' + str(year.yearp) +'\' and period=\'' + str(T(year.period.name))+ '\' and operation_log=\'insert\' and ' + session.search_validate_laboratory_management +';' ,as_dict=True)}}
+									{{pass}}
+									{{for dI in tI:}}
+										{{dIT=dI['total']}}
+									{{pass}}
+									{{=str(dIT)}}
+								</a>
+							</center>
+						</td>
+						<td>
+							<center>
+								<a class="badge badge-info" style="white-space:nowrap;">
+									{{if session.search_validate_laboratory_management == "":}}
+										{{tU = db.executesql('SELECT count(id) as total from validate_laboratory_log where project=\'' + assigantion.project.name + '\' and yearp=\'' + str(year.yearp) +'\' and period=\'' + str(T(year.period.name))+ '\' and operation_log=\'update\'' + session.search_validate_laboratory_management +';' ,as_dict=True)}}
+									{{else:}}
+										{{tU = db.executesql('SELECT count(id) as total from validate_laboratory_log where project=\'' + assigantion.project.name + '\' and yearp=\'' + str(year.yearp) +'\' and period=\'' + str(T(year.period.name))+ '\' and operation_log=\'update\' and ' + session.search_validate_laboratory_management +';' ,as_dict=True)}}
+									{{pass}}
+									{{for dU in tU:}}
+										{{dUT=dU['total']}}
+									{{pass}}
+									{{=str(dUT)}}
+								</a>
+							</center>
+						</td>
+						<td>
+							<center>
+								<a class="badge badge-important" style="white-space:nowrap;">
+									{{if session.search_validate_laboratory_management == "":}}
+										{{tD = db.executesql('SELECT count(id) as total from validate_laboratory_log where project=\'' + assigantion.project.name + '\' and yearp=\'' + str(year.yearp) +'\' and period=\'' + str(T(year.period.name))+ '\' and operation_log=\'delete\'' + session.search_validate_laboratory_management +';' ,as_dict=True)}}
+									{{else:}}
+										{{tD = db.executesql('SELECT count(id) as total from validate_laboratory_log where project=\'' + assigantion.project.name + '\' and yearp=\'' + str(year.yearp) +'\' and period=\'' + str(T(year.period.name))+ '\' and operation_log=\'delete\' and ' + session.search_validate_laboratory_management +';' ,as_dict=True)}}
+									{{pass}}
+									{{for dD in tD:}}
+										{{dDT=dD['total']}}
+									{{pass}}
+									{{=str(dDT)}}
+								</a>
+							</center>
+						</td>
+					</tr>
+					<tr bgcolor="#BDBDBD">
+						<td colspan="4">
+							<div id="div_p{{=assigantion.project}}" style="display: none;">
+								<table class="table table-bordered">
+									<thead>
+										<tr bgcolor="#01A9DB">
+											<th width="490px"><center>{{=T('Month')}}</center></th>
+											<th><center>{{=T('Total inserted')}}</center></th>
+											<th><center>{{=T('Total modified')}}</center></th>
+											<th><center>{{=T('Total out')}}</center></th>
+										</tr>
+									</thead>
+									<tbody>
+										{{for month in vecMonth:}}
+											{{start = datetime.strptime(str(year.yearp) + '-' + str(month[0]) +'-01', "%Y-%m-%d")}}
+											{{if month[2]==1:}}
+							        			{{end = datetime.strptime(str(year.yearp+1) + '-' + str(month[2]) +'-01', "%Y-%m-%d")}}
+							        		{{else:}}
+							        			{{end = datetime.strptime(str(year.yearp) + '-' + str(month[2]) +'-01', "%Y-%m-%d")}}
+							        		{{pass}}
+							        		<tr bgcolor="#00BFFF">
+												<td>
+														<a id="p{{=str(assigantion.project)}}_all_m{{=month[0]}}_all" style="white-space:nowrap; cursor:pointer;"><b>{{=month[1]}}</b></a>
+												</td>
+												<td>
+													<center>
+														<a id="p{{=str(assigantion.project)}}_all_m{{=month[0]}}_i" style="white-space:nowrap; cursor:pointer;" class="badge badge-success">
+															{{if session.search_validate_laboratory_management == "":}}
+																{{tD = db.executesql('SELECT count(id) as total from validate_laboratory_log where project=\'' + assigantion.project.name + '\' and yearp=\'' + str(year.yearp) +'\' and period=\'' + str(T(year.period.name))+ '\' and operation_log=\'insert\' and date_log>=\'' + str(start) +'\' and date_log <= \''+ str(end) +'\';' ,as_dict=True)}}
+															{{else:}}
+																{{tD = db.executesql('SELECT count(id) as total from validate_laboratory_log where project=\'' + assigantion.project.name + '\' and yearp=\'' + str(year.yearp) +'\' and period=\'' + str(T(year.period.name))+ '\' and operation_log=\'insert\' and date_log>=\'' + str(start) +'\' and date_log <= \''+ str(end) + '\' and ' + session.search_validate_laboratory_management +';' ,as_dict=True)}}
+															{{pass}}
+															{{for dD in tD:}}
+																{{dDT=dD['total']}}
+															{{pass}}
+															{{=str(dDT)}}
+														</a>
+													</center>
+												</td>
+												<td>
+													<center>
+														<a id="p{{=str(assigantion.project)}}_all_m{{=month[0]}}_u" style="white-space:nowrap; cursor:pointer;" class="badge badge-info">
+															{{if session.search_validate_laboratory_management == "":}}
+																{{tD = db.executesql('SELECT count(id) as total from validate_laboratory_log where project=\'' + assigantion.project.name + '\' and yearp=\'' + str(year.yearp) +'\' and period=\'' + str(T(year.period.name))+ '\' and operation_log=\'update\' and date_log>=\'' + str(start) +'\' and date_log <= \''+ str(end) +'\';' ,as_dict=True)}}
+															{{else:}}
+																{{tD = db.executesql('SELECT count(id) as total from validate_laboratory_log where project=\'' + assigantion.project.name + '\' and yearp=\'' + str(year.yearp) +'\' and period=\'' + str(T(year.period.name))+ '\' and operation_log=\'update\' and date_log>=\'' + str(start) +'\' and date_log <= \''+ str(end) + '\' and ' + session.search_validate_laboratory_management +';' ,as_dict=True)}}
+															{{pass}}
+															{{for dD in tD:}}
+																{{dDT=dD['total']}}
+															{{pass}}
+															{{=str(dDT)}}
+														</a>
+													</center>
+												</td>
+												<td>
+													<center>
+														<a id="p{{=str(assigantion.project)}}_all_m{{=month[0]}}_d" style="white-space:nowrap; cursor:pointer;" class="badge badge-important">
+															{{if session.search_validate_laboratory_management == "":}}
+																{{tD = db.executesql('SELECT count(id) as total from validate_laboratory_log where project=\'' + assigantion.project.name + '\' and yearp=\'' + str(year.yearp) +'\' and period=\'' + str(T(year.period.name))+ '\' and operation_log=\'delete\' and date_log>=\'' + str(start) +'\' and date_log <= \''+ str(end) +'\';' ,as_dict=True)}}
+															{{else:}}
+																{{tD = db.executesql('SELECT count(id) as total from validate_laboratory_log where project=\'' + assigantion.project.name + '\' and yearp=\'' + str(year.yearp) +'\' and period=\'' + str(T(year.period.name))+ '\' and operation_log=\'delete\' and date_log>=\'' + str(start) +'\' and date_log <= \''+ str(end) + '\' and ' + session.search_validate_laboratory_management +';' ,as_dict=True)}}
+															{{pass}}
+															{{for dD in tD:}}
+																{{dDT=dD['total']}}
+															{{pass}}
+															{{=str(dDT)}}
+														</a>
+													</center>
+												</td>
+											</tr>
+											<tr bgcolor="#2ECCFA">
+												<td colspan="4">
+													<div id="div_p{{=assigantion.project}}_m{{=month[0]}}" style="display: none;">
+														<center>{{=T('Loading')}}...</center>
+													</div>
+												</td>
+											</tr>
+										{{pass}}
+									</tbody>
+								</table>
+							</div>
+						</td>
+					</tr>
+				{{pass}}
+			</tbody>
+		</table>
+	</div>
+</div>
+
+<script type="text/javascript">
+	$(document).ready(function(){
+		//INICIO --- Botones para realizar la ejecución o cancelación de la busqueda
+		$("#buildSearch").click(function(){
+			$("#div_search").slideDown();
+		});
+
+		$("#cancelSearch").click(function(){
+			window.location.href = "{{=URL('activity_control', 'validate_laboratory_management')}}";
+		});
+		//FIN --- Botones para realizar la ejecución o cancelación de la busqueda
+
+
+		//INICIO --- Botones para realizar la construcción del query
+		$("#closeSearch").click(function(){
+			$("#div_search").slideUp();
+		});
+
+
+		$("#fieldSearch").change(function(){
+			{{for fieldSearch in vecFieldsSearch:}}
+				{{valuesSearch = 'valuesSearch_'+fieldSearch[1]}}
+				$("#{{=valuesSearch}}").css("display", "none");
+			{{pass}}
+
+			{{for fieldSearch in vecFieldsSearch:}}
+				{{valuesSearch = 'valuesSearch_'+fieldSearch[1]}}
+				if (document.getElementById('fieldSearch').value == '{{=str(fieldSearch[1])}}'){
+					$("#{{=valuesSearch}}").css("display", "block");
+				}
+			{{pass}}
+		});
+
+		
+		$("#newSearch").click(function(){
+			{{for fieldSearch in vecFieldsSearch:}}
+				{{valuesSearch = 'valuesSearch_'+fieldSearch[1]}}
+				if (document.getElementById('fieldSearch').value == '{{=str(fieldSearch[1])}}'){
+					{{if fieldSearch[2]=='3':}}
+						var formatDate = /^(\d{4})(\/|-)(\d{1,2})(\/|-)(\d{1,2})$/;
+						var validDateInit = document.getElementById('{{=valuesSearch}}').value.match(formatDate);
+						var validDateEnd = document.getElementById('{{=valuesSearch}}').value.match(formatDate);
+						if (validDateInit == null || validDateEnd==null) {
+							alert("{{=T('Enter date and time as YYYY-MM-DD or YYYY/MM/DD')}}");
+						}else{
+							document.getElementById('querySearch').value = document.getElementById('fieldSearch').value+ " "+ document.getElementById('optionSearch').value +" '" +document.getElementById('{{=valuesSearch}}').value+"'";
+						}
+					{{else:}}
+						{{if fieldSearch[2]=='2':}}
+							if (document.getElementById('{{=valuesSearch}}').value==""){
+								if (document.getElementById('optionSearch').value=="!="){
+									document.getElementById('querySearch').value = document.getElementById('fieldSearch').value+ " is not NULL";
+								}else{
+									document.getElementById('querySearch').value = document.getElementById('fieldSearch').value+ " is NULL";
+								}
+							}else{
+								var regex = /^\d+(?:\.\d{0,2})$/; 
+								var regex2 = /^([0-9])*$/; 
+								if (!regex.test(document.getElementById('{{=valuesSearch}}').value) && !regex2.test(document.getElementById('{{=valuesSearch}}').value)){
+									alert("{{=T('The entered value is not a decimal')}}");  
+								}else{
+									document.getElementById('querySearch').value = document.getElementById('fieldSearch').value+ " "+ document.getElementById('optionSearch').value +" '" +document.getElementById('{{=valuesSearch}}').value+"'";
+								}		
+							}
+						{{else:}}
+							document.getElementById('querySearch').value = document.getElementById('fieldSearch').value+ " "+ document.getElementById('optionSearch').value +" '" +document.getElementById('{{=valuesSearch}}').value+"'";
+						{{pass}}
+					{{pass}}
+				}
+			{{pass}}
+		});
+
+
+		$("#andSearch").click(function(){
+			{{for fieldSearch in vecFieldsSearch:}}
+				{{valuesSearch = 'valuesSearch_'+fieldSearch[1]}}
+				if (document.getElementById('fieldSearch').value == '{{=str(fieldSearch[1])}}'){
+					{{if fieldSearch[2]=='3':}}
+						var formatDate = /^(\d{4})(\/|-)(\d{1,2})(\/|-)(\d{1,2})$/;
+						var validDateInit = document.getElementById('{{=valuesSearch}}').value.match(formatDate);
+						var validDateEnd = document.getElementById('{{=valuesSearch}}').value.match(formatDate);
+						if (validDateInit == null || validDateEnd==null) {
+							alert("{{=T('Enter date and time as YYYY-MM-DD or YYYY/MM/DD')}}");
+						}else{
+							if (document.getElementById('querySearch').value=='')
+								document.getElementById('querySearch').value = document.getElementById('fieldSearch').value+ " "+ document.getElementById('optionSearch').value +" '" +document.getElementById('{{=valuesSearch}}').value+"'";
+							else
+								document.getElementById('querySearch').value = document.getElementById('querySearch').value +" and "+ document.getElementById('fieldSearch').value+ " "+ document.getElementById('optionSearch').value +" '" +document.getElementById('{{=valuesSearch}}').value+"'";
+						}
+					{{else:}}
+						{{if fieldSearch[2]=='2':}}
+							if (document.getElementById('{{=valuesSearch}}').value==""){
+								if (document.getElementById('optionSearch').value=="!="){
+									if (document.getElementById('querySearch').value=='')
+										document.getElementById('querySearch').value = document.getElementById('fieldSearch').value+ " is not NULL";
+									else
+										document.getElementById('querySearch').value = document.getElementById('querySearch').value +" and "+ document.getElementById('fieldSearch').value+ " is not NULL";
+								}else{
+									if (document.getElementById('querySearch').value=='')
+										document.getElementById('querySearch').value = document.getElementById('fieldSearch').value+ " is NULL";
+									else
+										document.getElementById('querySearch').value = document.getElementById('querySearch').value +" and "+ document.getElementById('fieldSearch').value+ " is NULL";
+								}
+							}else{
+								var regex = /^\d+(?:\.\d{0,2})$/; 
+								var regex2 = /^([0-9])*$/; 
+								if (!regex.test(document.getElementById('{{=valuesSearch}}').value) && !regex2.test(document.getElementById('{{=valuesSearch}}').value)){
+									alert("{{=T('The entered value is not a decimal')}}");  
+								}else{
+									if (document.getElementById('querySearch').value=='')
+										document.getElementById('querySearch').value = document.getElementById('fieldSearch').value+ " "+ document.getElementById('optionSearch').value +" '" +document.getElementById('{{=valuesSearch}}').value+"'";
+									else
+										document.getElementById('querySearch').value = document.getElementById('querySearch').value +" and "+ document.getElementById('fieldSearch').value+ " "+ document.getElementById('optionSearch').value +" '" +document.getElementById('{{=valuesSearch}}').value+"'";
+								}		
+							}
+						{{else:}}
+							if (document.getElementById('querySearch').value=='')
+								document.getElementById('querySearch').value = document.getElementById('fieldSearch').value+ " "+ document.getElementById('optionSearch').value +" '" +document.getElementById('{{=valuesSearch}}').value+"'";
+							else
+								document.getElementById('querySearch').value = document.getElementById('querySearch').value +" and "+ document.getElementById('fieldSearch').value+ " "+ document.getElementById('optionSearch').value +" '" +document.getElementById('{{=valuesSearch}}').value+"'";
+						{{pass}}
+					{{pass}}
+				}
+			{{pass}}
+		});
+
+
+		$("#orSearch").click(function(){
+			{{for fieldSearch in vecFieldsSearch:}}
+				{{valuesSearch = 'valuesSearch_'+fieldSearch[1]}}
+				if (document.getElementById('fieldSearch').value == '{{=str(fieldSearch[1])}}'){
+					{{if fieldSearch[2]=='3':}}
+						var formatDate = /^(\d{4})(\/|-)(\d{1,2})(\/|-)(\d{1,2})$/;
+						var validDateInit = document.getElementById('{{=valuesSearch}}').value.match(formatDate);
+						var validDateEnd = document.getElementById('{{=valuesSearch}}').value.match(formatDate);
+						if (validDateInit == null || validDateEnd==null) {
+							alert("{{=T('Enter date and time as YYYY-MM-DD or YYYY/MM/DD')}}");
+						}else{
+							if (document.getElementById('querySearch').value=='')
+								document.getElementById('querySearch').value = document.getElementById('fieldSearch').value+ " "+ document.getElementById('optionSearch').value +" '" +document.getElementById('{{=valuesSearch}}').value+"'";
+							else
+								document.getElementById('querySearch').value = document.getElementById('querySearch').value +" or "+ document.getElementById('fieldSearch').value+ " "+ document.getElementById('optionSearch').value +" '" +document.getElementById('{{=valuesSearch}}').value+"'";
+						}
+					{{else:}}
+						{{if fieldSearch[2]=='2':}}
+							if (document.getElementById('{{=valuesSearch}}').value==""){
+								if (document.getElementById('optionSearch').value=="!="){
+									if (document.getElementById('querySearch').value=='')
+										document.getElementById('querySearch').value = document.getElementById('fieldSearch').value+ " is not NULL";
+									else
+										document.getElementById('querySearch').value = document.getElementById('querySearch').value +" or "+ document.getElementById('fieldSearch').value+ " is not NULL";
+								}else{
+									if (document.getElementById('querySearch').value=='')
+										document.getElementById('querySearch').value = document.getElementById('fieldSearch').value+ " is NULL";
+									else
+										document.getElementById('querySearch').value = document.getElementById('querySearch').value +" or "+ document.getElementById('fieldSearch').value+ " is NULL";
+								}
+							}else{
+								var regex = /^\d+(?:\.\d{0,2})$/; 
+								var regex2 = /^([0-9])*$/; 
+								if (!regex.test(document.getElementById('{{=valuesSearch}}').value) && !regex2.test(document.getElementById('{{=valuesSearch}}').value)){
+									alert("{{=T('The entered value is not a decimal')}}");  
+								}else{
+									if (document.getElementById('querySearch').value=='')
+										document.getElementById('querySearch').value = document.getElementById('fieldSearch').value+ " "+ document.getElementById('optionSearch').value +" '" +document.getElementById('{{=valuesSearch}}').value+"'";
+									else
+										document.getElementById('querySearch').value = document.getElementById('querySearch').value +" or "+ document.getElementById('fieldSearch').value+ " "+ document.getElementById('optionSearch').value +" '" +document.getElementById('{{=valuesSearch}}').value+"'";
+								}		
+							}
+						{{else:}}
+							if (document.getElementById('querySearch').value=='')
+								document.getElementById('querySearch').value = document.getElementById('fieldSearch').value+ " "+ document.getElementById('optionSearch').value +" '" +document.getElementById('{{=valuesSearch}}').value+"'";
+							else
+								document.getElementById('querySearch').value = document.getElementById('querySearch').value +" or "+ document.getElementById('fieldSearch').value+ " "+ document.getElementById('optionSearch').value +" '" +document.getElementById('{{=valuesSearch}}').value+"'";
+						{{pass}}
+					{{pass}}
+				}
+			{{pass}}
+		});
+		//FIN --- Botones para realizar la construcción del query
+
+
+		//INICIO --- Botones para mostrar el nivel 2 del reporte
+		{{for assigantion in assigantions:}}
+			$("#p{{=str(assigantion.project)}}_all").click(function(){
+				$("#div_p{{=assigantion.project}}").toggle();
+				{{for month in vecMonth:}}
+					jQuery('#div_p{{=assigantion.project}}_m{{=month[0]}}').empty();
+					jQuery('#div_p{{=assigantion.project}}_m{{=month[0]}}').append("{{=T('Loading')}}...");
+					$("#div_p{{=assigantion.project}}_m{{=month[0]}}").css("display", "none");
+				{{pass}}
+			});
+
+
+			{{for month in vecMonth:}}
+				$("#p{{=str(assigantion.project)}}_all_m{{=month[0]}}_all").click(function(){
+					$("#div_p{{=assigantion.project}}_m{{=month[0]}}").toggle();
+					jQuery('#div_p{{=assigantion.project}}_m{{=month[0]}}').empty();
+					jQuery('#div_p{{=assigantion.project}}_m{{=month[0]}}').append("{{=T('Loading')}}...");
+					$("#div_p{{=assigantion.project}}_m{{=month[0]}}").load("{{=URL('activity_control','validate_laboratory_management_n2.load')}}?tipo=all&amp;month={{=month[0]}}&amp;project="+encodeURIComponent({{=assigantion.project}}));
+				});
+
+				$("#p{{=str(assigantion.project)}}_all_m{{=month[0]}}_i").click(function(){
+					$("#div_p{{=assigantion.project}}_m{{=month[0]}}").toggle();
+					jQuery('#div_p{{=assigantion.project}}_m{{=month[0]}}').empty();
+					jQuery('#div_p{{=assigantion.project}}_m{{=month[0]}}').append("{{=T('Loading')}}...");
+					$("#div_p{{=assigantion.project}}_m{{=month[0]}}").load("{{=URL('activity_control','validate_laboratory_management_n2.load')}}?tipo=i&amp;month={{=month[0]}}&amp;project="+encodeURIComponent({{=assigantion.project}}));
+				});
+
+				$("#p{{=str(assigantion.project)}}_all_m{{=month[0]}}_u").click(function(){
+					$("#div_p{{=assigantion.project}}_m{{=month[0]}}").toggle();
+					jQuery('#div_p{{=assigantion.project}}_m{{=month[0]}}').empty();
+					jQuery('#div_p{{=assigantion.project}}_m{{=month[0]}}').append("{{=T('Loading')}}...");
+					$("#div_p{{=assigantion.project}}_m{{=month[0]}}").load("{{=URL('activity_control','validate_laboratory_management_n2.load')}}?tipo=u&amp;month={{=month[0]}}&amp;project="+encodeURIComponent({{=assigantion.project}}));
+				});
+
+				$("#p{{=str(assigantion.project)}}_all_m{{=month[0]}}_d").click(function(){
+					$("#div_p{{=assigantion.project}}_m{{=month[0]}}").toggle();
+					jQuery('#div_p{{=assigantion.project}}_m{{=month[0]}}').empty();
+					jQuery('#div_p{{=assigantion.project}}_m{{=month[0]}}').append("{{=T('Loading')}}...");
+					$("#div_p{{=assigantion.project}}_m{{=month[0]}}").load("{{=URL('activity_control','validate_laboratory_management_n2.load')}}?tipo=d&amp;month={{=month[0]}}&amp;project="+encodeURIComponent({{=assigantion.project}}));
+				});
+			{{pass}}
+		{{pass}}
+		//FIN --- Botones para mostrar el nivel 2 del reporte
+	});
+
+	
+</script>
