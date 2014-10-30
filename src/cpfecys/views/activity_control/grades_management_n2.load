@@ -33,11 +33,11 @@
 				<tr bgcolor="#31B404">
 					<td>
 						<a id="p{{=str(project.id)}}_all_m{{=month}}_all_r{{=ror[0]}}_all" style="white-space:nowrap; cursor:pointer;">
-							{{if ror[0]=='Student':}}
+							<b>{{if ror[0]=='Student':}}
 								{{=T('Rol Student')}}
 							{{else:}}
 								{{=T(ror[0])}}
-							{{pass}}
+							{{pass}}</b>
 						</a>
 					</td>
 					{{if tipo=='all':}}

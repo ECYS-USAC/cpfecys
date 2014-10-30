@@ -32,7 +32,7 @@
 			{{for userr in vecUserRoleMonth:}}
 				<tr bgcolor="#DBA901">
 					<td>
-						<a id="p{{=str(project.id)}}_all_m{{=month}}_all_r{{=roll}}_all_r{{=userr[0]}}_all" style="white-space:nowrap; cursor:pointer;">{{=userr[0]}}</a>
+						<a id="p{{=str(project.id)}}_all_m{{=month}}_all_r{{=roll}}_all_r{{=userr[0]}}_all" style="white-space:nowrap; cursor:pointer;"><b>{{=userr[0]}}</b></a>
 					</td>
 					{{if tipo=='all':}}
 						<td>

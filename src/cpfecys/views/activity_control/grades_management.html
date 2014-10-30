@@ -92,17 +92,19 @@
 		<table class="table table-bordered">
 			<thead>
 				<tr bgcolor="#585858">
-					<th><center>{{=T('Course')}}</center></th>
-					<th><center>{{=T('Total inserted')}}</center></th>
-					<th><center>{{=T('Total modified')}}</center></th>
-					<th><center>{{=T('Total out')}}</center></th>
+					<th><center><font Color="White">{{=T('Course')}}</font></center></th>
+					<th><center><font Color="White">{{=T('Total inserted')}}</font></center></th>
+					<th><center><font Color="White">{{=T('Total modified')}}</font></center></th>
+					<th><center><font Color="White">{{=T('Total out')}}</font></center></th>
 				</tr>
 			</thead>
 			<tbody>
 				{{for assigantion in assigantions:}}
 					<tr bgcolor="#848484">
 						<td width="500px">
-							<a id="p{{=str(assigantion.project)}}_all" style="white-space:nowrap; cursor:pointer;">{{=str(assigantion.project.name)}}</a>
+							<font Color="White">
+							<a id="p{{=str(assigantion.project)}}_all" style="white-space:nowrap; cursor:pointer; color:white;"><b>{{=str(assigantion.project.name)}}</b></a>
+							</font>
 						</td>
 						<td>
 							<center>
@@ -172,7 +174,7 @@
 							        		{{pass}}
 							        		<tr bgcolor="#00BFFF">
 												<td>
-														<a id="p{{=str(assigantion.project)}}_all_m{{=month[0]}}_all" style="white-space:nowrap; cursor:pointer;">{{=month[1]}}</a>
+														<a id="p{{=str(assigantion.project)}}_all_m{{=month[0]}}_all" style="white-space:nowrap; cursor:pointer;"><b>{{=month[1]}}</b></a>
 												</td>
 												<td>
 													<center>
