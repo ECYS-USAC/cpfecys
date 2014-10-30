@@ -5,8 +5,9 @@
 		window.location.href = "{{=URL('default', 'index.html')}}";
 	</script>
 {{else:}}
-	<table class="table table-striped table-bordered">
+	<table class="table table-bordered">
 		<thead>
+			<tr bgcolor="#B18904">
 			<th width="470px">
 				<center>{{=T('User')}}</center>
 			</th>
@@ -25,10 +26,11 @@
 					<center>{{=T('Total out')}}</center>
 				</th>
 			{{pass}}
+			</tr>
 		</thead>
 		<tbody>
 			{{for userr in vecUserRoleMonth:}}
-				<tr>
+				<tr bgcolor="#DBA901">
 					<td>
 						<a id="p{{=str(project.id)}}_all_m{{=month}}_all_r{{=roll}}_all_r{{=userr[0]}}_all" style="white-space:nowrap; cursor:pointer;">{{=userr[0]}}</a>
 					</td>
@@ -68,7 +70,7 @@
 						</td>
 					{{pass}}
 				</tr>
-				<tr>
+				<tr bgcolor="#FFBF00">
 					{{if tipo=='all':}}
 						<td colspan="4">
 					{{elif tipo=='i' or tipo=='u' or tipo=='d':}}

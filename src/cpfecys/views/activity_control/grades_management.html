@@ -89,9 +89,9 @@
 	</div>
 	<!--Search in report-->
 	<div style="overflow:auto; width:100%;">
-		<table class="table table-striped table-bordered">
+		<table class="table table-bordered">
 			<thead>
-				<tr>
+				<tr bgcolor="#585858">
 					<th><center>{{=T('Course')}}</center></th>
 					<th><center>{{=T('Total inserted')}}</center></th>
 					<th><center>{{=T('Total modified')}}</center></th>
@@ -100,7 +100,7 @@
 			</thead>
 			<tbody>
 				{{for assigantion in assigantions:}}
-					<tr>
+					<tr bgcolor="#848484">
 						<td width="500px">
 							<a id="p{{=str(assigantion.project)}}_all" style="white-space:nowrap; cursor:pointer;">{{=str(assigantion.project.name)}}</a>
 						</td>
@@ -150,12 +150,12 @@
 							</center>
 						</td>
 					</tr>
-					<tr>
+					<tr bgcolor="#BDBDBD">
 						<td colspan="4">
 							<div id="div_p{{=assigantion.project}}" style="display: none;">
-								<table class="table table-striped table-bordered">
+								<table class="table table-bordered">
 									<thead>
-										<tr>
+										<tr bgcolor="#01A9DB">
 											<th width="490px"><center>{{=T('Month')}}</center></th>
 											<th><center>{{=T('Total inserted')}}</center></th>
 											<th><center>{{=T('Total modified')}}</center></th>
@@ -170,7 +170,7 @@
 							        		{{else:}}
 							        			{{end = datetime.strptime(str(year.yearp) + '-' + str(month[2]) +'-01', "%Y-%m-%d")}}
 							        		{{pass}}
-							        		<tr>
+							        		<tr bgcolor="#00BFFF">
 												<td>
 														<a id="p{{=str(assigantion.project)}}_all_m{{=month[0]}}_all" style="white-space:nowrap; cursor:pointer;">{{=month[1]}}</a>
 												</td>
@@ -220,7 +220,7 @@
 													</center>
 												</td>
 											</tr>
-											<tr>
+											<tr bgcolor="#2ECCFA">
 												<td colspan="4">
 													<div id="div_p{{=assigantion.project}}_m{{=month[0]}}" style="display: none;">
 														<center>{{=T('Loading')}}...</center>
@@ -425,6 +425,11 @@
 		{{for assigantion in assigantions:}}
 			$("#p{{=str(assigantion.project)}}_all").click(function(){
 				$("#div_p{{=assigantion.project}}").toggle();
+				{{for month in vecMonth:}}
+					jQuery('#div_p{{=assigantion.project}}_m{{=month[0]}}').empty();
+					jQuery('#div_p{{=assigantion.project}}_m{{=month[0]}}').append("{{=T('Loading')}}...");
+					$("#div_p{{=assigantion.project}}_m{{=month[0]}}").css("display", "none");
+				{{pass}}
 			});
 
 

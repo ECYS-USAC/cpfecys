@@ -5,42 +5,42 @@
 		window.location.href = "{{=URL('default', 'index.html')}}";
 	</script>
 {{else:}}
-	<table class="table table-striped table-bordered">
-		<tr>
-			<td>
+	<table class="table table-bordered">
+		<tr bgcolor="#D7DF01">
+			<th>
 				{{=T('User resolution')}}
-			</td>
-			<td>
+			</th>
+			<th>
 				{{=T('Role resolution')}}
-			</td>
-			<td>
+			</th>
+			<th>
 				{{=T('Date of resolution')}}
-			</td>
-			<td>
+			</th>
+			<th>
 				{{=T('Operation')}}
-			</td>
-			<td>
+			</th>
+			<th>
 				{{=T('Description')}}
-			</td>
-			<td>
+			</th>
+			<th>
 				{{=T('Category')}}
-			</td>
-			<td>
+			</th>
+			<th>
 				{{=T('Activity')}}
-			</td>
-			<td>
+			</th>
+			<th>
 				{{=T('Rol Academic')}}
-			</td>
-			<td>
+			</th>
+			<th>
 				{{=T('Before Grade')}}
-			</td>
-			<td>
+			</th>
+			<th>
 				{{=T('Grade edited')}}
-			</td>
+			</th>
 		</tr>
 		{{for field in vecAllUserRoleMonth:}}
 			{{for camp in field:}}
-				<tr>
+				<tr bgcolor="#FFFF00">
 					<td>
 						{{=str(camp['user_name'])}}
 					</td>
