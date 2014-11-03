@@ -2459,9 +2459,13 @@ def general_report_activities_export():
     teacher = db((db.user_project.period == year.id) & (db.user_project.project == project_var.id) & (db.user_project.assigned_user==db.auth_user.id)&(db.auth_user.id==db.auth_membership.user_id)&(db.auth_membership.group_id==3)).select().first()
     practice = db((db.user_project.period == year.id) & (db.user_project.project == project_var.id) & (db.user_project.assigned_user==db.auth_user.id)&(db.auth_user.id==db.auth_membership.user_id)&(db.auth_membership.group_id==2)).select()
     if request.vars['type'] == 'class':
-        students = db((db.academic_course_assignation.semester == year.id) & (db.academic_course_assignation.assignation==project_var.id)).select()
+        academic_assig2 = db((db.academic.id==db.academic_course_assignation.carnet)&(db.academic_course_assignation.semester == year.id) & (db.academic_course_assignation.assignation==project_var.id)).select(orderby=db.academic.carnet)
     else:
-        students = db((db.academic_course_assignation.semester == year.id) & (db.academic_course_assignation.assignation==project_var.id) & (db.academic_course_assignation.laboratorio==True)).select()
+        academic_assig2 = db((db.academic.id==db.academic_course_assignation.carnet)&(db.academic_course_assignation.semester == year.id) & (db.academic_course_assignation.assignation==project_var.id) & (db.academic_course_assignation.laboratorio==True)).select(orderby=db.academic.carnet)
+
+    students=[]
+    for acaT in academic_assig2:
+        students.append(acaT.academic_course_assignation)
 
 
     existLab=False
@@ -2623,13 +2627,13 @@ def general_report_activities_export():
                         totalActivities=totalActivities+1
 
                     if category.specific_grade==True:
-                        t.append(str(totalCategory))
+                        t.append(str(round(totalCategory,3)))
                     else:
                         if totalActivities==0:
                             totalActivities=1
                         totalActivities=totalActivities*100
                         totalCategory=float((totalCategory*float(category.grade))/float(totalActivities))
-                        t.append(str(totalCategory))
+                        t.append(str(round(totalCategory,3)))
                     totalCarry=totalCarry+totalCategory
                     posVCC=posVCC+1
 
@@ -2680,7 +2684,7 @@ def general_report_activities_export():
 
 
                 #<!--Show grade of laboratory-->
-                t.append(str(totalCategory))
+                t.append(str(round(totalCategory,3)))
                 #<!--Plus the laboratory to the carry-->
                 totalCarry=totalCarry+totalCategory
 
@@ -2693,21 +2697,21 @@ def general_report_activities_export():
                 if db((db.course_requirement_student.carnet==t1.carnet)&(db.course_requirement_student.requirement==requirement.id)).select().first() is not None:
                     if request.vars['type'] == 'class' and existLab==True:
                         if totalCategory>=float((61*totalLab)/100):
-                            t.append(str(totalCarry))
+                            t.append(str(int(round(totalCarry,0))))
                         else:
                             t.append('0')
                     else:
-                        t.append(str(totalCarry))
+                        t.append(str(int(round(totalCarry,0))))
                 else:
                     t.append('0')
             else:
                 if request.vars['type'] == 'class' and existLab==True:
                     if totalCategory>=float((61*totalLab)/100):
-                        t.append(str(totalCarry))
+                        t.append(str(int(round(totalCarry,0))))
                     else:
                         t.append('0')
                 else:
-                    t.append(str(totalCarry))
+                    t.append(str(int(round(totalCarry,0))))
             posVCC=0
             totalCategory=float(0)
             totalActivities=0
@@ -2743,18 +2747,18 @@ def general_report_activities_export():
                     totalActivities=totalActivities+1
 
                 if category.specific_grade==True:
-                    t.append(str(totalCategory))
+                    t.append(str(round(totalCategory,3)))
                 else:
                     if totalActivities==0:
                         totalActivities=1
                     pass
                     totalActivities=totalActivities*100
                     totalCategory=float((totalCategory*float(category.grade))/float(totalActivities))
-                    t.append(str(totalCategory))
+                    t.append(str(round(totalCategory,3)))
                 totalCarry=totalCarry+totalCategory
                 posVCC=posVCC+1
 
-            t.append(str(totalCarry))
+            t.append(str(int(round(totalCarry,0))))
             l.append(t)
             t=[]
             posVCC=0
@@ -2817,9 +2821,13 @@ def General_report_activities():
     teacher = db((db.user_project.period == year.id) & (db.user_project.project == project_var.id) & (db.user_project.assigned_user==db.auth_user.id)&(db.auth_user.id==db.auth_membership.user_id)&(db.auth_membership.group_id==3)).select().first()
     practice = db((db.user_project.period == year.id) & (db.user_project.project == project_var.id) & (db.user_project.assigned_user==db.auth_user.id)&(db.auth_user.id==db.auth_membership.user_id)&(db.auth_membership.group_id==2)).select()
     if request.vars['type'] == 'class':
-        students = db((db.academic_course_assignation.semester == year.id) & (db.academic_course_assignation.assignation==project_var.id)).select()
+        academic_assig = db((db.academic.id==db.academic_course_assignation.carnet)&(db.academic_course_assignation.semester == year.id) & (db.academic_course_assignation.assignation==project_var.id)).select(orderby=db.academic.carnet)
     else:
-        students = db((db.academic_course_assignation.semester == year.id) & (db.academic_course_assignation.assignation==project_var.id) & (db.academic_course_assignation.laboratorio==True)).select()
+        academic_assig = db((db.academic.id==db.academic_course_assignation.carnet)&(db.academic_course_assignation.semester == year.id) & (db.academic_course_assignation.assignation==project_var.id) & (db.academic_course_assignation.laboratorio==True)).select(orderby=db.academic.carnet)
+
+    students=[]
+    for acaT in academic_assig:
+        students.append(acaT.academic_course_assignation)
 
 
     existLab=False
