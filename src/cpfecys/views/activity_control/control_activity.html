@@ -204,6 +204,21 @@
 					    <!--Change request option-->
 				    {{pass}}
 				{{pass}}
+			{{elif no_menu == False:}}
+				 <!--Validate Laboratory option-->
+				{{if request.vars['type']=="lab":}}
+					{{if float(total_var2) == 100:}}
+		  				<li>
+							<a  tabindex="-1" title="{{=T('Validate Laboratory')}}" aria-hidden="true" href="{{=URL('activity_control', 'validate_laboratory',vars=dict(project = request.vars['project'], year = request.vars['year']))}}" >
+					{{else:}}
+						<li class="disabled">
+							<a  tabindex="-1" title="{{=T('Validate Laboratory')}}">
+					{{pass}}
+						<span class="icon-check"></span>{{=T('Validate Laboratory')}}
+						</a>
+					</li>
+				{{pass}}
+				<!--Validate Laboratory option-->
 			{{pass}}
 		{{pass}}
 

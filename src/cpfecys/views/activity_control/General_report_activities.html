@@ -26,6 +26,11 @@
                     <span class="icon-black icon-edit"></span>
                     {{=T('Course requirement')}}
                 </a>
+            {{elif (auth.has_membership('Ecys-Administrator') or auth.has_membership('Super-Administrator')):}}
+                <a class="btn btn-primary" href="{{=URL('activity_control', 'course_requirement',vars=dict(project = request.vars['project'], period = request.vars['period']))}}">
+                    <span class="icon-black icon-edit"></span>
+                    {{=T('Course requirement')}}
+                </a>
             {{pass}}
             {{if (auth.has_membership('Super-Administrator') or auth.has_membership('Ecys-Administrator') or auth.has_membership('Teacher') or auth.has_membership('Student')):}}
                 <a class="btn btn-success" href="{{=URL(vars=dict(project = project.id, period = year.id, list='True', type=request.vars['type']))}}"><i class="icon-download icon-white"></i>{{=T('Export Report')}} (CSV)</a>
@@ -261,7 +266,8 @@
                                                 <FONT COLOR="Green">
                                             {{pass}}
                                             <b>
-                                            {{=str(totalCategory)}}
+                                                {{=str(round(totalCategory,3))}}
+                                            <!--{{#str(totalCategory)}}-->
                                             </b>
                                             </font>
                                         {{pass}}
@@ -338,7 +344,8 @@
                                             <FONT COLOR="Green">
                                         {{pass}}
                                         <b>
-                                        {{=str(totalCategory)}}
+                                        <!--{{#str(totalCategory)}}-->
+                                        {{=str(round(totalCategory,3))}}
                                         </b>
                                         </font>
                                         <!--Plus the laboratory to the carry-->
@@ -481,7 +488,8 @@
                                             <FONT COLOR="Green">
                                         {{pass}}
                                         <b>
-                                        {{=str(totalCategory)}}
+                                        <!--{{#str(totalCategory)}}-->
+                                        {{=str(round(totalCategory,3))}}
                                         </b>
                                         </font>
                                     {{else:}}
@@ -499,7 +507,8 @@
                                             <FONT COLOR="Green">
                                         {{pass}}
                                         <b>
-                                        {{=str(totalCategory)}}
+                                        <!--{{#str(totalCategory)}}-->
+                                        {{=str(round(totalCategory,3))}}
                                         </b>
                                         </font>
                                     {{pass}}
