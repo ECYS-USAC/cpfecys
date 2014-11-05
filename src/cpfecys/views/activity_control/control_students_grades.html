@@ -224,7 +224,7 @@ aria-hidden="true">{{=T('Close')}}</button>
               document.getElementById('grade_input').select();
             }else{
               var coment = ""
-              {{if actual_period == False:}}                
+              {{if ( (actual_period == False) or (course_ended  == True) ):}}                
                 while (coment == ""){
                   coment = prompt("{{=T('Please enter the reason for the change.')}}","");  
                 }                

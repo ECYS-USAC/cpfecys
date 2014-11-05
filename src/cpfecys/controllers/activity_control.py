@@ -154,6 +154,12 @@ def control_students_grades():
 
     course_ended_var = db((db.course_ended.project==var_project.id) & (db.course_ended.period==var_period.id) ).select().first()
 
+    course_ended = False
+    course_ended_var = db((db.course_ended.project==var_project.id) & (db.course_ended.period==var_period.id) ).select().first()
+    if course_ended_var != None:
+        if course_ended_var.finish == True:
+            course_ended=True
+
     if course_ended_var != None:
         if (auth.has_membership('Super-Administrator') == False and auth.has_membership('Ecys-Administrator') == False) and (course_ended_var.finish == True):
             session.flash = T('Not valid Action.')
@@ -230,7 +236,7 @@ def control_students_grades():
         request_change_var = False
 
 
-    return dict(academic_assig=academic_assig, var_period=var_period, var_activity=var_activity, var_project=var_project, request_change_var =request_change_var, actual_period = actual_period)
+    return dict(academic_assig=academic_assig, var_period=var_period, var_activity=var_activity, var_project=var_project, request_change_var =request_change_var, actual_period = actual_period, course_ended = course_ended)
 
 
 @auth.requires_login()
@@ -276,6 +282,12 @@ def grades():
         pass      
     pass
     
+    course_ended = False
+    course_ended_var = db((db.course_ended.project==var_project.id) & (db.course_ended.period==var_period.id) ).select().first()
+    if course_ended_var != None:
+        if course_ended_var.finish == True:
+            course_ended=True
+
     rol_log=''
     if auth.has_membership('Ecys-Administrator')==True:
         rol_log='Ecys-Administrator'
@@ -529,7 +541,8 @@ def grades():
         add_grade_flash = add_grade_flash,
         exist_activity_request_change = exist_activity_request_change,
         coment = coment,
-        actual_period = actual_period
+        actual_period = actual_period,
+        course_ended = course_ended
         )
 
 
