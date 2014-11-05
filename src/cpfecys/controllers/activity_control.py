@@ -155,7 +155,7 @@ def control_students_grades():
     course_ended_var = db((db.course_ended.project==var_project.id) & (db.course_ended.period==var_period.id) ).select().first()
 
     if course_ended_var != None:
-        if course_ended_var.finish == True:
+        if (auth.has_membership('Super-Administrator') == False and auth.has_membership('Ecys-Administrator') == False) and (course_ended_var.finish == True):
             session.flash = T('Not valid Action.')
             redirect(URL('default', 'index'))
     
@@ -2467,7 +2467,7 @@ def general_report_activities_export():
     for acaT in academic_assig2:
         students.append(acaT.academic_course_assignation)
 
-
+    
     existLab=False
     totalLab=float(0)
     totalW=float(0)

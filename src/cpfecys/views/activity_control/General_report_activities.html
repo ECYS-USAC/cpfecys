@@ -78,7 +78,7 @@
             </tr>
         </table>
         {{totalColumnsTable=0}}
-        <table class="table table-bordered">
+        <table class="table table-bordered ">
             <THEAD>
                 <tr>
                     <td bgcolor="#E6E6E6">
@@ -185,7 +185,7 @@
                             </center>
                         </td>
                     {{pass}}
-                    <td bgcolor="DarkBlue">
+                    <td bgcolor="#2282A5">
                         {{totalColumnsTable=totalColumnsTable+1}}
                         <center>
                             <b>
@@ -218,7 +218,7 @@
                                     {{totalCategory=float(0)}}
                                     {{totalActivities=0}}
                                     {{for c in CourseActivities[posVCC]:}}
-                                        <td class="rcat{{=str(category.category)}}" style="display:none;" bgcolor="#CEECF5">
+                                        <td class="rcat{{=str(category.category)}}" style="display:none;" bgcolor="#EEF6F9">
                                             <center>
                                                 {{studentGrade = db((db.grades.activity==c.id)&(db.grades.academic_assignation==t1.id)).select().first()}}
                                                 {{if studentGrade is None:}}
@@ -241,15 +241,15 @@
                                         {{if category.specific_grade==True:}}
                                             {{checkGrade = float((totalCategory*float(100))/float(category.grade))}}
                                             {{if checkGrade < float(controlP.min_average):}}
-                                                <FONT COLOR="Red">
+                                                <FONT COLOR="#FA4545">
                                             {{elif checkGrade>=float(controlP.min_average) and checkGrade <= float(controlP.max_average):}}
-                                                <FONT COLOR="#5E610B">
+                                                <FONT COLOR="#BCC111">
                                             {{else:}}
                                                 <FONT COLOR="Green">
                                             {{pass}}
                                             <b>
-                                            {{=str(round(totalCategory,3))}}
-                                            <!--{{#str(totalCategory)}}-->
+                                            {{=str(round(totalCategory,2))}}
+
                                             </b>
                                             </font>
                                         {{else:}}
@@ -260,15 +260,14 @@
                                             {{totalCategory=float((totalCategory*float(category.grade))/float(totalActivities))}}
                                             {{checkGrade = float((totalCategory*float(100))/float(category.grade))}}
                                             {{if checkGrade < float(controlP.min_average):}}
-                                                <FONT COLOR="Red">
+                                                <FONT COLOR="#FA4545">
                                             {{elif checkGrade>=float(controlP.min_average) and checkGrade <= float(controlP.max_average):}}
-                                                <FONT COLOR="#5E610B">
+                                                <FONT COLOR="#BCC111">
                                             {{else:}}
                                                 <FONT COLOR="Green">
                                             {{pass}}
                                             <b>
-                                                {{=str(round(totalCategory,3))}}
-                                            <!--{{#str(totalCategory)}}-->
+                                            {{=str(round(totalCategory,2))}}
                                             </b>
                                             </font>
                                         {{pass}}
@@ -338,15 +337,15 @@
                                         <!--Show grade of laboratory-->
                                         {{checkGrade = float((totalCategory*float(100))/float(totalLab))}}
                                         {{if checkGrade < float(controlP.min_average):}}
-                                            <FONT COLOR="Red">
+                                            <FONT COLOR="#FA4545">
                                         {{elif checkGrade>=float(controlP.min_average) and checkGrade <= float(controlP.max_average):}}
-                                            <FONT COLOR="#5E610B">
+                                            <FONT COLOR="#BCC111">
                                         {{else:}}
                                             <FONT COLOR="Green">
                                         {{pass}}
                                         <b>
-                                        <!--{{#str(totalCategory)}}-->
-                                        {{=str(round(totalCategory,3))}}
+                                        {{=str(round(totalCategory,2))}}
+
                                         </b>
                                         </font>
                                         <!--Plus the laboratory to the carry-->
@@ -459,7 +458,7 @@
                                 {{totalCategory=float(0)}}
                                 {{totalActivities=0}}
                                 {{for c in LabActivities[posVCC]:}}
-                                    <td class="rcat{{=str(category.category)}}" style="display:none;"  bgcolor="#CEECF5">
+                                    <td class="rcat{{=str(category.category)}}" style="display:none;"  bgcolor="#EEF6F9">
                                         <center>
                                             {{studentGrade = db((db.grades.activity==c.id)&(db.grades.academic_assignation==t1.id)).select().first()}}
                                             {{if studentGrade is None:}}
@@ -482,15 +481,15 @@
                                     {{if category.specific_grade==True:}}
                                         {{checkGrade = float((totalCategory*float(100))/float(category.grade))}}
                                         {{if checkGrade < float(controlP.min_average):}}
-                                            <FONT COLOR="Red">
+                                            <FONT COLOR="#FA4545">
                                         {{elif checkGrade>=float(controlP.min_average) and checkGrade <= float(controlP.max_average):}}
-                                            <FONT COLOR="#5E610B">
+                                            <FONT COLOR="#BCC111">
                                         {{else:}}
                                             <FONT COLOR="Green">
                                         {{pass}}
                                         <b>
-                                        <!--{{#str(totalCategory)}}-->
-                                        {{=str(round(totalCategory,3))}}
+                                        {{=str(round(totalCategory,2))}}
+
                                         </b>
                                         </font>
                                     {{else:}}
@@ -501,15 +500,15 @@
                                         {{totalCategory=float((totalCategory*float(category.grade))/float(totalActivities))}}
                                         {{checkGrade = float((totalCategory*float(100))/float(category.grade))}}
                                         {{if checkGrade < float(controlP.min_average):}}
-                                            <FONT COLOR="Red">
+                                            <FONT COLOR="#FA4545">
                                         {{elif checkGrade>=float(controlP.min_average) and checkGrade <= float(controlP.max_average):}}
-                                            <FONT COLOR="#5E610B">
+                                            <FONT COLOR="#BCC111">
                                         {{else:}}
                                             <FONT COLOR="Green">
                                         {{pass}}
                                         <b>
-                                        <!--{{#str(totalCategory)}}-->
-                                        {{=str(round(totalCategory,3))}}
+                                        {{=str(round(totalCategory,2))}}
+
                                         </b>
                                         </font>
                                     {{pass}}
@@ -561,7 +560,7 @@
                                     <td>
                                         <span class="label label-inverse">&nbsp;&nbsp;&nbsp;</span>&nbsp;<b>{{=T('Laboratory lost or Missing requirement')}}</b>
                                         <br>
-                                        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<i class="icon-flag"></i><font color="red">{{=T('Only applies to final mark')}}</font>
+                                        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<i class="icon-flag"></i><font color="#FA4545">{{=T('Only applies to final mark')}}</font>
                                     </td>
                                     {{pass}}
                                 </tr>
