@@ -2857,7 +2857,10 @@ def General_report_activities():
             totalLab=float(categoryC.grade)
             catVecCourseTemp.append(categoryC)
         elif categoryC.category.category=="Examen Final":
-            catCourseTemp=categoryC
+            if ( request.vars['op'] == '2' or  request.vars['op'] == '3'):
+                None
+            else:
+                catCourseTemp=categoryC
         else:
             catVecCourseTemp.append(categoryC)
             CourseActivities.append(db((db.course_activity.semester==year.id)&(db.course_activity.assignation==project_var.id)&(db.course_activity.laboratory==False)&(db.course_activity.course_activity_category==categoryC.id)).select())
@@ -2899,6 +2902,9 @@ def General_report_activities():
             session.flash= T('Can not find the correct weighting defined in the laboratory. You can not use this function')
             redirect(URL('default','index'))
 
+    if request.vars['list'] =='cancel':
+        db((db.course_ended.project==project_var.id) & (db.course_ended.period==year.id) ).delete()
+        response.flash= T('Course has been enabled')
 
     if request.vars['list'] =='True':
         redirect(URL('activity_control','general_report_activities_export',vars=dict(project = project_var.id, period = year.id, type=request.vars['type'])))
@@ -3086,10 +3092,22 @@ def General_report_activities():
         #Generate csv file format technical school
         response.flash = T("Request has been canceled")
 
+    print "fecha:" + str( (T(year.period.name)+" "+str(year.yearp)) )
     controlP = db((db.student_control_period.period_name==(T(year.period.name)+" "+str(year.yearp)))).select().first()
     requirement = db((db.course_requirement.semester==year.id)&(db.course_requirement.project==project_var.id)).select().first()
+    print "controlP:" +str(controlP) 
+    course_ended_var = db((db.course_ended.project==project_var.id) & (db.course_ended.period==year.id) ).select().first()
 
-    return dict(project = project_var, year = year, teacher=teacher, practice=practice, students=students, CourseCategory=CourseCategory, CourseActivities=CourseActivities, existLab=existLab, LabCategory=LabCategory, LabActivities=LabActivities, validateLaboratory=validateLaboratory, totalLab=totalLab, controlP=controlP, requirement=requirement)
+    course_ended = False
+    course_ended_var = db((db.course_ended.project==project_var.id) & (db.course_ended.period==year.id) ).select().first()
+    if course_ended_var != None:
+        if course_ended_var.finish == True:
+            course_ended=True
+
+    if request.vars['op'] == '0':
+        response.flash= T('Course hasn’t finalized.')
+
+    return dict(project = project_var, year = year, teacher=teacher, practice=practice, students=students, CourseCategory=CourseCategory, CourseActivities=CourseActivities, existLab=existLab, LabCategory=LabCategory, LabActivities=LabActivities, validateLaboratory=validateLaboratory, totalLab=totalLab, controlP=controlP, requirement=requirement, course_ended = course_ended)
 
 
 @auth.requires_login()
