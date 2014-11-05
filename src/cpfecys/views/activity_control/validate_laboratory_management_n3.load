@@ -7,7 +7,7 @@
 {{else:}}
 	<table class="table table-bordered">
 		<thead>
-			<tr bgcolor="#B18904">
+			<tr bgcolor="#F7D358">
 			<th width="470px">
 				<center>{{=T('User')}}</center>
 			</th>
@@ -30,7 +30,7 @@
 		</thead>
 		<tbody>
 			{{for userr in vecUserRoleMonth:}}
-				<tr bgcolor="#DBA901">
+				<tr bgcolor="#F5DA81">
 					<td>
 						<a id="p{{=str(project.id)}}_all_m{{=month}}_all_r{{=roll}}_all_r{{=userr[0]}}_all" style="white-space:nowrap; cursor:pointer;"><b>{{=userr[0]}}</b></a>
 					</td>
@@ -70,7 +70,7 @@
 						</td>
 					{{pass}}
 				</tr>
-				<tr bgcolor="#FFBF00">
+				<tr bgcolor="#F3E2A9">
 					{{if tipo=='all':}}
 						<td colspan="4">
 					{{elif tipo=='i' or tipo=='u' or tipo=='d':}}

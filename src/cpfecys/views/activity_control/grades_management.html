@@ -91,19 +91,19 @@
 	<div style="overflow:auto; width:100%;">
 		<table class="table table-bordered">
 			<thead>
-				<tr bgcolor="#585858">
-					<th><center><font Color="White">{{=T('Course')}}</font></center></th>
-					<th><center><font Color="White">{{=T('Total inserted')}}</font></center></th>
-					<th><center><font Color="White">{{=T('Total modified')}}</font></center></th>
-					<th><center><font Color="White">{{=T('Total out')}}</font></center></th>
+				<tr bgcolor="#D8D8D8">
+					<th><center><font Color="Black">{{=T('Course')}}</font></center></th>
+					<th><center><font Color="Black">{{=T('Total inserted')}}</font></center></th>
+					<th><center><font Color="Black">{{=T('Total modified')}}</font></center></th>
+					<th><center><font Color="Black">{{=T('Total out')}}</font></center></th>
 				</tr>
 			</thead>
 			<tbody>
 				{{for assigantion in assigantions:}}
-					<tr bgcolor="#848484">
+					<tr bgcolor="#E6E6E6">
 						<td width="500px">
-							<font Color="White">
-							<a id="p{{=str(assigantion.project)}}_all" style="white-space:nowrap; cursor:pointer; color:white;"><b>{{=str(assigantion.project.name)}}</b></a>
+							<font Color="Black">
+							<a id="p{{=str(assigantion.project)}}_all" style="white-space:nowrap; cursor:pointer;"><b>{{=str(assigantion.project.name)}}</b></a>
 							</font>
 						</td>
 						<td>
@@ -152,12 +152,12 @@
 							</center>
 						</td>
 					</tr>
-					<tr bgcolor="#BDBDBD">
+					<tr bgcolor="#F2F2F2">
 						<td colspan="4">
 							<div id="div_p{{=assigantion.project}}" style="display: none;">
 								<table class="table table-bordered">
 									<thead>
-										<tr bgcolor="#01A9DB">
+										<tr bgcolor="#58D3F7">
 											<th width="490px"><center>{{=T('Month')}}</center></th>
 											<th><center>{{=T('Total inserted')}}</center></th>
 											<th><center>{{=T('Total modified')}}</center></th>
@@ -172,7 +172,7 @@
 							        		{{else:}}
 							        			{{end = datetime.strptime(str(year.yearp) + '-' + str(month[2]) +'-01', "%Y-%m-%d")}}
 							        		{{pass}}
-							        		<tr bgcolor="#00BFFF">
+							        		<tr bgcolor="#81DAF5">
 												<td>
 														<a id="p{{=str(assigantion.project)}}_all_m{{=month[0]}}_all" style="white-space:nowrap; cursor:pointer;"><b>{{=month[1]}}</b></a>
 												</td>
@@ -222,7 +222,7 @@
 													</center>
 												</td>
 											</tr>
-											<tr bgcolor="#2ECCFA">
+											<tr bgcolor="#A9E2F3">
 												<td colspan="4">
 													<div id="div_p{{=assigantion.project}}_m{{=month[0]}}" style="display: none;">
 														<center>{{=T('Loading')}}...</center>

@@ -1880,7 +1880,6 @@ def ondelete_validate_laboratory(table_involved, id_of_the_deleted_record):
 
 def onupdate_validate_laboratory(form):
     import cpfecys
-
     #Check if the period is correct
     if request.vars['year'] is None or request.vars['year']=='':
         session.flash = T('Not valid Action.')
@@ -2640,13 +2639,13 @@ def general_report_activities_export():
                         totalActivities=totalActivities+1
 
                     if category.specific_grade==True:
-                        t.append(str(round(totalCategory,3)))
+                        t.append(str(round(totalCategory,2)))
                     else:
                         if totalActivities==0:
                             totalActivities=1
                         totalActivities=totalActivities*100
                         totalCategory=float((totalCategory*float(category.grade))/float(totalActivities))
-                        t.append(str(round(totalCategory,3)))
+                        t.append(str(round(totalCategory,2)))
                     totalCarry=totalCarry+totalCategory
                     posVCC=posVCC+1
 
@@ -2657,7 +2656,7 @@ def general_report_activities_export():
                 for validate in validateLaboratory:
                     if validate.carnet==t1.carnet:
                         isValidate=True
-                        totalCategory=float((validate.grade*totalLab)/100)
+                        totalCategory=float((int(round(validate.grade,0))*totalLab)/100)
 
 
                 #<!--Doesnt has a revalidation-->
@@ -2693,11 +2692,11 @@ def general_report_activities_export():
                             totalCategory_Lab=float((totalCategory_Lab*float(category_Lab.grade))/float(totalActivities_Lab))
                         totalCarry_Lab=totalCarry_Lab+totalCategory_Lab
                         posVCC_Lab=posVCC_Lab+1
-                    totalCategory=float((totalCarry_Lab*totalLab)/100)
+                    totalCategory=float((int(round(totalCarry_Lab,0))*totalLab)/100)
 
 
                 #<!--Show grade of laboratory-->
-                t.append(str(round(totalCategory,3)))
+                t.append(str(round(totalCategory,2)))
                 #<!--Plus the laboratory to the carry-->
                 totalCarry=totalCarry+totalCategory
 
@@ -2760,14 +2759,14 @@ def general_report_activities_export():
                     totalActivities=totalActivities+1
 
                 if category.specific_grade==True:
-                    t.append(str(round(totalCategory,3)))
+                    t.append(str(round(totalCategory,2)))
                 else:
                     if totalActivities==0:
                         totalActivities=1
                     pass
                     totalActivities=totalActivities*100
                     totalCategory=float((totalCategory*float(category.grade))/float(totalActivities))
-                    t.append(str(round(totalCategory,3)))
+                    t.append(str(round(totalCategory,2)))
                 totalCarry=totalCarry+totalCategory
                 posVCC=posVCC+1
 

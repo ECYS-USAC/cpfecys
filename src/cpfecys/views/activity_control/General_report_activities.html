@@ -290,6 +290,7 @@
                                 <td bgcolor="#2282A5">
                                     {{totalColumnsTable=totalColumnsTable+1}}
                                     <center>
+
                                         <b>
                                             <font Color="White">
                                                 {{=T('Final Grade')}}
@@ -306,6 +307,7 @@
                                 {{if request.vars['type'] == 'class':}}
                                     <tr>
                                         <td>{{=t1.carnet.carnet}}</td>
+
 
                                         <!--Position in the vector of activities-->
                                         {{posVCC=0}}
@@ -385,6 +387,7 @@
                                                 </td>
                                                 {{posVCC=posVCC+1}}
                                             {{pass}}
+
                                         {{pass}}
                                         {{if request.vars['type'] == 'class' and existLab==True:}}
                                             <td>
@@ -395,7 +398,7 @@
                                                     {{for validate in validateLaboratory:}}
                                                         {{if validate.carnet==t1.carnet:}}
                                                             {{isValidate=True}}
-                                                            {{totalCategory=float((validate.grade*totalLab)/100)}}
+                                                            {{totalCategory=float((int(round(validate.grade,0))*totalLab)/100)}}
                                                         {{pass}}
                                                     {{pass}}
 
@@ -439,7 +442,7 @@
                                                                 {{totalCarry_Lab=totalCarry_Lab+totalCategory_Lab}}
                                                             {{posVCC_Lab=posVCC_Lab+1}}
                                                         {{pass}}
-                                                        {{totalCategory=float((totalCarry_Lab*totalLab)/100)}}
+                                                        {{totalCategory=float((int(round(totalCarry_Lab,0))*totalLab)/100)}}
                                                     {{pass}}
 
 
