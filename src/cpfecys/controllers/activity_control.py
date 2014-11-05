@@ -2053,7 +2053,7 @@ def onupdate_validate_laboratory(form):
 #------------------------------------------------------------------------------------------------------------------------
 @auth.requires_login()
 @auth.requires(auth.has_membership('Student') or auth.has_membership('Teacher') or auth.has_membership('Super-Administrator') or auth.has_membership('Ecys-Administrator'))
-def general_report_activities_export():
+def Course_Format_Technical_School():
     #vars
     year = None
     project_var = None
