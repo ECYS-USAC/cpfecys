@@ -6,7 +6,7 @@
 	</script>
 {{else:}}
 	<table class="table table-bordered">
-		<tr bgcolor="#D7DF01">
+		<tr bgcolor="#F3F781">
 			<th>
 				{{=T('User resolution')}}
 			</th>
@@ -34,7 +34,7 @@
 		</tr>
 		{{for field in vecAllUserRoleMonth:}}
 			{{for camp in field:}}
-				<tr bgcolor="#FFFF00">
+				<tr bgcolor="#F2F5A9">
 					<td>
 						{{=str(camp['user_name'])}}
 					</td>

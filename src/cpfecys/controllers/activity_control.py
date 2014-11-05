@@ -1880,7 +1880,6 @@ def ondelete_validate_laboratory(table_involved, id_of_the_deleted_record):
 
 def onupdate_validate_laboratory(form):
     import cpfecys
-
     #Check if the period is correct
     if request.vars['year'] is None or request.vars['year']=='':
         session.flash = T('Not valid Action.')

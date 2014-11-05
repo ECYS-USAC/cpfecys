@@ -7,7 +7,7 @@
 {{else:}}
 	<table class="table table-bordered">
 		<thead>
-			<tr bgcolor="#298A08">
+			<tr bgcolor="#81F781">
 			<th width="480px">
 				<center>{{=T('Role')}}</center>
 			</th>
@@ -30,7 +30,7 @@
 		</thead>
 		<tbody>
 			{{for ror in vecRoleMonth:}}
-				<tr bgcolor="#31B404">
+				<tr bgcolor="#A9F5A9">
 					<td>
 						<a id="p{{=str(project.id)}}_all_m{{=month}}_all_r{{=ror[0]}}_all" style="white-space:nowrap; cursor:pointer;">
 							<b>{{if ror[0]=='Student':}}
@@ -76,7 +76,7 @@
 						</td>
 					{{pass}}
 				</tr>
-				<tr bgcolor="#3ADF00">
+				<tr bgcolor="#BCF5A9">
 					{{if tipo=='all':}}
 						<td colspan="4">
 					{{elif tipo=='i' or tipo=='u' or tipo=='d':}}
