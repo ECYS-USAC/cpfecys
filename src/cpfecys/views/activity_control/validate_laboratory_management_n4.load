@@ -23,12 +23,6 @@
 				{{=T('Description')}}
 			</th>
 			<th>
-				{{=T('Category')}}
-			</th>
-			<th>
-				{{=T('Activity')}}
-			</th>
-			<th>
 				{{=T('Rol Academic')}}
 			</th>
 			<th>
@@ -59,12 +53,6 @@
 					</td>
 					<td>
 						{{=camp['description']}}
-					</td>
-					<td>
-						{{=str(camp['category'])}}
-					</td>
-					<td>
-						{{=str(camp['activity'])}}
 					</td>
 					<td>
 						{{=str(camp['academic'])}}

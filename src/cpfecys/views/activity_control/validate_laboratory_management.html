@@ -2,7 +2,7 @@
 {{from datetime import datetime}}
 <div class="row-fluid">
 	<h1>
-		{{=T('Report management grades')}}
+		{{=T('Management Reports Laboratory Revalidations')}}
 		<br>
 		<small>
 			{{=T(year.period.name)}} {{=str(year.yearp)}}
@@ -14,8 +14,8 @@
 	<!--Search in report-->
 	<div>
 		<div>
-			<form action="{{=URL('activity_control', 'grades_management/search')}}" method="post">
-				<input type="text" id="querySearch" name="querySearch" value="{{=session.search_grades_management}}" readonly="readonly"/>
+			<form action="{{=URL('activity_control', 'validate_laboratory_management/search')}}" method="post">
+				<input type="text" id="querySearch" name="querySearch" value="{{=session.search_validate_laboratory_management}}" readonly="readonly"/>
 				<a id="buildSearch" class="btn">{{=T('Build Search')}}</a>
 				<button type="submit"  class="btn">{{=T('Search')}}</button>
 				<a id="cancelSearch" class="btn">{{=T('Clear')}}</a>
@@ -109,10 +109,10 @@
 						<td>
 							<center>
 								<a class="badge badge-success" style="white-space:nowrap;">
-									{{if session.search_grades_management == "":}}
-										{{tI = db.executesql('SELECT count(id) as total from grades_log where project=\'' + assigantion.project.name + '\' and yearp=\'' + str(year.yearp) +'\' and period=\'' + str(T(year.period.name))+ '\' and operation_log=\'insert\'' + session.search_grades_management +';' ,as_dict=True)}}
+									{{if session.search_validate_laboratory_management == "":}}
+										{{tI = db.executesql('SELECT count(id) as total from validate_laboratory_log where project=\'' + assigantion.project.name + '\' and yearp=\'' + str(year.yearp) +'\' and period=\'' + str(T(year.period.name))+ '\' and operation_log=\'insert\'' + session.search_validate_laboratory_management +';' ,as_dict=True)}}
 									{{else:}}
-										{{tI = db.executesql('SELECT count(id) as total from grades_log where project=\'' + assigantion.project.name + '\' and yearp=\'' + str(year.yearp) +'\' and period=\'' + str(T(year.period.name))+ '\' and operation_log=\'insert\' and ' + session.search_grades_management +';' ,as_dict=True)}}
+										{{tI = db.executesql('SELECT count(id) as total from validate_laboratory_log where project=\'' + assigantion.project.name + '\' and yearp=\'' + str(year.yearp) +'\' and period=\'' + str(T(year.period.name))+ '\' and operation_log=\'insert\' and ' + session.search_validate_laboratory_management +';' ,as_dict=True)}}
 									{{pass}}
 									{{for dI in tI:}}
 										{{dIT=dI['total']}}
@@ -124,10 +124,10 @@
 						<td>
 							<center>
 								<a class="badge badge-info" style="white-space:nowrap;">
-									{{if session.search_grades_management == "":}}
-										{{tU = db.executesql('SELECT count(id) as total from grades_log where project=\'' + assigantion.project.name + '\' and yearp=\'' + str(year.yearp) +'\' and period=\'' + str(T(year.period.name))+ '\' and operation_log=\'update\'' + session.search_grades_management +';' ,as_dict=True)}}
+									{{if session.search_validate_laboratory_management == "":}}
+										{{tU = db.executesql('SELECT count(id) as total from validate_laboratory_log where project=\'' + assigantion.project.name + '\' and yearp=\'' + str(year.yearp) +'\' and period=\'' + str(T(year.period.name))+ '\' and operation_log=\'update\'' + session.search_validate_laboratory_management +';' ,as_dict=True)}}
 									{{else:}}
-										{{tU = db.executesql('SELECT count(id) as total from grades_log where project=\'' + assigantion.project.name + '\' and yearp=\'' + str(year.yearp) +'\' and period=\'' + str(T(year.period.name))+ '\' and operation_log=\'update\' and ' + session.search_grades_management +';' ,as_dict=True)}}
+										{{tU = db.executesql('SELECT count(id) as total from validate_laboratory_log where project=\'' + assigantion.project.name + '\' and yearp=\'' + str(year.yearp) +'\' and period=\'' + str(T(year.period.name))+ '\' and operation_log=\'update\' and ' + session.search_validate_laboratory_management +';' ,as_dict=True)}}
 									{{pass}}
 									{{for dU in tU:}}
 										{{dUT=dU['total']}}
@@ -139,10 +139,10 @@
 						<td>
 							<center>
 								<a class="badge badge-important" style="white-space:nowrap;">
-									{{if session.search_grades_management == "":}}
-										{{tD = db.executesql('SELECT count(id) as total from grades_log where project=\'' + assigantion.project.name + '\' and yearp=\'' + str(year.yearp) +'\' and period=\'' + str(T(year.period.name))+ '\' and operation_log=\'delete\'' + session.search_grades_management +';' ,as_dict=True)}}
+									{{if session.search_validate_laboratory_management == "":}}
+										{{tD = db.executesql('SELECT count(id) as total from validate_laboratory_log where project=\'' + assigantion.project.name + '\' and yearp=\'' + str(year.yearp) +'\' and period=\'' + str(T(year.period.name))+ '\' and operation_log=\'delete\'' + session.search_validate_laboratory_management +';' ,as_dict=True)}}
 									{{else:}}
-										{{tD = db.executesql('SELECT count(id) as total from grades_log where project=\'' + assigantion.project.name + '\' and yearp=\'' + str(year.yearp) +'\' and period=\'' + str(T(year.period.name))+ '\' and operation_log=\'delete\' and ' + session.search_grades_management +';' ,as_dict=True)}}
+										{{tD = db.executesql('SELECT count(id) as total from validate_laboratory_log where project=\'' + assigantion.project.name + '\' and yearp=\'' + str(year.yearp) +'\' and period=\'' + str(T(year.period.name))+ '\' and operation_log=\'delete\' and ' + session.search_validate_laboratory_management +';' ,as_dict=True)}}
 									{{pass}}
 									{{for dD in tD:}}
 										{{dDT=dD['total']}}
@@ -179,10 +179,10 @@
 												<td>
 													<center>
 														<a id="p{{=str(assigantion.project)}}_all_m{{=month[0]}}_i" style="white-space:nowrap; cursor:pointer;" class="badge badge-success">
-															{{if session.search_grades_management == "":}}
-																{{tD = db.executesql('SELECT count(id) as total from grades_log where project=\'' + assigantion.project.name + '\' and yearp=\'' + str(year.yearp) +'\' and period=\'' + str(T(year.period.name))+ '\' and operation_log=\'insert\' and date_log>=\'' + str(start) +'\' and date_log <= \''+ str(end) +'\';' ,as_dict=True)}}
+															{{if session.search_validate_laboratory_management == "":}}
+																{{tD = db.executesql('SELECT count(id) as total from validate_laboratory_log where project=\'' + assigantion.project.name + '\' and yearp=\'' + str(year.yearp) +'\' and period=\'' + str(T(year.period.name))+ '\' and operation_log=\'insert\' and date_log>=\'' + str(start) +'\' and date_log <= \''+ str(end) +'\';' ,as_dict=True)}}
 															{{else:}}
-																{{tD = db.executesql('SELECT count(id) as total from grades_log where project=\'' + assigantion.project.name + '\' and yearp=\'' + str(year.yearp) +'\' and period=\'' + str(T(year.period.name))+ '\' and operation_log=\'insert\' and date_log>=\'' + str(start) +'\' and date_log <= \''+ str(end) + '\' and ' + session.search_grades_management +';' ,as_dict=True)}}
+																{{tD = db.executesql('SELECT count(id) as total from validate_laboratory_log where project=\'' + assigantion.project.name + '\' and yearp=\'' + str(year.yearp) +'\' and period=\'' + str(T(year.period.name))+ '\' and operation_log=\'insert\' and date_log>=\'' + str(start) +'\' and date_log <= \''+ str(end) + '\' and ' + session.search_validate_laboratory_management +';' ,as_dict=True)}}
 															{{pass}}
 															{{for dD in tD:}}
 																{{dDT=dD['total']}}
@@ -194,10 +194,10 @@
 												<td>
 													<center>
 														<a id="p{{=str(assigantion.project)}}_all_m{{=month[0]}}_u" style="white-space:nowrap; cursor:pointer;" class="badge badge-info">
-															{{if session.search_grades_management == "":}}
-																{{tD = db.executesql('SELECT count(id) as total from grades_log where project=\'' + assigantion.project.name + '\' and yearp=\'' + str(year.yearp) +'\' and period=\'' + str(T(year.period.name))+ '\' and operation_log=\'update\' and date_log>=\'' + str(start) +'\' and date_log <= \''+ str(end) +'\';' ,as_dict=True)}}
+															{{if session.search_validate_laboratory_management == "":}}
+																{{tD = db.executesql('SELECT count(id) as total from validate_laboratory_log where project=\'' + assigantion.project.name + '\' and yearp=\'' + str(year.yearp) +'\' and period=\'' + str(T(year.period.name))+ '\' and operation_log=\'update\' and date_log>=\'' + str(start) +'\' and date_log <= \''+ str(end) +'\';' ,as_dict=True)}}
 															{{else:}}
-																{{tD = db.executesql('SELECT count(id) as total from grades_log where project=\'' + assigantion.project.name + '\' and yearp=\'' + str(year.yearp) +'\' and period=\'' + str(T(year.period.name))+ '\' and operation_log=\'update\' and date_log>=\'' + str(start) +'\' and date_log <= \''+ str(end) + '\' and ' + session.search_grades_management +';' ,as_dict=True)}}
+																{{tD = db.executesql('SELECT count(id) as total from validate_laboratory_log where project=\'' + assigantion.project.name + '\' and yearp=\'' + str(year.yearp) +'\' and period=\'' + str(T(year.period.name))+ '\' and operation_log=\'update\' and date_log>=\'' + str(start) +'\' and date_log <= \''+ str(end) + '\' and ' + session.search_validate_laboratory_management +';' ,as_dict=True)}}
 															{{pass}}
 															{{for dD in tD:}}
 																{{dDT=dD['total']}}
@@ -209,10 +209,10 @@
 												<td>
 													<center>
 														<a id="p{{=str(assigantion.project)}}_all_m{{=month[0]}}_d" style="white-space:nowrap; cursor:pointer;" class="badge badge-important">
-															{{if session.search_grades_management == "":}}
-																{{tD = db.executesql('SELECT count(id) as total from grades_log where project=\'' + assigantion.project.name + '\' and yearp=\'' + str(year.yearp) +'\' and period=\'' + str(T(year.period.name))+ '\' and operation_log=\'delete\' and date_log>=\'' + str(start) +'\' and date_log <= \''+ str(end) +'\';' ,as_dict=True)}}
+															{{if session.search_validate_laboratory_management == "":}}
+																{{tD = db.executesql('SELECT count(id) as total from validate_laboratory_log where project=\'' + assigantion.project.name + '\' and yearp=\'' + str(year.yearp) +'\' and period=\'' + str(T(year.period.name))+ '\' and operation_log=\'delete\' and date_log>=\'' + str(start) +'\' and date_log <= \''+ str(end) +'\';' ,as_dict=True)}}
 															{{else:}}
-																{{tD = db.executesql('SELECT count(id) as total from grades_log where project=\'' + assigantion.project.name + '\' and yearp=\'' + str(year.yearp) +'\' and period=\'' + str(T(year.period.name))+ '\' and operation_log=\'delete\' and date_log>=\'' + str(start) +'\' and date_log <= \''+ str(end) + '\' and ' + session.search_grades_management +';' ,as_dict=True)}}
+																{{tD = db.executesql('SELECT count(id) as total from validate_laboratory_log where project=\'' + assigantion.project.name + '\' and yearp=\'' + str(year.yearp) +'\' and period=\'' + str(T(year.period.name))+ '\' and operation_log=\'delete\' and date_log>=\'' + str(start) +'\' and date_log <= \''+ str(end) + '\' and ' + session.search_validate_laboratory_management +';' ,as_dict=True)}}
 															{{pass}}
 															{{for dD in tD:}}
 																{{dDT=dD['total']}}
@@ -249,7 +249,7 @@
 		});
 
 		$("#cancelSearch").click(function(){
-			window.location.href = "{{=URL('activity_control', 'grades_management')}}";
+			window.location.href = "{{=URL('activity_control', 'validate_laboratory_management')}}";
 		});
 		//FIN --- Botones para realizar la ejecución o cancelación de la busqueda
 
@@ -440,28 +440,28 @@
 					$("#div_p{{=assigantion.project}}_m{{=month[0]}}").toggle();
 					jQuery('#div_p{{=assigantion.project}}_m{{=month[0]}}').empty();
 					jQuery('#div_p{{=assigantion.project}}_m{{=month[0]}}').append("{{=T('Loading')}}...");
-					$("#div_p{{=assigantion.project}}_m{{=month[0]}}").load("{{=URL('activity_control','grades_management_n2.load')}}?tipo=all&amp;month={{=month[0]}}&amp;project="+encodeURIComponent({{=assigantion.project}}));
+					$("#div_p{{=assigantion.project}}_m{{=month[0]}}").load("{{=URL('activity_control','validate_laboratory_management_n2.load')}}?tipo=all&amp;month={{=month[0]}}&amp;project="+encodeURIComponent({{=assigantion.project}}));
 				});
 
 				$("#p{{=str(assigantion.project)}}_all_m{{=month[0]}}_i").click(function(){
 					$("#div_p{{=assigantion.project}}_m{{=month[0]}}").toggle();
 					jQuery('#div_p{{=assigantion.project}}_m{{=month[0]}}').empty();
 					jQuery('#div_p{{=assigantion.project}}_m{{=month[0]}}').append("{{=T('Loading')}}...");
-					$("#div_p{{=assigantion.project}}_m{{=month[0]}}").load("{{=URL('activity_control','grades_management_n2.load')}}?tipo=i&amp;month={{=month[0]}}&amp;project="+encodeURIComponent({{=assigantion.project}}));
+					$("#div_p{{=assigantion.project}}_m{{=month[0]}}").load("{{=URL('activity_control','validate_laboratory_management_n2.load')}}?tipo=i&amp;month={{=month[0]}}&amp;project="+encodeURIComponent({{=assigantion.project}}));
 				});
 
 				$("#p{{=str(assigantion.project)}}_all_m{{=month[0]}}_u").click(function(){
 					$("#div_p{{=assigantion.project}}_m{{=month[0]}}").toggle();
 					jQuery('#div_p{{=assigantion.project}}_m{{=month[0]}}').empty();
 					jQuery('#div_p{{=assigantion.project}}_m{{=month[0]}}').append("{{=T('Loading')}}...");
-					$("#div_p{{=assigantion.project}}_m{{=month[0]}}").load("{{=URL('activity_control','grades_management_n2.load')}}?tipo=u&amp;month={{=month[0]}}&amp;project="+encodeURIComponent({{=assigantion.project}}));
+					$("#div_p{{=assigantion.project}}_m{{=month[0]}}").load("{{=URL('activity_control','validate_laboratory_management_n2.load')}}?tipo=u&amp;month={{=month[0]}}&amp;project="+encodeURIComponent({{=assigantion.project}}));
 				});
 
 				$("#p{{=str(assigantion.project)}}_all_m{{=month[0]}}_d").click(function(){
 					$("#div_p{{=assigantion.project}}_m{{=month[0]}}").toggle();
 					jQuery('#div_p{{=assigantion.project}}_m{{=month[0]}}').empty();
 					jQuery('#div_p{{=assigantion.project}}_m{{=month[0]}}').append("{{=T('Loading')}}...");
-					$("#div_p{{=assigantion.project}}_m{{=month[0]}}").load("{{=URL('activity_control','grades_management_n2.load')}}?tipo=d&amp;month={{=month[0]}}&amp;project="+encodeURIComponent({{=assigantion.project}}));
+					$("#div_p{{=assigantion.project}}_m{{=month[0]}}").load("{{=URL('activity_control','validate_laboratory_management_n2.load')}}?tipo=d&amp;month={{=month[0]}}&amp;project="+encodeURIComponent({{=assigantion.project}}));
 				});
 			{{pass}}
 		{{pass}}
