@@ -2734,27 +2734,24 @@ def Course_Format_Technical_School():
     if auth.has_membership('Super-Administrator') == False and auth.has_membership('Ecys-Administrator')==False:
         assigantion = db((db.user_project.assigned_user == auth.user.id) & (db.user_project.period == year.id) & (db.user_project.project == project_var.id)).select().first()
         if assigantion is None:
-            try:
-                academic_var = db(db.academic.carnet==auth.user.username).select().first()
-                academic_assig = db((db.academic_course_assignation.carnet == academic_var.id) & (db.academic_course_assignation.semester == year.id) & (db.academic_course_assignation.assignation==project_var.id)).select().first()
-                if academic_assig is None:
+            session.flash = T('Not valid Action.')
+            redirect(URL('default','index'))
+        else:
+            if auth.has_membership('Student')==True:
+                exception_query = db(db.course_laboratory_exception.project == project.id).select().first()
+                if exception_query is None:
                     session.flash = T('Not valid Action.')
                     redirect(URL('default','index'))
-            except:
-                session.flash = T('Not valid Action.')
-                redirect(URL('default','index'))
+                else:
+                    if exception_query.s_edit_course==False:
+                        session.flash = T('Not valid Action.')
+                        redirect(URL('default','index'))
 
-    #Check the correct parameters
-    if (request.vars['type'] != 'class' and request.vars['type']!='lab'):
-        session.flash = T('Not valid Action.')
-        redirect(URL('default','index'))
-
-    teacher = db((db.user_project.period == year.id) & (db.user_project.project == project_var.id) & (db.user_project.assigned_user==db.auth_user.id)&(db.auth_user.id==db.auth_membership.user_id)&(db.auth_membership.group_id==3)).select().first()
-    practice = db((db.user_project.period == year.id) & (db.user_project.project == project_var.id) & (db.user_project.assigned_user==db.auth_user.id)&(db.auth_user.id==db.auth_membership.user_id)&(db.auth_membership.group_id==2)).select()
-    if request.vars['type'] == 'class':
-        students = db((db.academic_course_assignation.semester == year.id) & (db.academic_course_assignation.assignation==project_var.id)).select()
-    else:
-        students = db((db.academic_course_assignation.semester == year.id) & (db.academic_course_assignation.assignation==project_var.id) & (db.academic_course_assignation.laboratorio==True)).select()
+    #Students    
+    academic_assig3 = db((db.academic.id==db.academic_course_assignation.carnet)&(db.academic_course_assignation.semester == year.id) & (db.academic_course_assignation.assignation==project_var.id)).select(orderby=db.academic.carnet)
+    students=[]
+    for acaT in academic_assig3:
+        students.append(acaT.academic_course_assignation)
 
 
     existLab=False
@@ -2780,10 +2777,10 @@ def Course_Format_Technical_School():
         CourseActivities.append(db((db.course_activity.semester==year.id)&(db.course_activity.assignation==project_var.id)&(db.course_activity.laboratory==False)&(db.course_activity.course_activity_category==catCourseTemp.id)).select())
     CourseCategory=catVecCourseTemp
 
-    if request.vars['type'] == 'class':
-        if totalW!=float(100):
-            session.flash= T('Can not find the correct weighting defined in the course. You can not use this function')
-            redirect(URL('default','index'))
+    if totalW!=float(100):
+        session.flash= T('Can not find the correct weighting defined in the course. You can not use this function')
+        redirect(URL('default','index'))
+
 
     totalW=float(0)
     LabCategory=None
@@ -2791,7 +2788,7 @@ def Course_Format_Technical_School():
     catVecLabTemp=[]
     LabActivities = None
     validateLaboratory=None
-    if existLab == True or request.vars['type'] == 'lab':
+    if existLab == True:
         validateLaboratory = db((db.validate_laboratory.semester==year.id)&(db.validate_laboratory.project==project_var.id)).select()
         LabCategory = db((db.course_activity_category.semester==year.id)&(db.course_activity_category.assignation==project_var.id)&(db.course_activity_category.laboratory==True)).select()
         LabActivities = []
@@ -2816,247 +2813,175 @@ def Course_Format_Technical_School():
 
     l=[]
     t=[]
-    tempCont=T('General Report of Activities')
-    if request.vars['type'] == 'class':
-        tempCont += ' - '+T('Course')
-    else:
-        tempCont += ' - '+T('Laboratory')
-    t.append(tempCont)
-    l.append(t)
-
-    t=[]
-    tempCont=T('General Course Data')
-    t.append(tempCont)
-    l.append(t)
-
-    t=[]
-    tempCont=T('Course')
-    t.append(tempCont)
-    tempCont=project_var.name
-    t.append(tempCont)
-    tempCont=T('Semester')
-    t.append(tempCont)
-    tempCont=T(year.period.name)+' '+str(year.yearp)
-    t.append(tempCont)
-    l.append(t)
-
-    t=[]
-    tempCont=T('Teacher')
-    t.append(tempCont)
-    if teacher is not None:
-        tempCont=teacher.auth_user.first_name+' '+teacher.auth_user.last_name
-    else:
-        tempCont=T('Not Assigned')
-    t.append(tempCont)
-    tempCont=T('Rol Student')
-    t.append(tempCont)
-    tempCont=None
-    for t1 in practice:
-        if tempCont is None:
-            tempCont=t1.auth_user.first_name+' '+t1.auth_user.last_name
-        else:
-            tempCont=tempCont+'\n'+t1.auth_user.first_name+' '+t1.auth_user.last_name
-    t.append(tempCont)
-    l.append(t)
-
-    t=[]
     t.append(T('Carnet'))
-    posVCC=0
-    if request.vars['type'] == 'class':
-        for category in CourseCategory:
-            if category.category.category!="Laboratorio":
-                for c in CourseActivities[posVCC]:
-                    t.append(c.name)
-                t.append(category.category.category +'\n('+str(category.grade)+'pts)')
-                posVCC=posVCC+1
-    else:
-        for category in LabCategory:
-            if category.category.category!="Laboratorio":
-                for c in LabActivities[posVCC]:
-                    t.append(c.name)
-                t.append(category.category.category +'\n('+str(category.grade)+'pts)')
-                posVCC=posVCC+1
-    if request.vars['type'] == 'class' and existLab==True:
-        t.append(T('Laboratory') +'\n('+str(totalLab)+'pts)')
-    if request.vars['type'] == 'class' and requirement is not None:
-        t.append(T('Course Requeriment') +'\n('+requirement.name+'pts)')
-    t.append(T('Final Grade') +'\n(100 pts)')
+    t.append(T('Laboratory'))
+    t.append('Zona')
+    t.append('Final')
     l.append(t) 
 
 
     t=[]
     for t1 in students:
         t=[]
-        if request.vars['type'] == 'class':
-            t.append(str(t1.carnet.carnet))
-            #Position in the vector of activities-
-            posVCC=0
-            #Vars to the control of grade of the student
+        t.append(str(t1.carnet.carnet))
+        #Position in the vector of activities-
+        posVCC=0
+        #Vars to the control of grade of the student
+        totalCategory=float(0)
+        totalActivities=0
+        totalLab_Final=0
+        totalFinal_Clase=0
+        totalCarry=float(0)
+        #<!--****************************************FILL THE GRADES OF THE STUDENT****************************************-->
+        #<!--LABORATORY ACTIVITIES-->
+        if existLab==True:
             totalCategory=float(0)
-            totalActivities=0
-            totalCarry=float(0)
-            #<!--****************************************FILL THE GRADES OF THE STUDENT****************************************-->
-            #<!--COURSE ACTIVITIES-->
-            for category in CourseCategory:
-                if category.category.category!="Laboratorio":
-                    totalCategory=float(0)
-                    totalActivities=0
-                    for c in CourseActivities[posVCC]:
-                        studentGrade = db((db.grades.activity==c.id)&(db.grades.academic_assignation==t1.id)).select().first()
-                        if studentGrade is None:
-                            totalCategory=totalCategory+float(0)
-                            t.append('')
-                        else:
-                            if category.specific_grade==True:
-                                t.append(str(studentGrade.grade))
-                                totalCategory=totalCategory+float((studentGrade.grade*c.grade)/100)
-                            else:
-                                t.append(str(studentGrade.grade))
-                                totalCategory=totalCategory+float(studentGrade.grade)
-                        totalActivities=totalActivities+1
-
-                    if category.specific_grade==True:
-                        t.append(str(totalCategory))
-                    else:
-                        if totalActivities==0:
-                            totalActivities=1
-                        totalActivities=totalActivities*100
-                        totalCategory=float((totalCategory*float(category.grade))/float(totalActivities))
-                        t.append(str(totalCategory))
-                    totalCarry=totalCarry+totalCategory
-                    posVCC=posVCC+1
-
-            if request.vars['type'] == 'class' and existLab==True:
-                totalCategory=float(0)
-                isValidate=False
-                #<!--Revalidation of laboratory-->
-                for validate in validateLaboratory:
-                    if validate.carnet==t1.carnet:
-                        isValidate=True
-                        totalCategory=float((validate.grade*totalLab)/100)
+            isValidate=False
+            #<!--Revalidation of laboratory-->
+            for validate in validateLaboratory:
+                if validate.carnet==t1.carnet:
+                    isValidate=True
+                    #<!--Show grade of laboratory-->
+                    totalLab_Final=int(round(validate.grade,0))
+                    t.append(str(totalLab_Final))
+                    totalCategory=float((totalLab_Final*totalLab)/100)
 
 
-                #<!--Doesnt has a revalidation-->
-                if isValidate==False:
-                    #<!--Position in the vector of activities-->
-                    posVCC_Lab=0
-                    #<!--Vars to the control of grade of the student-->
+            #<!--Doesnt has a revalidation-->
+            if isValidate==False:
+                #<!--Position in the vector of activities-->
+                posVCC_Lab=0
+                #<!--Vars to the control of grade of the student-->
+                totalCategory_Lab=float(0)
+                totalActivities_Lab=0
+                totalCarry_Lab=float(0)
+
+                #<!--****************************************FILL THE GRADES OF THE STUDENT****************************************-->
+                #<!--LAB ACTIVITIES-->
+                for category_Lab in LabCategory:
                     totalCategory_Lab=float(0)
                     totalActivities_Lab=0
-                    totalCarry_Lab=float(0)
-
-                    #<!--****************************************FILL THE GRADES OF THE STUDENT****************************************-->
-                    #<!--LAB ACTIVITIES-->
-                    for category_Lab in LabCategory:
-                        totalCategory_Lab=float(0)
-                        totalActivities_Lab=0
-                        for c_Lab in LabActivities[posVCC_Lab]:
-                            studentGrade = db((db.grades.activity==c_Lab.id)&(db.grades.academic_assignation==t1.id)).select().first()
-                            if studentGrade is None:
-                                totalCategory_Lab=totalCategory_Lab+float(0)
-                            else:
-                                if category_Lab.specific_grade==True:
-                                    totalCategory_Lab=totalCategory_Lab+float((studentGrade.grade*c_Lab.grade)/100)
-                                else:
-                                    totalCategory_Lab=totalCategory_Lab+float(studentGrade.grade)
-                            totalActivities_Lab=totalActivities_Lab+1
-                        
-
-                        if category_Lab.specific_grade==False:
-                            if totalActivities_Lab==0:
-                                totalActivities_Lab=1
-                            totalActivities_Lab=totalActivities_Lab*100
-                            totalCategory_Lab=float((totalCategory_Lab*float(category_Lab.grade))/float(totalActivities_Lab))
-                        totalCarry_Lab=totalCarry_Lab+totalCategory_Lab
-                        posVCC_Lab=posVCC_Lab+1
-                    totalCategory=float((totalCarry_Lab*totalLab)/100)
-
-
-                #<!--Show grade of laboratory-->
-                t.append(str(totalCategory))
-                #<!--Plus the laboratory to the carry-->
-                totalCarry=totalCarry+totalCategory
-
-            if request.vars['type'] == 'class' and requirement is not None:
-                if db((db.course_requirement_student.carnet==t1.carnet)&(db.course_requirement_student.requirement==requirement.id)).select().first() is not None:
-                    t.append(T('True'))
-                else:
-                    t.append(T('False'))
-            if request.vars['type'] == 'class' and requirement is not None:
-                if db((db.course_requirement_student.carnet==t1.carnet)&(db.course_requirement_student.requirement==requirement.id)).select().first() is not None:
-                    if request.vars['type'] == 'class' and existLab==True:
-                        if totalCategory>=float((61*totalLab)/100):
-                            t.append(str(totalCarry))
+                    for c_Lab in LabActivities[posVCC_Lab]:
+                        studentGrade = db((db.grades.activity==c_Lab.id)&(db.grades.academic_assignation==t1.id)).select().first()
+                        if studentGrade is None:
+                            totalCategory_Lab=totalCategory_Lab+float(0)
                         else:
-                            t.append('0')
-                    else:
-                        t.append(str(totalCarry))
-                else:
-                    t.append('0')
-            else:
-                if request.vars['type'] == 'class' and existLab==True:
-                    if totalCategory>=float((61*totalLab)/100):
-                        t.append(str(totalCarry))
-                    else:
-                        t.append('0')
-                else:
-                    t.append(str(totalCarry))
-            posVCC=0
-            totalCategory=float(0)
-            totalActivities=0
-            totalCarry=float(0)
-            l.append(t)
-            t=[]
-        else:
-            t.append(str(t1.carnet.carnet))
+                            if category_Lab.specific_grade==True:
+                                totalCategory_Lab=totalCategory_Lab+float((studentGrade.grade*c_Lab.grade)/100)
+                            else:
+                                totalCategory_Lab=totalCategory_Lab+float(studentGrade.grade)
+                        totalActivities_Lab=totalActivities_Lab+1
+                    
 
-            #<!--Position in the vector of activities-->
-            posVCC=0
-            #<!--Vars to the control of grade of the student-->
-            totalCategory=float(0)
-            totalActivities=0
-            totalCarry=float(0)
-            #<!--****************************************FILL THE GRADES OF THE STUDENT****************************************-->
-            #<!--COURSE ACTIVITIES-->
-            for category in LabCategory:
+                    if category_Lab.specific_grade==False:
+                        if totalActivities_Lab==0:
+                            totalActivities_Lab=1
+                        totalActivities_Lab=totalActivities_Lab*100
+                        totalCategory_Lab=float((totalCategory_Lab*float(category_Lab.grade))/float(totalActivities_Lab))
+                    totalCarry_Lab=totalCarry_Lab+totalCategory_Lab
+                    posVCC_Lab=posVCC_Lab+1
+                #<!--Show grade of laboratory-->
+                totalLab_Final=int(round(totalCarry_Lab,0))
+                t.append(str(totalLab_Final))
+                totalCategory=float((totalLab_Final*totalLab)/100)
+
+            #<!--Plus the laboratory to the carry-->
+            totalCarry=totalCarry+totalCategory
+        else:
+            #<!--Show grade of laboratory-->
+            t.append('0')
+
+
+        #<!--COURSE ACTIVITIES-->
+        for category in CourseCategory:
+            if category.category.category!="Laboratorio" and category.category.category!="Examen Final":
                 totalCategory=float(0)
                 totalActivities=0
-                for c in LabActivities[posVCC]:
+                for c in CourseActivities[posVCC]:
                     studentGrade = db((db.grades.activity==c.id)&(db.grades.academic_assignation==t1.id)).select().first()
                     if studentGrade is None:
                         totalCategory=totalCategory+float(0)
-                        t.append('')
                     else:
                         if category.specific_grade==True:
-                            t.append(str(studentGrade.grade))
                             totalCategory=totalCategory+float((studentGrade.grade*c.grade)/100)
                         else:
-                            t.append(str(studentGrade.grade))
                             totalCategory=totalCategory+float(studentGrade.grade)
                     totalActivities=totalActivities+1
 
                 if category.specific_grade==True:
-                    t.append(str(totalCategory))
+                    None
                 else:
                     if totalActivities==0:
                         totalActivities=1
-                    pass
                     totalActivities=totalActivities*100
                     totalCategory=float((totalCategory*float(category.grade))/float(totalActivities))
-                    t.append(str(totalCategory))
                 totalCarry=totalCarry+totalCategory
                 posVCC=posVCC+1
+            elif category.category.category!="Examen Final":
+                totalCategory=float(0)
+                totalActivities=0
+                for c in CourseActivities[posVCC]:
+                    studentGrade = db((db.grades.activity==c.id)&(db.grades.academic_assignation==t1.id)).select().first()
+                    if studentGrade is None:
+                        totalCategory=totalCategory+float(0)
+                    else:
+                        if category.specific_grade==True:
+                            totalCategory=totalCategory+float((studentGrade.grade*c.grade)/100)
+                        else:
+                            totalCategory=totalCategory+float(studentGrade.grade)
+                    totalActivities=totalActivities+1
 
-            t.append(str(totalCarry))
-            l.append(t)
-            t=[]
-            posVCC=0
-            totalCategory=float(0)
-            totalActivities=0
-            totalCarry=float(0)
+                if category.specific_grade==True:
+                    None
+                else:
+                    if totalActivities==0:
+                        totalActivities=1
+                    totalActivities=totalActivities*100
+                    totalCategory=float((totalCategory*float(category.grade))/float(totalActivities))
+                totalFinal_Clase=int(round(totalCategory,0))
+                posVCC=posVCC+1
+        totalCarry=int(round(totalCarry,0))
+
+        
+
+        if requirement is not None:
+            if db((db.course_requirement_student.carnet==t1.carnet)&(db.course_requirement_student.requirement==requirement.id)).select().first() is not None:
+                if existLab==True:
+                    if totalLab_Final>=61:
+                        t.append(str(totalCarry))
+                        t.append(str(totalFinal_Clase))
+                    else:
+                        t.append('0')
+                        t.append('0')
+                else:
+                    t.append(str(totalCarry))
+                    t.append(str(totalFinal_Clase))
+            else:
+                t.append('0')
+                t.append('0')
+        else:
+            if existLab==True:
+                if totalLab_Final>=61:
+                    t.append(str(totalCarry))
+                    t.append(str(totalFinal_Clase))
+                else:
+                    t.append('0')
+                    t.append('0')
+            else:
+                t.append(str(totalCarry))
+                t.append(str(totalFinal_Clase))
+
+        posVCC=0
+        totalCategory=float(0)
+        totalActivities=0
+        totalCarry=float(0)
+        totalFinal_Clase=0
+        totalLab_Final=0
+        l.append(t)
+        t=[]
 
 
-    nombre='ReporteGeneralActividades '+project_var.name
+    nombre=project_var.name.replace(' ','_')+'_'+T(year.period.name).replace(' ','_')+str(year.yearp)
     return dict(filename=nombre, csvdata=l)
 
     
@@ -3730,7 +3655,7 @@ def General_report_activities():
                             period = year.id,
                             finish =  True)
         #Generate csv file format technical school
-        response.flash = T("Request has been canceled")
+        redirect(URL('activity_control','Course_Format_Technical_School',vars=dict(project = project_var.id, period = year.id)))
 
     print "fecha:" + str( (T(year.period.name)+" "+str(year.yearp)) )
     controlP = db((db.student_control_period.period_name==(T(year.period.name)+" "+str(year.yearp)))).select().first()
