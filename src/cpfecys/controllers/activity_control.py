@@ -2173,6 +2173,7 @@ def course_first_recovery_test():
     else:
         session.flash = T('Not valid Action.')
         redirect(URL('default','index'))
+
     return dict(year = year, project = project, grid=grid)
 
 
@@ -2231,7 +2232,12 @@ def oncreate_course_first_recovery_test(form):
             session.flash = T('Error. Exist a register of recovery test of the student in the course.')
         else:
             academic_s = db(db.academic.id==form.vars.carnet).select().first()
-            db.course_first_recovery_test_log.insert(user_name = auth.user.username,
+            var_assignation = db( (db.academic_course_assignation.carnet==academic_s.id)&(db.academic_course_assignation.semester==year.id)&(db.academic_course_assignation.assignation==project.id) ).select().first()
+            if var_assignation is None:
+                db(db.course_first_recovery_test.id==form.vars.id).delete()
+                session.flash = T('Error. The academic is not assigned to the course')
+            else:
+                db.course_first_recovery_test_log.insert(user_name = auth.user.username,
                                     roll = roll_var,
                                     operation_log = 'insert',
                                     academic_id = academic_s.id,
@@ -2551,7 +2557,12 @@ def oncreate_course_second_recovery_test(form):
             session.flash = T('Error. Exist a register of recovery test of the student in the course.')
         else:
             academic_s = db(db.academic.id==form.vars.carnet).select().first()
-            db.course_second_recovery_test_log.insert(user_name = auth.user.username,
+            var_assignation = db( (db.academic_course_assignation.carnet==academic_s.id)&(db.academic_course_assignation.semester==year.id)&(db.academic_course_assignation.assignation==project.id) ).select().first()
+            if var_assignation is None:
+                db(db.course_first_recovery_test.id==form.vars.id).delete()
+                session.flash = T('Error. The academic is not assigned to the course')
+            else:
+                db.course_second_recovery_test_log.insert(user_name = auth.user.username,
                                     roll = roll_var,
                                     operation_log = 'insert',
                                     academic_id = academic_s.id,
@@ -3657,10 +3668,10 @@ def General_report_activities():
         #Generate csv file format technical school
         redirect(URL('activity_control','Course_Format_Technical_School',vars=dict(project = project_var.id, period = year.id)))
 
-    print "fecha:" + str( (T(year.period.name)+" "+str(year.yearp)) )
+    
     controlP = db((db.student_control_period.period_name==(T(year.period.name)+" "+str(year.yearp)))).select().first()
     requirement = db((db.course_requirement.semester==year.id)&(db.course_requirement.project==project_var.id)).select().first()
-    print "controlP:" +str(controlP) 
+    
     course_ended_var = db((db.course_ended.project==project_var.id) & (db.course_ended.period==year.id) ).select().first()
 
     course_ended = False
