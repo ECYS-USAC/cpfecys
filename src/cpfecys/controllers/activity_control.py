@@ -2057,6 +2057,645 @@ def onupdate_validate_laboratory(form):
             if failCheck==2:
                 redirect(URL('default','index'))
 
+#------------------------------------course_first_recovery_test--------------
+
+@auth.requires_login()
+@auth.requires(auth.has_membership('Student') or auth.has_membership('Teacher') or auth.has_membership('Super-Administrator') or auth.has_membership('Ecys-Administrator'))
+def course_first_recovery_test():
+    #Check if the period is correct
+    if request.vars['year'] is None or request.vars['year']=='':
+        session.flash = T('Not valid Action.')
+        redirect(URL('default','index'))
+    else:
+        year = request.vars['year']
+        year = db(db.period_year.id==year).select().first()
+        if year is None:
+            session.flash = T('Not valid Action.')
+            redirect(URL('default','index'))
+        
+
+    #Check if the project is correct
+    if request.vars['project'] is None or request.vars['project']=='':
+        session.flash = T('Not valid Action.')
+        redirect(URL('default','index'))
+    else:
+        project = request.vars['project']
+        project = db(db.project.id==project).select().first()
+        if project is None:
+            session.flash = T('Not valid Action.')
+            redirect(URL('default','index'))
+
+    #Time limit of semester
+    from datetime import datetime
+    date1=None
+    tiempo=str(datetime.now())
+    dateInicialP = db.executesql('SELECT date(\''+tiempo+'\');',as_dict=True)
+    for d0 in dateInicialP:
+        date1=d0['date(\''+tiempo+'\')']
+    date_var = db((db.student_control_period.period_name==(T(year.period.name)+" "+str(year.yearp)))).select().first()
+    
+    #Exception of permition
+    exception_query = db(db.course_laboratory_exception.project == project.id).select().first()
+    exception_s_var = False
+    exception_t_var = False
+    if exception_query is not None:
+        exception_t_var = exception_query.t_edit_lab
+        exception_s_var = exception_query.s_edit_course
+
+    #Check if the course has endend
+    no_actionsAll=False
+    course_ended_var = db((db.course_ended.project==project.id) & (db.course_ended.period==year.id) ).select().first()
+    if course_ended_var != None:
+        if course_ended_var.finish == False:
+            session.flash = T('Course hasn’t finalized.')
+            redirect(URL('default','index'))
+    else:
+        session.flash = T('Course hasn’t finalized.')
+        redirect(URL('default','index'))
+    
+
+    #Grid
+    grid=None
+    db.course_first_recovery_test.id.readable = False
+    db.course_first_recovery_test.id.writable = False
+    db.course_first_recovery_test.project.readable = False
+    db.course_first_recovery_test.project.writable = False
+    db.course_first_recovery_test.project.default = project.id
+    db.course_first_recovery_test.semester.readable = False
+    db.course_first_recovery_test.semester.writable = False
+    db.course_first_recovery_test.semester.default = year.id
+    if auth.has_membership('Super-Administrator') or auth.has_membership('Ecys-Administrator'):
+        query = ((db.course_first_recovery_test.semester==year.id)&(db.course_first_recovery_test.project==project.id))
+        if cpfecys.current_year_period().id == year.id and no_actionsAll==False:
+            if 'edit' in request.args:
+                db.course_first_recovery_test.carnet.writable = False
+                grid = SQLFORM.grid(query, csv=False, paginate=50, oncreate=oncreate_course_first_recovery_test, onupdate=onupdate_course_first_recovery_test, ondelete=ondelete_course_first_recovery_test, searchable=False)
+            else:
+                grid = SQLFORM.grid(query, csv=False, paginate=50, oncreate=oncreate_course_first_recovery_test, onupdate=onupdate_course_first_recovery_test, ondelete=ondelete_course_first_recovery_test, searchable=False)
+        else:
+            if 'edit' in request.args:
+                db.course_first_recovery_test.carnet.writable = False
+                grid = SQLFORM.grid(query, csv=False, paginate=50, oncreate=oncreate_course_first_recovery_test, onupdate=onupdate_course_first_recovery_test, ondelete=ondelete_course_first_recovery_test, searchable=False)
+            else:
+                grid = SQLFORM.grid(query, csv=False, paginate=50, oncreate=oncreate_course_first_recovery_test, onupdate=onupdate_course_first_recovery_test, ondelete=ondelete_course_first_recovery_test, searchable=False)
+    elif auth.has_membership('Student'):
+        assigantion = db((db.user_project.assigned_user == auth.user.id) & (db.user_project.period == year.id) & (db.user_project.project == project)).select().first()
+        if assigantion is None:
+            session.flash = T('Not valid Action.')
+            redirect(URL('default','index'))
+        else:
+            if exception_s_var==True and no_actionsAll==False:
+                query = ((db.course_first_recovery_test.semester==year.id)&(db.course_first_recovery_test.project==project.id))
+                if 'edit' in request.args:
+                    db.course_first_recovery_test.carnet.writable = False
+                    grid = SQLFORM.grid(query, csv=False, paginate=50, oncreate=oncreate_course_first_recovery_test, onupdate=onupdate_course_first_recovery_test, ondelete=ondelete_course_first_recovery_test, searchable=False)
+                else:
+                    grid = SQLFORM.grid(query, csv=False, paginate=50, oncreate=oncreate_course_first_recovery_test, onupdate=onupdate_course_first_recovery_test, ondelete=ondelete_course_first_recovery_test, searchable=False)
+            else:
+                query = ((db.course_first_recovery_test.semester==year.id)&(db.course_first_recovery_test.project==project.id))
+                grid = SQLFORM.grid(query, csv=False, create=False, editable=False, deletable=False, paginate=50, searchable=False)
+    elif auth.has_membership('Teacher'):
+        assigantion = db((db.user_project.assigned_user == auth.user.id) & (db.user_project.period == year.id) & (db.user_project.project == project)).select().first()
+        if assigantion is None:
+            session.flash = T('Not valid Action.')
+            redirect(URL('default','index'))
+        else:
+            if no_actionsAll==False:
+                query = ((db.course_first_recovery_test.semester==year.id)&(db.course_first_recovery_test.project==project.id))
+                if 'edit' in request.args:
+                    db.course_first_recovery_test.carnet.writable = False
+                    grid = SQLFORM.grid(query, csv=False, paginate=50, oncreate=oncreate_course_first_recovery_test, onupdate=onupdate_course_first_recovery_test, ondelete=ondelete_course_first_recovery_test, searchable=False)
+                else:
+                    grid = SQLFORM.grid(query, csv=False, paginate=50, oncreate=oncreate_course_first_recovery_test, onupdate=onupdate_course_first_recovery_test, ondelete=ondelete_course_first_recovery_test, searchable=False)
+            else:
+                query = ((db.course_first_recovery_test.semester==year.id)&(db.course_first_recovery_test.project==project.id))
+                grid = SQLFORM.grid(query, csv=False, create=False, editable=False, deletable=False, paginate=50, searchable=False)
+    else:
+        session.flash = T('Not valid Action.')
+        redirect(URL('default','index'))
+    return dict(year = year, project = project, grid=grid)
+
+
+
+
+def oncreate_course_first_recovery_test(form):
+    import cpfecys
+
+    #Check if the period is correct
+    if request.vars['year'] is None or request.vars['year']=='':
+        db(db.course_first_recovery_test.id==form.vars.id).delete()
+        session.flash = T('Not valid Action.')
+        redirect(URL('default','index'))
+    else:
+        year = request.vars['year']
+        year = db(db.period_year.id==year).select().first()
+        if year is None:
+            db(db.course_first_recovery_test.id==form.vars.id).delete()
+            session.flash = T('Not valid Action.')
+            redirect(URL('default','index'))
+        
+
+    #Check if the project is correct
+    if request.vars['project'] is None or request.vars['project']=='':
+        db(db.course_first_recovery_test.id==form.vars.id).delete()
+        session.flash = T('Not valid Action.')
+        redirect(URL('default','index'))
+    else:
+        project = request.vars['project']
+        project = db(db.project.id==project).select().first()
+        if project is None:
+            db(db.course_first_recovery_test.id==form.vars.id).delete()
+            session.flash = T('Not valid Action.')
+            redirect(URL('default','index'))
+
+
+    #Check if the course has endend
+    no_actionsAll=False
+    
+
+    if no_actionsAll==False:
+        roll_var=''
+        if auth.has_membership('Super-Administrator'):
+            roll_var='Super-Administrator'
+        elif auth.has_membership('Ecys-Administrator'):
+            roll_var='Ecys-Administrator'
+        elif auth.has_membership('Teacher'):
+            roll_var='Teacher'
+        elif auth.has_membership('Student'):
+            roll_var='Student'
+
+       
+        usr2 = db((db.course_first_recovery_test.id != form.vars.id) & (db.course_first_recovery_test.semester == request.vars['year']) & (db.course_first_recovery_test.project == request.vars['project']) & (db.course_first_recovery_test.carnet == form.vars.carnet)).select().first()
+        if usr2 is not None:
+            db(db.course_first_recovery_test.id==form.vars.id).delete()
+            session.flash = T('Error. Exist a register of recovery test of the student in the course.')
+        else:
+            academic_s = db(db.academic.id==form.vars.carnet).select().first()
+            db.course_first_recovery_test_log.insert(user_name = auth.user.username,
+                                    roll = roll_var,
+                                    operation_log = 'insert',
+                                    academic_id = academic_s.id,
+                                    academic = academic_s.carnet,
+                                    project = project.name,
+                                    period = T(year.period.name),
+                                    yearp = year.yearp,
+                                    after_grade = form.vars.grade,
+                                    id_course_first_recovery_test = form.vars.id,
+                                    description = T('Inserted from first recovery test page')
+                                     )
+    
+
+def ondelete_course_first_recovery_test(table_involved, id_of_the_deleted_record):
+    import cpfecys
+
+    #Check if the period is correct
+    if request.vars['year'] is None or request.vars['year']=='':
+        session.flash = T('Not valid Action.')
+        redirect(URL('default','index'))
+    else:
+        year = request.vars['year']
+        year = db(db.period_year.id==year).select().first()
+        if year is None:
+            session.flash = T('Not valid Action.')
+            redirect(URL('default','index'))
+        
+
+    #Check if the project is correct
+    if request.vars['project'] is None or request.vars['project']=='':
+        session.flash = T('Not valid Action.')
+        redirect(URL('default','index'))
+    else:
+        project = request.vars['project']
+        project = db(db.project.id==project).select().first()
+        if project is None:
+            session.flash = T('Not valid Action.')
+            redirect(URL('default','index'))
+
+    roll_var=''
+    if auth.has_membership('Super-Administrator'):
+        roll_var='Super-Administrator'
+    elif auth.has_membership('Ecys-Administrator'):
+        roll_var='Ecys-Administrator'
+    elif auth.has_membership('Teacher'):
+        roll_var='Teacher'
+    elif auth.has_membership('Student'):
+        roll_var='Student'
+
+
+    course_first_recovery_test_var = db.course_first_recovery_test(id_of_the_deleted_record)
+    if course_first_recovery_test_var is not None:        
+        academic_s = db(db.academic.id==course_first_recovery_test_var.carnet).select().first()
+        db.course_first_recovery_test_log.insert(user_name = auth.user.username,
+                                roll = roll_var,
+                                operation_log = 'delete',
+                                academic_id = academic_s.id,
+                                academic = academic_s.carnet,
+                                project = project.name,
+                                period = T(year.period.name),
+                                yearp = year.yearp,
+                                before_grade = course_first_recovery_test_var.grade,
+                                description = T('Delete from first recovery test page')
+                                 )
+
+def onupdate_course_first_recovery_test(form):
+    import cpfecys
+    #Check if the period is correct
+    if request.vars['year'] is None or request.vars['year']=='':
+        session.flash = T('Not valid Action.')
+        redirect(URL('default','index'))
+    else:
+        year = request.vars['year']
+        year = db(db.period_year.id==year).select().first()
+        if year is None:
+            session.flash = T('Not valid Action.')
+            redirect(URL('default','index'))
+        
+
+    #Check if the project is correct
+    if request.vars['project'] is None or request.vars['project']=='':
+        session.flash = T('Not valid Action.')
+        redirect(URL('default','index'))
+    else:
+        project = request.vars['project']
+        project = db(db.project.id==project).select().first()
+        if project is None:
+            session.flash = T('Not valid Action.')
+            redirect(URL('default','index'))
+
+
+    #Check if the course has endend
+    no_actionsAll=False
+    
+
+
+    if no_actionsAll==False:
+        roll_var=''
+        if auth.has_membership('Super-Administrator'):
+            roll_var='Super-Administrator'
+        elif auth.has_membership('Ecys-Administrator'):
+            roll_var='Ecys-Administrator'
+        elif auth.has_membership('Teacher'):
+            roll_var='Teacher'
+        elif auth.has_membership('Student'):
+            roll_var='Student'
+
+        usr2 = db(db.course_first_recovery_test_log.id_course_first_recovery_test == form.vars.id).select(orderby=db.course_first_recovery_test_log.id)
+        academic_log=''
+        academic_id_log=''
+        before_grade_log=''
+        for u in usr2:
+            academic_log=u.academic
+            academic_id_log=u.academic_id
+            before_grade_log=u.after_grade
+
+        if form.vars.delete_this_record != None:
+            db.course_first_recovery_test_log.insert(user_name = auth.user.username,
+                                    roll = roll_var,
+                                    operation_log = 'delete',
+                                    academic_id = academic_id_log,
+                                    academic = academic_log,
+                                    project = project.name,
+                                    period = T(year.period.name),
+                                    yearp = year.yearp,
+                                    before_grade = before_grade_log,
+                                    description = T('Delete from first recovery test page')
+                                     )
+        else:
+            if before_grade_log != form.vars.grade:
+                db.course_first_recovery_test_log.insert(user_name = auth.user.username,
+                                        roll = roll_var,
+                                        operation_log = 'update',
+                                        academic_id = academic_id_log,
+                                        academic = academic_log,
+                                        project = project.name,
+                                        period = T(year.period.name),
+                                        yearp = year.yearp,
+                                        before_grade = before_grade_log,
+                                        after_grade = form.vars.grade,
+                                        id_course_first_recovery_test = form.vars.id,
+                                        description = T('Update from first recovery test page')
+                                         )
+    
+
+#------------------------------------course_second_recovery_test--------------
+
+@auth.requires_login()
+@auth.requires(auth.has_membership('Student') or auth.has_membership('Teacher') or auth.has_membership('Super-Administrator') or auth.has_membership('Ecys-Administrator'))
+def course_second_recovery_test():
+    #Check if the period is correct
+    if request.vars['year'] is None or request.vars['year']=='':
+        session.flash = T('Not valid Action.')
+        redirect(URL('default','index'))
+    else:
+        year = request.vars['year']
+        year = db(db.period_year.id==year).select().first()
+        if year is None:
+            session.flash = T('Not valid Action.')
+            redirect(URL('default','index'))
+        
+
+    #Check if the project is correct
+    if request.vars['project'] is None or request.vars['project']=='':
+        session.flash = T('Not valid Action.')
+        redirect(URL('default','index'))
+    else:
+        project = request.vars['project']
+        project = db(db.project.id==project).select().first()
+        if project is None:
+            session.flash = T('Not valid Action.')
+            redirect(URL('default','index'))
+
+    #Time limit of semester
+    from datetime import datetime
+    date1=None
+    tiempo=str(datetime.now())
+    dateInicialP = db.executesql('SELECT date(\''+tiempo+'\');',as_dict=True)
+    for d0 in dateInicialP:
+        date1=d0['date(\''+tiempo+'\')']
+    date_var = db((db.student_control_period.period_name==(T(year.period.name)+" "+str(year.yearp)))).select().first()
+    
+    #Exception of permition
+    exception_query = db(db.course_laboratory_exception.project == project.id).select().first()
+    exception_s_var = False
+    exception_t_var = False
+    if exception_query is not None:
+        exception_t_var = exception_query.t_edit_lab
+        exception_s_var = exception_query.s_edit_course
+
+    #Check if the course has endend
+    no_actionsAll=False
+    course_ended_var = db((db.course_ended.project==project.id) & (db.course_ended.period==year.id) ).select().first()
+    if course_ended_var != None:
+        if course_ended_var.finish == False:
+            session.flash = T('Course hasn’t finalized.')
+            redirect(URL('default','index'))
+    else:
+        session.flash = T('Course hasn’t finalized.')
+        redirect(URL('default','index'))
+    
+
+    #Grid
+    grid=None
+    db.course_second_recovery_test.id.readable = False
+    db.course_second_recovery_test.id.writable = False
+    db.course_second_recovery_test.project.readable = False
+    db.course_second_recovery_test.project.writable = False
+    db.course_second_recovery_test.project.default = project.id
+    db.course_second_recovery_test.semester.readable = False
+    db.course_second_recovery_test.semester.writable = False
+    db.course_second_recovery_test.semester.default = year.id
+    if auth.has_membership('Super-Administrator') or auth.has_membership('Ecys-Administrator'):
+        query = ((db.course_second_recovery_test.semester==year.id)&(db.course_second_recovery_test.project==project.id))
+        if cpfecys.current_year_period().id == year.id and no_actionsAll==False:
+            if 'edit' in request.args:
+                db.course_second_recovery_test.carnet.writable = False
+                grid = SQLFORM.grid(query, csv=False, paginate=50, oncreate=oncreate_course_second_recovery_test, onupdate=onupdate_course_second_recovery_test, ondelete=ondelete_course_second_recovery_test, searchable=False)
+            else:
+                grid = SQLFORM.grid(query, csv=False, paginate=50, oncreate=oncreate_course_second_recovery_test, onupdate=onupdate_course_second_recovery_test, ondelete=ondelete_course_second_recovery_test, searchable=False)
+        else:
+            if 'edit' in request.args:
+                db.course_second_recovery_test.carnet.writable = False
+                grid = SQLFORM.grid(query, csv=False, paginate=50, oncreate=oncreate_course_second_recovery_test, onupdate=onupdate_course_second_recovery_test, ondelete=ondelete_course_second_recovery_test, searchable=False)
+            else:
+                grid = SQLFORM.grid(query, csv=False, paginate=50, oncreate=oncreate_course_second_recovery_test, onupdate=onupdate_course_second_recovery_test, ondelete=ondelete_course_second_recovery_test, searchable=False)
+    elif auth.has_membership('Student'):
+        assigantion = db((db.user_project.assigned_user == auth.user.id) & (db.user_project.period == year.id) & (db.user_project.project == project)).select().first()
+        if assigantion is None:
+            session.flash = T('Not valid Action.')
+            redirect(URL('default','index'))
+        else:
+            if exception_s_var==True and no_actionsAll==False:
+                query = ((db.course_second_recovery_test.semester==year.id)&(db.course_second_recovery_test.project==project.id))
+                if 'edit' in request.args:
+                    db.course_second_recovery_test.carnet.writable = False
+                    grid = SQLFORM.grid(query, csv=False, paginate=50, oncreate=oncreate_course_second_recovery_test, onupdate=onupdate_course_second_recovery_test, ondelete=ondelete_course_second_recovery_test, searchable=False)
+                else:
+                    grid = SQLFORM.grid(query, csv=False, paginate=50, oncreate=oncreate_course_second_recovery_test, onupdate=onupdate_course_second_recovery_test, ondelete=ondelete_course_second_recovery_test, searchable=False)
+            else:
+                query = ((db.course_second_recovery_test.semester==year.id)&(db.course_second_recovery_test.project==project.id))
+                grid = SQLFORM.grid(query, csv=False, create=False, editable=False, deletable=False, paginate=50, searchable=False)
+    elif auth.has_membership('Teacher'):
+        assigantion = db((db.user_project.assigned_user == auth.user.id) & (db.user_project.period == year.id) & (db.user_project.project == project)).select().first()
+        if assigantion is None:
+            session.flash = T('Not valid Action.')
+            redirect(URL('default','index'))
+        else:
+            if no_actionsAll==False:
+                query = ((db.course_second_recovery_test.semester==year.id)&(db.course_second_recovery_test.project==project.id))
+                if 'edit' in request.args:
+                    db.course_second_recovery_test.carnet.writable = False
+                    grid = SQLFORM.grid(query, csv=False, paginate=50, oncreate=oncreate_course_second_recovery_test, onupdate=onupdate_course_second_recovery_test, ondelete=ondelete_course_second_recovery_test, searchable=False)
+                else:
+                    grid = SQLFORM.grid(query, csv=False, paginate=50, oncreate=oncreate_course_second_recovery_test, onupdate=onupdate_course_second_recovery_test, ondelete=ondelete_course_second_recovery_test, searchable=False)
+            else:
+                query = ((db.course_second_recovery_test.semester==year.id)&(db.course_second_recovery_test.project==project.id))
+                grid = SQLFORM.grid(query, csv=False, create=False, editable=False, deletable=False, paginate=50, searchable=False)
+    else:
+        session.flash = T('Not valid Action.')
+        redirect(URL('default','index'))
+    return dict(year = year, project = project, grid=grid)
+
+
+
+
+def oncreate_course_second_recovery_test(form):
+    import cpfecys
+
+    #Check if the period is correct
+    if request.vars['year'] is None or request.vars['year']=='':
+        db(db.course_second_recovery_test.id==form.vars.id).delete()
+        session.flash = T('Not valid Action.')
+        redirect(URL('default','index'))
+    else:
+        year = request.vars['year']
+        year = db(db.period_year.id==year).select().first()
+        if year is None:
+            db(db.course_second_recovery_test.id==form.vars.id).delete()
+            session.flash = T('Not valid Action.')
+            redirect(URL('default','index'))
+        
+
+    #Check if the project is correct
+    if request.vars['project'] is None or request.vars['project']=='':
+        db(db.course_second_recovery_test.id==form.vars.id).delete()
+        session.flash = T('Not valid Action.')
+        redirect(URL('default','index'))
+    else:
+        project = request.vars['project']
+        project = db(db.project.id==project).select().first()
+        if project is None:
+            db(db.course_second_recovery_test.id==form.vars.id).delete()
+            session.flash = T('Not valid Action.')
+            redirect(URL('default','index'))
+
+
+    #Check if the course has endend
+    no_actionsAll=False
+    
+
+    if no_actionsAll==False:
+        roll_var=''
+        if auth.has_membership('Super-Administrator'):
+            roll_var='Super-Administrator'
+        elif auth.has_membership('Ecys-Administrator'):
+            roll_var='Ecys-Administrator'
+        elif auth.has_membership('Teacher'):
+            roll_var='Teacher'
+        elif auth.has_membership('Student'):
+            roll_var='Student'
+
+       
+        usr2 = db((db.course_second_recovery_test.id != form.vars.id) & (db.course_second_recovery_test.semester == request.vars['year']) & (db.course_second_recovery_test.project == request.vars['project']) & (db.course_second_recovery_test.carnet == form.vars.carnet)).select().first()
+        if usr2 is not None:
+            db(db.course_second_recovery_test.id==form.vars.id).delete()
+            session.flash = T('Error. Exist a register of recovery test of the student in the course.')
+        else:
+            academic_s = db(db.academic.id==form.vars.carnet).select().first()
+            db.course_second_recovery_test_log.insert(user_name = auth.user.username,
+                                    roll = roll_var,
+                                    operation_log = 'insert',
+                                    academic_id = academic_s.id,
+                                    academic = academic_s.carnet,
+                                    project = project.name,
+                                    period = T(year.period.name),
+                                    yearp = year.yearp,
+                                    after_grade = form.vars.grade,
+                                    id_course_second_recovery_test = form.vars.id,
+                                    description = T('Inserted from second recovery test page')
+                                     )
+    
+
+def ondelete_course_second_recovery_test(table_involved, id_of_the_deleted_record):
+    import cpfecys
+
+    #Check if the period is correct
+    if request.vars['year'] is None or request.vars['year']=='':
+        session.flash = T('Not valid Action.')
+        redirect(URL('default','index'))
+    else:
+        year = request.vars['year']
+        year = db(db.period_year.id==year).select().first()
+        if year is None:
+            session.flash = T('Not valid Action.')
+            redirect(URL('default','index'))
+        
+
+    #Check if the project is correct
+    if request.vars['project'] is None or request.vars['project']=='':
+        session.flash = T('Not valid Action.')
+        redirect(URL('default','index'))
+    else:
+        project = request.vars['project']
+        project = db(db.project.id==project).select().first()
+        if project is None:
+            session.flash = T('Not valid Action.')
+            redirect(URL('default','index'))
+
+    roll_var=''
+    if auth.has_membership('Super-Administrator'):
+        roll_var='Super-Administrator'
+    elif auth.has_membership('Ecys-Administrator'):
+        roll_var='Ecys-Administrator'
+    elif auth.has_membership('Teacher'):
+        roll_var='Teacher'
+    elif auth.has_membership('Student'):
+        roll_var='Student'
+
+
+    course_second_recovery_test_var = db.course_second_recovery_test(id_of_the_deleted_record)
+    if course_second_recovery_test_var is not None:        
+        academic_s = db(db.academic.id==course_second_recovery_test_var.carnet).select().first()
+        db.course_second_recovery_test_log.insert(user_name = auth.user.username,
+                                roll = roll_var,
+                                operation_log = 'delete',
+                                academic_id = academic_s.id,
+                                academic = academic_s.carnet,
+                                project = project.name,
+                                period = T(year.period.name),
+                                yearp = year.yearp,
+                                before_grade = course_second_recovery_test_var.grade,
+                                description = T('Delete from second recovery test page')
+                                 )
+
+def onupdate_course_second_recovery_test(form):
+    import cpfecys
+    #Check if the period is correct
+    if request.vars['year'] is None or request.vars['year']=='':
+        session.flash = T('Not valid Action.')
+        redirect(URL('default','index'))
+    else:
+        year = request.vars['year']
+        year = db(db.period_year.id==year).select().first()
+        if year is None:
+            session.flash = T('Not valid Action.')
+            redirect(URL('default','index'))
+        
+
+    #Check if the project is correct
+    if request.vars['project'] is None or request.vars['project']=='':
+        session.flash = T('Not valid Action.')
+        redirect(URL('default','index'))
+    else:
+        project = request.vars['project']
+        project = db(db.project.id==project).select().first()
+        if project is None:
+            session.flash = T('Not valid Action.')
+            redirect(URL('default','index'))
+
+
+    #Check if the course has endend
+    no_actionsAll=False
+    
+
+
+    if no_actionsAll==False:
+        roll_var=''
+        if auth.has_membership('Super-Administrator'):
+            roll_var='Super-Administrator'
+        elif auth.has_membership('Ecys-Administrator'):
+            roll_var='Ecys-Administrator'
+        elif auth.has_membership('Teacher'):
+            roll_var='Teacher'
+        elif auth.has_membership('Student'):
+            roll_var='Student'
+
+        usr2 = db(db.course_second_recovery_test_log.id_course_second_recovery_test == form.vars.id).select(orderby=db.course_second_recovery_test_log.id)
+        academic_log=''
+        academic_id_log=''
+        before_grade_log=''
+        for u in usr2:
+            academic_log=u.academic
+            academic_id_log=u.academic_id
+            before_grade_log=u.after_grade
+
+        if form.vars.delete_this_record != None:
+            db.course_second_recovery_test_log.insert(user_name = auth.user.username,
+                                    roll = roll_var,
+                                    operation_log = 'delete',
+                                    academic_id = academic_id_log,
+                                    academic = academic_log,
+                                    project = project.name,
+                                    period = T(year.period.name),
+                                    yearp = year.yearp,
+                                    before_grade = before_grade_log,
+                                    description = T('Delete from second recovery test page')
+                                     )
+        else:
+            if before_grade_log != form.vars.grade:
+                db.course_second_recovery_test_log.insert(user_name = auth.user.username,
+                                        roll = roll_var,
+                                        operation_log = 'update',
+                                        academic_id = academic_id_log,
+                                        academic = academic_log,
+                                        project = project.name,
+                                        period = T(year.period.name),
+                                        yearp = year.yearp,
+                                        before_grade = before_grade_log,
+                                        after_grade = form.vars.grade,
+                                        id_course_second_recovery_test = form.vars.id,
+                                        description = T('Update from second recovery test page')
+                                         )
+    
 
 
 #------------------------------------------------------------------------------------------------------------------------
@@ -2841,6 +3480,7 @@ def General_report_activities():
     for acaT in academic_assig:
         students.append(acaT.academic_course_assignation)
 
+    var_final_grade = 0.00
 
     existLab=False
     totalLab=float(0)
@@ -2856,6 +3496,7 @@ def General_report_activities():
             totalLab=float(categoryC.grade)
             catVecCourseTemp.append(categoryC)
         elif categoryC.category.category=="Examen Final":
+            var_final_grade = categoryC.grade
             if ( request.vars['op'] == '2' or  request.vars['op'] == '3'):
                 None
             else:
@@ -3106,7 +3747,31 @@ def General_report_activities():
     if request.vars['op'] == '0':
         response.flash= T('Course hasn’t finalized.')
 
-    return dict(project = project_var, year = year, teacher=teacher, practice=practice, students=students, CourseCategory=CourseCategory, CourseActivities=CourseActivities, existLab=existLab, LabCategory=LabCategory, LabActivities=LabActivities, validateLaboratory=validateLaboratory, totalLab=totalLab, controlP=controlP, requirement=requirement, course_ended = course_ended)
+    exception_query = db(db.course_laboratory_exception.project == project_var.id).select().first()
+    exception_s_var = False
+    exception_t_var = False
+    if exception_query is not None:
+        exception_t_var = exception_query.t_edit_lab
+        exception_s_var = exception_query.s_edit_course
+
+    return dict(project = project_var,
+                year = year, 
+                teacher=teacher, 
+                practice=practice, 
+                students=students, 
+                CourseCategory=CourseCategory, 
+                CourseActivities=CourseActivities, 
+                existLab=existLab, 
+                LabCategory=LabCategory, 
+                LabActivities=LabActivities, 
+                validateLaboratory=validateLaboratory, 
+                totalLab=totalLab, 
+                controlP=controlP,
+                var_final_grade = var_final_grade,
+                requirement=requirement, 
+                course_ended = course_ended,
+                exception_s_var=exception_s_var,
+                exception_t_var=exception_t_var)
 
 
 @auth.requires_login()
@@ -4474,16 +5139,6 @@ def grades_management_n4():
             pass
             vecAllUserRoleMonth.append(tD)
     return dict(showLevel=showLevel, project=project, tipo=tipo, month=month, vecAllUserRoleMonth=vecAllUserRoleMonth, roll=roll, userr=userr)
-
-@auth.requires_login()
-@auth.requires(auth.has_membership('Teacher'))
-def grades_report():
-    return "<b>En construcción disculpe las molestias.</b>"
-    
-@auth.requires_login()
-@auth.requires(auth.has_membership('Teacher'))
-def laboratory_revalidation():
-    return "<b>En construcción disculpe las molestias.</b>"
 
 
 @auth.requires_login()

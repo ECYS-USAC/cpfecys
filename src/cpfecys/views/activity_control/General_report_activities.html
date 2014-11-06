@@ -1,15 +1,7 @@
 {{extend 'template.html'}}
 
-{{exception_query = db(db.course_laboratory_exception.project == project.id).select().first()}}
-{{exception_s_var = False}}
-{{exception_t_var = False}}
+
 {{no_menu=True}}
-
-{{if exception_query is not None:}}
-    {{exception_t_var = exception_query.t_edit_lab}}
-    {{exception_s_var = exception_query.s_edit_course}}
-{{pass}}
-
 {{activityPermition=db((db.course_requirement.semester==year.id)&(db.course_requirement.project==project.id)&(db.course_requirement.teacher_permition==True)).count()}}
 {{if request.vars['type'] == 'class' and (auth.has_membership('Ecys-Administrator') or auth.has_membership('Super-Administrator') or auth.has_membership('Teacher') or (auth.has_membership('Student') and exception_s_var == True)):}}
     {{no_menu=False}}
@@ -21,22 +13,22 @@
             
         </a>
         <ul class="nav pull-right">
-            {{if (request.vars['op']  == '2') and ((auth.has_membership('Ecys-Administrator') or auth.has_membership('Super-Administrator')) or (  ( auth.has_membership('Teacher') or (request.vars['type'] == 'class' and auth.has_membership('Student') and activityPermition>0) ) ) and (course_ended == True)):}}
+            {{if (request.vars['op']  == '2') and ((auth.has_membership('Ecys-Administrator') or auth.has_membership('Super-Administrator')) or (  ( auth.has_membership('Teacher') or (request.vars['type'] == 'class' and auth.has_membership('Student') and exception_s_var == True) ) ) and (course_ended == True)):}}
                 <li>
-                    <a  style="color:white;text-shadow:none;background:#01A9DB;" class="btn-btn" href="{{=URL('activity_control', 'course_first_recovery_test',vars=dict(project = request.vars['project'], period = request.vars['period']))}}">
+                    <a  style="color:white;text-shadow:none;background:#01A9DB;" class="btn-btn" href="{{=URL('activity_control', 'course_first_recovery_test',vars=dict(project = request.vars['project'], year = request.vars['period']))}}">
                         <span class="icon-white icon-cog"></span>
-                        {{=T('Management First Recovery Test')}}
+                        {{=T('First Recovery Test')}}
                     </a>
                 </li>
             
                 </li>
             {{pass}}
 
-            {{if (request.vars['op']  == '3') and ((auth.has_membership('Ecys-Administrator') or auth.has_membership('Super-Administrator')) or (  ( auth.has_membership('Teacher') or (request.vars['type'] == 'class' and auth.has_membership('Student') and activityPermition>0) ) ) and (course_ended == True)):}}
+            {{if (request.vars['op']  == '3') and ((auth.has_membership('Ecys-Administrator') or auth.has_membership('Super-Administrator')) or (  ( auth.has_membership('Teacher') or (request.vars['type'] == 'class' and auth.has_membership('Student') and exception_s_var == True) ) ) and (course_ended == True)):}}
                 <li>
-                    <a  style="color:white;text-shadow:none;background:#04B4AE;" class="btn-btn" href="{{=URL('activity_control', 'course_second_recovery_test',vars=dict(project = request.vars['project'], period = request.vars['period']))}}">
+                    <a  style="color:white;text-shadow:none;background:#04B4AE;" class="btn-btn" href="{{=URL('activity_control', 'course_second_recovery_test',vars=dict(project = request.vars['project'], year = request.vars['period']))}}">
                         <span class="icon-white icon-cog"></span>
-                        {{=T('Management Second Recovery Test')}}
+                        {{=T('Second Recovery Test')}}
                     </a>
                 </li>
             
@@ -78,7 +70,10 @@
             {{if no_menu==False:}}
                 <li>
                     <a style="color:white;text-shadow:none;" class="btn-warning" href="#" onclick="click_botton();"><i class="icon-warning-sign icon-white"></i> 
-                        {{=T('Generate Document')}} {{=T('Format Technical School')}} (CSV)
+                        {{=T('Generate Document')}} {{=T('Format Technical School')}} (CSV)  
+                        {{if course_ended == False:}}
+                            | <small>{{=T('Finish course')}}</small>
+                        {{pass}}
                     </a>
                 </li>
                         
@@ -136,7 +131,7 @@
         <br>
         
 
-        
+        {{if request.vars['type']  == 'class':}}
         <br>
             <ul class="nav nav-tabs">
                 {{if (request.vars['op'] == None) or (request.vars['op']  == '1') or (request.vars['op']  == '0'):}}
@@ -148,33 +143,35 @@
                             {{=T(year.period.name)}} {{=str(year.yearp)}}
                         </a>
                     </li>
-                {{if request.vars['op']  == '2':}}
-                    <li class="active">
-                {{else:}}
-                    <li>
-                {{pass}}  
-                    {{if (course_ended == False):}}
-                        <a href="{{=URL(vars=dict(period= request.vars['period'], project = request.vars['project'], type = request.vars['type'], op = '0'))}}">
-                    {{else:}}          
-                        <a href="{{=URL(vars=dict(period= request.vars['period'], project = request.vars['project'], type = request.vars['type'], op = '2'))}}">
-                    {{pass}}
-                            {{=T('First recovery test')}}
-                        </a>
-                    </li>
-                {{if request.vars['op']  == '3':}}
-                    <li class="active">
-                {{else:}}
-                    <li>
-                {{pass}}                
-                     {{if (course_ended == False):}}
-                        <a href="{{=URL(vars=dict(period= request.vars['period'], project = request.vars['project'], type = request.vars['type'], op = '0'))}}">
-                    {{else:}}          
-                        <a href="{{=URL(vars=dict(period= request.vars['period'], project = request.vars['project'], type = request.vars['type'], op = '3'))}}">
-                    {{pass}}
-                            {{=T('Second recovery test')}}
-                        </a>
-                    </li>
+                    {{if request.vars['op']  == '2':}}
+                        <li class="active">
+                    {{else:}}
+                        <li>
+                    {{pass}}  
+                        {{if (course_ended == False):}}
+                            <a href="{{=URL(vars=dict(period= request.vars['period'], project = request.vars['project'], type = request.vars['type'], op = '0'))}}">
+                        {{else:}}          
+                            <a href="{{=URL(vars=dict(period= request.vars['period'], project = request.vars['project'], type = request.vars['type'], op = '2'))}}">
+                        {{pass}}
+                                {{=T('First recovery test')}}
+                            </a>
+                        </li>
+                    {{if request.vars['op']  == '3':}}
+                        <li class="active">
+                    {{else:}}
+                        <li>
+                    {{pass}}                
+                         {{if (course_ended == False):}}
+                            <a href="{{=URL(vars=dict(period= request.vars['period'], project = request.vars['project'], type = request.vars['type'], op = '0'))}}">
+                        {{else:}}          
+                            <a href="{{=URL(vars=dict(period= request.vars['period'], project = request.vars['project'], type = request.vars['type'], op = '3'))}}">
+                        {{pass}}
+                                {{=T('Second recovery test')}}
+                            </a>
+                        </li>
+                
             </ul>
+            {{pass}}
 
             
 
@@ -287,6 +284,64 @@
                                         </center>
                                     </td>
                                 {{pass}}
+                                {{if (request.vars['type'] == 'class' and request.vars['op']  == '2'):}}
+                                    <td bgcolor="#E6E6E6" class="rcatfirst_r_t" style="display:none;">
+                                        {{totalColumnsTable=totalColumnsTable+1}}
+                                        <center>
+                                            <b>
+                                                    {{=T("First recovery test")}}
+                                                    <br>
+                                                    100.00 pts
+                                            </b>
+                                        </center>
+                                    </td>
+                                    <td bgcolor="#E6E6E6">
+                                        {{totalColumnsTable=totalColumnsTable+1}}
+                                        <center>
+                                            <b>
+                                                <a id="btV_first_r_t" style="cursor:pointer;" onclick="visible_activities_gr('first_r_t');">
+                                                    {{=T("First recovery test")}}
+                                                    <br>
+                                                    {{=var_final_grade}} pts
+                                                </a>
+                                                <a id="btnNV_first_r_t" style="cursor:pointer; display:none;" onclick="no_visible_activities_gr('first_r_t');">
+                                                    {{=T("First recovery test")}}
+                                                    <br>
+                                                    {{=var_final_grade}} pts
+                                                </a>
+                                            </b>
+                                        </center>
+                                    </td>
+                                {{pass}}
+                                {{if (request.vars['type'] == 'class' and request.vars['op']  == '3'):}}
+                                    <td bgcolor="#E6E6E6" class="rcatsecond_r_t" style="display:none;">
+                                        {{totalColumnsTable=totalColumnsTable+1}}
+                                        <center>
+                                            <b>
+                                                    {{=T("Second recovery test")}}
+                                                    <br>
+                                                    100.00 pts
+                                            </b>
+                                        </center>
+                                    </td>
+                                    <td bgcolor="#E6E6E6">
+                                        {{totalColumnsTable=totalColumnsTable+1}}
+                                        <center>
+                                            <b>
+                                                <a id="btV_second_r_t" style="cursor:pointer;" onclick="visible_activities_gr('second_r_t');">
+                                                    {{=T("Second recovery test")}}
+                                                    <br>
+                                                    {{=var_final_grade}} pts
+                                                </a>
+                                                <a id="btnNV_second_r_t" style="cursor:pointer; display:none;" onclick="no_visible_activities_gr('second_r_t');">
+                                                    {{=T("Second recovery test")}}
+                                                    <br>
+                                                    {{=var_final_grade}} pts
+                                                </a>
+                                            </b>
+                                        </center>
+                                    </td>
+                                {{pass}}
                                 <td bgcolor="#2282A5">
                                     {{totalColumnsTable=totalColumnsTable+1}}
                                     <center>
@@ -300,6 +355,7 @@
                                         </b>
                                     </center>
                                 </td>
+                                
                             </tr>
                         </THEAD>
                         <TBODY>
@@ -476,6 +532,89 @@
                                                 </center>
                                             </td>
                                         {{pass}}
+
+                                        {{if request.vars['type'] == 'class' and request.vars['op'] =='2':}}
+                                            <td class="rcatfirst_r_t" width="100px" style="display:none;" bgcolor="#EEF6F9">
+                                                <center>
+                                                    
+                                                        {{var_first_recovery_test =db((db.course_first_recovery_test.carnet==t1.carnet)&(db.course_first_recovery_test.semester==period.id)&(db.course_first_recovery_test.project==project.id)).select().first()}}
+                                                        {{if var_first_recovery_test is not None:}}
+                                                            {{if var_first_recovery_test.grade < float(controlP.min_average):}}
+                                                                <FONT COLOR="#FA4545">
+                                                            {{elif var_first_recovery_test.grade>=float(controlP.min_average) and var_first_recovery_test.grade <= float(controlP.max_average):}}
+                                                                <FONT STYLE="color: #C5B911;">
+                                                            {{else:}}
+                                                                <FONT STYLE="color: Green; ">
+                                                            {{pass}}
+                                                                {{=round( (var_first_recovery_test.grade),2)}}                                                                
+                                                            </font>
+                                                        {{pass}}
+                                                    
+                                                </center>
+                                            </td>
+                                            <td width="100px" >
+                                                <center>
+                                                    
+                                                        {{var_first_recovery_test =db((db.course_first_recovery_test.carnet==t1.carnet)&(db.course_first_recovery_test.semester==period.id)&(db.course_first_recovery_test.project==project.id)).select().first()}}
+                                                        {{if var_first_recovery_test is not None:}}
+                                                            {{if var_first_recovery_test.grade < float(controlP.min_average):}}
+                                                                <FONT COLOR="#FA4545">
+                                                            {{elif var_first_recovery_test.grade>=float(controlP.min_average) and var_first_recovery_test.grade <= float(controlP.max_average):}}
+                                                                <FONT STYLE="color: #C5B911; text-shadow: -1px -1px 0 #F2F5A9, 1px -1px 0 #F2F5A9, -1px 1px 0 #F2F5A9, 1px 1px 0 #F2F5A9;   ">
+                                                            {{else:}}
+                                                                <FONT STYLE="color: Green; text-shadow: -1px -1px 0 #CBE9C4, 1px -1px 0 #CBE9C4, -1px 1px 0 #CBE9C4, 1px 1px 0 #CBE9C4;   ">
+                                                            {{pass}}
+
+                                                                {{=round( (var_first_recovery_test.grade)*var_final_grade/100,2)}}
+                                                                {{totalCarry=totalCarry+round( (var_first_recovery_test.grade)*var_final_grade/100,2)}}
+                                                            </font>
+                                                        {{pass}}
+                                                    
+                                                </center>
+                                            </td>
+                                        {{pass}}
+
+                                        {{if request.vars['type'] == 'class' and request.vars['op'] =='3':}}
+                                            <td class="rcatsecond_r_t" width="100px" style="display:none;" bgcolor="#EEF6F9">
+                                                <center>
+                                                    
+                                                        {{var_second_recovery_test =db((db.course_second_recovery_test.carnet==t1.carnet)&(db.course_second_recovery_test.semester==period.id)&(db.course_second_recovery_test.project==project.id)).select().first()}}
+                                                        {{if var_second_recovery_test is not None:}}
+                                                            {{if var_second_recovery_test.grade < float(controlP.min_average):}}
+                                                                <FONT COLOR="#FA4545">
+                                                            {{elif var_second_recovery_test.grade>=float(controlP.min_average) and var_second_recovery_test.grade <= float(controlP.max_average):}}
+                                                                <FONT STYLE="color: #C5B911;">
+                                                            {{else:}}
+                                                                <FONT STYLE="color: Green; ">
+                                                            {{pass}}
+                                                                {{=round( (var_second_recovery_test.grade),2)}}                                                                
+                                                            </font>
+                                                        {{pass}}
+                                                    
+                                                </center>
+                                            </td>
+                                            <td width="100px" >
+                                                <center>
+                                                    
+                                                        {{var_second_recovery_test =db((db.course_second_recovery_test.carnet==t1.carnet)&(db.course_second_recovery_test.semester==period.id)&(db.course_second_recovery_test.project==project.id)).select().first()}}
+                                                        {{if var_second_recovery_test is not None:}}
+                                                            {{if var_second_recovery_test.grade < float(controlP.min_average):}}
+                                                                <FONT COLOR="#FA4545">
+                                                            {{elif var_second_recovery_test.grade>=float(controlP.min_average) and var_second_recovery_test.grade <= float(controlP.max_average):}}
+                                                                <FONT STYLE="color: #C5B911; text-shadow: -1px -1px 0 #F2F5A9, 1px -1px 0 #F2F5A9, -1px 1px 0 #F2F5A9, 1px 1px 0 #F2F5A9;   ">
+                                                            {{else:}}
+                                                                <FONT STYLE="color: Green; text-shadow: -1px -1px 0 #CBE9C4, 1px -1px 0 #CBE9C4, -1px 1px 0 #CBE9C4, 1px 1px 0 #CBE9C4;   ">
+                                                            {{pass}}
+
+                                                                {{=round( (var_second_recovery_test.grade)*var_final_grade/100,2)}}
+                                                                {{totalCarry=totalCarry+round( (var_second_recovery_test.grade)*var_final_grade/100,2)}}
+                                                            </font>
+                                                        {{pass}}
+                                                    
+                                                </center>
+                                            </td>
+                                        {{pass}}
+
                                         <td>
                                             <center>
                                                 {{if request.vars['type'] == 'class' and existLab==True:}}
@@ -705,7 +844,19 @@
                         $(".rcat{{=str(category.category)}}").css("display", "none");
                     }
                 {{pass}}
-            {{pass}}    
+            {{pass}}
+            if (var_name=="first_r_t"){
+                    $("#btnNV_first_r_t").css("display", "none");
+                    $("#btV_first_r_t").css("display", "");
+                    $(".rcatfirst_r_t").css("display", "none");
+
+                }else{
+                    if (var_name=="second_r_t"){
+                        $("#btnNV_second_r_t").css("display", "none");
+                        $("#btV_second_r_t").css("display", "");
+                        $(".rcatsecond_r_t").css("display", "none");
+                    }
+                }    
         {{else:}}
             {{for category in LabCategory:}}
                 if (var_name=="{{=str(category.category)}}"){
@@ -727,7 +878,20 @@
                         $(".rcat{{=str(category.category)}}").css("display", "");
                     }
                 {{pass}}
-            {{pass}}    
+                
+
+            {{pass}}  
+            if (var_name=="first_r_t"){
+                    $("#btnNV_first_r_t").css("display", "");
+                    $("#btV_first_r_t").css("display", "none");
+                    $(".rcatfirst_r_t").css("display", "");
+                }else{
+                    if (var_name=="second_r_t"){
+                        $("#btnNV_second_r_t").css("display", "");
+                        $("#btV_second_r_t").css("display", "none");
+                        $(".rcatsecond_r_t").css("display", "");
+                    }
+                }  
         {{else:}}
             {{for category in LabCategory:}}
                 if (var_name=="{{=str(category.category)}}"){

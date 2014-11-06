@@ -1,0 +1,15 @@
+{{extend 'template.html'}}
+<div>
+	<a href="{{=URL('activity_control', 'General_report_activities', vars=dict(project = project.id, period = year.id, type = 'class', op='2'))}}" class="btn" ><i class="icon-arrow-left"></i> 
+		{{=T('Back')}}
+	</a>
+</div>
+<h2>
+	{{=T('First Recovery Test')}}
+	<br>
+	<small>
+		{{=project.name}} - {{=T(year.period.name)}} {{=str(year.yearp)}}
+    </small>
+</h2>
+
+{{=grid}}

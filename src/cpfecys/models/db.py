@@ -1033,6 +1033,52 @@ db.define_table('validate_laboratory_log',
     Field('date_log', 'datetime', notnull = True, default = datetime.datetime.now(), label = T('Date'))
 )
 
+db.define_table('course_first_recovery_test',
+    Field('carnet', 'reference academic', notnull=True, label=T('Carnet')),
+    Field('semester', 'reference period_year', notnull=True, label=T('Period')),
+    Field('project', 'reference project', notnull=True, label=T('Course')),
+    Field('grade', 'integer', notnull=True, label=T('Grade'), requires=IS_DECIMAL_IN_RANGE(0, 100))
+)
+
+db.define_table('course_first_recovery_test_log',    
+    Field('user_name', 'string', notnull = False, label = T('User Name')),
+    Field('roll', 'string', notnull = False, label = T('Role')),
+    Field('operation_log', 'string', notnull = False, label = T('Operation')),
+    Field('academic_id', 'string', notnull = False, label = T('Academic Assignation Id')),
+    Field('academic', 'string', notnull=False, label=T('Academic')),
+    Field('project', 'string', notnull=False, label=T('Course')),
+    Field('yearp', 'string', notnull=False, label=T('Year')),
+    Field('period', 'string', notnull=False, label=T('Period')),
+    Field('before_grade', 'integer', notnull=False, label=T('Grade Before')),
+    Field('after_grade', 'integer', notnull=False, label=T('Grade After')),
+    Field('description', 'text', notnull=False, label=T('Description')),
+    Field('id_course_first_recovery_test', 'text',notnull = False, label = T('id_course_first_recovery_test')),
+    Field('date_log', 'datetime', notnull = True, default = datetime.datetime.now(), label = T('Date'))
+)
+
+db.define_table('course_second_recovery_test',
+    Field('carnet', 'reference academic', notnull=True, label=T('Carnet')),
+    Field('semester', 'reference period_year', notnull=True, label=T('Period')),
+    Field('project', 'reference project', notnull=True, label=T('Course')),
+    Field('grade', 'integer', notnull=True, label=T('Grade'), requires=IS_DECIMAL_IN_RANGE(0, 100))
+)
+
+db.define_table('course_second_recovery_test_log',    
+    Field('user_name', 'string', notnull = False, label = T('User Name')),
+    Field('roll', 'string', notnull = False, label = T('Role')),
+    Field('operation_log', 'string', notnull = False, label = T('Operation')),
+    Field('academic_id', 'string', notnull = False, label = T('Academic Assignation Id')),
+    Field('academic', 'string', notnull=False, label=T('Academic')),
+    Field('project', 'string', notnull=False, label=T('Course')),
+    Field('yearp', 'string', notnull=False, label=T('Year')),
+    Field('period', 'string', notnull=False, label=T('Period')),
+    Field('before_grade', 'integer', notnull=False, label=T('Grade Before')),
+    Field('after_grade', 'integer', notnull=False, label=T('Grade After')),
+    Field('description', 'text', notnull=False, label=T('Description')),
+    Field('id_course_second_recovery_test', 'text',notnull = False, label = T('id_course_second_recovery_test')),
+    Field('date_log', 'datetime', notnull = True, default = datetime.datetime.now(), label = T('Date'))
+)
+
 db.define_table('course_requirement',
     Field('name', 'string', label = T('name')),
     Field('semester', 'reference period_year', notnull=True, label=T('Period')),
