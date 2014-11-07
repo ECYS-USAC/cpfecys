@@ -48,7 +48,7 @@ aria-hidden="true">{{=T('Close')}}</button>
     $("#course_requirement_student_carnet").find('option').remove().end();
     var lista=document.getElementById("course_requirement_student_carnet");
     lista.options.add(new Option("",""));
-    {{for students in db((db.academic_course_assignation.semester==request.vars['period'])&(db.academic_course_assignation.assignation==request.vars['project'])).select():}}
+    {{for students in students:}}
       lista.options.add(new Option({{=str(students.carnet.carnet)}},{{=students.carnet}}));
     {{pass}}
   });

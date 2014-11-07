@@ -9,15 +9,14 @@
 		{{=project.name}} - {{=T(year.period.name)}} {{=str(year.yearp)}}
     </small>
 </h2>
-<font Color="Red"><b>La revalidación sera valida unicamente si el registro existe en Centro de Calculo</b></font>
-<div id="desAdmin"></div>
+<font Color="Red"><b>{{=T('Revalidation shall be valid only if the record exists in Computer Centre')}}</b></font>
 {{=grid}}
 <script type="text/javascript">
 	$(document).ready(function(){
 		$("#validate_laboratory_carnet").find('option').remove().end();
 		var lista=document.getElementById("validate_laboratory_carnet");
 		lista.options.add(new Option("",""));
-		{{for students in db((db.academic_course_assignation.semester==request.vars['year'])&(db.academic_course_assignation.assignation==request.vars['project'])).select():}}
+		{{for students in students:}}
 			lista.options.add(new Option({{=str(students.carnet.carnet)}},{{=students.carnet}}));
 		{{pass}}
 	});

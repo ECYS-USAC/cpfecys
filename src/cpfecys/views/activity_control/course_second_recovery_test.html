@@ -13,3 +13,15 @@
 </h2>
 
 {{=grid}}
+
+<script type="text/javascript">
+	$(document).ready(function(){
+		$("#course_second_recovery_test_carnet").find('option').remove().end();
+		var lista=document.getElementById("course_second_recovery_test_carnet");
+		lista.options.add(new Option("",""));
+		
+		{{for studentsOnly in students:}}
+			lista.options.add(new Option({{=str(studentsOnly.carnet.carnet)}},{{=studentsOnly.carnet}}));
+		{{pass}}
+	});
+</script>

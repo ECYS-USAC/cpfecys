@@ -1642,7 +1642,12 @@ def validate_laboratory():
         else:
             session.flash = T('Not valid Action.')
             redirect(URL('default','index'))
-        return dict(year = year, project = project, grid=grid)
+
+        academic_assig3 = db((db.academic.id==db.academic_course_assignation.carnet)&(db.academic_course_assignation.semester == request.vars['year']) & (db.academic_course_assignation.assignation==request.vars['project'])).select(orderby=db.academic.carnet)
+        students=[]
+        for acaT in academic_assig3:
+            students.append(acaT.academic_course_assignation)
+        return dict(year = year, project = project, grid=grid, students=students)
     else:
         #Grid
         grid=None
@@ -1676,7 +1681,13 @@ def validate_laboratory():
         else:
             session.flash = T('Not valid Action.')
             redirect(URL('default','index'))
-        return dict(year = year, project = project, grid=grid)
+        
+        academic_assig3 = db((db.academic.id==db.academic_course_assignation.carnet)&(db.academic_course_assignation.semester == request.vars['year']) & (db.academic_course_assignation.assignation==request.vars['project'])).select(orderby=db.academic.carnet)
+        students=[]
+        for acaT in academic_assig3:
+            students.append(acaT.academic_course_assignation)
+
+        return dict(year = year, project = project, grid=grid, students=students)
 
 
 
@@ -2174,7 +2185,12 @@ def course_first_recovery_test():
         session.flash = T('Not valid Action.')
         redirect(URL('default','index'))
 
-    return dict(year = year, project = project, grid=grid)
+    academic_assig3 = db((db.academic.id==db.academic_course_assignation.carnet)&(db.academic_course_assignation.semester == request.vars['year']) & (db.academic_course_assignation.assignation==request.vars['project'])).select(orderby=db.academic.carnet)
+    students=[]
+    for acaT in academic_assig3:
+        students.append(acaT.academic_course_assignation)
+    
+    return dict(year = year, project = project, grid=grid,students=students)
 
 
 
@@ -2499,7 +2515,13 @@ def course_second_recovery_test():
     else:
         session.flash = T('Not valid Action.')
         redirect(URL('default','index'))
-    return dict(year = year, project = project, grid=grid)
+
+    academic_assig3 = db((db.academic.id==db.academic_course_assignation.carnet)&(db.academic_course_assignation.semester == request.vars['year']) & (db.academic_course_assignation.assignation==request.vars['project'])).select(orderby=db.academic.carnet)
+    students=[]
+    for acaT in academic_assig3:
+        students.append(acaT.academic_course_assignation)
+
+    return dict(year = year, project = project, grid=grid,students=students)
 
 
 
@@ -3938,7 +3960,12 @@ def management_approval_students_requirement():
     else:
         session.flash = T('Not valid Action.')
         redirect(URL('default','index'))
-    return dict(project = project_var, year = year, requirement=requirement, grid=grid)
+
+    academic_assig3 = db((db.academic.id==db.academic_course_assignation.carnet)&(db.academic_course_assignation.semester == request.vars['period']) & (db.academic_course_assignation.assignation==request.vars['project'])).select(orderby=db.academic.carnet)
+    students=[]
+    for acaT in academic_assig3:
+        students.append(acaT.academic_course_assignation)
+    return dict(project = project_var, year = year, requirement=requirement, grid=grid, students=students)
 
 
 
