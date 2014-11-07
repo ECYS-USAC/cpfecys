@@ -374,7 +374,7 @@
                                         <!--****************************************FILL THE GRADES OF THE STUDENT****************************************-->
                                         <!--COURSE ACTIVITIES-->
                                         {{for category in CourseCategory:}}
-                                            {{if category.category.category!="Laboratorio":}}
+                                            {{if category.category.category!="Laboratorio" and category.category.category!="Examen Final":}}
                                                 {{totalCategory=float(0)}}
                                                 {{totalActivities=0}}
                                                 {{for c in CourseActivities[posVCC]:}}
@@ -438,6 +438,76 @@
                                                         </b>
                                                         </font>
                                                     {{pass}}
+                                                    {{totalCarry=totalCarry+totalCategory}}
+                                                    </center>
+                                                </td>
+                                                {{posVCC=posVCC+1}}
+                                            {{elif category.category.category=="Examen Final":}}
+                                                {{totalCarry=int(round(totalCarry,0))}}
+                                                {{totalCategory=float(0)}}
+                                                {{totalActivities=0}}
+                                                {{for c in CourseActivities[posVCC]:}}
+                                                    <td class="rcat{{=str(category.category)}}" style="display:none;" bgcolor="#EEF6F9">
+                                                        <center>
+                                                            {{studentGrade = db((db.grades.activity==c.id)&(db.grades.academic_assignation==t1.id)).select().first()}}
+                                                            {{if studentGrade is None:}}
+                                                                {{totalCategory=totalCategory+float(0)}}
+                                                            {{else:}}
+                                                                {{if studentGrade.grade < float(controlP.min_average):}}
+                                                                    <FONT COLOR="#FA4545">
+                                                                {{elif studentGrade.grade>=float(controlP.min_average) and studentGrade.grade <= float(controlP.max_average):}}
+                                                                    <FONT COLOR="#C5B911">
+                                                                {{else:}}
+                                                                    <FONT COLOR="Green">
+                                                                {{pass}}
+                                                                        {{=studentGrade.grade}}
+                                                                </font>
+                                                                {{if category.specific_grade==True:}}
+                                                                    {{totalCategory=totalCategory+float((studentGrade.grade*c.grade)/100)}}
+                                                                {{else:}}
+                                                                    {{totalCategory=totalCategory+float(studentGrade.grade)}}
+                                                                {{pass}}
+                                                            {{pass}}
+                                                        </center>
+                                                    </td>
+                                                    {{totalActivities=totalActivities+1}}
+                                                {{pass}}
+                                                <td>
+                                                    <center>
+                                                    {{if category.specific_grade==True:}}
+                                                        {{checkGrade = float((totalCategory*float(100))/float(category.grade))}}
+                                                        {{if checkGrade < float(controlP.min_average):}}
+                                                            <FONT COLOR="#FA4545">
+                                                        {{elif checkGrade>=float(controlP.min_average) and checkGrade <= float(controlP.max_average):}}
+                                                            <FONT STYLE="color: #C5B911; text-shadow: -1px -1px 0 #F2F5A9, 1px -1px 0 #F2F5A9, -1px 1px 0 #F2F5A9, 1px 1px 0 #F2F5A9;   ">
+                                                        {{else:}}
+                                                            <FONT STYLE="color: Green; text-shadow: -1px -1px 0 #CBE9C4, 1px -1px 0 #CBE9C4, -1px 1px 0 #CBE9C4, 1px 1px 0 #CBE9C4;   ">
+                                                        {{pass}}
+                                                        
+                                                        {{=str(round(totalCategory,2))}}
+
+                                                        </b>
+                                                        </font>
+                                                    {{else:}}
+                                                        {{if totalActivities==0:}}
+                                                            {{totalActivities=1}}
+                                                        {{pass}}
+                                                        {{totalActivities=totalActivities*100}}
+                                                        {{totalCategory=float((totalCategory*float(category.grade))/float(totalActivities))}}
+                                                        {{checkGrade = float((totalCategory*float(100))/float(category.grade))}}
+                                                        {{if checkGrade < float(controlP.min_average):}}
+                                                            <FONT COLOR="#FA4545">
+                                                        {{elif checkGrade>=float(controlP.min_average) and checkGrade <= float(controlP.max_average):}}
+                                                            <FONT STYLE="color: #C5B911; text-shadow: -1px -1px 0 #F2F5A9, 1px -1px 0 #F2F5A9, -1px 1px 0 #F2F5A9, 1px 1px 0 #F2F5A9;   ">
+                                                        {{else:}}
+                                                            <FONT STYLE="color: Green; text-shadow: -1px -1px 0 #CBE9C4, 1px -1px 0 #CBE9C4, -1px 1px 0 #CBE9C4, 1px 1px 0 #CBE9C4;   ">
+                                                        {{pass}}
+                                                        
+                                                        {{=str(round(totalCategory,2))}}
+                                                        </b>
+                                                        </font>
+                                                    {{pass}}
+                                                    {{totalCategory=int(round(totalCategory,0))}}
                                                     {{totalCarry=totalCarry+totalCategory}}
                                                     </center>
                                                 </td>

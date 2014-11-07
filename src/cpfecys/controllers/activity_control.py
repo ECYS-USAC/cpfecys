@@ -2928,7 +2928,7 @@ def Course_Format_Technical_School():
                     totalCategory=float((totalCategory*float(category.grade))/float(totalActivities))
                 totalCarry=totalCarry+totalCategory
                 posVCC=posVCC+1
-            elif category.category.category!="Examen Final":
+            elif category.category.category=="Examen Final":
                 totalCategory=float(0)
                 totalActivities=0
                 for c in CourseActivities[posVCC]:
@@ -3196,7 +3196,7 @@ def general_report_activities_export():
             #<!--****************************************FILL THE GRADES OF THE STUDENT****************************************-->
             #<!--COURSE ACTIVITIES-->
             for category in CourseCategory:
-                if category.category.category!="Laboratorio":
+                if category.category.category!="Laboratorio" and category.category.category!="Examen Final":
                     totalCategory=float(0)
                     totalActivities=0
                     for c in CourseActivities[posVCC]:
@@ -3223,6 +3223,36 @@ def general_report_activities_export():
                         t.append(str(round(totalCategory,2)))
                     totalCarry=totalCarry+totalCategory
                     posVCC=posVCC+1
+                elif category.category.category=="Examen Final":
+                    totalCarry=int(round(totalCarry,0))
+                    totalCategory=float(0)
+                    totalActivities=0
+                    for c in CourseActivities[posVCC]:
+                        studentGrade = db((db.grades.activity==c.id)&(db.grades.academic_assignation==t1.id)).select().first()
+                        if studentGrade is None:
+                            totalCategory=totalCategory+float(0)
+                            t.append('')
+                        else:
+                            if category.specific_grade==True:
+                                t.append(str(studentGrade.grade))
+                                totalCategory=totalCategory+float((studentGrade.grade*c.grade)/100)
+                            else:
+                                t.append(str(studentGrade.grade))
+                                totalCategory=totalCategory+float(studentGrade.grade)
+                        totalActivities=totalActivities+1
+
+                    if category.specific_grade==True:
+                        t.append(str(round(totalCategory,2)))
+                    else:
+                        if totalActivities==0:
+                            totalActivities=1
+                        totalActivities=totalActivities*100
+                        totalCategory=float((totalCategory*float(category.grade))/float(totalActivities))
+                        t.append(str(round(totalCategory,2)))
+                    totalCategory=int(round(totalCategory,0))
+                    totalCarry=totalCarry+totalCategory
+                    posVCC=posVCC+1
+
 
             if request.vars['type'] == 'class' and existLab==True:
                 totalCategory=float(0)
