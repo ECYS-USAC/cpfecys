@@ -151,11 +151,50 @@ def auto_freeze():
     db.commit()
 
 
-def funcionPrueba():
+def check_exception_semester_repeat():
     import datetime
-    db.course_limit_exception.insert(project = 1, semester_repet=True, date_finish=datetime.datetime.now())
-    db.course_limit_exception.insert(project = 2, semester_repet=True, date_finish=datetime.datetime.now())
-    db.course_limit_exception.insert(project = 3, semester_repet=True, date_finish=datetime.datetime.now())
+    import cpfecys
+    cperiod = cpfecys.current_year_period()
+    year = str(cperiod.yearp)
+    cdate = datetime.datetime.now()
+    compareDate = datetime.datetime(cdate.year, cdate.month, cdate.day)
+    #compareDate = datetime.strptime( + '-'+cdate.month+'-'+cdate.day, "%Y-%m-%d")
+    if cperiod.period == 1:
+        #Period
+        initSemester = datetime.strptime(year + '-01-01', "%Y-%m-%d")
+        #Time exception for the courses
+        extraTime = datetime.strptime(year + '-03-01', "%Y-%m-%d")
+
+        if compareDate==initSemester:
+            db(db.course_limit_exception.semester_repet==False).delete()
+            db(db.course_limit_exception.semester_repet==True).update(date_finish=extraTime)
+        else:			
+            exceptions = db((db.course_limit_exception.date_finish<initSemester)).select()
+            if exceptions.first() is not None:
+                for exception in exceptions:
+                    if exception.semester_repet==True:
+                        db(db.course_limit_exception.id==exception.id).update(date_finish=extraTime)
+                    else:
+                        db(db.course_limit_exception.id==exception.id).delete()
+    else:
+        #Period
+        #initSemester = datetime.strptime(year + '-06-01', "%Y-%m-%d")
+        initSemester = datetime.datetime(cdate.year, 6, 1)
+        #Time exception for the courses
+        #extraTime = datetime.strptime(year + '-09-01', "%Y-%m-%d")
+        extraTime = datetime.datetime(cdate.year, 9, 1)
+
+        if compareDate==initSemester:
+            db(db.course_limit_exception.semester_repet==False).delete()
+            db(db.course_limit_exception.semester_repet==True).update(date_finish=extraTime)
+        else:
+            exceptions = db((db.course_limit_exception.date_finish<initSemester)).select()
+            if exceptions.first() is not None:
+                for exception in exceptions:
+                    if exception.semester_repet==True:
+                        db(db.course_limit_exception.id==exception.id).update(date_finish=extraTime)
+                    else:
+                        db(db.course_limit_exception.id==exception.id).delete()	
     db.commit()
 
 
@@ -322,7 +361,7 @@ def auto_daily():
                              success = was_sent)
     db.commit()
     auto_freeze()
-    funcionPrueba()
+    check_exception_semester_repeat()
     return T('Total Updated Reports: ') + str(total_recheckies + total_drafties + missed_reports) + ' ' + \
             T('Automatically Updated Draft Reports: ') + str(total_drafties) + ' ' + \
             T('Automatically Updated Recheck Reports: ') + str(total_recheckies) + ' ' + \
