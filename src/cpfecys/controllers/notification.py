@@ -197,7 +197,7 @@ def teacher_send_mail_to_students(users1, users2, message, subject, check, semes
     control = 0
     #Log General del Envio
     row = db.notification_general_log4.insert(subject=subject,
-                                        sent_message=message,
+                                        sent_message=message + attachment_m,
                                         emisor=check.assigned_user.username,
                                         course=check.project.name,
                                         yearp=year,
@@ -207,7 +207,6 @@ def teacher_send_mail_to_students(users1, users2, message, subject, check, semes
     email_list_log=""
     if users1 != None:
         for user in users1:
-            print user.email
             if user.email != None and user.email != '':
                 if ListadoCorreos == None:
                     ListadoCorreos = []
@@ -220,7 +219,6 @@ def teacher_send_mail_to_students(users1, users2, message, subject, check, semes
 
     if users2 != None:
         for user in users2:
-            print user.email
             if user.email != None and user.email != '':
                 if ListadoCorreos == None:
                     ListadoCorreos = []
@@ -668,7 +666,7 @@ def send_mail_to_students(users, message, subject, check, semester, year):
     control = 0
     #Log General del Envio
     row = db.notification_general_log4.insert(subject=subject,
-                                        sent_message=message,
+                                        sent_message=message + attachment_m,
                                         emisor=check.assigned_user.username,
                                         course=check.project.name,
                                         yearp=year,
@@ -677,7 +675,6 @@ def send_mail_to_students(users, message, subject, check, semester, year):
     ListadoCorreos = None
     email_list_log=""
     for user in users:
-        print user.email
         if user.email != None and user.email != '':
             if ListadoCorreos == None:
                 ListadoCorreos = []

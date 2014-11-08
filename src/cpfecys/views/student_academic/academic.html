@@ -5,7 +5,33 @@
 		$("#w2p_keywords").prop("type", "hidden");
 		var input1Str = '<input type="text" id="search_var" name="search_var">';
 		$(input1Str).insertAfter("#w2p_keywords");
+
+
 	}); 
+	function set_values(var_id){
+
+		if(var_id != "None"){
+			$("#img_div").show(1000);
+			$("#img_div").load("{{=URL('student_academic','photo.load')}}?id_user="+var_id);
+		}else{
+			$("#img_div").hide();
+		}
+		
+	}
 </script>
 
 {{=grid}}
+
+<!-- PIC MODAL -->
+<div id="picModal" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true" style="height:75%; width:30%; left:55%; overflow:auto;"> 
+    <div id ="a" class="modal-header">
+      <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+        <h3 id="myModalLabel">
+            <span class="icon-picture"></span>
+            {{=T('View photo')}}
+        </h3>
+    </div>    
+		<div align="center" id="img_div">          
+		</div>
+</div>
+<!-- PIC MODAL -->

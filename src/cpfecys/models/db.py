@@ -123,7 +123,11 @@ auth.settings.extra_fields['auth_user']= [
                   Field('data_updated', 'boolean', notnull=False, \
                     writable=False, readable=False),
                   Field('load_alerted', 'boolean', notnull=False, \
-                    writable=False, readable=False),]
+                    writable=False, readable=False),
+                  Field('photo', 'upload', notnull=False, label = T('Photo'), \
+                    requires=[IS_UPLOAD_FILENAME(extension = '(png|jpg)',\
+                    error_message=T('Only files are accepted with extension') +\
+                    ' png|jpg'),IS_LENGTH(2097152,error_message=T('The maximum file size is')+' 2MB')]),]
 
 crud, service, plugins = Crud(db), Service(), PluginManager()
 
@@ -645,7 +649,9 @@ db.define_table('public_event_schedule',
 db.define_table('academic',
         Field('carnet', 'integer', unique=True, notnull=True, label=T('carnet')),
         Field('email', 'string', notnull=True, requires = IS_EMAIL(error_message='El email no es valido')),
+        Field('id_auth_user', 'integer', notnull = False),
         format='%(carnet)s')
+
 
 #Tabla de asignacion de alumnos al curso
 db.define_table('academic_course_assignation',
@@ -790,6 +796,7 @@ db.define_table('course_activity_without_metric',
     Field('teacher_permition', 'boolean', notnull=True, label = T('Teacher Permition')),
     Field('date_start', 'date', notnull = True, default = datetime.datetime.now(), label = T('Date'))
     )
+
 
 db.define_table('course_activity_log',
     Field('user_name', 'string', notnull = False, label = 'Usuario'),
@@ -1009,6 +1016,136 @@ db.define_table('request_change_grade_d_log',
     Field('before_grade', 'decimal(5,2)', notnull=False, label=T('Before Grade')),
     Field('after_grade', 'decimal(5,2)', notnull=False, label=T('After Grade'))
     )
+
+db.define_table('academic_send_mail_log',
+    Field('subject', 'text', notnull = True, label = T('Asunto')),
+    Field('sent_message', 'text', notnull = True, label = T('Sent Message')),
+    Field('time_date', 'datetime', notnull = True,
+          default = datetime.datetime.now(), label = T('Sent Time')),
+    Field('emisor', 'text', notnull=True, label=T('Emisor')),
+    Field('course', 'text', notnull=True, label=T('Curso')),
+    Field('yearp', 'text', notnull=True, label=T('yearp')),
+    Field('period', 'text', notnull=True, label=T('Periodo')),
+    Field('email_list', 'text', notnull=True, label=T('Email List')),
+    Field('mail_state', 'text', notnull=True, label=T('State'))
+    )
+
+db.define_table('read_mail',
+    Field('id_auth_user', 'integer',notnull = True, label = T('id_auth_user')),
+    Field('id_mail', 'integer',notnull = True, label = T('id_mail'))
+    )
+
+
+db.academic._after_insert.append(lambda f,id: academic_insert(f,id))
+db.academic._after_update.append(lambda s,f: academic_update(f))
+db.academic._before_delete.append(lambda s: academic_delete(s))
+
+db.auth_user._after_update.append(lambda s,f: auth_user_update(f,s))
+db.auth_user._before_delete.append(lambda s: auth_user_delete(s))
+
+def split_num(var):
+    var_arg = str(var)
+    (first_part, second_part) = str(var_arg).split('=')
+    (result,garbage) = str(second_part).split(')')
+    return result
+
+##############################AUTH_USER TRIGGERS####################################
+def auth_user_update(*args):    
+    try:
+        academic_var = db.academic(db.academic.carnet==args[0]['username'])
+        db(db.academic.id == academic_var.id).update(id_auth_user = str(int(split_num(args[1]))),
+                                                    email = str(args[0]['email']))
+        #log
+        import cpfecys
+        cperiod = cpfecys.current_year_period()
+        db.academic_log.insert(user_name = 'system',
+                        roll = 'system',
+                        operation_log = 'update', 
+                        before_carnet = args[0]['username'],
+                        before_email = academic_var.email,
+                        after_carnet = args[0]['username'],
+                        after_email = str(args[0]['email']),
+                        id_period = cperiod,
+                        description = T('Registration data was update because auth_user was update'))
+    except:
+        None       
+
+def auth_user_delete(*args):    
+    try:                
+        auth_user_var = db.auth_user(db.auth_user.id == str(int(split_num(args[0]))))
+        academic_var = db.academic(db.academic.carnet==str(auth_user_var.username))        
+        if academic_var != None:
+            db(db.academic.id==academic_var.id).delete()
+            import cpfecys
+            cperiod = cpfecys.current_year_period()
+            db.academic_log.insert(user_name = 'system',
+                            roll = 'system',
+                            operation_log = 'delete', 
+                            before_carnet = academic_var.carnet, 
+                            before_email = academic_var.email,  
+                            id_period = cperiod,
+                            description = T('Registration data was deleted because auth_user was remove'))
+    except:
+        None                                 
+##############################ACADEMIC TRIGGERS####################################
+def academic_delete(*args):    
+    try:                
+        academic_var = db.academic(db.academic.id == str(int(split_num(args[0]))))
+        user_var = db.auth_user(db.auth_user.username==str(academic_var.carnet))
+        
+        if user_var != None:
+            academic_var = db.auth_group(db.auth_group.role=='Academic')
+            membership_var = db.auth_membership((db.auth_membership.user_id==user_var.id) & (db.auth_membership.group_id==academic_var.id))
+            db(db.auth_membership.id==membership_var.id).delete()
+    except:
+        None
+
+def academic_update(*args):
+    None
+
+def academic_insert(*args):
+    academic_var = db.auth_group(db.auth_group.role=='Academic')
+    user_var = db.auth_user(db.auth_user.username==str(args[0]['carnet']))
+    if user_var is None:
+        #AQUI IRIA LA VALIDACION CON EL WEBSERVICE
+        #If not exists, create auth_user of academic
+        id_user = db.auth_user.insert(first_name = str(args[0]['carnet']),
+                        last_name =  " ",
+                        email = str(args[0]['email']),
+                        username = str(args[0]['carnet']),
+                        phone = '12345678',
+                        home_address = T('Enter your address'))
+        #Add the id_auth_user to academic.
+        db(db.academic.id == args[1]['id']).update(id_auth_user = id_user.id)
+        #Create membership to academic
+        db.auth_membership.insert(user_id = id_user.id, group_id =  academic_var.id)   
+    else:
+        membership_var = db.auth_membership((db.auth_membership.user_id==user_var.id) & (db.auth_membership.group_id==academic_var.id))
+        if membership_var is None:
+            #Create membership to academic
+            db.auth_membership.insert(user_id = user_var.id, group_id =  academic_var.id) 
+
+        #Add the id_auth_user to academic. And update academic inforamtion  
+        db(db.academic.id == args[1]['id']).update(id_auth_user = user_var.id,
+                                                email = user_var.email,
+                                                carnet = user_var.username)
+        #academic_LOG 
+        import cpfecys
+        cperiod = cpfecys.current_year_period()
+        db.academic_log.insert(user_name = 'system',
+                            roll = 'system',
+                            operation_log = 'update', 
+                            before_carnet = str(args[0]['carnet']), 
+                            before_email = str(args[0]['email']), 
+                            after_carnet = user_var.username, 
+                            after_email = user_var.email, 
+                            id_academic = args[1]['id'], 
+                            id_period = cperiod,
+                            description = T('Registration data was updated, set with the information entered by the administrator'))
+##############################ACADEMIC TRIGGERS####################################
+
+        
+
 
 db.define_table('validate_laboratory',
     Field('carnet', 'reference academic', notnull=True, label=T('Carnet')),

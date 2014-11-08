@@ -1,0 +1,49 @@
+<div class="row-fluid" style="overflow:auto; height:330px;">
+
+<b>Asunto:</b>{{=mail_var.subject}}<br>
+<b>Mensaje:</b>{{=mail_var.sent_message}}<br><br>
+<b>Fecha de Envio:</b>{{=mail_var.time_date}}<br>
+{{if mail_var.mail_state == False:}}
+	<b>Estado mensaje:</b>Fallido<br>
+{{else:}}
+	<b>Estado mensaje:</b>Exitoso<br>
+{{pass}}
+<hr>
+
+	<table>
+	<td>
+		</center>
+		<b>Destinatarios:</b>
+		<center>
+	</td>
+		
+	</table>
+
+<div id="dest" style="height:200px; witdh:310px; overflow:auto;">
+<table class="table table-striped table-bordered">
+	<tbody>
+		{{for p in listadoC:}}
+			<tr>
+				<td width="60%">
+					{{
+					try:
+						var_user = db(db.auth_user.email==p).select().first()
+						var_result = var_user.first_name + ' ' + var_user.last_name
+						=var_result
+					except:
+						=''
+					pass
+
+
+					}}
+				</td>
+				<td width="60%">
+					{{=p}}
+				</td>
+			</tr>
+		{{pass}}
+	<tbody>
+</table>
+</div>
+</div>
+

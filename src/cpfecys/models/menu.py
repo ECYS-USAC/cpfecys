@@ -150,7 +150,15 @@ if not (auth.is_logged_in()):
     user_menu.append((T('Events'), False, URL(), [
         (T('View Events'), False, URL('default','events'), []),
         ]))
- 
+
+if auth.has_membership(role="Academic"):
+    user_menu.append((T('Mail'), False, URL(), [
+    (T('Inbox'), False, URL('notification_student','inbox'), []),
+    (T('Send Mail'), False, URL('notification_student','send_mail'), []),
+    (T('Sent Mails'), False, URL('notification_student','sent_mails'), []),
+    ]))
+
+
 if auth.has_membership(role="Super-Administrator"):
     user_menu.append((T('Academic'), False, URL(), [
     (T('General List of Academic'), False, URL('student_academic','academic'), []),    
@@ -171,8 +179,7 @@ if auth.has_membership(role="Super-Administrator"):
         ]))
     ]))
 
-    
-if auth.has_membership(role="Student") or auth.has_membership(role="Teacher"):
+if auth.has_membership(role="Student") or auth.has_membership(role="Teacher") or auth.has_membership(role="Academic"):
     user_menu.append((T('Library'), False, URL('library','file_managers',vars=dict(tipo=0, pro=0)), []),)
 if auth.has_membership(role="Teacher"):
     user_menu.append((T('Notices'), False, URL(), [

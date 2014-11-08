@@ -1,0 +1,47 @@
+<table class="table table-striped table-bordered">
+	<thead>
+		<th>
+			{{=T('Subject')}}
+		</th>
+		<th>
+			{{=T('sent_message')}}
+		</th>
+		<th>
+			{{=T('Sent Time')}}
+		</th>
+		<th>
+			{{=T('Detail')}}
+		</th>
+	</thead>
+	<tbody>
+		{{for n in range(len(notices)-1, -1, -1):}}
+			<tr>
+				<td>
+					{{=notices[n].subject[0:30]}}...
+				</td>
+				<td>
+					{{=notices[n].sent_message[0:100]}}...
+				</td>
+				<td>
+					{{=notices[n].time_date}}
+				</td>
+				<td>
+					<center>
+					<a id="notice{{=notices[n].id}}" href="#detail_modal" role="button" class="btn btn-primary" data-toggle="modal"> 
+						<i class="icon-eye-open"></i> {{=T('Detail')}}
+					</a>
+					</center>
+				</td>
+			</tr>
+		{{pass}}
+	<tbody>
+</table>
+<script type="text/javascript">
+    $(document).ready(function(){
+        {{for n in notices:}}
+            $("#notice{{=n.id}}").click(function(){         
+                $("#detalle").load('{{=URL('notification_student','register_mail_detail.load')}}',{notice: {{=n.id}}});
+            })
+        {{pass}}
+    })
+</script>

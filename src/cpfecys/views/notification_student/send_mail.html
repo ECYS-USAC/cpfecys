@@ -1,0 +1,193 @@
+{{extend 'template.html'}}
+
+<!-- //Additional Scripts for MARKMIN -->
+<div class="row-fluid">
+    <div class="well span12" id="principal_div">
+    	
+	<form action="{{=URL('notification_student', 'send_mail/send')}}" method="post">
+	  {{if email != None:}}
+	  	<fieldset>
+	  		<label for="subject">{{=T('To')}}</label>
+	  		<h4><small>{{=name}}</small></h4>
+	  		<input name="mail" type="hidden" value="{{=email}}">
+	  		<input name="name" type="hidden" value="{{=name}}">
+	  		<input name="remessage" type="hidden" value="{{=remessage}}">
+	  		<input name="retime" type="hidden" value="{{=retime}}">
+	  		<input name="resub" type="hidden" value="{{=resub}}">	
+	  		<input name="var_project_name" type="hidden" value="{{=var_project_name}}">
+
+	  		
+	  		  		
+	  	</fieldset>
+	  {{else:}}
+	  	<input name="var_course" id="var_course"  type="hidden" value="">
+		  <table>
+			<tr>
+				<td>
+				  <!--Courses list-->
+				  <h3>{{=T('My Courses')}}</h3>
+				  <div style="overflow:auto; width:75%; height:150px;">
+				  	<table class="table-striped table-bordered">						
+						{{for assignation in assignations:}}
+							<tr>
+				   	  		 	<td>
+				   	  				<input type="checkbox" class="tipo_trigger" name="course_list" id="c_l_{{=assignation.assignation.id}}" value="all">
+				   	  			</td>
+				   	  			<td >
+			   	  		    		{{=assignation.assignation.name}}
+			   	  		  		</td>
+				   	  		</tr>
+				   	  		<script type="text/javascript">
+				   	  			$("#c_l_{{=assignation.assignation.id}}").click(function(){
+				   	  				{{for assignation2 in assignations:}}
+				   	  					{{if assignation.id != assignation2.id:}}
+				   	  						$("#c_l_{{=assignation2.assignation.id}}").attr("checked", false);
+				   	  						$("#course_members_{{=assignation2.assignation.id}}").css("display", "none");
+				   	  					{{pass}}
+				   	  				{{pass}}
+				   	  				var var_check{{=assignation.assignation.id}} = document.getElementById('c_l_{{=assignation.assignation.id}}').checked;
+				   	  				if (var_check{{=assignation.assignation.id}}+"" == 'true'){
+				   	  					document.getElementById('var_course').value = "{{=assignation.assignation.name}}";
+				   	  					$("#course_members_{{=assignation.assignation.id}}").css("display", "block");	
+				   	  				}else{
+				   	  					document.getElementById('var_course').value = "";
+				   	  					$("#course_members_{{=assignation.assignation.id}}").css("display", "none");	
+				   	  				}
+									
+								})	
+				   	  		</script>
+				   	  					   	  		
+						{{pass}}
+				  	</table>
+				  </div>
+				  <!--Finish Courses list-->
+				</td>
+				<td><p>&nbsp;&nbsp;</p></td>
+					<td>
+						{{for assignation in assignations:}}
+							<div id="course_members_{{=assignation.assignation.id}}" style="display: none;">
+								<table>
+									<tr>									
+										<td>
+											<h3><small>{{=T('Academic Tutor')}}</small></h3>
+											<div style="overflow:auto; width:75%; height:150px;">
+											   	<!--course_members-->
+											   	<table class="table-striped table-bordered">							   		
+											   		{{for memb in db((db.user_project.period==cperiod.id) & (db.user_project.project==assignation.assignation.id) & (db.user_project.assigned_user == db.auth_membership.user_id) & (db.auth_membership.group_id==2) ).select():}}
+													  	<tr>
+													  	  <td>
+														    <input type="checkbox" 
+														    class="claboratorio" ="project" name="list_users"
+														    value="{{=memb.user_project.assigned_user.id}}">
+														  </td>
+														  <td>
+														  	{{=memb.user_project.assigned_user.first_name}} {{=memb.user_project.assigned_user.last_name}}
+														  </td>
+														</tr>
+												  	{{pass}}
+											  	</table>
+											</div>
+										</td>
+										<td>
+											<h3><small>{{=T('Teacher')}}</small></h3>
+											<div style="overflow:auto; width:75%; height:150px;">
+											   	<!--course_members-->
+											   	<table class="table-striped table-bordered">							   		
+											   		{{for memb in db((db.user_project.period==cperiod.id) & (db.user_project.project==assignation.assignation.id) & (db.user_project.assigned_user == db.auth_membership.user_id) & (db.auth_membership.group_id==3) ).select():}}
+													  	<tr>
+													  	  <td>
+														    <input type="checkbox" 
+														    class="claboratorio" ="project" name="list_users"
+														    value="{{=memb.user_project.assigned_user.id}}">
+														  </td>
+														  <td>
+														  	{{=memb.user_project.assigned_user.first_name}} {{=memb.user_project.assigned_user.last_name}}
+														  </td>
+														</tr>
+												  	{{pass}}
+											  	</table>
+											</div>
+
+										</td>
+									</tr>
+								</table>
+							</div>
+
+						{{pass}}
+					</td>
+				
+				
+			</tr>
+		  </table>
+		{{pass}}
+	  <fieldset>
+	  	<label for="subject">{{=T('Subject')}}</label>
+	  	{{if email != None:}}
+	    	<input type="hidden" id="subject" name="subject" value="Re: {{=resub}}">
+	    	<h3><small>Re: {{=resub}}</small><h3>
+	    {{else:}}
+	    	<input type="text" id="subject" name="subject">
+	    {{pass}}
+	    <label for="message">{{=T('Message')}}</label>
+	    <textarea id="message" name="message" rows="8" ></textarea>
+	    
+	    
+	    <button type="submit" class="btn btn-success">{{=T('Send')}}</button>
+	    
+	  </fieldset>
+	</form>
+	
+	</div>
+</div>
+
+
+
+
+<script type="text/javascript">
+	$(document).ready(function(){		
+		
+       });
+		
+		
+
+		
+
+		
+
+		
+
+		$("#specific").click(function(){
+			if ($("#specific").attr("checked")){
+			   $("#students_content").css("display", "block");
+			   $("#students_content2").css("display", "block");
+			}else{
+			   $("#students_content").css("display", "none");
+			   $("#students_content2").css("display", "none");
+			}
+			$("#all").attr("checked", false);
+			$("#slaboratorio").attr("checked", false);
+			$("#claboratorio").attr("checked", false);
+		})
+		$("#all").click(function(){
+			$("#students_content").css("display", "none");
+			$("#students_content2").css("display", "none");
+			$("#specific").attr("checked", false);
+			$("#slaboratorio").attr("checked", false);
+			$("#claboratorio").attr("checked", false);
+		})
+		$("#claboratorio").click(function(){
+			$("#students_content").css("display", "none");
+			$("#students_content2").css("display", "none");
+			$("#specific").attr("checked", false);
+			$("#all").attr("checked", false);
+			$("#slaboratorio").attr("checked", false);
+		})
+		$("#slaboratorio").click(function(){
+			$("#students_content").css("display", "none");
+			$("#students_content2").css("display", "none");
+			$("#specific").attr("checked", false);
+			$("#all").attr("checked", false);
+			$("#claboratorio").attr("checked", false);
+		})
+	});
+</script>
