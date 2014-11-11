@@ -16,6 +16,14 @@
 									{{pass}}
 									<option  onclick="refresh_period({{=per.semester.id}});" value="{{=per.semester.id}}" {{=var_sel}} >{{=T(per.semester.period.name)}} {{=per.semester.yearp}}</option>
 								{{pass}}
+								{{for per in period_list2:}}
+									{{if str(per.period.id) == str(period_id):}}
+										{{var_sel="selected='selected'"}}
+									{{else:}}
+										{{var_sel=''}}
+									{{pass}}
+									<option  onclick="refresh_period({{=per.period.id}});" value="{{=per.period.id}}" {{=var_sel}} >{{=T(per.period.period.name)}} {{=per.period.yearp}}</option>
+								{{pass}}
 							</select>
 						</td>
 						<td>
@@ -27,8 +35,8 @@
 	</tr>
 	<tr>
 		<td>
-			<div style=" height:300px; overflow:auto;">				
-				<table class="table table-striped table-bordered" >
+			<div style="  overflow:auto;">				
+				<table class="table table-bordered" >
 					
 					<tbody>
 						{{for assignation in assignations:}}							
@@ -41,22 +49,15 @@
 											{{	#SHOW JUST EMAILS SENDED TO ME
 												mine_var='false'
 												var_query = db.notification_log4(db.notification_log4.register==mails[a].id)
-												split_var1 = list(str(var_query).split("'"))
-												for x in split_var1:
-													split_var2 = list(str(x).split(","))
-													for xx in split_var2:
-														if str(xx) == str(email):
-															mine_var='true'
-														pass
+												
+												split_var2 = list(str(var_query).split(","))
+												for xx in split_var2:
+													if str(xx) == str(email):
+														mine_var='true'
 													pass
-													split_var2 = list(str(x).split("|"))
-													for xx in split_var2:
-														if str(xx) == str(email):
-															mine_var='true'
-														pass
-													pass
+												pass												
 
-												pass}}
+												}}
 											{{if mine_var=='true':}}
 												{{if db((db.read_mail.id_auth_user == auth.user.id) & (db.read_mail.id_mail == mails[a].id) ).select().first() == None:}}
 													{{cont_news = cont_news + 1}}
@@ -78,8 +79,90 @@
 												{{pass}}												
 											</tr>
 										</table>
+
+
+									{{if len(mails) <= 3:}}
+										<div id="mail_{{=assignation.assignation.id}}" style="display:none; overflow:auto;" >
+									{{else:}}
+										<div id="mail_{{=assignation.assignation.id}}" style="display:none; height:300px; overflow:auto;" >
+									{{pass}}									
+										{{=T('Loading')}}...
+									<div>
+								</td>
+
+							</tr>
+						{{pass}}
+
+						{{for course in coursesAdmin:}}							
+							<tr>
+								<td >
 									
-									<div id="mail_{{=assignation.assignation.id}}" style="display:none; height:200px; overflow:auto;" >
+										{{cont_news = 0}}
+										{{mails = db((db.academic_send_mail_log.yearp==course.user_project.period.yearp) & (db.academic_send_mail_log.period==course.user_project.period.period.name) & (db.academic_send_mail_log.course==course.user_project.project.name)).select()}}
+										{{for a in range(len(mails)-1, -1, -1):}}
+											{{	#SHOW JUST EMAILS SENDED TO ME
+												mine_var='false'
+												var_query = mails[a].email_list
+												
+												split_var2 = list(str(var_query).split(","))
+												for xx in split_var2:
+													if str(xx) == str(email):
+														mine_var='true'
+													pass
+												pass													
+
+												}}
+											{{if mine_var=='true':}}
+												{{if db((db.read_mail_student.id_auth_user == auth.user.id) & (db.read_mail_student.id_mail == mails[a].id) ).select().first() == None:}}
+													{{cont_news = cont_news + 1}}
+												{{pass}}
+											{{pass}}
+										{{pass}}
+
+
+										{{mails2 = db((db.notification_general_log4.yearp==course.user_project.period.yearp) & (db.notification_general_log4.period==course.user_project.period.period.name) & (db.notification_general_log4.course==course.user_project.project.name)).select()}}
+										{{for a in range(len(mails2)-1, -1, -1):}}
+											{{	#SHOW JUST EMAILS SENDED TO ME
+												mine_var='false'
+												var_query = db.notification_log4(db.notification_log4.register==mails2[a].id)
+												
+												split_var2 = list(str(var_query).split(","))
+												for xx in split_var2:
+													if str(xx) == str(email):
+														mine_var='true'
+													pass
+												pass												
+
+												}}
+											{{if mine_var=='true':}}
+												{{if db((db.read_mail.id_auth_user == auth.user.id) & (db.read_mail.id_mail == mails2[a].id) ).select().first() == None:}}
+													{{cont_news = cont_news + 1}}
+												{{pass}}
+											{{pass}}
+										{{pass}}
+
+										<table class="table table-striped table-bordered" >
+											<tr>
+												<td width="100%">
+													<span class="icon-book"></span> &nbsp 
+													<a style="cursor:pointer;" onclick="click_link2({{=course.user_project.project.id}});">
+														{{=course.user_project.project.name}}
+													</a>
+												</td>
+												{{if cont_news>0:}}
+													<td align="right">
+														<span id="information_text" class="badge btn-success">{{=T('New Mails')}} {{=cont_news}}</span> 
+													</td>
+												{{pass}}												
+											</tr>
+										</table>
+
+
+									{{if len(mails2) + len(mails) <= 3:}}
+										<div id="mail_{{=course.user_project.project.id}}" style="display:none; overflow:auto;" >
+									{{else:}}
+										<div id="mail_{{=course.user_project.project.id}}" style="display:none; height:300px; overflow:auto;" >
+									{{pass}}
 										{{=T('Loading')}}...
 									<div>
 								</td>
@@ -123,6 +206,11 @@
 	function click_link(var_id){
   		$("#mail_"+var_id).toggle(700);
   		$("#mail_"+var_id).load("{{=URL('notification_student','inbox_mails_load.html')}}?operation=mails_list&amp;email={{=email}}&amp;period_id={{=period_id}}&amp;project_id="+var_id);
+	}
+
+	function click_link2(var_id){
+  		$("#mail_"+var_id).toggle(700);
+  		$("#mail_"+var_id).load("{{=URL('notification_student','inbox_student_mails_load.html')}}?operation=mails_list&amp;email={{=email}}&amp;period_id={{=period_id}}&amp;project_id="+var_id);
 	}
 	
 </script>

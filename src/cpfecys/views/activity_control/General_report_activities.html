@@ -51,7 +51,7 @@
                 </li>
             {{pass}}
             
-            {{if (auth.has_membership('Super-Administrator') or auth.has_membership('Ecys-Administrator') or auth.has_membership('Teacher') or auth.has_membership('Student')):}}
+            {{if (auth.has_membership('Super-Administrator') or auth.has_membership('Ecys-Administrator') or auth.has_membership('Teacher') or auth.has_membership('Student') or auth.has_membership('Academic')):}}
                 <li>
                     <a style="color:white;text-shadow:none;" class="btn-success" href="{{=URL(vars=dict(project = project.id, period = year.id, list='True', type=request.vars['type']))}}"><i class="icon-download icon-white"></i>
                          {{=T('Export Report')}} (CSV)
@@ -903,6 +903,7 @@
     </div>
 </div>
 
+
 <script type="text/javascript">
     function no_visible_activities_gr(var_name){
         {{if request.vars['type'] == 'class':}}
@@ -980,4 +981,5 @@
             window.location.href = "{{=URL(vars=dict(project = project.id, period = year.id, list='False', type=request.vars['type']))}}";
         }
     }
+
 </script>

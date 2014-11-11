@@ -80,25 +80,73 @@ if auth.has_membership(role="Super-Administrator"):
     ])
 
 
-
-if auth.has_membership(role="Teacher"):
+cont_news = 0
+if auth.has_membership(role="Teacher") or auth.has_membership(role="Student"):
     var_count = 0
     var_count_report = 0
+
     projects = db(db.user_project.assigned_user == auth.user.id).select()
     for project in projects:
-        var_count = var_count + db((db.request_change_weighting.status=='pending')&(db.request_change_weighting.period==current_year_period().id)&(db.request_change_weighting.project==project.project)).count()
-        var_count = var_count + db((db.requestchange_activity.status=='pending')&(db.requestchange_activity.semester==current_year_period().id)&(db.requestchange_activity.course==project.project)).count()
-        var_count = var_count + db((db.request_change_grades.status=='pending')&(db.request_change_grades.period==current_year_period().id)&(db.request_change_grades.project==project.project)).count()
+        
+        mails = db((db.academic_send_mail_log.course==project.project.name)).select()
+        for a in range(len(mails)-1, -1, -1):
+            #SHOW JUST EMAILS SENDED TO ME
+            mine_var='false'
+            var_query = mails[a].email_list
+            
+            split_var2 = list(str(var_query).split(","))
+            for xx in split_var2:
+                if str(xx) == str(auth.user.email):
+                    mine_var='true'
+                pass
+            pass                                                    
+
+                
+            if mine_var=='true':
+                if db((db.read_mail_student.id_auth_user == auth.user.id) & (db.read_mail_student.id_mail == mails[a].id) ).select().first() == None:
+                    cont_news = cont_news + 1
+                pass
+            pass
+        pass
+
+        if auth.has_membership(role="Teacher"):
+            var_count = var_count + db((db.request_change_weighting.status=='pending')&(db.request_change_weighting.period==current_year_period().id)&(db.request_change_weighting.project==project.project)).count()
+            var_count = var_count + db((db.requestchange_activity.status=='pending')&(db.requestchange_activity.semester==current_year_period().id)&(db.requestchange_activity.course==project.project)).count()
+            var_count = var_count + db((db.request_change_grades.status=='pending')&(db.request_change_grades.period==current_year_period().id)&(db.request_change_grades.project==project.project)).count()
 
     pass
 
-    my_projects = db((db.user_project.assigned_user == auth.user.id)&(db.project.id == db.user_project.project)).select()
-    for project in my_projects:
-        for assignation in project.project.user_project.select():
-            q=((assignation.report((db.report.status == db.report_status.id)&((db.report_status.name == 'Grading')|(db.report_status.name == 'EnabledForTeacher')))))
-            var_count_report = var_count_report + q.count()
+    if auth.has_membership(role="Teacher"):
+        my_projects = db((db.user_project.assigned_user == auth.user.id)&(db.project.id == db.user_project.project)).select()
+        for project in my_projects:
+            for assignation in project.project.user_project.select():
+                q=((assignation.report((db.report.status == db.report_status.id)&((db.report_status.name == 'Grading')|(db.report_status.name == 'EnabledForTeacher')))))
+                var_count_report = var_count_report + q.count()
 
 
+if auth.has_membership(role="Academic"):
+    academic_var = db.academic(db.academic.id_auth_user==auth.user.id)
+    assignation_var = db((db.academic_course_assignation.carnet==academic_var.id)).select(db.academic_course_assignation.assignation,distinct=True)
+    for assignation in assignation_var:
+        for a in db((db.notification_general_log4.course==assignation.assignation.name)).select():
+            mine_var = False
+            var_query = db.notification_log4(db.notification_log4.register==a.id)
+            
+            split_var2 = list(str(var_query).split(","))
+            for xx in split_var2:
+                if str(xx) == str(auth.user.email):
+                    mine_var = True
+                pass
+            pass                                                
+                
+            if mine_var == True:
+                if db((db.read_mail.id_auth_user == auth.user.id) & (db.read_mail.id_mail == a.id) ).select().first() == None:
+                    cont_news = cont_news + 1
+                pass
+            pass
+        pass
+
+if auth.has_membership(role="Teacher"):
     response.menu.extend([(T('Courses'), False, URL(),[
              (T('Show Students'), False, URL('teacher', 'courses'), []),
              (T('Show Academic'), False, URL(), [
@@ -137,8 +185,21 @@ if auth.has_membership(role="Student"):
                 (T('Insert Events'), False, URL('default', 'event_edition'), []),
               ])
              ]),
-            (T('Academic Control')+"", False, URL('activity_control','courses_list'), []),
+            
     ])
+
+if auth.has_membership(role="Academic") or auth.has_membership(role="Student"):
+    response.menu.extend([
+        (T('Academic Control')+"", False, URL('activity_control','courses_list'), [])
+        ])
+
+
+if auth.has_membership(role="Teacher") or auth.has_membership(role="Student"):
+    if auth.has_membership(role="Academic") == False:
+        response.menu.extend([
+            (T('Inbox')+" ("+str(cont_news)+")", False, URL('notification_student','inbox'), [])
+        ])
+
 
 if auth.has_membership(role="DSI") and \
  not auth.has_membership(role="Super-Administrator"):
@@ -152,10 +213,10 @@ if not (auth.is_logged_in()):
         ]))
 
 if auth.has_membership(role="Academic"):
-    user_menu.append((T('Mail'), False, URL(), [
-    (T('Inbox'), False, URL('notification_student','inbox'), []),
-    (T('Send Mail'), False, URL('notification_student','send_mail'), []),
-    (T('Sent Mails'), False, URL('notification_student','sent_mails'), []),
+    user_menu.append((T('Messages')+" ("+str(cont_news)+")", False, URL(), [
+    (T('Inbox')+" ("+str(cont_news)+")", False, URL('notification_student','inbox'), []),
+    (T('Send Message'), False, URL('notification_student','send_mail'), []),
+    (T('Sent Messages'), False, URL('notification_student','sent_mails'), []),
     ]))
 
 

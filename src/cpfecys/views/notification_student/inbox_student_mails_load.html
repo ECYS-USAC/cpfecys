@@ -3,19 +3,20 @@
 
 		{{for a in range(len(mails)-1, -1, -1):}}
 			{{	#SHOW JUST EMAILS SENDED TO ME
+				
 				mine_var='false'
-				var_query = db.notification_log4(db.notification_log4.register==mails[a].id)
+				var_query = mails[a].email_list
 				
 				split_var2 = list(str(var_query).split(","))
+				
 				for xx in split_var2:
 					if str(xx) == str(request.vars['email']):
+						
 						mine_var='true'
 					pass
 				pass
-			}}
 				
-			
-			
+			}}
 			
 			{{if mine_var=='true':}}
 				<tr>
@@ -27,6 +28,7 @@
 									{{=mails[a].subject}}
 								</a>
 							</td>
+							
 							<td style="width:25%;">
 								{{
 									try:
@@ -38,13 +40,65 @@
 								{{=user_var.first_name}} {{=user_var.last_name}}
 							</td>
 							<td style="width:15%;">
-								{{format = "%a %d %b %Y"}}
-								{{=mails[a].time_date.strftime(format)}}
+								{{=mails[a].time_date}}
 							</td>
-							<td style="width:5%;">
-								{{format2 = "%H:%M:%S"}}
-								{{=mails[a].time_date.strftime(format2)}}
+							
+							<td style="width:7%;">
+								<center>
+									{{if db((db.read_mail_student.id_auth_user == auth_user) & (db.read_mail_student.id_mail == mails[a].id) ).select().first() == None:}}
+										<span id="information_text" class="badge btn-success">{{=T('New') }}</span> 
+									{{else:}}
+										<span id="information_text" class="badge btn-info">{{=T('Viewed') }}</span> 
+									{{pass}}
+								</center>
 							</td>
+						</table>
+					</td>
+				</tr>
+			{{pass}}
+		{{pass}}
+
+		{{mails=mails2}}
+		{{for a in range(len(mails)-1, -1, -1):}}
+			{{	#SHOW JUST EMAILS SENDED TO ME
+				mine_var='false'
+				var_query = db.notification_log4(db.notification_log4.register==mails[a].id)
+				
+				split_var2 = list(str(var_query).split(","))
+				for xx in split_var2:
+					if str(xx) == str(request.vars['email']):
+						mine_var='true'
+					pass
+				pass
+
+				
+			}}
+			
+			{{if mine_var=='true':}}
+				<tr>
+					<td  style="height:10px;" >
+						<table style="width:100%;" class="table table-striped table-bordered">
+							<td style="width:40%;">
+								<span class="icon-envelope"></span>  &nbsp
+								<a style="cursor:pointer;" onclick="view_mail_academic({{=mails[a].id}},'{{=request.vars['project_id']}}');"  role="button"  href="#mailModal" data-toggle="modal" data-target="#mailModal">
+									{{=mails[a].subject}}
+								</a>
+							</td>
+							
+							<td style="width:25%;">
+								{{
+									try:
+										user_var = db.auth_user(db.auth_user.username==mails[a].emisor)
+									except:
+										user_var = T("Not found")
+									pass
+								}}
+								{{=user_var.first_name}} {{=user_var.last_name}}
+							</td>
+							<td style="width:15%;">
+								{{=mails[a].time_date}}
+							</td>
+							
 							<td style="width:7%;">
 								<center>
 									{{if db((db.read_mail.id_auth_user == auth_user) & (db.read_mail.id_mail == mails[a].id) ).select().first() == None:}}
@@ -149,6 +203,12 @@
   	});
 
 	function view_mail(var_id, var_project_id){ 
+
+  		$("#mail_div").load("{{=URL('notification_student','inbox_student_mails_load.html')}}?operation=view_mail&amp;mail_id="+var_id+"&amp;var_project_id="+var_project_id);
+ 		
+	}
+
+	function view_mail_academic(var_id, var_project_id){ 
 
   		$("#mail_div").load("{{=URL('notification_student','inbox_mails_load.html')}}?operation=view_mail&amp;mail_id="+var_id+"&amp;var_project_id="+var_project_id);
  		

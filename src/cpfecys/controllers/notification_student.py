@@ -3,25 +3,53 @@
 #***************************************************************
 #***************************************************************
 @auth.requires_login()
-@auth.requires_membership('Academic')
+@auth.requires(auth.has_membership('Student') or auth.has_membership('Teacher') or auth.has_membership('Academic'))
 def inbox():
     import cpfecys
     cperiod = cpfecys.current_year_period()
+    period_list = []
+    period_list2 = []
+    assignations = []
+    coursesAdmin = []
 
     academic_var = db.academic(db.academic.id_auth_user==auth.user.id)        
-    period_list = db(db.academic_course_assignation.carnet==academic_var.id).select(db.academic_course_assignation.semester,distinct=True)
-
+    if auth.has_membership('Academic'):
+        period_list = db(db.academic_course_assignation.carnet==academic_var.id).select(db.academic_course_assignation.semester,distinct=True)
+    
     select_form = FORM(INPUT(_name='semester_id',_type='text'))
 
+    
     if select_form.accepts(request.vars,formname='select_form'):
-        assignations = db((db.academic_course_assignation.semester==str(select_form.vars.semester_id)) & (db.academic_course_assignation.carnet==academic_var.id)).select()
+        if auth.has_membership('Academic'):
+            assignations = db((db.academic_course_assignation.semester==str(select_form.vars.semester_id)) & (db.academic_course_assignation.carnet==academic_var.id)).select()
         period_id = str(select_form.vars.semester_id)
     else:
-        assignations = db((db.academic_course_assignation.semester==cperiod.id) & (db.academic_course_assignation.carnet==academic_var.id)).select()
+        if auth.has_membership('Academic'):
+            assignations = db((db.academic_course_assignation.semester==cperiod.id) & (db.academic_course_assignation.carnet==academic_var.id)).select()
         period_id = str(cperiod.id)
 
-    return dict(assignations=assignations,email=auth.user.email,period_id=period_id,period_list=period_list,cperiod=cperiod.id)
+    if (auth.has_membership('Student') or auth.has_membership('Teacher')):
+        coursesAdmin = db((db.user_project.assigned_user == auth.user.id) & (db.user_project.period == period_id) & (db.user_project.project==db.project.id) ).select()
+        temp = db((db.user_project.assigned_user == auth.user.id) & (db.user_project.project==db.project.id) ).select(db.user_project.period ,distinct=True)
+        for t in temp:
+            exists = False
+            for t2 in period_list:
+                if str(T(t.period.period.name) + t.period.yearp) == str(T(t2.semester.period.name) + t2.semester.yearp):
+                    exists = True
+                pass
+            pass
+            if exists == False:
+                period_list2.append(t)
+            pass
+        pass
+    pass
 
+
+        
+    return dict(assignations=assignations,email=auth.user.email,period_id=period_id,period_list=period_list,cperiod=cperiod.id,coursesAdmin=coursesAdmin, period_list2=period_list2)
+
+@auth.requires_login()
+@auth.requires(auth.has_membership('Student') or auth.has_membership('Teacher') or auth.has_membership('Academic'))
 def inbox_mails_load():
     import cpfecys
     #request.vars['email']
@@ -41,6 +69,33 @@ def inbox_mails_load():
                 db.read_mail.insert(id_auth_user = auth.user.id,
                                 id_mail  = request.vars['mail_id'])
             mail_var = db.notification_general_log4(db.notification_general_log4.id==request.vars['mail_id'])
+            user_var = db.auth_user(db.auth_user.username==mail_var.emisor)
+        return dict(mail = mail_var, emisor = user_var)
+    except:
+        return dict(mail = "", emisor = "")
+
+@auth.requires_login()
+@auth.requires(auth.has_membership('Student') or auth.has_membership('Teacher') or auth.has_membership('Academic'))
+def inbox_student_mails_load():
+    import cpfecys
+    #request.vars['email']
+    #If emisor username change... error of reload
+    try:
+        if request.vars['operation'] == "mails_list":
+            year_var = db.period_year(db.period_year.id==request.vars['period_id'])
+            period_var = db.period(db.period.id==year_var.period)
+            project_var = db.project(db.project.id==request.vars['project_id'])
+                        
+            mails = db((db.academic_send_mail_log.yearp==year_var.yearp) & (db.academic_send_mail_log.period==period_var.name) & (db.academic_send_mail_log.course==project_var.name)).select()
+            mails2 = db((db.notification_general_log4.yearp==year_var.yearp) & (db.notification_general_log4.period==period_var.name) & (db.notification_general_log4.course==project_var.name)).select()
+
+            return dict(mails = mails,  mails2 = mails2, auth_user = auth.user.id)    
+
+        if request.vars['operation'] == "view_mail":
+            if db((db.read_mail_student.id_auth_user == auth.user.id) & (db.read_mail_student.id_mail == request.vars['mail_id']) ).select().first() == None:
+                db.read_mail_student.insert(id_auth_user = auth.user.id,
+                                id_mail  = request.vars['mail_id'])
+            mail_var = db.academic_send_mail_log(db.academic_send_mail_log.id==request.vars['mail_id'])
             user_var = db.auth_user(db.auth_user.username==mail_var.emisor)
         return dict(mail = mail_var, emisor = user_var)
     except:

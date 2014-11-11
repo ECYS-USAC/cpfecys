@@ -1035,6 +1035,11 @@ db.define_table('read_mail',
     Field('id_mail', 'integer',notnull = True, label = T('id_mail'))
     )
 
+db.define_table('read_mail_student',
+    Field('id_auth_user', 'integer',notnull = True, label = T('id_auth_user')),
+    Field('id_mail', 'integer',notnull = True, label = T('id_mail'))
+    )
+
 
 db.academic._after_insert.append(lambda f,id: academic_insert(f,id))
 db.academic._after_update.append(lambda s,f: academic_update(f))
