@@ -306,7 +306,7 @@ db.define_table('notification_access',
 #Reports and Activities structure
 db.define_table('report_restriction',
                 Field('name', 'string', notnull=True, \
-                    label = T('name')),
+                    label = T('name'), unique = True, length = 50),
                 Field('start_date', 'date', notnull=True, \
                     label = T('start date')),
                 Field('end_date', 'date', notnull=True, \
@@ -398,6 +398,8 @@ db.define_table('log_future',
                 )
 
 db.define_table('log_entry',
+                Field('idActivity', 'integer', notnull=False, label = T('Activity')),
+                Field('tActivity', 'boolean', notnull=False, label = T('tActivity')),
                 Field('log_type', 'reference log_type', label = T('log_type')),
                 Field('entry_date', 'date', notnull=True, \
                     label = T('entry_date')),
