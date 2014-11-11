@@ -1,6 +1,280 @@
+import collections
+import math
+
+from fractions import Fraction
+from decimal import Decimal
+
+
+class StatisticsError(ValueError):
+    pass
+
+
+def _sum(data, start=0):
+    # We fail as soon as we reach a value that is not an int or the type of
+    # the first value which is not an int. E.g. _sum([int, int, float, int])
+    # is okay, but sum([int, int, float, Fraction]) is not.
+    allowed_types = set([int, type(start)])
+    n, d = _exact_ratio(start)
+    partials = {d: n}  # map {denominator: sum of numerators}
+    # Micro-optimizations.
+    exact_ratio = _exact_ratio
+    partials_get = partials.get
+    # Add numerators for each denominator.
+    for x in data:
+        _check_type(type(x), allowed_types)
+        n, d = exact_ratio(x)
+        partials[d] = partials_get(d, 0) + n
+    # Find the expected result type. If allowed_types has only one item, it
+    # will be int; if it has two, use the one which isn't int.
+    assert len(allowed_types) in (1, 2)
+    if len(allowed_types) == 1:
+        assert allowed_types.pop() is int
+        T = int
+    else:
+        T = (allowed_types - set([int])).pop()
+    if None in partials:
+        assert issubclass(T, (float, Decimal))
+        assert not math.isfinite(partials[None])
+        return T(partials[None])
+    total = Fraction()
+    for d, n in sorted(partials.items()):
+        total += Fraction(n, d)
+    if issubclass(T, int):
+        assert total.denominator == 1
+        return T(total.numerator)
+    if issubclass(T, Decimal):
+        return T(total.numerator)/total.denominator
+    return T(total)
+
+
+def _check_type(T, allowed):
+    if T not in allowed:
+        if len(allowed) == 1:
+            allowed.add(T)
+        else:
+            types = ', '.join([t.__name__ for t in allowed] + [T.__name__])
+            raise TypeError("unsupported mixed types: %s" % types)
+
+
+def _exact_ratio(x):
+    
+    try:
+        try:
+            # int, Fraction
+            return (x.numerator, x.denominator)
+        except AttributeError:
+            # float
+            try:
+                return x.as_integer_ratio()
+            except AttributeError:
+                # Decimal
+                try:
+                    return _decimal_to_ratio(x)
+                except AttributeError:
+                    msg = "can't convert type '{}' to numerator/denominator"
+                    #raise TypeError(msg.format(type(x).__name__)) from None
+    except (OverflowError, ValueError):
+        # INF or NAN
+        if __debug__:
+            # Decimal signalling NANs cannot be converted to float :-(
+            if isinstance(x, Decimal):
+                assert not x.is_finite()
+            else:
+                assert not math.isfinite(x)
+        return (x, None)
+
+
+# FIXME This is faster than Fraction.from_decimal, but still too slow.
+def _decimal_to_ratio(d):
+   
+    sign, digits, exp = d.as_tuple()
+    if exp in ('F', 'n', 'N'):  # INF, NAN, sNAN
+        assert not d.is_finite()
+        raise ValueError
+    num = 0
+    for digit in digits:
+        num = num*10 + digit
+    if exp < 0:
+        den = 10**-exp
+    else:
+        num *= 10**exp
+        den = 1
+    if sign:
+        num = -num
+    return (num, den)
+
+
+def _counts(data):
+    # Generate a table of sorted (value, frequency) pairs.
+    table = collections.Counter(iter(data)).most_common()
+    if not table:
+        return table
+    # Extract the values with the highest frequency.
+    maxfreq = table[0][1]
+    for i in range(1, len(table)):
+        if table[i][1] != maxfreq:
+            table = table[:i]
+            break
+    return table
+
+
+def mean(data):
+    
+    if iter(data) is data:
+        data = list(data)
+    n = len(data)
+    if n < 1:
+        raise StatisticsError('mean requires at least one data point')
+    return _sum(data)/n
+
+
+def median(data):
+    
+    data = sorted(data)
+    n = len(data)
+    if n == 0:
+        raise StatisticsError("no median for empty data")
+    if n%2 == 1:
+        return data[n//2]
+    else:
+        i = n//2
+        return (data[i - 1] + data[i])/2
+
+def median_low(data):
+    
+    data = sorted(data)
+    n = len(data)
+    if n == 0:
+        raise StatisticsError("no median for empty data")
+    if n%2 == 1:
+        return data[n//2]
+    else:
+        return data[n//2 - 1]
+
+
+def median_high(data):
+    
+    data = sorted(data)
+    n = len(data)
+    if n == 0:
+        raise StatisticsError("no median for empty data")
+    return data[n//2]
+
+
+def median_grouped(data, interval=1):
+    
+    data = sorted(data)
+    n = len(data)
+    if n == 0:
+        raise StatisticsError("no median for empty data")
+    elif n == 1:
+        return data[0]
+    # Find the value at the midpoint. Remember this corresponds to the
+    # centre of the class interval.
+    x = data[n//2]
+    for obj in (x, interval):
+        if isinstance(obj, (str, bytes)):
+            raise TypeError('expected number but got %r' % obj)
+    try:
+        L = x - interval/2  # The lower limit of the median interval.
+    except TypeError:
+        # Mixed type. For now we just coerce to float.
+        L = float(x) - float(interval)/2
+    cf = data.index(x)  # Number of values below the median interval.
+    # FIXME The following line could be more efficient for big lists.
+    f = data.count(x)  # Number of data points in the median interval.
+    return L + interval*(n/2 - cf)/f
+
+
+def mode(data):
+    # Generate a table of sorted (value, frequency) pairs.
+    table = _counts(data)
+    if len(table) == 1:
+        return table[0][0]
+    elif table:
+        raise StatisticsError(
+                'no unique mode; found %d equally common values' % len(table)
+                )
+    else:
+        raise StatisticsError('no mode for empty data')
+
+
+
+def _ss(data, c=None):
+    if c is None:
+        c = mean(data)
+    ss = _sum((x-c)**2 for x in data)
+    # The following sum should mathematically equal zero, but due to rounding
+    # error may not.
+    ss -= _sum((x-c) for x in data)**2/len(data)
+    assert not ss < 0, 'negative sum of square deviations: %f' % ss
+    return ss
+
+
+def variance(data, xbar=None):
+    if iter(data) is data:
+        data = list(data)
+    n = len(data)
+    if n < 2:
+        raise StatisticsError('variance requires at least two data points')
+    ss = _ss(data, xbar)
+    return ss/(n-1)
+
+
+def pvariance(data, mu=None):
+   
+    if iter(data) is data:
+        data = list(data)
+    n = len(data)
+    if n < 1:
+        raise StatisticsError('pvariance requires at least one data point')
+    ss = _ss(data, mu)
+    return ss/n
+
+
+def stdev(data, xbar=None):
+    
+    var = variance(data, xbar)
+    try:
+        return var.sqrt()
+    except AttributeError:
+        return math.sqrt(var)
+
+
+def pstdev(data, mu=None):
+    
+    var = pvariance(data, mu)
+    try:
+        return var.sqrt()
+    except AttributeError:
+        return math.sqrt(var)
+
+
+
+
 @auth.requires_login()
 @auth.requires(auth.has_membership('Student') or auth.has_membership('Teacher') or auth.has_membership('Super-Administrator') or auth.has_membership('Academic') or auth.has_membership('Ecys-Administrator'))
 def courses_list():
+    lista = [66,88,90,76,61]
+    var_temp = mean(lista)
+    print "mean->:"+str(var_temp)
+    var_temp = median(lista)
+    print "median->:"+str(var_temp)
+    try:
+        var_temp = mode(lista)
+        print "mode->:"+str(var_temp)
+    except:
+        None
+    var_temp = stdev(lista)
+    print "standar desviation->:"+str(var_temp)
+    var_temp = variance(lista)
+    print "variance->:"+str(var_temp)
+    var_temp = stdev(lista)/math.sqrt(len(lista))
+    print "standar error->:"+str(var_temp)
+    #var_temp = kurtosis(lista)
+    #print "kurt->:"+str(var_temp)
+    
+
     area = db(db.area_level.name=='DTT Tutor Académico').select().first()
     coursesAdmin = None
     countcoursesAdmin = db.user_project.id.count()

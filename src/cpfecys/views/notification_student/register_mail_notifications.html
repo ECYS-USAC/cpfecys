@@ -1,0 +1,70 @@
+{{extend 'template.html'}}
+<div class="row-fluid">
+    <div class="well span12"  style="overflow:auto;">
+        <a onclick="window.history.back()" class="btn" ><i class="icon-arrow-left"></i>{{=T('Back')}}</a>
+        <table class="table-striped table-bordered" style="align:0 auto;">
+        <tr>
+          <td>
+          <form class="form-inline" 
+          action="{{=URL('notification','register_mail_notifications')}}" 
+            method='get'>
+                 <select name="period">
+                    {{for period in periods:}}
+                      <option value="{{=period.id}}">
+                      {{=T(period.period.name)}}-{{=period.yearp}}
+                      </option>
+                    {{pass}}
+                </select>
+                <input class="btn" type="submit" value="{{=T('Filter')}}">
+          </form>
+          </td>
+        </tr>
+        </table>
+        <table class="table table-striped table-bordered">
+        {{for project in projects:}}
+        <tr>
+            <td>
+                <b>{{=project.project.name}}</b>
+            </td>
+            <td><center>
+                <a id="pr-{{=project.id}}" style="white-space:nowrap;" class="btn btn-info">Ver</a>
+            </center></td>
+        </tr>
+        <tr>
+            <td colspan="2">
+                <div id="div_project_{{=project.id}}" style="display: none; background-color:white;  white-space:nowrap; height:300px; width:1100px; overflow:auto;">
+                    
+                </div>
+                <br>
+            </td>
+        </tr>
+        {{pass}}
+        </table>
+    </div>
+</div>
+<div id="attachModal" class="modal hide fade" tabindex="-1" style="left:35%; width:70%;"> 
+    <div id ="a" class="modal-header">
+      <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+        <h3 id="myModalLabel">
+            <span class="icon-upload"></span>
+            {{=T('Register Notices Detail')}}
+        </h3>
+    </div>
+    <div class="modal-body">
+        <div class="row-fluid">
+            <div id="detalle" value="detalle" class="well">
+
+            </div>
+        </div>
+    </div>
+</div>
+<script type="text/javascript">
+    $(document).ready(function(){
+        {{for project in projects:}}
+            $("#pr-{{=project.id}}").click(function(){         
+                $("#div_project_{{=project.id}}").toggle();
+                $("#div_project_{{=project.id}}").load('{{=URL('notification','register_mail.load')}}',{project: {{=project.id}}});  
+            })
+        {{pass}}
+    })
+</script>

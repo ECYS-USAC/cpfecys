@@ -1,0 +1,159 @@
+{{if request.vars['operation'] == "mails_list": }}
+	<table class="table table-striped table-bordered" >
+
+		{{for a in range(len(mails)-1, -1, -1):}}
+			{{	#SHOW JUST EMAILS SENDED TO ME
+				mine_var='false'
+				var_query = db.notification_log4(db.notification_log4.register==mails[a].id)
+				split_var1 = list(str(var_query).split("'"))
+				for x in split_var1:
+					split_var2 = list(str(x).split(","))
+					for xx in split_var2:
+						if str(xx) == str(request.vars['email']):
+							mine_var='true'
+						pass
+					pass
+					split_var2 = list(str(x).split("|"))
+					for xx in split_var2:
+						if str(xx) == str(request.vars['email']):
+							mine_var='true'
+						pass
+					pass
+
+				pass}}
+				
+			
+			
+			
+			{{if mine_var=='true':}}
+				<tr>
+					<td  style="height:10px;" >
+						<table style="width:100%;" class="table table-striped table-bordered">
+							<td style="width:40%;">
+								<span class="icon-envelope"></span>  &nbsp
+								<a style="cursor:pointer;" onclick="view_mail({{=mails[a].id}},'{{=request.vars['project_id']}}');"  role="button"  href="#mailModal" data-toggle="modal" data-target="#mailModal">
+									{{=mails[a].subject}}
+								</a>
+							</td>
+							<td style="width:25%;">
+								{{
+									try:
+										user_var = db.auth_user(db.auth_user.username==mails[a].emisor)
+									except:
+										user_var = T("Not found")
+									pass
+								}}
+								{{=user_var.first_name}} {{=user_var.last_name}}
+							</td>
+							<td style="width:15%;">
+								{{=mails[a].time_date}}
+							</td>
+							<td style="width:7%;">
+								<center>
+									{{if db((db.read_mail.id_auth_user == auth_user) & (db.read_mail.id_mail == mails[a].id) ).select().first() == None:}}
+										<span id="information_text" class="badge btn-success">{{=T('New') }}</span> 
+									{{else:}}
+										<span id="information_text" class="badge btn-info">{{=T('Viewed') }}</span> 
+									{{pass}}
+								</center>
+							</td>
+						</table>
+					</td>
+				</tr>
+			{{pass}}
+		{{pass}}
+	</table>
+
+{{pass}}
+
+{{if request.vars['operation'] == "view_mail": }}
+	<table style="width:100%;">
+		<td>
+			<div style=" height:400px; overflow:auto;">
+				<table class="table table-striped table-bordered">
+					<td style="width:25%;" >
+						<div style="height:140px; overflow:hidden">
+							<!--<img id="img_img" src="{{=cpfecys.get_domain() + URL('default/download', emisor.photo)}}" alt="No photo" > -->
+							<img id="img_img" src="{{= URL('default/download', emisor.photo)}}" alt="No photo" height="100%" width="100%">
+						</div>
+					</td>
+					<td style="width:75%;">
+						<h3>
+							<div style="height:60px; overflow:auto;">
+								{{=mail.subject}} 
+							</div>
+							<div style="height:40px; overflow:auto;">
+								<small>{{=emisor.first_name}} {{=emisor.last_name}} </small>
+							</div>
+							</h3>
+						
+					</td>
+				</table>
+				<hr style="width:100%;"> 
+					<div style="height:150px; overflow:auto;">
+						<!--Parse message to html <br><b><a>-->
+						{{split_var1 = list(str(mail.sent_message).split("<br>"))}}
+						{{for x in split_var1:}}
+							{{split_var2 = list(str(x).split("<b>"))}}
+							{{for x2 in split_var2:}}								
+								{{split_var3 = list(str(x2).split("</b>"))}}
+								{{for x3 in split_var3:}}
+									{{split_var4 = list(str(x3).split("<a href=\""))}}
+									{{if len(split_var4) >1:}}
+										{{for x4 in split_var4:}}
+											{{split_var5 = list(str(x4).split("\" target=\"blank\">"))}}
+											{{if len(split_var5) >1:}}
+												{{for x5 in split_var5:}}
+													{{split_var6 = list(str(x5).split("</a>"))}}
+													{{if len(split_var6) >1:}}
+														{{for x6 in split_var6:}}
+															{{=x6}}</a>
+														{{pass}}
+													{{else:}}
+														<a href="{{=x5}}" target="blank">
+													{{pass}}													
+												{{pass}}												
+											{{else:}}
+												{{=x4}}
+											{{pass}}											
+										{{pass}}
+									{{else:}}
+										{{=x3}}
+									{{pass}}									 
+									</a></b>
+								{{pass}}
+								<b>
+							{{pass}}
+							
+							</b><br>
+						{{pass}}
+					</div>
+				<hr style="width:100%;"> 
+			</div>
+			<script type="text/javascript">
+
+			</script>
+			<div align="right">
+				 <a id="myButton" href="{{=URL('notification_student', 'send_mail', vars=dict(mail = emisor.email, name = emisor.first_name + ' ' +emisor.last_name , remessage = mail.sent_message, retime = mail.time_date, resub = mail.subject, var_project_id = request.vars['var_project_id']))}}" role="button" class="btn btn-success"   > 
+                	{{=('Reply')}}
+              	</a>
+              	<button class="btn" data-dismiss="modal" aria-hidden="true">{{=T('Close')}}</button>
+              	&nbsp;&nbsp;&nbsp;
+			<div>
+				
+		</tr>
+	</table>
+{{pass}}
+
+
+<script type="text/javascript">
+	$(document).ready(function(){
+		
+  	});
+
+	function view_mail(var_id, var_project_id){ 
+
+  		$("#mail_div").load("{{=URL('notification_student','inbox_mails_load.html')}}?operation=view_mail&amp;mail_id="+var_id+"&amp;var_project_id="+var_project_id);
+ 		
+	}
+</script>
