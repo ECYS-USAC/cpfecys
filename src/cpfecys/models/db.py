@@ -310,7 +310,7 @@ db.define_table('notification_access',
 #Reports and Activities structure
 db.define_table('report_restriction',
                 Field('name', 'string', notnull=True, \
-                    label = T('name'), unique = True, length = 50),
+                    label = T('name'),  length = 50),
                 Field('start_date', 'date', notnull=True, \
                     label = T('start date')),
                 Field('end_date', 'date', notnull=True, \
