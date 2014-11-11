@@ -1,3 +1,48 @@
 {{extend 'template.html'}}
 <h1>{{=T('Report Restrictions')}}</h1>
 {{=grid}}
+
+
+<!--#INIT DTT PHASE2-->
+<script type="text/javascript">
+	var nameReport = document.getElementById('report_restriction_name').value;
+	var contentReport = "<select class=\"generic-widget\" id=\"report_restriction_name\" name=\"name\">";
+	{{if cpfecys.current_year_period().period == 1:}}
+		if (nameReport!="")
+			contentReport = contentReport + "<option value="+nameReport+">"+nameReport+"</option>";
+		if (nameReport!="Reporte Enero {{=str(cpfecys.current_year_period().yearp)}}")
+			contentReport = contentReport + "<option value=\"Reporte Enero {{=str(cpfecys.current_year_period().yearp)}}\">Reporte Enero {{=str(cpfecys.current_year_period().yearp)}}</option>";
+		if (nameReport!="Reporte Febrero {{=str(cpfecys.current_year_period().yearp)}}")
+			contentReport = contentReport + "<option value=\"Reporte Febrero {{=str(cpfecys.current_year_period().yearp)}}\">Reporte Febrero {{=str(cpfecys.current_year_period().yearp)}}</option>";
+		if (nameReport!="Reporte Marzo {{=str(cpfecys.current_year_period().yearp)}}")
+			contentReport = contentReport + "<option value=\"Reporte Marzo {{=str(cpfecys.current_year_period().yearp)}}\">Reporte Marzo {{=str(cpfecys.current_year_period().yearp)}}</option>";
+		if (nameReport!="Reporte Abril {{=str(cpfecys.current_year_period().yearp)}}")
+			contentReport = contentReport + "<option value=\"Reporte Abril {{=str(cpfecys.current_year_period().yearp)}}\">Reporte Abril {{=str(cpfecys.current_year_period().yearp)}}</option>";
+		if (nameReport!="Reporte Mayo {{=str(cpfecys.current_year_period().yearp)}}")
+			contentReport = contentReport + "<option value=\"Reporte Mayo {{=str(cpfecys.current_year_period().yearp)}}\">Reporte Mayo {{=str(cpfecys.current_year_period().yearp)}}</option>";
+		if (nameReport!="Reporte Final Primer Semestre {{=str(cpfecys.current_year_period().yearp)}}")
+			contentReport = contentReport + "<option value=\"Reporte Final Primer Semestre {{=str(cpfecys.current_year_period().yearp)}}\">Reporte Final Primer Semestre {{=str(cpfecys.current_year_period().yearp)}}</option>";
+	{{else:}}
+		if (nameReport!="")
+			contentReport = contentReport + "<option value="+nameReport+">"+nameReport+"</option>";
+		if (nameReport!="Reporte Junio {{=str(cpfecys.current_year_period().yearp)}}")
+			contentReport = contentReport + "<option value=\"Reporte Junio {{=str(cpfecys.current_year_period().yearp)}}\">Reporte Junio {{=str(cpfecys.current_year_period().yearp)}}</option>";
+		if (nameReport!="Reporte Julio {{=str(cpfecys.current_year_period().yearp)}}")
+			contentReport = contentReport + "<option value=\"Reporte Julio {{=str(cpfecys.current_year_period().yearp)}}\">Reporte Julio {{=str(cpfecys.current_year_period().yearp)}}</option>";
+		if (nameReport!="Reporte Agosto {{=str(cpfecys.current_year_period().yearp)}}")
+			contentReport = contentReport + "<option value=\"Reporte Agosto {{=str(cpfecys.current_year_period().yearp)}}\">Reporte Agosto {{=str(cpfecys.current_year_period().yearp)}}</option>";
+		if (nameReport!="Reporte Septiembre {{=str(cpfecys.current_year_period().yearp)}}")
+			contentReport = contentReport + "<option value=\"Reporte Septiembre {{=str(cpfecys.current_year_period().yearp)}}\">Reporte Septiembre {{=str(cpfecys.current_year_period().yearp)}}</option>";
+		if (nameReport!="Reporte Octubre {{=str(cpfecys.current_year_period().yearp)}}")
+			contentReport = contentReport + "<option value=\"Reporte Octubre {{=str(cpfecys.current_year_period().yearp)}}\">Reporte Octubre {{=str(cpfecys.current_year_period().yearp)}}</option>";
+		if (nameReport!="Reporte Noviembre {{=str(cpfecys.current_year_period().yearp)}}")
+			contentReport = contentReport + "<option value=\"Reporte Noviembre {{=str(cpfecys.current_year_period().yearp)}}\">Reporte Noviembre {{=str(cpfecys.current_year_period().yearp)}}</option>";
+		if (nameReport!="Reporte Diciembre {{=str(cpfecys.current_year_period().yearp)}}")
+			contentReport = contentReport + "<option value=\"Reporte Diciembre {{=str(cpfecys.current_year_period().yearp)}}\">Reporte Diciembre {{=str(cpfecys.current_year_period().yearp)}}</option>";
+		if (nameReport!="Reporte Final Segundo Semestre {{=str(cpfecys.current_year_period().yearp)}}")
+			contentReport = contentReport + "<option value=\"Reporte Final Segundo Semestre {{=str(cpfecys.current_year_period().yearp)}}\">Reporte Final Segundo Semestre {{=str(cpfecys.current_year_period().yearp)}}</option>";
+	{{pass}}
+	contentReport = contentReport + "</select>";
+	$("#report_restriction_name").replaceWith(contentReport);
+</script>
+<!--#END DTT PHASE2-->

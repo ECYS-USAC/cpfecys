@@ -992,7 +992,8 @@
 											{{if request.vars['op'] == "showTableNoEditable":}}
 												{{if assigned_to_project==True or auth.has_membership('Ecys-Administrator')==True or auth.has_membership('Super-Administrator')==True:}}
 													<th style="white-space:normal;">
-														{{=T('Entered Grades')}}
+														<!--{{#=T('Entered Grades')}}-->
+														{{=T('Delivered Activities')}}
 													</th>
 													<th style="white-space:normal;">
 														{{=T('Average of Grades')}}
