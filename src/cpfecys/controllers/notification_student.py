@@ -234,8 +234,7 @@ def reply_mail_with_email(email, message, remessage, retime, resub ,subject, sem
     messageC = messageC + project_name+"<br>"+str(period)+'<br>Sistema de Seguimiento de La Escuela de Ciencias y Sistemas<br> Facultad de Ingeniería - Universidad de San Carlos de Guatemala'
     messageC = messageC + '<br><br><hr style="width:100%;"><b><i>Respuesta al mensaje enviado el '+ retime +':</i></b><br><table><tr><td><i><b>Asunto:</b></td><td>'+resub+ '</td></tr></table></i></html>'
     control = 0
-    #was_sent = mail.send(to='dtt.ecys@dtt-ecys.org',subject=subject,message=messageC, bcc=email)
-    was_sent = mail.send(to='lecatavo@gmail.com',subject=subject,message=messageC, bcc=email)
+    was_sent = mail.send(to='dtt.ecys@dtt-ecys.org',subject=subject,message=messageC, bcc=email)
 
     if ((coursesAdmin is None) and auth.has_membership('Academic')):        
         db.academic_send_mail_log.insert(subject=subject,
