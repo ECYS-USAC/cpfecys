@@ -85,25 +85,44 @@ if auth.has_membership(role="Teacher") or auth.has_membership(role="Student"):
     var_count = 0
     var_count_report = 0
 
-    projects = db(db.user_project.assigned_user == auth.user.id).select()
+    projects = db(db.user_project.assigned_user == auth.user.id).select(db.user_project.project,distinct=True)
     for project in projects:
         
         mails = db((db.academic_send_mail_log.course==project.project.name)).select()
         for a in range(len(mails)-1, -1, -1):
             #SHOW JUST EMAILS SENDED TO ME
-            mine_var='false'
+            mine_var=False
             var_query = mails[a].email_list
             
             split_var2 = list(str(var_query).split(","))
             for xx in split_var2:
                 if str(xx) == str(auth.user.email):
-                    mine_var='true'
+                    mine_var=True
                 pass
             pass                                                    
 
                 
-            if mine_var=='true':
+            if mine_var== True:
                 if db((db.read_mail_student.id_auth_user == auth.user.id) & (db.read_mail_student.id_mail == mails[a].id) ).select().first() == None:
+                    cont_news = cont_news + 1
+                pass
+            pass
+        pass
+
+        for a in db((db.notification_general_log4.course==project.project.name)).select():
+            mine_var = False
+            var_query = db.notification_log4(db.notification_log4.register==a.id)
+            
+            split_var2 = list(str(var_query.destination).split(","))
+            for xx in split_var2:
+                if str(xx) == str(auth.user.email):
+                    mine_var = True
+                pass
+            pass                                                
+                
+            if mine_var == True:
+
+                if db((db.read_mail.id_auth_user == auth.user.id) & (db.read_mail.id_mail == a.id) ).select().first() == None:
                     cont_news = cont_news + 1
                 pass
             pass
@@ -132,7 +151,7 @@ if auth.has_membership(role="Academic"):
             mine_var = False
             var_query = db.notification_log4(db.notification_log4.register==a.id)
             
-            split_var2 = list(str(var_query).split(","))
+            split_var2 = list(str(var_query.destination).split(","))
             for xx in split_var2:
                 if str(xx) == str(auth.user.email):
                     mine_var = True
@@ -140,6 +159,7 @@ if auth.has_membership(role="Academic"):
             pass                                                
                 
             if mine_var == True:
+
                 if db((db.read_mail.id_auth_user == auth.user.id) & (db.read_mail.id_mail == a.id) ).select().first() == None:
                     cont_news = cont_news + 1
                 pass

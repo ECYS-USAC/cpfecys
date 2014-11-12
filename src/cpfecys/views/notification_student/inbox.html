@@ -38,10 +38,10 @@
 			<div style="  overflow:auto;">				
 				<table class="table table-bordered" >
 					
-					<tbody>
+					<tbody bgcolor="#F2F2F2">
 						{{for assignation in assignations:}}							
-							<tr>
-								<td >
+							<tr >
+								<td  >
 									
 										{{cont_news = 0}}
 										{{mails = db((db.notification_general_log4.yearp==assignation.semester.yearp) & (db.notification_general_log4.period==assignation.semester.period.name) & (db.notification_general_log4.course==assignation.assignation.name)).select()}}
@@ -50,7 +50,7 @@
 												mine_var='false'
 												var_query = db.notification_log4(db.notification_log4.register==mails[a].id)
 												
-												split_var2 = list(str(var_query).split(","))
+												split_var2 = list(str(var_query.destination).split(","))
 												for xx in split_var2:
 													if str(xx) == str(email):
 														mine_var='true'
@@ -64,9 +64,9 @@
 												{{pass}}
 											{{pass}}
 										{{pass}}
-										<table class="table table-striped table-bordered" >
-											<tr>
-												<td width="100%">
+										<table class="table table-bordered" >
+											<tr bgcolor="#FAFAFA"> 
+												<td width="100%" >
 													<span class="icon-book"></span> &nbsp 
 													<a style="cursor:pointer;" onclick="click_link({{=assignation.assignation.id}});">
 														{{=assignation.assignation.name}}
@@ -126,7 +126,7 @@
 												mine_var='false'
 												var_query = db.notification_log4(db.notification_log4.register==mails2[a].id)
 												
-												split_var2 = list(str(var_query).split(","))
+												split_var2 = list(str(var_query.destination).split(","))
 												for xx in split_var2:
 													if str(xx) == str(email):
 														mine_var='true'
@@ -141,8 +141,8 @@
 											{{pass}}
 										{{pass}}
 
-										<table class="table table-striped table-bordered" >
-											<tr>
+										<table class="table table-bordered" >
+											<tr bgcolor="#FAFAFA">
 												<td width="100%">
 													<span class="icon-book"></span> &nbsp 
 													<a style="cursor:pointer;" onclick="click_link2({{=course.user_project.project.id}});">

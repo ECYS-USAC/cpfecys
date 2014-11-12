@@ -1,5 +1,5 @@
 {{if request.vars['operation'] == "mails_list": }}
-	<table class="table table-striped table-bordered" >
+	<table class="table  " >
 
 		{{for a in range(len(mails)-1, -1, -1):}}
 			{{	#SHOW JUST EMAILS SENDED TO ME
@@ -19,9 +19,14 @@
 			}}
 			
 			{{if mine_var=='true':}}
-				<tr>
+				<tr bgcolor="#F2F2F2">
 					<td  style="height:10px;" >
-						<table style="width:100%;" class="table table-striped table-bordered">
+						<table style="width:100%;" class="table table-bordered">
+							{{if db((db.read_mail_student.id_auth_user == auth_user) & (db.read_mail_student.id_mail == mails[a].id) ).select().first() == None:}}
+								<tr>
+							{{else:}}
+								<tr bgcolor="#F2F2F2">
+							{{pass}}
 							<td style="width:40%;">
 								<span class="icon-envelope"></span>  &nbsp
 								<a style="cursor:pointer;" onclick="view_mail({{=mails[a].id}},'{{=request.vars['project_id']}}');"  role="button"  href="#mailModal" data-toggle="modal" data-target="#mailModal">
@@ -40,7 +45,18 @@
 								{{=user_var.first_name}} {{=user_var.last_name}}
 							</td>
 							<td style="width:15%;">
-								{{=mails[a].time_date}}
+								{{d_temp = mails[a].time_date}}
+								{{format = "%a %d %b %Y"}}
+								{{day = "%a"}}
+								{{month = "%b"}}
+								{{=T(d_temp.strftime(day))}}
+								{{=d_temp.day}}
+								{{=T(d_temp.strftime(month))}}
+								{{=d_temp.year}}
+							</td>
+							<td style="width:5%;">
+								{{format2 = "%H:%M:%S"}}
+								{{=d_temp.strftime(format2)}}
 							</td>
 							
 							<td style="width:7%;">
@@ -48,10 +64,11 @@
 									{{if db((db.read_mail_student.id_auth_user == auth_user) & (db.read_mail_student.id_mail == mails[a].id) ).select().first() == None:}}
 										<span id="information_text" class="badge btn-success">{{=T('New') }}</span> 
 									{{else:}}
-										<span id="information_text" class="badge btn-info">{{=T('Viewed') }}</span> 
+										<span id="information_text" class="badge btn-info">{{=T('Read') }}</span> 
 									{{pass}}
 								</center>
 							</td>
+							<tr>
 						</table>
 					</td>
 				</tr>
@@ -75,9 +92,15 @@
 			}}
 			
 			{{if mine_var=='true':}}
-				<tr>
+				<tr bgcolor="#F2F2F2">
 					<td  style="height:10px;" >
-						<table style="width:100%;" class="table table-striped table-bordered">
+						<table style="width:100%;" class="table  table-bordered" >
+							{{if db((db.read_mail.id_auth_user == auth_user) & (db.read_mail.id_mail == mails[a].id) ).select().first() == None:}}
+								<tr>
+							{{else:}}
+								<tr bgcolor="#F2F2F2">
+							{{pass}}
+							
 							<td style="width:40%;">
 								<span class="icon-envelope"></span>  &nbsp
 								<a style="cursor:pointer;" onclick="view_mail_academic({{=mails[a].id}},'{{=request.vars['project_id']}}');"  role="button"  href="#mailModal" data-toggle="modal" data-target="#mailModal">
@@ -96,7 +119,18 @@
 								{{=user_var.first_name}} {{=user_var.last_name}}
 							</td>
 							<td style="width:15%;">
-								{{=mails[a].time_date}}
+								{{d_temp = mails[a].time_date}}
+								{{format = "%a %d %b %Y"}}
+								{{day = "%a"}}
+								{{month = "%b"}}
+								{{=T(d_temp.strftime(day))}}
+								{{=d_temp.day}}
+								{{=T(d_temp.strftime(month))}}
+								{{=d_temp.year}}
+							</td>
+							<td style="width:5%;">
+								{{format2 = "%H:%M:%S"}}
+								{{=d_temp.strftime(format2)}}
 							</td>
 							
 							<td style="width:7%;">
@@ -104,10 +138,11 @@
 									{{if db((db.read_mail.id_auth_user == auth_user) & (db.read_mail.id_mail == mails[a].id) ).select().first() == None:}}
 										<span id="information_text" class="badge btn-success">{{=T('New') }}</span> 
 									{{else:}}
-										<span id="information_text" class="badge btn-info">{{=T('Viewed') }}</span> 
+										<span id="information_text" class="badge btn-info">{{=T('Read') }}</span> 
 									{{pass}}
 								</center>
 							</td>
+							</tr>
 						</table>
 					</td>
 				</tr>
@@ -134,7 +169,7 @@
 								{{=mail.subject}} 
 							</div>
 							<div style="height:40px; overflow:auto;">
-								<small>{{=emisor.first_name}} {{=emisor.last_name}} </small>
+								<small> {{=emisor.first_name}} {{=emisor.last_name}} </small>
 							</div>
 							</h3>
 						
@@ -185,9 +220,11 @@
 
 			</script>
 			<div align="right">
-				 <a id="myButton" href="{{=URL('notification_student', 'send_mail', vars=dict(mail = emisor.email, name = emisor.first_name + ' ' +emisor.last_name , remessage = mail.sent_message, retime = mail.time_date, resub = mail.subject, var_project_id = request.vars['var_project_id']))}}" role="button" class="btn btn-success"   > 
-                	{{=('Reply')}}
-              	</a>
+				
+					 <a id="myButton" href="{{=URL('notification_student', 'send_mail', vars=dict(mail = emisor.email, name = emisor.first_name + ' ' +emisor.last_name , remessage = mail.sent_message, retime = mail.time_date, resub = mail.subject, var_project_id = request.vars['var_project_id']))}}" role="button" class="btn btn-success"   > 
+	                	{{=T('Reply')}}
+	              	</a>
+              	
               	<button class="btn" data-dismiss="modal" aria-hidden="true">{{=T('Close')}}</button>
               	&nbsp;&nbsp;&nbsp;
 			<div>

@@ -14,7 +14,11 @@ def inbox():
 
     academic_var = db.academic(db.academic.id_auth_user==auth.user.id)        
     if auth.has_membership('Academic'):
-        period_list = db(db.academic_course_assignation.carnet==academic_var.id).select(db.academic_course_assignation.semester,distinct=True)
+        if academic_var is None:
+            session.flash = T('Not valid Action.')
+            redirect(URL('default', 'index'))
+        else:
+            period_list = db(db.academic_course_assignation.carnet==academic_var.id).select(db.academic_course_assignation.semester,distinct=True)
     
     select_form = FORM(INPUT(_name='semester_id',_type='text'))
 
@@ -102,7 +106,7 @@ def inbox_student_mails_load():
         return dict(mail = "", emisor = "")
 
 @auth.requires_login()
-@auth.requires_membership('Academic')
+@auth.requires(auth.has_membership('Student') or auth.has_membership('Teacher') or auth.has_membership('Academic'))
 def send_mail():        
     import cpfecys
     cperiod = cpfecys.current_year_period()
@@ -118,7 +122,7 @@ def send_mail():
             retime = request.vars['retime']
             var_project_name = request.vars['var_project_name']
             if message != '' and subject != '':
-                fail = reply_mail_with_email(email,message, remessage, retime, resub, subject, cperiod.period.name, cperiod.yearp, var_project_name)
+                fail = reply_mail_with_email(email,message, remessage, retime, resub, subject, cperiod, var_project_name)
                 if fail > 0:
                     response.flash = T('Sent Error')
                 else:
@@ -140,7 +144,8 @@ def send_mail():
                     response.flash = T('Mail Sent')                
             else:
                 response.flash = T('Fill all fields of the mail')
-            academic_var = db.academic(db.academic.id_auth_user==auth.user.id)        
+            academic_var = db.academic(db.academic.id_auth_user==auth.user.id) 
+            assignations = []       
             assignations = db((db.academic_course_assignation.semester==cperiod.id) & (db.academic_course_assignation.carnet==academic_var.id)).select()
             return dict(email=None,assignations=assignations,cperiod=cperiod)
         
@@ -203,25 +208,53 @@ def register_mail_detail():
             
             
 @auth.requires_login()
-def reply_mail_with_email(email, message, remessage, retime, resub ,subject, semester,year, project_name):  
+def reply_mail_with_email(email, message, remessage, retime, resub ,subject, semester, project_name):  
     
     message = message.replace("\n","<br>")
-    period = T(semester)+' '+str(year)
+    period = T(semester.period.name)+' '+str(semester.yearp) 
+    coursesAdmin = None
+    if (auth.has_membership('Student') or auth.has_membership('Teacher')):
+        project = db(db.project.name==project_name).select().first()
+        if project == None:
+            session.flash = T('Not valid Action.')
+            redirect(URL('default', 'index'))
+        else:
+            coursesAdmin = db((db.user_project.assigned_user == auth.user.id) & (db.user_project.period == semester.id) & (db.user_project.project==db.project.id) ).select()
     
-    academic_var = db.academic(db.academic.id_auth_user==auth.user.id)
+    
 
-    messageC = '<html>' + message  +'<br><br>Estudiante: '+ auth.user.first_name +' '+ auth.user.last_name +'<br>Carnet: '+auth.user.username+'<br>Correo: '+auth.user.email+'<br>'+project_name+"<br>"+str(period)+'<br>Sistema de Seguimiento de La Escuela de Ciencias y Sistemas<br> Facultad de Ingeniería - Universidad de San Carlos de Guatemala'
+    messageC = '<html>' + message 
+    if ((coursesAdmin is None) and auth.has_membership('Academic')):
+        messageC = messageC +'<br><br>Estudiante: '+ auth.user.first_name +' '+ auth.user.last_name +'<br>Carnet: '+auth.user.username+'<br>Correo: '+auth.user.email+'<br>'
+    elif (auth.has_membership('Student') or auth.has_membership('Teacher')) and coursesAdmin != None:
+        messageC = messageC +'<br><br>'+ auth.user.first_name +' '+ auth.user.last_name + '<br>'
+    else:
+        session.flash = T('Not valid Action.')
+        redirect(URL('default', 'index'))
+    messageC = messageC + project_name+"<br>"+str(period)+'<br>Sistema de Seguimiento de La Escuela de Ciencias y Sistemas<br> Facultad de Ingeniería - Universidad de San Carlos de Guatemala'
     messageC = messageC + '<br><br><hr style="width:100%;"><b><i>Respuesta al mensaje enviado el '+ retime +':</i></b><br><table><tr><td><i><b>Asunto:</b></td><td>'+resub+ '</td></tr></table></i></html>'
     control = 0
-    was_sent = mail.send(to='dtt.ecys@dtt-ecys.org',subject=subject,message=messageC, bcc=email)
-    db.academic_send_mail_log.insert(subject=subject,
+    #was_sent = mail.send(to='dtt.ecys@dtt-ecys.org',subject=subject,message=messageC, bcc=email)
+    was_sent = mail.send(to='lecatavo@gmail.com',subject=subject,message=messageC, bcc=email)
+
+    if ((coursesAdmin is None) and auth.has_membership('Academic')):        
+        db.academic_send_mail_log.insert(subject=subject,
                                     sent_message=message,
                                     emisor=auth.user.username,
                                     course=project_name,
-                                    yearp=year,
-                                    period=semester,
+                                    yearp=semester.yearp,
+                                    period=semester.period.name,
                                     email_list=email,
                                     mail_state=str(was_sent))
+    elif (auth.has_membership('Student') or auth.has_membership('Teacher')) and coursesAdmin != None:
+        row = db.notification_general_log4.insert(subject=subject,
+                                        sent_message=message,
+                                        emisor=auth.user.username,
+                                        course=project_name,
+                                        yearp=semester.yearp,
+                                        period=semester.period.name)
+        db.notification_log4.insert(destination = email, result_log =str(was_sent), success = str(was_sent), register=row)    
+    
     if was_sent==False:
         control=control+1
     
