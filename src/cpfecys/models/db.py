@@ -1028,9 +1028,14 @@ db.define_table('academic_send_mail_log',
     Field('course', 'text', notnull=True, label=T('Curso')),
     Field('yearp', 'text', notnull=True, label=T('yearp')),
     Field('period', 'text', notnull=True, label=T('Periodo')),
-    Field('email_list', 'text', notnull=True, label=T('Email List')),
     Field('mail_state', 'text', notnull=True, label=T('State'))
     )
+
+db.define_table('academic_send_mail_detail',
+    Field('academic_send_mail_log', 'reference academic_send_mail_log', notnull = True, label = T('academic_send_mail_log')),
+    Field('username', 'string', notnull=True, label=T('username')),
+    Field('email', 'string', notnull=True, label=T('Email'))
+)
 
 db.define_table('read_mail',
     Field('id_auth_user', 'integer',notnull = True, label = T('id_auth_user')),

@@ -98,26 +98,20 @@
 								<td >
 									
 										{{cont_news = 0}}
+										{{cont_mails = 0}}
 										{{mails = db((db.academic_send_mail_log.yearp==course.user_project.period.yearp) & (db.academic_send_mail_log.period==course.user_project.period.period.name) & (db.academic_send_mail_log.course==course.user_project.project.name)).select()}}
-										{{for a in range(len(mails)-1, -1, -1):}}
-											{{	#SHOW JUST EMAILS SENDED TO ME
-												mine_var='false'
-												var_query = mails[a].email_list
-												
-												split_var2 = list(str(var_query).split(","))
-												for xx in split_var2:
-													if str(xx) == str(email):
-														mine_var='true'
-													pass
-												pass													
-
-												}}
-											{{if mine_var=='true':}}
-												{{if db((db.read_mail_student.id_auth_user == auth.user.id) & (db.read_mail_student.id_mail == mails[a].id) ).select().first() == None:}}
-													{{cont_news = cont_news + 1}}
-												{{pass}}
-											{{pass}}
-										{{pass}}
+										
+								        {{for a in mails:
+								            
+								            var_query = db.academic_send_mail_detail((db.academic_send_mail_detail.academic_send_mail_log==a.id) & (db.academic_send_mail_detail.username==auth.user.username))
+								                            
+								            if var_query != None:
+								            	cont_mails = cont_mails + 1
+								                if db((db.read_mail_student.id_auth_user == auth.user.id) & (db.read_mail_student.id_mail == a.id) ).select().first() == None:
+								                    cont_news = cont_news + 1
+								                pass
+								            pass
+								        pass}}
 
 
 										{{mails2 = db((db.notification_general_log4.yearp==course.user_project.period.yearp) & (db.notification_general_log4.period==course.user_project.period.period.name) & (db.notification_general_log4.course==course.user_project.project.name)).select()}}
@@ -135,6 +129,7 @@
 
 												}}
 											{{if mine_var=='true':}}
+												{{cont_mails = cont_mails + 1}}
 												{{if db((db.read_mail.id_auth_user == auth.user.id) & (db.read_mail.id_mail == mails2[a].id) ).select().first() == None:}}
 													{{cont_news = cont_news + 1}}
 												{{pass}}
@@ -158,11 +153,12 @@
 										</table>
 
 
-									{{if len(mails2) + len(mails) <= 3:}}
+									{{if (cont_mails) <= 3:}}
 										<div id="mail_{{=course.user_project.project.id}}" style="display:none; overflow:auto;" >
 									{{else:}}
 										<div id="mail_{{=course.user_project.project.id}}" style="display:none; height:300px; overflow:auto;" >
 									{{pass}}
+									
 										{{=T('Loading')}}...
 									<div>
 								</td>

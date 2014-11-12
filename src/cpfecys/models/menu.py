@@ -89,21 +89,11 @@ if auth.has_membership(role="Teacher") or auth.has_membership(role="Student"):
     for project in projects:
         
         mails = db((db.academic_send_mail_log.course==project.project.name)).select()
-        for a in range(len(mails)-1, -1, -1):
-            #SHOW JUST EMAILS SENDED TO ME
-            mine_var=False
-            var_query = mails[a].email_list
-            
-            split_var2 = list(str(var_query).split(","))
-            for xx in split_var2:
-                if str(xx) == str(auth.user.email):
-                    mine_var=True
-                pass
-            pass                                                    
-
-                
-            if mine_var== True:
-                if db((db.read_mail_student.id_auth_user == auth.user.id) & (db.read_mail_student.id_mail == mails[a].id) ).select().first() == None:
+        for a in mails:
+            var_query = db.academic_send_mail_detail((db.academic_send_mail_detail.academic_send_mail_log==a.id) & (db.academic_send_mail_detail.username==auth.user.username))
+                            
+            if var_query != None:
+                if db((db.read_mail_student.id_auth_user == auth.user.id) & (db.read_mail_student.id_mail == a.id) ).select().first() == None:
                     cont_news = cont_news + 1
                 pass
             pass

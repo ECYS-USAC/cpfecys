@@ -200,9 +200,8 @@ def register_mail():
 @auth.requires_login()
 def register_mail_detail():
     if request.vars['notice'] != None:
-        mail_var = db(db.academic_send_mail_log.id==request.vars['notice']).select().first()
-        listadoC=str(mail_var.email_list).split(",")
-        
+        mail_var = db(db.academic_send_mail_log.id==request.vars['notice']).select().first()         
+        listadoC=db((db.academic_send_mail_detail.academic_send_mail_log==mail_var.id)).select()
     
     return dict(mail_var=mail_var,listadoC=listadoC)
             
@@ -237,14 +236,25 @@ def reply_mail_with_email(email, message, remessage, retime, resub ,subject, sem
     was_sent = mail.send(to='dtt.ecys@dtt-ecys.org',subject=subject,message=messageC, bcc=email)
 
     if ((coursesAdmin is None) and auth.has_membership('Academic')):        
-        db.academic_send_mail_log.insert(subject=subject,
+        row = db.academic_send_mail_log.insert(subject=subject,
                                     sent_message=message,
                                     emisor=auth.user.username,
                                     course=project_name,
                                     yearp=semester.yearp,
                                     period=semester.period.name,
-                                    email_list=email,
                                     mail_state=str(was_sent))
+
+        email_list =str(email).split(",")
+        for email_temp in email_list:
+            user_var = db((db.auth_user.email == email_temp)).select().first()
+
+            if user_var != None:
+                username_var = user_var.username
+            else:
+                username_var = 'None'
+            db.academic_send_mail_detail.insert(academic_send_mail_log=row,
+                                                username = username_var,
+                                                email = email_temp)
     elif (auth.has_membership('Student') or auth.has_membership('Teacher')) and coursesAdmin != None:
         row = db.notification_general_log4.insert(subject=subject,
                                         sent_message=message,
@@ -301,14 +311,25 @@ def send_mail_to_users(users, message, subject, semester,year, project_name):
                     email_list_log = email_list_log + "," + str(user.email)
 
     was_sent = mail.send(to='dtt.ecys@dtt-ecys.org',subject=subject,message=messageC, bcc=email_list)
-    db.academic_send_mail_log.insert(subject=subject,
+    row = db.academic_send_mail_log.insert(subject=subject,
                                     sent_message=message,
                                     emisor=auth.user.username,
                                     course=project_name,
                                     yearp=year,
                                     period=semester,
-                                    email_list=str(email_list_log),
                                     mail_state=str(was_sent))
+
+    email_list =str(email_list_log).split(",")
+    for email_temp in email_list:
+        user_var = db((db.auth_user.email == email_temp)).select().first()
+
+        if user_var != None:
+            username_var = user_var.username
+        else:
+            username_var = 'None'
+        db.academic_send_mail_detail.insert(academic_send_mail_log=row,
+                                            username = username_var,
+                                            email = email_temp)
     
     #if was_sent==False:
     #    control=control+1

@@ -25,20 +25,10 @@
 		{{for p in listadoC:}}
 			<tr>
 				<td width="60%">
-					{{
-					try:
-						var_user = db(db.auth_user.email==p).select().first()
-						var_result = var_user.first_name + ' ' + var_user.last_name
-						=var_result
-					except:
-						=''
-					pass
-
-
-					}}
+					{{=p.username}}
 				</td>
 				<td width="60%">
-					{{=p}}
+					{{=p.email}}
 				</td>
 			</tr>
 		{{pass}}

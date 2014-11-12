@@ -2,19 +2,13 @@
 	<table class="table  " >
 
 		{{for a in range(len(mails)-1, -1, -1):}}
-			{{	#SHOW JUST EMAILS SENDED TO ME
-				
+			{{	
 				mine_var='false'
-				var_query = mails[a].email_list
-				
-				split_var2 = list(str(var_query).split(","))
-				
-				for xx in split_var2:
-					if str(xx) == str(request.vars['email']):
-						
-						mine_var='true'
-					pass
-				pass
+	            var_query = db.academic_send_mail_detail((db.academic_send_mail_detail.academic_send_mail_log==mails[a].id) & (db.academic_send_mail_detail.username==str(auth.user.username)))
+	                            
+	            if var_query != None:
+                    mine_var='true'
+	            pass
 				
 			}}
 			
