@@ -714,13 +714,13 @@ db.define_table('academic_course_assignation_log',
                 Field('date_log', 'datetime', notnull = True, default = datetime.datetime.now(), label = T('Fecha')))
 
 db.define_table('library',
-                Field('name', 'text', notnull=True, unique=False, label = T('name')),
-                Field('file_data', 'upload', notnull=True, label = T('file_data'), requires=[IS_UPLOAD_FILENAME(extension = '(pdf|zip)',error_message='Solo se aceptan archivos con extension zip|pdf'),IS_LENGTH(2097152,error_message='El tamaño máximo del archivo es 2MB')]),
-                Field('description', 'text', notnull=True, unique=False, label = T('description')),
-                Field('visible', 'boolean', label = T('visible')),
-                Field('period', 'reference period_year', notnull=True, label = T('period')),
-                Field('project', 'reference project', notnull=True, label = T('project')),
-                Field('owner_file', 'reference auth_user', notnull=True, label = T('owner_file')))
+                Field('name', 'text', notnull=True, unique=False, label = T('Name')),
+                Field('file_data', 'upload', notnull=True, label = T('File_data'), requires=[IS_UPLOAD_FILENAME(extension = '(pdf|zip)',error_message='Solo se aceptan archivos con extension zip|pdf'),IS_LENGTH(2097152,error_message='El tamaño máximo del archivo es 2MB')]),
+                Field('description', 'text', notnull=True, unique=False, label = T('Description')),
+                Field('visible', 'boolean', label = T('Visible')),
+                Field('period', 'reference period_year', notnull=True, label = T('Period')),
+                Field('project', 'reference project', notnull=True, label = T('Course')),
+                Field('owner_file', 'reference auth_user', notnull=True, label = T('Owner_file')))
 
 db.define_table('activity_category',
     Field('category', 'string', notnull=True, unique=False, label = T('category')),

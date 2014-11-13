@@ -1,49 +1,5 @@
 {{extend 'template.html'}}
-            <div id="div_list_courses" class="well span12" style="overflow-x:auto; overflow-y:auto; height:500px; width:20%;  background-color:white;  white-space:nowrap; position:absolute; left:0;">
-            {{if auth.has_membership('Academic'):}}
-                <a id="c_w_i_s" style="cursor:pointer;"><span id="span_c_w_i_s" class="icon-folder-close"></span>&nbsp;<font color="#">{{=T('Courses where I am student')}}</font></a>
-                <br>
-                <div id="div_c_w_i_s" style="display: none; padding-left: 20px; white-space:nowrap;">
-                    {{for period in obtainPeriods(1):}}
-                        <a id="a-p-{{=period.semester.id}}" style="cursor:pointer;"><span class="icon-folder-open"></span>&nbsp;{{=period.semester.period.name}} {{=period.semester.yearp}}</a>
-                        <br>
-                    {{pass}}
-                </div>
-            {{pass}}
-            {{if auth.has_membership('Student') or auth.has_membership('Teacher') :}}
-                <a id="c_w_i_p_t" style="cursor:pointer;"><span id="span_c_w_i_p_t" class="icon-folder-close"></span>&nbsp;{{=T('Courses where I am a professor or tutor')}}</a>
-                <br>
-                <div id="div_c_w_i_p_t" style="display: none; padding-left: 20px; white-space:nowrap;">
-                    {{for period in obtainPeriods(0):}}
-                        <a id="p-{{=period.id}}" style="cursor:pointer;"><span id="span_p_{{=period.id}}" class="icon-folder-close"></span>&nbsp;{{=period.period.name}} {{=period.yearp}}</a>
-                        <br>
-                            <div id="div_period_{{=period.id}}" style="display: none; padding-left: 20px; white-space:nowrap;">
-                            {{for project in obtainProjects(period.id):}}
-                                <a id="pr-{{=project.id}}" style="white-space:nowrap; cursor:pointer;"><span id="span_pr_{{=project.id}}" class="icon-folder-close"></span>&nbsp;{{=T(project.project.name)}}</a>
-                                <br>
-                                <div id="div_project_{{=project.id}}" style="display: none; padding-left: 20px; white-space:nowrap;">
-                                {{rol = obtenerRol()}}
-                                {{if rol == 2:}}
-                                    <a href="{{=URL(vars=dict(tipo=1, pro = project.id))}}" style="white-space:nowrap;"><span class="icon-folder-open"></span>&nbsp;{{=T('Owns')}}</a>
-                                        <br>
-                                    <a href="{{=URL(vars=dict(tipo=2, pro = project.id))}}" style="white-space:nowrap;"><span class="icon-folder-open"></span>&nbsp;{{=T('Share')}}</a>
-                                {{else:}}
-                                    <a href="{{=URL(vars=dict(tipo=3, pro = project.id))}}" style="white-space:nowrap;"><span class="icon-folder-open"></span>&nbsp;{{=T('Owns')}}</a>
-                                    {{for student in obtainStudents(project):}}
-                                        <br>
-                                        <a href="{{=URL(vars=dict(tipo=4, pro = student.user_project.id))}}" style="white-space:nowrap;"><span class="icon-folder-open"></span>&nbsp;{{=T(student.user_project.assigned_user.first_name)}}</a>
-                                    {{pass}}
-                                {{pass}}
-                                </div>
-                            {{pass}}
-                            </div>
-                    {{pass}}
-                </div>
-            {{pass}}
-        </div>
-<div id="file1">
-    <div class="well span12" id="file2" style="height:450px; width:60%; position:absolute; left:23%; overflow-y:auto;">
-        
+
         {{if existeRegistro()==True:}}
             <h3>{{=name}}
             <br>
@@ -57,18 +13,78 @@
                 <small>{{=T('File module')}}</small>
             </h3>
         {{pass}}
-        <div id="showGrid" style="overflow-x:auto; ">
-            {{if existeRegistro()==True:}}
-                
-                {{=grid}}
-            {{else:}}
-                
-            {{pass}}
-        </div>
-    </div>
-</div>
-<div style="height:500px;">
-    </div>
+        <table>
+            <tr>
+                <td>
+                    <div id="div_list_courses" class="well span12" style="height:500px; width:250px;  background-color:white;  white-space:nowrap; overflow-y:auto;">
+                    {{if auth.has_membership('Academic'):}}
+                        <a id="c_w_i_s" style="cursor:pointer; white-space:nowrap;"><span id="span_c_w_i_s" class="icon-folder-close"></span>&nbsp;<font   size="2">{{=T('My courses')}}</font></a>
+                        <br>
+                        <div id="div_c_w_i_s" style="display: none; padding-left: 20px; white-space:nowrap;">
+                            {{for period in obtainPeriods(1):}}
+                                <a id="a-p-{{=period.semester.id}}" style="cursor:pointer; white-space:nowrap;"><span id="a-span_p_{{=period.semester.id}}" class="icon-folder-close"></span>&nbsp;<font   size="2">{{=T(period.semester.period.name)}} {{=period.semester.yearp}}</a>
+                                <br>
+                                    <div id="a-div_period_{{=period.semester.id}}" style="display: none; padding-left: 20px; white-space:nowrap;">
+                                    {{for project in obtainProjects(1,period.semester.id):}}
+                                        <a href="{{=URL(vars=dict(tipo=5, semester=period.semester.id, pro = project.assignation.id))}}" id="a-pr-{{=project.assignation.id}}" style="white-space:nowrap; cursor:pointer;"><span id="a-span_pr_{{=project.assignation.id}}" class="icon-folder-close"></span>&nbsp;<font   size="2">{{=T(project.assignation.name)}}</a>
+                                        <br>
+                                        
+                                    {{pass}}
+                                    </div>
+                            {{pass}}
+                        </div>
+                    {{pass}}
+                    {{if auth.has_membership('Student') or auth.has_membership('Teacher') :}}
+                        {{if auth.has_membership('Student'):}}
+                            <a id="c_w_i_p_t" style="cursor:pointer; white-space:nowrap;"><span id="span_c_w_i_p_t" class="icon-folder-close"></span>&nbsp;<font   size="2">{{=T('My final practice')}}</a>
+                        {{else:}}
+                            <a id="c_w_i_p_t" style="cursor:pointer; white-space:nowrap;"><span id="span_c_w_i_p_t" class="icon-folder-close"></span>&nbsp;<font   size="2">{{=T('My courses')}}</a>
+                        {{pass}}
+                        <br>
+                        <div id="div_c_w_i_p_t" style="display: none; padding-left: 20px; white-space:nowrap;">
+                            {{for period in obtainPeriods(0):}}
+                                <a id="p-{{=period.id}}" style="cursor:pointer;"><span id="span_p_{{=period.id}}" class="icon-folder-close"></span>&nbsp;<font   size="2">{{=T(period.period.name)}} {{=period.yearp}}</a>
+                                <br>
+                                    <div id="div_period_{{=period.id}}" style="display: none; padding-left: 20px; white-space:nowrap;">
+                                    {{for project in obtainProjects(0,period.id):}}
+                                        <a id="pr-{{=project.id}}" style="white-space:nowrap; cursor:pointer;"><span id="span_pr_{{=project.id}}" class="icon-folder-close"></span>&nbsp;<font   size="2">{{=T(project.project.name)}}</a>
+                                        <br>
+                                        <div id="div_project_{{=project.id}}" style="display: none; padding-left: 20px; white-space:nowrap;">
+                                        {{if auth.has_membership('Student'):}}
+                                            <a href="{{=URL(vars=dict(tipo=1, pro = project.id))}}" style="white-space:nowrap;"><span class="icon-folder-close"></span>&nbsp;<font   size="2">{{=T('Owns')}}</a>
+                                                <br>
+                                            <a href="{{=URL(vars=dict(tipo=2, pro = project.id))}}" style="white-space:nowrap;"><span class="icon-folder-close"></span>&nbsp;<font   size="2">{{=T('Share')}}</a>
+                                        {{else:}}
+                                            <a href="{{=URL(vars=dict(tipo=3, pro = project.id))}}" style="white-space:nowrap;"><span class="icon-folder-close"></span>&nbsp;<font   size="2">{{=T('Owns')}}</a>
+                                            {{for student in obtainStudents(project):}}
+                                                <br>
+                                                <a href="{{=URL(vars=dict(tipo=4, pro = student.user_project.id))}}" style="white-space:nowrap;"><span class="icon-folder-close"></span>&nbsp;<font   size="2">{{=T(student.user_project.assigned_user.first_name)}}</a>
+                                            {{pass}}
+                                        {{pass}}
+                                        </div>
+                                    {{pass}}
+                                    </div>
+                            {{pass}}
+                        </div>
+                    {{pass}}
+                </div>
+            </td>
+            <td style="width:100%;">
+                <div id="file1" style="width:100%; overflow-y:auto; ">
+                    <div class="well" id="file2" style="height:425px; width:90%; overflow-y:auto;">
+                        <div id="showGrid" >
+                            {{if existeRegistro()==True:}}
+                                {{=grid}}
+                            {{else:}}
+                                
+                            {{pass}}
+                        </div>
+                    </div>
+                </div>
+            </td>
+        </tr>
+    </table>
+
 <script type="text/javascript">
     $(document).ready(function(){
         {{for period in obtainPeriods(0):}}
@@ -80,13 +96,33 @@
                     document.getElementById('span_p_{{=period.id}}').className = "icon-folder-close";
                 }
             })
-            {{for project in obtainProjects(period.id):}}
+            {{for project in obtainProjects(0,period.id):}}
                 $("#pr-{{=project.id}}").click(function(){         
                     $("#div_project_{{=project.id}}").toggle();
                     if (document.getElementById('span_pr_{{=project.id}}').className == "icon-folder-close") {
                         document.getElementById('span_pr_{{=project.id}}').className = "icon-folder-open";
                     }else{
                         document.getElementById('span_pr_{{=project.id}}').className = "icon-folder-close";
+                    }
+                })
+            {{pass}}
+        {{pass}}
+
+        {{for period in obtainPeriods(1):}}
+            $("#a-p-{{=period.semester.id}}").click(function(){         
+                $("#a-div_period_{{=period.semester.id}}").toggle();
+                if (document.getElementById('a-span_p_{{=period.semester.id}}').className == "icon-folder-close") {
+                    document.getElementById('a-span_p_{{=period.semester.id}}').className = "icon-folder-open";
+                }else{
+                    document.getElementById('a-span_p_{{=period.semester.id}}').className = "icon-folder-close";
+                }
+            })
+            {{for project in obtainProjects(1,period.semester.id):}}
+                $("#a-pr-{{=project.assignation.id}}").click(function(){  
+                    if (document.getElementById('a-span_pr_{{=project.assignation.id}}').className == "icon-folder-close") {
+                        document.getElementById('a-span_pr_{{=project.assignation.id}}').className = "icon-folder-open";
+                    }else{
+                        document.getElementById('a-span_pr_{{=project.assignation.id}}').className = "icon-folder-close";
                     }
                 })
             {{pass}}
