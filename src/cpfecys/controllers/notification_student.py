@@ -262,7 +262,22 @@ def reply_mail_with_email(email, message, remessage, retime, resub ,subject, sem
                                         course=project_name,
                                         yearp=semester.yearp,
                                         period=semester.period.name)
-        db.notification_log4.insert(destination = email, result_log =str(was_sent), success = str(was_sent), register=row)    
+        
+        user_var = db((db.auth_user.email == email)).select().first()
+
+        if user_var != None:
+            username_var = user_var.username
+        else:
+            user_var = db((db.academic.email == email)).select().first()
+            if user_var != None:
+                username_var = user_var.carnet
+            else:
+                username_var = 'None'
+        db.notification_log4.insert(destination = email, 
+                                    result_log =str(was_sent), 
+                                    username = username_var,
+                                    success = str(was_sent), 
+                                    register=row)    
     
     if was_sent==False:
         control=control+1

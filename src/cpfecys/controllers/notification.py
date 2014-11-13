@@ -132,37 +132,19 @@ def teacher_register_mail_detail():
     if request.vars['notice'] != None:
         noticia = db(db.notification_general_log4.id==request.vars['notice']).select().first()
 
-        mail_var = db(db.notification_log4.register==request.vars['notice']).select().first()
-        listadoC=str(mail_var.destination).split(",")
-
-        tutores = db((db.auth_user.id==db.user_project.assigned_user)&(db.user_project.project==db.project.id)&(db.project.name==noticia.course)&(db.user_project.period==db.period_year.id)&(db.period_year.yearp==noticia.yearp)&(db.period_year.period==db.period.id)&(db.period.name==noticia.period)).select()
-        tempT = []
-        for t in tutores:
-            if t.auth_user.email in listadoC:
-                tempT.append(t.auth_user.id)
-        tutores = db(db.auth_user.id.belongs(tempT)).select()
-        estudiantes = db(db.academic.email.belongs(listadoC)).select()
-    return dict(tutores=tutores, estudiantes=estudiantes, noticia=noticia, log=mail_var)
+        listadoC = db(db.notification_log4.register==request.vars['notice']).select()
+        
+    return dict(noticia=noticia,listadoC = listadoC, log=listadoC.first())
 
 def teacher_search_destination():
+    all_n=None
+    tipoD = 0
     if request.vars['notice'] != None:
-        noticia = db(db.notification_general_log4.id==request.vars['notice']).select().first()
-
-        mail_var = db(db.notification_log4.register==request.vars['notice']).select().first()
-        listadoC=str(mail_var.destination).split(",")
-
-        tutores = db((db.auth_user.id==db.user_project.assigned_user)&(db.user_project.project==db.project.id)&(db.project.name==noticia.course)&(db.user_project.period==db.period_year.id)&(db.period_year.yearp==noticia.yearp)&(db.period_year.period==db.period.id)&(db.period.name==noticia.period)).select()
-        tempT = []
-        for t in tutores:
-            if t.auth_user.email in listadoC:
-                tempT.append(t.auth_user.id)
         if request.vars['search_input'] != None:
-            tutores = db((db.auth_user.id.belongs(tempT))&(db.auth_user.username.like('%'+request.vars['search_input']+'%'))).select()
-            estudiantes = db((db.academic.email.belongs(listadoC))&(db.academic.carnet.like('%'+request.vars['search_input']+'%'))).select()
+            mail_var = db((db.notification_log4.register==request.vars['notice']) & (db.notification_log4.username.like('%'+request.vars['search_input']+'%'))).select()
         else:
-            tutores = db(db.auth_user.id.belongs(tempT)).select()
-            estudiantes = db(db.academic.email.belongs(listadoC)).select()
-    return dict(tutores=tutores, estudiantes=estudiantes, noticia=noticia, log=mail_var)
+            mail_var = db(db.notification_log4.register==request.vars['notice']).select()
+    return dict(all_n=mail_var, tipoD=tipoD)
 
 #*********************************************************
 #**********************ENVIAR AVISOS**********************
@@ -234,7 +216,23 @@ def teacher_send_mail_to_students(users1, users2, message, subject, check, semes
     ##Notification LOG GENERAL
     db.mailer_log.insert(sent_message = messageC, destination = email_list_log, result_log = str(mail.error or '') + ':' + str(mail.result), success = was_sent, emisor=str(check.assigned_user.username))
     ##Notification LOG
-    db.notification_log4.insert(destination = email_list_log, result_log = str(mail.error or '') + ':' + str(mail.result), success = was_sent, register=row.id)
+    email_list =str(email_list_log).split(",")
+    for email_temp in email_list:
+        user_var = db((db.auth_user.email == email_temp)).select().first()
+
+        if user_var != None:
+            username_var = user_var.username
+        else:
+            user_var = db((db.academic.email == email_temp)).select().first()
+            if user_var != None:
+                username_var = user_var.carnet
+            else:
+                username_var = 'None'
+        db.notification_log4.insert(destination = email_temp, 
+                                    username = username_var,
+                                    result_log = str(mail.error or '') + ':' + str(mail.result), 
+                                    success = was_sent, 
+                                    register=row.id)
     if was_sent==False:
         control=control+1
                 
@@ -608,25 +606,22 @@ def register_mail():
 
 
 def register_mail_detail():
-    all_n=None
     if request.vars['notice'] != None:
-        noticia = db(db.notification_general_log4.id==request.vars['notice']).select().first()
+        notice = db(db.notification_general_log4.id==request.vars['notice']).select().first()
 
-        mail_var = db(db.notification_log4.register==request.vars['notice']).select().first()
-        listadoC=str(mail_var.destination).split(",")
-        mail_var.destination = db(db.academic.email.belongs(listadoC)).select()
-    return dict(notice=noticia, all_n=mail_var)
+        listadoC = db(db.notification_log4.register==request.vars['notice']).select()
+        
+    return dict(notice=notice,listadoC = listadoC, log=listadoC.first())
+
 
 def search_destination():
     all_n=None
     tipoD = 0
     if request.vars['notice'] != None:
-        mail_var = db(db.notification_log4.register==request.vars['notice']).select().first()
-        listadoC=str(mail_var.destination).split(",")
         if request.vars['search_input'] != None:
-            mail_var.destination = db((db.academic.email.belongs(listadoC)) & (db.academic.carnet.like('%'+request.vars['search_input']+'%'))).select()
+            mail_var = db((db.notification_log4.register==request.vars['notice']) & (db.notification_log4.username.like('%'+request.vars['search_input']+'%'))).select()
         else:
-            mail_var.destination = db(db.academic.email.belongs(listadoC)).select()
+            mail_var = db(db.notification_log4.register==request.vars['notice']).select()
     return dict(all_n=mail_var, tipoD=tipoD)
 #*********************************************************
 #**********************ENVIAR AVISOS**********************
@@ -694,11 +689,24 @@ def send_mail_to_students(users, message, subject, check, semester, year):
                      str(mail.result),
                      success = was_sent, emisor=str(check.assigned_user.username))
     ##Notification LOG
-    db.notification_log4.insert(destination = email_list_log,
-                     result_log = str(mail.error or '') + ':' + \
-                     str(mail.result),
-                     success = was_sent,
-                     register=row.id)
+    email_list =str(email_list_log).split(",")
+    for email_temp in email_list:
+        user_var = db((db.auth_user.email == email_temp)).select().first()
+
+        if user_var != None:
+            username_var = user_var.username
+        else:
+            user_var = db((db.academic.email == email_temp)).select().first()
+            if user_var != None:
+                username_var = user_var.carnet
+            else:
+                username_var = 'None'
+        db.notification_log4.insert(destination = email_temp, 
+                                    username = username_var,
+                                    result_log = str(mail.error or '') + ':' + str(mail.result), 
+                                    success = was_sent, 
+                                    register=row.id)
+    
     if was_sent==False:
         control=control+1
     session.attachment_list = []

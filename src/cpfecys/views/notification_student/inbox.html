@@ -42,27 +42,22 @@
 						{{for assignation in assignations:}}							
 							<tr >
 								<td  >
+
 									
 										{{cont_news = 0}}
 										{{mails = db((db.notification_general_log4.yearp==assignation.semester.yearp) & (db.notification_general_log4.period==assignation.semester.period.name) & (db.notification_general_log4.course==assignation.assignation.name)).select()}}
 										{{for a in range(len(mails)-1, -1, -1):}}
 											{{	#SHOW JUST EMAILS SENDED TO ME
-												mine_var='false'
-												var_query = db.notification_log4(db.notification_log4.register==mails[a].id)
-												
-												split_var2 = list(str(var_query.destination).split(","))
-												for xx in split_var2:
-													if str(xx) == str(email):
-														mine_var='true'
-													pass
-												pass												
 
+									            var_query = db.notification_log4((db.notification_log4.register==mails[a].id) & (db.notification_log4.username==auth.user.username))
+									            if var_query != None:
+									                if db((db.read_mail.id_auth_user == auth.user.id) & (db.read_mail.id_mail == mails[a].id) ).select().first() == None:
+									                    cont_news = cont_news + 1
+									                pass
+									            pass
+									        
 												}}
-											{{if mine_var=='true':}}
-												{{if db((db.read_mail.id_auth_user == auth.user.id) & (db.read_mail.id_mail == mails[a].id) ).select().first() == None:}}
-													{{cont_news = cont_news + 1}}
-												{{pass}}
-											{{pass}}
+												
 										{{pass}}
 										<table class="table table-bordered" >
 											<tr bgcolor="#FAFAFA"> 
@@ -117,23 +112,12 @@
 										{{mails2 = db((db.notification_general_log4.yearp==course.user_project.period.yearp) & (db.notification_general_log4.period==course.user_project.period.period.name) & (db.notification_general_log4.course==course.user_project.project.name)).select()}}
 										{{for a in range(len(mails2)-1, -1, -1):}}
 											{{	#SHOW JUST EMAILS SENDED TO ME
-												mine_var='false'
-												var_query = db.notification_log4(db.notification_log4.register==mails2[a].id)
-												
-												split_var2 = list(str(var_query.destination).split(","))
-												for xx in split_var2:
-													if str(xx) == str(email):
-														mine_var='true'
-													pass
-												pass												
-
-												}}
-											{{if mine_var=='true':}}
-												{{cont_mails = cont_mails + 1}}
-												{{if db((db.read_mail.id_auth_user == auth.user.id) & (db.read_mail.id_mail == mails2[a].id) ).select().first() == None:}}
-													{{cont_news = cont_news + 1}}
-												{{pass}}
-											{{pass}}
+												var_query = db.notification_log4((db.notification_log4.register==mails2[a].id) & (db.notification_log4.username==auth.user.username))
+									            if var_query != None:
+									                if db((db.read_mail.id_auth_user == auth.user.id) & (db.read_mail.id_mail == mails2[a].id) ).select().first() == None:
+									                    cont_news = cont_news + 1
+									                pass
+									            pass}}
 										{{pass}}
 
 										<table class="table table-bordered" >

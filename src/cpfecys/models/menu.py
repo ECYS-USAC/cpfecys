@@ -100,18 +100,8 @@ if auth.has_membership(role="Teacher") or auth.has_membership(role="Student"):
         pass
 
         for a in db((db.notification_general_log4.course==project.project.name)).select():
-            mine_var = False
-            var_query = db.notification_log4(db.notification_log4.register==a.id)
-            
-            split_var2 = list(str(var_query.destination).split(","))
-            for xx in split_var2:
-                if str(xx) == str(auth.user.email):
-                    mine_var = True
-                pass
-            pass                                                
-                
-            if mine_var == True:
-
+            var_query = db.notification_log4((db.notification_log4.register==a.id) & (db.notification_log4.username==auth.user.username))
+            if var_query != None:
                 if db((db.read_mail.id_auth_user == auth.user.id) & (db.read_mail.id_mail == a.id) ).select().first() == None:
                     cont_news = cont_news + 1
                 pass
@@ -138,23 +128,15 @@ if auth.has_membership(role="Academic"):
     assignation_var = db((db.academic_course_assignation.carnet==academic_var.id)).select(db.academic_course_assignation.assignation,distinct=True)
     for assignation in assignation_var:
         for a in db((db.notification_general_log4.course==assignation.assignation.name)).select():
-            mine_var = False
-            var_query = db.notification_log4(db.notification_log4.register==a.id)
+            var_query = db.notification_log4((db.notification_log4.register==a.id) & (db.notification_log4.username==auth.user.username))
             
-            split_var2 = list(str(var_query.destination).split(","))
-            for xx in split_var2:
-                if str(xx) == str(auth.user.email):
-                    mine_var = True
-                pass
-            pass                                                
-                
-            if mine_var == True:
-
+            if var_query != None:
                 if db((db.read_mail.id_auth_user == auth.user.id) & (db.read_mail.id_mail == a.id) ).select().first() == None:
                     cont_news = cont_news + 1
                 pass
             pass
         pass
+        
 
 if auth.has_membership(role="Teacher"):
     response.menu.extend([(T('Courses'), False, URL(),[

@@ -676,6 +676,7 @@ db.define_table('notification_general_log4',
 #Tabla de avisos
 db.define_table('notification_log4',
                 Field('destination', 'text', notnull = True, label = T('Destination')),
+                Field('username', 'text', notnull = True, label = T('Username')),
                 Field('result_log', 'text', notnull = False, label = T('Log')),
                 Field('success', 'boolean', notnull = True, label = T('Success')),
                 Field('register', 'reference notification_general_log4', notnull = True, label = T('Register')))

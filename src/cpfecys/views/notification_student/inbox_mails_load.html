@@ -4,14 +4,10 @@
 		{{for a in range(len(mails)-1, -1, -1):}}
 			{{	#SHOW JUST EMAILS SENDED TO ME
 				mine_var='false'
-				var_query = db.notification_log4(db.notification_log4.register==mails[a].id)
-				split_var2 = list(str(var_query.destination).split(","))
-				
-				for xx in split_var2:
-					if str(xx) == str(request.vars['email']):
-						mine_var='true'
-					pass
-				pass
+				var_query = db.notification_log4((db.notification_log4.register==mails[a].id) & (db.notification_log4.username==auth.user.username))
+	            if var_query != None:
+	                mine_var='true'
+	            pass
 			}}
 				
 			
