@@ -9,7 +9,14 @@
 		<thead>
 			<tr bgcolor="#F7D358">
 			<th width="470px">
-				<center>{{=T('User')}}</center>
+				<div>
+					<div>
+						<a href="{{=URL(vars=dict(list='False',level='4',level_project=project.id, level_month=month, level_tipo=tipo, level_rol=roll))}}" title="{{=T('Export reporting level')}}"><img src="{{=URL('static','images')}}/icono_CSV.png"></a>
+					</div>
+					<div>
+						<center>{{=T('User')}}</center>
+					</div>
+				</div>
 			</th>
 			{{if ((tipo=='all') or (tipo=='i')):}}
 				<th>

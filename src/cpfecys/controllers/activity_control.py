@@ -4247,6 +4247,10 @@ def management_approval_students_requirement():
 #********************************************************************************************************************************************************************************************************
 #********************************************************************************************************************************************************************************************************
 #********************************************************************************************************************************************************************************************************
+#***************************************************Management Report Revalidations laboratory***************************************************
+
+#********************************************************
+#Export full management reporting grade
 @auth.requires_login()
 @auth.requires(auth.has_membership('Teacher'))
 def grades_management_export():
@@ -4366,34 +4370,34 @@ def grades_management_export():
     for assigantion in assigantions:
         tempRemport1=[]
         tempRemport1.append(assigantion.project.name)
-        if session.search_grades_management == "":
-            tI = db.executesql('SELECT count(id) as total from grades_log where project=\'' + assigantion.project.name + '\' and yearp=\'' + str(year.yearp) +'\' and period=\'' + str(T(year.period.name))+ '\' and operation_log=\'insert\'' + session.search_grades_management +';' ,as_dict=True)
+        if session.search_grades_management == "" or session.search_grades_management is None:
+            tI = db.executesql('SELECT count(id) as total from grades_log where project=\'' + assigantion.project.name + '\' and yearp=\'' + str(year.yearp) +'\' and period=\'' + str(T(year.period.name))+ '\' and operation_log=\'insert\';' ,as_dict=True)
             for dI in tI:
                 dIT=dI['total']
             pass
             tempRemport1.append(str(dIT))
-            tI = db.executesql('SELECT count(id) as total from grades_log where project=\'' + assigantion.project.name + '\' and yearp=\'' + str(year.yearp) +'\' and period=\'' + str(T(year.period.name))+ '\' and operation_log=\'update\'' + session.search_grades_management +';' ,as_dict=True)
+            tI = db.executesql('SELECT count(id) as total from grades_log where project=\'' + assigantion.project.name + '\' and yearp=\'' + str(year.yearp) +'\' and period=\'' + str(T(year.period.name))+ '\' and operation_log=\'update\';' ,as_dict=True)
             for dI in tI:
                 dIT=dI['total']
             pass
             tempRemport1.append(str(dIT))
-            tI = db.executesql('SELECT count(id) as total from grades_log where project=\'' + assigantion.project.name + '\' and yearp=\'' + str(year.yearp) +'\' and period=\'' + str(T(year.period.name))+ '\' and operation_log=\'delete\'' + session.search_grades_management +';' ,as_dict=True)
+            tI = db.executesql('SELECT count(id) as total from grades_log where project=\'' + assigantion.project.name + '\' and yearp=\'' + str(year.yearp) +'\' and period=\'' + str(T(year.period.name))+ '\' and operation_log=\'delete\';' ,as_dict=True)
             for dI in tI:
                 dIT=dI['total']
             pass
             tempRemport1.append(str(dIT))
         else:
-            tI = db.executesql('SELECT count(id) as total from grades_log where project=\'' + assigantion.project.name + '\' and yearp=\'' + str(year.yearp) +'\' and period=\'' + str(T(year.period.name))+ '\' and operation_log=\'insert\' and ' + session.search_grades_management +';' ,as_dict=True)
+            tI = db.executesql('SELECT count(id) as total from grades_log where project=\'' + assigantion.project.name + '\' and yearp=\'' + str(year.yearp) +'\' and period=\'' + str(T(year.period.name))+ '\' and operation_log=\'insert\' and (' + session.search_grades_management +');' ,as_dict=True)
             for dI in tI:
                 dIT=dI['total']
             pass
             tempRemport1.append(str(dIT))
-            tI = db.executesql('SELECT count(id) as total from grades_log where project=\'' + assigantion.project.name + '\' and yearp=\'' + str(year.yearp) +'\' and period=\'' + str(T(year.period.name))+ '\' and operation_log=\'update\' and ' + session.search_grades_management +';' ,as_dict=True)
+            tI = db.executesql('SELECT count(id) as total from grades_log where project=\'' + assigantion.project.name + '\' and yearp=\'' + str(year.yearp) +'\' and period=\'' + str(T(year.period.name))+ '\' and operation_log=\'update\' and (' + session.search_grades_management +');' ,as_dict=True)
             for dI in tI:
                 dIT=dI['total']
             pass
             tempRemport1.append(str(dIT))
-            tI = db.executesql('SELECT count(id) as total from grades_log where project=\'' + assigantion.project.name + '\' and yearp=\'' + str(year.yearp) +'\' and period=\'' + str(T(year.period.name))+ '\' and operation_log=\'delete\' and ' + session.search_grades_management +';' ,as_dict=True)
+            tI = db.executesql('SELECT count(id) as total from grades_log where project=\'' + assigantion.project.name + '\' and yearp=\'' + str(year.yearp) +'\' and period=\'' + str(T(year.period.name))+ '\' and operation_log=\'delete\' and (' + session.search_grades_management +');' ,as_dict=True)
             for dI in tI:
                 dIT=dI['total']
             pass
@@ -4421,7 +4425,7 @@ def grades_management_export():
                 end = datetime.strptime(str(year.yearp) + '-' + str(month[2]) +'-01', "%Y-%m-%d")
             pass
             tempRemport2.append(month[1])
-            if session.search_grades_management == "":
+            if session.search_grades_management == "" or session.search_grades_management is None:
                 tD = db.executesql('SELECT count(id) as total from grades_log where project=\'' + assigantion.project.name + '\' and yearp=\'' + str(year.yearp) +'\' and period=\'' + str(T(year.period.name))+ '\' and operation_log=\'insert\' and date_log>=\'' + str(start) +'\' and date_log <= \''+ str(end) +'\';' ,as_dict=True)
                 for dD in tD:
                     dDT=dD['total']
@@ -4438,17 +4442,17 @@ def grades_management_export():
                 pass
                 tempRemport2.append(str(dDT))
             else:
-                tD = db.executesql('SELECT count(id) as total from grades_log where project=\'' + assigantion.project.name + '\' and yearp=\'' + str(year.yearp) +'\' and period=\'' + str(T(year.period.name))+ '\' and operation_log=\'insert\' and date_log>=\'' + str(start) +'\' and date_log <= \''+ str(end) + '\' and ' + session.search_grades_management +';' ,as_dict=True)
+                tD = db.executesql('SELECT count(id) as total from grades_log where project=\'' + assigantion.project.name + '\' and yearp=\'' + str(year.yearp) +'\' and period=\'' + str(T(year.period.name))+ '\' and operation_log=\'insert\' and date_log>=\'' + str(start) +'\' and date_log <= \''+ str(end) + '\' and (' + session.search_grades_management +');' ,as_dict=True)
                 for dD in tD:
                     dDT=dD['total']
                 pass
                 tempRemport2.append(str(dDT))
-                tD = db.executesql('SELECT count(id) as total from grades_log where project=\'' + assigantion.project.name + '\' and yearp=\'' + str(year.yearp) +'\' and period=\'' + str(T(year.period.name))+ '\' and operation_log=\'update\' and date_log>=\'' + str(start) +'\' and date_log <= \''+ str(end) + '\' and ' + session.search_grades_management +';' ,as_dict=True)
+                tD = db.executesql('SELECT count(id) as total from grades_log where project=\'' + assigantion.project.name + '\' and yearp=\'' + str(year.yearp) +'\' and period=\'' + str(T(year.period.name))+ '\' and operation_log=\'update\' and date_log>=\'' + str(start) +'\' and date_log <= \''+ str(end) + '\' and (' + session.search_grades_management +');' ,as_dict=True)
                 for dD in tD:
                     dDT=dD['total']
                 pass
                 tempRemport2.append(str(dDT))
-                tD = db.executesql('SELECT count(id) as total from grades_log where project=\'' + assigantion.project.name + '\' and yearp=\'' + str(year.yearp) +'\' and period=\'' + str(T(year.period.name))+ '\' and operation_log=\'delete\' and date_log>=\'' + str(start) +'\' and date_log <= \''+ str(end) + '\' and ' + session.search_grades_management +';' ,as_dict=True)
+                tD = db.executesql('SELECT count(id) as total from grades_log where project=\'' + assigantion.project.name + '\' and yearp=\'' + str(year.yearp) +'\' and period=\'' + str(T(year.period.name))+ '\' and operation_log=\'delete\' and date_log>=\'' + str(start) +'\' and date_log <= \''+ str(end) + '\' and (' + session.search_grades_management +');' ,as_dict=True)
                 for dD in tD:
                     dDT=dD['total']
                 pass
@@ -4481,7 +4485,7 @@ def grades_management_export():
                 else:
                     tempRemport3.append(T(roll))
                 pass
-                if session.search_grades_management == "":
+                if session.search_grades_management == "" or session.search_grades_management is None:
                     tD = db.executesql('SELECT count(id) as total from grades_log where project=\'' + assigantion.project.name + '\' and yearp=\'' + str(year.yearp) +'\' and period=\'' + str(T(year.period.name))+ '\' and operation_log=\'insert\' and date_log>=\'' + str(start) +'\' and date_log <= \''+ str(end) +'\' and roll=\''+ roll +'\';' ,as_dict=True)
                     for dD in tD:
                         dDT=dD['total']
@@ -4498,17 +4502,17 @@ def grades_management_export():
                     pass
                     tempRemport3.append(dDT)
                 else:
-                    tD = db.executesql('SELECT count(id) as total from grades_log where project=\'' + assigantion.project.name + '\' and yearp=\'' + str(year.yearp) +'\' and period=\'' + str(T(year.period.name))+ '\' and operation_log=\'insert\' and date_log>=\'' + str(start) +'\' and date_log <= \''+ str(end) +'\' and roll=\''+ roll +'\' and ' + session.search_grades_management +';' ,as_dict=True)
+                    tD = db.executesql('SELECT count(id) as total from grades_log where project=\'' + assigantion.project.name + '\' and yearp=\'' + str(year.yearp) +'\' and period=\'' + str(T(year.period.name))+ '\' and operation_log=\'insert\' and date_log>=\'' + str(start) +'\' and date_log <= \''+ str(end) +'\' and roll=\''+ roll +'\' and (' + session.search_grades_management +');' ,as_dict=True)
                     for dD in tD:
                         dDT=dD['total']
                     pass
                     tempRemport3.append(dDT)
-                    tD = db.executesql('SELECT count(id) as total from grades_log where project=\'' + assigantion.project.name + '\' and yearp=\'' + str(year.yearp) +'\' and period=\'' + str(T(year.period.name))+ '\' and operation_log=\'update\' and date_log>=\'' + str(start) +'\' and date_log <= \''+ str(end) +'\' and roll=\''+ roll +'\' and ' + session.search_grades_management +';' ,as_dict=True)
+                    tD = db.executesql('SELECT count(id) as total from grades_log where project=\'' + assigantion.project.name + '\' and yearp=\'' + str(year.yearp) +'\' and period=\'' + str(T(year.period.name))+ '\' and operation_log=\'update\' and date_log>=\'' + str(start) +'\' and date_log <= \''+ str(end) +'\' and roll=\''+ roll +'\' and (' + session.search_grades_management +');' ,as_dict=True)
                     for dD in tD:
                         dDT=dD['total']
                     pass
                     tempRemport3.append(dDT)
-                    tD = db.executesql('SELECT count(id) as total from grades_log where project=\'' + assigantion.project.name + '\' and yearp=\'' + str(year.yearp) +'\' and period=\'' + str(T(year.period.name))+ '\' and operation_log=\'delete\' and date_log>=\'' + str(start) +'\' and date_log <= \''+ str(end) +'\' and roll=\''+ roll +'\' and ' + session.search_grades_management +';' ,as_dict=True)
+                    tD = db.executesql('SELECT count(id) as total from grades_log where project=\'' + assigantion.project.name + '\' and yearp=\'' + str(year.yearp) +'\' and period=\'' + str(T(year.period.name))+ '\' and operation_log=\'delete\' and date_log>=\'' + str(start) +'\' and date_log <= \''+ str(end) +'\' and roll=\''+ roll +'\' and (' + session.search_grades_management +');' ,as_dict=True)
                     for dD in tD:
                         dDT=dD['total']
                     pass
@@ -4548,7 +4552,7 @@ def grades_management_export():
                     tempRemport4.append('')
                     tempRemport4.append('')
                     tempRemport4.append(userr)
-                    if session.search_grades_management == "":
+                    if session.search_grades_management == "" or session.search_grades_management is None:
                         tD = db.executesql('SELECT count(id) as total from grades_log where project=\'' + assigantion.project.name + '\' and yearp=\'' + str(year.yearp) +'\' and period=\'' + str(T(year.period.name))+ '\' and operation_log=\'insert\' and date_log>=\'' + str(start) +'\' and date_log <= \''+ str(end) +'\' and roll=\''+ roll +'\' and user_name=\''+ userr +'\';' ,as_dict=True)
                         for dD in tD:
                             dDT=dD['total']
@@ -4565,17 +4569,17 @@ def grades_management_export():
                         pass
                         tempRemport4.append(dDT)
                     else:
-                        tD = db.executesql('SELECT count(id) as total from grades_log where project=\'' + assigantion.project.name + '\' and yearp=\'' + str(year.yearp) +'\' and period=\'' + str(T(year.period.name))+ '\' and operation_log=\'insert\' and date_log>=\'' + str(start) +'\' and date_log <= \''+ str(end) +'\' and roll=\''+ roll +'\' and user_name=\''+ userr +'\' and ' + session.search_grades_management +';' ,as_dict=True)
+                        tD = db.executesql('SELECT count(id) as total from grades_log where project=\'' + assigantion.project.name + '\' and yearp=\'' + str(year.yearp) +'\' and period=\'' + str(T(year.period.name))+ '\' and operation_log=\'insert\' and date_log>=\'' + str(start) +'\' and date_log <= \''+ str(end) +'\' and roll=\''+ roll +'\' and user_name=\''+ userr +'\' and (' + session.search_grades_management +');' ,as_dict=True)
                         for dD in tD:
                             dDT=dD['total']
                         pass
                         tempRemport4.append(dDT)
-                        tD = db.executesql('SELECT count(id) as total from grades_log where project=\'' + assigantion.project.name + '\' and yearp=\'' + str(year.yearp) +'\' and period=\'' + str(T(year.period.name))+ '\' and operation_log=\'update\' and date_log>=\'' + str(start) +'\' and date_log <= \''+ str(end) +'\' and roll=\''+ roll +'\' and user_name=\''+ userr +'\' and ' + session.search_grades_management +';' ,as_dict=True)
+                        tD = db.executesql('SELECT count(id) as total from grades_log where project=\'' + assigantion.project.name + '\' and yearp=\'' + str(year.yearp) +'\' and period=\'' + str(T(year.period.name))+ '\' and operation_log=\'update\' and date_log>=\'' + str(start) +'\' and date_log <= \''+ str(end) +'\' and roll=\''+ roll +'\' and user_name=\''+ userr +'\' and (' + session.search_grades_management +');' ,as_dict=True)
                         for dD in tD:
                             dDT=dD['total']
                         pass
                         tempRemport4.append(dDT)
-                        tD = db.executesql('SELECT count(id) as total from grades_log where project=\'' + assigantion.project.name + '\' and yearp=\'' + str(year.yearp) +'\' and period=\'' + str(T(year.period.name))+ '\' and operation_log=\'delete\' and date_log>=\'' + str(start) +'\' and date_log <= \''+ str(end) +'\' and roll=\''+ roll +'\' and user_name=\''+ userr +'\' and ' + session.search_grades_management +';' ,as_dict=True)
+                        tD = db.executesql('SELECT count(id) as total from grades_log where project=\'' + assigantion.project.name + '\' and yearp=\'' + str(year.yearp) +'\' and period=\'' + str(T(year.period.name))+ '\' and operation_log=\'delete\' and date_log>=\'' + str(start) +'\' and date_log <= \''+ str(end) +'\' and roll=\''+ roll +'\' and user_name=\''+ userr +'\' and (' + session.search_grades_management +');' ,as_dict=True)
                         for dD in tD:
                             dDT=dD['total']
                         pass
@@ -4587,7 +4591,7 @@ def grades_management_export():
                     temp_vecAllUserRoleMonth=[]
                     tempRemport5=[]
                     #Body Level 5
-                    if session.search_grades_management == "":
+                    if session.search_grades_management == "" or session.search_grades_management is None:
                         tD = db.executesql('SELECT * from grades_log where project=\'' + assigantion.project.name + '\' and yearp=\'' + str(year.yearp) +'\' and period=\'' + str(T(year.period.name))+ '\' and operation_log=\'insert\' and date_log>=\'' + str(start) +'\' and date_log <= \''+ str(end) +'\' and roll=\''+ roll +'\' and user_name=\''+ userr +'\';' ,as_dict=True)
                         temp_vecAllUserRoleMonth.append(tD)
                         tD = db.executesql('SELECT * from grades_log where project=\'' + assigantion.project.name + '\' and yearp=\'' + str(year.yearp) +'\' and period=\'' + str(T(year.period.name))+ '\' and operation_log=\'update\' and date_log>=\'' + str(start) +'\' and date_log <= \''+ str(end) +'\' and roll=\''+ roll +'\' and user_name=\''+ userr +'\';' ,as_dict=True)
@@ -4595,11 +4599,11 @@ def grades_management_export():
                         tD = db.executesql('SELECT * from grades_log where project=\'' + assigantion.project.name + '\' and yearp=\'' + str(year.yearp) +'\' and period=\'' + str(T(year.period.name))+ '\' and operation_log=\'delete\' and date_log>=\'' + str(start) +'\' and date_log <= \''+ str(end) +'\' and roll=\''+ roll +'\' and user_name=\''+ userr +'\';' ,as_dict=True)
                         temp_vecAllUserRoleMonth.append(tD)
                     else:
-                        tD = db.executesql('SELECT * from grades_log where project=\'' + assigantion.project.name + '\' and yearp=\'' + str(year.yearp) +'\' and period=\'' + str(T(year.period.name))+ '\' and operation_log=\'insert\' and date_log>=\'' + str(start) +'\' and date_log <= \''+ str(end) +'\' and roll=\''+ roll +'\' and user_name=\''+ userr +'\' and ' + session.search_grades_management +';' ,as_dict=True)
+                        tD = db.executesql('SELECT * from grades_log where project=\'' + assigantion.project.name + '\' and yearp=\'' + str(year.yearp) +'\' and period=\'' + str(T(year.period.name))+ '\' and operation_log=\'insert\' and date_log>=\'' + str(start) +'\' and date_log <= \''+ str(end) +'\' and roll=\''+ roll +'\' and user_name=\''+ userr +'\' and (' + session.search_grades_management +');' ,as_dict=True)
                         temp_vecAllUserRoleMonth.append(tD)
-                        tD = db.executesql('SELECT * from grades_log where project=\'' + assigantion.project.name + '\' and yearp=\'' + str(year.yearp) +'\' and period=\'' + str(T(year.period.name))+ '\' and operation_log=\'update\' and date_log>=\'' + str(start) +'\' and date_log <= \''+ str(end) +'\' and roll=\''+ roll +'\' and user_name=\''+ userr +'\' and ' + session.search_grades_management +';' ,as_dict=True)
+                        tD = db.executesql('SELECT * from grades_log where project=\'' + assigantion.project.name + '\' and yearp=\'' + str(year.yearp) +'\' and period=\'' + str(T(year.period.name))+ '\' and operation_log=\'update\' and date_log>=\'' + str(start) +'\' and date_log <= \''+ str(end) +'\' and roll=\''+ roll +'\' and user_name=\''+ userr +'\' and (' + session.search_grades_management +');' ,as_dict=True)
                         temp_vecAllUserRoleMonth.append(tD)
-                        tD = db.executesql('SELECT * from grades_log where project=\'' + assigantion.project.name + '\' and yearp=\'' + str(year.yearp) +'\' and period=\'' + str(T(year.period.name))+ '\' and operation_log=\'delete\' and date_log>=\'' + str(start) +'\' and date_log <= \''+ str(end) +'\' and roll=\''+ roll +'\' and user_name=\''+ userr +'\' and ' + session.search_grades_management +';' ,as_dict=True)
+                        tD = db.executesql('SELECT * from grades_log where project=\'' + assigantion.project.name + '\' and yearp=\'' + str(year.yearp) +'\' and period=\'' + str(T(year.period.name))+ '\' and operation_log=\'delete\' and date_log>=\'' + str(start) +'\' and date_log <= \''+ str(end) +'\' and roll=\''+ roll +'\' and user_name=\''+ userr +'\' and (' + session.search_grades_management +');' ,as_dict=True)
                         temp_vecAllUserRoleMonth.append(tD)
                     pass
                     varTypeHead=0
@@ -4678,6 +4682,779 @@ def grades_management_export():
     return dict(filename='ReporteGestionNotas', csvdata=report)
 
 
+
+#********************************************************
+#Export management reporting grade levels 1 and 2
+@auth.requires_login()
+@auth.requires(auth.has_membership('Teacher'))
+def grades_management_level_export():
+    #Vars of the report
+    createReport = True
+    report=[]
+    tempRemport1=[]
+    #Obtain the current period of the system and all the register periods
+    import cpfecys
+    from datetime import datetime
+    year = cpfecys.current_year_period()
+
+    #Check if the user is assigned to the course
+    assigantions = db((db.user_project.assigned_user == auth.user.id) & (db.user_project.period == year.id)).select()
+    if assigantions.first() is None:
+        createReport=False
+
+    #Vec with the months of the current period
+    vecMonth=[]
+    tmpMonth=[]
+    if year.period == 1:
+        tmpMonth=[]
+        tmpMonth.append(1)
+        tmpMonth.append('Enero')
+        tmpMonth.append(2)
+        vecMonth.append(tmpMonth)
+
+        tmpMonth=[]
+        tmpMonth.append(2)
+        tmpMonth.append('Febrero')
+        tmpMonth.append(3)
+        vecMonth.append(tmpMonth)
+
+        tmpMonth=[]
+        tmpMonth.append(3)
+        tmpMonth.append('Marzo')
+        tmpMonth.append(4)
+        vecMonth.append(tmpMonth)
+
+        tmpMonth=[]
+        tmpMonth.append(4)
+        tmpMonth.append('Abril')
+        tmpMonth.append(5)
+        vecMonth.append(tmpMonth)
+
+        tmpMonth=[]
+        tmpMonth.append(5)
+        tmpMonth.append('Mayo')
+        tmpMonth.append(6)
+        vecMonth.append(tmpMonth)
+    else:
+        tmpMonth=[]
+        tmpMonth.append(6)
+        tmpMonth.append('Junio')
+        tmpMonth.append(7)
+        vecMonth.append(tmpMonth)
+
+        tmpMonth=[]
+        tmpMonth.append(7)
+        tmpMonth.append('Julio')
+        tmpMonth.append(8)
+        vecMonth.append(tmpMonth)
+
+        tmpMonth=[]
+        tmpMonth.append(8)
+        tmpMonth.append('Agosto')
+        tmpMonth.append(9)
+        vecMonth.append(tmpMonth)
+
+        tmpMonth=[]
+        tmpMonth.append(9)
+        tmpMonth.append('Septiembre')
+        tmpMonth.append(10)
+        vecMonth.append(tmpMonth)
+
+        tmpMonth=[]
+        tmpMonth.append(10)
+        tmpMonth.append('Octubre')
+        tmpMonth.append(11)
+        vecMonth.append(tmpMonth)
+
+        tmpMonth=[]
+        tmpMonth.append(11)
+        tmpMonth.append('Noviembre')
+        tmpMonth.append(12)
+        vecMonth.append(tmpMonth)
+
+        tmpMonth=[]
+        tmpMonth.append(12)
+        tmpMonth.append('Diciembre')
+        tmpMonth.append(1)
+        vecMonth.append(tmpMonth)
+
+    #Check the parameters
+    if request.vars['level']=='1' or request.vars['level']=='2':
+        if int(request.vars['level']) > 1 and createReport==True:
+            #Check if the project is correct
+            if request.vars['level_project'] is None or request.vars['level_project']=='':
+                createReport=False
+            else:
+                level_project = request.vars['level_project']
+                level_project = db(db.project.id==level_project).select().first()
+                if level_project is None:
+                    createReport=False
+                else:
+                    exportReport=False
+                    for assigantion in assigantions:
+                        if assigantion.project==level_project.id:
+                            exportReport=True
+                    if exportReport==False:
+                        createReport=False
+        pass
+    else:
+        createReport=False
+
+    #MAKE REPORT
+    if createReport==True:
+        #Report heading
+        tempRemport1=[]
+        tempRemport1.append('Reporte Gestion de Notas')
+        report.append(tempRemport1)
+        tempRemport1=[]
+        tempRemport1.append(T(year.period.name)+' '+str(year.yearp))
+        report.append(tempRemport1)
+
+        #LEVEL 1
+        if request.vars['level']=='1':
+            #Heading Level 1
+            tempRemport1=[]
+            tempRemport1.append('')
+            report.append(tempRemport1)
+
+            tempRemport1=[]
+            tempRemport1.append(T('Detail'))
+            report.append(tempRemport1)
+
+            tempRemport1=[]
+            tempRemport1.append(T('Course'))
+            tempRemport1.append(T('Total inserted'))
+            tempRemport1.append(T('Total modified'))
+            tempRemport1.append(T('Total out'))
+            report.append(tempRemport1)
+            #Body Level 1
+            for assigantion in assigantions:
+                tempRemport1=[]
+                tempRemport1.append(assigantion.project.name)
+                if session.search_grades_management == "" or session.search_grades_management is None:
+                    tI = db.executesql('SELECT count(id) as total from grades_log where project=\'' + assigantion.project.name + '\' and yearp=\'' + str(year.yearp) +'\' and period=\'' + str(T(year.period.name))+ '\' and operation_log=\'insert\';' ,as_dict=True)
+                    for dI in tI:
+                        dIT=dI['total']
+                    pass
+                    tempRemport1.append(str(dIT))
+                    tI = db.executesql('SELECT count(id) as total from grades_log where project=\'' + assigantion.project.name + '\' and yearp=\'' + str(year.yearp) +'\' and period=\'' + str(T(year.period.name))+ '\' and operation_log=\'update\';' ,as_dict=True)
+                    for dI in tI:
+                        dIT=dI['total']
+                    pass
+                    tempRemport1.append(str(dIT))
+                    tI = db.executesql('SELECT count(id) as total from grades_log where project=\'' + assigantion.project.name + '\' and yearp=\'' + str(year.yearp) +'\' and period=\'' + str(T(year.period.name))+ '\' and operation_log=\'delete\';' ,as_dict=True)
+                    for dI in tI:
+                        dIT=dI['total']
+                    pass
+                    tempRemport1.append(str(dIT))
+                else:
+                    tI = db.executesql('SELECT count(id) as total from grades_log where project=\'' + assigantion.project.name + '\' and yearp=\'' + str(year.yearp) +'\' and period=\'' + str(T(year.period.name))+ '\' and operation_log=\'insert\' and (' + session.search_grades_management +');' ,as_dict=True)
+                    for dI in tI:
+                        dIT=dI['total']
+                    pass
+                    tempRemport1.append(str(dIT))
+                    tI = db.executesql('SELECT count(id) as total from grades_log where project=\'' + assigantion.project.name + '\' and yearp=\'' + str(year.yearp) +'\' and period=\'' + str(T(year.period.name))+ '\' and operation_log=\'update\' and (' + session.search_grades_management +');' ,as_dict=True)
+                    for dI in tI:
+                        dIT=dI['total']
+                    pass
+                    tempRemport1.append(str(dIT))
+                    tI = db.executesql('SELECT count(id) as total from grades_log where project=\'' + assigantion.project.name + '\' and yearp=\'' + str(year.yearp) +'\' and period=\'' + str(T(year.period.name))+ '\' and operation_log=\'delete\' and (' + session.search_grades_management +');' ,as_dict=True)
+                    for dI in tI:
+                        dIT=dI['total']
+                    pass
+                    tempRemport1.append(str(dIT))
+                pass
+                report.append(tempRemport1)
+            pass
+        
+
+        #LEVEL 2
+        elif request.vars['level']=='2':
+            #Heading Level 2
+            tempRemport1=[]
+            tempRemport1.append(T('Course'))
+            tempRemport1.append(level_project.name)
+            report.append(tempRemport1)
+            
+            tempRemport1=[]
+            tempRemport1.append('')
+            report.append(tempRemport1)
+
+            tempRemport1=[]
+            tempRemport1.append(T('Detail'))
+            report.append(tempRemport1)
+
+            tempRemport1=[]
+            tempRemport1.append(T('Month'))
+            tempRemport1.append(T('Total inserted'))
+            tempRemport1.append(T('Total modified'))
+            tempRemport1.append(T('Total out'))
+            report.append(tempRemport1)
+            #Body Level 2
+            for month in vecMonth:
+                tempRemport1=[]
+                start = datetime.strptime(str(year.yearp) + '-' + str(month[0]) +'-01', "%Y-%m-%d")
+                if month[2]==1:
+                    end = datetime.strptime(str(year.yearp+1) + '-' + str(month[2]) +'-01', "%Y-%m-%d")
+                else:
+                    end = datetime.strptime(str(year.yearp) + '-' + str(month[2]) +'-01', "%Y-%m-%d")
+                pass
+                tempRemport1.append(month[1])
+                if session.search_grades_management == "" or session.search_grades_management is None:
+                    tD = db.executesql('SELECT count(id) as total from grades_log where project=\'' + level_project.name + '\' and yearp=\'' + str(year.yearp) +'\' and period=\'' + str(T(year.period.name))+ '\' and operation_log=\'insert\' and date_log>=\'' + str(start) +'\' and date_log <= \''+ str(end) +'\';' ,as_dict=True)
+                    for dD in tD:
+                        dDT=dD['total']
+                    pass
+                    tempRemport1.append(str(dDT))
+                    tD = db.executesql('SELECT count(id) as total from grades_log where project=\'' + level_project.name + '\' and yearp=\'' + str(year.yearp) +'\' and period=\'' + str(T(year.period.name))+ '\' and operation_log=\'update\' and date_log>=\'' + str(start) +'\' and date_log <= \''+ str(end) +'\';' ,as_dict=True)
+                    for dD in tD:
+                        dDT=dD['total']
+                    pass
+                    tempRemport1.append(str(dDT))
+                    tD = db.executesql('SELECT count(id) as total from grades_log where project=\'' + level_project.name + '\' and yearp=\'' + str(year.yearp) +'\' and period=\'' + str(T(year.period.name))+ '\' and operation_log=\'delete\' and date_log>=\'' + str(start) +'\' and date_log <= \''+ str(end) +'\';' ,as_dict=True)
+                    for dD in tD:
+                        dDT=dD['total']
+                    pass
+                    tempRemport1.append(str(dDT))
+                else:
+                    tD = db.executesql('SELECT count(id) as total from grades_log where project=\'' + level_project.name + '\' and yearp=\'' + str(year.yearp) +'\' and period=\'' + str(T(year.period.name))+ '\' and operation_log=\'insert\' and date_log>=\'' + str(start) +'\' and date_log <= \''+ str(end) + '\' and (' + session.search_grades_management +');' ,as_dict=True)
+                    for dD in tD:
+                        dDT=dD['total']
+                    pass
+                    tempRemport1.append(str(dDT))
+                    tD = db.executesql('SELECT count(id) as total from grades_log where project=\'' + level_project.name + '\' and yearp=\'' + str(year.yearp) +'\' and period=\'' + str(T(year.period.name))+ '\' and operation_log=\'update\' and date_log>=\'' + str(start) +'\' and date_log <= \''+ str(end) + '\' and (' + session.search_grades_management +');' ,as_dict=True)
+                    for dD in tD:
+                        dDT=dD['total']
+                    pass
+                    tempRemport1.append(str(dDT))
+                    tD = db.executesql('SELECT count(id) as total from grades_log where project=\'' + level_project.name + '\' and yearp=\'' + str(year.yearp) +'\' and period=\'' + str(T(year.period.name))+ '\' and operation_log=\'delete\' and date_log>=\'' + str(start) +'\' and date_log <= \''+ str(end) + '\' and (' + session.search_grades_management +');' ,as_dict=True)
+                    for dD in tD:
+                        dDT=dD['total']
+                    pass
+                    tempRemport1.append(str(dDT))
+                pass
+                report.append(tempRemport1)
+        
+        return dict(filename='ReporteGestionNotas', csvdata=report)
+    else:
+        session.flash = T('Not valid Action.')
+        redirect(URL('activity_control','grades_management'))
+
+
+
+#********************************************************
+#Export management reporting laboratory revalidation levels 3, 4 and 5
+@auth.requires_login()
+@auth.requires(auth.has_membership('Teacher'))
+def grades_management_level_export_load():
+    #Vars of the report
+    createReport = True
+    report=[]
+    tempRemport1=[]
+    #Obtain the current period of the system and all the register periods
+    import cpfecys
+    from datetime import datetime
+    year = cpfecys.current_year_period()
+
+    #Check if the user is assigned to the course
+    assigantions = db((db.user_project.assigned_user == auth.user.id) & (db.user_project.period == year.id)).select()
+    if assigantions.first() is None:
+        createReport=False
+
+    #Vec with the months of the current period
+    vecMonth=[]
+    tmpMonth=[]
+    if year.period == 1:
+        tmpMonth=[]
+        tmpMonth.append(1)
+        tmpMonth.append('Enero')
+        tmpMonth.append(2)
+        vecMonth.append(tmpMonth)
+
+        tmpMonth=[]
+        tmpMonth.append(2)
+        tmpMonth.append('Febrero')
+        tmpMonth.append(3)
+        vecMonth.append(tmpMonth)
+
+        tmpMonth=[]
+        tmpMonth.append(3)
+        tmpMonth.append('Marzo')
+        tmpMonth.append(4)
+        vecMonth.append(tmpMonth)
+
+        tmpMonth=[]
+        tmpMonth.append(4)
+        tmpMonth.append('Abril')
+        tmpMonth.append(5)
+        vecMonth.append(tmpMonth)
+
+        tmpMonth=[]
+        tmpMonth.append(5)
+        tmpMonth.append('Mayo')
+        tmpMonth.append(6)
+        vecMonth.append(tmpMonth)
+    else:
+        tmpMonth=[]
+        tmpMonth.append(6)
+        tmpMonth.append('Junio')
+        tmpMonth.append(7)
+        vecMonth.append(tmpMonth)
+
+        tmpMonth=[]
+        tmpMonth.append(7)
+        tmpMonth.append('Julio')
+        tmpMonth.append(8)
+        vecMonth.append(tmpMonth)
+
+        tmpMonth=[]
+        tmpMonth.append(8)
+        tmpMonth.append('Agosto')
+        tmpMonth.append(9)
+        vecMonth.append(tmpMonth)
+
+        tmpMonth=[]
+        tmpMonth.append(9)
+        tmpMonth.append('Septiembre')
+        tmpMonth.append(10)
+        vecMonth.append(tmpMonth)
+
+        tmpMonth=[]
+        tmpMonth.append(10)
+        tmpMonth.append('Octubre')
+        tmpMonth.append(11)
+        vecMonth.append(tmpMonth)
+
+        tmpMonth=[]
+        tmpMonth.append(11)
+        tmpMonth.append('Noviembre')
+        tmpMonth.append(12)
+        vecMonth.append(tmpMonth)
+
+        tmpMonth=[]
+        tmpMonth.append(12)
+        tmpMonth.append('Diciembre')
+        tmpMonth.append(1)
+        vecMonth.append(tmpMonth)
+
+    #Check the parameters
+    if request.vars['level']=='3' or request.vars['level']=='4' or request.vars['level']=='5':
+        if int(request.vars['level']) > 2 and createReport==True:
+            #Check if the project is correct
+            if request.vars['level_project'] is None or request.vars['level_project']=='':
+                createReport=False
+            else:
+                level_project = request.vars['level_project']
+                level_project = db(db.project.id==level_project).select().first()
+                if level_project is None:
+                    createReport=False
+                else:
+                    exportReport=False
+                    for assigantion in assigantions:
+                        if assigantion.project==level_project.id:
+                            exportReport=True
+                    if exportReport==False:
+                        createReport=False
+
+            #Check if the Month is correct
+            if request.vars['level_month'] is None or request.vars['level_month']=='':
+                createReport=False
+            else:
+                if year.period == 1:
+                    try:
+                        if int(request.vars['level_month']) >= 1 and int(request.vars['level_month']) <=5:
+                            level_month=str(request.vars['level_month'])
+                        else:
+                            createReport=False
+                    except:
+                        createReport=False
+                else:
+                    try:
+                        if int(request.vars['level_month']) >= 6 and int(request.vars['level_month']) <=12:
+                            level_month=str(request.vars['level_month'])
+                        else:
+                            createReport=False
+                    except:
+                        createReport=False
+                
+            #Check if the type is correct
+            if request.vars['level_tipo'] is None or request.vars['level_tipo']=='':
+                createReport=False
+            else:
+                if str(request.vars['level_tipo'])!='all' and str(request.vars['level_tipo'])!='i' and str(request.vars['level_tipo'])!='u' and str(request.vars['level_tipo'])!='d':
+                    createReport=False
+                else:
+                    level_tipo = str(request.vars['level_tipo'])
+        pass
+
+        if int(request.vars['level']) > 3 and createReport==True:
+            if request.vars['level_rol'] is None or request.vars['level_rol']=='':
+                createReport=False
+            else:
+                value = db(db.auth_group.role==str(request.vars['level_rol'])).select().first()
+                if value is None:
+                    #Check if the log has a roll that is not register
+                    value = db((db.grades_log.yearp==year.yearp)&(db.grades_log.period==T(year.period.name))&(db.grades_log.project==level_project.name)&(db.grades_log.roll==str(request.vars['level_rol']))).select(db.grades_log.roll, distinct=True).first()
+                    if value is None:
+                        createReport=False
+                    else:
+                        level_rol=str(value.roll)
+                else:
+                    level_rol=str(value.role)
+        pass
+
+        if int(request.vars['level']) > 4 and createReport==True:
+            if request.vars['level_user'] is None or request.vars['level_user']=='':
+                createReport=False
+            else:
+                flagCheck = False
+                #User Temp of auth_user where the username is equal
+                userr = db(db.auth_user.username==str(request.vars['level_user'])).select().first()
+                if ((level_rol=='Super-Administrator') or (level_rol=='Ecys-Administrator')):
+                    if userr is not None:
+                        #Check if the user has the rol specific
+                        userrT = db(db.auth_membership.user_id==userr.id).select()
+                        for tempUserCheck in userrT:
+                            if tempUserCheck.group_id.role==level_rol:
+                                flagCheck = True
+                else:
+                    if userr is not None:
+                        #Check if the user has the rol specific
+                        userrT = db(db.auth_membership.user_id==userr.id).select()
+                        for tempUserCheck in userrT:
+                            if tempUserCheck.group_id.role==level_rol:
+                                if db((db.user_project.period==year.id)&(db.user_project.project==level_project.id)&(db.user_project.assigned_user==userr.id)).select().first() is not None:
+                                    flagCheck = True
+
+                if flagCheck==False:
+                    #Check if the log has a roll that is not register
+                    userr = db((db.grades_log.yearp==year.yearp)&(db.grades_log.period==T(year.period.name))&(db.grades_log.project==level_project.name)&(db.grades_log.roll==level_rol)&(db.grades_log.user_name==str(request.vars['userr']))).select().first()
+                    if value is None:
+                        showLevel = Falses
+                    else:
+                        level_user=userr.user_name
+                else:
+                    level_user=userr.username
+        pass
+    else:
+        createReport=False
+
+    #MAKE REPORT
+    if createReport==True:
+        #Report heading
+        tempRemport1=[]
+        tempRemport1.append('Reporte de Gestión de Notas')
+        report.append(tempRemport1)
+        tempRemport1=[]
+        tempRemport1.append(T(year.period.name)+' '+str(year.yearp))
+        report.append(tempRemport1)
+
+        #LEVEL 3
+        if request.vars['level']=='3':
+            #Heading Level 3
+            tempRemport1=[]
+            tempRemport1.append(T('Course'))
+            tempRemport1.append(level_project.name)
+            report.append(tempRemport1)
+
+            tempRemport1=[]
+            tempRemport1.append(T('Month'))
+            for tempMonth in vecMonth:
+                if str(tempMonth[0])==level_month:
+                    tempRemport1.append(tempMonth[1])
+                    start = datetime.strptime(str(year.yearp) + '-' + str(tempMonth[0]) +'-01', "%Y-%m-%d")
+                    if tempMonth[2]==1:
+                        end = datetime.strptime(str(year.yearp+1) + '-' + str(tempMonth[2]) +'-01', "%Y-%m-%d")
+                    else:
+                        end = datetime.strptime(str(year.yearp) + '-' + str(tempMonth[2]) +'-01', "%Y-%m-%d")
+                    pass
+            report.append(tempRemport1)
+
+            tempRemport1=[]
+            tempRemport1.append('')
+            report.append(tempRemport1)
+
+            tempRemport1=[]
+            tempRemport1.append(T('Detail'))
+            report.append(tempRemport1)
+
+            tempRemport1=[]
+            tempRole = []
+            tempRemport1.append(T('Role'))
+            if ((level_tipo=='all') or (level_tipo=='i')):
+                tempRemport1.append(T('Total inserted'))
+            if ((level_tipo=='all') or (level_tipo=='u')):
+                tempRemport1.append(T('Total modified'))
+            if ((level_tipo=='all') or (level_tipo=='d')):
+                tempRemport1.append(T('Total out'))
+            report.append(tempRemport1)
+            #Body Level 3
+            for tempR in db((db.auth_group.role!='Academic')&(db.auth_group.role!='DSI')).select():
+                tempRole.append(tempR.role)
+            for tempR in db((db.grades_log.yearp==year.yearp)&(db.grades_log.period==T(year.period.name))&(db.grades_log.project==level_project.name)&(~db.grades_log.roll.belongs(tempRole))).select(db.grades_log.roll, distinct=True):
+                tempRole.append(tempR.roll)
+            for roll in tempRole:
+                tempRemport1=[]
+                if roll=='Student':
+                    tempRemport1.append(T('Rol Student'))
+                else:
+                    tempRemport1.append(T(roll))
+                pass
+                if session.search_validate_laboratory_management == "" or session.search_grades_management is None:
+                    if ((level_tipo=='all') or (level_tipo=='i')):
+                        tD = db.executesql('SELECT count(id) as total from grades_log where project=\'' + level_project.name + '\' and yearp=\'' + str(year.yearp) +'\' and period=\'' + str(T(year.period.name))+ '\' and operation_log=\'insert\' and date_log>=\'' + str(start) +'\' and date_log <= \''+ str(end) +'\' and roll=\''+ roll +'\';' ,as_dict=True)
+                        for dD in tD:
+                            dDT=dD['total']
+                        pass
+                        tempRemport1.append(dDT)
+                    if ((level_tipo=='all') or (level_tipo=='u')):
+                        tD = db.executesql('SELECT count(id) as total from grades_log where project=\'' + level_project.name + '\' and yearp=\'' + str(year.yearp) +'\' and period=\'' + str(T(year.period.name))+ '\' and operation_log=\'update\' and date_log>=\'' + str(start) +'\' and date_log <= \''+ str(end) +'\' and roll=\''+ roll +'\';' ,as_dict=True)
+                        for dD in tD:
+                            dDT=dD['total']
+                        pass
+                        tempRemport1.append(dDT)
+                    if ((level_tipo=='all') or (level_tipo=='d')):
+                        tD = db.executesql('SELECT count(id) as total from grades_log where project=\'' + level_project.name + '\' and yearp=\'' + str(year.yearp) +'\' and period=\'' + str(T(year.period.name))+ '\' and operation_log=\'delete\' and date_log>=\'' + str(start) +'\' and date_log <= \''+ str(end) +'\' and roll=\''+ roll +'\';' ,as_dict=True)
+                        for dD in tD:
+                            dDT=dD['total']
+                        pass
+                        tempRemport1.append(dDT)
+                else:
+                    if ((level_tipo=='all') or (level_tipo=='i')):
+                        tD = db.executesql('SELECT count(id) as total from grades_log where project=\'' + level_project.name + '\' and yearp=\'' + str(year.yearp) +'\' and period=\'' + str(T(year.period.name))+ '\' and operation_log=\'insert\' and date_log>=\'' + str(start) +'\' and date_log <= \''+ str(end) +'\' and roll=\''+ roll +'\' and (' + session.search_grades_management +');' ,as_dict=True)
+                        for dD in tD:
+                            dDT=dD['total']
+                        pass
+                        tempRemport1.append(dDT)
+                    if ((level_tipo=='all') or (level_tipo=='u')):
+                        tD = db.executesql('SELECT count(id) as total from grades_log where project=\'' + level_project.name + '\' and yearp=\'' + str(year.yearp) +'\' and period=\'' + str(T(year.period.name))+ '\' and operation_log=\'update\' and date_log>=\'' + str(start) +'\' and date_log <= \''+ str(end) +'\' and roll=\''+ roll +'\' and (' + session.search_grades_management +');' ,as_dict=True)
+                        for dD in tD:
+                            dDT=dD['total']
+                        pass
+                        tempRemport1.append(dDT)
+                    if ((level_tipo=='all') or (level_tipo=='d')):
+                        tD = db.executesql('SELECT count(id) as total from grades_log where project=\'' + assigantion.project.name + '\' and yearp=\'' + str(year.yearp) +'\' and period=\'' + str(T(year.period.name))+ '\' and operation_log=\'delete\' and date_log>=\'' + str(start) +'\' and date_log <= \''+ str(end) +'\' and roll=\''+ roll +'\' and (' + session.search_grades_management +');' ,as_dict=True)
+                        for dD in tD:
+                            dDT=dD['total']
+                        pass
+                        tempRemport1.append(dDT)
+                pass
+                report.append(tempRemport1)
+        #LEVEL 4
+        elif request.vars['level']=='4':
+            #Heading Level 4
+            tempRemport1=[]
+            tempRemport1.append(T('Course'))
+            tempRemport1.append(level_project.name)
+            report.append(tempRemport1)
+
+            tempRemport1=[]
+            tempRemport1.append(T('Month'))
+            for tempMonth in vecMonth:
+                if str(tempMonth[0])==level_month:
+                    tempRemport1.append(tempMonth[1])
+                    start = datetime.strptime(str(year.yearp) + '-' + str(tempMonth[0]) +'-01', "%Y-%m-%d")
+                    if tempMonth[2]==1:
+                        end = datetime.strptime(str(year.yearp+1) + '-' + str(tempMonth[2]) +'-01', "%Y-%m-%d")
+                    else:
+                        end = datetime.strptime(str(year.yearp) + '-' + str(tempMonth[2]) +'-01', "%Y-%m-%d")
+                    pass
+            report.append(tempRemport1)
+
+            tempRemport1=[]
+            tempRemport1.append(T('Role'))
+            tempRemport1.append(level_rol)
+            report.append(tempRemport1)
+
+            tempRemport1=[]
+            tempRemport1.append('')
+            report.append(tempRemport1)
+
+            tempRemport1=[]
+            tempRemport1.append(T('Detail'))
+            report.append(tempRemport1)
+
+            tempRemport1=[]
+            tempUsers=[]
+            tempRemport1.append(T('User'))
+            if ((level_tipo=='all') or (level_tipo=='i')):
+                tempRemport1.append(T('Total inserted'))
+            if ((level_tipo=='all') or (level_tipo=='u')):
+                tempRemport1.append(T('Total modified'))
+            if ((level_tipo=='all') or (level_tipo=='d')):
+                tempRemport1.append(T('Total out'))
+            report.append(tempRemport1)
+            #Body Level 4
+            tempUsers2=[]
+            registerRol = db(db.auth_group.role==level_rol).select().first()
+            if ((level_rol=='Super-Administrator') or (level_rol=='Ecys-Administrator')):
+                for valueU in db((db.auth_membership.group_id==registerRol.id)).select(db.auth_membership.user_id, distinct=True):
+                    tempUsers.append(valueU.user_id.username)
+            else:
+                for valueU in db((db.auth_membership.group_id==registerRol.id)).select(db.auth_membership.user_id, distinct=True):
+                    tempUsers2.append(valueU.user_id)
+                for valueU in db((db.user_project.period==year.id)&(db.user_project.project==level_project.id)&(db.user_project.assigned_user.belongs(tempUsers2))).select(db.user_project.assigned_user, distinct=True):
+                    tempUsers.append(valueU.assigned_user.username)
+            pass
+            for valueU in db((db.grades_log.yearp==year.yearp)&(db.grades_log.period==T(year.period.name))&(db.grades_log.project==level_project.name)&(db.grades_log.roll==level_rol)&(~db.grades_log.user_name.belongs(tempUsers))).select(db.grades_log.user_name, distinct=True):
+                tempUsers.append(valueU.user_name)
+            for userr in tempUsers:
+                tempRemport1=[]
+                tempRemport1.append(userr)
+                if session.search_validate_laboratory_management == "" or session.search_grades_management is None:
+                    if ((level_tipo=='all') or (level_tipo=='i')):
+                        tD = db.executesql('SELECT count(id) as total from grades_log where project=\'' + level_project.name + '\' and yearp=\'' + str(year.yearp) +'\' and period=\'' + str(T(year.period.name))+ '\' and operation_log=\'insert\' and date_log>=\'' + str(start) +'\' and date_log <= \''+ str(end) +'\' and roll=\''+ level_rol +'\' and user_name=\''+ userr +'\';' ,as_dict=True)
+                        for dD in tD:
+                            dDT=dD['total']
+                        pass
+                        tempRemport1.append(dDT)
+                    if ((level_tipo=='all') or (level_tipo=='u')):
+                        tD = db.executesql('SELECT count(id) as total from grades_log where project=\'' + level_project.name + '\' and yearp=\'' + str(year.yearp) +'\' and period=\'' + str(T(year.period.name))+ '\' and operation_log=\'update\' and date_log>=\'' + str(start) +'\' and date_log <= \''+ str(end) +'\' and roll=\''+ level_rol +'\' and user_name=\''+ userr +'\';' ,as_dict=True)
+                        for dD in tD:
+                            dDT=dD['total']
+                        pass
+                        tempRemport1.append(dDT)
+                    if ((level_tipo=='all') or (level_tipo=='d')):
+                        tD = db.executesql('SELECT count(id) as total from grades_log where project=\'' + level_project.name + '\' and yearp=\'' + str(year.yearp) +'\' and period=\'' + str(T(year.period.name))+ '\' and operation_log=\'delete\' and date_log>=\'' + str(start) +'\' and date_log <= \''+ str(end) +'\' and roll=\''+ level_rol +'\' and user_name=\''+ userr +'\';' ,as_dict=True)
+                        for dD in tD:
+                            dDT=dD['total']
+                        pass
+                        tempRemport1.append(dDT)
+                else:
+                    if ((level_tipo=='all') or (level_tipo=='i')):
+                        tD = db.executesql('SELECT count(id) as total from grades_log where project=\'' + level_project.name + '\' and yearp=\'' + str(year.yearp) +'\' and period=\'' + str(T(year.period.name))+ '\' and operation_log=\'insert\' and date_log>=\'' + str(start) +'\' and date_log <= \''+ str(end) +'\' and roll=\''+ level_rol +'\' and user_name=\''+ userr +'\' and (' + session.search_grades_management +');' ,as_dict=True)
+                        for dD in tD:
+                            dDT=dD['total']
+                        pass
+                        tempRemport1.append(dDT)
+                    if ((level_tipo=='all') or (level_tipo=='u')):
+                        tD = db.executesql('SELECT count(id) as total from grades_log where project=\'' + level_project.name + '\' and yearp=\'' + str(year.yearp) +'\' and period=\'' + str(T(year.period.name))+ '\' and operation_log=\'update\' and date_log>=\'' + str(start) +'\' and date_log <= \''+ str(end) +'\' and roll=\''+ level_rol +'\' and user_name=\''+ userr +'\' and (' + session.search_grades_management +');' ,as_dict=True)
+                        for dD in tD:
+                            dDT=dD['total']
+                        pass
+                        tempRemport1.append(dDT)
+                    if ((level_tipo=='all') or (level_tipo=='d')):
+                        tD = db.executesql('SELECT count(id) as total from grades_log where project=\'' + level_project.name + '\' and yearp=\'' + str(year.yearp) +'\' and period=\'' + str(T(year.period.name))+ '\' and operation_log=\'delete\' and date_log>=\'' + str(start) +'\' and date_log <= \''+ str(end) +'\' and roll=\''+ level_rol +'\' and user_name=\''+ userr +'\' and (' + session.search_grades_management +');' ,as_dict=True)
+                        for dD in tD:
+                            dDT=dD['total']
+                        pass
+                        tempRemport1.append(dDT)
+                pass
+                report.append(tempRemport1)
+        #LEVEL 5
+        elif request.vars['level']=='5':
+            #Head of Level 5
+            tempRemport1=[]
+            tempRemport1.append(T('Course'))
+            tempRemport1.append(level_project.name)
+            report.append(tempRemport1)
+
+            tempRemport1=[]
+            tempRemport1.append(T('Month'))
+            for tempMonth in vecMonth:
+                if str(tempMonth[0])==level_month:
+                    tempRemport1.append(tempMonth[1])
+                    start = datetime.strptime(str(year.yearp) + '-' + str(tempMonth[0]) +'-01', "%Y-%m-%d")
+                    if tempMonth[2]==1:
+                        end = datetime.strptime(str(year.yearp+1) + '-' + str(tempMonth[2]) +'-01', "%Y-%m-%d")
+                    else:
+                        end = datetime.strptime(str(year.yearp) + '-' + str(tempMonth[2]) +'-01', "%Y-%m-%d")
+                    pass
+            report.append(tempRemport1)
+
+            tempRemport1=[]
+            tempRemport1.append(T('Role'))
+            tempRemport1.append(level_rol)
+            report.append(tempRemport1)
+
+            tempRemport1=[]
+            tempRemport1.append(T('User resolution'))
+            tempRemport1.append(level_user)
+            report.append(tempRemport1)
+
+            tempRemport1=[]
+            tempRemport1.append('')
+            report.append(tempRemport1)
+
+            tempRemport1=[]
+            tempRemport1.append(T('Detail'))
+            report.append(tempRemport1)
+
+            temp_vecAllUserRoleMonth=[]
+            tempRemport1=[]
+            #Body Level 5
+            if session.search_validate_laboratory_management == "" or session.search_grades_management is None:
+                if ((level_tipo=='all') or (level_tipo=='i')):
+                    tD = db.executesql('SELECT * from grades_log where project=\'' + level_project.name + '\' and yearp=\'' + str(year.yearp) +'\' and period=\'' + str(T(year.period.name))+ '\' and operation_log=\'insert\' and date_log>=\'' + str(start) +'\' and date_log <= \''+ str(end) +'\' and roll=\''+ level_rol +'\' and user_name=\''+ level_user +'\';' ,as_dict=True)
+                    temp_vecAllUserRoleMonth.append(tD)
+                if ((level_tipo=='all') or (level_tipo=='u')):
+                    tD = db.executesql('SELECT * from grades_log where project=\'' + level_project.name + '\' and yearp=\'' + str(year.yearp) +'\' and period=\'' + str(T(year.period.name))+ '\' and operation_log=\'update\' and date_log>=\'' + str(start) +'\' and date_log <= \''+ str(end) +'\' and roll=\''+ level_rol +'\' and user_name=\''+ level_user +'\';' ,as_dict=True)
+                    temp_vecAllUserRoleMonth.append(tD)
+                if ((level_tipo=='all') or (level_tipo=='d')):
+                    tD = db.executesql('SELECT * from grades_log where project=\'' + level_project.name + '\' and yearp=\'' + str(year.yearp) +'\' and period=\'' + str(T(year.period.name))+ '\' and operation_log=\'delete\' and date_log>=\'' + str(start) +'\' and date_log <= \''+ str(end) +'\' and roll=\''+ level_rol +'\' and user_name=\''+ level_user +'\';' ,as_dict=True)
+                    temp_vecAllUserRoleMonth.append(tD)
+            else:
+                if ((level_tipo=='all') or (level_tipo=='i')):
+                    tD = db.executesql('SELECT * from grades_log where project=\'' + level_project.name + '\' and yearp=\'' + str(year.yearp) +'\' and period=\'' + str(T(year.period.name))+ '\' and operation_log=\'insert\' and date_log>=\'' + str(start) +'\' and date_log <= \''+ str(end) +'\' and roll=\''+ level_rol +'\' and user_name=\''+ level_user +'\' and (' + session.search_grades_management +');' ,as_dict=True)
+                    temp_vecAllUserRoleMonth.append(tD)
+                if ((level_tipo=='all') or (level_tipo=='u')):
+                    tD = db.executesql('SELECT * from grades_log where project=\'' + level_project.name + '\' and yearp=\'' + str(year.yearp) +'\' and period=\'' + str(T(year.period.name))+ '\' and operation_log=\'update\' and date_log>=\'' + str(start) +'\' and date_log <= \''+ str(end) +'\' and roll=\''+ level_rol +'\' and user_name=\''+ level_user +'\' and (' + session.search_grades_management +');' ,as_dict=True)
+                    temp_vecAllUserRoleMonth.append(tD)
+                if ((level_tipo=='all') or (level_tipo=='d')):
+                    tD = db.executesql('SELECT * from grades_log where project=\'' + level_project.name + '\' and yearp=\'' + str(year.yearp) +'\' and period=\'' + str(T(year.period.name))+ '\' and operation_log=\'delete\' and date_log>=\'' + str(start) +'\' and date_log <= \''+ str(end) +'\' and roll=\''+ level_rol +'\' and user_name=\''+ level_user +'\' and (' + session.search_grades_management +');' ,as_dict=True)
+                    temp_vecAllUserRoleMonth.append(tD)
+            pass
+            varTypeHead=0
+            for field in temp_vecAllUserRoleMonth:
+                for camp in field:
+                    if varTypeHead==0:
+                        #Heading Level 5
+                        tempRemport1=[]
+                        tempRemport1.append(T('User resolution'))
+                        tempRemport1.append(T('Role resolution'))
+                        tempRemport1.append(T('Date of resolution'))
+                        tempRemport1.append(T('Operation'))
+                        tempRemport1.append(T('Description'))
+                        tempRemport1.append(T('Category'))
+                        tempRemport1.append(T('Activity'))
+                        tempRemport1.append(T('Rol Academic'))
+                        tempRemport1.append(T('Before Grade'))
+                        tempRemport1.append(T('Grade edited'))
+                        report.append(tempRemport1)
+                        varTypeHead=1
+                    tempRemport1=[]
+                    tempRemport1.append(str(camp['user_name']))
+                    if str(camp['roll'])=='Student':
+                        tempRemport1.append(T('Rol Student'))
+                    else:
+                        tempRemport1.append(T(str(camp['roll'])))
+                    pass
+                    tempRemport1.append(str(camp['date_log']))
+                    tempRemport1.append(str(camp['operation_log']))
+                    desT = camp['description']+''
+                    tempRemport1.append(desT.encode('utf-8'))
+                    tempRemport1.append(str(camp['category']))
+                    tempRemport1.append(str(camp['activity']))
+                    tempRemport1.append(str(camp['academic']))
+                    if camp['before_grade'] is not None:
+                        tempRemport1.append(str(camp['before_grade']))
+                    else:
+                        tempRemport1.append('')
+                    if camp['after_grade'] is not None:
+                        tempRemport1.append(str(camp['after_grade']))
+                    else:
+                        tempRemport1.append('')
+                    report.append(tempRemport1)
+                pass
+            pass
+        return dict(filename='ReporteGestionNotas', csvdata=report)
+    else:
+        return "<center>"+T('Action not allowed')+"</center><script type=\"text/javascript\"> alert(\""+T('Action not allowed')+"\"); window.location.href = \"validate_laboratory_management\";</script>"
+
+
+
+#********************************************************
+#Management Report Grade levels 1 and 2
 @auth.requires_login()
 @auth.requires(auth.has_membership('Teacher'))
 def grades_management():
@@ -4685,6 +5462,18 @@ def grades_management():
     if request.vars['list'] =='True':
         redirect(URL('activity_control','grades_management_export'))
 
+    #Export Report Nivel 0
+    #redirect(URL('activity_control','request_change_activity',vars=dict(project=request.vars['project'], year=request.vars['year'])))
+    if request.vars['list'] =='False':
+        if request.vars['level'] =='1':
+            redirect(URL('activity_control','grades_management_level_export',vars=dict(level=request.vars['level'])))
+        elif request.vars['level'] =='2':
+            if request.vars['level_project'] is None or request.vars['level_project']=='':
+                redirect(URL('activity_control','grades_management'))
+            else:
+                redirect(URL('activity_control','grades_management_level_export',vars=dict(level=request.vars['level'],level_project=request.vars['level_project'])))
+        else:
+            redirect(URL('activity_control','grades_management'))
 
     import cpfecys
     #Obtain the current period of the system and all the register periods
@@ -4949,6 +5738,8 @@ def grades_management():
 
 
 
+#********************************************************
+#Management Report Grade levels 3
 @auth.requires_login()
 @auth.requires(auth.has_membership('Teacher'))
 def grades_management_n2():
@@ -4960,6 +5751,22 @@ def grades_management_n2():
     tipo = None
     month=None
     vecRoleMonth=None
+
+    #Check the correct parameters
+    if request.vars['list'] =='False':
+        if request.vars['level'] =='3':
+            if request.vars['level_project'] is None or request.vars['level_project']=='':
+                showLevel = False
+            else:
+                if request.vars['level_month'] is None or request.vars['level_month']=='':
+                    showLevel = False
+                else:
+                    if request.vars['level_tipo'] is None or request.vars['level_tipo']=='':
+                        showLevel = False
+                    else:
+                        redirect(URL('activity_control','grades_management_level_export_load',vars=dict(level=request.vars['level'],level_project=request.vars['level_project'],level_month=request.vars['level_month'],level_tipo=request.vars['level_tipo'])))
+        else:
+            showLevel = False
 
     #Check if the project is correct
     if request.vars['tipo'] is None or request.vars['tipo']=='':
@@ -5032,30 +5839,30 @@ def grades_management_n2():
             optionSearch.append(value.role)
             roleTemp.append(value.role)
             if str(request.vars['tipo'])=='all' or str(request.vars['tipo'])=='i':
-                if session.search_grades_management == "":
+                if session.search_grades_management == "" or session.search_grades_management is None:
                     tD = db.executesql('SELECT count(id) as total from grades_log where project=\'' + project.name + '\' and yearp=\'' + str(period.yearp) +'\' and period=\'' + str(T(period.period.name))+ '\' and operation_log=\'insert\' and date_log>=\'' + str(start) +'\' and date_log <= \''+ str(end) +'\' and roll=\''+ value.role +'\';' ,as_dict=True)
                 else:
-                    tD = db.executesql('SELECT count(id) as total from grades_log where project=\'' + project.name + '\' and yearp=\'' + str(period.yearp) +'\' and period=\'' + str(T(period.period.name))+ '\' and operation_log=\'insert\' and date_log>=\'' + str(start) +'\' and date_log <= \''+ str(end) +'\' and roll=\''+ value.role +'\' and ' + session.search_grades_management +';' ,as_dict=True)
+                    tD = db.executesql('SELECT count(id) as total from grades_log where project=\'' + project.name + '\' and yearp=\'' + str(period.yearp) +'\' and period=\'' + str(T(period.period.name))+ '\' and operation_log=\'insert\' and date_log>=\'' + str(start) +'\' and date_log <= \''+ str(end) +'\' and roll=\''+ value.role +'\' and (' + session.search_grades_management +');' ,as_dict=True)
                 pass
                 for dD in tD:
                     dDT=dD['total']
                 pass
                 optionSearch.append(dDT)
             if str(request.vars['tipo'])=='all' or str(request.vars['tipo'])=='u':
-                if session.search_grades_management == "":
+                if session.search_grades_management == "" or session.search_grades_management is None:
                     tD = db.executesql('SELECT count(id) as total from grades_log where project=\'' + project.name + '\' and yearp=\'' + str(period.yearp) +'\' and period=\'' + str(T(period.period.name))+ '\' and operation_log=\'update\' and date_log>=\'' + str(start) +'\' and date_log <= \''+ str(end) +'\' and roll=\''+ value.role +'\';' ,as_dict=True)
                 else:
-                    tD = db.executesql('SELECT count(id) as total from grades_log where project=\'' + project.name + '\' and yearp=\'' + str(period.yearp) +'\' and period=\'' + str(T(period.period.name))+ '\' and operation_log=\'update\' and date_log>=\'' + str(start) +'\' and date_log <= \''+ str(end) +'\' and roll=\''+ value.role +'\' and ' + session.search_grades_management +';' ,as_dict=True)
+                    tD = db.executesql('SELECT count(id) as total from grades_log where project=\'' + project.name + '\' and yearp=\'' + str(period.yearp) +'\' and period=\'' + str(T(period.period.name))+ '\' and operation_log=\'update\' and date_log>=\'' + str(start) +'\' and date_log <= \''+ str(end) +'\' and roll=\''+ value.role +'\' and (' + session.search_grades_management +');' ,as_dict=True)
                 pass
                 for dD in tD:
                     dDT=dD['total']
                 pass
                 optionSearch.append(dDT)
             if str(request.vars['tipo'])=='all' or str(request.vars['tipo'])=='d':
-                if session.search_grades_management == "":
+                if session.search_grades_management == "" or session.search_grades_management is None:
                     tD = db.executesql('SELECT count(id) as total from grades_log where project=\'' + project.name + '\' and yearp=\'' + str(period.yearp) +'\' and period=\'' + str(T(period.period.name))+ '\' and operation_log=\'delete\' and date_log>=\'' + str(start) +'\' and date_log <= \''+ str(end) +'\' and roll=\''+ value.role +'\';' ,as_dict=True)
                 else:
-                    tD = db.executesql('SELECT count(id) as total from grades_log where project=\'' + project.name + '\' and yearp=\'' + str(period.yearp) +'\' and period=\'' + str(T(period.period.name))+ '\' and operation_log=\'delete\' and date_log>=\'' + str(start) +'\' and date_log <= \''+ str(end) +'\' and roll=\''+ value.role +'\' and ' + session.search_grades_management +';' ,as_dict=True)
+                    tD = db.executesql('SELECT count(id) as total from grades_log where project=\'' + project.name + '\' and yearp=\'' + str(period.yearp) +'\' and period=\'' + str(T(period.period.name))+ '\' and operation_log=\'delete\' and date_log>=\'' + str(start) +'\' and date_log <= \''+ str(end) +'\' and roll=\''+ value.role +'\' and (' + session.search_grades_management +');' ,as_dict=True)
                 pass
                 for dD in tD:
                     dDT=dD['total']
@@ -5067,30 +5874,30 @@ def grades_management_n2():
             optionSearch=[]
             optionSearch.append(value.roll)
             if str(request.vars['tipo'])=='all' or str(request.vars['tipo'])=='i':
-                if session.search_grades_management == "":
+                if session.search_grades_management == "" or session.search_grades_management is None:
                     tD = db.executesql('SELECT count(id) as total from grades_log where project=\'' + project.name + '\' and yearp=\'' + str(period.yearp) +'\' and period=\'' + str(T(period.period.name))+ '\' and operation_log=\'insert\' and date_log>=\'' + str(start) +'\' and date_log <= \''+ str(end) +'\' and roll=\''+ value.roll +'\';' ,as_dict=True)
                 else:
-                    tD = db.executesql('SELECT count(id) as total from grades_log where project=\'' + project.name + '\' and yearp=\'' + str(period.yearp) +'\' and period=\'' + str(T(period.period.name))+ '\' and operation_log=\'insert\' and date_log>=\'' + str(start) +'\' and date_log <= \''+ str(end) +'\' and roll=\''+ value.roll +'\' and ' + session.search_grades_management +';' ,as_dict=True)
+                    tD = db.executesql('SELECT count(id) as total from grades_log where project=\'' + project.name + '\' and yearp=\'' + str(period.yearp) +'\' and period=\'' + str(T(period.period.name))+ '\' and operation_log=\'insert\' and date_log>=\'' + str(start) +'\' and date_log <= \''+ str(end) +'\' and roll=\''+ value.roll +'\' and (' + session.search_grades_management +');' ,as_dict=True)
                 pass
                 for dD in tD:
                     dDT=dD['total']
                 pass
                 optionSearch.append(dDT)
             if str(request.vars['tipo'])=='all' or str(request.vars['tipo'])=='u':
-                if session.search_grades_management == "":
+                if session.search_grades_management == "" or session.search_grades_management is None:
                     tD = db.executesql('SELECT count(id) as total from grades_log where project=\'' + project.name + '\' and yearp=\'' + str(period.yearp) +'\' and period=\'' + str(T(period.period.name))+ '\' and operation_log=\'update\' and date_log>=\'' + str(start) +'\' and date_log <= \''+ str(end) +'\' and roll=\''+ value.roll +'\';' ,as_dict=True)
                 else:
-                    tD = db.executesql('SELECT count(id) as total from grades_log where project=\'' + project.name + '\' and yearp=\'' + str(period.yearp) +'\' and period=\'' + str(T(period.period.name))+ '\' and operation_log=\'update\' and date_log>=\'' + str(start) +'\' and date_log <= \''+ str(end) +'\' and roll=\''+ value.roll +'\' and ' + session.search_grades_management +';' ,as_dict=True)
+                    tD = db.executesql('SELECT count(id) as total from grades_log where project=\'' + project.name + '\' and yearp=\'' + str(period.yearp) +'\' and period=\'' + str(T(period.period.name))+ '\' and operation_log=\'update\' and date_log>=\'' + str(start) +'\' and date_log <= \''+ str(end) +'\' and roll=\''+ value.roll +'\' and (' + session.search_grades_management +');' ,as_dict=True)
                 pass
                 for dD in tD:
                     dDT=dD['total']
                 pass
                 optionSearch.append(dDT)
             if str(request.vars['tipo'])=='all' or str(request.vars['tipo'])=='d':
-                if session.search_grades_management == "":
+                if session.search_grades_management == "" or session.search_grades_management is None:
                     tD = db.executesql('SELECT count(id) as total from grades_log where project=\'' + project.name + '\' and yearp=\'' + str(period.yearp) +'\' and period=\'' + str(T(period.period.name))+ '\' and operation_log=\'delete\' and date_log>=\'' + str(start) +'\' and date_log <= \''+ str(end) +'\' and roll=\''+ value.roll +'\';' ,as_dict=True)
                 else:
-                    tD = db.executesql('SELECT count(id) as total from grades_log where project=\'' + project.name + '\' and yearp=\'' + str(period.yearp) +'\' and period=\'' + str(T(period.period.name))+ '\' and operation_log=\'delete\' and date_log>=\'' + str(start) +'\' and date_log <= \''+ str(end) +'\' and roll=\''+ value.roll +'\' and ' + session.search_grades_management +';' ,as_dict=True)
+                    tD = db.executesql('SELECT count(id) as total from grades_log where project=\'' + project.name + '\' and yearp=\'' + str(period.yearp) +'\' and period=\'' + str(T(period.period.name))+ '\' and operation_log=\'delete\' and date_log>=\'' + str(start) +'\' and date_log <= \''+ str(end) +'\' and roll=\''+ value.roll +'\' and (' + session.search_grades_management +');' ,as_dict=True)
                 pass
                 for dD in tD:
                     dDT=dD['total']
@@ -5101,7 +5908,8 @@ def grades_management_n2():
 
 
 
-
+#********************************************************
+#Management Report Grade levels 4
 @auth.requires_login()
 @auth.requires(auth.has_membership('Teacher'))
 def grades_management_n3():
@@ -5114,6 +5922,25 @@ def grades_management_n3():
     month=None
     roll=None
     vecUserRoleMonth=None
+
+    #Check the correct parameters
+    if request.vars['list'] =='False':
+        if request.vars['level'] =='4':
+            if request.vars['level_project'] is None or request.vars['level_project']=='':
+                showLevel = False
+            else:
+                if request.vars['level_month'] is None or request.vars['level_month']=='':
+                    showLevel = False
+                else:
+                    if request.vars['level_tipo'] is None or request.vars['level_tipo']=='':
+                        showLevel = False
+                    else:
+                        if request.vars['level_rol'] is None or request.vars['level_rol']=='':
+                            showLevel = False
+                        else:
+                            redirect(URL('activity_control','grades_management_level_export_load',vars=dict(level=request.vars['level'],level_project=request.vars['level_project'],level_month=request.vars['level_month'],level_tipo=request.vars['level_tipo'],level_rol=request.vars['level_rol'])))
+        else:
+            showLevel = False
 
     #Check if the project is correct
     if request.vars['tipo'] is None or request.vars['tipo']=='':
@@ -5221,30 +6048,30 @@ def grades_management_n3():
             optionSearch=[]
             optionSearch.append(value)
             if str(request.vars['tipo'])=='all' or str(request.vars['tipo'])=='i':
-                if session.search_grades_management == "":
+                if session.search_grades_management == "" or session.search_grades_management is None:
                     tD = db.executesql('SELECT count(id) as total from grades_log where project=\'' + project.name + '\' and yearp=\'' + str(period.yearp) +'\' and period=\'' + str(T(period.period.name))+ '\' and operation_log=\'insert\' and date_log>=\'' + str(start) +'\' and date_log <= \''+ str(end) +'\' and roll=\''+ roll +'\' and user_name=\''+ value +'\';' ,as_dict=True)
                 else:
-                    tD = db.executesql('SELECT count(id) as total from grades_log where project=\'' + project.name + '\' and yearp=\'' + str(period.yearp) +'\' and period=\'' + str(T(period.period.name))+ '\' and operation_log=\'insert\' and date_log>=\'' + str(start) +'\' and date_log <= \''+ str(end) +'\' and roll=\''+ roll +'\' and user_name=\''+ value +'\' and ' + session.search_grades_management +';' ,as_dict=True)
+                    tD = db.executesql('SELECT count(id) as total from grades_log where project=\'' + project.name + '\' and yearp=\'' + str(period.yearp) +'\' and period=\'' + str(T(period.period.name))+ '\' and operation_log=\'insert\' and date_log>=\'' + str(start) +'\' and date_log <= \''+ str(end) +'\' and roll=\''+ roll +'\' and user_name=\''+ value +'\' and (' + session.search_grades_management +');' ,as_dict=True)
                 pass
                 for dD in tD:
                     dDT=dD['total']
                 pass
                 optionSearch.append(dDT)
             if str(request.vars['tipo'])=='all' or str(request.vars['tipo'])=='u':
-                if session.search_grades_management == "":
+                if session.search_grades_management == "" or session.search_grades_management is None:
                     tD = db.executesql('SELECT count(id) as total from grades_log where project=\'' + project.name + '\' and yearp=\'' + str(period.yearp) +'\' and period=\'' + str(T(period.period.name))+ '\' and operation_log=\'update\' and date_log>=\'' + str(start) +'\' and date_log <= \''+ str(end) +'\' and roll=\''+ roll +'\' and user_name=\''+ value +'\';' ,as_dict=True)
                 else:
-                    tD = db.executesql('SELECT count(id) as total from grades_log where project=\'' + project.name + '\' and yearp=\'' + str(period.yearp) +'\' and period=\'' + str(T(period.period.name))+ '\' and operation_log=\'update\' and date_log>=\'' + str(start) +'\' and date_log <= \''+ str(end) +'\' and roll=\''+ roll +'\' and user_name=\''+ value +'\' and ' + session.search_grades_management +';' ,as_dict=True)
+                    tD = db.executesql('SELECT count(id) as total from grades_log where project=\'' + project.name + '\' and yearp=\'' + str(period.yearp) +'\' and period=\'' + str(T(period.period.name))+ '\' and operation_log=\'update\' and date_log>=\'' + str(start) +'\' and date_log <= \''+ str(end) +'\' and roll=\''+ roll +'\' and user_name=\''+ value +'\' and (' + session.search_grades_management +');' ,as_dict=True)
                 pass
                 for dD in tD:
                     dDT=dD['total']
                 pass
                 optionSearch.append(dDT)
             if str(request.vars['tipo'])=='all' or str(request.vars['tipo'])=='d':
-                if session.search_grades_management == "":
+                if session.search_grades_management == "" or session.search_grades_management is None:
                     tD = db.executesql('SELECT count(id) as total from grades_log where project=\'' + project.name + '\' and yearp=\'' + str(period.yearp) +'\' and period=\'' + str(T(period.period.name))+ '\' and operation_log=\'delete\' and date_log>=\'' + str(start) +'\' and date_log <= \''+ str(end) +'\' and roll=\''+ roll +'\' and user_name=\''+ value +'\';' ,as_dict=True)
                 else:
-                    tD = db.executesql('SELECT count(id) as total from grades_log where project=\'' + project.name + '\' and yearp=\'' + str(period.yearp) +'\' and period=\'' + str(T(period.period.name))+ '\' and operation_log=\'delete\' and date_log>=\'' + str(start) +'\' and date_log <= \''+ str(end) +'\' and roll=\''+ roll +'\' and user_name=\''+ value +'\' and ' + session.search_grades_management +';' ,as_dict=True)
+                    tD = db.executesql('SELECT count(id) as total from grades_log where project=\'' + project.name + '\' and yearp=\'' + str(period.yearp) +'\' and period=\'' + str(T(period.period.name))+ '\' and operation_log=\'delete\' and date_log>=\'' + str(start) +'\' and date_log <= \''+ str(end) +'\' and roll=\''+ roll +'\' and user_name=\''+ value +'\' and (' + session.search_grades_management +');' ,as_dict=True)
                 pass
                 for dD in tD:
                     dDT=dD['total']
@@ -5254,6 +6081,9 @@ def grades_management_n3():
     return dict(showLevel=showLevel, project=project, tipo=tipo, month=month, vecUserRoleMonth=vecUserRoleMonth, roll=roll)
 
 
+
+#********************************************************
+#Management Report Grade levels 5
 @auth.requires_login()
 @auth.requires(auth.has_membership('Teacher'))
 def grades_management_n4():
@@ -5267,6 +6097,28 @@ def grades_management_n4():
     roll=None
     userr=None
     vecAllUserRoleMonth=None
+
+    #Check the correct parameters
+    if request.vars['list'] =='False':
+        if request.vars['level'] =='5':
+            if request.vars['level_project'] is None or request.vars['level_project']=='':
+                showLevel = False
+            else:
+                if request.vars['level_month'] is None or request.vars['level_month']=='':
+                    showLevel = False
+                else:
+                    if request.vars['level_tipo'] is None or request.vars['level_tipo']=='':
+                        showLevel = False
+                    else:
+                        if request.vars['level_rol'] is None or request.vars['level_rol']=='':
+                            showLevel = False
+                        else:
+                            if request.vars['level_user'] is None or request.vars['level_user']=='':
+                                showLevel = False
+                            else:
+                                redirect(URL('activity_control','grades_management_level_export_load',vars=dict(level=request.vars['level'],level_project=request.vars['level_project'],level_month=request.vars['level_month'],level_tipo=request.vars['level_tipo'],level_rol=request.vars['level_rol'],level_user=request.vars['level_user'])))
+        else:
+            showLevel = False
 
     #Check if the project is correct
     if request.vars['tipo'] is None or request.vars['tipo']=='':
@@ -5331,7 +6183,7 @@ def grades_management_n4():
                 else:
                     roll=value
             else:
-                roll=value
+                roll=value.role
 
     #Check if the user is correct
     if showLevel==True:
@@ -5341,20 +6193,21 @@ def grades_management_n4():
             flagCheck = False
             #User Temp of auth_user where the username is equal
             userr = db(db.auth_user.username==str(request.vars['userr'])).select().first()
-            if ((roll.role=='Super-Administrator') or (roll.role=='Ecys-Administrator')):
+            if ((roll=='Super-Administrator') or (roll=='Ecys-Administrator')):
                 if userr is not None:
                     #Check if the user has the rol specific
-                    userrT = db((db.auth_membership.user_id==userr.id)&(db.auth_membership.group_id==roll.id)).select().first()
-                    if userrT is not None:
-                        flagCheck = True
+                    userrT = db(db.auth_membership.user_id==userr.id).select()
+                    for tempUserCheck in userrT:
+                        if tempUserCheck.group_id.role==roll:
+                            flagCheck = True
             else:
                 if userr is not None:
                     #Check if the user has the rol specific
-                    userrT = db((db.auth_membership.user_id==userr.id)&(db.auth_membership.group_id==roll.id)).select().first()
-                    if userrT is not None:
-                        userrT = db((db.user_project.period==period.id)&(db.user_project.project==project.id)&(db.user_project.assigned_user==userr.id)).select().first()
-                        if userrT is not None:
-                            flagCheck = True
+                    userrT = db(db.auth_membership.user_id==userr.id).select()
+                    for tempUserCheck in userrT:
+                        if tempUserCheck.group_id.role==roll:
+                            if db((db.user_project.period==period.id)&(db.user_project.project==project.id)&(db.user_project.assigned_user==userr.id)).select().first() is not None:
+                                flagCheck = True
 
             if flagCheck==False:
                 #Check if the log has a roll that is not register
@@ -5385,29 +6238,38 @@ def grades_management_n4():
         
         vecAllUserRoleMonth=[]
         if str(request.vars['tipo'])=='all' or str(request.vars['tipo'])=='i':
-            if session.search_grades_management == "":
-                tD = db.executesql('SELECT * from grades_log where project=\'' + project.name + '\' and yearp=\'' + str(period.yearp) +'\' and period=\'' + str(T(period.period.name))+ '\' and operation_log=\'insert\' and date_log>=\'' + str(start) +'\' and date_log <= \''+ str(end) +'\' and roll=\''+ roll.role +'\' and user_name=\''+ userr +'\';' ,as_dict=True)
+            if session.search_grades_management == "" or session.search_grades_management is None:
+                tD = db.executesql('SELECT * from grades_log where project=\'' + project.name + '\' and yearp=\'' + str(period.yearp) +'\' and period=\'' + str(T(period.period.name))+ '\' and operation_log=\'insert\' and date_log>=\'' + str(start) +'\' and date_log <= \''+ str(end) +'\' and roll=\''+ roll +'\' and user_name=\''+ userr +'\';' ,as_dict=True)
             else:
-                tD = db.executesql('SELECT * from grades_log where project=\'' + project.name + '\' and yearp=\'' + str(period.yearp) +'\' and period=\'' + str(T(period.period.name))+ '\' and operation_log=\'insert\' and date_log>=\'' + str(start) +'\' and date_log <= \''+ str(end) +'\' and roll=\''+ roll.role +'\' and user_name=\''+ userr +'\' and ' + session.search_grades_management +';' ,as_dict=True)
+                tD = db.executesql('SELECT * from grades_log where project=\'' + project.name + '\' and yearp=\'' + str(period.yearp) +'\' and period=\'' + str(T(period.period.name))+ '\' and operation_log=\'insert\' and date_log>=\'' + str(start) +'\' and date_log <= \''+ str(end) +'\' and roll=\''+ roll +'\' and user_name=\''+ userr +'\' and (' + session.search_grades_management +');' ,as_dict=True)
             pass
             vecAllUserRoleMonth.append(tD)
         if str(request.vars['tipo'])=='all' or str(request.vars['tipo'])=='u':
-            if session.search_grades_management == "":
-                tD = db.executesql('SELECT * from grades_log where project=\'' + project.name + '\' and yearp=\'' + str(period.yearp) +'\' and period=\'' + str(T(period.period.name))+ '\' and operation_log=\'update\' and date_log>=\'' + str(start) +'\' and date_log <= \''+ str(end) +'\' and roll=\''+ roll.role +'\' and user_name=\''+ userr +'\';' ,as_dict=True)
+            if session.search_grades_management == "" or session.search_grades_management is None:
+                tD = db.executesql('SELECT * from grades_log where project=\'' + project.name + '\' and yearp=\'' + str(period.yearp) +'\' and period=\'' + str(T(period.period.name))+ '\' and operation_log=\'update\' and date_log>=\'' + str(start) +'\' and date_log <= \''+ str(end) +'\' and roll=\''+ roll +'\' and user_name=\''+ userr +'\';' ,as_dict=True)
             else:
-                tD = db.executesql('SELECT * from grades_log where project=\'' + project.name + '\' and yearp=\'' + str(period.yearp) +'\' and period=\'' + str(T(period.period.name))+ '\' and operation_log=\'update\' and date_log>=\'' + str(start) +'\' and date_log <= \''+ str(end) +'\' and roll=\''+ roll.role +'\' and user_name=\''+ userr +'\' and ' + session.search_grades_management +';' ,as_dict=True)
+                tD = db.executesql('SELECT * from grades_log where project=\'' + project.name + '\' and yearp=\'' + str(period.yearp) +'\' and period=\'' + str(T(period.period.name))+ '\' and operation_log=\'update\' and date_log>=\'' + str(start) +'\' and date_log <= \''+ str(end) +'\' and roll=\''+ roll +'\' and user_name=\''+ userr +'\' and (' + session.search_grades_management +');' ,as_dict=True)
             pass
             vecAllUserRoleMonth.append(tD)
         if str(request.vars['tipo'])=='all' or str(request.vars['tipo'])=='d':
-            if session.search_grades_management == "":
-                tD = db.executesql('SELECT * from grades_log where project=\'' + project.name + '\' and yearp=\'' + str(period.yearp) +'\' and period=\'' + str(T(period.period.name))+ '\' and operation_log=\'delete\' and date_log>=\'' + str(start) +'\' and date_log <= \''+ str(end) +'\' and roll=\''+ roll.role +'\' and user_name=\''+ userr +'\';' ,as_dict=True)
+            if session.search_grades_management == "" or session.search_grades_management is None:
+                tD = db.executesql('SELECT * from grades_log where project=\'' + project.name + '\' and yearp=\'' + str(period.yearp) +'\' and period=\'' + str(T(period.period.name))+ '\' and operation_log=\'delete\' and date_log>=\'' + str(start) +'\' and date_log <= \''+ str(end) +'\' and roll=\''+ roll +'\' and user_name=\''+ userr +'\';' ,as_dict=True)
             else:
-                tD = db.executesql('SELECT * from grades_log where project=\'' + project.name + '\' and yearp=\'' + str(period.yearp) +'\' and period=\'' + str(T(period.period.name))+ '\' and operation_log=\'delete\' and date_log>=\'' + str(start) +'\' and date_log <= \''+ str(end) +'\' and roll=\''+ roll.role +'\' and user_name=\''+ userr +'\' and ' + session.search_grades_management +';' ,as_dict=True)
+                tD = db.executesql('SELECT * from grades_log where project=\'' + project.name + '\' and yearp=\'' + str(period.yearp) +'\' and period=\'' + str(T(period.period.name))+ '\' and operation_log=\'delete\' and date_log>=\'' + str(start) +'\' and date_log <= \''+ str(end) +'\' and roll=\''+ roll +'\' and user_name=\''+ userr +'\' and (' + session.search_grades_management +');' ,as_dict=True)
             pass
             vecAllUserRoleMonth.append(tD)
     return dict(showLevel=showLevel, project=project, tipo=tipo, month=month, vecAllUserRoleMonth=vecAllUserRoleMonth, roll=roll, userr=userr)
 
 
+
+########################################################################################################################################################################################################################################################################
+########################################################################################################################################################################################################################################################################
+########################################################################################################################################################################################################################################################################
+########################################################################################################################################################################################################################################################################
+#####################################################Management Report Revalidations laboratory#####################################################
+
+#********************************************************
+#Export full management reporting laboratory revalidation
 @auth.requires_login()
 @auth.requires(auth.has_membership('Teacher'))
 def validate_laboratory_management_export():
@@ -5527,34 +6389,34 @@ def validate_laboratory_management_export():
     for assigantion in assigantions:
         tempRemport1=[]
         tempRemport1.append(assigantion.project.name)
-        if session.search_validate_laboratory_management == "":
-            tI = db.executesql('SELECT count(id) as total from validate_laboratory_log where project=\'' + assigantion.project.name + '\' and yearp=\'' + str(year.yearp) +'\' and period=\'' + str(T(year.period.name))+ '\' and operation_log=\'insert\'' + session.search_validate_laboratory_management +';' ,as_dict=True)
+        if session.search_validate_laboratory_management == "" or session.search_validate_laboratory_management is None:
+            tI = db.executesql('SELECT count(id) as total from validate_laboratory_log where project=\'' + assigantion.project.name + '\' and yearp=\'' + str(year.yearp) +'\' and period=\'' + str(T(year.period.name))+ '\' and operation_log=\'insert\';' ,as_dict=True)
             for dI in tI:
                 dIT=dI['total']
             pass
             tempRemport1.append(str(dIT))
-            tI = db.executesql('SELECT count(id) as total from validate_laboratory_log where project=\'' + assigantion.project.name + '\' and yearp=\'' + str(year.yearp) +'\' and period=\'' + str(T(year.period.name))+ '\' and operation_log=\'update\'' + session.search_validate_laboratory_management +';' ,as_dict=True)
+            tI = db.executesql('SELECT count(id) as total from validate_laboratory_log where project=\'' + assigantion.project.name + '\' and yearp=\'' + str(year.yearp) +'\' and period=\'' + str(T(year.period.name))+ '\' and operation_log=\'update\';' ,as_dict=True)
             for dI in tI:
                 dIT=dI['total']
             pass
             tempRemport1.append(str(dIT))
-            tI = db.executesql('SELECT count(id) as total from validate_laboratory_log where project=\'' + assigantion.project.name + '\' and yearp=\'' + str(year.yearp) +'\' and period=\'' + str(T(year.period.name))+ '\' and operation_log=\'delete\'' + session.search_validate_laboratory_management +';' ,as_dict=True)
+            tI = db.executesql('SELECT count(id) as total from validate_laboratory_log where project=\'' + assigantion.project.name + '\' and yearp=\'' + str(year.yearp) +'\' and period=\'' + str(T(year.period.name))+ '\' and operation_log=\'delete\';' ,as_dict=True)
             for dI in tI:
                 dIT=dI['total']
             pass
             tempRemport1.append(str(dIT))
         else:
-            tI = db.executesql('SELECT count(id) as total from validate_laboratory_log where project=\'' + assigantion.project.name + '\' and yearp=\'' + str(year.yearp) +'\' and period=\'' + str(T(year.period.name))+ '\' and operation_log=\'insert\' and ' + session.search_validate_laboratory_management +';' ,as_dict=True)
+            tI = db.executesql('SELECT count(id) as total from validate_laboratory_log where project=\'' + assigantion.project.name + '\' and yearp=\'' + str(year.yearp) +'\' and period=\'' + str(T(year.period.name))+ '\' and operation_log=\'insert\' and (' + session.search_validate_laboratory_management +');' ,as_dict=True)
             for dI in tI:
                 dIT=dI['total']
             pass
             tempRemport1.append(str(dIT))
-            tI = db.executesql('SELECT count(id) as total from validate_laboratory_log where project=\'' + assigantion.project.name + '\' and yearp=\'' + str(year.yearp) +'\' and period=\'' + str(T(year.period.name))+ '\' and operation_log=\'update\' and ' + session.search_validate_laboratory_management +';' ,as_dict=True)
+            tI = db.executesql('SELECT count(id) as total from validate_laboratory_log where project=\'' + assigantion.project.name + '\' and yearp=\'' + str(year.yearp) +'\' and period=\'' + str(T(year.period.name))+ '\' and operation_log=\'update\' and (' + session.search_validate_laboratory_management +');' ,as_dict=True)
             for dI in tI:
                 dIT=dI['total']
             pass
             tempRemport1.append(str(dIT))
-            tI = db.executesql('SELECT count(id) as total from validate_laboratory_log where project=\'' + assigantion.project.name + '\' and yearp=\'' + str(year.yearp) +'\' and period=\'' + str(T(year.period.name))+ '\' and operation_log=\'delete\' and ' + session.search_validate_laboratory_management +';' ,as_dict=True)
+            tI = db.executesql('SELECT count(id) as total from validate_laboratory_log where project=\'' + assigantion.project.name + '\' and yearp=\'' + str(year.yearp) +'\' and period=\'' + str(T(year.period.name))+ '\' and operation_log=\'delete\' and (' + session.search_validate_laboratory_management +');' ,as_dict=True)
             for dI in tI:
                 dIT=dI['total']
             pass
@@ -5582,7 +6444,7 @@ def validate_laboratory_management_export():
                 end = datetime.strptime(str(year.yearp) + '-' + str(month[2]) +'-01', "%Y-%m-%d")
             pass
             tempRemport2.append(month[1])
-            if session.search_validate_laboratory_management == "":
+            if session.search_validate_laboratory_management == "" or session.search_validate_laboratory_management is None:
                 tD = db.executesql('SELECT count(id) as total from validate_laboratory_log where project=\'' + assigantion.project.name + '\' and yearp=\'' + str(year.yearp) +'\' and period=\'' + str(T(year.period.name))+ '\' and operation_log=\'insert\' and date_log>=\'' + str(start) +'\' and date_log <= \''+ str(end) +'\';' ,as_dict=True)
                 for dD in tD:
                     dDT=dD['total']
@@ -5599,17 +6461,17 @@ def validate_laboratory_management_export():
                 pass
                 tempRemport2.append(str(dDT))
             else:
-                tD = db.executesql('SELECT count(id) as total from validate_laboratory_log where project=\'' + assigantion.project.name + '\' and yearp=\'' + str(year.yearp) +'\' and period=\'' + str(T(year.period.name))+ '\' and operation_log=\'insert\' and date_log>=\'' + str(start) +'\' and date_log <= \''+ str(end) + '\' and ' + session.search_validate_laboratory_management +';' ,as_dict=True)
+                tD = db.executesql('SELECT count(id) as total from validate_laboratory_log where project=\'' + assigantion.project.name + '\' and yearp=\'' + str(year.yearp) +'\' and period=\'' + str(T(year.period.name))+ '\' and operation_log=\'insert\' and date_log>=\'' + str(start) +'\' and date_log <= \''+ str(end) + '\' and (' + session.search_validate_laboratory_management +');' ,as_dict=True)
                 for dD in tD:
                     dDT=dD['total']
                 pass
                 tempRemport2.append(str(dDT))
-                tD = db.executesql('SELECT count(id) as total from validate_laboratory_log where project=\'' + assigantion.project.name + '\' and yearp=\'' + str(year.yearp) +'\' and period=\'' + str(T(year.period.name))+ '\' and operation_log=\'update\' and date_log>=\'' + str(start) +'\' and date_log <= \''+ str(end) + '\' and ' + session.search_validate_laboratory_management +';' ,as_dict=True)
+                tD = db.executesql('SELECT count(id) as total from validate_laboratory_log where project=\'' + assigantion.project.name + '\' and yearp=\'' + str(year.yearp) +'\' and period=\'' + str(T(year.period.name))+ '\' and operation_log=\'update\' and date_log>=\'' + str(start) +'\' and date_log <= \''+ str(end) + '\' and (' + session.search_validate_laboratory_management +');' ,as_dict=True)
                 for dD in tD:
                     dDT=dD['total']
                 pass
                 tempRemport2.append(str(dDT))
-                tD = db.executesql('SELECT count(id) as total from validate_laboratory_log where project=\'' + assigantion.project.name + '\' and yearp=\'' + str(year.yearp) +'\' and period=\'' + str(T(year.period.name))+ '\' and operation_log=\'delete\' and date_log>=\'' + str(start) +'\' and date_log <= \''+ str(end) + '\' and ' + session.search_validate_laboratory_management +';' ,as_dict=True)
+                tD = db.executesql('SELECT count(id) as total from validate_laboratory_log where project=\'' + assigantion.project.name + '\' and yearp=\'' + str(year.yearp) +'\' and period=\'' + str(T(year.period.name))+ '\' and operation_log=\'delete\' and date_log>=\'' + str(start) +'\' and date_log <= \''+ str(end) + '\' and (' + session.search_validate_laboratory_management +');' ,as_dict=True)
                 for dD in tD:
                     dDT=dD['total']
                 pass
@@ -5642,7 +6504,7 @@ def validate_laboratory_management_export():
                 else:
                     tempRemport3.append(T(roll))
                 pass
-                if session.search_validate_laboratory_management == "":
+                if session.search_validate_laboratory_management == "" or session.search_validate_laboratory_management is None:
                     tD = db.executesql('SELECT count(id) as total from validate_laboratory_log where project=\'' + assigantion.project.name + '\' and yearp=\'' + str(year.yearp) +'\' and period=\'' + str(T(year.period.name))+ '\' and operation_log=\'insert\' and date_log>=\'' + str(start) +'\' and date_log <= \''+ str(end) +'\' and roll=\''+ roll +'\';' ,as_dict=True)
                     for dD in tD:
                         dDT=dD['total']
@@ -5659,17 +6521,17 @@ def validate_laboratory_management_export():
                     pass
                     tempRemport3.append(dDT)
                 else:
-                    tD = db.executesql('SELECT count(id) as total from validate_laboratory_log where project=\'' + assigantion.project.name + '\' and yearp=\'' + str(year.yearp) +'\' and period=\'' + str(T(year.period.name))+ '\' and operation_log=\'insert\' and date_log>=\'' + str(start) +'\' and date_log <= \''+ str(end) +'\' and roll=\''+ roll +'\' and ' + session.search_validate_laboratory_management +';' ,as_dict=True)
+                    tD = db.executesql('SELECT count(id) as total from validate_laboratory_log where project=\'' + assigantion.project.name + '\' and yearp=\'' + str(year.yearp) +'\' and period=\'' + str(T(year.period.name))+ '\' and operation_log=\'insert\' and date_log>=\'' + str(start) +'\' and date_log <= \''+ str(end) +'\' and roll=\''+ roll +'\' and (' + session.search_validate_laboratory_management +');' ,as_dict=True)
                     for dD in tD:
                         dDT=dD['total']
                     pass
                     tempRemport3.append(dDT)
-                    tD = db.executesql('SELECT count(id) as total from validate_laboratory_log where project=\'' + assigantion.project.name + '\' and yearp=\'' + str(year.yearp) +'\' and period=\'' + str(T(year.period.name))+ '\' and operation_log=\'update\' and date_log>=\'' + str(start) +'\' and date_log <= \''+ str(end) +'\' and roll=\''+ roll +'\' and ' + session.search_validate_laboratory_management +';' ,as_dict=True)
+                    tD = db.executesql('SELECT count(id) as total from validate_laboratory_log where project=\'' + assigantion.project.name + '\' and yearp=\'' + str(year.yearp) +'\' and period=\'' + str(T(year.period.name))+ '\' and operation_log=\'update\' and date_log>=\'' + str(start) +'\' and date_log <= \''+ str(end) +'\' and roll=\''+ roll +'\' and (' + session.search_validate_laboratory_management +');' ,as_dict=True)
                     for dD in tD:
                         dDT=dD['total']
                     pass
                     tempRemport3.append(dDT)
-                    tD = db.executesql('SELECT count(id) as total from validate_laboratory_log where project=\'' + assigantion.project.name + '\' and yearp=\'' + str(year.yearp) +'\' and period=\'' + str(T(year.period.name))+ '\' and operation_log=\'delete\' and date_log>=\'' + str(start) +'\' and date_log <= \''+ str(end) +'\' and roll=\''+ roll +'\' and ' + session.search_validate_laboratory_management +';' ,as_dict=True)
+                    tD = db.executesql('SELECT count(id) as total from validate_laboratory_log where project=\'' + assigantion.project.name + '\' and yearp=\'' + str(year.yearp) +'\' and period=\'' + str(T(year.period.name))+ '\' and operation_log=\'delete\' and date_log>=\'' + str(start) +'\' and date_log <= \''+ str(end) +'\' and roll=\''+ roll +'\' and (' + session.search_validate_laboratory_management +');' ,as_dict=True)
                     for dD in tD:
                         dDT=dD['total']
                     pass
@@ -5709,7 +6571,7 @@ def validate_laboratory_management_export():
                     tempRemport4.append('')
                     tempRemport4.append('')
                     tempRemport4.append(userr)
-                    if session.search_validate_laboratory_management == "":
+                    if session.search_validate_laboratory_management == "" or session.search_validate_laboratory_management is None:
                         tD = db.executesql('SELECT count(id) as total from validate_laboratory_log where project=\'' + assigantion.project.name + '\' and yearp=\'' + str(year.yearp) +'\' and period=\'' + str(T(year.period.name))+ '\' and operation_log=\'insert\' and date_log>=\'' + str(start) +'\' and date_log <= \''+ str(end) +'\' and roll=\''+ roll +'\' and user_name=\''+ userr +'\';' ,as_dict=True)
                         for dD in tD:
                             dDT=dD['total']
@@ -5726,17 +6588,17 @@ def validate_laboratory_management_export():
                         pass
                         tempRemport4.append(dDT)
                     else:
-                        tD = db.executesql('SELECT count(id) as total from validate_laboratory_log where project=\'' + assigantion.project.name + '\' and yearp=\'' + str(year.yearp) +'\' and period=\'' + str(T(year.period.name))+ '\' and operation_log=\'insert\' and date_log>=\'' + str(start) +'\' and date_log <= \''+ str(end) +'\' and roll=\''+ roll +'\' and user_name=\''+ userr +'\' and ' + session.search_validate_laboratory_management +';' ,as_dict=True)
+                        tD = db.executesql('SELECT count(id) as total from validate_laboratory_log where project=\'' + assigantion.project.name + '\' and yearp=\'' + str(year.yearp) +'\' and period=\'' + str(T(year.period.name))+ '\' and operation_log=\'insert\' and date_log>=\'' + str(start) +'\' and date_log <= \''+ str(end) +'\' and roll=\''+ roll +'\' and user_name=\''+ userr +'\' and (' + session.search_validate_laboratory_management +');' ,as_dict=True)
                         for dD in tD:
                             dDT=dD['total']
                         pass
                         tempRemport4.append(dDT)
-                        tD = db.executesql('SELECT count(id) as total from validate_laboratory_log where project=\'' + assigantion.project.name + '\' and yearp=\'' + str(year.yearp) +'\' and period=\'' + str(T(year.period.name))+ '\' and operation_log=\'update\' and date_log>=\'' + str(start) +'\' and date_log <= \''+ str(end) +'\' and roll=\''+ roll +'\' and user_name=\''+ userr +'\' and ' + session.search_validate_laboratory_management +';' ,as_dict=True)
+                        tD = db.executesql('SELECT count(id) as total from validate_laboratory_log where project=\'' + assigantion.project.name + '\' and yearp=\'' + str(year.yearp) +'\' and period=\'' + str(T(year.period.name))+ '\' and operation_log=\'update\' and date_log>=\'' + str(start) +'\' and date_log <= \''+ str(end) +'\' and roll=\''+ roll +'\' and user_name=\''+ userr +'\' and (' + session.search_validate_laboratory_management +');' ,as_dict=True)
                         for dD in tD:
                             dDT=dD['total']
                         pass
                         tempRemport4.append(dDT)
-                        tD = db.executesql('SELECT count(id) as total from validate_laboratory_log where project=\'' + assigantion.project.name + '\' and yearp=\'' + str(year.yearp) +'\' and period=\'' + str(T(year.period.name))+ '\' and operation_log=\'delete\' and date_log>=\'' + str(start) +'\' and date_log <= \''+ str(end) +'\' and roll=\''+ roll +'\' and user_name=\''+ userr +'\' and ' + session.search_validate_laboratory_management +';' ,as_dict=True)
+                        tD = db.executesql('SELECT count(id) as total from validate_laboratory_log where project=\'' + assigantion.project.name + '\' and yearp=\'' + str(year.yearp) +'\' and period=\'' + str(T(year.period.name))+ '\' and operation_log=\'delete\' and date_log>=\'' + str(start) +'\' and date_log <= \''+ str(end) +'\' and roll=\''+ roll +'\' and user_name=\''+ userr +'\' and (' + session.search_validate_laboratory_management +');' ,as_dict=True)
                         for dD in tD:
                             dDT=dD['total']
                         pass
@@ -5748,7 +6610,7 @@ def validate_laboratory_management_export():
                     temp_vecAllUserRoleMonth=[]
                     tempRemport5=[]
                     #Body Level 5
-                    if session.search_validate_laboratory_management == "":
+                    if session.search_validate_laboratory_management == "" or session.search_validate_laboratory_management is None:
                         tD = db.executesql('SELECT * from validate_laboratory_log where project=\'' + assigantion.project.name + '\' and yearp=\'' + str(year.yearp) +'\' and period=\'' + str(T(year.period.name))+ '\' and operation_log=\'insert\' and date_log>=\'' + str(start) +'\' and date_log <= \''+ str(end) +'\' and roll=\''+ roll +'\' and user_name=\''+ userr +'\';' ,as_dict=True)
                         temp_vecAllUserRoleMonth.append(tD)
                         tD = db.executesql('SELECT * from validate_laboratory_log where project=\'' + assigantion.project.name + '\' and yearp=\'' + str(year.yearp) +'\' and period=\'' + str(T(year.period.name))+ '\' and operation_log=\'update\' and date_log>=\'' + str(start) +'\' and date_log <= \''+ str(end) +'\' and roll=\''+ roll +'\' and user_name=\''+ userr +'\';' ,as_dict=True)
@@ -5756,11 +6618,11 @@ def validate_laboratory_management_export():
                         tD = db.executesql('SELECT * from validate_laboratory_log where project=\'' + assigantion.project.name + '\' and yearp=\'' + str(year.yearp) +'\' and period=\'' + str(T(year.period.name))+ '\' and operation_log=\'delete\' and date_log>=\'' + str(start) +'\' and date_log <= \''+ str(end) +'\' and roll=\''+ roll +'\' and user_name=\''+ userr +'\';' ,as_dict=True)
                         temp_vecAllUserRoleMonth.append(tD)
                     else:
-                        tD = db.executesql('SELECT * from validate_laboratory_log where project=\'' + assigantion.project.name + '\' and yearp=\'' + str(year.yearp) +'\' and period=\'' + str(T(year.period.name))+ '\' and operation_log=\'insert\' and date_log>=\'' + str(start) +'\' and date_log <= \''+ str(end) +'\' and roll=\''+ roll +'\' and user_name=\''+ userr +'\' and ' + session.search_validate_laboratory_management +';' ,as_dict=True)
+                        tD = db.executesql('SELECT * from validate_laboratory_log where project=\'' + assigantion.project.name + '\' and yearp=\'' + str(year.yearp) +'\' and period=\'' + str(T(year.period.name))+ '\' and operation_log=\'insert\' and date_log>=\'' + str(start) +'\' and date_log <= \''+ str(end) +'\' and roll=\''+ roll +'\' and user_name=\''+ userr +'\' and (' + session.search_validate_laboratory_management +');' ,as_dict=True)
                         temp_vecAllUserRoleMonth.append(tD)
-                        tD = db.executesql('SELECT * from validate_laboratory_log where project=\'' + assigantion.project.name + '\' and yearp=\'' + str(year.yearp) +'\' and period=\'' + str(T(year.period.name))+ '\' and operation_log=\'update\' and date_log>=\'' + str(start) +'\' and date_log <= \''+ str(end) +'\' and roll=\''+ roll +'\' and user_name=\''+ userr +'\' and ' + session.search_validate_laboratory_management +';' ,as_dict=True)
+                        tD = db.executesql('SELECT * from validate_laboratory_log where project=\'' + assigantion.project.name + '\' and yearp=\'' + str(year.yearp) +'\' and period=\'' + str(T(year.period.name))+ '\' and operation_log=\'update\' and date_log>=\'' + str(start) +'\' and date_log <= \''+ str(end) +'\' and roll=\''+ roll +'\' and user_name=\''+ userr +'\' and (' + session.search_validate_laboratory_management +');' ,as_dict=True)
                         temp_vecAllUserRoleMonth.append(tD)
-                        tD = db.executesql('SELECT * from validate_laboratory_log where project=\'' + assigantion.project.name + '\' and yearp=\'' + str(year.yearp) +'\' and period=\'' + str(T(year.period.name))+ '\' and operation_log=\'delete\' and date_log>=\'' + str(start) +'\' and date_log <= \''+ str(end) +'\' and roll=\''+ roll +'\' and user_name=\''+ userr +'\' and ' + session.search_validate_laboratory_management +';' ,as_dict=True)
+                        tD = db.executesql('SELECT * from validate_laboratory_log where project=\'' + assigantion.project.name + '\' and yearp=\'' + str(year.yearp) +'\' and period=\'' + str(T(year.period.name))+ '\' and operation_log=\'delete\' and date_log>=\'' + str(start) +'\' and date_log <= \''+ str(end) +'\' and roll=\''+ roll +'\' and user_name=\''+ userr +'\' and (' + session.search_validate_laboratory_management +');' ,as_dict=True)
                         temp_vecAllUserRoleMonth.append(tD)
                     pass
                     varTypeHead=0
@@ -5832,15 +6694,797 @@ def validate_laboratory_management_export():
     pass
     #End Level 1
 
-    return dict(filename='ReporteGestionNotas', csvdata=report)
+    return dict(filename='ReporteGestionRevalidaciones', csvdata=report)
 
 
+
+#********************************************************
+#Export management reporting laboratory revalidation levels 1 and 2
+@auth.requires_login()
+@auth.requires(auth.has_membership('Teacher'))
+def validate_laboratory_management_level_export():
+    #Vars of the report
+    createReport = True
+    report=[]
+    tempRemport1=[]
+    #Obtain the current period of the system and all the register periods
+    import cpfecys
+    from datetime import datetime
+    year = cpfecys.current_year_period()
+
+    #Check if the user is assigned to the course
+    assigantions = db((db.user_project.assigned_user == auth.user.id) & (db.user_project.period == year.id)).select()
+    if assigantions.first() is None:
+        createReport=False
+
+    #Vec with the months of the current period
+    vecMonth=[]
+    tmpMonth=[]
+    if year.period == 1:
+        tmpMonth=[]
+        tmpMonth.append(1)
+        tmpMonth.append('Enero')
+        tmpMonth.append(2)
+        vecMonth.append(tmpMonth)
+
+        tmpMonth=[]
+        tmpMonth.append(2)
+        tmpMonth.append('Febrero')
+        tmpMonth.append(3)
+        vecMonth.append(tmpMonth)
+
+        tmpMonth=[]
+        tmpMonth.append(3)
+        tmpMonth.append('Marzo')
+        tmpMonth.append(4)
+        vecMonth.append(tmpMonth)
+
+        tmpMonth=[]
+        tmpMonth.append(4)
+        tmpMonth.append('Abril')
+        tmpMonth.append(5)
+        vecMonth.append(tmpMonth)
+
+        tmpMonth=[]
+        tmpMonth.append(5)
+        tmpMonth.append('Mayo')
+        tmpMonth.append(6)
+        vecMonth.append(tmpMonth)
+    else:
+        tmpMonth=[]
+        tmpMonth.append(6)
+        tmpMonth.append('Junio')
+        tmpMonth.append(7)
+        vecMonth.append(tmpMonth)
+
+        tmpMonth=[]
+        tmpMonth.append(7)
+        tmpMonth.append('Julio')
+        tmpMonth.append(8)
+        vecMonth.append(tmpMonth)
+
+        tmpMonth=[]
+        tmpMonth.append(8)
+        tmpMonth.append('Agosto')
+        tmpMonth.append(9)
+        vecMonth.append(tmpMonth)
+
+        tmpMonth=[]
+        tmpMonth.append(9)
+        tmpMonth.append('Septiembre')
+        tmpMonth.append(10)
+        vecMonth.append(tmpMonth)
+
+        tmpMonth=[]
+        tmpMonth.append(10)
+        tmpMonth.append('Octubre')
+        tmpMonth.append(11)
+        vecMonth.append(tmpMonth)
+
+        tmpMonth=[]
+        tmpMonth.append(11)
+        tmpMonth.append('Noviembre')
+        tmpMonth.append(12)
+        vecMonth.append(tmpMonth)
+
+        tmpMonth=[]
+        tmpMonth.append(12)
+        tmpMonth.append('Diciembre')
+        tmpMonth.append(1)
+        vecMonth.append(tmpMonth)
+
+    #Check the parameters
+    if request.vars['level']=='1' or request.vars['level']=='2':
+        if int(request.vars['level']) > 1 and createReport==True:
+            #Check if the project is correct
+            if request.vars['level_project'] is None or request.vars['level_project']=='':
+                createReport=False
+            else:
+                level_project = request.vars['level_project']
+                level_project = db(db.project.id==level_project).select().first()
+                if level_project is None:
+                    createReport=False
+                else:
+                    exportReport=False
+                    for assigantion in assigantions:
+                        if assigantion.project==level_project.id:
+                            exportReport=True
+                    if exportReport==False:
+                        createReport=False
+        pass
+    else:
+        createReport=False
+
+    #MAKE REPORT
+    if createReport==True:
+        #Report heading
+        tempRemport1=[]
+        tempRemport1.append('Reporte de Gestión de Revalidación de Laboratorio')
+        report.append(tempRemport1)
+        tempRemport1=[]
+        tempRemport1.append(T(year.period.name)+' '+str(year.yearp))
+        report.append(tempRemport1)
+
+        #LEVEL 1
+        if request.vars['level']=='1':
+            #Heading Level 1
+            tempRemport1=[]
+            tempRemport1.append('')
+            report.append(tempRemport1)
+
+            tempRemport1=[]
+            tempRemport1.append(T('Detail'))
+            report.append(tempRemport1)
+
+            tempRemport1=[]
+            tempRemport1.append(T('Course'))
+            tempRemport1.append(T('Total inserted'))
+            tempRemport1.append(T('Total modified'))
+            tempRemport1.append(T('Total out'))
+            report.append(tempRemport1)
+            #Body Level 1
+            for assigantion in assigantions:
+                tempRemport1=[]
+                tempRemport1.append(assigantion.project.name)
+                if session.search_validate_laboratory_management == "" or session.search_validate_laboratory_management is None:
+                    tI = db.executesql('SELECT count(id) as total from validate_laboratory_log where project=\'' + assigantion.project.name + '\' and yearp=\'' + str(year.yearp) +'\' and period=\'' + str(T(year.period.name))+ '\' and operation_log=\'insert\';' ,as_dict=True)
+                    for dI in tI:
+                        dIT=dI['total']
+                    pass
+                    tempRemport1.append(str(dIT))
+                    tI = db.executesql('SELECT count(id) as total from validate_laboratory_log where project=\'' + assigantion.project.name + '\' and yearp=\'' + str(year.yearp) +'\' and period=\'' + str(T(year.period.name))+ '\' and operation_log=\'update\';' ,as_dict=True)
+                    for dI in tI:
+                        dIT=dI['total']
+                    pass
+                    tempRemport1.append(str(dIT))
+                    tI = db.executesql('SELECT count(id) as total from validate_laboratory_log where project=\'' + assigantion.project.name + '\' and yearp=\'' + str(year.yearp) +'\' and period=\'' + str(T(year.period.name))+ '\' and operation_log=\'delete\';' ,as_dict=True)
+                    for dI in tI:
+                        dIT=dI['total']
+                    pass
+                    tempRemport1.append(str(dIT))
+                else:
+                    tI = db.executesql('SELECT count(id) as total from validate_laboratory_log where project=\'' + assigantion.project.name + '\' and yearp=\'' + str(year.yearp) +'\' and period=\'' + str(T(year.period.name))+ '\' and operation_log=\'insert\' and (' + session.search_validate_laboratory_management +');' ,as_dict=True)
+                    for dI in tI:
+                        dIT=dI['total']
+                    pass
+                    tempRemport1.append(str(dIT))
+                    tI = db.executesql('SELECT count(id) as total from validate_laboratory_log where project=\'' + assigantion.project.name + '\' and yearp=\'' + str(year.yearp) +'\' and period=\'' + str(T(year.period.name))+ '\' and operation_log=\'update\' and (' + session.search_validate_laboratory_management +');' ,as_dict=True)
+                    for dI in tI:
+                        dIT=dI['total']
+                    pass
+                    tempRemport1.append(str(dIT))
+                    tI = db.executesql('SELECT count(id) as total from validate_laboratory_log where project=\'' + assigantion.project.name + '\' and yearp=\'' + str(year.yearp) +'\' and period=\'' + str(T(year.period.name))+ '\' and operation_log=\'delete\' and (' + session.search_validate_laboratory_management +');' ,as_dict=True)
+                    for dI in tI:
+                        dIT=dI['total']
+                    pass
+                    tempRemport1.append(str(dIT))
+                pass
+                report.append(tempRemport1)
+            pass
+        
+
+        #LEVEL 2
+        elif request.vars['level']=='2':
+            #Heading Level 2
+            tempRemport1=[]
+            tempRemport1.append(T('Course'))
+            tempRemport1.append(level_project.name)
+            report.append(tempRemport1)
+            
+            tempRemport1=[]
+            tempRemport1.append('')
+            report.append(tempRemport1)
+
+            tempRemport1=[]
+            tempRemport1.append(T('Detail'))
+            report.append(tempRemport1)
+
+            tempRemport1=[]
+            tempRemport1.append(T('Month'))
+            tempRemport1.append(T('Total inserted'))
+            tempRemport1.append(T('Total modified'))
+            tempRemport1.append(T('Total out'))
+            report.append(tempRemport1)
+            #Body Level 2
+            for month in vecMonth:
+                tempRemport1=[]
+                start = datetime.strptime(str(year.yearp) + '-' + str(month[0]) +'-01', "%Y-%m-%d")
+                if month[2]==1:
+                    end = datetime.strptime(str(year.yearp+1) + '-' + str(month[2]) +'-01', "%Y-%m-%d")
+                else:
+                    end = datetime.strptime(str(year.yearp) + '-' + str(month[2]) +'-01', "%Y-%m-%d")
+                pass
+                tempRemport1.append(month[1])
+                if session.search_validate_laboratory_management == "" or session.search_validate_laboratory_management is None:
+                    tD = db.executesql('SELECT count(id) as total from validate_laboratory_log where project=\'' + level_project.name + '\' and yearp=\'' + str(year.yearp) +'\' and period=\'' + str(T(year.period.name))+ '\' and operation_log=\'insert\' and date_log>=\'' + str(start) +'\' and date_log <= \''+ str(end) +'\';' ,as_dict=True)
+                    for dD in tD:
+                        dDT=dD['total']
+                    pass
+                    tempRemport1.append(str(dDT))
+                    tD = db.executesql('SELECT count(id) as total from validate_laboratory_log where project=\'' + level_project.name + '\' and yearp=\'' + str(year.yearp) +'\' and period=\'' + str(T(year.period.name))+ '\' and operation_log=\'update\' and date_log>=\'' + str(start) +'\' and date_log <= \''+ str(end) +'\';' ,as_dict=True)
+                    for dD in tD:
+                        dDT=dD['total']
+                    pass
+                    tempRemport1.append(str(dDT))
+                    tD = db.executesql('SELECT count(id) as total from validate_laboratory_log where project=\'' + level_project.name + '\' and yearp=\'' + str(year.yearp) +'\' and period=\'' + str(T(year.period.name))+ '\' and operation_log=\'delete\' and date_log>=\'' + str(start) +'\' and date_log <= \''+ str(end) +'\';' ,as_dict=True)
+                    for dD in tD:
+                        dDT=dD['total']
+                    pass
+                    tempRemport1.append(str(dDT))
+                else:
+                    tD = db.executesql('SELECT count(id) as total from validate_laboratory_log where project=\'' + level_project.name + '\' and yearp=\'' + str(year.yearp) +'\' and period=\'' + str(T(year.period.name))+ '\' and operation_log=\'insert\' and date_log>=\'' + str(start) +'\' and date_log <= \''+ str(end) + '\' and (' + session.search_validate_laboratory_management +');' ,as_dict=True)
+                    for dD in tD:
+                        dDT=dD['total']
+                    pass
+                    tempRemport1.append(str(dDT))
+                    tD = db.executesql('SELECT count(id) as total from validate_laboratory_log where project=\'' + level_project.name + '\' and yearp=\'' + str(year.yearp) +'\' and period=\'' + str(T(year.period.name))+ '\' and operation_log=\'update\' and date_log>=\'' + str(start) +'\' and date_log <= \''+ str(end) + '\' and (' + session.search_validate_laboratory_management +');' ,as_dict=True)
+                    for dD in tD:
+                        dDT=dD['total']
+                    pass
+                    tempRemport1.append(str(dDT))
+                    tD = db.executesql('SELECT count(id) as total from validate_laboratory_log where project=\'' + level_project.name + '\' and yearp=\'' + str(year.yearp) +'\' and period=\'' + str(T(year.period.name))+ '\' and operation_log=\'delete\' and date_log>=\'' + str(start) +'\' and date_log <= \''+ str(end) + '\' and (' + session.search_validate_laboratory_management +');' ,as_dict=True)
+                    for dD in tD:
+                        dDT=dD['total']
+                    pass
+                    tempRemport1.append(str(dDT))
+                pass
+                report.append(tempRemport1)
+        
+        return dict(filename='ReporteGestionRevalidaciones', csvdata=report)
+    else:
+        session.flash = T('Not valid Action.')
+        redirect(URL('activity_control','validate_laboratory_management'))
+
+
+
+#********************************************************
+#Export management reporting laboratory revalidation levels 3, 4 and 5
+@auth.requires_login()
+@auth.requires(auth.has_membership('Teacher'))
+def validate_laboratory_management_level_export_load():
+    #Vars of the report
+    createReport = True
+    report=[]
+    tempRemport1=[]
+    #Obtain the current period of the system and all the register periods
+    import cpfecys
+    from datetime import datetime
+    year = cpfecys.current_year_period()
+
+    #Check if the user is assigned to the course
+    assigantions = db((db.user_project.assigned_user == auth.user.id) & (db.user_project.period == year.id)).select()
+    if assigantions.first() is None:
+        createReport=False
+
+    #Vec with the months of the current period
+    vecMonth=[]
+    tmpMonth=[]
+    if year.period == 1:
+        tmpMonth=[]
+        tmpMonth.append(1)
+        tmpMonth.append('Enero')
+        tmpMonth.append(2)
+        vecMonth.append(tmpMonth)
+
+        tmpMonth=[]
+        tmpMonth.append(2)
+        tmpMonth.append('Febrero')
+        tmpMonth.append(3)
+        vecMonth.append(tmpMonth)
+
+        tmpMonth=[]
+        tmpMonth.append(3)
+        tmpMonth.append('Marzo')
+        tmpMonth.append(4)
+        vecMonth.append(tmpMonth)
+
+        tmpMonth=[]
+        tmpMonth.append(4)
+        tmpMonth.append('Abril')
+        tmpMonth.append(5)
+        vecMonth.append(tmpMonth)
+
+        tmpMonth=[]
+        tmpMonth.append(5)
+        tmpMonth.append('Mayo')
+        tmpMonth.append(6)
+        vecMonth.append(tmpMonth)
+    else:
+        tmpMonth=[]
+        tmpMonth.append(6)
+        tmpMonth.append('Junio')
+        tmpMonth.append(7)
+        vecMonth.append(tmpMonth)
+
+        tmpMonth=[]
+        tmpMonth.append(7)
+        tmpMonth.append('Julio')
+        tmpMonth.append(8)
+        vecMonth.append(tmpMonth)
+
+        tmpMonth=[]
+        tmpMonth.append(8)
+        tmpMonth.append('Agosto')
+        tmpMonth.append(9)
+        vecMonth.append(tmpMonth)
+
+        tmpMonth=[]
+        tmpMonth.append(9)
+        tmpMonth.append('Septiembre')
+        tmpMonth.append(10)
+        vecMonth.append(tmpMonth)
+
+        tmpMonth=[]
+        tmpMonth.append(10)
+        tmpMonth.append('Octubre')
+        tmpMonth.append(11)
+        vecMonth.append(tmpMonth)
+
+        tmpMonth=[]
+        tmpMonth.append(11)
+        tmpMonth.append('Noviembre')
+        tmpMonth.append(12)
+        vecMonth.append(tmpMonth)
+
+        tmpMonth=[]
+        tmpMonth.append(12)
+        tmpMonth.append('Diciembre')
+        tmpMonth.append(1)
+        vecMonth.append(tmpMonth)
+
+    #Check the parameters
+    if request.vars['level']=='3' or request.vars['level']=='4' or request.vars['level']=='5':
+        if int(request.vars['level']) > 2 and createReport==True:
+            #Check if the project is correct
+            if request.vars['level_project'] is None or request.vars['level_project']=='':
+                createReport=False
+            else:
+                level_project = request.vars['level_project']
+                level_project = db(db.project.id==level_project).select().first()
+                if level_project is None:
+                    createReport=False
+                else:
+                    exportReport=False
+                    for assigantion in assigantions:
+                        if assigantion.project==level_project.id:
+                            exportReport=True
+                    if exportReport==False:
+                        createReport=False
+
+            #Check if the Month is correct
+            if request.vars['level_month'] is None or request.vars['level_month']=='':
+                createReport=False
+            else:
+                if year.period == 1:
+                    try:
+                        if int(request.vars['level_month']) >= 1 and int(request.vars['level_month']) <=5:
+                            level_month=str(request.vars['level_month'])
+                        else:
+                            createReport=False
+                    except:
+                        createReport=False
+                else:
+                    try:
+                        if int(request.vars['level_month']) >= 6 and int(request.vars['level_month']) <=12:
+                            level_month=str(request.vars['level_month'])
+                        else:
+                            createReport=False
+                    except:
+                        createReport=False
+                
+            #Check if the type is correct
+            if request.vars['level_tipo'] is None or request.vars['level_tipo']=='':
+                createReport=False
+            else:
+                if str(request.vars['level_tipo'])!='all' and str(request.vars['level_tipo'])!='i' and str(request.vars['level_tipo'])!='u' and str(request.vars['level_tipo'])!='d':
+                    createReport=False
+                else:
+                    level_tipo = str(request.vars['level_tipo'])
+        pass
+
+        if int(request.vars['level']) > 3 and createReport==True:
+            if request.vars['level_rol'] is None or request.vars['level_rol']=='':
+                createReport=False
+            else:
+                value = db(db.auth_group.role==str(request.vars['level_rol'])).select().first()
+                if value is None:
+                    #Check if the log has a roll that is not register
+                    value = db((db.validate_laboratory_log.yearp==year.yearp)&(db.validate_laboratory_log.period==T(year.period.name))&(db.validate_laboratory_log.project==level_project.name)&(db.validate_laboratory_log.roll==str(request.vars['level_rol']))).select(db.validate_laboratory_log.roll, distinct=True).first()
+                    if value is None:
+                        createReport=False
+                    else:
+                        level_rol=str(value.roll)
+                else:
+                    level_rol=str(value.role)
+        pass
+
+        if int(request.vars['level']) > 4 and createReport==True:
+            if request.vars['level_user'] is None or request.vars['level_user']=='':
+                createReport=False
+            else:
+                flagCheck = False
+                #User Temp of auth_user where the username is equal
+                userr = db(db.auth_user.username==str(request.vars['level_user'])).select().first()
+                if ((level_rol=='Super-Administrator') or (level_rol=='Ecys-Administrator')):
+                    if userr is not None:
+                        #Check if the user has the rol specific
+                        userrT = db(db.auth_membership.user_id==userr.id).select()
+                        for tempUserCheck in userrT:
+                            if tempUserCheck.group_id.role==level_rol:
+                                flagCheck = True
+                else:
+                    if userr is not None:
+                        #Check if the user has the rol specific
+                        userrT = db(db.auth_membership.user_id==userr.id).select()
+                        for tempUserCheck in userrT:
+                            if tempUserCheck.group_id.role==level_rol:
+                                if db((db.user_project.period==year.id)&(db.user_project.project==level_project.id)&(db.user_project.assigned_user==userr.id)).select().first() is not None:
+                                    flagCheck = True
+
+                if flagCheck==False:
+                    #Check if the log has a roll that is not register
+                    userr = db((db.validate_laboratory_log.yearp==year.yearp)&(db.validate_laboratory_log.period==T(year.period.name))&(db.validate_laboratory_log.project==level_project.name)&(db.validate_laboratory_log.roll==level_rol)&(db.validate_laboratory_log.user_name==str(request.vars['userr']))).select().first()
+                    if value is None:
+                        showLevel = Falses
+                    else:
+                        level_user=userr.user_name
+                else:
+                    level_user=userr.username
+        pass
+    else:
+        createReport=False
+
+    #MAKE REPORT
+    if createReport==True:
+        #Report heading
+        tempRemport1=[]
+        tempRemport1.append('Reporte de Gestión de Revalidación de Laboratorio')
+        report.append(tempRemport1)
+        tempRemport1=[]
+        tempRemport1.append(T(year.period.name)+' '+str(year.yearp))
+        report.append(tempRemport1)
+
+        #LEVEL 3
+        if request.vars['level']=='3':
+            #Heading Level 3
+            tempRemport1=[]
+            tempRemport1.append(T('Course'))
+            tempRemport1.append(level_project.name)
+            report.append(tempRemport1)
+
+            tempRemport1=[]
+            tempRemport1.append(T('Month'))
+            for tempMonth in vecMonth:
+                if str(tempMonth[0])==level_month:
+                    tempRemport1.append(tempMonth[1])
+                    start = datetime.strptime(str(year.yearp) + '-' + str(tempMonth[0]) +'-01', "%Y-%m-%d")
+                    if tempMonth[2]==1:
+                        end = datetime.strptime(str(year.yearp+1) + '-' + str(tempMonth[2]) +'-01', "%Y-%m-%d")
+                    else:
+                        end = datetime.strptime(str(year.yearp) + '-' + str(tempMonth[2]) +'-01', "%Y-%m-%d")
+                    pass
+            report.append(tempRemport1)
+
+            tempRemport1=[]
+            tempRemport1.append('')
+            report.append(tempRemport1)
+
+            tempRemport1=[]
+            tempRemport1.append(T('Detail'))
+            report.append(tempRemport1)
+
+            tempRemport1=[]
+            tempRole = []
+            tempRemport1.append(T('Role'))
+            if ((level_tipo=='all') or (level_tipo=='i')):
+                tempRemport1.append(T('Total inserted'))
+            if ((level_tipo=='all') or (level_tipo=='u')):
+                tempRemport1.append(T('Total modified'))
+            if ((level_tipo=='all') or (level_tipo=='d')):
+                tempRemport1.append(T('Total out'))
+            report.append(tempRemport1)
+            #Body Level 3
+            for tempR in db((db.auth_group.role!='Academic')&(db.auth_group.role!='DSI')).select():
+                tempRole.append(tempR.role)
+            for tempR in db((db.validate_laboratory_log.yearp==year.yearp)&(db.validate_laboratory_log.period==T(year.period.name))&(db.validate_laboratory_log.project==level_project.name)&(~db.validate_laboratory_log.roll.belongs(tempRole))).select(db.validate_laboratory_log.roll, distinct=True):
+                tempRole.append(tempR.roll)
+            for roll in tempRole:
+                tempRemport1=[]
+                if roll=='Student':
+                    tempRemport1.append(T('Rol Student'))
+                else:
+                    tempRemport1.append(T(roll))
+                pass
+                if session.search_validate_laboratory_management == "" or session.search_validate_laboratory_management is None:
+                    if ((level_tipo=='all') or (level_tipo=='i')):
+                        tD = db.executesql('SELECT count(id) as total from validate_laboratory_log where project=\'' + level_project.name + '\' and yearp=\'' + str(year.yearp) +'\' and period=\'' + str(T(year.period.name))+ '\' and operation_log=\'insert\' and date_log>=\'' + str(start) +'\' and date_log <= \''+ str(end) +'\' and roll=\''+ roll +'\';' ,as_dict=True)
+                        for dD in tD:
+                            dDT=dD['total']
+                        pass
+                        tempRemport1.append(dDT)
+                    if ((level_tipo=='all') or (level_tipo=='u')):
+                        tD = db.executesql('SELECT count(id) as total from validate_laboratory_log where project=\'' + level_project.name + '\' and yearp=\'' + str(year.yearp) +'\' and period=\'' + str(T(year.period.name))+ '\' and operation_log=\'update\' and date_log>=\'' + str(start) +'\' and date_log <= \''+ str(end) +'\' and roll=\''+ roll +'\';' ,as_dict=True)
+                        for dD in tD:
+                            dDT=dD['total']
+                        pass
+                        tempRemport1.append(dDT)
+                    if ((level_tipo=='all') or (level_tipo=='d')):
+                        tD = db.executesql('SELECT count(id) as total from validate_laboratory_log where project=\'' + level_project.name + '\' and yearp=\'' + str(year.yearp) +'\' and period=\'' + str(T(year.period.name))+ '\' and operation_log=\'delete\' and date_log>=\'' + str(start) +'\' and date_log <= \''+ str(end) +'\' and roll=\''+ roll +'\';' ,as_dict=True)
+                        for dD in tD:
+                            dDT=dD['total']
+                        pass
+                        tempRemport1.append(dDT)
+                else:
+                    if ((level_tipo=='all') or (level_tipo=='i')):
+                        tD = db.executesql('SELECT count(id) as total from validate_laboratory_log where project=\'' + level_project.name + '\' and yearp=\'' + str(year.yearp) +'\' and period=\'' + str(T(year.period.name))+ '\' and operation_log=\'insert\' and date_log>=\'' + str(start) +'\' and date_log <= \''+ str(end) +'\' and roll=\''+ roll +'\' and (' + session.search_validate_laboratory_management +');' ,as_dict=True)
+                        for dD in tD:
+                            dDT=dD['total']
+                        pass
+                        tempRemport1.append(dDT)
+                    if ((level_tipo=='all') or (level_tipo=='u')):
+                        tD = db.executesql('SELECT count(id) as total from validate_laboratory_log where project=\'' + level_project.name + '\' and yearp=\'' + str(year.yearp) +'\' and period=\'' + str(T(year.period.name))+ '\' and operation_log=\'update\' and date_log>=\'' + str(start) +'\' and date_log <= \''+ str(end) +'\' and roll=\''+ roll +'\' and (' + session.search_validate_laboratory_management +');' ,as_dict=True)
+                        for dD in tD:
+                            dDT=dD['total']
+                        pass
+                        tempRemport1.append(dDT)
+                    if ((level_tipo=='all') or (level_tipo=='d')):
+                        tD = db.executesql('SELECT count(id) as total from validate_laboratory_log where project=\'' + assigantion.project.name + '\' and yearp=\'' + str(year.yearp) +'\' and period=\'' + str(T(year.period.name))+ '\' and operation_log=\'delete\' and date_log>=\'' + str(start) +'\' and date_log <= \''+ str(end) +'\' and roll=\''+ roll +'\' and (' + session.search_validate_laboratory_management +');' ,as_dict=True)
+                        for dD in tD:
+                            dDT=dD['total']
+                        pass
+                        tempRemport1.append(dDT)
+                pass
+                report.append(tempRemport1)
+        #LEVEL 4
+        elif request.vars['level']=='4':
+            #Heading Level 4
+            tempRemport1=[]
+            tempRemport1.append(T('Course'))
+            tempRemport1.append(level_project.name)
+            report.append(tempRemport1)
+
+            tempRemport1=[]
+            tempRemport1.append(T('Month'))
+            for tempMonth in vecMonth:
+                if str(tempMonth[0])==level_month:
+                    tempRemport1.append(tempMonth[1])
+                    start = datetime.strptime(str(year.yearp) + '-' + str(tempMonth[0]) +'-01', "%Y-%m-%d")
+                    if tempMonth[2]==1:
+                        end = datetime.strptime(str(year.yearp+1) + '-' + str(tempMonth[2]) +'-01', "%Y-%m-%d")
+                    else:
+                        end = datetime.strptime(str(year.yearp) + '-' + str(tempMonth[2]) +'-01', "%Y-%m-%d")
+                    pass
+            report.append(tempRemport1)
+
+            tempRemport1=[]
+            tempRemport1.append(T('Role'))
+            tempRemport1.append(level_rol)
+            report.append(tempRemport1)
+
+            tempRemport1=[]
+            tempRemport1.append('')
+            report.append(tempRemport1)
+
+            tempRemport1=[]
+            tempRemport1.append(T('Detail'))
+            report.append(tempRemport1)
+
+            tempRemport1=[]
+            tempUsers=[]
+            tempRemport1.append(T('User'))
+            if ((level_tipo=='all') or (level_tipo=='i')):
+                tempRemport1.append(T('Total inserted'))
+            if ((level_tipo=='all') or (level_tipo=='u')):
+                tempRemport1.append(T('Total modified'))
+            if ((level_tipo=='all') or (level_tipo=='d')):
+                tempRemport1.append(T('Total out'))
+            report.append(tempRemport1)
+            #Body Level 4
+            tempUsers2=[]
+            registerRol = db(db.auth_group.role==level_rol).select().first()
+            if ((level_rol=='Super-Administrator') or (level_rol=='Ecys-Administrator')):
+                for valueU in db((db.auth_membership.group_id==registerRol.id)).select(db.auth_membership.user_id, distinct=True):
+                    tempUsers.append(valueU.user_id.username)
+            else:
+                for valueU in db((db.auth_membership.group_id==registerRol.id)).select(db.auth_membership.user_id, distinct=True):
+                    tempUsers2.append(valueU.user_id)
+                for valueU in db((db.user_project.period==year.id)&(db.user_project.project==level_project.id)&(db.user_project.assigned_user.belongs(tempUsers2))).select(db.user_project.assigned_user, distinct=True):
+                    tempUsers.append(valueU.assigned_user.username)
+            pass
+            for valueU in db((db.validate_laboratory_log.yearp==year.yearp)&(db.validate_laboratory_log.period==T(year.period.name))&(db.validate_laboratory_log.project==level_project.name)&(db.validate_laboratory_log.roll==level_rol)&(~db.validate_laboratory_log.user_name.belongs(tempUsers))).select(db.validate_laboratory_log.user_name, distinct=True):
+                tempUsers.append(valueU.user_name)
+            for userr in tempUsers:
+                tempRemport1=[]
+                tempRemport1.append(userr)
+                if session.search_validate_laboratory_management == "" or session.search_validate_laboratory_management is None:
+                    if ((level_tipo=='all') or (level_tipo=='i')):
+                        tD = db.executesql('SELECT count(id) as total from validate_laboratory_log where project=\'' + level_project.name + '\' and yearp=\'' + str(year.yearp) +'\' and period=\'' + str(T(year.period.name))+ '\' and operation_log=\'insert\' and date_log>=\'' + str(start) +'\' and date_log <= \''+ str(end) +'\' and roll=\''+ level_rol +'\' and user_name=\''+ userr +'\';' ,as_dict=True)
+                        for dD in tD:
+                            dDT=dD['total']
+                        pass
+                        tempRemport1.append(dDT)
+                    if ((level_tipo=='all') or (level_tipo=='u')):
+                        tD = db.executesql('SELECT count(id) as total from validate_laboratory_log where project=\'' + level_project.name + '\' and yearp=\'' + str(year.yearp) +'\' and period=\'' + str(T(year.period.name))+ '\' and operation_log=\'update\' and date_log>=\'' + str(start) +'\' and date_log <= \''+ str(end) +'\' and roll=\''+ level_rol +'\' and user_name=\''+ userr +'\';' ,as_dict=True)
+                        for dD in tD:
+                            dDT=dD['total']
+                        pass
+                        tempRemport1.append(dDT)
+                    if ((level_tipo=='all') or (level_tipo=='d')):
+                        tD = db.executesql('SELECT count(id) as total from validate_laboratory_log where project=\'' + level_project.name + '\' and yearp=\'' + str(year.yearp) +'\' and period=\'' + str(T(year.period.name))+ '\' and operation_log=\'delete\' and date_log>=\'' + str(start) +'\' and date_log <= \''+ str(end) +'\' and roll=\''+ level_rol +'\' and user_name=\''+ userr +'\';' ,as_dict=True)
+                        for dD in tD:
+                            dDT=dD['total']
+                        pass
+                        tempRemport1.append(dDT)
+                else:
+                    if ((level_tipo=='all') or (level_tipo=='i')):
+                        tD = db.executesql('SELECT count(id) as total from validate_laboratory_log where project=\'' + level_project.name + '\' and yearp=\'' + str(year.yearp) +'\' and period=\'' + str(T(year.period.name))+ '\' and operation_log=\'insert\' and date_log>=\'' + str(start) +'\' and date_log <= \''+ str(end) +'\' and roll=\''+ level_rol +'\' and user_name=\''+ userr +'\' and (' + session.search_validate_laboratory_management +');' ,as_dict=True)
+                        for dD in tD:
+                            dDT=dD['total']
+                        pass
+                        tempRemport1.append(dDT)
+                    if ((level_tipo=='all') or (level_tipo=='u')):
+                        tD = db.executesql('SELECT count(id) as total from validate_laboratory_log where project=\'' + level_project.name + '\' and yearp=\'' + str(year.yearp) +'\' and period=\'' + str(T(year.period.name))+ '\' and operation_log=\'update\' and date_log>=\'' + str(start) +'\' and date_log <= \''+ str(end) +'\' and roll=\''+ level_rol +'\' and user_name=\''+ userr +'\' and (' + session.search_validate_laboratory_management +');' ,as_dict=True)
+                        for dD in tD:
+                            dDT=dD['total']
+                        pass
+                        tempRemport1.append(dDT)
+                    if ((level_tipo=='all') or (level_tipo=='d')):
+                        tD = db.executesql('SELECT count(id) as total from validate_laboratory_log where project=\'' + level_project.name + '\' and yearp=\'' + str(year.yearp) +'\' and period=\'' + str(T(year.period.name))+ '\' and operation_log=\'delete\' and date_log>=\'' + str(start) +'\' and date_log <= \''+ str(end) +'\' and roll=\''+ level_rol +'\' and user_name=\''+ userr +'\' and (' + session.search_validate_laboratory_management +');' ,as_dict=True)
+                        for dD in tD:
+                            dDT=dD['total']
+                        pass
+                        tempRemport1.append(dDT)
+                pass
+                report.append(tempRemport1)
+        #LEVEL 5
+        elif request.vars['level']=='5':
+            #Head of Level 5
+            tempRemport1=[]
+            tempRemport1.append(T('Course'))
+            tempRemport1.append(level_project.name)
+            report.append(tempRemport1)
+
+            tempRemport1=[]
+            tempRemport1.append(T('Month'))
+            for tempMonth in vecMonth:
+                if str(tempMonth[0])==level_month:
+                    tempRemport1.append(tempMonth[1])
+                    start = datetime.strptime(str(year.yearp) + '-' + str(tempMonth[0]) +'-01', "%Y-%m-%d")
+                    if tempMonth[2]==1:
+                        end = datetime.strptime(str(year.yearp+1) + '-' + str(tempMonth[2]) +'-01', "%Y-%m-%d")
+                    else:
+                        end = datetime.strptime(str(year.yearp) + '-' + str(tempMonth[2]) +'-01', "%Y-%m-%d")
+                    pass
+            report.append(tempRemport1)
+
+            tempRemport1=[]
+            tempRemport1.append(T('Role'))
+            tempRemport1.append(level_rol)
+            report.append(tempRemport1)
+
+            tempRemport1=[]
+            tempRemport1.append(T('User resolution'))
+            tempRemport1.append(level_user)
+            report.append(tempRemport1)
+
+            tempRemport1=[]
+            tempRemport1.append('')
+            report.append(tempRemport1)
+
+            tempRemport1=[]
+            tempRemport1.append(T('Detail'))
+            report.append(tempRemport1)
+
+            temp_vecAllUserRoleMonth=[]
+            tempRemport1=[]
+            #Body Level 5
+            if session.search_validate_laboratory_management == "" or session.search_validate_laboratory_management is None:
+                if ((level_tipo=='all') or (level_tipo=='i')):
+                    tD = db.executesql('SELECT * from validate_laboratory_log where project=\'' + level_project.name + '\' and yearp=\'' + str(year.yearp) +'\' and period=\'' + str(T(year.period.name))+ '\' and operation_log=\'insert\' and date_log>=\'' + str(start) +'\' and date_log <= \''+ str(end) +'\' and roll=\''+ level_rol +'\' and user_name=\''+ level_user +'\';' ,as_dict=True)
+                    temp_vecAllUserRoleMonth.append(tD)
+                if ((level_tipo=='all') or (level_tipo=='u')):
+                    tD = db.executesql('SELECT * from validate_laboratory_log where project=\'' + level_project.name + '\' and yearp=\'' + str(year.yearp) +'\' and period=\'' + str(T(year.period.name))+ '\' and operation_log=\'update\' and date_log>=\'' + str(start) +'\' and date_log <= \''+ str(end) +'\' and roll=\''+ level_rol +'\' and user_name=\''+ level_user +'\';' ,as_dict=True)
+                    temp_vecAllUserRoleMonth.append(tD)
+                if ((level_tipo=='all') or (level_tipo=='d')):
+                    tD = db.executesql('SELECT * from validate_laboratory_log where project=\'' + level_project.name + '\' and yearp=\'' + str(year.yearp) +'\' and period=\'' + str(T(year.period.name))+ '\' and operation_log=\'delete\' and date_log>=\'' + str(start) +'\' and date_log <= \''+ str(end) +'\' and roll=\''+ level_rol +'\' and user_name=\''+ level_user +'\';' ,as_dict=True)
+                    temp_vecAllUserRoleMonth.append(tD)
+            else:
+                if ((level_tipo=='all') or (level_tipo=='i')):
+                    tD = db.executesql('SELECT * from validate_laboratory_log where project=\'' + level_project.name + '\' and yearp=\'' + str(year.yearp) +'\' and period=\'' + str(T(year.period.name))+ '\' and operation_log=\'insert\' and date_log>=\'' + str(start) +'\' and date_log <= \''+ str(end) +'\' and roll=\''+ level_rol +'\' and user_name=\''+ level_user +'\' and (' + session.search_validate_laboratory_management +');' ,as_dict=True)
+                    temp_vecAllUserRoleMonth.append(tD)
+                if ((level_tipo=='all') or (level_tipo=='u')):
+                    tD = db.executesql('SELECT * from validate_laboratory_log where project=\'' + level_project.name + '\' and yearp=\'' + str(year.yearp) +'\' and period=\'' + str(T(year.period.name))+ '\' and operation_log=\'update\' and date_log>=\'' + str(start) +'\' and date_log <= \''+ str(end) +'\' and roll=\''+ level_rol +'\' and user_name=\''+ level_user +'\' and (' + session.search_validate_laboratory_management +');' ,as_dict=True)
+                    temp_vecAllUserRoleMonth.append(tD)
+                if ((level_tipo=='all') or (level_tipo=='d')):
+                    tD = db.executesql('SELECT * from validate_laboratory_log where project=\'' + level_project.name + '\' and yearp=\'' + str(year.yearp) +'\' and period=\'' + str(T(year.period.name))+ '\' and operation_log=\'delete\' and date_log>=\'' + str(start) +'\' and date_log <= \''+ str(end) +'\' and roll=\''+ level_rol +'\' and user_name=\''+ level_user +'\' and (' + session.search_validate_laboratory_management +');' ,as_dict=True)
+                    temp_vecAllUserRoleMonth.append(tD)
+            pass
+            varTypeHead=0
+            for field in temp_vecAllUserRoleMonth:
+                for camp in field:
+                    if varTypeHead==0:
+                        #Heading Level 5
+                        tempRemport1=[]
+                        tempRemport1.append(T('User resolution'))
+                        tempRemport1.append(T('Role resolution'))
+                        tempRemport1.append(T('Date of resolution'))
+                        tempRemport1.append(T('Operation'))
+                        tempRemport1.append(T('Description'))
+                        tempRemport1.append(T('Rol Academic'))
+                        tempRemport1.append(T('Before Grade'))
+                        tempRemport1.append(T('Grade edited'))
+                        report.append(tempRemport1)
+                        varTypeHead=1
+                    tempRemport1=[]
+                    tempRemport1.append(str(camp['user_name']))
+                    if str(camp['roll'])=='Student':
+                        tempRemport1.append(T('Rol Student'))
+                    else:
+                        tempRemport1.append(T(str(camp['roll'])))
+                    pass
+                    tempRemport1.append(str(camp['date_log']))
+                    tempRemport1.append(str(camp['operation_log']))
+                    desT = camp['description']+''
+                    tempRemport1.append(desT.encode('utf-8'))
+                    tempRemport1.append(str(camp['academic']))
+                    if camp['before_grade'] is not None:
+                        tempRemport1.append(str(camp['before_grade']))
+                    else:
+                        tempRemport1.append('')
+                    if camp['after_grade'] is not None:
+                        tempRemport1.append(str(camp['after_grade']))
+                    else:
+                        tempRemport1.append('')
+                    report.append(tempRemport1)
+                pass
+            pass
+        return dict(filename='ReporteGestionRevalidaciones', csvdata=report)
+    else:
+        return "<center>"+T('Action not allowed')+"</center><script type=\"text/javascript\"> alert(\""+T('Action not allowed')+"\"); window.location.href = \"validate_laboratory_management\";</script>"
+
+
+
+#********************************************************
+#Management Report revalidation laboratory levels 1 and 2
 @auth.requires_login()
 @auth.requires(auth.has_membership('Teacher'))
 def validate_laboratory_management():
     #Export Report to CSV
     if request.vars['list'] =='True':
         redirect(URL('activity_control','validate_laboratory_management_export'))
+
+    #Export Report Nivel 0
+    #redirect(URL('activity_control','request_change_activity',vars=dict(project=request.vars['project'], year=request.vars['year'])))
+    if request.vars['list'] =='False':
+        if request.vars['level'] =='1':
+            redirect(URL('activity_control','validate_laboratory_management_level_export',vars=dict(level=request.vars['level'])))
+        elif request.vars['level'] =='2':
+            if request.vars['level_project'] is None or request.vars['level_project']=='':
+                redirect(URL('activity_control','validate_laboratory_management'))
+            else:
+                redirect(URL('activity_control','validate_laboratory_management_level_export',vars=dict(level=request.vars['level'],level_project=request.vars['level_project'])))
+        else:
+            redirect(URL('activity_control','validate_laboratory_management'))
 
 
     import cpfecys
@@ -6070,6 +7714,9 @@ def validate_laboratory_management():
     return dict(year=period, assigantions=assigantions, vecMonth=vecMonth, vecOptionSearch=vecOptionSearch, vecFieldsSearch=vecFieldsSearch)
 
 
+
+#********************************************************
+#Management Report revalidation laboratory level 3
 @auth.requires_login()
 @auth.requires(auth.has_membership('Teacher'))
 def validate_laboratory_management_n2():
@@ -6081,6 +7728,22 @@ def validate_laboratory_management_n2():
     tipo = None
     month=None
     vecRoleMonth=None
+
+    #Check the correct parameters
+    if request.vars['list'] =='False':
+        if request.vars['level'] =='3':
+            if request.vars['level_project'] is None or request.vars['level_project']=='':
+                showLevel = False
+            else:
+                if request.vars['level_month'] is None or request.vars['level_month']=='':
+                    showLevel = False
+                else:
+                    if request.vars['level_tipo'] is None or request.vars['level_tipo']=='':
+                        showLevel = False
+                    else:
+                        redirect(URL('activity_control','validate_laboratory_management_level_export_load',vars=dict(level=request.vars['level'],level_project=request.vars['level_project'],level_month=request.vars['level_month'],level_tipo=request.vars['level_tipo'])))
+        else:
+            showLevel = False
 
     #Check if the project is correct
     if request.vars['tipo'] is None or request.vars['tipo']=='':
@@ -6153,30 +7816,30 @@ def validate_laboratory_management_n2():
             optionSearch.append(value.role)
             roleTemp.append(value.role)
             if str(request.vars['tipo'])=='all' or str(request.vars['tipo'])=='i':
-                if session.search_validate_laboratory_management == "":
+                if session.search_validate_laboratory_management == "" or session.search_validate_laboratory_management is None:
                     tD = db.executesql('SELECT count(id) as total from validate_laboratory_log where project=\'' + project.name + '\' and yearp=\'' + str(period.yearp) +'\' and period=\'' + str(T(period.period.name))+ '\' and operation_log=\'insert\' and date_log>=\'' + str(start) +'\' and date_log <= \''+ str(end) +'\' and roll=\''+ value.role +'\';' ,as_dict=True)
                 else:
-                    tD = db.executesql('SELECT count(id) as total from validate_laboratory_log where project=\'' + project.name + '\' and yearp=\'' + str(period.yearp) +'\' and period=\'' + str(T(period.period.name))+ '\' and operation_log=\'insert\' and date_log>=\'' + str(start) +'\' and date_log <= \''+ str(end) +'\' and roll=\''+ value.role +'\' and ' + session.search_validate_laboratory_management +';' ,as_dict=True)
+                    tD = db.executesql('SELECT count(id) as total from validate_laboratory_log where project=\'' + project.name + '\' and yearp=\'' + str(period.yearp) +'\' and period=\'' + str(T(period.period.name))+ '\' and operation_log=\'insert\' and date_log>=\'' + str(start) +'\' and date_log <= \''+ str(end) +'\' and roll=\''+ value.role +'\' and (' + session.search_validate_laboratory_management +');' ,as_dict=True)
                 pass
                 for dD in tD:
                     dDT=dD['total']
                 pass
                 optionSearch.append(dDT)
             if str(request.vars['tipo'])=='all' or str(request.vars['tipo'])=='u':
-                if session.search_validate_laboratory_management == "":
+                if session.search_validate_laboratory_management == "" or session.search_validate_laboratory_management is None:
                     tD = db.executesql('SELECT count(id) as total from validate_laboratory_log where project=\'' + project.name + '\' and yearp=\'' + str(period.yearp) +'\' and period=\'' + str(T(period.period.name))+ '\' and operation_log=\'update\' and date_log>=\'' + str(start) +'\' and date_log <= \''+ str(end) +'\' and roll=\''+ value.role +'\';' ,as_dict=True)
                 else:
-                    tD = db.executesql('SELECT count(id) as total from validate_laboratory_log where project=\'' + project.name + '\' and yearp=\'' + str(period.yearp) +'\' and period=\'' + str(T(period.period.name))+ '\' and operation_log=\'update\' and date_log>=\'' + str(start) +'\' and date_log <= \''+ str(end) +'\' and roll=\''+ value.role +'\' and ' + session.search_validate_laboratory_management +';' ,as_dict=True)
+                    tD = db.executesql('SELECT count(id) as total from validate_laboratory_log where project=\'' + project.name + '\' and yearp=\'' + str(period.yearp) +'\' and period=\'' + str(T(period.period.name))+ '\' and operation_log=\'update\' and date_log>=\'' + str(start) +'\' and date_log <= \''+ str(end) +'\' and roll=\''+ value.role +'\' and (' + session.search_validate_laboratory_management +');' ,as_dict=True)
                 pass
                 for dD in tD:
                     dDT=dD['total']
                 pass
                 optionSearch.append(dDT)
             if str(request.vars['tipo'])=='all' or str(request.vars['tipo'])=='d':
-                if session.search_validate_laboratory_management == "":
+                if session.search_validate_laboratory_management == "" or session.search_validate_laboratory_management is None:
                     tD = db.executesql('SELECT count(id) as total from validate_laboratory_log where project=\'' + project.name + '\' and yearp=\'' + str(period.yearp) +'\' and period=\'' + str(T(period.period.name))+ '\' and operation_log=\'delete\' and date_log>=\'' + str(start) +'\' and date_log <= \''+ str(end) +'\' and roll=\''+ value.role +'\';' ,as_dict=True)
                 else:
-                    tD = db.executesql('SELECT count(id) as total from validate_laboratory_log where project=\'' + project.name + '\' and yearp=\'' + str(period.yearp) +'\' and period=\'' + str(T(period.period.name))+ '\' and operation_log=\'delete\' and date_log>=\'' + str(start) +'\' and date_log <= \''+ str(end) +'\' and roll=\''+ value.role +'\' and ' + session.search_validate_laboratory_management +';' ,as_dict=True)
+                    tD = db.executesql('SELECT count(id) as total from validate_laboratory_log where project=\'' + project.name + '\' and yearp=\'' + str(period.yearp) +'\' and period=\'' + str(T(period.period.name))+ '\' and operation_log=\'delete\' and date_log>=\'' + str(start) +'\' and date_log <= \''+ str(end) +'\' and roll=\''+ value.role +'\' and (' + session.search_validate_laboratory_management +');' ,as_dict=True)
                 pass
                 for dD in tD:
                     dDT=dD['total']
@@ -6188,30 +7851,30 @@ def validate_laboratory_management_n2():
             optionSearch=[]
             optionSearch.append(value.roll)
             if str(request.vars['tipo'])=='all' or str(request.vars['tipo'])=='i':
-                if session.search_validate_laboratory_management == "":
+                if session.search_validate_laboratory_management == "" or session.search_validate_laboratory_management is None:
                     tD = db.executesql('SELECT count(id) as total from validate_laboratory_log where project=\'' + project.name + '\' and yearp=\'' + str(period.yearp) +'\' and period=\'' + str(T(period.period.name))+ '\' and operation_log=\'insert\' and date_log>=\'' + str(start) +'\' and date_log <= \''+ str(end) +'\' and roll=\''+ value.roll +'\';' ,as_dict=True)
                 else:
-                    tD = db.executesql('SELECT count(id) as total from validate_laboratory_log where project=\'' + project.name + '\' and yearp=\'' + str(period.yearp) +'\' and period=\'' + str(T(period.period.name))+ '\' and operation_log=\'insert\' and date_log>=\'' + str(start) +'\' and date_log <= \''+ str(end) +'\' and roll=\''+ value.roll +'\' and ' + session.search_validate_laboratory_management +';' ,as_dict=True)
+                    tD = db.executesql('SELECT count(id) as total from validate_laboratory_log where project=\'' + project.name + '\' and yearp=\'' + str(period.yearp) +'\' and period=\'' + str(T(period.period.name))+ '\' and operation_log=\'insert\' and date_log>=\'' + str(start) +'\' and date_log <= \''+ str(end) +'\' and roll=\''+ value.roll +'\' and (' + session.search_validate_laboratory_management +');' ,as_dict=True)
                 pass
                 for dD in tD:
                     dDT=dD['total']
                 pass
                 optionSearch.append(dDT)
             if str(request.vars['tipo'])=='all' or str(request.vars['tipo'])=='u':
-                if session.search_validate_laboratory_management == "":
+                if session.search_validate_laboratory_management == "" or session.search_validate_laboratory_management is None:
                     tD = db.executesql('SELECT count(id) as total from validate_laboratory_log where project=\'' + project.name + '\' and yearp=\'' + str(period.yearp) +'\' and period=\'' + str(T(period.period.name))+ '\' and operation_log=\'update\' and date_log>=\'' + str(start) +'\' and date_log <= \''+ str(end) +'\' and roll=\''+ value.roll +'\';' ,as_dict=True)
                 else:
-                    tD = db.executesql('SELECT count(id) as total from validate_laboratory_log where project=\'' + project.name + '\' and yearp=\'' + str(period.yearp) +'\' and period=\'' + str(T(period.period.name))+ '\' and operation_log=\'update\' and date_log>=\'' + str(start) +'\' and date_log <= \''+ str(end) +'\' and roll=\''+ value.roll +'\' and ' + session.search_validate_laboratory_management +';' ,as_dict=True)
+                    tD = db.executesql('SELECT count(id) as total from validate_laboratory_log where project=\'' + project.name + '\' and yearp=\'' + str(period.yearp) +'\' and period=\'' + str(T(period.period.name))+ '\' and operation_log=\'update\' and date_log>=\'' + str(start) +'\' and date_log <= \''+ str(end) +'\' and roll=\''+ value.roll +'\' and (' + session.search_validate_laboratory_management +');' ,as_dict=True)
                 pass
                 for dD in tD:
                     dDT=dD['total']
                 pass
                 optionSearch.append(dDT)
             if str(request.vars['tipo'])=='all' or str(request.vars['tipo'])=='d':
-                if session.search_validate_laboratory_management == "":
+                if session.search_validate_laboratory_management == "" or session.search_validate_laboratory_management is None:
                     tD = db.executesql('SELECT count(id) as total from validate_laboratory_log where project=\'' + project.name + '\' and yearp=\'' + str(period.yearp) +'\' and period=\'' + str(T(period.period.name))+ '\' and operation_log=\'delete\' and date_log>=\'' + str(start) +'\' and date_log <= \''+ str(end) +'\' and roll=\''+ value.roll +'\';' ,as_dict=True)
                 else:
-                    tD = db.executesql('SELECT count(id) as total from validate_laboratory_log where project=\'' + project.name + '\' and yearp=\'' + str(period.yearp) +'\' and period=\'' + str(T(period.period.name))+ '\' and operation_log=\'delete\' and date_log>=\'' + str(start) +'\' and date_log <= \''+ str(end) +'\' and roll=\''+ value.roll +'\' and ' + session.search_validate_laboratory_management +';' ,as_dict=True)
+                    tD = db.executesql('SELECT count(id) as total from validate_laboratory_log where project=\'' + project.name + '\' and yearp=\'' + str(period.yearp) +'\' and period=\'' + str(T(period.period.name))+ '\' and operation_log=\'delete\' and date_log>=\'' + str(start) +'\' and date_log <= \''+ str(end) +'\' and roll=\''+ value.roll +'\' and (' + session.search_validate_laboratory_management +');' ,as_dict=True)
                 pass
                 for dD in tD:
                     dDT=dD['total']
@@ -6221,6 +7884,9 @@ def validate_laboratory_management_n2():
     return dict(showLevel=showLevel, project=project, tipo=tipo, month=month, vecRoleMonth=vecRoleMonth)
 
 
+
+#********************************************************
+#Management Report revalidation laboratory level 4
 @auth.requires_login()
 @auth.requires(auth.has_membership('Teacher'))
 def validate_laboratory_management_n3():
@@ -6233,6 +7899,25 @@ def validate_laboratory_management_n3():
     month=None
     roll=None
     vecUserRoleMonth=None
+
+    #Check the correct parameters
+    if request.vars['list'] =='False':
+        if request.vars['level'] =='4':
+            if request.vars['level_project'] is None or request.vars['level_project']=='':
+                showLevel = False
+            else:
+                if request.vars['level_month'] is None or request.vars['level_month']=='':
+                    showLevel = False
+                else:
+                    if request.vars['level_tipo'] is None or request.vars['level_tipo']=='':
+                        showLevel = False
+                    else:
+                        if request.vars['level_rol'] is None or request.vars['level_rol']=='':
+                            showLevel = False
+                        else:
+                            redirect(URL('activity_control','validate_laboratory_management_level_export_load',vars=dict(level=request.vars['level'],level_project=request.vars['level_project'],level_month=request.vars['level_month'],level_tipo=request.vars['level_tipo'],level_rol=request.vars['level_rol'])))
+        else:
+            showLevel = False
 
     #Check if the project is correct
     if request.vars['tipo'] is None or request.vars['tipo']=='':
@@ -6340,30 +8025,30 @@ def validate_laboratory_management_n3():
             optionSearch=[]
             optionSearch.append(value)
             if str(request.vars['tipo'])=='all' or str(request.vars['tipo'])=='i':
-                if session.search_validate_laboratory_management == "":
+                if session.search_validate_laboratory_management == "" or session.search_validate_laboratory_management is None:
                     tD = db.executesql('SELECT count(id) as total from validate_laboratory_log where project=\'' + project.name + '\' and yearp=\'' + str(period.yearp) +'\' and period=\'' + str(T(period.period.name))+ '\' and operation_log=\'insert\' and date_log>=\'' + str(start) +'\' and date_log <= \''+ str(end) +'\' and roll=\''+ roll +'\' and user_name=\''+ value +'\';' ,as_dict=True)
                 else:
-                    tD = db.executesql('SELECT count(id) as total from validate_laboratory_log where project=\'' + project.name + '\' and yearp=\'' + str(period.yearp) +'\' and period=\'' + str(T(period.period.name))+ '\' and operation_log=\'insert\' and date_log>=\'' + str(start) +'\' and date_log <= \''+ str(end) +'\' and roll=\''+ roll +'\' and user_name=\''+ value +'\' and ' + session.search_validate_laboratory_management +';' ,as_dict=True)
+                    tD = db.executesql('SELECT count(id) as total from validate_laboratory_log where project=\'' + project.name + '\' and yearp=\'' + str(period.yearp) +'\' and period=\'' + str(T(period.period.name))+ '\' and operation_log=\'insert\' and date_log>=\'' + str(start) +'\' and date_log <= \''+ str(end) +'\' and roll=\''+ roll +'\' and user_name=\''+ value +'\' and (' + session.search_validate_laboratory_management +');' ,as_dict=True)
                 pass
                 for dD in tD:
                     dDT=dD['total']
                 pass
                 optionSearch.append(dDT)
             if str(request.vars['tipo'])=='all' or str(request.vars['tipo'])=='u':
-                if session.search_validate_laboratory_management == "":
+                if session.search_validate_laboratory_management == "" or session.search_validate_laboratory_management is None:
                     tD = db.executesql('SELECT count(id) as total from validate_laboratory_log where project=\'' + project.name + '\' and yearp=\'' + str(period.yearp) +'\' and period=\'' + str(T(period.period.name))+ '\' and operation_log=\'update\' and date_log>=\'' + str(start) +'\' and date_log <= \''+ str(end) +'\' and roll=\''+ roll +'\' and user_name=\''+ value +'\';' ,as_dict=True)
                 else:
-                    tD = db.executesql('SELECT count(id) as total from validate_laboratory_log where project=\'' + project.name + '\' and yearp=\'' + str(period.yearp) +'\' and period=\'' + str(T(period.period.name))+ '\' and operation_log=\'update\' and date_log>=\'' + str(start) +'\' and date_log <= \''+ str(end) +'\' and roll=\''+ roll +'\' and user_name=\''+ value +'\' and ' + session.search_validate_laboratory_management +';' ,as_dict=True)
+                    tD = db.executesql('SELECT count(id) as total from validate_laboratory_log where project=\'' + project.name + '\' and yearp=\'' + str(period.yearp) +'\' and period=\'' + str(T(period.period.name))+ '\' and operation_log=\'update\' and date_log>=\'' + str(start) +'\' and date_log <= \''+ str(end) +'\' and roll=\''+ roll +'\' and user_name=\''+ value +'\' and (' + session.search_validate_laboratory_management +');' ,as_dict=True)
                 pass
                 for dD in tD:
                     dDT=dD['total']
                 pass
                 optionSearch.append(dDT)
             if str(request.vars['tipo'])=='all' or str(request.vars['tipo'])=='d':
-                if session.search_validate_laboratory_management == "":
+                if session.search_validate_laboratory_management == "" or session.search_validate_laboratory_management is None:
                     tD = db.executesql('SELECT count(id) as total from validate_laboratory_log where project=\'' + project.name + '\' and yearp=\'' + str(period.yearp) +'\' and period=\'' + str(T(period.period.name))+ '\' and operation_log=\'delete\' and date_log>=\'' + str(start) +'\' and date_log <= \''+ str(end) +'\' and roll=\''+ roll +'\' and user_name=\''+ value +'\';' ,as_dict=True)
                 else:
-                    tD = db.executesql('SELECT count(id) as total from validate_laboratory_log where project=\'' + project.name + '\' and yearp=\'' + str(period.yearp) +'\' and period=\'' + str(T(period.period.name))+ '\' and operation_log=\'delete\' and date_log>=\'' + str(start) +'\' and date_log <= \''+ str(end) +'\' and roll=\''+ roll +'\' and user_name=\''+ value +'\' and ' + session.search_validate_laboratory_management +';' ,as_dict=True)
+                    tD = db.executesql('SELECT count(id) as total from validate_laboratory_log where project=\'' + project.name + '\' and yearp=\'' + str(period.yearp) +'\' and period=\'' + str(T(period.period.name))+ '\' and operation_log=\'delete\' and date_log>=\'' + str(start) +'\' and date_log <= \''+ str(end) +'\' and roll=\''+ roll +'\' and user_name=\''+ value +'\' and (' + session.search_validate_laboratory_management +');' ,as_dict=True)
                 pass
                 for dD in tD:
                     dDT=dD['total']
@@ -6373,6 +8058,9 @@ def validate_laboratory_management_n3():
     return dict(showLevel=showLevel, project=project, tipo=tipo, month=month, vecUserRoleMonth=vecUserRoleMonth, roll=roll)
 
 
+
+#********************************************************
+#Management Report revalidation laboratory level 5
 @auth.requires_login()
 @auth.requires(auth.has_membership('Teacher'))
 def validate_laboratory_management_n4():
@@ -6386,6 +8074,28 @@ def validate_laboratory_management_n4():
     roll=None
     userr=None
     vecAllUserRoleMonth=None
+
+    #Check the correct parameters
+    if request.vars['list'] =='False':
+        if request.vars['level'] =='5':
+            if request.vars['level_project'] is None or request.vars['level_project']=='':
+                showLevel = False
+            else:
+                if request.vars['level_month'] is None or request.vars['level_month']=='':
+                    showLevel = False
+                else:
+                    if request.vars['level_tipo'] is None or request.vars['level_tipo']=='':
+                        showLevel = False
+                    else:
+                        if request.vars['level_rol'] is None or request.vars['level_rol']=='':
+                            showLevel = False
+                        else:
+                            if request.vars['level_user'] is None or request.vars['level_user']=='':
+                                showLevel = False
+                            else:
+                                redirect(URL('activity_control','validate_laboratory_management_level_export_load',vars=dict(level=request.vars['level'],level_project=request.vars['level_project'],level_month=request.vars['level_month'],level_tipo=request.vars['level_tipo'],level_rol=request.vars['level_rol'],level_user=request.vars['level_user'])))
+        else:
+            showLevel = False
 
     #Check if the project is correct
     if request.vars['tipo'] is None or request.vars['tipo']=='':
@@ -6450,7 +8160,7 @@ def validate_laboratory_management_n4():
                 else:
                     roll=value
             else:
-                roll=value
+                roll=value.role
 
     #Check if the user is correct
     if showLevel==True:
@@ -6460,24 +8170,25 @@ def validate_laboratory_management_n4():
             flagCheck = False
             #User Temp of auth_user where the username is equal
             userr = db(db.auth_user.username==str(request.vars['userr'])).select().first()
-            if ((roll.role=='Super-Administrator') or (roll.role=='Ecys-Administrator')):
+            if ((roll=='Super-Administrator') or (roll=='Ecys-Administrator')):
                 if userr is not None:
                     #Check if the user has the rol specific
-                    userrT = db((db.auth_membership.user_id==userr.id)&(db.auth_membership.group_id==roll.id)).select().first()
-                    if userrT is not None:
-                        flagCheck = True
+                    userrT = db(db.auth_membership.user_id==userr.id).select()
+                    for tempUserCheck in userrT:
+                        if tempUserCheck.group_id.role==roll:
+                            flagCheck = True
             else:
                 if userr is not None:
                     #Check if the user has the rol specific
-                    userrT = db((db.auth_membership.user_id==userr.id)&(db.auth_membership.group_id==roll.id)).select().first()
-                    if userrT is not None:
-                        userrT = db((db.user_project.period==period.id)&(db.user_project.project==project.id)&(db.user_project.assigned_user==userr.id)).select().first()
-                        if userrT is not None:
-                            flagCheck = True
+                    userrT = db(db.auth_membership.user_id==userr.id).select()
+                    for tempUserCheck in userrT:
+                        if tempUserCheck.group_id.role==roll:
+                            if db((db.user_project.period==period.id)&(db.user_project.project==project.id)&(db.user_project.assigned_user==userr.id)).select().first() is not None:
+                                flagCheck = True
 
             if flagCheck==False:
                 #Check if the log has a roll that is not register
-                userr = db((db.validate_laboratory_log.yearp==period.yearp)&(db.validate_laboratory_log.period==T(period.period.name))&(db.validate_laboratory_log.project==project.name)&(db.validate_laboratory_log.roll==roll.role)&(db.validate_laboratory_log.user_name==str(request.vars['userr']))).select().first()
+                userr = db((db.validate_laboratory_log.yearp==period.yearp)&(db.validate_laboratory_log.period==T(period.period.name))&(db.validate_laboratory_log.project==project.name)&(db.validate_laboratory_log.roll==roll)&(db.validate_laboratory_log.user_name==str(request.vars['userr']))).select().first()
                 if value is None:
                     showLevel = False
                 else:
@@ -6504,24 +8215,24 @@ def validate_laboratory_management_n4():
         
         vecAllUserRoleMonth=[]
         if str(request.vars['tipo'])=='all' or str(request.vars['tipo'])=='i':
-            if session.search_validate_laboratory_management == "":
-                tD = db.executesql('SELECT * from validate_laboratory_log where project=\'' + project.name + '\' and yearp=\'' + str(period.yearp) +'\' and period=\'' + str(T(period.period.name))+ '\' and operation_log=\'insert\' and date_log>=\'' + str(start) +'\' and date_log <= \''+ str(end) +'\' and roll=\''+ roll.role +'\' and user_name=\''+ userr +'\';' ,as_dict=True)
+            if session.search_validate_laboratory_management == "" or session.search_validate_laboratory_management is None:
+                tD = db.executesql('SELECT * from validate_laboratory_log where project=\'' + project.name + '\' and yearp=\'' + str(period.yearp) +'\' and period=\'' + str(T(period.period.name))+ '\' and operation_log=\'insert\' and date_log>=\'' + str(start) +'\' and date_log <= \''+ str(end) +'\' and roll=\''+ roll +'\' and user_name=\''+ userr +'\';' ,as_dict=True)
             else:
-                tD = db.executesql('SELECT * from validate_laboratory_log where project=\'' + project.name + '\' and yearp=\'' + str(period.yearp) +'\' and period=\'' + str(T(period.period.name))+ '\' and operation_log=\'insert\' and date_log>=\'' + str(start) +'\' and date_log <= \''+ str(end) +'\' and roll=\''+ roll.role +'\' and user_name=\''+ userr +'\' and ' + session.search_validate_laboratory_management +';' ,as_dict=True)
+                tD = db.executesql('SELECT * from validate_laboratory_log where project=\'' + project.name + '\' and yearp=\'' + str(period.yearp) +'\' and period=\'' + str(T(period.period.name))+ '\' and operation_log=\'insert\' and date_log>=\'' + str(start) +'\' and date_log <= \''+ str(end) +'\' and roll=\''+ roll +'\' and user_name=\''+ userr +'\' and (' + session.search_validate_laboratory_management +');' ,as_dict=True)
             pass
             vecAllUserRoleMonth.append(tD)
         if str(request.vars['tipo'])=='all' or str(request.vars['tipo'])=='u':
-            if session.search_validate_laboratory_management == "":
-                tD = db.executesql('SELECT * from validate_laboratory_log where project=\'' + project.name + '\' and yearp=\'' + str(period.yearp) +'\' and period=\'' + str(T(period.period.name))+ '\' and operation_log=\'update\' and date_log>=\'' + str(start) +'\' and date_log <= \''+ str(end) +'\' and roll=\''+ roll.role +'\' and user_name=\''+ userr +'\';' ,as_dict=True)
+            if session.search_validate_laboratory_management == "" or session.search_validate_laboratory_management is None:
+                tD = db.executesql('SELECT * from validate_laboratory_log where project=\'' + project.name + '\' and yearp=\'' + str(period.yearp) +'\' and period=\'' + str(T(period.period.name))+ '\' and operation_log=\'update\' and date_log>=\'' + str(start) +'\' and date_log <= \''+ str(end) +'\' and roll=\''+ roll +'\' and user_name=\''+ userr +'\';' ,as_dict=True)
             else:
-                tD = db.executesql('SELECT * from validate_laboratory_log where project=\'' + project.name + '\' and yearp=\'' + str(period.yearp) +'\' and period=\'' + str(T(period.period.name))+ '\' and operation_log=\'update\' and date_log>=\'' + str(start) +'\' and date_log <= \''+ str(end) +'\' and roll=\''+ roll.role +'\' and user_name=\''+ userr +'\' and ' + session.search_validate_laboratory_management +';' ,as_dict=True)
+                tD = db.executesql('SELECT * from validate_laboratory_log where project=\'' + project.name + '\' and yearp=\'' + str(period.yearp) +'\' and period=\'' + str(T(period.period.name))+ '\' and operation_log=\'update\' and date_log>=\'' + str(start) +'\' and date_log <= \''+ str(end) +'\' and roll=\''+ roll +'\' and user_name=\''+ userr +'\' and (' + session.search_validate_laboratory_management +');' ,as_dict=True)
             pass
             vecAllUserRoleMonth.append(tD)
         if str(request.vars['tipo'])=='all' or str(request.vars['tipo'])=='d':
-            if session.search_validate_laboratory_management == "":
-                tD = db.executesql('SELECT * from validate_laboratory_log where project=\'' + project.name + '\' and yearp=\'' + str(period.yearp) +'\' and period=\'' + str(T(period.period.name))+ '\' and operation_log=\'delete\' and date_log>=\'' + str(start) +'\' and date_log <= \''+ str(end) +'\' and roll=\''+ roll.role +'\' and user_name=\''+ userr +'\';' ,as_dict=True)
+            if session.search_validate_laboratory_management == "" or session.search_validate_laboratory_management is None:
+                tD = db.executesql('SELECT * from validate_laboratory_log where project=\'' + project.name + '\' and yearp=\'' + str(period.yearp) +'\' and period=\'' + str(T(period.period.name))+ '\' and operation_log=\'delete\' and date_log>=\'' + str(start) +'\' and date_log <= \''+ str(end) +'\' and roll=\''+ roll +'\' and user_name=\''+ userr +'\';' ,as_dict=True)
             else:
-                tD = db.executesql('SELECT * from validate_laboratory_log where project=\'' + project.name + '\' and yearp=\'' + str(period.yearp) +'\' and period=\'' + str(T(period.period.name))+ '\' and operation_log=\'delete\' and date_log>=\'' + str(start) +'\' and date_log <= \''+ str(end) +'\' and roll=\''+ roll.role +'\' and user_name=\''+ userr +'\' and ' + session.search_validate_laboratory_management +';' ,as_dict=True)
+                tD = db.executesql('SELECT * from validate_laboratory_log where project=\'' + project.name + '\' and yearp=\'' + str(period.yearp) +'\' and period=\'' + str(T(period.period.name))+ '\' and operation_log=\'delete\' and date_log>=\'' + str(start) +'\' and date_log <= \''+ str(end) +'\' and roll=\''+ roll +'\' and user_name=\''+ userr +'\' and (' + session.search_validate_laboratory_management +');' ,as_dict=True)
             pass
             vecAllUserRoleMonth.append(tD)
     return dict(showLevel=showLevel, project=project, tipo=tipo, month=month, vecAllUserRoleMonth=vecAllUserRoleMonth, roll=roll, userr=userr)

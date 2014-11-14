@@ -7,6 +7,13 @@
 {{else:}}
 	<table class="table table-bordered">
 		<tr bgcolor="#F3F781">
+			<td colspan="8">
+			<div align="left">
+				<a href="{{=URL(vars=dict(list='False',level='5',level_project=project.id, level_month=month, level_tipo=tipo, level_rol=roll, level_user=userr))}}" title="{{=T('Export reporting level')}}"><img src="{{=URL('static','images')}}/icono_CSV.png"></a>
+			</div>
+			</td>
+		</tr>
+		<tr bgcolor="#F3F781">
 			<th>
 				{{=T('User resolution')}}
 			</th>

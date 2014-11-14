@@ -92,7 +92,16 @@
 		<table class="table table-bordered">
 			<thead>
 				<tr bgcolor="#D8D8D8">
-					<th><center><font Color="Black">{{=T('Course')}}</font></center></th>
+					<th>
+						<div>
+							<div>
+								<a href="{{=URL(vars=dict(list='False',level='1'))}}" title="{{=T('Export reporting level')}}"><img src="{{=URL('static','images')}}/icono_CSV.png"></a>
+							</div>
+							<div>
+								<center><font Color="Black">{{=T('Course')}}</font></center>
+							</div>
+						</div>
+					</th>
 					<th><center><font Color="Black">{{=T('Total inserted')}}</font></center></th>
 					<th><center><font Color="Black">{{=T('Total modified')}}</font></center></th>
 					<th><center><font Color="Black">{{=T('Total out')}}</font></center></th>
@@ -109,10 +118,10 @@
 						<td>
 							<center>
 								<a class="badge badge-success" style="white-space:nowrap;">
-									{{if session.search_validate_laboratory_management == "":}}
-										{{tI = db.executesql('SELECT count(id) as total from validate_laboratory_log where project=\'' + assigantion.project.name + '\' and yearp=\'' + str(year.yearp) +'\' and period=\'' + str(T(year.period.name))+ '\' and operation_log=\'insert\'' + session.search_validate_laboratory_management +';' ,as_dict=True)}}
+									{{if session.search_validate_laboratory_management == "" or session.search_validate_laboratory_management is None:}}
+										{{tI = db.executesql('SELECT count(id) as total from validate_laboratory_log where project=\'' + assigantion.project.name + '\' and yearp=\'' + str(year.yearp) +'\' and period=\'' + str(T(year.period.name))+ '\' and operation_log=\'insert\';' ,as_dict=True)}}
 									{{else:}}
-										{{tI = db.executesql('SELECT count(id) as total from validate_laboratory_log where project=\'' + assigantion.project.name + '\' and yearp=\'' + str(year.yearp) +'\' and period=\'' + str(T(year.period.name))+ '\' and operation_log=\'insert\' and ' + session.search_validate_laboratory_management +';' ,as_dict=True)}}
+										{{tI = db.executesql('SELECT count(id) as total from validate_laboratory_log where project=\'' + assigantion.project.name + '\' and yearp=\'' + str(year.yearp) +'\' and period=\'' + str(T(year.period.name))+ '\' and operation_log=\'insert\' and (' + session.search_validate_laboratory_management +');' ,as_dict=True)}}
 									{{pass}}
 									{{for dI in tI:}}
 										{{dIT=dI['total']}}
@@ -124,10 +133,10 @@
 						<td>
 							<center>
 								<a class="badge badge-info" style="white-space:nowrap;">
-									{{if session.search_validate_laboratory_management == "":}}
-										{{tU = db.executesql('SELECT count(id) as total from validate_laboratory_log where project=\'' + assigantion.project.name + '\' and yearp=\'' + str(year.yearp) +'\' and period=\'' + str(T(year.period.name))+ '\' and operation_log=\'update\'' + session.search_validate_laboratory_management +';' ,as_dict=True)}}
+									{{if session.search_validate_laboratory_management == "" or session.search_validate_laboratory_management is None:}}
+										{{tU = db.executesql('SELECT count(id) as total from validate_laboratory_log where project=\'' + assigantion.project.name + '\' and yearp=\'' + str(year.yearp) +'\' and period=\'' + str(T(year.period.name))+ '\' and operation_log=\'update\';' ,as_dict=True)}}
 									{{else:}}
-										{{tU = db.executesql('SELECT count(id) as total from validate_laboratory_log where project=\'' + assigantion.project.name + '\' and yearp=\'' + str(year.yearp) +'\' and period=\'' + str(T(year.period.name))+ '\' and operation_log=\'update\' and ' + session.search_validate_laboratory_management +';' ,as_dict=True)}}
+										{{tU = db.executesql('SELECT count(id) as total from validate_laboratory_log where project=\'' + assigantion.project.name + '\' and yearp=\'' + str(year.yearp) +'\' and period=\'' + str(T(year.period.name))+ '\' and operation_log=\'update\' and (' + session.search_validate_laboratory_management +');' ,as_dict=True)}}
 									{{pass}}
 									{{for dU in tU:}}
 										{{dUT=dU['total']}}
@@ -139,10 +148,10 @@
 						<td>
 							<center>
 								<a class="badge badge-important" style="white-space:nowrap;">
-									{{if session.search_validate_laboratory_management == "":}}
-										{{tD = db.executesql('SELECT count(id) as total from validate_laboratory_log where project=\'' + assigantion.project.name + '\' and yearp=\'' + str(year.yearp) +'\' and period=\'' + str(T(year.period.name))+ '\' and operation_log=\'delete\'' + session.search_validate_laboratory_management +';' ,as_dict=True)}}
+									{{if session.search_validate_laboratory_management == "" or session.search_validate_laboratory_management is None:}}
+										{{tD = db.executesql('SELECT count(id) as total from validate_laboratory_log where project=\'' + assigantion.project.name + '\' and yearp=\'' + str(year.yearp) +'\' and period=\'' + str(T(year.period.name))+ '\' and operation_log=\'delete\';' ,as_dict=True)}}
 									{{else:}}
-										{{tD = db.executesql('SELECT count(id) as total from validate_laboratory_log where project=\'' + assigantion.project.name + '\' and yearp=\'' + str(year.yearp) +'\' and period=\'' + str(T(year.period.name))+ '\' and operation_log=\'delete\' and ' + session.search_validate_laboratory_management +';' ,as_dict=True)}}
+										{{tD = db.executesql('SELECT count(id) as total from validate_laboratory_log where project=\'' + assigantion.project.name + '\' and yearp=\'' + str(year.yearp) +'\' and period=\'' + str(T(year.period.name))+ '\' and operation_log=\'delete\' and (' + session.search_validate_laboratory_management +');' ,as_dict=True)}}
 									{{pass}}
 									{{for dD in tD:}}
 										{{dDT=dD['total']}}
@@ -158,7 +167,16 @@
 								<table class="table table-bordered">
 									<thead>
 										<tr bgcolor="#58D3F7">
-											<th width="490px"><center>{{=T('Month')}}</center></th>
+											<th width="490px">
+												<div>
+													<div>
+														<a href="{{=URL(vars=dict(list='False',level='2',level_project=assigantion.project))}}" title="{{=T('Export reporting level')}}"><img src="{{=URL('static','images')}}/icono_CSV.png"></a>
+													</div>
+													<div>
+														<center>{{=T('Month')}}</center>
+													</div>
+												</div>
+											</th>
 											<th><center>{{=T('Total inserted')}}</center></th>
 											<th><center>{{=T('Total modified')}}</center></th>
 											<th><center>{{=T('Total out')}}</center></th>
@@ -179,10 +197,10 @@
 												<td>
 													<center>
 														<a id="p{{=str(assigantion.project)}}_all_m{{=month[0]}}_i" style="white-space:nowrap; cursor:pointer;" class="badge badge-success">
-															{{if session.search_validate_laboratory_management == "":}}
+															{{if session.search_validate_laboratory_management == "" or session.search_validate_laboratory_management is None:}}
 																{{tD = db.executesql('SELECT count(id) as total from validate_laboratory_log where project=\'' + assigantion.project.name + '\' and yearp=\'' + str(year.yearp) +'\' and period=\'' + str(T(year.period.name))+ '\' and operation_log=\'insert\' and date_log>=\'' + str(start) +'\' and date_log <= \''+ str(end) +'\';' ,as_dict=True)}}
 															{{else:}}
-																{{tD = db.executesql('SELECT count(id) as total from validate_laboratory_log where project=\'' + assigantion.project.name + '\' and yearp=\'' + str(year.yearp) +'\' and period=\'' + str(T(year.period.name))+ '\' and operation_log=\'insert\' and date_log>=\'' + str(start) +'\' and date_log <= \''+ str(end) + '\' and ' + session.search_validate_laboratory_management +';' ,as_dict=True)}}
+																{{tD = db.executesql('SELECT count(id) as total from validate_laboratory_log where project=\'' + assigantion.project.name + '\' and yearp=\'' + str(year.yearp) +'\' and period=\'' + str(T(year.period.name))+ '\' and operation_log=\'insert\' and date_log>=\'' + str(start) +'\' and date_log <= \''+ str(end) + '\' and (' + session.search_validate_laboratory_management +');' ,as_dict=True)}}
 															{{pass}}
 															{{for dD in tD:}}
 																{{dDT=dD['total']}}
@@ -194,10 +212,10 @@
 												<td>
 													<center>
 														<a id="p{{=str(assigantion.project)}}_all_m{{=month[0]}}_u" style="white-space:nowrap; cursor:pointer;" class="badge badge-info">
-															{{if session.search_validate_laboratory_management == "":}}
+															{{if session.search_validate_laboratory_management == "" or session.search_validate_laboratory_management is None:}}
 																{{tD = db.executesql('SELECT count(id) as total from validate_laboratory_log where project=\'' + assigantion.project.name + '\' and yearp=\'' + str(year.yearp) +'\' and period=\'' + str(T(year.period.name))+ '\' and operation_log=\'update\' and date_log>=\'' + str(start) +'\' and date_log <= \''+ str(end) +'\';' ,as_dict=True)}}
 															{{else:}}
-																{{tD = db.executesql('SELECT count(id) as total from validate_laboratory_log where project=\'' + assigantion.project.name + '\' and yearp=\'' + str(year.yearp) +'\' and period=\'' + str(T(year.period.name))+ '\' and operation_log=\'update\' and date_log>=\'' + str(start) +'\' and date_log <= \''+ str(end) + '\' and ' + session.search_validate_laboratory_management +';' ,as_dict=True)}}
+																{{tD = db.executesql('SELECT count(id) as total from validate_laboratory_log where project=\'' + assigantion.project.name + '\' and yearp=\'' + str(year.yearp) +'\' and period=\'' + str(T(year.period.name))+ '\' and operation_log=\'update\' and date_log>=\'' + str(start) +'\' and date_log <= \''+ str(end) + '\' and (' + session.search_validate_laboratory_management +');' ,as_dict=True)}}
 															{{pass}}
 															{{for dD in tD:}}
 																{{dDT=dD['total']}}
@@ -209,10 +227,10 @@
 												<td>
 													<center>
 														<a id="p{{=str(assigantion.project)}}_all_m{{=month[0]}}_d" style="white-space:nowrap; cursor:pointer;" class="badge badge-important">
-															{{if session.search_validate_laboratory_management == "":}}
+															{{if session.search_validate_laboratory_management == "" or session.search_validate_laboratory_management is None:}}
 																{{tD = db.executesql('SELECT count(id) as total from validate_laboratory_log where project=\'' + assigantion.project.name + '\' and yearp=\'' + str(year.yearp) +'\' and period=\'' + str(T(year.period.name))+ '\' and operation_log=\'delete\' and date_log>=\'' + str(start) +'\' and date_log <= \''+ str(end) +'\';' ,as_dict=True)}}
 															{{else:}}
-																{{tD = db.executesql('SELECT count(id) as total from validate_laboratory_log where project=\'' + assigantion.project.name + '\' and yearp=\'' + str(year.yearp) +'\' and period=\'' + str(T(year.period.name))+ '\' and operation_log=\'delete\' and date_log>=\'' + str(start) +'\' and date_log <= \''+ str(end) + '\' and ' + session.search_validate_laboratory_management +';' ,as_dict=True)}}
+																{{tD = db.executesql('SELECT count(id) as total from validate_laboratory_log where project=\'' + assigantion.project.name + '\' and yearp=\'' + str(year.yearp) +'\' and period=\'' + str(T(year.period.name))+ '\' and operation_log=\'delete\' and date_log>=\'' + str(start) +'\' and date_log <= \''+ str(end) + '\' and (' + session.search_validate_laboratory_management +');' ,as_dict=True)}}
 															{{pass}}
 															{{for dD in tD:}}
 																{{dDT=dD['total']}}
