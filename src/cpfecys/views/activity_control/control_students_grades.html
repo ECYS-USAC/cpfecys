@@ -2,7 +2,7 @@
 <link rel="stylesheet" href="{{=URL('static','css')}}/jquery-ui.css">
 <script src="{{=URL('static','js')}}/jquery.js"></script>
 <script src="{{=URL('static','js')}}/jquery-ui.js"></script>
-<div class="well ">
+<div class="well " style="overflow:auto; ">
   <table style="width:100%;" >
     <tr>
       <td>
@@ -133,6 +133,20 @@
       <b>{{=T('Academic List')}}</b>
     </td>
     <td colspan="3">
+      
+      <center>
+        <div class="alert"  style="width:70%;" id="notice_1">
+            <strong>{{=T('Notice')}}!</strong> {{=T('The notes should be entered on 100 points')}}
+        </div>
+        <div class="alert"  style="width:70%;" id="notice_2">
+            <strong>{{=T('Notice')}}!</strong> {{=T('Please enter only the notes of the students who participated in the activity')}}
+        </div>
+        {{if auth.has_membership('Student'):}}
+        <div class="alert"  style="width:70%;" id="notice_3">
+            <strong>{{=T('Notice')}}!</strong> {{=T('In order to consider this activity in the report, you must enter a percentage of the total of the entered notes.')}}
+        </div>
+        {{pass}}
+      </center>
       <center>
         <div id="grades_list" style="overflow:auto; ">
           {{=T('Loading')}}...
@@ -180,8 +194,16 @@ aria-hidden="true">{{=T('Close')}}</button>
       source: availableTags
     });
 
-      
+    myVar  = setInterval(function(){
+      $("#notice_1").toggle(700);
+      $("#notice_2").toggle(700);
+      $("#notice_3").toggle(700);
+      clearTimeout(myVar)
+    },30000);
+    
   });
+
+  
 
   function refresh_list_grade(){
     $("#grades_list").load("{{=URL('activity_control','grades.html')}}?op=view_grades&amp;activity={{=var_activity.id}}&amp;project={{=var_project.id}}&amp;year={{=var_period.id}}");
