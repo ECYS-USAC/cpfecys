@@ -17,7 +17,7 @@ aria-labelledby="myModalLabel" aria-hidden="true">
 aria-hidden="true">×</button>
       <h3 id="myModalLabel">
           <span class="icon-question-sign"></span>
-          {{=T('Ayuda Carga Alumnos')}}
+          {{=T('Help Academic Upload')}}
       </h3>
   </div>
   <div class="modal-body">
@@ -76,7 +76,7 @@ data-toggle="tab">
     <!--La tab del periodo actual-->
 
       <li><a href="{{=URL('academic_assignation_upload', vars=dict(assignation=assignation))}}">
-          {{=T('Cargar Alumnos')}}
+          {{=T('Upload Acadmics')}}
       </a></li>
   </ul>
   <div class="tab-content">
@@ -106,7 +106,8 @@ data-toggle="tab">
             $(input1Str).insertAfter("#w2p_keywords");
           }); 
         </script>
-        <a class="btn btn-success" href="{{=URL(vars=dict(listado='True'))}}">Crear Listado de Asistencia (CSV)</a>
+        <a class="btn btn-success" href="{{=URL(vars=dict(listado='True'))}}">{{=T('Create Assistance List')}}</a>
+        <a class="btn btn-warning" href="{{=URL(vars=dict(listado='Users'))}}">{{=T('Create profiles for academic')}}</a>
           {{=grid}}
       </div>
   </div>
