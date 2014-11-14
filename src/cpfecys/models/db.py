@@ -310,7 +310,7 @@ db.define_table('notification_access',
 #Reports and Activities structure
 db.define_table('report_restriction',
                 Field('name', 'string', notnull=True, \
-                    label = T('name'), unique = True, length = 50),
+                    label = T('name'),  length = 50),
                 Field('start_date', 'date', notnull=True, \
                     label = T('start date')),
                 Field('end_date', 'date', notnull=True, \
@@ -676,6 +676,7 @@ db.define_table('notification_general_log4',
 #Tabla de avisos
 db.define_table('notification_log4',
                 Field('destination', 'text', notnull = True, label = T('Destination')),
+                Field('username', 'text', notnull = True, label = T('Username')),
                 Field('result_log', 'text', notnull = False, label = T('Log')),
                 Field('success', 'boolean', notnull = True, label = T('Success')),
                 Field('register', 'reference notification_general_log4', notnull = True, label = T('Register')))
@@ -713,13 +714,13 @@ db.define_table('academic_course_assignation_log',
                 Field('date_log', 'datetime', notnull = True, default = datetime.datetime.now(), label = T('Fecha')))
 
 db.define_table('library',
-                Field('name', 'text', notnull=True, unique=False, label = T('name')),
-                Field('file_data', 'upload', notnull=True, label = T('file_data'), requires=[IS_UPLOAD_FILENAME(extension = '(pdf|zip)',error_message='Solo se aceptan archivos con extension zip|pdf'),IS_LENGTH(2097152,error_message='El tamaño máximo del archivo es 2MB')]),
-                Field('description', 'text', notnull=True, unique=False, label = T('description')),
-                Field('visible', 'boolean', label = T('visible')),
-                Field('period', 'reference period_year', notnull=True, label = T('period')),
-                Field('project', 'reference project', notnull=True, label = T('project')),
-                Field('owner_file', 'reference auth_user', notnull=True, label = T('owner_file')))
+                Field('name', 'text', notnull=True, unique=False, label = T('Name')),
+                Field('file_data', 'upload', notnull=True, label = T('File_data'), requires=[IS_UPLOAD_FILENAME(extension = '(pdf|zip)',error_message='Solo se aceptan archivos con extension zip|pdf'),IS_LENGTH(2097152,error_message='El tamaño máximo del archivo es 2MB')]),
+                Field('description', 'text', notnull=True, unique=False, label = T('Description')),
+                Field('visible', 'boolean', label = T('Visible')),
+                Field('period', 'reference period_year', notnull=True, label = T('Period')),
+                Field('project', 'reference project', notnull=True, label = T('Course')),
+                Field('owner_file', 'reference auth_user', notnull=True, label = T('Owner_file')))
 
 db.define_table('activity_category',
     Field('category', 'string', notnull=True, unique=False, label = T('category')),
@@ -1028,11 +1029,21 @@ db.define_table('academic_send_mail_log',
     Field('course', 'text', notnull=True, label=T('Curso')),
     Field('yearp', 'text', notnull=True, label=T('yearp')),
     Field('period', 'text', notnull=True, label=T('Periodo')),
-    Field('email_list', 'text', notnull=True, label=T('Email List')),
     Field('mail_state', 'text', notnull=True, label=T('State'))
     )
 
+db.define_table('academic_send_mail_detail',
+    Field('academic_send_mail_log', 'reference academic_send_mail_log', notnull = True, label = T('academic_send_mail_log')),
+    Field('username', 'string', notnull=True, label=T('username')),
+    Field('email', 'string', notnull=True, label=T('Email'))
+)
+
 db.define_table('read_mail',
+    Field('id_auth_user', 'integer',notnull = True, label = T('id_auth_user')),
+    Field('id_mail', 'integer',notnull = True, label = T('id_mail'))
+    )
+
+db.define_table('read_mail_student',
     Field('id_auth_user', 'integer',notnull = True, label = T('id_auth_user')),
     Field('id_mail', 'integer',notnull = True, label = T('id_mail'))
     )

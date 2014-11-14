@@ -14,24 +14,21 @@ def file_managers():
             periods = db((db.period_year.id == db.user_project.period)&(db.user_project.assigned_user==auth.user.id)).select(db.period_year.id, db.period_year.yearp, db.period_year.period, distinct = True)
         return periods
     #The list of the projects
-    def obtainProjects(period):
-        rproject = db((db.user_project.assigned_user==auth.user.id)&(db.user_project.period==period)).select()
+    def obtainProjects(func,period):
+        if func == 1:
+            try:
+                academic_var = db.academic(db.academic.id_auth_user==auth.user.id)        
+                rproject = db((db.academic_course_assignation.carnet==academic_var.id)&(db.academic_course_assignation.semester==period)).select()
+            except:
+                rproject = []
+        else:
+            rproject = db((db.user_project.assigned_user==auth.user.id)&(db.user_project.period==period)).select()
         return rproject
     #The list of the final students
     def obtainStudents(project):
         persons = db((db.user_project.project == project.project)&(db.user_project.period==project.period)&(db.auth_membership.user_id==db.user_project.assigned_user)&(db.auth_membership.group_id==2)).select()
         return persons
-    #Type of rol
-    def obtenerRol():
-        try:
-            rol = db(db.auth_membership.user_id==auth.user.id).select()
-            nrol = 0
-            for s in rol:
-                nrol = s.group_id
-        except:
-            session.flash = T('Not valid Action.')
-            redirect(URL('default', 'index'))
-        return nrol
+    
     #Existe alguna accion
     def existeRegistro():
         resultado=False
@@ -58,7 +55,27 @@ def file_managers():
 
     grid = None
     if tipo != None and pro != None:
-        if tipo != '0':
+        if tipo=='5':
+            academic_var = db.academic(db.academic.id_auth_user==auth.user.id)        
+            if request.vars['semester'] is not None:
+                session.library_semester = request.vars['semester']
+            project = db((db.academic_course_assignation.carnet==academic_var.id)&(db.academic_course_assignation.assignation==session.library_pro_vars)&(db.academic_course_assignation.semester==session.library_semester)).select().first()
+            if project is None:
+                session.flash = T('Not valid Action.')
+                redirect(URL('default', 'index'))
+            else:
+                
+                query = ((db.library.project==project.assignation)&(db.library.period==project.semester)&(db.library.visible==True))
+                db.library.period.readable = False
+                db.library.project.readable = False
+                db.library.visible.readable = False
+                db.library.owner_file.readable = False
+                grid = SQLFORM.grid(query, csv=False, create=False, editable=False, deletable=False, paginate=9)
+                nameProject = project.assignation.name
+                nameSemester = project.semester.period.name
+                nameYear = project.semester.yearp
+                usernombre=''
+        elif tipo != '0':
             project = int(pro)+0
             check = db.user_project(id = project)
             year = db.period_year(id=check.period)
@@ -81,32 +98,38 @@ def file_managers():
             nameProject = check.project.name
             nameSemester = T(year_semester.name)
             nameYear = year.yearp
+            
+
+            rproject = db((db.user_project.assigned_user==auth.user.id)&(db.user_project.period==year.id)&(db.user_project.id==pro)).select().first()
+            if rproject is None:
+                session.flash = T('Not valid Action.')
+                redirect(URL('default', 'index'))
 
             if tipo=='1':
                 usernombre=check.assigned_user.first_name
                 query = ((db.library.owner_file==check.assigned_user)&(db.library.project==check.project)&(db.library.period==check.period))
                 if period.id == year.id:
-                    grid = SQLFORM.grid(query, csv=False, paginate=5)
+                    grid = SQLFORM.grid(query, csv=False, paginate=9)
                 else:
                     links = [lambda row: A('Enlazar Semestre Actual',_href=URL("library","change_period",args=[row.id]))]
-                    grid = SQLFORM.grid(query, links=links, csv=False, paginate=5)
+                    grid = SQLFORM.grid(query, links=links, csv=False, paginate=9)
             elif tipo=='2':
                 db.library.owner_file.readable = True
                 query = ((db.library.visible==True)&(db.library.owner_file!=check.assigned_user)&(db.library.project==check.project)&(db.library.period==check.period))
-                grid = SQLFORM.grid(query, csv=False, create=False, editable=False, deletable=False, paginate=5)
+                grid = SQLFORM.grid(query, csv=False, create=False, editable=False, deletable=False, paginate=9)
                 usernombre=T('Share')
             elif tipo=='3':
                 usernombre=check.assigned_user.first_name
                 query = ((db.library.owner_file==check.assigned_user)&(db.library.project==check.project)&(db.library.period==check.period))
                 if period.id == year.id:
-                    grid = SQLFORM.grid(query, csv=False, paginate=5)
+                    grid = SQLFORM.grid(query, csv=False, paginate=9)
                 else:
                     links = [lambda row: A('Enlazar Semestre Actual',_href=URL("library","change_period",args=[row.id]))]
-                    grid = SQLFORM.grid(query, links=links, csv=False, paginate=5)
+                    grid = SQLFORM.grid(query, links=links, csv=False, paginate=9)
             elif tipo=='4':
                 usernombre=check.assigned_user.first_name
                 query = ((db.library.owner_file==check.assigned_user)&(db.library.project==check.project)&(db.library.period==check.period))
-                grid = SQLFORM.grid(query, csv=False, create=False, editable=False, deletable=False, paginate=5)
+                grid = SQLFORM.grid(query, csv=False, create=False, editable=False, deletable=False, paginate=9)
             else:
                 session.flash = T('Not valid Action.')
                 redirect(URL('default', 'index'))
@@ -119,7 +142,15 @@ def file_managers():
         session.flash = T('Not valid Action.')
         redirect(URL('default', 'index'))
 
-    return dict(obtainPeriods = obtainPeriods, obtainProjects=obtainProjects, obtainStudents=obtainStudents, obtenerRol=obtenerRol, existeRegistro=existeRegistro, grid=grid, name = nameProject,semester=nameSemester,year=nameYear,usernombre=usernombre)
+    return dict(obtainPeriods = obtainPeriods, 
+                obtainProjects=obtainProjects, 
+                obtainStudents=obtainStudents, 
+                existeRegistro=existeRegistro, 
+                grid=grid, 
+                name = nameProject,
+                semester=nameSemester,
+                year=nameYear,
+                usernombre=usernombre)
 
 @auth.requires_login()
 @auth.requires(auth.has_membership('Student') or auth.has_membership('Teacher') or auth.has_membership('Academic'))

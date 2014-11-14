@@ -120,7 +120,8 @@ def user():
     to decorate functions that need access control
     """
     if request.args(0) == 'profile':
-        db.auth_user.username.writable = False
+        if auth.has_membership('Super-Administrator') == False:
+            db.auth_user.username.writable = False
     pass
     return dict(form=auth())
 

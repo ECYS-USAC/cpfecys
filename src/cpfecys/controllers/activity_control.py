@@ -255,22 +255,22 @@ def pstdev(data, mu=None):
 @auth.requires_login()
 @auth.requires(auth.has_membership('Student') or auth.has_membership('Teacher') or auth.has_membership('Super-Administrator') or auth.has_membership('Academic') or auth.has_membership('Ecys-Administrator'))
 def courses_list():
-    lista = [66,88,90,76,61]
-    var_temp = mean(lista)
-    print "mean->:"+str(var_temp)
-    var_temp = median(lista)
-    print "median->:"+str(var_temp)
-    try:
-        var_temp = mode(lista)
-        print "mode->:"+str(var_temp)
-    except:
-        None
-    var_temp = stdev(lista)
-    print "standar desviation->:"+str(var_temp)
-    var_temp = variance(lista)
-    print "variance->:"+str(var_temp)
-    var_temp = stdev(lista)/math.sqrt(len(lista))
-    print "standar error->:"+str(var_temp)
+    #lista = [66,88,90,76,61]
+    #var_temp = mean(lista)
+    #print "mean->:"+str(var_temp)
+    #var_temp = median(lista)
+    #print "median->:"+str(var_temp)
+    #try:
+    #    var_temp = mode(lista)
+    #    print "mode->:"+str(var_temp)
+    #except:
+    #    None
+    #var_temp = stdev(lista)
+    #print "standar desviation->:"+str(var_temp)
+    #var_temp = variance(lista)
+    #print "variance->:"+str(var_temp)
+    #var_temp = stdev(lista)/math.sqrt(len(lista))
+    #print "standar error->:"+str(var_temp)
     #var_temp = kurtosis(lista)
     #print "kurt->:"+str(var_temp)
     
@@ -349,7 +349,7 @@ def courses_list():
 
 
 @auth.requires_login()
-@auth.requires(auth.has_membership('Student') or auth.has_membership('Teacher') or auth.has_membership('Super-Administrator') or auth.has_membership('Ecys-Administrator'))
+@auth.requires(auth.has_membership('Student') or auth.has_membership('Academic') or auth.has_membership('Teacher') or auth.has_membership('Super-Administrator') or auth.has_membership('Ecys-Administrator'))
 def students_control():
     #vars
     year = None
@@ -3812,6 +3812,7 @@ def General_report_activities():
         redirect(URL('activity_control','general_report_activities_export',vars=dict(project = project_var.id, period = year.id, type=request.vars['type'])))
     
     if request.vars['list'] =='False':
+
         course_ended_var = db((db.course_ended.project==project_var.id) & (db.course_ended.period==year.id) ).select().first() 
         if course_ended_var is None:
             
@@ -3986,13 +3987,14 @@ def General_report_activities():
                                                                     date_start=actChange.date_start, 
                                                                     date_finish=actChange.date_finish)
             pass
-
             #Insert to course_ended           
             db.course_ended.insert(project = project_var.id,
                             period = year.id,
                             finish =  True)
         #Generate csv file format technical school
-        redirect(URL('activity_control','Course_Format_Technical_School',vars=dict(project = project_var.id, period = year.id)))
+        response.flash = T('Request has been canceled')
+        #redirect(URL('activity_control','Course_Format_Technical_School',vars=dict(project = project_var.id, period = year.id)))
+
 
     
     controlP = db((db.student_control_period.period_name==(T(year.period.name)+" "+str(year.yearp)))).select().first()

@@ -84,6 +84,53 @@ def academic_assignation():
     if request.vars['listado'] =='True':
         redirect(URL('student_academic','attendance_list',vars=dict(usuario_proyecto=str(check.id))))
 
+    #Temporal---------------------------------------------------------------------------------------------
+    if request.vars['listado'] =='Users':
+        academic_var = db.auth_group(db.auth_group.role=='Academic')
+        academic_list = db((db.academic_course_assignation.semester == currentyear_period.id) & (db.academic_course_assignation.assignation==check.project)).select()
+        for academic_temp in academic_list:
+            user_var = db.auth_user(db.auth_user.username==academic_temp.carnet.carnet)
+            if user_var is None:
+                #AQUI IRIA LA VALIDACION CON EL WEBSERVICE
+                #If not exists, create auth_user of academic
+                id_user = db.auth_user.insert(first_name = academic_temp.carnet.carnet,
+                                last_name =  " ",
+                                email = academic_temp.carnet.email,
+                                username = academic_temp.carnet.carnet,
+                                phone = '12345678',
+                                home_address = T('Enter your address'))
+                #Add the id_auth_user to academic.
+                db(db.academic.id == academic_temp.carnet.id).update(id_auth_user = id_user.id)
+                #Create membership to academic
+                db.auth_membership.insert(user_id = id_user.id, group_id =  academic_var.id)   
+            else:
+                membership_var = db.auth_membership((db.auth_membership.user_id==user_var.id) & (db.auth_membership.group_id==academic_var.id))
+                if membership_var is None:
+                    #Create membership to academic
+                    db.auth_membership.insert(user_id = user_var.id, group_id =  academic_var.id) 
+
+                #Add the id_auth_user to academic. And update academic inforamtion  
+                db(db.academic.id == academic_temp.carnet.id).update(id_auth_user = user_var.id,
+                                                        email = user_var.email,
+                                                        carnet = user_var.username)
+                #academic_LOG 
+                import cpfecys
+                cperiod = cpfecys.current_year_period()
+                db.academic_log.insert(user_name = 'system',
+                                    roll = 'system',
+                                    operation_log = 'update', 
+                                    before_carnet = academic_temp.carnet.carnet, 
+                                    before_email = academic_temp.carnet.email, 
+                                    after_carnet = user_var.username, 
+                                    after_email = user_var.email, 
+                                    id_academic = academic_temp.carnet.id, 
+                                    id_period = cperiod,
+                                    description = T('Registration data was updated, set with the information entered by ')+str(auth.user.username))
+        response.flash = T('Profiles created')
+    #Temporal---------------------------------------------------------------------------------------------
+
+
+
     if request.vars['search_var'] is None:
         query = ((db.academic_course_assignation.semester == currentyear_period.id) & (db.academic_course_assignation.assignation==check.project))
     else:
