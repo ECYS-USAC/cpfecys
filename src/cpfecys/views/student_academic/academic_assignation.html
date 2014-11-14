@@ -107,7 +107,7 @@ data-toggle="tab">
           }); 
         </script>
         <a class="btn btn-success" href="{{=URL(vars=dict(listado='True'))}}">{{=T('Create Assistance List')}}</a>
-        <a class="btn btn-warning" href="{{=URL(vars=dict(listado='Users'))}}">{{=T('Create profiles for academic')}}</a>
+        <a class="btn btn-warning" href="{{=(URL('student_academic','attendance_list',vars=dict(list='true',project=check.project,period=currentyear_period.id)))}}">{{=T('Create profiles for academic')}}</a>
           {{=grid}}
       </div>
   </div>
