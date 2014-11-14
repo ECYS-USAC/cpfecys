@@ -110,7 +110,8 @@ def inbox_student_mails_load():
 def send_mail():        
     import cpfecys
     cperiod = cpfecys.current_year_period()
-
+    period_id = cperiod.id
+    period_list = []
     if (request.args(0) == 'send'):
         email = request.vars['mail']
         if email != None:
@@ -145,11 +146,16 @@ def send_mail():
             else:
                 response.flash = T('Fill all fields of the mail')
             academic_var = db.academic(db.academic.id_auth_user==auth.user.id) 
-            assignations = []       
-            assignations = db((db.academic_course_assignation.semester==cperiod.id) & (db.academic_course_assignation.carnet==academic_var.id)).select()
-            return dict(email=None,assignations=assignations,cperiod=cperiod)
+            
+            assignations = []
+             
+            assignations = db((db.academic_course_assignation.semester==period_id) & (db.academic_course_assignation.carnet==academic_var.id)).select()
+            period_list = db(db.academic_course_assignation.carnet==academic_var.id).select(db.academic_course_assignation.semester,distinct=True)
+            return dict(email=None,assignations=assignations,cperiod=cperiod,period_list = period_list, period_id = period_id)
         
     else:
+        if (request.args(0) == 'period'):
+            period_id = subject = request.vars['semester_id']
         if request.vars['mail'] != None:
             email = request.vars['mail']          
             name = request.vars['name']       
@@ -161,8 +167,9 @@ def send_mail():
             return dict(email=email,name=name,remessage=remessage,retime=retime,resub=resub,var_project_name=var_project_name)
         else:
             academic_var = db.academic(db.academic.id_auth_user==auth.user.id)        
-            assignations = db((db.academic_course_assignation.semester==cperiod.id) & (db.academic_course_assignation.carnet==academic_var.id)).select()
-            return dict(email=None,assignations=assignations,cperiod=cperiod)
+            assignations = db((db.academic_course_assignation.semester==period_id) & (db.academic_course_assignation.carnet==academic_var.id)).select()
+            period_list = db(db.academic_course_assignation.carnet==academic_var.id).select(db.academic_course_assignation.semester,distinct=True)
+            return dict(email=None,assignations=assignations,cperiod=cperiod,period_list = period_list, period_id = period_id)
             
 
 @auth.requires_login()

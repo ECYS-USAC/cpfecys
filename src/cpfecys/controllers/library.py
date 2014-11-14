@@ -64,7 +64,7 @@ def file_managers():
                 session.flash = T('Not valid Action.')
                 redirect(URL('default', 'index'))
             else:
-                print "project:"+str(project)
+                
                 query = ((db.library.project==project.assignation)&(db.library.period==project.semester)&(db.library.visible==True))
                 db.library.period.readable = False
                 db.library.project.readable = False
@@ -99,9 +99,6 @@ def file_managers():
             nameSemester = T(year_semester.name)
             nameYear = year.yearp
             
-            print "year" +str(year.id)
-            print "pro" +str(pro)
-            print "auth.user.id" +str(auth.user.id)
 
             rproject = db((db.user_project.assigned_user==auth.user.id)&(db.user_project.period==year.id)&(db.user_project.id==pro)).select().first()
             if rproject is None:

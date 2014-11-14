@@ -4,8 +4,9 @@
 <div class="row-fluid">
     <div class="well span12" id="principal_div">
     	
-	<form action="{{=URL('notification_student', 'send_mail/send')}}" method="post">
+	
 	  {{if email != None:}}
+	  <form action="{{=URL('notification_student', 'send_mail/send')}}" method="post">
 	  	<fieldset>
 	  		<label for="subject">{{=T('To')}}</label>
 	  		<h4><small>{{=name}}</small></h4>
@@ -20,13 +21,36 @@
 	  		  		
 	  	</fieldset>
 	  {{else:}}
-	  	<input name="var_course" id="var_course"  type="hidden" value="">
+	  	
 		  <table>
 			<tr>
 				<td>
 				  <!--Courses list-->
+				  	<form action="{{=URL('notification_student', 'send_mail/period')}}" method="post">
+					<table>
+					  	<td>
+					  		<input name="_formname" type="hidden" value="select_form">
+							<select class="generic-widget" id="semester_id" name="semester_id">
+								{{for per in period_list:}}
+									{{if str(per.semester.id) == str(period_id):}}
+										{{var_sel="selected='selected'"}}
+									{{else:}}
+										{{var_sel=''}}
+									{{pass}}
+									<option  onclick="refresh_period({{=per.semester.id}});" value="{{=per.semester.id}}" {{=var_sel}} >{{=T(per.semester.period.name)}} {{=per.semester.yearp}}</option>
+								{{pass}}
+							</select>
+						</td>
+						<td>
+							<input type="submit" value="{{=T('go')}}" >
+						</td>
+					</table>
+					</form>
+				<form action="{{=URL('notification_student', 'send_mail/send')}}" method="post">
+					<input name="var_course" id="var_course"  type="hidden" value="">
 				  <h3>{{=T('My Courses')}}</h3>
 				  <div style="overflow:auto; width:75%; height:150px;">
+				  	
 				  	<table class="table-striped table-bordered">						
 						{{for assignation in assignations:}}
 							<tr>
