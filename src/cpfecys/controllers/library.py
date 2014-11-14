@@ -70,7 +70,7 @@ def file_managers():
                 db.library.project.readable = False
                 db.library.visible.readable = False
                 db.library.owner_file.readable = False
-                grid = SQLFORM.grid(query, csv=False, create=False, editable=False, deletable=False, paginate=5)
+                grid = SQLFORM.grid(query, csv=False, create=False, editable=False, deletable=False, paginate=9)
                 nameProject = project.assignation.name
                 nameSemester = project.semester.period.name
                 nameYear = project.semester.yearp
@@ -109,27 +109,27 @@ def file_managers():
                 usernombre=check.assigned_user.first_name
                 query = ((db.library.owner_file==check.assigned_user)&(db.library.project==check.project)&(db.library.period==check.period))
                 if period.id == year.id:
-                    grid = SQLFORM.grid(query, csv=False, paginate=5)
+                    grid = SQLFORM.grid(query, csv=False, paginate=9)
                 else:
                     links = [lambda row: A('Enlazar Semestre Actual',_href=URL("library","change_period",args=[row.id]))]
-                    grid = SQLFORM.grid(query, links=links, csv=False, paginate=5)
+                    grid = SQLFORM.grid(query, links=links, csv=False, paginate=9)
             elif tipo=='2':
                 db.library.owner_file.readable = True
                 query = ((db.library.visible==True)&(db.library.owner_file!=check.assigned_user)&(db.library.project==check.project)&(db.library.period==check.period))
-                grid = SQLFORM.grid(query, csv=False, create=False, editable=False, deletable=False, paginate=5)
+                grid = SQLFORM.grid(query, csv=False, create=False, editable=False, deletable=False, paginate=9)
                 usernombre=T('Share')
             elif tipo=='3':
                 usernombre=check.assigned_user.first_name
                 query = ((db.library.owner_file==check.assigned_user)&(db.library.project==check.project)&(db.library.period==check.period))
                 if period.id == year.id:
-                    grid = SQLFORM.grid(query, csv=False, paginate=5)
+                    grid = SQLFORM.grid(query, csv=False, paginate=9)
                 else:
                     links = [lambda row: A('Enlazar Semestre Actual',_href=URL("library","change_period",args=[row.id]))]
-                    grid = SQLFORM.grid(query, links=links, csv=False, paginate=5)
+                    grid = SQLFORM.grid(query, links=links, csv=False, paginate=9)
             elif tipo=='4':
                 usernombre=check.assigned_user.first_name
                 query = ((db.library.owner_file==check.assigned_user)&(db.library.project==check.project)&(db.library.period==check.period))
-                grid = SQLFORM.grid(query, csv=False, create=False, editable=False, deletable=False, paginate=5)
+                grid = SQLFORM.grid(query, csv=False, create=False, editable=False, deletable=False, paginate=9)
             else:
                 session.flash = T('Not valid Action.')
                 redirect(URL('default', 'index'))
