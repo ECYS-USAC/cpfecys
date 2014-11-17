@@ -69,6 +69,7 @@ if auth.has_membership(role="Super-Administrator"):
              ]),
          (T('System Configuration'), False, URL(),[
              (T('Parameters configuration'), False, URL('admin', 'parameters'), []),
+             (T('Configuration Web Service'), False, URL('student_academic', 'student_validation_parameters'), []),
              ]),
          (T('Reports'), False, URL(),[
              (T('Courses reports'), False, URL('admin', 'courses_report/areas'), []),

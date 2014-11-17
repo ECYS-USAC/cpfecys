@@ -32,10 +32,10 @@ def student_validation_parameters():
     if svp is None:
         grid = SQLFORM.grid(db.validate_student, csv=False, paginate=1, searchable=False)
     else:
-        links = [lambda row: A(T('Fields of Student Validation Parameters'),
+        links = [lambda row: A(T('Web Service Parameters'),
         _role='label',
         _href=URL('student_academic', 'student_validation_parameters_fields'),
-        _title=T('Fields of Student Validation Parameters'))]
+        _title=T('Web Service Parameters'))]
         grid = SQLFORM.grid(db.validate_student, csv=False, paginate=1, create=False, searchable=False, links=links)
     return dict(grid=grid)
 
