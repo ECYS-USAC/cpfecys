@@ -4542,10 +4542,9 @@ def General_report_activities():
                             period = year.id,
                             finish =  True)
         #Generate csv file format technical school
-        response.flash = T('Request has been canceled')
+        session.flash = T('Request has been canceled')
+        #
         #redirect(URL('activity_control','Course_Format_Technical_School',vars=dict(project = project_var.id, period = year.id)))
-
-
     
     controlP = db((db.student_control_period.period_name==(T(year.period.name)+" "+str(year.yearp)))).select().first()
     requirement = db((db.course_requirement.semester==year.id)&(db.course_requirement.project==project_var.id)).select().first()

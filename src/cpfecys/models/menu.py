@@ -162,6 +162,22 @@ if auth.has_membership(role="Teacher"):
         
     ])
 
+    response.menu.extend([(T('Messages'), False, URL(),[
+             (T('Inbox')+" ("+str(cont_news)+")", False, URL('notification_student','inbox'), []),
+             (T('Notices'), False, URL(), [
+              (T('Send Notice'), False, URL('notification','teacher_courses_mail_notifications'), []),
+              (T('Register Notices'), False, URL('notification', 'teacher_register_mail_notifications'), [])
+             ])
+          
+
+
+   
+                
+        
+    ])
+    ])
+
+
 if auth.has_membership(role="Student"):
     response.menu.extend([(T('Final Practice'), False, URL(),[
              (T('My Final Practice'), False, URL('student', 'index'), []),
@@ -187,7 +203,7 @@ if auth.has_membership(role="Academic") or auth.has_membership(role="Student"):
         ])
 
 
-if auth.has_membership(role="Teacher") or auth.has_membership(role="Student"):
+if auth.has_membership(role="Student"):
     if auth.has_membership(role="Academic") == False:
         response.menu.extend([
             (T('Inbox')+" ("+str(cont_news)+")", False, URL('notification_student','inbox'), [])
@@ -232,14 +248,9 @@ if auth.has_membership(role="Super-Administrator"):
             (T('Course Time Limit Exception'), False, URL('activity_control','course_limit_exception'), [])
         ]))
     ]))
-
 if auth.has_membership(role="Student") or auth.has_membership(role="Teacher") or auth.has_membership(role="Academic"):
     user_menu.append((T('Library'), False, URL('library','file_managers',vars=dict(tipo=0, pro=0)), []),)
-if auth.has_membership(role="Teacher"):
-    user_menu.append((T('Notices'), False, URL(), [
-    (T('Send Notice'), False, URL('notification','teacher_courses_mail_notifications'), []),
-    (T('Register Notices'), False, URL('notification', 'teacher_register_mail_notifications'), []),
-    ]))
+
 if auth.has_membership(role="Super-Administrator"):
     user_menu.append((T('Audit'), False, URL(), [
     (T('Teacher notices'), False, URL('audit','audit_teacher_mail_notifications_areas'), []),

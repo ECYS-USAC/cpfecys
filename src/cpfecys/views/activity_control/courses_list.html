@@ -1,40 +1,58 @@
 {{extend 'template.html'}}
 <div class="row-fluid">
-    <div class="well span12"  style="overflow:auto;">
-		<a onclick="window.history.back()" class="btn" ><i class="icon-arrow-left"></i>{{=T('Back')}}</a>
-        <table class="table-striped table-bordered" style="align:0 auto;">
-        <tr>
-          <td>
-          <form class="form-inline" 
-          action="{{=URL('activity_control','courses_list')}}" 
-            method='get'>
-                 <select name="period">
-                    {{for period in periods:}}
-                      <option value="{{=period.id}}">
-                      {{=T(period.period.name)}}-{{=period.yearp}}
-                      </option>
-                    {{pass}}
-                </select>
-                <input class="btn" type="submit" value="{{=T('Filter')}}">
-          </form>
-          </td>
-        </tr>
-        </table>
-
-        <h1>{{=T('Academic Control')}}
-			<br>
-			<small>{{=T(periodo.period.name)}} {{=str(periodo.yearp)}}</small>
-        </h1>
+	{{if auth.has_membership('Super-Administrator') or auth.has_membership('Ecys-Administrator'):}}
+    <div  style="overflow:auto;" class="well">
+    {{else:}}
+    	<div  style="overflow:auto;">
+    {{pass}}
+		<a onclick="window.history.back()" class="btn" >
+			<i class="icon-arrow-left"></i>
+			{{=T('Back')}}
+		</a>
+        
+		<center>
+			{{if auth.has_membership('Super-Administrator') or auth.has_membership('Ecys-Administrator'):}}
+		    <h2>{{=T('Academic Control')}}
+				<br>
+				<small>{{=T(periodo.period.name)}} {{=str(periodo.yearp)}}</small>
+	        </h2>
+		    {{else:}}
+		    <h2>{{=T('My Courses')}}
+				<br>
+				<small>{{=T(periodo.period.name)}} {{=str(periodo.yearp)}}</small>
+	        </h2>
+		    {{pass}}
+        
+    	</center>
         
         {{if auth.has_membership('Teacher') or auth.has_membership('Super-Administrator') or auth.has_membership('Ecys-Administrator'):}}
-        
-		<table class="table table-striped table-bordered">
-			<thead>
-				<tr>
-					<td colspan='6'  >
-						<div align="right">
+        <center>
+        <table style="align:0 auto;">
+        <tr>
+          <td>
+          	<br>
+	          <form class="form-inline" 
+	          action="{{=URL('activity_control','courses_list')}}" 
+	            method='get'>
+	                 <select name="period">
+	                    {{for period in periods:}}
+	                    	{{if str(period.id) == str(request.vars['period']):}}
+								{{var_sel="selected='selected'"}}
+							{{else:}}
+								{{var_sel=''}}
+							{{pass}}
+	                      <option value="{{=period.id}}" {{=var_sel}}>
+	                      {{=T(period.period.name)}}-{{=period.yearp}}
+	                      </option>
+	                    {{pass}}
+	                </select>
+	                <input class="btn" type="submit" value="{{=T('Go')}}">
+	          </form>
+          </td>
+          <td>
+          	<div align="right" >
 							<table class="table-bordered">
-								<tr>
+								
 									<td>
 										<small>
 											<br>
@@ -51,73 +69,150 @@
 								</tr>
 							</table>
 						</div>
-					</td>
-					
-				</tr>
-				<tr>
+          </td>
+        </tr>
+        </table>
+		<table>
+		
+		{{if auth.has_membership('Super-Administrator') or auth.has_membership('Ecys-Administrator'):}}
+		<table class="table table-striped table-bordered">
+			<thead>
+				<tr bgcolor="#F2F2F2">
 					<th width="50%">{{=T('Course')}}<br><br></th>
-					<th width="20%">{{=T('Section')}}<br><br></th>
+					<th width="20%"><center>{{=T('Section')}}<br><br></center></th>
 					<th width="10%" style="white-space:inherit;"><center>{{=T('Course Average')}}</center></th>
-					<th  width="10%" style="white-space:inherit;"><center>{{=T('Laboratory Average')}}</center></th>
-					<th width="10%"><center>{{=T('View')}}<br><br></center></th>
+					<th width="10%" style="white-space:inherit;"><center>{{=T('Laboratory Average')}}</center></th>
+					<th width="10%"><center>{{=T('Grades Management')}}<br><br></center></th>
 				</tr>
 			</thead>
+			{{pass}}
 			<tbody>
 				{{for course in coursesAdmin:}}
 				<tr>
 					{{if auth.has_membership('Teacher'):}}
-						<td>{{=split_name(course.user_project.project.name)}}</td>
-						<td>{{=split_section(course.user_project.project.name)}}</td>
-						<td>
-							<div id="label_average_{{=course.user_project.project.id}}"><center>{{=T('Calculating')}}...</center></div>
-							<script type="text/javascript">
-								 $("#label_average_{{=course.user_project.project.id}}").load("{{=URL('activity_control','semaphore.load')}}?project={{=course.user_project.project.id}}&amp;period={{=periodo.id}}&amp;laboratory=False");
-							</script>
-							<center>
-								<span id="average_course_{{=course.user_project.project.id}}" >
+					<td>
+						<div class="navbar">
+							<div class="navbar-inner">
+								<center><h4>{{=split_name(course.user_project.project.name)}}</h4></center>
+							</div>
+						</div>
+						<div class="well">
+						<table>
+							<tr>
+								<td width="35%">
+									<br>
+									<b>Seccion:</b> {{=split_section(course.user_project.project.name)}}
+									
+									<br>
+									<b>{{=T('Course Average')}}:</b>
+									<span id="average_course_{{=course.user_project.project.id}}" >
+									</span>
+									<font id="label_average_{{=course.user_project.project.id}}">{{=T('Calculating')}}...</font>
+									<br>
+									<script type="text/javascript">
+										 $("#label_average_{{=course.user_project.project.id}}").load("{{=URL('activity_control','semaphore.load')}}?project={{=course.user_project.project.id}}&amp;period={{=periodo.id}}&amp;laboratory=False");
+									</script>
+									<b>{{=T('Laboratory Average')}}:</b>
+									<span id="average_lab_{{=course.user_project.project.id}}" >
+										{{=T('Calculating')}}...
+										</span>
+									
+								{{else:}}
 
-          						</span>
-							</center>
-						</td>
-						<td>
-							<center>
-								<span id="average_lab_{{=course.user_project.project.id}}" >
-									{{=T('Calculating')}}...
-	          					</span>
-          					</center>
-						</td>
-					{{else:}}
-						<td>{{=split_name(course.name)}}</td>
-						<td>{{=split_section(course.name)}}</td>
-						<td>
-							<div id="label_average_{{=course.id}}"><center>{{=T('Calculating')}}...</center></div>
-							<script type="text/javascript">
-								 $("#label_average_{{=course.id}}").load("{{=URL('activity_control','semaphore.load')}}?project={{=course.id}}&amp;period={{=periodo.id}}&amp;laboratory=False");
-							</script>
-							<center>
-								<span id="average_course_{{=course.id}}" >
+									<td>{{=split_name(course.name)}}</td>
+									<td>{{=split_section(course.name)}}</td>
+									<td>
+										<div id="label_average_{{=course.id}}"><center>{{=T('Calculating')}}...</center></div>
+										<script type="text/javascript">
+											 $("#label_average_{{=course.id}}").load("{{=URL('activity_control','semaphore.load')}}?project={{=course.id}}&amp;period={{=periodo.id}}&amp;laboratory=False");
+										</script>
+										<center>
+											<span id="average_course_{{=course.id}}" >
 
-          						</span>
-							</center>
-						</td>
-						<td>
-							<center>
-								<span id="average_lab_{{=course.id}}" >
-									{{=T('Calculating')}}...
-	          					</span>
-          					</center>
-						</td>
-					{{pass}}
+			          						</span>
+										</center>
+									</td>
+									<td>
+										<center>
+											<span id="average_lab_{{=course.id}}" >
+												{{=T('Calculating')}}...
+				          					</span>
+			          					</center>
+									</td>
+								{{pass}}
+							</td>
+
+					{{if auth.has_membership('Super-Administrator') or auth.has_membership('Ecys-Administrator'):}}
+
 					<td>
 						<center>
-							{{if auth.has_membership('Super-Administrator'):}}
-							<a class="btn" href="{{=URL('activity_control', 'students_control', vars=dict(project = course.id, period=periodo.id))}}">{{=T('Sign in')}}
-							{{else:}}
-							<a class="btn" href="{{=URL('activity_control', 'students_control', vars=dict( project = course.user_project.project, period=periodo.id))}}">{{=T('Sign in')}}
-							{{pass}}
+							<a title="{{=T('Grades Management')}}" class="btn" href="{{=URL('activity_control', 'students_control', vars=dict(project = course.id, period=periodo.id))}}">
+								<img src="{{=URL('static','images')}}/academic_control/time3.png" height="32" width="32">
 							</a>
 						</center>
 					</td>
+					{{else:}}
+					<td colspan="4">
+						<table>
+							<tr>
+								<td width="20%">
+									<center>
+										<a class="btn" href="{{=URL('student_academic', 'academic_assignation', vars=dict(assignation = course.user_project.project))}}">
+											<img src="{{=URL('static','images')}}/academic_control/users6.png" height="32" width="32">							
+										</a><br>
+										<a href="{{=URL('student_academic', 'academic_assignation', vars=dict(assignation = course.user_project.project))}}">
+											{{=T('List of Students')}}	
+										</a>
+									</center>
+								</td>
+								<td width="20%">
+									<center>
+										<a class="btn" href="{{=URL('activity_control', 'students_control', vars=dict( project = course.user_project.project, period=periodo.id))}}">
+											<img src="{{=URL('static','images')}}/academic_control/time3.png" height="32" width="32">
+										</a><br>
+										<a href="{{=URL('activity_control', 'students_control', vars=dict( project = course.user_project.project, period=periodo.id))}}">
+											{{=T('Grades Management')}}
+										</a>
+									</center>
+								</td>
+								<td width="20%">
+									<center>
+										<a class="btn" href="{{=URL('notification', 'teacher_mail_notifications', vars=dict( assignation = course.user_project.project, period=periodo.id))}}">
+											<img src="{{=URL('static','images')}}/academic_control/send4.png" height="32" width="32">
+										</a><br>
+										<a href="{{=URL('notification', 'teacher_mail_notifications', vars=dict( assignation = course.user_project.project, period=periodo.id))}}">
+											{{=T('Send Notice')}}
+										</a>
+									</center>
+								</td>
+								<td width="20%">
+									<center>
+										<a class="btn" href="{{=URL('notification', 'teacher_register_mail_notifications', vars=dict( project = course.user_project.project, period=periodo.id, type = 'course_list'))}}">
+											<img src="{{=URL('static','images')}}/academic_control/envelope33.png" height="32" width="32">
+										</a><br>
+										<a  href="{{=URL('notification', 'teacher_register_mail_notifications', vars=dict( project = course.user_project.project, period=periodo.id, type = 'course_list'))}}">
+											{{=T('Register Notices')}}
+										</a>
+									</center>
+								</td>
+								<td width="20%">
+									<center>
+										{{assignation_var = db((db.user_project.project==course.user_project.project)&(db.user_project.assigned_user==auth.user.id)&(db.user_project.period==periodo.id)).select().first()}}
+										<a class="btn" href="{{=URL('library', 'file_managers', vars=dict( pro = assignation_var.id, tipo='3'))}}">
+											<img src="{{=URL('static','images')}}/academic_control/file96.png" height="32" width="32">
+										</a><br>
+										<a  href="{{=URL('library', 'file_managers', vars=dict( pro = assignation_var.id, tipo='3'))}}">
+											{{=T('Library')}}
+										</a>
+									</center>
+								</td>
+							</tr>
+						</table>
+					</td>
+					{{pass}}
+				{{if auth.has_membership('Teacher'):}}
+				</table></div></td>
+				{{pass}}
 				</tr>
 				{{pass}}
 			</tbody>

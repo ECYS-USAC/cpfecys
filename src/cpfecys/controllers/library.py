@@ -100,8 +100,14 @@ def file_managers():
             nameYear = year.yearp
             
 
-            rproject = db((db.user_project.assigned_user==auth.user.id)&(db.user_project.period==year.id)&(db.user_project.id==pro)).select().first()
-            if rproject is None:
+            rproject = db((db.user_project.assigned_user==auth.user.id)&(db.user_project.period==year.id)).select().first()
+            this_project = db((db.user_project.id==pro)).select().first()
+            none_access = False
+            for var_project in rproject:
+                if(rproject.project.id == this_project.project.id):
+                    none_access = True
+
+            if none_access == False:
                 session.flash = T('Not valid Action.')
                 redirect(URL('default', 'index'))
 
