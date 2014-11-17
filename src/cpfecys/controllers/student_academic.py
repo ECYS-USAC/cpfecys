@@ -9,6 +9,97 @@
 ## - call exposes all registered services (none by default)
 #########################################################################
 @auth.requires_login()
+@auth.requires_membership('Super-Administrator')
+def student_validation_parameters_fields():
+    svp=db(db.validate_student).select().first()
+    if svp is not None:
+        db.validate_student_parameters.validate_student.default = svp.id
+        db.validate_student_parameters.validate_student.writable = False
+        db.validate_student_parameters.validate_student.readable = False
+        grid = SQLFORM.grid(db.validate_student_parameters, csv=False)
+        return dict(grid=grid)
+    else:
+        session.flash = T('Not valid Action.')
+        redirect(URL('default','index'))
+
+
+@auth.requires_login()
+@auth.requires_membership('Super-Administrator')
+def student_validation_parameters():
+    svp=db(db.validate_student).select().first()
+    db.validate_student.id.writable = False
+    db.validate_student.id.readable = False
+    if svp is None:
+        grid = SQLFORM.grid(db.validate_student, csv=False, paginate=1, searchable=False)
+    else:
+        links = [lambda row: A(T('Fields of Student Validation Parameters'),
+        _role='label',
+        _href=URL('student_academic', 'student_validation_parameters_fields'),
+        _title=T('Fields of Student Validation Parameters'))]
+        grid = SQLFORM.grid(db.validate_student, csv=False, paginate=1, create=False, searchable=False, links=links)
+    return dict(grid=grid)
+
+
+@auth.requires_login()
+@auth.requires(auth.has_membership('Student') or auth.has_membership('Teacher') or auth.has_membership('Super-Administrator') or auth.has_membership('Ecys-Administrator'))
+def check_student(check_carnet):
+    svp=db(db.validate_student).select().first()
+    if svp is not None:
+        try:
+            #CONSUME THE WEBSERVICE
+            from gluon.contrib.pysimplesoap.client import SoapClient
+            from gluon.contrib.pysimplesoap.client import SimpleXMLElement
+            client = SoapClient(
+                location = svp.supplier,
+                action = svp.supplier+"/"+svp.action_service,
+                namespace = svp.supplier,
+                soap_ns=svp.type_service, trace = True, ns = False)
+
+            import cpfecys
+            year = cpfecys.current_year_period()
+            sent="<"+svp.send+">"
+            for svpf in db(db.validate_student_parameters).select():
+                sent +="<"+svpf.parameter_name_validate+">"+svpf.parameter_value_validate+"</"+svpf.parameter_name_validate+">"
+            sent += "<CARNET>"+str(check_carnet)+"</CARNET><CICLO>"+str(year.yearp)+"</CICLO></"+svp.send+">"
+            back = client.call(svp.action_service,xmlDatos=sent)
+
+            #PREPARE FOR RETURNED XML WEB SERVICE
+            xml = back.as_xml()
+            print xml
+            xml=xml.replace('&lt;','<')
+            xml=xml.replace('&gt;','>')
+            inicio = xml.find("<"+svp.receive+">")
+            final = xml.find("</"+svp.receive+">")
+            xml = xml[inicio:(final+17)]
+            import xml.etree.ElementTree as ET
+            root = ET.fromstring(xml)
+            xml = SimpleXMLElement(xml)
+
+            #VARIABLE TO CHECK THE CORRECT FUNCTIONING
+            CARNET = xml.CARNET
+            NOMBRES = xml.NOMBRES
+            APELLIDOS= xml.APELLIDOS
+            CORREO = xml.CORREO
+            if (CARNET is None or CARNET=='') and (NOMBRES is None or NOMBRES=='') and (APELLIDOS is None or APELLIDOS=='') and (CORREO is None or CORREO==''):
+                return dict(flag=False)
+            else:
+                isStuden=False
+                for c in root.findall('CARRERA'):
+                    if c.find('UNIDAD').text=="08" and c.find('EXTENSION').text=="00" and (c.find('CARRERA').text=="05" or c.find('CARRERA').text=="09"):
+                        isStuden=True
+
+                if isStuden==False:
+                    return dict(flag=False)
+                else:
+                    return dict(flag=True, carnet=int(str(CARNET)), nombres=str(NOMBRES), apellidos=str(APELLIDOS), correo=str(CORREO))
+        except:
+            return dict(flag=False)
+    else:
+        return dict(flag=False)
+
+
+
+@auth.requires_login()
 @auth.requires(auth.has_membership('Student') or auth.has_membership('Teacher'))
 def attendance_list():
     if request.vars['list'] != None:
@@ -759,6 +850,16 @@ def oncreate_academic(form):
                                 id_academic = form.vars.id, 
                                 id_period = str(currentyear_period.id),
                                 description = 'Se agrego registro desde la pagina agregar estudiantes.')
+
+    #Probar funcion
+    check_student(form.vars.carnet)
+
+
+
+
+
+     
+
 
 def onupdate_academic(form):
     import datetime

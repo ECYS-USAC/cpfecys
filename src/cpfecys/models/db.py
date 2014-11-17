@@ -1248,6 +1248,20 @@ db.define_table('course_ended',
     Field('finish', 'boolean', notnull=True, label = T('Finish'))
 )
 
+db.define_table('validate_student',
+    Field('supplier', 'string', notnull=True, label=T('Supplier')),
+    Field('action_service', 'string', notnull=True, label=T('Action')),
+    Field('type_service', 'string', notnull=True, label=T('Type Service')),
+    Field('send', 'string', notnull=True, label=T('Send')),
+    Field('receive', 'string', notnull=True, label=T('Receive'))
+)
+
+db.define_table('validate_student_parameters',
+    Field('validate_student', 'reference validate_student', notnull=True, label=T('Student Validation Parameters')),
+    Field('parameter_name_validate', 'string', notnull=True, label=T('Parameter Name')),
+    Field('parameter_value_validate', 'string', notnull=True, label=T('Parameter_Value'))
+)
+
 ## after defining tables, uncomment below to enable auditing
     # auth.enable_record_versioning(db)
 # automatic forcing spanish language

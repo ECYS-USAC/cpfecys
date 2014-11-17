@@ -184,6 +184,21 @@
 						{{pass}}
 						<!--Validate Laboratory option-->
 
+						 <!--Laboratory replacing option-->
+						{{if request.vars['type']=="lab":}}
+							{{if float(total_var2) == 100:}}
+				  				<li>
+									<a  tabindex="-1" title="{{=T('Laboratory replacing')}}" aria-hidden="true" href="{{=URL('activity_control', 'laboratory_replacing',vars=dict(project = request.vars['project'], year = request.vars['year']))}}" >
+							{{else:}}
+								<li class="disabled">
+									<a  tabindex="-1" title="{{=T('Laboratory replacing')}}">
+							{{pass}}
+								<span class="icon-check"></span>{{=T('Laboratory replacing')}}
+								</a>
+							</li>
+						{{pass}}
+						<!--Laboratory replacing option-->
+
 					{{if auth.has_membership('Student') and request.vars['type']=="lab":}}
 					     <!--Change request option-->
 				    	{{if var_do == 'false' and float(total_var2) == 100:}}
@@ -219,6 +234,21 @@
 					</li>
 				{{pass}}
 				<!--Validate Laboratory option-->
+
+				<!--Laboratory replacing option-->
+				{{if request.vars['type']=="lab":}}
+					{{if float(total_var2) == 100:}}
+		  				<li>
+							<a  tabindex="-1" title="{{=T('Laboratory replacing')}}" aria-hidden="true" href="{{=URL('activity_control', 'laboratory_replacing',vars=dict(project = request.vars['project'], year = request.vars['year']))}}" >
+					{{else:}}
+						<li class="disabled">
+							<a  tabindex="-1" title="{{=T('Laboratory replacing')}}">
+					{{pass}}
+						<span class="icon-check"></span>{{=T('Laboratory replacing')}}
+						</a>
+					</li>
+				{{pass}}
+				<!--Laboratory replacing option-->
 			{{pass}}
 		{{pass}}
 

@@ -1,0 +1,27 @@
+{{extend 'template.html'}}
+<div>
+	<a href="{{=URL('activity_control', 'students_control', vars=dict(project = project.id, period = year.id))}}" class="btn" ><i class="icon-arrow-left"></i> {{=T('Back')}}</a>
+</div>
+<h2>
+	{{=T('Laboratory replacing')}}
+	<br>
+	<small>
+		{{=project.name}} - {{=T(year.period.name)}} {{=str(year.yearp)}}
+    </small>
+</h2>
+{{=grid}}
+<script type="text/javascript">
+	$(document).ready(function(){
+		$("#validate_laboratory_carnet").find('option').remove().end();
+		var lista=document.getElementById("validate_laboratory_carnet");
+		lista.options.add(new Option("",""));
+		{{for students in students:}}
+			lista.options.add(new Option({{=str(students.carnet.carnet)}},{{=students.carnet}}));
+		{{pass}}
+	});
+	
+	$("#submit_record__row").empty();
+	$("#submit_record__row").append("<td class=\"w2p_fl\"><label>{{=T('Description of Request Change')}}:</label></td>");
+	$("#submit_record__row").append("<td class=\"w2p_fw\"><textarea class=\"string\" cols=\"40\" type=\"text\" value=\"\" id=\"description_request\" name=\"description_request\" style=\"width:280px; height:100px;\"></textarea><br><input type=\"submit\" value=\"Continuar\" /></td>");
+	$("#submit_record__row").append("<td class=\"w2p_fc\"></td>");
+</script>
