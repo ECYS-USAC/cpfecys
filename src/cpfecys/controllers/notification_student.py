@@ -110,7 +110,10 @@ def inbox_student_mails_load():
 def send_mail():        
     import cpfecys
     cperiod = cpfecys.current_year_period()
-    period_id = cperiod.id
+    if request.vars['semester_id'] is None:
+        period_id = cperiod.id
+    else:
+        period_id = request.vars['semester_id'] 
     period_list = []
     if (request.args(0) == 'send'):
         email = request.vars['mail']
@@ -176,7 +179,12 @@ def send_mail():
 @auth.requires_membership('Academic')
 def sent_mails():        
     import cpfecys
-    cperiod = cpfecys.current_year_period()
+    all_course = True
+    if request.vars['period'] is None:
+        cperiod = cpfecys.current_year_period()
+    else:
+        all_course = False
+        cperiod = db.period_year(db.period_year.id == request.vars['period'])
 
     academic_var = db.academic(db.academic.id_auth_user==auth.user.id)        
     period_list = db(db.academic_course_assignation.carnet==academic_var.id).select(db.academic_course_assignation.semester,distinct=True)
@@ -186,11 +194,12 @@ def sent_mails():
     if select_form.accepts(request.vars,formname='select_form'):
         assignations = db((db.academic_course_assignation.semester==str(select_form.vars.semester_id)) & (db.academic_course_assignation.carnet==academic_var.id)).select()
         period_id = str(select_form.vars.semester_id)
+        all_course = True
     else:
         assignations = db((db.academic_course_assignation.semester==cperiod.id) & (db.academic_course_assignation.carnet==academic_var.id)).select()
         period_id = str(cperiod.id)
 
-    return dict(assignations=assignations,email=auth.user.email,period_id=period_id,period_list=period_list,cperiod=cperiod.id)
+    return dict(assignations=assignations,email=auth.user.email,period_id=period_id,period_list=period_list,cperiod=cperiod.id, all_course = all_course)
 
 
 @auth.requires_login()

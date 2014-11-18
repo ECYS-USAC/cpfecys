@@ -10,7 +10,12 @@
             method='get'>
                  <select name="period">
                     {{for period in periods:}}
-                      <option value="{{=period.id}}">
+                        {{if str(period.id) == str(request.vars['period']):}}
+                            {{var_sel="selected='selected'"}}
+                        {{else:}}
+                            {{var_sel=''}}
+                        {{pass}}
+                      <option value="{{=period.id}}" {{=var_sel}}>
                       {{=T(period.period.name)}}-{{=period.yearp}}
                       </option>
                     {{pass}}
@@ -22,6 +27,7 @@
         </table>
         <table class="table table-striped table-bordered">
         {{for project in projects:}}
+        {{if (str(project.project.id)==request.vars['project'])or(request.vars['type']==None):}}
         <tr>
             <td>
                 <b>{{=project.project.name}}</b>
@@ -38,6 +44,7 @@
                 <br>
             </td>
         </tr>
+        {{pass}}
         {{pass}}
         </table>
     </div>

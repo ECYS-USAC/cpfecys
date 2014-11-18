@@ -287,7 +287,34 @@ def courses_list():
     import cpfecys
     #Obtain the current period of the system and all the register periods
     period = cpfecys.current_year_period()
-    periods = db(db.period_year).select()
+    
+    if auth.has_membership('Academic'):
+        academic_var = db.academic(db.academic.id_auth_user==auth.user.id)
+    pass
+
+    if(auth.has_membership('Super-Administrator') or auth.has_membership('Ecys-Administrator')):
+        periods = db(db.period_year).select()
+    else:
+        periods_temp = db(db.period_year).select()
+        periods = []
+        for period_temp in periods_temp:
+            added = False
+            if auth.has_membership('Student') or auth.has_membership('Teacher'):
+                try:
+                    if db((db.user_project.assigned_user == auth.user.id) & (db.user_project.period == period_temp.id)).select().first() is not None:
+                        periods.append(period_temp)
+                        added = True
+                except:
+                    None
+            if auth.has_membership('Academic'):
+                try:
+                    if db((db.academic_course_assignation.carnet==academic_var.id)&(db.academic_course_assignation.semester==period_temp.id)).select().first() is not None:
+                        if added == False:
+                            periods.append(period_temp)
+
+                except:
+                    None
+
 
     def split_name(project):
         try:
@@ -308,8 +335,7 @@ def courses_list():
 
     #Check if the period is change
     if request.vars['period'] is None:
-        period = cpfecys.current_year_period()
-        periods = db(db.period_year).select()
+        None
     else:
         if request.vars['period']!='':
             period = request.vars['period']

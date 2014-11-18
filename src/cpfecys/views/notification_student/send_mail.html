@@ -55,7 +55,16 @@
 						{{for assignation in assignations:}}
 							<tr>
 				   	  		 	<td>
-				   	  				<input type="checkbox" class="tipo_trigger" name="course_list" id="c_l_{{=assignation.assignation.id}}" value="all">
+				   	  				<input type="checkbox" class="tipo_trigger" name="course_list" id="c_l_{{=assignation.assignation.id}}" value="all"
+				   	  				{{if str(assignation.assignation.id) == request.vars['project']:}}
+				   	  				 	checked>
+				   	  				 	<script type="text/javascript">
+				   	  				 		document.getElementById('var_course').value = "{{=assignation.assignation.name}}";
+				   	  				 	</script>
+				   	  				 {{else:}}
+				   	  				 	>
+				   	  				 {{pass}}
+				   	  				 
 				   	  			</td>
 				   	  			<td >
 			   	  		    		{{=assignation.assignation.name}}
@@ -80,7 +89,7 @@
 									
 								})	
 				   	  		</script>
-				   	  					   	  		
+				   	  		
 						{{pass}}
 				  	</table>
 				  </div>
@@ -88,16 +97,22 @@
 				</td>
 				<td><p>&nbsp;&nbsp;</p></td>
 					<td>
+						<br>
+						<br>
 						{{for assignation in assignations:}}
-							<div id="course_members_{{=assignation.assignation.id}}" style="display: none;">
+							<div id="course_members_{{=assignation.assignation.id}}" 
+							{{if str(assignation.assignation.id) != request.vars['project']:}}
+		   	  				 	style="display: none;"
+		   	  				{{pass}}
+		   	  				 >
 								<table>
 									<tr>									
 										<td>
 											<h3><small>{{=T('Academic Tutor')}}</small></h3>
-											<div style="overflow:auto; width:75%; height:150px;">
+											<div style="overflow:auto; width:100%; height:150px;">
 											   	<!--course_members-->
-											   	<table class="table-striped table-bordered">							   		
-											   		{{for memb in db((db.user_project.period==cperiod.id) & (db.user_project.project==assignation.assignation.id) & (db.user_project.assigned_user == db.auth_membership.user_id) & (db.auth_membership.group_id==2) ).select():}}
+											   	<table class="table-striped table-bordered">
+											   		{{for memb in db((db.user_project.period==period_id) & (db.user_project.project==assignation.assignation.id) & (db.user_project.assigned_user == db.auth_membership.user_id) & (db.auth_membership.group_id==2) ).select():}}
 													  	<tr>
 													  	  <td>
 														    <input type="checkbox" 
@@ -105,7 +120,7 @@
 														    value="{{=memb.user_project.assigned_user.id}}">
 														  </td>
 														  <td>
-														  	{{=memb.user_project.assigned_user.first_name}} {{=memb.user_project.assigned_user.last_name}}
+														  	{{=memb.user_project.assigned_user.first_name}} {{=memb.user_project.assigned_user.last_name}} 
 														  </td>
 														</tr>
 												  	{{pass}}
@@ -117,7 +132,7 @@
 											<div style="overflow:auto; width:75%; height:150px;">
 											   	<!--course_members-->
 											   	<table class="table-striped table-bordered">							   		
-											   		{{for memb in db((db.user_project.period==cperiod.id) & (db.user_project.project==assignation.assignation.id) & (db.user_project.assigned_user == db.auth_membership.user_id) & (db.auth_membership.group_id==3) ).select():}}
+											   		{{for memb in db((db.user_project.period==period_id) & (db.user_project.project==assignation.assignation.id) & (db.user_project.assigned_user == db.auth_membership.user_id) & (db.auth_membership.group_id==3) ).select():}}
 													  	<tr>
 													  	  <td>
 														    <input type="checkbox" 
@@ -136,7 +151,6 @@
 									</tr>
 								</table>
 							</div>
-
 						{{pass}}
 					</td>
 				

@@ -49,7 +49,17 @@ def teacher_register_mail_notifications():
 #db.user_project.assigned_user == auth.user.id
     #Obtain the current period of the system and all the register periods
     period = cpfecys.current_year_period()
-    periods = db(db.period_year).select()
+
+    periods_temp = db(db.period_year).select()
+    periods = []
+    for period_temp in periods_temp:
+        if auth.has_membership('Student') or auth.has_membership('Teacher'):
+            try:
+                if db((db.user_project.assigned_user == auth.user.id) & (db.user_project.period == period_temp.id)).select().first() is not None:
+                    periods.append(period_temp)
+            except:
+                None
+        
 
     #Check if the period is change
     if request.vars['period'] !=None:
@@ -270,6 +280,7 @@ def teacher_mail_notifications():
 
     year = db.period_year(id=check.period)
     year_semester = db.period(id=year.period)
+    period = check.period
     var=""
     if (request.args(0) == 'send'):
         #Tipo estudiante al que se le enviara el correo
@@ -573,7 +584,15 @@ def register_mail_notifications_detail():
 def register_mail_notifications():
     #Obtain the current period of the system and all the register periods
     period = cpfecys.current_year_period()
-    periods = db(db.period_year).select()
+    periods_temp = db(db.period_year).select()
+    periods = []
+    for period_temp in periods_temp:
+        if auth.has_membership('Student') or auth.has_membership('Teacher'):
+            try:
+                if db((db.user_project.assigned_user == auth.user.id) & (db.user_project.period == period_temp.id)).select().first() is not None:
+                    periods.append(period_temp)
+            except:
+                None
 
     #Check if the period is change
     if request.vars['period'] !=None:
@@ -738,6 +757,7 @@ def mail_notifications():
     else:
         session.last_assignation = check.id
 
+    period = check.period
 
     year = db.period_year(id=check.period)
     year_semester = db.period(id=year.period)
