@@ -127,8 +127,20 @@
                     <br>
                 {{pass}}
             </tr>
+            {{if auth.has_membership('Ecys-Administrator') or auth.has_membership('Super-Administrator') or auth.has_membership('Teacher') or auth.has_membership('Student'):}}
+                <tr>
+                    <td>
+                        <b>{{=T('Laboratory')}}</b>
+                    </td>
+                    <td>
+                        <a href="#RevalidationsModal" role="button" data-toggle="modal">{{=T('Revalidations:')}} {{=str(db((db.validate_laboratory.semester==year.id)&(db.validate_laboratory.project==project.id)&(db.validate_laboratory.validation_type==True)).count())}}</a>
+                    </td>
+                    <td>
+                        <a href="#ReplacementModal" role="button" data-toggle="modal">{{=T('Replacements:')}} {{=str(db((db.validate_laboratory.semester==year.id)&(db.validate_laboratory.project==project.id)&(db.validate_laboratory.validation_type==False)).count())}}</a>
+                    </td>
+                </tr>
+            {{pass}}
         </table>
-        <br>
         
 
         {{if request.vars['type']  == 'class':}}
@@ -983,3 +995,103 @@
     }
 
 </script>
+
+
+{{if auth.has_membership('Ecys-Administrator') or auth.has_membership('Super-Administrator') or auth.has_membership('Teacher') or auth.has_membership('Student'):}}
+    <!--Validate Laboratory-->
+    <div id="RevalidationsModal" class="modal hide fade" tabindex="-1" role="dialog"
+    aria-labelledby="myModalLabel" aria-hidden="true">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+          <h3 id="myModalLabel">
+              {{=T('Validate Laboratory')}}
+          </h3>
+      </div>
+      <div class="modal-body">
+        <div class="well">
+            <div align="right">
+                <a  class = "btn btn-success" title="{{=T('Go to Laboratory Revalidation')}}" href="{{=URL('activity_control', 'validate_laboratory',vars=dict(project = project.id, year = year.id))}}" >
+                    <span class="icon-white icon-check"></span>  {{=T('Validate Laboratory')}}
+                </a>
+            </div>
+            <table class="table table-bordered ">
+                <thead>
+                    <tr>
+                        <th>
+                            Carnet
+                        </th>
+                        <th>
+                            Nota
+                        </th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {{for revalidation in db((db.academic.id==db.validate_laboratory.carnet)&(db.validate_laboratory.semester==year.id)&(db.validate_laboratory.project==project.id)&(db.validate_laboratory.validation_type==True)).select(orderby=db.academic.carnet):}}
+                    <tr>
+                        <td>
+                            {{=str(revalidation.validate_laboratory.carnet.carnet)}}
+                        </td>
+                        <td>
+                            {{=str(revalidation.validate_laboratory.grade)}}
+                        </td>
+                    </tr>
+                    {{pass}}
+                </tbody>
+            </table>
+        </div>
+      </div>
+      <div class="modal-footer">
+          <button class="btn" data-dismiss="modal" aria-hidden="true">{{=T('Close')}}</button>
+      </div>
+    </div>
+    <!--Validate Laboratory-->
+
+
+    <!--Laboratory replacing-->
+    <div id="ReplacementModal" class="modal hide fade" tabindex="-1" role="dialog"
+    aria-labelledby="myModalLabel" aria-hidden="true">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+          <h3 id="myModalLabel">
+              {{=T('Laboratory replacing')}}
+          </h3>
+      </div>
+      <div class="modal-body">
+        <div class="well">
+            <div align="right">
+                <a  class = "btn btn-success" title="{{=T('Go to Replacement Laboratory')}}" href="{{=URL('activity_control', 'laboratory_replacing',vars=dict(project = project.id, year = year.id))}}" >
+                    <span class="icon-white icon-certificate"></span>  {{=T('Laboratory replacing')}}
+                </a>
+            </div>
+            <table class="table table-bordered ">
+                <thead>
+                    <tr>
+                        <th>
+                            Carnet
+                        </th>
+                        <th>
+                            Nota
+                        </th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {{for revalidation in db((db.academic.id==db.validate_laboratory.carnet)&(db.validate_laboratory.semester==year.id)&(db.validate_laboratory.project==project.id)&(db.validate_laboratory.validation_type==False)).select(orderby=db.academic.carnet):}}
+                    <tr>
+                        <td>
+                            {{=str(revalidation.validate_laboratory.carnet.carnet)}}
+                        </td>
+                        <td>
+                            {{=str(revalidation.validate_laboratory.grade)}}
+                        </td>
+                    </tr>
+                    {{pass}}
+                </tbody>
+            </table>
+        </div>
+      </div>
+      <div class="modal-footer">
+          <button class="btn" data-dismiss="modal" aria-hidden="true">{{=T('Close')}}</button>
+      </div>
+    </div>
+    <!--Laboratory replacing-->
+{{pass}}

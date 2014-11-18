@@ -3,13 +3,76 @@
 	<a href="{{=URL('activity_control', 'students_control', vars=dict(project = project.id, period = year.id))}}" class="btn" ><i class="icon-arrow-left"></i> {{=T('Back')}}</a>
 </div>
 <h2>
-	{{=T('Laboratory replacing')}}
+	{{=T('Laboratory replacing')}} <a href="#myModalReplacing" role="button" class="btn btn-primary"data-toggle="modal"><span class="icon-white icon-question-sign"></span></a>
 	<br>
 	<small>
 		{{=project.name}} - {{=T(year.period.name)}} {{=str(year.yearp)}}
     </small>
 </h2>
+
+
+<!--Help button and help content-->
+<div id="myModalReplacing" class="modal hide fade" tabindex="-1" role="dialog"
+aria-labelledby="myModalLabel" aria-hidden="true">
+  <div class="modal-header">
+    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+      <h3 id="myModalLabel">
+          <span class="icon-question-sign"></span>{{=T('Help')}} {{=T('Laboratory replacing')}}
+      </h3>
+  </div>
+  <div class="modal-body">
+    <div class="well">
+        <p>
+            {{=T('Within this space you can create, edit or delete records from laboratory replacements.')}}
+        </p>
+        <p>
+            {{=T('Laboratory replacements are substitutions approved lab in class by the student.')}}
+        </p>
+        <p>
+            {{=T('Laboratory replacement example:')}}
+            <br>
+            *) {{=T('Laboratories of India')}}
+        </p>
+    </div>
+  </div>
+  <div class="modal-footer">
+      <button class="btn" data-dismiss="modal" aria-hidden="true">{{=T('Close')}}</button>
+  </div>
+</div>
+<!--Help button and help content-->
+
+
+<!--Replacement point modal laboratory-->
+<div id="modaltheme" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true" > 
+    <div id ="a" class="modal-header">
+      <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+        <h3 id="myModalLabel">
+            {{=T('Reason for Replacement Laboratory')}}
+        </h3>
+    </div>
+    <div class="modal-body">
+      <div class="well" id="Show_theme">
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn" data-dismiss="modal" aria-hidden="true">{{=T('Close')}}</button>
+    </div>
+</div>
+<!--Replacement point modal laboratory-->
+
+
+<!--Button that redirects to validate laboratory-->
+<div align="right">
+	<a  class = "btn btn-success" title="{{=T('Go to Laboratory Revalidation')}}" href="{{=URL('activity_control', 'validate_laboratory',vars=dict(project = project.id, year = year.id))}}" >
+		<span class="icon-white icon-check"></span>  {{=T('Validate Laboratory')}}
+	</a>
+</div>
+<!--Button that redirects to validate laboratory-->
+
+
 {{=grid}}
+
+
 <script type="text/javascript">
 	$(document).ready(function(){
 		$("#validate_laboratory_carnet").find('option').remove().end();
@@ -19,9 +82,14 @@
 			lista.options.add(new Option({{=str(students.carnet.carnet)}},{{=students.carnet}}));
 		{{pass}}
 	});
+
+  function set_values(carnet, theme){
+    jQuery('#Show_theme').empty();
+    $("#Show_theme").append("<pre>Estudiante:\n\t"+ carnet +"\n\n\nMotivo:\n\t"+theme+"</pre>");
+  }
 	
 	$("#submit_record__row").empty();
-	$("#submit_record__row").append("<td class=\"w2p_fl\"><label>{{=T('Description of Request Change')}}:</label></td>");
+	$("#submit_record__row").append("<td class=\"w2p_fl\"><label>{{=T('Reason for Replacement Laboratory')}}:</label></td>");
 	$("#submit_record__row").append("<td class=\"w2p_fw\"><textarea class=\"string\" cols=\"40\" type=\"text\" value=\"\" id=\"description_request\" name=\"description_request\" style=\"width:280px; height:100px;\"></textarea><br><input type=\"submit\" value=\"Continuar\" /></td>");
 	$("#submit_record__row").append("<td class=\"w2p_fc\"></td>");
 </script>

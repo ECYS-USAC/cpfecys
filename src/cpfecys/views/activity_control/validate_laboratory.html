@@ -10,6 +10,11 @@
     </small>
 </h2>
 <font Color="Red"><b>{{=T('Revalidation shall be valid only if the record exists in Computer Centre')}}</b></font>
+<div align="right">
+	<a  class = "btn btn-success" title="{{=T('Go to Replacement Laboratory')}}" href="{{=URL('activity_control', 'laboratory_replacing',vars=dict(project = project.id, year = year.id))}}" >
+		<span class="icon-white icon-certificate"></span>  {{=T('Laboratory replacing')}}
+	</a>
+</div>
 {{=grid}}
 <script type="text/javascript">
 	$(document).ready(function(){
@@ -21,14 +26,7 @@
 		{{pass}}
 	});
 	//Check if only the administrators have permition to change the revalidation
-    {{no_actionsAll=False}}
-    {{course_ended_var = db((db.course_ended.project==project.id) & (db.course_ended.period==year.id) ).select().first()}}
-    {{if course_ended_var != None:}}
-        {{if course_ended_var.finish == True:}}
-            {{no_actionsAll=True}}
-        {{pass}}
-    {{pass}}
-	{{if cpfecys.current_year_period().id != year.id or no_actionsAll==True:}}
+	{{if no_actionsAll==True:}}
 		$("#submit_record__row").empty();
 		$("#submit_record__row").append("<td class=\"w2p_fl\"><label>{{=T('Description of Request Change')}}:</label></td>");
 		$("#submit_record__row").append("<td class=\"w2p_fw\"><textarea class=\"string\" cols=\"40\" type=\"text\" value=\"\" id=\"description_request\" name=\"description_request\" style=\"width:280px; height:100px;\"></textarea><br><input type=\"submit\" value=\"Continuar\" /></td>");
