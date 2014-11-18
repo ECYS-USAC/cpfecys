@@ -4289,6 +4289,7 @@ def General_report_activities():
             session.flash = T('Not valid Action.')
             redirect(URL('default','index'))
 
+    tutor_access = False
     if auth.has_membership('Super-Administrator') == False and auth.has_membership('Ecys-Administrator')==False:
         assigantion = db((db.user_project.assigned_user == auth.user.id) & (db.user_project.period == year.id) & (db.user_project.project == project_var.id)).select().first()
         if assigantion is None:
@@ -4301,6 +4302,8 @@ def General_report_activities():
             except:
                 session.flash = T('Not valid Action.')
                 redirect(URL('default','index'))
+        else:
+            tutor_access = True
 
     #Check the correct parameters
     if (request.vars['type'] != 'class' and request.vars['type']!='lab'):
@@ -4610,7 +4613,8 @@ def General_report_activities():
                 requirement=requirement, 
                 course_ended = course_ended,
                 exception_s_var=exception_s_var,
-                exception_t_var=exception_t_var)
+                exception_t_var=exception_t_var,
+                tutor_access = tutor_access)
 
 
 @auth.requires_login()
