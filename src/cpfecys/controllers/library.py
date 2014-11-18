@@ -99,9 +99,14 @@ def file_managers():
             nameSemester = T(year_semester.name)
             nameYear = year.yearp
             
+            rproject = db((db.user_project.assigned_user==auth.user.id)&(db.user_project.period==year.id)).select()
+            this_project = db((db.user_project.id==pro)).select().first()
+            none_access = False
+            for var_project in rproject:
+                if(var_project.project.id == this_project.project.id):
+                    none_access = True
 
-            rproject = db((db.user_project.assigned_user==auth.user.id)&(db.user_project.period==year.id)&(db.user_project.id==pro)).select().first()
-            if rproject is None:
+            if none_access == False:
                 session.flash = T('Not valid Action.')
                 redirect(URL('default', 'index'))
 

@@ -27,7 +27,8 @@
 			<table class="table table-striped table-bordered" >
 				
 				<tbody>
-					{{for assignation in assignations:}}							
+					{{for assignation in assignations:}}
+					{{if ((all_course==True) or (str(assignation.assignation.id) == request.vars['project']) ):}}
 						<tr>
 							<td >
 									<table class="table table-striped table-bordered" >
@@ -48,6 +49,7 @@
 							</td>
 
 						</tr>
+					{{pass}}
 					{{pass}}
 				</tbody>
 			</table>

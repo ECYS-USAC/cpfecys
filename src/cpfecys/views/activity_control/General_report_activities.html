@@ -13,7 +13,7 @@
             
         </a>
         <ul class="nav pull-right">
-            {{if (request.vars['op']  == '2') and ((auth.has_membership('Ecys-Administrator') or auth.has_membership('Super-Administrator')) or (  ( auth.has_membership('Teacher') or (request.vars['type'] == 'class' and auth.has_membership('Student') and exception_s_var == True) ) ) and (course_ended == True)):}}
+            {{if (request.vars['op']  == '2') and ((auth.has_membership('Ecys-Administrator') or auth.has_membership('Super-Administrator')) or (  ( auth.has_membership('Teacher') or (request.vars['type'] == 'class' and auth.has_membership('Student') and (exception_s_var == True) and (tutor_access == True)) ) ) and (course_ended == True)):}}
                 <li>
                     <a  style="color:white;text-shadow:none;background:#01A9DB;" class="btn-btn" href="{{=URL('activity_control', 'course_first_recovery_test',vars=dict(project = request.vars['project'], year = request.vars['period']))}}">
                         <span class="icon-white icon-cog"></span>
@@ -24,7 +24,7 @@
                 </li>
             {{pass}}
 
-            {{if (request.vars['op']  == '3') and ((auth.has_membership('Ecys-Administrator') or auth.has_membership('Super-Administrator')) or (  ( auth.has_membership('Teacher') or (request.vars['type'] == 'class' and auth.has_membership('Student') and exception_s_var == True) ) ) and (course_ended == True)):}}
+            {{if (request.vars['op']  == '3') and ((auth.has_membership('Ecys-Administrator') or auth.has_membership('Super-Administrator')) or (  ( auth.has_membership('Teacher') or (request.vars['type'] == 'class' and auth.has_membership('Student') and (exception_s_var == True) and (tutor_access == True) ) ) ) and (course_ended == True)):}}
                 <li>
                     <a  style="color:white;text-shadow:none;background:#04B4AE;" class="btn-btn" href="{{=URL('activity_control', 'course_second_recovery_test',vars=dict(project = request.vars['project'], year = request.vars['period']))}}">
                         <span class="icon-white icon-cog"></span>
@@ -35,7 +35,7 @@
                 </li>
             {{pass}}
 
-           {{if ((no_menu==False or (request.vars['type'] == 'class' and auth.has_membership('Student') and activityPermition>0)) and cpfecys.current_year_period().id == year.id) and (course_ended == False):}}
+           {{if ((tutor_access == True) & (no_menu==False or (request.vars['type'] == 'class' and auth.has_membership('Student') and activityPermition>0)) and cpfecys.current_year_period().id == year.id) and (course_ended == False):}}
                 <li>
                     <a  style="color:white;text-shadow:none;" class="btn-primary" href="{{=URL('activity_control', 'course_requirement',vars=dict(project = request.vars['project'], period = request.vars['period']))}}">
                         <span class="icon-white icon-edit"></span>
@@ -67,7 +67,7 @@
                 </li>    
             {{pass}}                
             
-            {{if no_menu==False:}}
+            {{if (no_menu==False) and (tutor_access == True) :}}
                 <li>
                     <a style="color:white;text-shadow:none;" class="btn-warning" href="#" onclick="click_botton();"><i class="icon-warning-sign icon-white"></i> 
                         {{=T('Generate Document')}} {{=T('Format Technical School')}} (CSV)  
@@ -1094,4 +1094,3 @@
       </div>
     </div>
     <!--Laboratory replacing-->
-{{pass}}

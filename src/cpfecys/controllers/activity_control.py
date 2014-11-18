@@ -287,7 +287,34 @@ def courses_list():
     import cpfecys
     #Obtain the current period of the system and all the register periods
     period = cpfecys.current_year_period()
-    periods = db(db.period_year).select()
+    
+    if auth.has_membership('Academic'):
+        academic_var = db.academic(db.academic.id_auth_user==auth.user.id)
+    pass
+
+    if(auth.has_membership('Super-Administrator') or auth.has_membership('Ecys-Administrator')):
+        periods = db(db.period_year).select()
+    else:
+        periods_temp = db(db.period_year).select()
+        periods = []
+        for period_temp in periods_temp:
+            added = False
+            if auth.has_membership('Student') or auth.has_membership('Teacher'):
+                try:
+                    if db((db.user_project.assigned_user == auth.user.id) & (db.user_project.period == period_temp.id)).select().first() is not None:
+                        periods.append(period_temp)
+                        added = True
+                except:
+                    None
+            if auth.has_membership('Academic'):
+                try:
+                    if db((db.academic_course_assignation.carnet==academic_var.id)&(db.academic_course_assignation.semester==period_temp.id)).select().first() is not None:
+                        if added == False:
+                            periods.append(period_temp)
+
+                except:
+                    None
+
 
     def split_name(project):
         try:
@@ -308,8 +335,7 @@ def courses_list():
 
     #Check if the period is change
     if request.vars['period'] is None:
-        period = cpfecys.current_year_period()
-        periods = db(db.period_year).select()
+        None
     else:
         if request.vars['period']!='':
             period = request.vars['period']
@@ -4453,6 +4479,7 @@ def General_report_activities():
             session.flash = T('Not valid Action.')
             redirect(URL('default','index'))
 
+    tutor_access = False
     if auth.has_membership('Super-Administrator') == False and auth.has_membership('Ecys-Administrator')==False:
         assigantion = db((db.user_project.assigned_user == auth.user.id) & (db.user_project.period == year.id) & (db.user_project.project == project_var.id)).select().first()
         if assigantion is None:
@@ -4465,6 +4492,8 @@ def General_report_activities():
             except:
                 session.flash = T('Not valid Action.')
                 redirect(URL('default','index'))
+        else:
+            tutor_access = True
 
     #Check the correct parameters
     if (request.vars['type'] != 'class' and request.vars['type']!='lab'):
@@ -4732,10 +4761,9 @@ def General_report_activities():
                             period = year.id,
                             finish =  True)
         #Generate csv file format technical school
-        response.flash = T('Request has been canceled')
+        session.flash = T('Request has been canceled')
+        #
         #redirect(URL('activity_control','Course_Format_Technical_School',vars=dict(project = project_var.id, period = year.id)))
-
-
     
     controlP = db((db.student_control_period.period_name==(T(year.period.name)+" "+str(year.yearp)))).select().first()
     requirement = db((db.course_requirement.semester==year.id)&(db.course_requirement.project==project_var.id)).select().first()
@@ -4775,7 +4803,8 @@ def General_report_activities():
                 requirement=requirement, 
                 course_ended = course_ended,
                 exception_s_var=exception_s_var,
-                exception_t_var=exception_t_var)
+                exception_t_var=exception_t_var,
+                tutor_access = tutor_access)
 
 
 
