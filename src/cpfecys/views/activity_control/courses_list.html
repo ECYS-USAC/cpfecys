@@ -9,6 +9,15 @@
 			<i class="icon-arrow-left"></i>
 			{{=T('Back')}}
 		</a>
+		<table >
+			<tr>
+				<td width="30%">
+				</td>
+				<td>					
+											
+				</td>
+			</tr>
+		</table>
         
 		<center>
 			{{if auth.has_membership('Super-Administrator') or auth.has_membership('Ecys-Administrator'):}}
@@ -27,10 +36,36 @@
         
         
 		<center>
-		    <table style="align:0 auto;">
+		    <table class="table-responsive">
 		        <tr>
+		        	
+		        	<td>
+		        		{{if auth.has_membership('Teacher'):}}
+		          		<ul class="dropdown"  class="close" aria-hidden="true"  style="height:10px;">
+						  	<a class="btn " class="dropdown-toggle" data-toggle="dropdown" style="height:32px; width:32px;">
+								<img src="{{=URL('static','images')}}/academic_control/seo47.png" height="32px" width="32px">
+							</a>
+						  	
+							<ul class="dropdown-menu">  
+								<li> 
+									<a  tabindex="-1" href="{{=URL('activity_control', 'grades_management')}}" id="menu_create_activity">
+										{{=T('Report management grades')}}
+									</a>
+								</li>
+								<li> 
+									<a  tabindex="-1" href="{{=URL('activity_control','validate_laboratory_management')}}" id="menu_create_activity">
+										{{=T('Management Reports Laboratory Revalidations')}}
+									</a>
+								</li>
+
+							</ul>
+						</ul>
+						{{pass}}
+		          	</td>
+		          	
 					<td>
 						<br>
+						<div>
 						<form class="form-inline" 
 						action="{{=URL('activity_control','courses_list')}}" 
 						method='get'>
@@ -48,21 +83,32 @@
 							</select>
 							<input class="btn" type="submit" value="{{=T('Go')}}">
 						</form>	
+						</div>
 					</td>
-					<td>
-		          		<div align="right" >
-							<table class="table-bordered">
+					{{if auth.has_membership('Teacher'):}}
+					<td width="65%">
+					{{else:}}
+					<td width="70%">
+					{{pass}}
+		          		<div align="right" width="100%">
+							<table class="table-bordered" width="100%">
 								
 									<td>
 										<small>
 											<br>
 											<center>
-
-												<span class="label label-success">&nbsp;&nbsp;&nbsp;</span> {{=T('Notes above average')}}
-												&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-												<span class="label label-warning">&nbsp;&nbsp;&nbsp;</span> {{=T('Notes on the average')}}
-												&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-												<span class="label label-important">&nbsp;&nbsp;&nbsp;</span> {{=T('Notes Below Average')}}
+												<font style="white-space:nowrap;"> 
+													<span class="label label-success">&nbsp;&nbsp;&nbsp;</span>													
+														{{=T('Notes above average')}}
+												</font>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+												<font style="white-space:nowrap;"> 
+													<span class="label label-warning">&nbsp;&nbsp;&nbsp;</span> 
+														{{=T('Notes on the average')}}
+												</font>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+												<font style="white-space:nowrap;">
+													<span class="label label-important">&nbsp;&nbsp;&nbsp;</span> 
+														{{=T('Notes Below Average')}}
+												</font>
 											</center>
 										</small>
 									</td>
@@ -70,6 +116,7 @@
 							</table>
 						</div>
 		          	</td>
+
 		        </tr>
 		    </table>
 		<table>
@@ -208,6 +255,73 @@
 									</center>
 								</td>
 							</tr>
+							<tr>
+								<td>
+									<br>
+								</td>
+							</tr>
+							<tr>
+								<td width="20%">
+									<center>										
+										<a class="btn" href="{{=URL('teacher', 'students', vars=dict( project = course.user_project.project, year_period=periodo.id))}}">
+											<img src="{{=URL('static','images')}}/academic_control/teacher35.png" height="32" width="32">							
+										</a><br>
+										<a href="{{=URL('teacher', 'students', vars=dict( project = course.user_project.project, year_period=periodo.id))}}">
+											{{=T('Show Students')}}	
+										</a>
+									</center>
+								</td>
+								<td width="20%">
+									<center>
+										<a class="btn" href="{{=URL('teacher', 'graphs', vars=dict( project = course.user_project.project, year_period=periodo.id))}}">
+											<img src="{{=URL('static','images')}}/academic_control/ascending24.png" height="32" width="32">
+										</a><br>
+										<a href="{{=URL('teacher', 'graphs', vars=dict( project = course.user_project.project, year_period=periodo.id))}}">
+											{{=T('Show Statistics')}}
+										</a>
+									</center>
+								</td>
+								{{if str(periodo.id) == str(currentyear_period.id):}}
+								<td width="20%">
+									{{
+									var_count_report = 0
+									my_projects = db((db.user_project.assigned_user == auth.user.id)&(db.project.id == db.user_project.project)).select()
+							        for project in my_projects:
+							            for assignation in project.project.user_project.select():
+							            	if str(assignation.project.id) == str(course.user_project.project):
+								                q=((assignation.report((db.report.status == db.report_status.id)&((db.report_status.name == 'Grading')|(db.report_status.name == 'EnabledForTeacher')))))
+								                var_count_report = var_count_report + q.count()
+								            pass
+							            pass
+							        pass
+									}}
+									<center>
+										<a class="btn" href="{{=URL('teacher', 'todo_reports', vars=dict(project = course.user_project.project, type='list'))}}">
+											<img src="{{=URL('static','images')}}/academic_control/business175.png" height="32" width="32">
+										</a><br>
+										<a href="{{=URL('teacher', 'todo_reports', vars=dict(project = course.user_project.project, type='list'))}}">
+											{{=T('Grade Pending Reports')}} ({{=var_count_report}})
+										</a>
+									</center>
+								</td>
+								<td width="20%">
+									{{var_count = 0
+									var_count = var_count + db((db.request_change_weighting.status=='pending')&(db.request_change_weighting.period==current_year_period().id)&(db.request_change_weighting.project==course.user_project.project)).count()
+						            var_count = var_count + db((db.requestchange_activity.status=='pending')&(db.requestchange_activity.semester==current_year_period().id)&(db.requestchange_activity.course==course.user_project.project)).count()
+						            var_count = var_count + db((db.request_change_grades.status=='pending')&(db.request_change_grades.period==current_year_period().id)&(db.request_change_grades.project==course.user_project.project)).count()
+
+									}}
+									<center>
+										<a class="btn" href="{{=URL('activity_control', 'courses_list_request', vars=dict( project = course.user_project.project, period=periodo.id, type = 'course_list'))}}">
+											<img src="{{=URL('static','images')}}/academic_control/research.png" height="32" width="32">
+										</a><br>
+										<a  href="{{=URL('activity_control', 'courses_list_request', vars=dict(project = course.user_project.project, type='list'))}}">
+											{{=T('Request Control')}} ({{=var_count}})
+										</a>
+									</center>
+								</td>
+								{{pass}}
+							</tr>
 						</table>
 					</td>
 					{{pass}}
@@ -224,8 +338,8 @@
 				<table >				
 						{{for course in coursesAdmin:}}
 						<td>
-						<div class="navbar">
-							<div class="navbar-inner">
+						<div class="navbar" >
+							<div class="navbar-inner" >
 								<center><h4>{{=split_name(course.user_project.project.name)}}*</h4></center>
 							</div>
 						</div>
@@ -249,8 +363,9 @@
 									<span id="average_lab_{{=course.user_project.project.id}}" >
 										{{=T('Calculating')}}...
 										</span>
-									<br><br>
-									{{=T('I am academic tutor of this course')}}*
+									<br>
+									<b>{{=T('Membership')}}:</b> {{=T('Rol Student')}}
+									
 									
 								</td>
 							
@@ -309,6 +424,16 @@
 												</a>
 											</center>
 										</td>
+										<td width="20%">
+											<center>
+												<a class="btn" href="{{=URL('default', 'event_editor', vars=dict( assignation = assignation_var.id))}}">
+													<img src="{{=URL('static','images')}}/academic_control/add98.png" height="32" width="32">
+												</a><br>
+												<a  href="{{=URL('default', 'event_editor', vars=dict( assignation = assignation_var.id))}}">
+													{{=T('Manage events')}}
+												</a>
+											</center>
+										</td>
 									</tr>
 								</table>
 							</td>
@@ -329,7 +454,7 @@
 			{{pass}}
 			
 			{{if coursesStudentT>0:}}
-				<table >
+				<table width="77%">
 					{{for course in coursesStudent:}}
 						<tr>
 							<td>
@@ -358,7 +483,8 @@
 										<span id="average_lab_{{=course.academic_course_assignation.assignation}}_academic" >
 											{{=T('Calculating')}}...
 										</span>
-										
+										<br>
+										<b>{{=T('Membership')}}:</b> {{=T('Student')}}
 									</td>						
 
 									<td colspan="4">

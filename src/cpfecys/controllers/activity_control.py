@@ -255,25 +255,11 @@ def pstdev(data, mu=None):
 @auth.requires_login()
 @auth.requires(auth.has_membership('Student') or auth.has_membership('Teacher') or auth.has_membership('Super-Administrator') or auth.has_membership('Academic') or auth.has_membership('Ecys-Administrator'))
 def courses_list():
-    #lista = [66,88,90,76,61]
-    #var_temp = mean(lista)
-    #print "mean->:"+str(var_temp)
-    #var_temp = median(lista)
-    #print "median->:"+str(var_temp)
-    #try:
-    #    var_temp = mode(lista)
-    #    print "mode->:"+str(var_temp)
-    #except:
-    #    None
-    #var_temp = stdev(lista)
-    #print "standar desviation->:"+str(var_temp)
-    #var_temp = variance(lista)
-    #print "variance->:"+str(var_temp)
-    #var_temp = stdev(lista)/math.sqrt(len(lista))
-    #print "standar error->:"+str(var_temp)
-    #var_temp = kurtosis(lista)
-    #print "kurt->:"+str(var_temp)
-    
+    session.attachment_list = []
+    session.attachment_list_temp = []
+    session.attachment_list_temp2 = []
+    session.notification_subject = ''
+    session.notification_message = ''
 
     area = db(db.area_level.name=='DTT Tutor Académico').select().first()
     coursesAdmin = None
@@ -371,7 +357,7 @@ def courses_list():
 
 
 
-    return dict(coursesAdmin = coursesAdmin, countcoursesAdminT=countcoursesAdminT, coursesStudent=coursesStudent, coursesStudentT=coursesStudentT, split_name=split_name, split_section=split_section, periods=periods,period=period,periodo=period)
+    return dict(coursesAdmin = coursesAdmin, countcoursesAdminT=countcoursesAdminT, coursesStudent=coursesStudent, coursesStudentT=coursesStudentT, split_name=split_name, split_section=split_section, periods=periods,period=period,periodo=period, currentyear_period = cpfecys.current_year_period())
 
 
 @auth.requires_login()

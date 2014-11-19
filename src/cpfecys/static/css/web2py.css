@@ -93,11 +93,10 @@ div.flash {
     display:none;
     position:fixed;
     padding:10px;
-    top:48px;
-    right:250px;
+    top:110px;
     min-width:280px;
     opacity:0.95;
-    margin:0px 0px 10px 10px;
+    margin:0px 0px 10px 0px;
     vertical-align:middle;
     cursor:pointer;
     color:Black;
@@ -110,6 +109,9 @@ div.flash {
     font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
     -webkit-font-smoothing: antialiased;
     z-index:2000;
+    text-align:center;
+    right:40%;
+    
 }
 
 div.flash #closeflash{color:inherit; float:right; margin-left:15px;}

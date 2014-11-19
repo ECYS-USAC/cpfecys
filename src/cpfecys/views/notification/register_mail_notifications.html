@@ -1,7 +1,7 @@
 {{extend 'template.html'}}
 <div class="row-fluid">
     <div class="well span12"  style="overflow:auto;">
-        <a onclick="window.history.back()" class="btn" ><i class="icon-arrow-left"></i>{{=T('Back')}}</a>
+        <a href="{{=URL('activity_control', 'courses_list')}}" class="btn" ><i class="icon-arrow-left"></i>{{=T('Back')}}</a>
         <table class="table-striped table-bordered" style="align:0 auto;">
         <tr>
           <td>
@@ -20,7 +20,7 @@
                       </option>
                     {{pass}}
                 </select>
-                <input class="btn" type="submit" value="{{=T('Filter')}}">
+                <input class="btn" type="submit" value="{{=T('Go')}}">
           </form>
           </td>
         </tr>
@@ -33,12 +33,12 @@
                 <b>{{=project.project.name}}</b>
             </td>
             <td><center>
-                <a id="pr-{{=project.id}}" style="white-space:nowrap;" class="btn btn-info">Ver</a>
+                <a id="pr-{{=project.id}}"  class="btn btn-info">Ver</a>
             </center></td>
         </tr>
         <tr>
             <td colspan="2">
-                <div id="div_project_{{=project.id}}" style="display: none; background-color:white;  white-space:nowrap; height:300px; width:1100px; overflow:auto;">
+                <div id="div_project_{{=project.id}}" style="display: none; background-color:white;  height:300px;  overflow:auto;">
                     
                 </div>
                 <br>
@@ -49,7 +49,7 @@
         </table>
     </div>
 </div>
-<div id="attachModal" class="modal hide fade" tabindex="-1" style="left:35%; width:70%;"> 
+<div id="attachModal" class="modal hide fade" tabindex="-1"> 
     <div id ="a" class="modal-header">
       <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
         <h3 id="myModalLabel">

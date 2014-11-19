@@ -135,18 +135,20 @@
     <td colspan="3">
       
       <center>
-        <div class="alert"  style="width:70%;" id="notice_1">
-            <strong>{{=T('Notice')}}!</strong> {{=T('The notes should be entered on 100 points')}}
-        </div>
-        <div class="alert"  style="width:70%;" id="notice_2">
-            <strong>{{=T('Notice')}}!</strong> {{=T('Please enter only the notes of the students who participated in the activity')}}
-        </div>
+        <div class="alert"  style="width:90%;" id="notice_1">
+            <strong>{{=T('Notice')}}!</strong><br> 
+
+            <div align="left">
+            - {{=T('The notes should be entered on 100 points')}}<br>
+            - {{=T('Please enter only the notes of the students who participated in the activity')}}
+        
         {{if auth.has_membership('Student'):}}
-        <div class="alert"  style="width:70%;" id="notice_3">
-            <strong>{{=T('Notice')}}!</strong> {{=T('In order to consider this activity in the report, you must enter a percentage of the total of the entered notes.')}}
-        </div>
+            <br>- {{=T('In order to consider this activity in the report, you must enter a percentage of the total of the entered notes.')}}
+        
         {{pass}}
-      </center>
+          </div>
+        </div>
+      
       <center>
         <div id="grades_list" style="overflow:auto; ">
           {{=T('Loading')}}...

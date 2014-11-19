@@ -14,10 +14,11 @@
     <small>{{=T(semester)}}, {{=year}}</small>
 </h1>
 <div class="row-fluid">
-    <div class="well span12" id="principal_div">
-    	<a onclick="window.history.back()" class="btn" ><i class="icon-arrow-left"></i>{{=T('Back')}}</a>
+    <div class="well span12" id="principal_div" >
+    	<a  href="{{=URL('activity_control', 'courses_list')}}" class="btn" ><i class="icon-arrow-left"></i>{{=T('Back')}}</a>
 	<form action="{{=URL('notification', 'mail_notifications/send')}}" method="post">
-	  <table>
+	<div style="overflow:auto;">
+	  <table >
 		<tr>
 			<td>
 			  <!--Tabla de los grupos de estudiantes-->
@@ -111,7 +112,9 @@
 				</div>
 			</td>
 		</tr>
+
 	  </table>
+	 </div>
 	  <fieldset>
 	  	<label for="subject">{{=T('Subject')}}</label>
 	    <input type="text" id="subject" name="subject" value="{{=session.notification_subject}}">

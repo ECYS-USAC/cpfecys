@@ -15,8 +15,9 @@
 </h1>
 <div class="row-fluid">
     <div class="well span12">
-    	<a onclick="window.history.back()" class="btn" ><i class="icon-arrow-left"></i>{{=T('Back')}}</a>
+    	<a  href="{{=URL('activity_control', 'courses_list')}}" class="btn" ><i class="icon-arrow-left"></i>{{=T('Back')}}</a>
 	<form action="{{=URL('notification', 'teacher_mail_notifications/send')}}" method="post">
+	<div style="overflow:auto;">
 	  <table>
 	  	<tr>
 			<td>
@@ -145,6 +146,7 @@
 			</td>
 		</tr>
 	</table>
+	</div>
 	  <fieldset>
 	  	<label for="subject">{{=T('Subject')}}</label>
 	    <input type="text" id="subject" name="subject" value="{{=session.notification_subject}}">

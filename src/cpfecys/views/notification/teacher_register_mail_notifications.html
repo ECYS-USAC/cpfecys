@@ -1,7 +1,7 @@
 {{extend 'template.html'}}
 <div class="row-fluid">
     <div class="well span12" style="overflow:auto;">
-        <a onclick="window.history.back()" class="btn" ><i class="icon-arrow-left"></i>{{=T('Back')}}</a>
+        <a  href="{{=URL('activity_control', 'courses_list')}}" class="btn" ><i class="icon-arrow-left"></i>{{=T('Back')}}</a>
         <table style="align:0 auto;">
         <tr>
           <td>
@@ -45,12 +45,12 @@
                                 <b>Avisos Propios</b>
                             </td>
                             <td><center>
-                                <a id="pr-{{=project.id}}-propios" style="white-space:nowrap;" class="btn btn-success">Ver</a>
+                                <a id="pr-{{=project.id}}-propios" class="btn btn-success">Ver</a>
                             </center></td>
                         </tr>
                         <tr>
                             <td colspan="2">
-                                <div id="div_project_{{=project.id}}_propios" style="display: none; background-color:white;  white-space:nowrap; height:300px; width:1100px; overflow:auto;">
+                                <div id="div_project_{{=project.id}}_propios" style="display: none; background-color:white; height:300px;  overflow:auto;">
                                     Cargando
                                 </div>
                             </td>
@@ -67,12 +67,12 @@
                                     {{=assignation.user_project.assigned_user.username}} - {{=assignation.user_project.assigned_user.first_name}} {{=assignation.user_project.assigned_user.last_name}}
                                 </td>
                                 <td><center>
-                                    <a id="pr-{{=project.id}}-{{=assignation.user_project.id}}" style="white-space:nowrap;" class="btn btn-alert">Ver</a>
+                                    <a id="pr-{{=project.id}}-{{=assignation.user_project.id}}"  class="btn btn-alert">Ver</a>
                                 </center></td>
                             </tr>
                             <tr>
                                 <td colspan="2">
-                                    <div id="div_project_{{=project.id}}_{{=assignation.user_project.id}}" style="display: none; background-color:white;  white-space:nowrap; height:300px; width:1100px; overflow:auto;">
+                                    <div id="div_project_{{=project.id}}_{{=assignation.user_project.id}}" style="display: none; background-color:white;  height:300px; overflow:auto;">
                                         {{=T('Cargando')}}...
                                     </div>
                                 </td>
@@ -89,7 +89,7 @@
         </table>
     </div>
 </div>
-<div id="attachModal" class="modal hide fade" tabindex="-1" style="left:35%; width:70%;"> 
+<div id="attachModal" class="modal hide fade" tabindex="-1" > 
     <div id ="a" class="modal-header">
       <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
         <h3 id="myModalLabel">
