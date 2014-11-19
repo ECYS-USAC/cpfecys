@@ -1,59 +1,59 @@
 {{extend 'template.html'}}
-
-
-{{no_menu=True}}
-{{activityPermition=db((db.course_requirement.semester==year.id)&(db.course_requirement.project==project.id)&(db.course_requirement.teacher_permition==True)).count()}}
-{{if request.vars['type'] == 'class' and (auth.has_membership('Ecys-Administrator') or auth.has_membership('Super-Administrator') or auth.has_membership('Teacher') or (auth.has_membership('Student') and exception_s_var == True)):}}
-    {{no_menu=False}}
-{{pass}}
-
 <div class="navbar navbar-fixed-bottom ">
     <div class="navbar-inner">
         <a class="brand" href="#">
             
         </a>
         <ul class="nav pull-right">
-            {{if (request.vars['op']  == '2') and ((auth.has_membership('Ecys-Administrator') or auth.has_membership('Super-Administrator')) or (  ( auth.has_membership('Teacher') or (request.vars['type'] == 'class' and auth.has_membership('Student') and (exception_s_var == True) and (tutor_access == True)) ) ) and (course_ended == True)):}}
+            {{if (request.vars['op']  == '2') and (((auth.has_membership('Ecys-Administrator') or auth.has_membership('Super-Administrator')) or ((auth.has_membership('Teacher') or (request.vars['type'] == 'class' and auth.has_membership('Student') and (exception_s_var == True) and (tutor_access == True))))) and (course_ended == True)):}}
                 <li>
                     <a  style="color:white;text-shadow:none;background:#01A9DB;" class="btn-btn" href="{{=URL('activity_control', 'course_first_recovery_test',vars=dict(project = request.vars['project'], year = request.vars['period']))}}">
                         <span class="icon-white icon-cog"></span>
                         {{=T('First Recovery Test')}}
                     </a>
                 </li>
-            
-                </li>
             {{pass}}
 
-            {{if (request.vars['op']  == '3') and ((auth.has_membership('Ecys-Administrator') or auth.has_membership('Super-Administrator')) or (  ( auth.has_membership('Teacher') or (request.vars['type'] == 'class' and auth.has_membership('Student') and (exception_s_var == True) and (tutor_access == True) ) ) ) and (course_ended == True)):}}
+
+            {{if (request.vars['op']  == '3') and (((auth.has_membership('Ecys-Administrator') or auth.has_membership('Super-Administrator')) or ((auth.has_membership('Teacher') or (request.vars['type'] == 'class' and auth.has_membership('Student') and (exception_s_var == True) and (tutor_access == True))))) and (course_ended == True)):}}
                 <li>
                     <a  style="color:white;text-shadow:none;background:#04B4AE;" class="btn-btn" href="{{=URL('activity_control', 'course_second_recovery_test',vars=dict(project = request.vars['project'], year = request.vars['period']))}}">
                         <span class="icon-white icon-cog"></span>
                         {{=T('Second Recovery Test')}}
                     </a>
                 </li>
-            
-                </li>
             {{pass}}
 
-           {{if ((tutor_access == True) & (no_menu==False or (request.vars['type'] == 'class' and auth.has_membership('Student') and activityPermition>0)) and cpfecys.current_year_period().id == year.id) and (course_ended == False):}}
-                <li>
-                    <a  style="color:white;text-shadow:none;" class="btn-primary" href="{{=URL('activity_control', 'course_requirement',vars=dict(project = request.vars['project'], period = request.vars['period']))}}">
-                        <span class="icon-white icon-edit"></span>
-                        {{=T('Course requirement')}}
-                    </a>
-                </li>
-            {{elif (auth.has_membership('Ecys-Administrator') or auth.has_membership('Super-Administrator')):}}
-                <li>
-                    <a style="color:white;text-shadow:none;" class="btn-primary" href="{{=URL('activity_control', 'course_requirement',vars=dict(project = request.vars['project'], period = request.vars['period']))}}">
-                        <span class="icon-white icon-edit"></span>
-                        {{=T('Course requirement')}}
-                    </a>
-                </li>
+
+            {{if cpfecys.current_year_period().id == year.id:}}
+                {{if (request.vars['type'] == 'class') and (course_ended == False) and (auth.has_membership('Ecys-Administrator') or auth.has_membership('Super-Administrator') or auth.has_membership('Teacher') or (auth.has_membership('Student') and tutor_access == True and (exception_s_var == True or activityPermition>0))):}}
+                    <li>
+                        <a  style="color:white;text-shadow:none;" class="btn-primary" href="{{=URL('activity_control', 'course_requirement',vars=dict(project = request.vars['project'], period = request.vars['period']))}}">
+                            <span class="icon-white icon-edit"></span>
+                            {{=T('Course requirement')}}
+                        </a>
+                    </li>
+                {{pass}}
+            {{else:}}
+                {{if (auth.has_membership('Ecys-Administrator') or auth.has_membership('Super-Administrator')):}}
+                    <li>
+                        <a style="color:white;text-shadow:none;" class="btn-primary" href="{{=URL('activity_control', 'course_requirement',vars=dict(project = request.vars['project'], period = request.vars['period']))}}">
+                            <span class="icon-white icon-edit"></span>
+                            {{=T('Course requirement')}}
+                        </a>
+                    </li>
+                {{pass}}
             {{pass}}
             
             {{if (auth.has_membership('Super-Administrator') or auth.has_membership('Ecys-Administrator') or auth.has_membership('Teacher') or auth.has_membership('Student') or auth.has_membership('Academic')):}}
                 <li>
-                    <a style="color:white;text-shadow:none;" class="btn-success" href="{{=URL(vars=dict(project = project.id, period = year.id, list='True', type=request.vars['type']))}}"><i class="icon-download icon-white"></i>
+                {{if (request.vars['op'] == None) or (request.vars['op']  == '1') or (request.vars['op']  == '0'):}}
+                    <a style="color:white;text-shadow:none;" class="btn-success" href="{{=URL(vars=dict(project = project.id, period = year.id, list='True', type=request.vars['type'],op='1'))}}"><i class="icon-download icon-white"></i>
+                {{elif request.vars['op']  == '2':}}
+                    <a style="color:white;text-shadow:none;" class="btn-success" href="{{=URL(vars=dict(project = project.id, period = year.id, list='True', type=request.vars['type'],op='2'))}}"><i class="icon-download icon-white"></i>
+                {{elif request.vars['op']  == '3':}}
+                    <a style="color:white;text-shadow:none;" class="btn-success" href="{{=URL(vars=dict(project = project.id, period = year.id, list='True', type=request.vars['type'],op='3'))}}"><i class="icon-download icon-white"></i>
+                {{pass}}
                          {{=T('Export Report')}} (CSV)
                     </a>
                 </li>
@@ -67,22 +67,18 @@
                 </li>    
             {{pass}}                
             
-            {{if (no_menu==False) and (tutor_access == True) :}}
+            {{if request.vars['type'] == 'class' and (auth.has_membership('Ecys-Administrator') or auth.has_membership('Super-Administrator') or auth.has_membership('Teacher') or (auth.has_membership('Student') and exception_s_var == True and tutor_access == True)):}}
                 <li>
-                    <a style="color:white;text-shadow:none;" class="btn-warning" href="#" onclick="click_botton();"><i class="icon-warning-sign icon-white"></i> 
+                    <a style="color:white;text-shadow:none; cursor:pointer;" class="btn-warning" onclick="click_botton();"><i class="icon-warning-sign icon-white"></i> 
                         {{=T('Generate Document')}} {{=T('Format Technical School')}} (CSV)  
                         {{if course_ended == False:}}
                             | <small>{{=T('Finish course')}}</small>
                         {{pass}}
                     </a>
                 </li>
-                        
             {{pass}}
         </ul>
     </div>
-</div>
-
-<div id="asP">
 </div>
 
 
@@ -127,8 +123,20 @@
                     <br>
                 {{pass}}
             </tr>
+            {{if auth.has_membership('Ecys-Administrator') or auth.has_membership('Super-Administrator') or auth.has_membership('Teacher') or (auth.has_membership('Student') and tutor_access == True):}}
+                <tr>
+                    <td>
+                        <b>{{=T('Laboratory')}}</b>
+                    </td>
+                    <td>
+                        <a href="#RevalidationsModal" role="button" data-toggle="modal">{{=T('Revalidations:')}} {{=str(db((db.validate_laboratory.semester==year.id)&(db.validate_laboratory.project==project.id)&(db.validate_laboratory.validation_type==True)).count())}}</a>
+                    </td>
+                    <td>
+                        <a href="#ReplacementModal" role="button" data-toggle="modal">{{=T('Equivalents:')}} {{=str(db((db.validate_laboratory.semester==year.id)&(db.validate_laboratory.project==project.id)&(db.validate_laboratory.validation_type==False)).count())}}</a>
+                    </td>
+                </tr>
+            {{pass}}
         </table>
-        <br>
         
 
         {{if request.vars['type']  == 'class':}}
@@ -636,7 +644,7 @@
                                                             {{pass}}
 
                                                                 {{=round( (var_first_recovery_test.grade)*var_final_grade/100,2)}}
-                                                                {{totalCarry=totalCarry+round( (var_first_recovery_test.grade)*var_final_grade/100,2)}}
+                                                                {{totalCarry=totalCarry+round( (var_first_recovery_test.grade)*var_final_grade/100,0)}}
                                                             </font>
                                                         {{pass}}
                                                     
@@ -677,7 +685,7 @@
                                                             {{pass}}
 
                                                                 {{=round( (var_second_recovery_test.grade)*var_final_grade/100,2)}}
-                                                                {{totalCarry=totalCarry+round( (var_second_recovery_test.grade)*var_final_grade/100,2)}}
+                                                                {{totalCarry=totalCarry+round( (var_second_recovery_test.grade)*var_final_grade/100,0)}}
                                                             </font>
                                                         {{pass}}
                                                     
@@ -975,11 +983,138 @@
     }
 
     function click_botton(){
-        {{#URL(vars=dict(project = project.id, period = year.id, list='True', type=request.vars['type']))}}
-        var r = confirm("{{=T('After generating the file will no longer be allowed to make changes within the course and the lab. Are you sure you want to continue?')}}");
-        if (r == true) {
-            window.location.href = "{{=URL(vars=dict(project = project.id, period = year.id, list='False', type=request.vars['type']))}}";
-        }
+        {{if course_ended == False:}}
+            var r = confirm("{{=T('After generating the file will no longer be allowed to make changes within the course and the lab. Are you sure you want to continue?')}}");
+            if (r == true) {
+                {{if (request.vars['op'] == None) or (request.vars['op']  == '1') or (request.vars['op']  == '0'):}}
+                    window.location.href = "{{=URL('activity_control','General_report_activities',vars=dict(project = project.id, period = year.id, list='False', type=request.vars['type'],op='1'))}}";
+                {{elif request.vars['op']  == '2':}}
+                    window.location.href = "{{=URL('activity_control','General_report_activities',vars=dict(project = project.id, period = year.id, list='False', type=request.vars['type'],op='2'))}}";
+                {{elif request.vars['op']  == '3':}}
+                    window.location.href = "{{=URL('activity_control','General_report_activities',vars=dict(project = project.id, period = year.id, list='False', type=request.vars['type'],op='3'))}}";
+                {{pass}}
+            }
+        {{else:}}
+            {{if (request.vars['op'] == None) or (request.vars['op']  == '1') or (request.vars['op']  == '0'):}}
+                window.location.href = "{{=URL('activity_control','General_report_activities',vars=dict(project = project.id, period = year.id, list='False', type=request.vars['type'],op='1'))}}";
+            {{elif request.vars['op']  == '2':}}
+                window.location.href = "{{=URL('activity_control','General_report_activities',vars=dict(project = project.id, period = year.id, list='False', type=request.vars['type'],op='2'))}}";
+            {{elif request.vars['op']  == '3':}}
+                window.location.href = "{{=URL('activity_control','General_report_activities',vars=dict(project = project.id, period = year.id, list='False', type=request.vars['type'],op='3'))}}";
+            {{pass}}
+        {{pass}}
     }
 
+    $(document).ready(function(){
+    {{if action_Export==True:}}
+        {{if (request.vars['op'] == None) or (request.vars['op']  == '1') or (request.vars['op']  == '0'):}}
+            window.location.href = "{{=URL('activity_control','General_report_activities',vars=dict(project = project.id, period = year.id, list='False', type=request.vars['type'],op='1'))}}";
+        {{elif request.vars['op']  == '2':}}
+            window.location.href = "{{=URL('activity_control','General_report_activities',vars=dict(project = project.id, period = year.id, list='False', type=request.vars['type'],op='2'))}}";
+        {{elif request.vars['op']  == '3':}}
+            window.location.href = "{{=URL('activity_control','General_report_activities',vars=dict(project = project.id, period = year.id, list='False', type=request.vars['type'],op='3'))}}";
+        {{pass}}
+    {{pass}}
+});
+
 </script>
+
+
+{{if auth.has_membership('Ecys-Administrator') or auth.has_membership('Super-Administrator') or auth.has_membership('Teacher') or (auth.has_membership('Student') and tutor_access == True):}}
+    <!--Validate Laboratory-->
+    <div id="RevalidationsModal" class="modal hide fade" tabindex="-1" role="dialog"
+    aria-labelledby="myModalLabel" aria-hidden="true">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+          <h3 id="myModalLabel">
+              {{=T('Validate Laboratory')}}
+          </h3>
+      </div>
+      <div class="modal-body">
+        <div class="well">
+            <div align="right">
+                <a  class = "btn btn-success" title="{{=T('Go to Laboratory Revalidation')}}" href="{{=URL('activity_control', 'validate_laboratory',vars=dict(project = project.id, year = year.id))}}" >
+                    <span class="icon-white icon-check"></span>  {{=T('Validate Laboratory')}}
+                </a>
+            </div>
+            <table class="table table-bordered ">
+                <thead>
+                    <tr>
+                        <th>
+                            Carnet
+                        </th>
+                        <th>
+                            Nota
+                        </th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {{for revalidation in db((db.academic.id==db.validate_laboratory.carnet)&(db.validate_laboratory.semester==year.id)&(db.validate_laboratory.project==project.id)&(db.validate_laboratory.validation_type==True)).select(orderby=db.academic.carnet):}}
+                    <tr>
+                        <td>
+                            {{=str(revalidation.validate_laboratory.carnet.carnet)}}
+                        </td>
+                        <td>
+                            {{=str(revalidation.validate_laboratory.grade)}}
+                        </td>
+                    </tr>
+                    {{pass}}
+                </tbody>
+            </table>
+        </div>
+      </div>
+      <div class="modal-footer">
+          <button class="btn" data-dismiss="modal" aria-hidden="true">{{=T('Close')}}</button>
+      </div>
+    </div>
+    <!--Validate Laboratory-->
+
+
+    <!--Laboratory replacing-->
+    <div id="ReplacementModal" class="modal hide fade" tabindex="-1" role="dialog"
+    aria-labelledby="myModalLabel" aria-hidden="true">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+          <h3 id="myModalLabel">
+              {{=T('Laboratory Equivalence')}}
+          </h3>
+      </div>
+      <div class="modal-body">
+        <div class="well">
+            <div align="right">
+                <a  class = "btn btn-success" title="{{=T('Go to Laboratory Equivalence')}}" href="{{=URL('activity_control', 'laboratory_replacing',vars=dict(project = project.id, year = year.id))}}" >
+                    <span class="icon-white icon-certificate"></span>  {{=T('Laboratory Equivalence')}}
+                </a>
+            </div>
+            <table class="table table-bordered ">
+                <thead>
+                    <tr>
+                        <th>
+                            Carnet
+                        </th>
+                        <th>
+                            Nota
+                        </th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {{for revalidation in db((db.academic.id==db.validate_laboratory.carnet)&(db.validate_laboratory.semester==year.id)&(db.validate_laboratory.project==project.id)&(db.validate_laboratory.validation_type==False)).select(orderby=db.academic.carnet):}}
+                    <tr>
+                        <td>
+                            {{=str(revalidation.validate_laboratory.carnet.carnet)}}
+                        </td>
+                        <td>
+                            {{=str(revalidation.validate_laboratory.grade)}}
+                        </td>
+                    </tr>
+                    {{pass}}
+                </tbody>
+            </table>
+        </div>
+      </div>
+      <div class="modal-footer">
+          <button class="btn" data-dismiss="modal" aria-hidden="true">{{=T('Close')}}</button>
+      </div>
+    </div>
+    <!--Laboratory replacing-->
+{{pass}}

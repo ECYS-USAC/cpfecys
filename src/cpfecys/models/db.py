@@ -1164,7 +1164,8 @@ db.define_table('validate_laboratory',
     Field('carnet', 'reference academic', notnull=True, label=T('Carnet')),
     Field('semester', 'reference period_year', notnull=True, label=T('Period')),
     Field('project', 'reference project', notnull=True, label=T('Course')),
-    Field('grade', 'integer', notnull=True, label=T('Grade'), requires=IS_DECIMAL_IN_RANGE(61, 100))
+    Field('grade', 'integer', notnull=True, label=T('Grade'), requires=IS_DECIMAL_IN_RANGE(61, 100)),
+    Field('validation_type', 'boolean', notnull=True, label = T('Validation Type'))
 )
 
 db.define_table('validate_laboratory_log',    
@@ -1180,7 +1181,8 @@ db.define_table('validate_laboratory_log',
     Field('after_grade', 'integer', notnull=False, label=T('Grade After')),
     Field('description', 'text', notnull=False, label=T('Description')),
     Field('id_validate_laboratory', 'text',notnull = False, label = T('id_validate_laboratory')),
-    Field('date_log', 'datetime', notnull = True, default = datetime.datetime.now(), label = T('Date'))
+    Field('date_log', 'datetime', notnull = True, default = datetime.datetime.now(), label = T('Date')),
+    Field('validation_type', 'boolean', notnull=True, label = T('Validation Type'))
 )
 
 db.define_table('course_first_recovery_test',
