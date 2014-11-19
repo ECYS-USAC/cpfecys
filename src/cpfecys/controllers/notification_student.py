@@ -12,13 +12,13 @@ def inbox():
     assignations = []
     coursesAdmin = []
 
-    academic_var = db.academic(db.academic.id_auth_user==auth.user.id)        
-    if auth.has_membership('Academic'):
-        if academic_var is None:
-            session.flash = T('Not valid Action.')
-            redirect(URL('default', 'index'))
-        else:
-            period_list = db(db.academic_course_assignation.carnet==academic_var.id).select(db.academic_course_assignation.semester,distinct=True)
+    try:
+        academic_var = db.academic(db.academic.id_auth_user==auth.user.id)
+
+        period_list = db(db.academic_course_assignation.carnet==academic_var.id).select(db.academic_course_assignation.semester,distinct=True)
+    
+    except:
+        None
     
     select_form = FORM(INPUT(_name='semester_id',_type='text'))
 
