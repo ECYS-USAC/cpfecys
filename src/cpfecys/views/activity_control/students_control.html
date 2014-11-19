@@ -1,9 +1,14 @@
 {{extend 'template.html'}}
+
+{{step_count=0}}
 <script src="{{=URL('static','js')}}/jquery-migrate-1.2.1.js"></script>
 <div style=" width:100%; overflow:auto;">
   <div style=" left:0; width:100%;  left:25px;" >
     <h1>
       {{=name}}
+      <a onclick="javascript:introJs().setOptions({ 'skipLabel': '{{=T('Skip')}}', 'nextLabel': '{{=T('Next')}}', 'prevLabel': '{{=T('Previous')}}', 'doneLabel': '{{=T('Exit')}}' }).start();" href='javascript:void(0);' class="btn btn-primary" >
+          <span class="icon-white icon-question-sign"></span>
+      </a>
       <br>
       <small>{{=nameP}}</small>
     </h1>
@@ -24,13 +29,28 @@
                       <span class="icon-black icon-fullscreen"></span>
                   </a>              
 
-              <div id="h_weighting_h" class="navbar-inner" >  
+              <div id="h_weighting_h" class="navbar-inner" 
+              {{if (auth.has_membership('Teacher')):}}
+                data-step="{{step_count+=1}}{{=step_count}}" data-intro="El primer paso consiste en crear la ponderación del curso. El menú le mostrara las acciones para gestionar la ponderación del curso:
+                <br><b>A.  Crear Nueva Ponderación:</b> Le permite una nueva ponderación del curso.
+                <br><b>B.  Obtener Ponderación Anterior:</b> Le permite obtener la ponderación de un curso de un semestre anterior. 
+                <br><b>C.  Editar Ponderación:</b> Luego de haber creado la ponderación del curso correctamente podrá editar la misma si desea hacer algún tipo de cambio.
+                "
+              {{pass}}>
                 <div id="weighting_menu">          
                   
                 </div>        
               </div>
 
-              <div id="weighting_inside" class="well" style="overflow:auto; background-color:white; ">
+              <div id="weighting_inside" class="well" style="overflow:auto; background-color:white; " 
+              {{if (auth.has_membership('Teacher')):}}
+                data-step="{{step_count+=1}}{{=step_count}}" data-intro="Luego de crear la ponderación del curso correctamente se le mostrará la ponderación en esta sección. Se mostrara el nombre de la <b>categoría</b>, la <b>nota</b>, si las actividades dentro de esta categoría serán notas promediadas <b>(P.N)</b> y por último si el tutor académico tiene permisos para planificar actividades dentro de la categoría <b>(P.C)</b>."
+              {{elif (auth.has_membership('Academic') or auth.has_membership('Student')):}}
+                  data-step="{{step_count+=1}}{{=step_count}}" data-intro="En esta sección se le mostrará la ponderación del curso. Se mostrará el nombre de la <b>categoría</b>, <b>nota</b>, si las actividades dentro de esta categoría serán notas promediadas <b>(P.N)</b> y por último si el tutor académico tiene permisos para planificar actividades dentro de la categoría <b>(P.C)</b>.
+                    "
+              {{pass}}
+              >
+
                 {{exception_query = db(db.course_laboratory_exception.project == request.vars['project']).select().first()}}
                 {{if exception_query is None:}}
                   {{exception_s_var = False}}
@@ -138,7 +158,7 @@
 
 
             <!--LAB WEIGHTING DIV-->
-            <div  id="weighting_lab_div" style=" width:100%;">
+            <div  id="weighting_lab_div" style=" width:100%;" >
                   
                   <a type="button" class="close" title="{{=T('Help')}}" aria-hidden="true" role="button" class="btn btn-warning" data-toggle="modal" data-target="#help_modal_weighting" >
                       <span class="icon-black icon-question-sign"></span>
@@ -148,23 +168,39 @@
                   <a type="button" class="close" title="{{=T('View in full page the weighting')}}" aria-hidden="true" href="{{=URL('activity_control', 'students_control_full',vars=dict( year = year, type='lab', project = request.vars['project'], f_view='weighting'))}}" >
                       <span class="icon-black icon-fullscreen"></span>
                   </a>              
-              
-
-              <div id="h_weighting_lab_h" class="navbar-inner" >  
-                  <div id="weighting_lab_menu">          
-                    
-                  </div>  
-              </div>
-
-
-              <div id="weighting_lab_inside" class="well" style="overflow:auto;  background-color:white;  ">
-                {{request.vars['type']="lab"}}
+              {{request.vars['type']="lab"}}
                 {{no_menu=True}}
                 {{if (auth.has_membership('Super-Administrator')) or (auth.has_membership('Ecys-Administrator')) or (auth.has_membership('Teacher') and request.vars['type'] == "course"  and assigned_to_project == True) or (auth.has_membership('Student') and request.vars['type'] == "lab"  and assigned_to_project == True) or (auth.has_membership('Student')  and request.vars['type'] == "course" and exception_s_var == True  and assigned_to_project == True) or (auth.has_membership('Teacher')  and request.vars['type'] == "lab" and exception_t_var == True  and assigned_to_project == True):}}
                   {{if str(year) == str(cpfecys.current_year_period().id):}}
                     {{no_menu=False}}
                   {{pass}}
                 {{pass}}
+
+              <div id="h_weighting_lab_h" class="navbar-inner" 
+              {{if (auth.has_membership('Student') and no_menu == False):}}
+                data-step="{{step_count+=1}}{{=step_count}}" data-intro="En esta sección podrá gestionar la ponderación del laboratorio. El menú le mostrara las siguientes acciones:
+                <br><b>A.  Crear Nueva Ponderación:</b> Le permite crear una nueva ponderación del laboratorio.
+                <br><b>B.  Obtener Ponderación Anterior:</b> Le permite obtener una ponderación del laboratorio de un semestre anterior. 
+                <br><b>C.  Editar Ponderación:</b> Luego de haber creado la ponderación del laboratorio correctamente podrá editar la misma si desea hacer algún tipo de cambio.
+                <br><b>D.  Solicitar Cambio:</b> Si la fecha límite de ingreso se ha cumplido se le mostrara la opción solicitar cambio. Cualquier cambio que desee realizar deberá ser aprobado por el catedrático del curso o por un administrador del sistema.
+                "
+              {{pass}}              
+              >  
+                  <div id="weighting_lab_menu">          
+                    
+                  </div>  
+              </div>
+
+
+              <div id="weighting_lab_inside" class="well" style="overflow:auto;  background-color:white; " 
+              {{if (auth.has_membership('Student') and no_menu == False):}}
+                  data-step="{{step_count+=1}}{{=step_count}}" data-intro="Luego de crear la ponderación del laboratorio correctamente se le mostrará la ponderación del mismo en esta sección. Las columnas a mostrar son <b>categoría</b>, <b>nota</b> y si las actividades dentro de esta categoría serán notas promediadas <b>(P.N)</b>."
+              {{elif (auth.has_membership('Teacher') or auth.has_membership('Academic')):}}
+                  data-step="{{step_count+=1}}{{=step_count}}" data-intro="En esta sección se le mostrará la ponderación del laboratorio. Las columnas a mostrar son <b>categoría</b>, <b>nota</b> y si las actividades dentro de esta categoría serán notas promediadas <b>(P.N)</b>.
+                    "
+              {{pass}}
+              >
+                
 
                 {{#-------------------------------------------Course ended---------------------------------------------------------}}
                 {{course_ended_var = db((db.course_ended.project==request.vars['project']) & (db.course_ended.period==year) ).select().first() }}
@@ -280,17 +316,67 @@
             </a>
             <!--Menu of activity DIV Right-->
              <!--Menu of activity DIV left-->
-              <div id="h_activity_h" class="navbar-inner">
-                <div id="activity_menu">
+              <div id="h_activity_h" class="navbar-inner" 
+              {{if (auth.has_membership('Teacher')):}}
+                  data-step="{{step_count+=1}}{{=step_count}}" data-intro="Luego de seleccionar la pestaña de <b>Actividades de Clase</b>, el menú le presenta las distintas acciones que tiene disponible para gestionar la planificación del curso como lo son <b>Crear Actividad</b> y <b>Editar Actividad</b>. También se encuentra la opción de <b>Reporte General de Actividades</b> en la cual le permite visualizar el reporte de todas las actividades de la clase entre otra opciones.
+                    "
+              {{elif (auth.has_membership('Student') and no_menu == False):}}
+                  data-step="{{step_count+=1}}{{=step_count}}" data-intro="Luego de seleccionar la pestaña de <b>Actividades de Laboratorio</b>, el menú le presenta las distintas acciones que tiene disponible para gestionar la planificación del laboratorio:
+                  <br><b>A.  Crear Actividad:</b> Le permite crear actividades dentro de la planificación del laboratorio.
+                  <br><b>B.  Editar Actividad:</b> Le permite editar las actividades creadas dentro de la planificación del laboratorio. Esta opción estará habilitada únicamente si el periodo permitido para el ingreso de actividades no ha concluido.
+                  <br><b>C.  Revalidar Laboratorio:</b> Le permite gestionar la revalidación de los laboratorios de los estudiantes asignados al curso.
+                  <br><b>D.  Solicitar Cambio:</b> Le permite solicitar un cambio de actividades dentro de una categoría que conforma la ponderación del laboratorio. Esta opción estará habilitada si el periodo  de  ingreso de actividades ha concluido.
+                  <br><b>E.  Reporte General de Actividades:</b> Le permite visualizar el reporte de todas las actividades del laboratorio.
+
+                    "
+              {{elif (auth.has_membership('Academic')):}}
+                  data-step="{{step_count+=1}}{{=step_count}}" data-intro="El menú le mostrara la opción <b>Reporte General de Actividades</b> en la cual le permite visualizar el reporte de todas las actividades de la clase (si se ha seleccionado la pestaña <b>Actividades de Clase</b>) o del laboratorio (si se ha seleccionado la pestaña <b>Actividades de Laboratorio</b>).
+                    "
+              {{pass}}
+              >
+                
+                <div id="activity_menu" >
                 </div>
+
+
               </div style="width:100%;">
               <!--Menu of the activity DIV lett-->
                  <!--Cuadro donde sale la información-->
                   <div id="activity_insideMaster" class="well" style=" background-color:white;  ">
                     <ul id="myTabActivities" class="nav nav-tabs">
-                      <li class="active" id="classActivities"><a href="#" data-toggle="tab">{{=T('Class Activities')}}</a></li>
-                      <li id="laboratoryActivities"><a href="#" data-toggle="tab">{{=T('Laboratory Activities')}}</a></li>
-                      <li id="Activitywithoutmetric"><a href="#" data-toggle="tab">{{=T('Activity without metric')}}</a></li>
+                      <li class="active" id="classActivities"><a href="#" data-toggle="tab"
+                        {{if (auth.has_membership('Teacher')) or ((auth.has_membership('Student') and no_menu == False ) ):}}
+                            data-step="{{step_count+=1}}{{=step_count}}" data-intro="
+                              Al seleccionar la pestaña <b>Actividades de Clase</b> se le mostrara la planificación de la clase en la cual podrá gestionar las notas de cada actividad.
+                              "
+                        {{elif (auth.has_membership('Academic')):}}
+                             data-step="{{step_count+=1}}{{=step_count}}" data-intro="
+                              Al seleccionar la pestaña <b>Actividades de Clase</b> se le mostrara la planificación de la clase en la cual podrá visualizar las notas obtenidas en cada una de las actividades.
+                              "
+                        {{pass}}
+                        >{{=T('Class Activities')}}</a></li>
+                      <li id="laboratoryActivities"><a href="#" data-toggle="tab"
+                        {{if (auth.has_membership('Teacher')) or ((auth.has_membership('Student') and no_menu == False) ):}}
+                            data-step="{{step_count+=1}}{{=step_count}}" data-intro="
+                              Al seleccionar la pestaña <b>Actividades de Laboratorio</b>, se le mostrara la planificación del laboratorio en la cual podrá gestionar las notas de cada actividad.
+                              "
+                        {{elif (auth.has_membership('Academic')):}}
+                             data-step="{{step_count+=1}}{{=step_count}}" data-intro="
+                              Al seleccionar la pestaña <b>Actividades de Laboratorio</b>, se le mostrara la planificación del laboratorio en la cual podrá visualizar las notas obtenidas en cada una de las actividades.
+                              "
+                        {{pass}}
+                        >{{=T('Laboratory Activities')}}</a></li>
+                      <li id="Activitywithoutmetric"><a href="#" data-toggle="tab"
+                        {{if (auth.has_membership('Teacher')) or ((auth.has_membership('Student') and no_menu == False) ):}}
+                            data-step="{{step_count+=1}}{{=step_count}}" data-intro="
+                              Al seleccionar la pestaña <b>Actividades sin métrica</b>, podrá gestionar todas aquellas actividades que no tengan una nota asociada.
+                              "
+                        {{elif (auth.has_membership('Academic')):}}
+                             data-step="{{step_count+=1}}{{=step_count}}" data-intro="
+                              Al seleccionar la pestaña <b>Actividades sin métrica</b>, podrá visualizar todas aquellas actividades que no tengan una nota asociada.
+                              "
+                        {{pass}}
+                        >{{=T('Activity without metric')}}</a></li>
                     </ul>
                     <div  style=" width:800px; overflow:auto;">
                       <div style=" width:100%;" >
@@ -413,3 +499,10 @@
 </div>
 
 
+{{if visited is None:}}
+<script type="text/javascript">
+      var introguide = introJs().setOptions({ 'skipLabel': '{{=T('Skip')}}', 'nextLabel': '{{=T('Next')}}', 'prevLabel': '{{=T('Previous')}}', 'doneLabel': '{{=T('Exit')}}' });
+      introguide.start(); 
+  </script>
+    {{db.page_visited.insert(user_id = auth.user.id, page_name ='students_control')}}
+{{pass}}

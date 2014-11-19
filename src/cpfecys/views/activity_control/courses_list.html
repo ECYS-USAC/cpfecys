@@ -205,7 +205,7 @@
 								<td width="20%">
 									<center>
 										{{assignation_var = db((db.user_project.project==course.user_project.project)&(db.user_project.assigned_user==auth.user.id)&(db.user_project.period==str(periodo.id))).select().first()}}
-										<a class="btn" href="{{=URL('student_academic', 'academic_assignation', vars=dict(assignation = assignation_var.id, year_period = str(periodo.id)))}}">
+										<a class="btn" href="{{=URL('student_academic', 'academic_assignation', vars=dict(assignation = assignation_var.id, year_period = str(periodo.id)))}}" style="height:32px; width:32px;">
 											<img src="{{=URL('static','images')}}/academic_control/users6.png" height="32" width="32">							
 										</a><br>
 										<a href="{{=URL('student_academic', 'academic_assignation', vars=dict(assignation = assignation_var.id, year_period = str(periodo.id)))}}">
@@ -215,7 +215,7 @@
 								</td>
 								<td width="20%">
 									<center>
-										<a class="btn" href="{{=URL('activity_control', 'students_control', vars=dict( project = course.user_project.project, period=periodo.id))}}">
+										<a class="btn" href="{{=URL('activity_control', 'students_control', vars=dict( project = course.user_project.project, period=periodo.id))}}" style="height:32px; width:32px;">
 											<img src="{{=URL('static','images')}}/academic_control/time3.png" height="32" width="32">
 										</a><br>
 										<a href="{{=URL('activity_control', 'students_control', vars=dict( project = course.user_project.project, period=periodo.id))}}">
@@ -225,7 +225,7 @@
 								</td>
 								<td width="20%">
 									<center>
-										<a class="btn" href="{{=URL('notification', 'teacher_mail_notifications', vars=dict(assignation = assignation_var.id ))}}">
+										<a class="btn" href="{{=URL('notification', 'teacher_mail_notifications', vars=dict(assignation = assignation_var.id ))}}" style="height:32px; width:32px;">
 											<img src="{{=URL('static','images')}}/academic_control/send4.png" height="32" width="32">
 										</a><br>
 										<a href="{{=URL('notification', 'teacher_mail_notifications', vars=dict(assignation = assignation_var.id))}}">
@@ -235,7 +235,7 @@
 								</td>
 								<td width="20%">
 									<center>
-										<a class="btn" href="{{=URL('notification', 'teacher_register_mail_notifications', vars=dict( project = course.user_project.project, period=periodo.id, type = 'course_list'))}}">
+										<a class="btn" href="{{=URL('notification', 'teacher_register_mail_notifications', vars=dict( project = course.user_project.project, period=periodo.id, type = 'course_list'))}}" style="height:32px; width:32px;">
 											<img src="{{=URL('static','images')}}/academic_control/envelope33.png" height="32" width="32">
 										</a><br>
 										<a  href="{{=URL('notification', 'teacher_register_mail_notifications', vars=dict( project = course.user_project.project, period=periodo.id, type = 'course_list'))}}">
@@ -246,7 +246,7 @@
 								<td width="20%">
 									<center>
 										
-										<a class="btn" href="{{=URL('library', 'file_managers', vars=dict( pro = assignation_var.id, tipo='3'))}}">
+										<a class="btn" href="{{=URL('library', 'file_managers', vars=dict( pro = assignation_var.id, tipo='3'))}}" style="height:32px; width:32px;">
 											<img src="{{=URL('static','images')}}/academic_control/file96.png" height="32" width="32">
 										</a><br>
 										<a  href="{{=URL('library', 'file_managers', vars=dict( pro = assignation_var.id, tipo='3'))}}">
@@ -263,7 +263,7 @@
 							<tr>
 								<td width="20%">
 									<center>										
-										<a class="btn" href="{{=URL('teacher', 'students', vars=dict( project = course.user_project.project, year_period=periodo.id))}}">
+										<a class="btn" href="{{=URL('teacher', 'students', vars=dict( project = course.user_project.project, year_period=periodo.id))}}" style="height:32px; width:32px;">
 											<img src="{{=URL('static','images')}}/academic_control/teacher35.png" height="32" width="32">							
 										</a><br>
 										<a href="{{=URL('teacher', 'students', vars=dict( project = course.user_project.project, year_period=periodo.id))}}">
@@ -273,7 +273,7 @@
 								</td>
 								<td width="20%">
 									<center>
-										<a class="btn" href="{{=URL('teacher', 'graphs', vars=dict( project = course.user_project.project, year_period=periodo.id))}}">
+										<a class="btn" href="{{=URL('teacher', 'graphs', vars=dict( project = course.user_project.project, year_period=periodo.id))}}" style="height:32px; width:32px;">
 											<img src="{{=URL('static','images')}}/academic_control/ascending24.png" height="32" width="32">
 										</a><br>
 										<a href="{{=URL('teacher', 'graphs', vars=dict( project = course.user_project.project, year_period=periodo.id))}}">
@@ -296,7 +296,7 @@
 							        pass
 									}}
 									<center>
-										<a class="btn" href="{{=URL('teacher', 'todo_reports', vars=dict(project = course.user_project.project, type='list'))}}">
+										<a class="btn" href="{{=URL('teacher', 'todo_reports', vars=dict(project = course.user_project.project, type='list'))}}" style="height:32px; width:32px;">
 											<img src="{{=URL('static','images')}}/academic_control/business175.png" height="32" width="32">
 										</a><br>
 										<a href="{{=URL('teacher', 'todo_reports', vars=dict(project = course.user_project.project, type='list'))}}">
@@ -312,7 +312,7 @@
 
 									}}
 									<center>
-										<a class="btn" href="{{=URL('activity_control', 'courses_list_request', vars=dict( project = course.user_project.project, period=periodo.id, type = 'course_list'))}}">
+										<a class="btn" href="{{=URL('activity_control', 'courses_list_request', vars=dict( project = course.user_project.project, period=periodo.id, type = 'course_list'))}}" style="height:32px; width:32px;">
 											<img src="{{=URL('static','images')}}/academic_control/research.png" height="32" width="32">
 										</a><br>
 										<a  href="{{=URL('activity_control', 'courses_list_request', vars=dict(project = course.user_project.project, type='list'))}}">
@@ -375,7 +375,7 @@
 										<td width="20%">
 											{{assignation_var = db((db.user_project.project==course.user_project.project)&(db.user_project.assigned_user==auth.user.id)&(db.user_project.period==str(periodo.id))).select().first()}}
 											<center>
-												<a class="btn" href="{{=URL('student_academic', 'academic_assignation', vars=dict(assignation = assignation_var.id, year_period = str(periodo.id)))}}">
+												<a class="btn" href="{{=URL('student_academic', 'academic_assignation', vars=dict(assignation = assignation_var.id, year_period = str(periodo.id)))}}" style="height:32px; width:32px;">
 													<img src="{{=URL('static','images')}}/academic_control/users6.png" height="32" width="32">							
 												</a><br>
 												<a href="{{=URL('student_academic', 'academic_assignation', vars=dict(assignation = assignation_var.id, year_period = str(periodo.id)))}}">
@@ -385,7 +385,7 @@
 										</td>
 										<td width="20%">
 											<center>
-												<a class="btn" href="{{=URL('activity_control', 'students_control', vars=dict( project = course.user_project.project, period=periodo.id))}}">
+												<a class="btn" href="{{=URL('activity_control', 'students_control', vars=dict( project = course.user_project.project, period=periodo.id))}}" style="height:32px; width:32px;">
 													<img src="{{=URL('static','images')}}/academic_control/time3.png" height="32" width="32">
 												</a><br>
 												<a href="{{=URL('activity_control', 'students_control', vars=dict( project = course.user_project.project, period=periodo.id))}}">
@@ -395,7 +395,7 @@
 										</td>
 										<td width="20%">
 											<center>
-												<a class="btn" href="{{=URL('notification', 'mail_notifications', vars=dict( assignation = assignation_var.id))}}">
+												<a class="btn" href="{{=URL('notification', 'mail_notifications', vars=dict( assignation = assignation_var.id))}}" style="height:32px; width:32px;">
 													<img src="{{=URL('static','images')}}/academic_control/send4.png" height="32" width="32">
 												</a><br>
 												<a href="{{=URL('notification', 'mail_notifications', vars=dict( assignation = assignation_var.id))}}">
@@ -405,7 +405,7 @@
 										</td>
 										<td width="20%">
 											<center>
-												<a class="btn" href="{{=URL('notification', 'register_mail_notifications', vars=dict( project = course.user_project.project, period=periodo.id, type = 'course_list'))}}">
+												<a class="btn" href="{{=URL('notification', 'register_mail_notifications', vars=dict( project = course.user_project.project, period=periodo.id, type = 'course_list'))}}" style="height:32px; width:32px;">
 													<img src="{{=URL('static','images')}}/academic_control/envelope33.png" height="32" width="32">
 												</a><br>
 												<a  href="{{=URL('notification', 'register_mail_notifications', vars=dict( project = course.user_project.project, period=periodo.id, type = 'course_list'))}}">
@@ -416,7 +416,7 @@
 										<td width="20%">
 											<center>
 												
-												<a class="btn" href="{{=URL('library', 'file_managers', vars=dict( pro = assignation_var.id, tipo='3'))}}">
+												<a class="btn" href="{{=URL('library', 'file_managers', vars=dict( pro = assignation_var.id, tipo='3'))}}" style="height:32px; width:32px;">
 													<img src="{{=URL('static','images')}}/academic_control/file96.png" height="32" width="32">
 												</a><br>
 												<a  href="{{=URL('library', 'file_managers', vars=dict( pro = assignation_var.id, tipo='3'))}}">
@@ -426,7 +426,7 @@
 										</td>
 										<td width="20%">
 											<center>
-												<a class="btn" href="{{=URL('default', 'event_editor', vars=dict( assignation = assignation_var.id))}}">
+												<a class="btn" href="{{=URL('default', 'event_editor', vars=dict( assignation = assignation_var.id))}}" style="height:32px; width:32px;">
 													<img src="{{=URL('static','images')}}/academic_control/add98.png" height="32" width="32">
 												</a><br>
 												<a  href="{{=URL('default', 'event_editor', vars=dict( assignation = assignation_var.id))}}">
@@ -493,7 +493,7 @@
 												<td width="20%">
 													
 													<center>
-														<a class="btn" href="{{=URL('activity_control', 'students_control', vars=dict( project = course.academic_course_assignation.assignation.id, period=periodo.id))}}">
+														<a class="btn" href="{{=URL('activity_control', 'students_control', vars=dict( project = course.academic_course_assignation.assignation.id, period=periodo.id))}}" style="height:32px; width:32px;">
 															<img src="{{=URL('static','images')}}/academic_control/time3.png" height="32" width="32">
 														</a><br>
 														<a href="{{=URL('activity_control', 'students_control', vars=dict( project = course.academic_course_assignation.assignation.id, period=periodo.id))}}">
@@ -504,7 +504,7 @@
 												<td width="20%">
 													
 													<center>
-														<a class="btn" href="{{=URL('notification_student', 'send_mail', vars=dict( project = course.academic_course_assignation.assignation.id, semester_id=periodo.id))}}">
+														<a class="btn" href="{{=URL('notification_student', 'send_mail', vars=dict( project = course.academic_course_assignation.assignation.id, semester_id=periodo.id))}}" style="height:32px; width:32px;">
 															<img src="{{=URL('static','images')}}/academic_control/send9.png" height="32" width="32">
 														</a><br>
 														<a href="{{=URL('notification_student', 'send_mail', vars=dict( project = course.academic_course_assignation.assignation.id, semester_id=periodo.id))}}">
@@ -515,7 +515,7 @@
 												<td width="20%">
 													
 													<center>
-														<a class="btn" href="{{=URL('notification_student', 'sent_mails', vars=dict( project = course.academic_course_assignation.assignation.id, period=periodo.id, type='acadmic_control'))}}">
+														<a class="btn" href="{{=URL('notification_student', 'sent_mails', vars=dict( project = course.academic_course_assignation.assignation.id, period=periodo.id, type='acadmic_control'))}}" style="height:32px; width:32px;">
 															<img src="{{=URL('static','images')}}/academic_control/envelope33.png" height="32" width="32">
 														</a><br>
 														<a href="{{=URL('notification_student', 'sent_mails', vars=dict( project = course.academic_course_assignation.assignation.id, period=periodo.id, type='acadmic_control'))}}">
@@ -525,7 +525,7 @@
 												</td>
 												<td width="20%">
 													<center>
-														<a class="btn" href="{{=URL('library', 'file_managers', vars=dict( pro = course.academic_course_assignation.assignation.id, semester = periodo.id, tipo = '5'))}}">
+														<a class="btn" href="{{=URL('library', 'file_managers', vars=dict( pro = course.academic_course_assignation.assignation.id, semester = periodo.id, tipo = '5'))}}" style="height:32px; width:32px;">
 															<img src="{{=URL('static','images')}}/academic_control/file96.png" height="32" width="32">
 														</a><br>
 														<a  href="{{=URL('library', 'file_managers', vars=dict( pro = course.academic_course_assignation.assignation.id, semester = periodo.id, tipo = '5'))}}">

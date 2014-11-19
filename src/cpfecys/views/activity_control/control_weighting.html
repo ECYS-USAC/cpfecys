@@ -94,12 +94,16 @@
 		   <span class="icon-list" ></span>
 		  </a>
 	 	{{pass}}
-		  <h3 class="icon-white" style="white-space:nowrap;">
+	 		
+		  <h3 class="icon-white" style="white-space:nowrap; ">
 		  	{{if request.vars['type'] == "course":}}
+		  		<font title="{{=T('Course Weighting') }}">
 		  		{{=T('Course Weighting') }}
 		  	{{else:}}
+		  		<font title="{{=T('Laboratory Weighting') }}">
 		  		{{=T('Laboratory Weighting') }}
 		  	{{pass}}		      
+		  		</font>
 		  </h3> 
 		  <ul class="dropdown-menu">  
 	  	          

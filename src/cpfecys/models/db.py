@@ -1264,6 +1264,11 @@ db.define_table('validate_student_parameters',
     Field('parameter_value_validate', 'string', notnull=True, label=T('Parameter_Value'))
 )
 
+db.define_table('page_visited',
+    Field('user_id', 'integer', notnull=True, label=T('username')),
+    Field('page_name', 'string', notnull=True, label=T('Page'))
+)
+
 ## after defining tables, uncomment below to enable auditing
     # auth.enable_record_versioning(db)
 # automatic forcing spanish language

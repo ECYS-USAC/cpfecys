@@ -407,7 +407,10 @@ def students_control():
         assigned_to_project = False
     else:
         assigned_to_project = True
-    return dict(project = project_var, year = year.id , name = project_select.name, nameP=(T(year.period.name)+" "+str(year.yearp)), assigned_to_project = assigned_to_project)
+
+    visited = db((db.page_visited.user_id == auth.user.id) & (db.page_visited.page_name == 'students_control')).select().first()
+
+    return dict(project = project_var, year = year.id , name = project_select.name, nameP=(T(year.period.name)+" "+str(year.yearp)), assigned_to_project = assigned_to_project, visited = visited)
 
 
 
