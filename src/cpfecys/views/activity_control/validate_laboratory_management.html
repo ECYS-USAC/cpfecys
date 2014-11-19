@@ -70,7 +70,7 @@
 									{{if session.search_validate_laboratory_management == "" or session.search_validate_laboratory_management is None:}}
 										{{=str(db((db.validate_laboratory_log.project==assigantion.project.name)&(db.validate_laboratory_log.yearp==str(year.yearp))&(db.validate_laboratory_log.period==str(T(year.period.name)))&(db.validate_laboratory_log.operation_log=='insert')&(db.validate_laboratory_log.validation_type==True)).count(db.validate_laboratory_log.id))}}
 									{{else:}}
-										{{=str(db((db.validate_laboratory_log.project==assigantion.project.name)&(db.validate_laboratory_log.yearp==str(year.yearp))&(db.validate_laboratory_log.period==str(T(year.period.name)))&(db.validate_laboratory_log.operation_log=='insert')&(db.validate_laboratory_log.validation_type==True)&(db.validate_laboratory_log.academic.like('%'+str(session.search_grades_management)+'%'))).count(db.validate_laboratory_log.id))}}
+										{{=str(db((db.validate_laboratory_log.project==assigantion.project.name)&(db.validate_laboratory_log.yearp==str(year.yearp))&(db.validate_laboratory_log.period==str(T(year.period.name)))&(db.validate_laboratory_log.operation_log=='insert')&(db.validate_laboratory_log.validation_type==True)&(db.validate_laboratory_log.academic.like('%'+str(session.search_validate_laboratory_management)+'%'))).count(db.validate_laboratory_log.id))}}
 									{{pass}}
 								</a>
 							</center>
@@ -81,7 +81,7 @@
 									{{if session.search_validate_laboratory_management == "" or session.search_validate_laboratory_management is None:}}
 										{{=str(db((db.validate_laboratory_log.project==assigantion.project.name)&(db.validate_laboratory_log.yearp==str(year.yearp))&(db.validate_laboratory_log.period==str(T(year.period.name)))&(db.validate_laboratory_log.operation_log=='update')&(db.validate_laboratory_log.validation_type==True)).count(db.validate_laboratory_log.id))}}
 									{{else:}}
-										{{=str(db((db.validate_laboratory_log.project==assigantion.project.name)&(db.validate_laboratory_log.yearp==str(year.yearp))&(db.validate_laboratory_log.period==str(T(year.period.name)))&(db.validate_laboratory_log.operation_log=='update')&(db.validate_laboratory_log.validation_type==True)&(db.validate_laboratory_log.academic.like('%'+str(session.search_grades_management)+'%'))).count(db.validate_laboratory_log.id))}}
+										{{=str(db((db.validate_laboratory_log.project==assigantion.project.name)&(db.validate_laboratory_log.yearp==str(year.yearp))&(db.validate_laboratory_log.period==str(T(year.period.name)))&(db.validate_laboratory_log.operation_log=='update')&(db.validate_laboratory_log.validation_type==True)&(db.validate_laboratory_log.academic.like('%'+str(session.search_validate_laboratory_management)+'%'))).count(db.validate_laboratory_log.id))}}
 									{{pass}}
 								</a>
 							</center>
@@ -92,7 +92,7 @@
 									{{if session.search_validate_laboratory_management == "" or session.search_validate_laboratory_management is None:}}
 										{{=str(db((db.validate_laboratory_log.project==assigantion.project.name)&(db.validate_laboratory_log.yearp==str(year.yearp))&(db.validate_laboratory_log.period==str(T(year.period.name)))&(db.validate_laboratory_log.operation_log=='delete')&(db.validate_laboratory_log.validation_type==True)).count(db.validate_laboratory_log.id))}}
 									{{else:}}
-										{{=str(db((db.validate_laboratory_log.project==assigantion.project.name)&(db.validate_laboratory_log.yearp==str(year.yearp))&(db.validate_laboratory_log.period==str(T(year.period.name)))&(db.validate_laboratory_log.operation_log=='delete')&(db.validate_laboratory_log.validation_type==True)&(db.validate_laboratory_log.academic.like('%'+str(session.search_grades_management)+'%'))).count(db.validate_laboratory_log.id))}}
+										{{=str(db((db.validate_laboratory_log.project==assigantion.project.name)&(db.validate_laboratory_log.yearp==str(year.yearp))&(db.validate_laboratory_log.period==str(T(year.period.name)))&(db.validate_laboratory_log.operation_log=='delete')&(db.validate_laboratory_log.validation_type==True)&(db.validate_laboratory_log.academic.like('%'+str(session.search_validate_laboratory_management)+'%'))).count(db.validate_laboratory_log.id))}}
 									{{pass}}
 								</a>
 							</center>
@@ -137,7 +137,7 @@
 															{{if session.search_validate_laboratory_management == "" or session.search_validate_laboratory_management is None:}}
 																{{=str(db((db.validate_laboratory_log.project==assigantion.project.name)&(db.validate_laboratory_log.yearp==str(year.yearp))&(db.validate_laboratory_log.period==str(T(year.period.name)))&(db.validate_laboratory_log.date_log>=str(start))&(db.validate_laboratory_log.date_log<str(end))&(db.validate_laboratory_log.operation_log=='insert')&(db.validate_laboratory_log.validation_type==True)).count(db.validate_laboratory_log.id))}}
 															{{else:}}
-																{{=str(db((db.validate_laboratory_log.project==assigantion.project.name)&(db.validate_laboratory_log.yearp==str(year.yearp))&(db.validate_laboratory_log.period==str(T(year.period.name)))&(db.validate_laboratory_log.date_log>=str(start))&(db.validate_laboratory_log.date_log<str(end))&(db.validate_laboratory_log.operation_log=='insert')&(db.validate_laboratory_log.validation_type==True)&(db.validate_laboratory_log.academic.like('%'+str(session.search_grades_management)+'%'))).count(db.validate_laboratory_log.id))}}
+																{{=str(db((db.validate_laboratory_log.project==assigantion.project.name)&(db.validate_laboratory_log.yearp==str(year.yearp))&(db.validate_laboratory_log.period==str(T(year.period.name)))&(db.validate_laboratory_log.date_log>=str(start))&(db.validate_laboratory_log.date_log<str(end))&(db.validate_laboratory_log.operation_log=='insert')&(db.validate_laboratory_log.validation_type==True)&(db.validate_laboratory_log.academic.like('%'+str(session.search_validate_laboratory_management)+'%'))).count(db.validate_laboratory_log.id))}}
 															{{pass}}
 														</a>
 													</center>
@@ -148,7 +148,7 @@
 															{{if session.search_validate_laboratory_management == "" or session.search_validate_laboratory_management is None:}}
 																{{=str(db((db.validate_laboratory_log.project==assigantion.project.name)&(db.validate_laboratory_log.yearp==str(year.yearp))&(db.validate_laboratory_log.period==str(T(year.period.name)))&(db.validate_laboratory_log.date_log>=str(start))&(db.validate_laboratory_log.date_log<str(end))&(db.validate_laboratory_log.operation_log=='update')&(db.validate_laboratory_log.validation_type==True)).count(db.validate_laboratory_log.id))}}
 															{{else:}}
-																{{=str(db((db.validate_laboratory_log.project==assigantion.project.name)&(db.validate_laboratory_log.yearp==str(year.yearp))&(db.validate_laboratory_log.period==str(T(year.period.name)))&(db.validate_laboratory_log.date_log>=str(start))&(db.validate_laboratory_log.date_log<str(end))&(db.validate_laboratory_log.operation_log=='update')&(db.validate_laboratory_log.validation_type==True)&(db.validate_laboratory_log.academic.like('%'+str(session.search_grades_management)+'%'))).count(db.validate_laboratory_log.id))}}
+																{{=str(db((db.validate_laboratory_log.project==assigantion.project.name)&(db.validate_laboratory_log.yearp==str(year.yearp))&(db.validate_laboratory_log.period==str(T(year.period.name)))&(db.validate_laboratory_log.date_log>=str(start))&(db.validate_laboratory_log.date_log<str(end))&(db.validate_laboratory_log.operation_log=='update')&(db.validate_laboratory_log.validation_type==True)&(db.validate_laboratory_log.academic.like('%'+str(session.search_validate_laboratory_management)+'%'))).count(db.validate_laboratory_log.id))}}
 															{{pass}}
 														</a>
 													</center>
@@ -159,7 +159,7 @@
 															{{if session.search_validate_laboratory_management == "" or session.search_validate_laboratory_management is None:}}
 																{{=str(db((db.validate_laboratory_log.project==assigantion.project.name)&(db.validate_laboratory_log.yearp==str(year.yearp))&(db.validate_laboratory_log.period==str(T(year.period.name)))&(db.validate_laboratory_log.date_log>=str(start))&(db.validate_laboratory_log.date_log<str(end))&(db.validate_laboratory_log.operation_log=='delete')&(db.validate_laboratory_log.validation_type==True)).count(db.validate_laboratory_log.id))}}
 															{{else:}}
-																{{=str(db((db.validate_laboratory_log.project==assigantion.project.name)&(db.validate_laboratory_log.yearp==str(year.yearp))&(db.validate_laboratory_log.period==str(T(year.period.name)))&(db.validate_laboratory_log.date_log>=str(start))&(db.validate_laboratory_log.date_log<str(end))&(db.validate_laboratory_log.operation_log=='delete')&(db.validate_laboratory_log.validation_type==True)&(db.validate_laboratory_log.academic.like('%'+str(session.search_grades_management)+'%'))).count(db.validate_laboratory_log.id))}}
+																{{=str(db((db.validate_laboratory_log.project==assigantion.project.name)&(db.validate_laboratory_log.yearp==str(year.yearp))&(db.validate_laboratory_log.period==str(T(year.period.name)))&(db.validate_laboratory_log.date_log>=str(start))&(db.validate_laboratory_log.date_log<str(end))&(db.validate_laboratory_log.operation_log=='delete')&(db.validate_laboratory_log.validation_type==True)&(db.validate_laboratory_log.academic.like('%'+str(session.search_validate_laboratory_management)+'%'))).count(db.validate_laboratory_log.id))}}
 															{{pass}}
 														</a>
 													</center>
