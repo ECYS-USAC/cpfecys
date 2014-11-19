@@ -70,7 +70,7 @@
 									{{if session.search_grades_management == "" or session.search_grades_management is None:}}
 										{{=str(db((db.grades_log.project==assigantion.project.name)&(db.grades_log.yearp==str(year.yearp))&(db.grades_log.period==str(T(year.period.name)))&(db.grades_log.operation_log=='insert')).count(db.grades_log.id))}}
 									{{else:}}
-										{{=str(db((db.grades_log.project==assigantion.project.name)&(db.grades_log.yearp==str(year.yearp))&(db.grades_log.period==str(T(year.period.name)))&(db.grades_log.operation_log=='insert')&(db.grades_log.academic==str(session.search_grades_management))).count(db.grades_log.id))}}
+										{{=str(db((db.grades_log.project==assigantion.project.name)&(db.grades_log.yearp==str(year.yearp))&(db.grades_log.period==str(T(year.period.name)))&(db.grades_log.operation_log=='insert')&(db.grades_log.academic.like('%'+str(session.search_grades_management)+'%'))).count(db.grades_log.id))}}
 									{{pass}}
 								</a>
 							</center>
@@ -81,7 +81,7 @@
 									{{if session.search_grades_management == "" or session.search_grades_management is None:}}
 										{{=str(db((db.grades_log.project==assigantion.project.name)&(db.grades_log.yearp==str(year.yearp))&(db.grades_log.period==str(T(year.period.name)))&(db.grades_log.operation_log=='update')).count(db.grades_log.id))}}
 									{{else:}}
-										{{=str(db((db.grades_log.project==assigantion.project.name)&(db.grades_log.yearp==str(year.yearp))&(db.grades_log.period==str(T(year.period.name)))&(db.grades_log.operation_log=='update')&(db.grades_log.academic==str(session.search_grades_management))).count(db.grades_log.id))}}
+										{{=str(db((db.grades_log.project==assigantion.project.name)&(db.grades_log.yearp==str(year.yearp))&(db.grades_log.period==str(T(year.period.name)))&(db.grades_log.operation_log=='update')&(db.grades_log.academic.like('%'+str(session.search_grades_management)+'%'))).count(db.grades_log.id))}}
 									{{pass}}
 								</a>
 							</center>
@@ -92,7 +92,7 @@
 									{{if session.search_grades_management == "" or session.search_grades_management is None:}}
 										{{=str(db((db.grades_log.project==assigantion.project.name)&(db.grades_log.yearp==str(year.yearp))&(db.grades_log.period==str(T(year.period.name)))&(db.grades_log.operation_log=='delete')).count(db.grades_log.id))}}
 									{{else:}}
-										{{=str(db((db.grades_log.project==assigantion.project.name)&(db.grades_log.yearp==str(year.yearp))&(db.grades_log.period==str(T(year.period.name)))&(db.grades_log.operation_log=='delete')&(db.grades_log.academic==str(session.search_grades_management))).count(db.grades_log.id))}}
+										{{=str(db((db.grades_log.project==assigantion.project.name)&(db.grades_log.yearp==str(year.yearp))&(db.grades_log.period==str(T(year.period.name)))&(db.grades_log.operation_log=='delete')&(db.grades_log.academic.like('%'+str(session.search_grades_management)+'%'))).count(db.grades_log.id))}}
 									{{pass}}
 								</a>
 							</center>
@@ -137,7 +137,7 @@
 															{{if session.search_grades_management == "" or session.search_grades_management is None:}}
 																{{=str(db((db.grades_log.project==assigantion.project.name)&(db.grades_log.yearp==str(year.yearp))&(db.grades_log.period==str(T(year.period.name)))&(db.grades_log.date_log>=str(start))&(db.grades_log.date_log<str(end))&(db.grades_log.operation_log=='insert')).count(db.grades_log.id))}}
 															{{else:}}
-																{{=str(db((db.grades_log.project==assigantion.project.name)&(db.grades_log.yearp==str(year.yearp))&(db.grades_log.period==str(T(year.period.name)))&(db.grades_log.date_log>=str(start))&(db.grades_log.date_log<str(end))&(db.grades_log.operation_log=='insert')&(db.grades_log.academic==str(session.search_grades_management))).count(db.grades_log.id))}}
+																{{=str(db((db.grades_log.project==assigantion.project.name)&(db.grades_log.yearp==str(year.yearp))&(db.grades_log.period==str(T(year.period.name)))&(db.grades_log.date_log>=str(start))&(db.grades_log.date_log<str(end))&(db.grades_log.operation_log=='insert')&(db.grades_log.academic.like('%'+str(session.search_grades_management)+'%'))).count(db.grades_log.id))}}
 															{{pass}}
 														</a>
 													</center>
@@ -148,7 +148,7 @@
 															{{if session.search_grades_management == "" or session.search_grades_management is None:}}
 																{{=str(db((db.grades_log.project==assigantion.project.name)&(db.grades_log.yearp==str(year.yearp))&(db.grades_log.period==str(T(year.period.name)))&(db.grades_log.date_log>=str(start))&(db.grades_log.date_log<str(end))&(db.grades_log.operation_log=='update')).count(db.grades_log.id))}}
 															{{else:}}
-																{{=str(db((db.grades_log.project==assigantion.project.name)&(db.grades_log.yearp==str(year.yearp))&(db.grades_log.period==str(T(year.period.name)))&(db.grades_log.date_log>=str(start))&(db.grades_log.date_log<str(end))&(db.grades_log.operation_log=='update')&(db.grades_log.academic==str(session.search_grades_management))).count(db.grades_log.id))}}
+																{{=str(db((db.grades_log.project==assigantion.project.name)&(db.grades_log.yearp==str(year.yearp))&(db.grades_log.period==str(T(year.period.name)))&(db.grades_log.date_log>=str(start))&(db.grades_log.date_log<str(end))&(db.grades_log.operation_log=='update')&(db.grades_log.academic.like('%'+str(session.search_grades_management)+'%'))).count(db.grades_log.id))}}
 															{{pass}}
 														</a>
 													</center>
@@ -159,7 +159,7 @@
 															{{if session.search_grades_management == "" or session.search_grades_management is None:}}
 																{{=str(db((db.grades_log.project==assigantion.project.name)&(db.grades_log.yearp==str(year.yearp))&(db.grades_log.period==str(T(year.period.name)))&(db.grades_log.date_log>=str(start))&(db.grades_log.date_log<str(end))&(db.grades_log.operation_log=='delete')).count(db.grades_log.id))}}
 															{{else:}}
-																{{=str(db((db.grades_log.project==assigantion.project.name)&(db.grades_log.yearp==str(year.yearp))&(db.grades_log.period==str(T(year.period.name)))&(db.grades_log.date_log>=str(start))&(db.grades_log.date_log<str(end))&(db.grades_log.operation_log=='delete')&(db.grades_log.academic==str(session.search_grades_management))).count(db.grades_log.id))}}
+																{{=str(db((db.grades_log.project==assigantion.project.name)&(db.grades_log.yearp==str(year.yearp))&(db.grades_log.period==str(T(year.period.name)))&(db.grades_log.date_log>=str(start))&(db.grades_log.date_log<str(end))&(db.grades_log.operation_log=='delete')&(db.grades_log.academic.like('%'+str(session.search_grades_management)+'%'))).count(db.grades_log.id))}}
 															{{pass}}
 														</a>
 													</center>

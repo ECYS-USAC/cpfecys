@@ -1442,7 +1442,7 @@
 'register': 'regístrese',
 'Register': 'Regístrese',
 'Register Notices': 'Registro de Avisos',
-'Register Notices Detail': 'Register Notices Detail',
+'Register Notices Detail': 'Detalle de Registro de Aviso',
 'Registration data was deleted because auth_user was remove': 'Se elimino por que la información del auth_user se elimino',
 'Registration data was update because auth_user was update': 'Se actualizo la información por que la informacion del auth_user se actualizo',
 'Registration data was updated before I entered by the administrator': 'Se actualizo registro con los datos ingresados anteriormente por parte del administrador',
