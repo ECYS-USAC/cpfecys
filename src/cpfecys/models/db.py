@@ -1049,6 +1049,65 @@ db.define_table('read_mail_student',
     )
 
 
+@auth.requires_login()
+@auth.requires(auth.has_membership('Student') or auth.has_membership('Teacher') or auth.has_membership('Super-Administrator') or auth.has_membership('Ecys-Administrator'))
+def check_student(check_carnet):
+    svp=db(db.validate_student).select().first()
+    if svp is not None:
+        try:
+            #CONSUME THE WEBSERVICE
+            from gluon.contrib.pysimplesoap.client import SoapClient
+            from gluon.contrib.pysimplesoap.client import SimpleXMLElement
+            client = SoapClient(
+                location = svp.supplier,
+                action = svp.supplier+"/"+svp.action_service,
+                namespace = svp.supplier,
+                soap_ns=svp.type_service, trace = True, ns = False)
+
+            import cpfecys
+            year = cpfecys.current_year_period()
+            sent="<"+svp.send+">"
+            for svpf in db(db.validate_student_parameters).select():
+                sent +="<"+svpf.parameter_name_validate+">"+svpf.parameter_value_validate+"</"+svpf.parameter_name_validate+">"
+            sent += "<CARNET>"+str(check_carnet)+"</CARNET><CICLO>"+str(year.yearp)+"</CICLO></"+svp.send+">"
+            back = client.call(svp.action_service,xmlDatos=sent)
+
+            #PREPARE FOR RETURNED XML WEB SERVICE
+            xml = back.as_xml()
+            print xml
+            xml=xml.replace('&lt;','<')
+            xml=xml.replace('&gt;','>')
+            inicio = xml.find("<"+svp.receive+">")
+            final = xml.find("</"+svp.receive+">")
+            xml = xml[inicio:(final+17)]
+            import xml.etree.ElementTree as ET
+            root = ET.fromstring(xml)
+            xml = SimpleXMLElement(xml)
+
+            #VARIABLE TO CHECK THE CORRECT FUNCTIONING
+            CARNET = xml.CARNET
+            NOMBRES = xml.NOMBRES
+            APELLIDOS= xml.APELLIDOS
+            CORREO = xml.CORREO
+            if (CARNET is None or CARNET=='') and (NOMBRES is None or NOMBRES=='') and (APELLIDOS is None or APELLIDOS=='') and (CORREO is None or CORREO==''):
+                return dict(flag=False)
+            else:
+                isStuden=False
+                for c in root.findall('CARRERA'):
+                    if c.find('UNIDAD').text=="08" and c.find('EXTENSION').text=="00" and (c.find('CARRERA').text=="05" or c.find('CARRERA').text=="09"):
+                        isStuden=True
+
+                if isStuden==False:
+                    return dict(flag=False)
+                else:
+                    return dict(flag=True, carnet=int(str(CARNET)), nombres=str(NOMBRES), apellidos=str(APELLIDOS), correo=str(CORREO))
+        except:
+            return dict(flag=False)
+    else:
+        return dict(flag=False)
+
+
+
 db.academic._after_insert.append(lambda f,id: academic_insert(f,id))
 db.academic._after_update.append(lambda s,f: academic_update(f))
 db.academic._before_delete.append(lambda s: academic_delete(s))
@@ -1120,18 +1179,60 @@ def academic_insert(*args):
     academic_var = db.auth_group(db.auth_group.role=='Academic')
     user_var = db.auth_user(db.auth_user.username==str(args[0]['carnet']))
     if user_var is None:
-        #AQUI IRIA LA VALIDACION CON EL WEBSERVICE
-        #If not exists, create auth_user of academic
-        id_user = db.auth_user.insert(first_name = str(args[0]['carnet']),
-                        last_name =  " ",
-                        email = str(args[0]['email']),
+        #WEBSERVICE
+        web_service = check_student(str(args[0]['carnet']))
+        
+        if web_service['flag'] == True:
+            print "erooooooooooooooooooooooooo 1"
+            print "erooooooooooooooooooooooooo 1" + str(web_service['nombres'])
+            print "erooooooooooooooooooooooooo 1" + str(web_service['apellidos'])
+            print "erooooooooooooooooooooooooo 1" + str(web_service['correo'])
+            print "erooooooooooooooooooooooooo 1" + str(args[0]['carnet'])
+            
+
+            id_user = db.auth_user.insert(first_name = web_service['nombres'],
+                        last_name =  web_service['apellidos'],
+                        email = web_service['correo'],
                         username = str(args[0]['carnet']),
                         phone = '12345678',
                         home_address = T('Enter your address'))
-        #Add the id_auth_user to academic.
-        db(db.academic.id == args[1]['id']).update(id_auth_user = id_user.id)
-        #Create membership to academic
-        db.auth_membership.insert(user_id = id_user.id, group_id =  academic_var.id)   
+            print "erooooooooooooooooooooooooo 5"
+            #Add the id_auth_user to academic.
+            db(db.academic.id == args[1]['id']).update(id_auth_user = id_user.id)
+            print "erooooooooooooooooooooooooo 6"
+            #Create membership to academic
+            db.auth_membership.insert(user_id = id_user.id, group_id =  academic_var.id)   
+            print "erooooooooooooooooooooooooo 7"
+        else:
+
+            if session.academic_update != None:
+                if session.assignation_error is None:
+                    session.assignation_error = []
+                    session.assignation_error.append(str(args[0]['carnet']))
+                else:
+                    session.assignation_error.append(str(args[0]['carnet']))
+            else:
+                session.flash = T('The user is not registered to the academic cycle')
+                db(db.academic.id == args[1]['id']).delete()
+
+                result = db(db.auth_membership.user_id==auth.user.id).select()
+                roll_var = ''
+                i = 0;
+                for a in result:
+                    if i == 0:
+                        roll_var = a.group_id.role
+                        i = i+1
+                    else:
+                       roll_var = roll_var + ',' + a.group_id.role
+                import cpfecys
+                currentyear_period = cpfecys.current_year_period()
+                db.academic_log.insert(user_name = auth.user.username, 
+                            roll =  str(roll_var), 
+                            operation_log = 'delete', 
+                            before_carnet = str(args[0]['carnet']), 
+                            before_email = str(args[0]['email']), 
+                            id_period = str(currentyear_period.id),
+                            description = T('The record was removed because it failed the webservice validation'))   
     else:
         membership_var = db.auth_membership((db.auth_membership.user_id==user_var.id) & (db.auth_membership.group_id==academic_var.id))
         if membership_var is None:

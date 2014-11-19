@@ -1,4 +1,5 @@
 {{extend 'template.html'}}
+
 <h2>
     {{=T('Academic per Course')}}
     <a href="#myModal" role="button" class="btn btn-primary"
@@ -199,3 +200,39 @@ data-toggle="tab">
     </div>
 </div>
 <!-- PIC MODAL -->
+{{if session.assignation_error is not None:}}
+<div id="error_modal" class="modal">
+  <div class="modal-header">
+    <button type="button" class="close"  onclick="close_errors()">×</button>
+      <h3 id="myModalLabel">
+          {{=T('Errors')}}
+      </h3>
+  </div>
+  <div class="modal-body">
+    <div class="well">
+        {{=T('The following users are not assigned to the academic year, so they were removed from the system:')}}:
+        <div id ="errors_div">
+          <table class="table table-striped table-bordered" >
+            {{for var_error in session.assignation_error:}}
+            <tr>
+              <td>
+                {{=var_error}}
+              </td>
+            </tr>
+            {{pass}}
+          </table>
+
+        </div>
+    </div>
+  </div>
+  <div class="modal-footer">
+      <button onclick="close_errors()">{{=T('Close')}}</button>
+  </div>
+</div>
+<script type="text/javascript">
+  function close_errors(){
+      $("#error_modal").css("display", "none");
+  }
+</script>
+{{session.assignation_error=None}}
+{{pass}}

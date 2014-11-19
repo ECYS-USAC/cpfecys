@@ -65,7 +65,7 @@ def check_student(check_carnet):
 
             #PREPARE FOR RETURNED XML WEB SERVICE
             xml = back.as_xml()
-            print xml
+            
             xml=xml.replace('&lt;','<')
             xml=xml.replace('&gt;','>')
             inicio = xml.find("<"+svp.receive+">")
@@ -85,7 +85,7 @@ def check_student(check_carnet):
             else:
                 isStuden=False
                 for c in root.findall('CARRERA'):
-                    if c.find('UNIDAD').text=="08" and c.find('EXTENSION').text=="00" and (c.find('CARRERA').text=="05" or c.find('CARRERA').text=="09"):
+                    if c.find('UNIDAD').text=="08" and c.find('EXTENSION').text=="00" and (c.find('CARRERA').text=="05" or c.find('CARRERA').text=="09" or c.find('CARRERA').text=="07"):
                         isStuden=True
 
                 if isStuden==False:
@@ -107,19 +107,49 @@ def attendance_list():
         academic_list = db((db.academic_course_assignation.semester == request.vars['period']) & (db.academic_course_assignation.assignation==request.vars['project'])).select()
         for academic_temp in academic_list:
             user_var = db.auth_user(db.auth_user.username==academic_temp.carnet.carnet)
+
             if user_var is None:
-                #AQUI IRIA LA VALIDACION CON EL WEBSERVICE
-                #If not exists, create auth_user of academic
-                id_user = db.auth_user.insert(first_name = academic_temp.carnet.carnet,
-                                last_name =  " ",
-                                email = academic_temp.carnet.email,
+                #WEBSERVICE
+                web_service = check_student(academic_temp.carnet.carnet)
+                
+                if web_service['flag'] == True:
+                    id_user = db.auth_user.insert(first_name = web_service['nombres'],
+                                last_name =  web_service['apellidos'],
+                                email = web_service['correo'],
                                 username = academic_temp.carnet.carnet,
                                 phone = '12345678',
                                 home_address = T('Enter your address'))
-                #Add the id_auth_user to academic.
-                db(db.academic.id == academic_temp.carnet.id).update(id_auth_user = id_user.id)
-                #Create membership to academic
-                db.auth_membership.insert(user_id = id_user.id, group_id =  academic_var.id)   
+                    #Add the id_auth_user to academic.
+                    db(db.academic.id == academic_temp.carnet.id).update(id_auth_user = id_user.id)
+                    #Create membership to academic
+                    db.auth_membership.insert(user_id = id_user.id, group_id =  academic_var.id)   
+                else:
+                    if session.assignation_error is None:
+                        session.assignation_error = []
+                        session.assignation_error.append(academic_temp.carnet.carnet)
+                    else:
+                        session.assignation_error.append(academic_temp.carnet.carnet)
+                    db(db.academic.id == academic_temp.carnet.id).delete()
+
+                    result = db(db.auth_membership.user_id==auth.user.id).select()
+                    roll_var = ''
+                    i = 0;
+                    for a in result:
+                        if i == 0:
+                            roll_var = a.group_id.role
+                            i = i+1
+                        else:
+                           roll_var = roll_var + ',' + a.group_id.role
+                    import cpfecys
+                    currentyear_period = cpfecys.current_year_period()
+                    db.academic_log.insert(user_name = auth.user.username, 
+                                roll =  str(roll_var), 
+                                operation_log = 'delete', 
+                                before_carnet = academic_temp.carnet.carnet, 
+                                before_email = academic_temp.carnet.email, 
+                                id_period = str(currentyear_period.id),
+                                description = T('The record was removed because it failed the webservice validation'))
+
             else:
                 membership_var = db.auth_membership((db.auth_membership.user_id==user_var.id) & (db.auth_membership.group_id==academic_var.id))
                 if membership_var is None:
@@ -283,7 +313,7 @@ def academic_assignation():
                                 before_carnet = update_form.vars.academic_carnet, 
                                 before_email = update_form.vars.academic_email, 
                                 id_period = str(currentyear_period.id),
-                                description = 'Se elimino el registro desde la pagina estudiantes.')
+                                description = T('Registration is removed from the page students'))
                 response.flash = T('Deleted register.')
             else:
                 if ( update_form.vars.academic_carnet is "" ) or ( update_form.vars.academic_email is ""):
@@ -299,7 +329,7 @@ def academic_assignation():
                                                 after_email = update_form.vars.academic_email, 
                                                 id_academic = update_form.vars.academic_id, 
                                                 id_period = str(currentyear_period.id),
-                                                description = 'Se modifico registro desde la pagina estudiantes.')    
+                                                description = T('Registration modified from the page from students'))    
         
                     response.flash = T('Updated register.')
         except:
@@ -644,12 +674,16 @@ def academic_assignation_upload():
                                 row.append(T('Error: ') + T('The type of laboratory entered is incorrect. This must be T or F.'))
                                 error_users.append(row)
                             else:
-                                #Agregar la advertencia que el usuario ya se encuentra registrado en el sistema
-                                row.append(T('Aviso: ') + T('Successful assignment to the course'))
+                                print "erntrojiosdaj 1.0"
                                 #insert a new user with csv data
+                                session.academic_update = True
+                                #aqui
+                                print "erntrojiosdaj 1.0.1"+str(rcarnet)
+                                print "erntrojiosdaj 1.0.1"+str(remail)
                                 usr = db.academic.insert(carnet = rcarnet,
                                                               email = remail)
                                 #Add log
+                                print "erntrojiosdaj 1.0.2"
                                 db.academic_log.insert(user_name = auth.user.username, 
                                                         roll =  'Student', 
                                                         operation_log = 'insert', 
@@ -657,16 +691,18 @@ def academic_assignation_upload():
                                                         after_email = remail, 
                                                         id_academic = usr.id,
                                                         id_period = current_period.id,
-                                                        description = 'Se inserto desde archivo CSV.')
+                                                        description = T('Inserted from CSV file.'))
                                 #add user to the course
+                                print "erntrojiosdaj 1.0.3"
                                 ingresado = db.academic_course_assignation.insert(carnet = usr.id, semester = current_period, assignation = check.project, laboratorio = rlaboratorio)
                                 #Add to log
+                                print "erntrojiosdaj 1.0.4"
                                 lab_var = ''
                                 if rlaboratorio == 'T':
                                     lab_var = 'True'
                                 else:
                                     lab_var = 'False'
-
+                                print "erntrojiosdaj 1.0.5"
                                 #Search for user roles
                                 result = db(db.auth_membership.user_id==auth.user.id).select()
                                 roll_var = ''
@@ -677,7 +713,7 @@ def academic_assignation_upload():
                                         i = i+1
                                     else:
                                         roll_var = roll_var + ',' + a.group_id.role
-
+                                print "erntrojiosdaj 1.1"
                                 db.academic_course_assignation_log.insert(user_name = auth.user.username, roll =  roll_var, 
                                                         operation_log = 'insert', 
                                                         after_carnet = rcarnet, 
@@ -687,8 +723,46 @@ def academic_assignation_upload():
                                                         after_laboratory = lab_var,
                                                         id_academic_course_assignation = str(ingresado.id),
                                                         id_period = current_period.id,
-                                                        description = 'Se inserto desde archivo CSV.')
-                                aviso_users.append(row)
+                                                        description = T('Inserted from CSV file.'))
+                                
+                                print "erntrojiosdaj 1.2"
+                                try:
+                                    for var_error in session.assignation_error:
+                                        var_ac = db(db.academic.carnet == var_error).select().first()
+                                        db(db.academic.carnet == var_error).delete()
+                                        result = db(db.auth_membership.user_id==auth.user.id).select()
+                                        roll_var = ''
+                                        i = 0;
+                                        for a in result:
+                                            if i == 0:
+                                                roll_var = a.group_id.role
+                                                i = i+1
+                                            else:
+                                               roll_var = roll_var + ',' + a.group_id.role
+                                        
+
+                                        db.academic_log.insert(user_name = auth.user.username, 
+                                                    roll =  str(roll_var), 
+                                                    operation_log = 'delete', 
+                                                    before_carnet = str(var_error), 
+                                                    before_email = str(var_ac.email), 
+                                                    id_period = str(current_period.id),
+                                                    description = T('The record was removed because it failed the webservice validation'))
+                                except:
+                                    None
+                                if session.assignation_error == None:
+                                    #Agregar la advertencia que el usuario ya se encuentra registrado en el sistema
+                                    print "erntrojiosdaj 2"
+                                    row.append(T('Aviso: ') + T('Successful assignment to the course'))
+                                    aviso_users.append(row)
+                                else:
+                                    print "erntrojiosdaj 3"
+                                    row.append(T('Error: ') + ' '+ T('The user is not registered to the academic cycle'))
+                                    error_users.append(row)
+                                print "erntrojiosdaj 4"
+                                session.academic_update = None
+                                session.assignation_error = None
+                                print "erntrojiosdaj 5"
                 else:
                     
                     usr2 = db.academic_course_assignation((db.academic_course_assignation.semester == current_period) & (db.academic_course_assignation.assignation == check.project) & (db.academic_course_assignation.carnet == usr.id))
@@ -732,7 +806,7 @@ def academic_assignation_upload():
                                                         after_laboratory = lab_var,
                                                         id_academic_course_assignation = str(ingresado.id),
                                                         id_period = current_period.id,
-                                                        description = 'Se inserto desde archivo CSV.')
+                                                        description = T('Inserted from CSV file.'))
                             aviso_users.append(row)
                     else:
                         try:
@@ -894,7 +968,7 @@ def onupdate_academic(form):
                                 after_email = form.vars.email, 
                                 id_academic = form.vars.id, 
                                 id_period = str(currentyear_period.id),
-                                description = 'Se modifico registro desde la pagina estudiantes.')
+                                description = T('Registration modified from the page from students'))
     else:
         db.academic_log.insert(user_name = auth.user.username, 
                                 roll =  str(roll_var), 
@@ -902,7 +976,7 @@ def onupdate_academic(form):
                                 before_carnet = carnet_var, 
                                 before_email = email_var, 
                                 id_period = str(currentyear_period.id),
-                                description = 'Se elimino el registro desde la pagina estudiantes.')
+                                description = T('Registration is removed from the page students'))
 
 
 def ondelete_academic(table_involved, id_of_the_deleted_record):
@@ -930,7 +1004,7 @@ def ondelete_academic(table_involved, id_of_the_deleted_record):
                                 before_carnet = student_var.carnet, 
                                 before_email = student_var.email, 
                                 id_period = str(currentyear_period.id),
-                                description = 'Se elimino el registro desde la pagina estudiantes.')
+                                description = T('Registration is removed from the page students'))
 
 
 
