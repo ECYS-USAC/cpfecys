@@ -1,7 +1,7 @@
 {{if showLevel==False:}}
-	<center>{{=T('Action not allowed')}}</center>
+	<center>{{=messageError}}</center>
 	<script type="text/javascript">
-		alert("{{=T('Action not allowed')}}");
+		alert("{{=messageError}}");
 		window.location.href = "{{=URL('default', 'index.html')}}";
 	</script>
 {{else:}}
@@ -98,7 +98,7 @@
 					$("#div_p{{=str(project.id)}}_m{{=month}}_r{{=roll}}_u{{=userr[0]}}").toggle();
 					jQuery('#div_p{{=str(project.id)}}_m{{=month}}_r{{=roll}}_u{{=userr[0]}}').empty();
 					jQuery('#div_p{{=str(project.id)}}_m{{=month}}_r{{=roll}}_u{{=userr[0]}}').append("{{=T('Loading')}}...");
-					$("#div_p{{=str(project.id)}}_m{{=month}}_r{{=roll}}_u{{=userr[0]}}").load("{{=URL('activity_control','grades_management_n4.load')}}?tipo=all&amp;userr="+encodeURIComponent("{{=userr[0]}}")+"&amp;month={{=month}}&amp;roll="+encodeURIComponent("{{=roll}}")+"&amp;project="+encodeURIComponent({{=project.id}}));
+					$("#div_p{{=str(project.id)}}_m{{=month}}_r{{=roll}}_u{{=userr[0]}}").load("{{=URL('activity_control','grades_management_n4')}}?tipo=all&amp;userr="+encodeURIComponent("{{=userr[0]}}")+"&amp;month={{=month}}&amp;roll="+encodeURIComponent("{{=roll}}")+"&amp;project="+encodeURIComponent({{=project.id}}));
 				});
 
 				
@@ -107,42 +107,42 @@
 						$("#div_p{{=str(project.id)}}_m{{=month}}_r{{=roll}}_u{{=userr[0]}}").toggle();
 						jQuery('#div_p{{=str(project.id)}}_m{{=month}}_r{{=roll}}_u{{=userr[0]}}').empty();
 						jQuery('#div_p{{=str(project.id)}}_m{{=month}}_r{{=roll}}_u{{=userr[0]}}').append("{{=T('Loading')}}...");
-						$("#div_p{{=str(project.id)}}_m{{=month}}_r{{=roll}}_u{{=userr[0]}}").load("{{=URL('activity_control','grades_management_n4.load')}}?tipo=i&amp;userr="+encodeURIComponent("{{=userr[0]}}")+"&amp;month={{=month}}&amp;roll="+encodeURIComponent("{{=roll}}")+"&amp;project="+encodeURIComponent({{=project.id}}));
+						$("#div_p{{=str(project.id)}}_m{{=month}}_r{{=roll}}_u{{=userr[0]}}").load("{{=URL('activity_control','grades_management_n4')}}?tipo=i&amp;userr="+encodeURIComponent("{{=userr[0]}}")+"&amp;month={{=month}}&amp;roll="+encodeURIComponent("{{=roll}}")+"&amp;project="+encodeURIComponent({{=project.id}}));
 					});
 
 					$("#p{{=str(project.id)}}_all_m{{=month}}_all_r{{=roll}}_all_U{{=userr[0]}}_u").click(function(){
 						$("#div_p{{=str(project.id)}}_m{{=month}}_r{{=roll}}_u{{=userr[0]}}").toggle();
 						jQuery('#div_p{{=str(project.id)}}_m{{=month}}_r{{=roll}}_u{{=userr[0]}}').empty();
 						jQuery('#div_p{{=str(project.id)}}_m{{=month}}_r{{=roll}}_u{{=userr[0]}}').append("{{=T('Loading')}}...");
-						$("#div_p{{=str(project.id)}}_m{{=month}}_r{{=roll}}_u{{=userr[0]}}").load("{{=URL('activity_control','grades_management_n4.load')}}?tipo=u&amp;userr="+encodeURIComponent("{{=userr[0]}}")+"&amp;month={{=month}}&amp;roll="+encodeURIComponent("{{=roll}}")+"&amp;project="+encodeURIComponent({{=project.id}}));
+						$("#div_p{{=str(project.id)}}_m{{=month}}_r{{=roll}}_u{{=userr[0]}}").load("{{=URL('activity_control','grades_management_n4')}}?tipo=u&amp;userr="+encodeURIComponent("{{=userr[0]}}")+"&amp;month={{=month}}&amp;roll="+encodeURIComponent("{{=roll}}")+"&amp;project="+encodeURIComponent({{=project.id}}));
 					});
 
 					$("#p{{=str(project.id)}}_all_m{{=month}}_all_r{{=roll}}_all_U{{=userr[0]}}_d").click(function(){
 						$("#div_p{{=str(project.id)}}_m{{=month}}_r{{=roll}}_u{{=userr[0]}}").toggle();
 						jQuery('#div_p{{=str(project.id)}}_m{{=month}}_r{{=roll}}_u{{=userr[0]}}').empty();
 						jQuery('#div_p{{=str(project.id)}}_m{{=month}}_r{{=roll}}_u{{=userr[0]}}').append("{{=T('Loading')}}...");
-						$("#div_p{{=str(project.id)}}_m{{=month}}_r{{=roll}}_u{{=userr[0]}}").load("{{=URL('activity_control','grades_management_n4.load')}}?tipo=d&amp;userr="+encodeURIComponent("{{=userr[0]}}")+"&amp;month={{=month}}&amp;roll="+encodeURIComponent("{{=roll}}")+"&amp;project="+encodeURIComponent({{=project.id}}));
+						$("#div_p{{=str(project.id)}}_m{{=month}}_r{{=roll}}_u{{=userr[0]}}").load("{{=URL('activity_control','grades_management_n4')}}?tipo=d&amp;userr="+encodeURIComponent("{{=userr[0]}}")+"&amp;month={{=month}}&amp;roll="+encodeURIComponent("{{=roll}}")+"&amp;project="+encodeURIComponent({{=project.id}}));
 					});
 				{{elif tipo=='i':}}
 					$("#p{{=str(project.id)}}_all_m{{=month}}_all_r{{=roll}}_all_U{{=userr[0]}}_i").click(function(){
 						$("#div_p{{=str(project.id)}}_m{{=month}}_r{{=roll}}_u{{=userr[0]}}").toggle();
 						jQuery('#div_p{{=str(project.id)}}_m{{=month}}_r{{=roll}}_u{{=userr[0]}}').empty();
 						jQuery('#div_p{{=str(project.id)}}_m{{=month}}_r{{=roll}}_u{{=userr[0]}}').append("{{=T('Loading')}}...");
-						$("#div_p{{=str(project.id)}}_m{{=month}}_r{{=roll}}_u{{=userr[0]}}").load("{{=URL('activity_control','grades_management_n4.load')}}?tipo=i&amp;userr="+encodeURIComponent("{{=userr[0]}}")+"&amp;month={{=month}}&amp;roll="+encodeURIComponent("{{=roll}}")+"&amp;project="+encodeURIComponent({{=project.id}}));
+						$("#div_p{{=str(project.id)}}_m{{=month}}_r{{=roll}}_u{{=userr[0]}}").load("{{=URL('activity_control','grades_management_n4')}}?tipo=i&amp;userr="+encodeURIComponent("{{=userr[0]}}")+"&amp;month={{=month}}&amp;roll="+encodeURIComponent("{{=roll}}")+"&amp;project="+encodeURIComponent({{=project.id}}));
 					});
 				{{elif tipo=='u':}}
 					$("#p{{=str(project.id)}}_all_m{{=month}}_all_r{{=roll}}_all_U{{=userr[0]}}_u").click(function(){
 						$("#div_p{{=str(project.id)}}_m{{=month}}_r{{=roll}}_u{{=userr[0]}}").toggle();
 						jQuery('#div_p{{=str(project.id)}}_m{{=month}}_r{{=roll}}_u{{=userr[0]}}').empty();
 						jQuery('#div_p{{=str(project.id)}}_m{{=month}}_r{{=roll}}_u{{=userr[0]}}').append("{{=T('Loading')}}...");
-						$("#div_p{{=str(project.id)}}_m{{=month}}_r{{=roll}}_u{{=userr[0]}}").load("{{=URL('activity_control','grades_management_n4.load')}}?tipo=u&amp;userr="+encodeURIComponent("{{=userr[0]}}")+"&amp;month={{=month}}&amp;roll="+encodeURIComponent("{{=roll}}")+"&amp;project="+encodeURIComponent({{=project.id}}));
+						$("#div_p{{=str(project.id)}}_m{{=month}}_r{{=roll}}_u{{=userr[0]}}").load("{{=URL('activity_control','grades_management_n4')}}?tipo=u&amp;userr="+encodeURIComponent("{{=userr[0]}}")+"&amp;month={{=month}}&amp;roll="+encodeURIComponent("{{=roll}}")+"&amp;project="+encodeURIComponent({{=project.id}}));
 					});
 				{{elif tipo=='d':}}
 					$("#p{{=str(project.id)}}_all_m{{=month}}_all_r{{=roll}}_all_U{{=userr[0]}}_d").click(function(){
 						$("#div_p{{=str(project.id)}}_m{{=month}}_r{{=roll}}_u{{=userr[0]}}").toggle();
 						jQuery('#div_p{{=str(project.id)}}_m{{=month}}_r{{=roll}}_u{{=userr[0]}}').empty();
 						jQuery('#div_p{{=str(project.id)}}_m{{=month}}_r{{=roll}}_u{{=userr[0]}}').append("{{=T('Loading')}}...");
-						$("#div_p{{=str(project.id)}}_m{{=month}}_r{{=roll}}_u{{=userr[0]}}").load("{{=URL('activity_control','grades_management_n4.load')}}?tipo=d&amp;userr="+encodeURIComponent("{{=userr[0]}}")+"&amp;month={{=month}}&amp;roll="+encodeURIComponent("{{=roll}}")+"&amp;project="+encodeURIComponent({{=project.id}}));
+						$("#div_p{{=str(project.id)}}_m{{=month}}_r{{=roll}}_u{{=userr[0]}}").load("{{=URL('activity_control','grades_management_n4')}}?tipo=d&amp;userr="+encodeURIComponent("{{=userr[0]}}")+"&amp;month={{=month}}&amp;roll="+encodeURIComponent("{{=roll}}")+"&amp;project="+encodeURIComponent({{=project.id}}));
 					});
 				{{pass}}
 			{{pass}}

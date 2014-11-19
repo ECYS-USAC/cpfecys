@@ -49,38 +49,34 @@
 			{{for camp in field:}}
 				<tr bgcolor="#F2F5A9">
 					<td>
-						{{=str(camp['user_name'])}}
+						{{=str(camp.user_name)}}
 					</td>
 					<td>
-						{{if str(camp['roll'])=='Student':}}
-							{{=T('Rol Student')}}
-						{{else:}}
-							{{=T(str(camp['roll']))}}
-						{{pass}}
+						{{=T('Rol '+str(camp.roll))}}
 					</td>
 					<td>
-						{{=str(camp['date_log'])}}
+						{{=str(camp.date_log)}}
 					</td>
 					<td>
-						{{=str(camp['operation_log'])}}
+						{{=str(camp.operation_log)}}
 					</td>
 					<td>
-						{{=camp['description']}}
+						{{=str(camp.description)}}
 					</td>
 					<td>
-						{{=str(camp['category'])}}
+						{{=str(camp.category)}}
 					</td>
 					<td>
-						{{=str(camp['activity'])}}
+						{{=str(camp.activity)}}
 					</td>
 					<td>
-						{{=str(camp['academic'])}}
+						{{=str(camp.academic)}}
 					</td>
 					<td>
-						{{=str(camp['before_grade'])}}
+						{{=str(camp.before_grade)}}
 					</td>
 					<td>
-						{{=str(camp['after_grade'])}}
+						{{=str(camp.after_grade)}}
 					</td>
 				</tr>
 			{{pass}}

@@ -33,6 +33,13 @@
                             {{=T('Course requirement')}}
                         </a>
                     </li>
+                {{elif (auth.has_membership('Ecys-Administrator') or auth.has_membership('Super-Administrator')):}}
+                    <li>
+                        <a style="color:white;text-shadow:none;" class="btn-primary" href="{{=URL('activity_control', 'course_requirement',vars=dict(project = request.vars['project'], period = request.vars['period']))}}">
+                            <span class="icon-white icon-edit"></span>
+                            {{=T('Course requirement')}}
+                        </a>
+                    </li>
                 {{pass}}
             {{else:}}
                 {{if (auth.has_membership('Ecys-Administrator') or auth.has_membership('Super-Administrator')):}}
