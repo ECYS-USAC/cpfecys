@@ -188,12 +188,12 @@
 						{{if request.vars['type']=="lab":}}
 							{{if float(total_var2) == 100:}}
 				  				<li>
-									<a  tabindex="-1" title="{{=T('Laboratory replacing')}}" aria-hidden="true" href="{{=URL('activity_control', 'laboratory_replacing',vars=dict(project = request.vars['project'], year = request.vars['year']))}}" >
+									<a  tabindex="-1" title="{{=T('Laboratory Equivalence')}}" aria-hidden="true" href="{{=URL('activity_control', 'laboratory_replacing',vars=dict(project = request.vars['project'], year = request.vars['year']))}}" >
 							{{else:}}
 								<li class="disabled">
-									<a  tabindex="-1" title="{{=T('Laboratory replacing')}}">
+									<a  tabindex="-1" title="{{=T('Laboratory Equivalence')}}">
 							{{pass}}
-								<span class="icon-certificate"></span>{{=T('Laboratory replacing')}}
+								<span class="icon-certificate"></span>{{=T('Laboratory Equivalence')}}
 								</a>
 							</li>
 						{{pass}}
@@ -239,12 +239,12 @@
 				{{if request.vars['type']=="lab":}}
 					{{if float(total_var2) == 100:}}
 		  				<li>
-							<a  tabindex="-1" title="{{=T('Laboratory replacing')}}" aria-hidden="true" href="{{=URL('activity_control', 'laboratory_replacing',vars=dict(project = request.vars['project'], year = request.vars['year']))}}" >
+							<a  tabindex="-1" title="{{=T('Laboratory Equivalence')}}" aria-hidden="true" href="{{=URL('activity_control', 'laboratory_replacing',vars=dict(project = request.vars['project'], year = request.vars['year']))}}" >
 					{{else:}}
 						<li class="disabled">
-							<a  tabindex="-1" title="{{=T('Laboratory replacing')}}">
+							<a  tabindex="-1" title="{{=T('Laboratory Equivalence')}}">
 					{{pass}}
-						<span class="icon-certificate"></span>{{=T('Laboratory replacing')}}
+						<span class="icon-certificate"></span>{{=T('Laboratory Equivalence')}}
 						</a>
 					</li>
 				{{pass}}

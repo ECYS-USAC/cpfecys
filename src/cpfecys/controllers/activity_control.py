@@ -2133,7 +2133,7 @@ def oncreate_validate_laboratory(form):
                 usr2 = db((db.validate_laboratory.id != form.vars.id) & (db.validate_laboratory.semester == request.vars['year']) & (db.validate_laboratory.project == request.vars['project']) & (db.validate_laboratory.carnet == form.vars.carnet)).select().first()
                 if usr2 is not None:
                     db(db.validate_laboratory.id==form.vars.id).delete()
-                    session.flash = T('Error. There is a registration renewal or replacement laboratory student in the course.')
+                    session.flash = T('Error. There is a registration renewal or equivalence laboratory student in the course.')
                 else:
                     academic_s = db(db.academic.id==form.vars.carnet).select().first()
                     db.validate_laboratory_log.insert(user_name = auth.user.username,
@@ -2580,7 +2580,7 @@ def laboratory_replacing():
                     _role='button', 
                     _class='btn btn-info', 
                     _onclick='set_values("'+str(db(db.academic.id==int(row.carnet)).select(db.academic.carnet).first().carnet)+'","'+str(db((db.validate_laboratory_log.period==T(year.period.name))&(db.validate_laboratory_log.yearp==year.yearp)&(db.validate_laboratory_log.project==project.name)&(db.validate_laboratory_log.validation_type==False)&(db.validate_laboratory_log.academic==str(db(db.academic.id==int(row.carnet)).select(db.academic.carnet).first().carnet))).select(db.validate_laboratory_log.description).last().description)+'")', 
-                    _title=T('Reason for Replacement Laboratory'),**{"_data-toggle":"modal", "_data-target": "#modaltheme"})]
+                    _title=T('Reason for Equivalence Laboratory'),**{"_data-toggle":"modal", "_data-target": "#modaltheme"})]
             if 'edit' in request.args:
                 db.validate_laboratory.carnet.writable = False
                 grid = SQLFORM.grid(query, csv=False, paginate=10, oncreate=oncreate_laboratory_replacing, onupdate=onupdate_laboratory_replacing, searchable=False, links=links)
@@ -2656,7 +2656,7 @@ def laboratory_replacing():
                     _role='button', 
                     _class='btn btn-info', 
                     _onclick='set_values("'+str(db(db.academic.id==int(row.carnet)).select(db.academic.carnet).first().carnet)+'","'+str(db((db.validate_laboratory_log.period==T(year.period.name))&(db.validate_laboratory_log.yearp==year.yearp)&(db.validate_laboratory_log.project==project.name)&(db.validate_laboratory_log.validation_type==False)&(db.validate_laboratory_log.academic==str(db(db.academic.id==int(row.carnet)).select(db.academic.carnet).first().carnet))).select(db.validate_laboratory_log.description).last().description)+'")', 
-                    _title=T('Reason for Replacement Laboratory'),**{"_data-toggle":"modal", "_data-target": "#modaltheme"})]
+                    _title=T('Reason for Equivalence Laboratory'),**{"_data-toggle":"modal", "_data-target": "#modaltheme"})]
             if 'edit' in request.args:
                 db.validate_laboratory.carnet.writable = False
                 grid = SQLFORM.grid(query, csv=False, paginate=10, oncreate=oncreate_laboratory_replacing, onupdate=onupdate_laboratory_replacing, searchable=False, links=links)
@@ -2667,7 +2667,7 @@ def laboratory_replacing():
                     _role='button', 
                     _class='btn btn-info', 
                     _onclick='set_values("'+str(db(db.academic.id==int(row.carnet)).select(db.academic.carnet).first().carnet)+'","'+str(db((db.validate_laboratory_log.period==T(year.period.name))&(db.validate_laboratory_log.yearp==year.yearp)&(db.validate_laboratory_log.project==project.name)&(db.validate_laboratory_log.validation_type==False)&(db.validate_laboratory_log.academic==str(db(db.academic.id==int(row.carnet)).select(db.academic.carnet).first().carnet))).select(db.validate_laboratory_log.description).last().description)+'")', 
-                    _title=T('Reason for Replacement Laboratory'),**{"_data-toggle":"modal", "_data-target": "#modaltheme"})]
+                    _title=T('Reason for Equivalence Laboratory'),**{"_data-toggle":"modal", "_data-target": "#modaltheme"})]
             if auth.has_membership('Super-Administrator') or auth.has_membership('Ecys-Administrator'):
                 if 'edit' in request.args:
                     db.validate_laboratory.carnet.writable = False
@@ -2814,7 +2814,7 @@ def oncreate_laboratory_replacing(form):
             usr2 = db((db.validate_laboratory.id != form.vars.id) & (db.validate_laboratory.semester == request.vars['year']) & (db.validate_laboratory.project == request.vars['project']) & (db.validate_laboratory.carnet == form.vars.carnet)).select().first()
             if usr2 is not None:
                 db(db.validate_laboratory.id==form.vars.id).delete()
-                session.flash = T('Error. There is a registration renewal or replacement laboratory student in the course.')
+                session.flash = T('Error. There is a registration renewal or equivalence laboratory student in the course.')
             else:
                 academic_s = db(db.academic.id==form.vars.carnet).select().first()
                 db.validate_laboratory_log.insert(user_name = auth.user.username,
@@ -2843,7 +2843,7 @@ def oncreate_laboratory_replacing(form):
                 usr2 = db((db.validate_laboratory.id != form.vars.id) & (db.validate_laboratory.semester == request.vars['year']) & (db.validate_laboratory.project == request.vars['project']) & (db.validate_laboratory.carnet == form.vars.carnet)).select().first()
                 if usr2 is not None:
                     db(db.validate_laboratory.id==form.vars.id).delete()
-                    session.flash = T('Error. There is a registration renewal or replacement laboratory student in the course.')
+                    session.flash = T('Error. There is a registration renewal or equivalence laboratory student in the course.')
                 else:
                     academic_s = db(db.academic.id==form.vars.carnet).select().first()
                     db.validate_laboratory_log.insert(user_name = auth.user.username,
@@ -3817,6 +3817,11 @@ def Course_Format_Technical_School():
                         session.flash = T('Not valid Action.')
                         redirect(URL('default','index'))
 
+    #Check the correct parameters
+    if (request.vars['op'] != '1' and request.vars['op'] != '2' and request.vars['op'] != '3'):
+        session.flash = T('Not valid Action.')
+        redirect(URL('default','index'))
+
     #Students    
     academic_assig3 = db((db.academic.id==db.academic_course_assignation.carnet)&(db.academic_course_assignation.semester == year.id) & (db.academic_course_assignation.assignation==project_var.id)).select(orderby=db.academic.carnet)
     students=[]
@@ -3824,6 +3829,7 @@ def Course_Format_Technical_School():
         students.append(acaT.academic_course_assignation)
 
 
+    var_final_grade = 0.00
     existLab=False
     totalLab=float(0)
     totalW=float(0)
@@ -3838,7 +3844,11 @@ def Course_Format_Technical_School():
             totalLab=float(categoryC.grade)
             catVecCourseTemp.append(categoryC)
         elif categoryC.category.category=="Examen Final":
-            catCourseTemp=categoryC
+            var_final_grade = categoryC.grade
+            if ( request.vars['op'] == '2' or  request.vars['op'] == '3'):
+                None
+            else:
+                catCourseTemp=categoryC
         else:
             catVecCourseTemp.append(categoryC)
             CourseActivities.append(db((db.course_activity.semester==year.id)&(db.course_activity.assignation==project_var.id)&(db.course_activity.laboratory==False)&(db.course_activity.course_activity_category==categoryC.id)).select())
@@ -3886,7 +3896,12 @@ def Course_Format_Technical_School():
     t.append(T('Carnet'))
     t.append(T('Laboratory'))
     t.append('Zona')
-    t.append('Final')
+    if request.vars['op'] == '1':
+        t.append('Final')
+    elif request.vars['op'] == '2':
+        t.append(T("First recovery test"))
+    elif request.vars['op'] == '3':
+        t.append(T("Second recovery test"))
     l.append(t) 
 
 
@@ -4015,6 +4030,20 @@ def Course_Format_Technical_School():
                 posVCC=posVCC+1
         totalCarry=int(round(totalCarry,0))
 
+        if request.vars['type'] == 'class' and request.vars['op'] =='2':
+                var_first_recovery_test =db((db.course_first_recovery_test.carnet==t1.carnet)&(db.course_first_recovery_test.semester==year.id)&(db.course_first_recovery_test.project==project_var.id)).select().first()
+                if var_first_recovery_test is not None:
+                    totalFinal_Clase=int(round( (var_first_recovery_test.grade)*var_final_grade/100,0))
+                else:
+                    totalFinal_Clase=int(0)
+
+        if request.vars['type'] == 'class' and request.vars['op'] =='3':
+                var_second_recovery_test =db((db.course_second_recovery_test.carnet==t1.carnet)&(db.course_second_recovery_test.semester==year.id)&(db.course_second_recovery_test.project==project_var.id)).select().first()
+                if var_second_recovery_test is not None:
+                    totalFinal_Clase=int(round( (var_second_recovery_test.grade)*var_final_grade/100,0))
+                else:
+                    totalFinal_Clase=int(0)
+
         
 
         if requirement is not None:
@@ -4105,6 +4134,11 @@ def general_report_activities_export():
         session.flash = T('Not valid Action.')
         redirect(URL('default','index'))
 
+    #Check the correct parameters
+    if (request.vars['op'] != '1' and request.vars['op'] != '2' and request.vars['op'] != '3'):
+        session.flash = T('Not valid Action.')
+        redirect(URL('default','index'))
+
     teacher = db((db.user_project.period == year.id) & (db.user_project.project == project_var.id) & (db.user_project.assigned_user==db.auth_user.id)&(db.auth_user.id==db.auth_membership.user_id)&(db.auth_membership.group_id==3)).select().first()
     practice = db((db.user_project.period == year.id) & (db.user_project.project == project_var.id) & (db.user_project.assigned_user==db.auth_user.id)&(db.auth_user.id==db.auth_membership.user_id)&(db.auth_membership.group_id==2)).select()
     if request.vars['type'] == 'class':
@@ -4116,7 +4150,7 @@ def general_report_activities_export():
     for acaT in academic_assig2:
         students.append(acaT.academic_course_assignation)
 
-    
+    var_final_grade = 0.00
     existLab=False
     totalLab=float(0)
     totalW=float(0)
@@ -4131,7 +4165,11 @@ def general_report_activities_export():
             totalLab=float(categoryC.grade)
             catVecCourseTemp.append(categoryC)
         elif categoryC.category.category=="Examen Final":
-            catCourseTemp=categoryC
+            var_final_grade = categoryC.grade
+            if ( request.vars['op'] == '2' or  request.vars['op'] == '3'):
+                None
+            else:
+                catCourseTemp=categoryC
         else:
             catVecCourseTemp.append(categoryC)
             CourseActivities.append(db((db.course_activity.semester==year.id)&(db.course_activity.assignation==project_var.id)&(db.course_activity.laboratory==False)&(db.course_activity.course_activity_category==categoryC.id)).select())
@@ -4240,6 +4278,14 @@ def general_report_activities_export():
         t.append(T('Laboratory') +'\n('+str(totalLab)+'pts)')
     if request.vars['type'] == 'class' and requirement is not None:
         t.append(T('Course Requeriment') +'\n('+requirement.name+'pts)')
+    if request.vars['op'] is not None and request.vars['op']=='2':
+        t.append(T("First recovery test")+'\n(100 pts)')
+        t.append(T("First recovery test")+'\n('+str(var_final_grade)+' pts)')
+    if request.vars['op'] is not None and request.vars['op']=='3':
+        t.append(T("Second recovery test")+'\n(100 pts)')
+        t.append(T("Second recovery test")+'\n('+str(var_final_grade)+' pts)')
+
+
     t.append(T('Final Grade') +'\n(100 pts)')
     l.append(t) 
 
@@ -4372,6 +4418,27 @@ def general_report_activities_export():
                     t.append(T('True'))
                 else:
                     t.append(T('False'))
+
+            if request.vars['type'] == 'class' and request.vars['op'] =='2':
+                var_first_recovery_test =db((db.course_first_recovery_test.carnet==t1.carnet)&(db.course_first_recovery_test.semester==year.id)&(db.course_first_recovery_test.project==project_var.id)).select().first()
+                if var_first_recovery_test is not None:
+                    t.append(str(round((var_first_recovery_test.grade),2)))
+                    t.append(str(round( (var_first_recovery_test.grade)*var_final_grade/100,2)))
+                    totalCarry=totalCarry+round( (var_first_recovery_test.grade)*var_final_grade/100,0)
+                else:
+                    t.append('')
+                    t.append('')
+
+            if request.vars['type'] == 'class' and request.vars['op'] =='3':
+                var_second_recovery_test =db((db.course_second_recovery_test.carnet==t1.carnet)&(db.course_second_recovery_test.semester==year.id)&(db.course_second_recovery_test.project==project_var.id)).select().first()
+                if var_second_recovery_test is not None:
+                    t.append(str(round((var_second_recovery_test.grade),2)))
+                    t.append(str(round( (var_second_recovery_test.grade)*var_final_grade/100,2)))
+                    totalCarry=totalCarry+round( (var_second_recovery_test.grade)*var_final_grade/100,0)
+                else:
+                    t.append('')
+                    t.append('')
+
             if request.vars['type'] == 'class' and requirement is not None:
                 if db((db.course_requirement_student.carnet==t1.carnet)&(db.course_requirement_student.requirement==requirement.id)).select().first() is not None:
                     if request.vars['type'] == 'class' and existLab==True:
@@ -4454,6 +4521,7 @@ def general_report_activities_export():
 @auth.requires(auth.has_membership('Student') or auth.has_membership('Teacher') or auth.has_membership('Super-Administrator') or auth.has_membership('Academic') or auth.has_membership('Ecys-Administrator'))
 def General_report_activities():
     #vars
+    action_Export=False
     year = None
     project_var = None
     #Check if the period is correct
@@ -4494,6 +4562,14 @@ def General_report_activities():
                 redirect(URL('default','index'))
         else:
             tutor_access = True
+
+    exception_query = db(db.course_laboratory_exception.project == project_var.id).select().first()
+    exception_s_var = False
+    exception_t_var = False
+    if exception_query is not None:
+        exception_t_var = exception_query.t_edit_lab
+        exception_s_var = exception_query.s_edit_course
+
 
     #Check the correct parameters
     if (request.vars['type'] != 'class' and request.vars['type']!='lab'):
@@ -4573,202 +4649,228 @@ def General_report_activities():
             session.flash= T('Can not find the correct weighting defined in the laboratory. You can not use this function')
             redirect(URL('default','index'))
 
+    #Enable the course
     if request.vars['list'] =='cancel':
-        db((db.course_ended.project==project_var.id) & (db.course_ended.period==year.id) ).delete()
-        response.flash= T('Course has been enabled')
+        if (auth.has_membership('Super-Administrator') or auth.has_membership('Ecys-Administrator')):
+            course_ended_var = db((db.course_ended.project==project_var.id) & (db.course_ended.period==year.id) ).select().first()
+            if course_ended_var != None:
+                if course_ended_var.finish == True:
+                    db((db.course_ended.project==project_var.id) & (db.course_ended.period==year.id) ).delete()
+                    response.flash= T('Course has been enabled')
 
+
+    #Export to CSV general activity report
     if request.vars['list'] =='True':
-        redirect(URL('activity_control','general_report_activities_export',vars=dict(project = project_var.id, period = year.id, type=request.vars['type'])))
-    
+        if (request.vars['op'] is None) or (request.vars['op'] == '') or (request.vars['op']  == '1') or (request.vars['op']  == '0'):
+                redirect(URL('activity_control','general_report_activities_export',vars=dict(project = project_var.id, period = year.id, type=request.vars['type'], op=1)))
+        elif request.vars['op']  == '2':
+            redirect(URL('activity_control','general_report_activities_export',vars=dict(project = project_var.id, period = year.id, type=request.vars['type'], op=2)))
+        elif request.vars['op']  == '3':
+            redirect(URL('activity_control','general_report_activities_export',vars=dict(project = project_var.id, period = year.id, type=request.vars['type'], op=3)))
+        else:
+            redirect(URL('activity_control','General_report_activities',vars=dict(project = project_var.id, period = year.id, type=request.vars['type'])))
+
+    #Finish the course and generate the csv file format technical school    
     if request.vars['list'] =='False':
-
-        course_ended_var = db((db.course_ended.project==project_var.id) & (db.course_ended.period==year.id) ).select().first() 
-        if course_ended_var is None:
-            
-            #ROL FOR LOG
-            nombreRol=''
-            if auth.has_membership('Ecys-Administrator')==True:
-                nombreRol='Ecys-Administrator'
-            elif auth.has_membership('Super-Administrator')==True:
-                nombreRol='Super-Administrator'
-            elif auth.has_membership('Teacher')==True:
-                nombreRol='Teacher'
-            elif auth.has_membership('Student')==True:
-                nombreRol='Student'
-            pass
-            
-            #GRADES CHANGE REQUEST
-            request_change = db((db.request_change_grades.status=='pending')&(db.request_change_grades.period==int(year.id))&(db.request_change_grades.project==int(project_var.id))).select()
-            for change in request_change:
-                from datetime import datetime
+        if request.vars['type'] == 'class' and (auth.has_membership('Ecys-Administrator') or auth.has_membership('Super-Administrator') or auth.has_membership('Teacher') or (auth.has_membership('Student') and exception_s_var == True and tutor_access == True)):
+            course_ended_var = db((db.course_ended.project==project_var.id) & (db.course_ended.period==year.id) ).select().first() 
+            if course_ended_var is None:
                 
-                db(db.request_change_grades.id==change.id).update(status = 'rejected', 
-                                                                    resolve_user = auth.user.id, 
-                                                                    roll_resolve =  nombreRol, 
-                                                                    date_request_resolve = str(datetime.now())
-                                                                )
-
-                #---------------------------------LOG-----------------------------------------------
-                                                                                    
-                temp2 = db(db.request_change_g_log.r_c_g_id == change.id).select().first()
-                
-                temp3 = db.request_change_g_log.insert(r_c_g_id=change.id,
-                                                    username=temp2.username,
-                                                    roll=temp2.roll,
-                                                    before_status='pending',
-                                                    after_status='rejected',
-                                                    description=temp2.description,
-                                                    semester=temp2.semester,
-                                                    yearp=temp2.yearp,
-                                                    project=temp2.project,
-                                                    category=temp2.activity,
-                                                    activity=temp2.category,
-                                                    resolve_user=auth.user.username,
-                                                    roll_resolve=nombreRol,
-                                                    date_request=temp2.date_request,
-                                                    date_request_resolve=str(datetime.now())
-                                                ) 
-                for var_chang_ins in db((db.request_change_grades_detail.request_change_grades ==  change.id)).select():
-                    db.request_change_grade_d_log.insert(request_change_g_log=temp3,
-                                                            operation_request=var_chang_ins.operation_request,
-                                                            academic=var_chang_ins.academic_assignation.carnet.carnet,
-                                                            after_grade=var_chang_ins.after_grade,
-                                                            before_grade=var_chang_ins.before_grade
-                                                           )
+                #ROL FOR LOG
+                nombreRol=''
+                if auth.has_membership('Ecys-Administrator')==True:
+                    nombreRol='Ecys-Administrator'
+                elif auth.has_membership('Super-Administrator')==True:
+                    nombreRol='Super-Administrator'
+                elif auth.has_membership('Teacher')==True:
+                    nombreRol='Teacher'
+                elif auth.has_membership('Student')==True:
+                    nombreRol='Student'
                 pass
-            pass
-
-            #Weighting CHANGE REQUEST
-            request_change = db((db.request_change_weighting.status=='pending')&(db.request_change_weighting.period==int(year.id))&(db.request_change_weighting.project==int(project_var.id))).select()
-            for change in request_change:
-                from datetime import datetime
-                db(db.request_change_weighting.id==change.id).update(status = 'rejected', 
-                                                                    resolve_user = auth.user.id, 
-                                                                    roll_resolve =  nombreRol, 
-                                                                    date_request_resolve = str(datetime.now())
-                                                                )
-                temp2 = db(db.request_change_w_log.r_c_w_id == change.id).select().first()
-                temp3 = db.request_change_w_log.insert(r_c_w_id=change.id,
-                                                    username=temp2.username,
-                                                    roll=temp2.roll,
-                                                    before_status='pending',
-                                                    after_status='rejected',
-                                                    description=temp2.description,
-                                                    semester=temp2.semester,
-                                                    yearp=temp2.yearp,
-                                                    project=temp2.project,
-                                                    resolve_user=auth.user.username,
-                                                    roll_resolve=nombreRol,
-                                                    date_request=temp2.date_request,
-                                                    date_request_resolve=str(datetime.now())
-                                                ) 
-                temp4 = db(db.request_change_weighting.id == change.id).select().first() 
                 
-                for var_chang_ins in db((db.request_change_weighting_detail.request_change_weighting ==  temp4.id) & (db.request_change_weighting_detail.operation_request == 'insert')).select():
-                    if var_chang_ins.operation_request == 'insert':
-                        db.request_change_w_detail_log.insert(request_change_w_log=temp3,
+                #GRADES CHANGE REQUEST
+                request_change = db((db.request_change_grades.status=='pending')&(db.request_change_grades.period==int(year.id))&(db.request_change_grades.project==int(project_var.id))).select()
+                for change in request_change:
+                    from datetime import datetime
+                    
+                    db(db.request_change_grades.id==change.id).update(status = 'rejected', 
+                                                                        resolve_user = auth.user.id, 
+                                                                        roll_resolve =  nombreRol, 
+                                                                        date_request_resolve = str(datetime.now())
+                                                                    )
+
+                    #---------------------------------LOG-----------------------------------------------
+                                                                                        
+                    temp2 = db(db.request_change_g_log.r_c_g_id == change.id).select().first()
+                    
+                    temp3 = db.request_change_g_log.insert(r_c_g_id=change.id,
+                                                        username=temp2.username,
+                                                        roll=temp2.roll,
+                                                        before_status='pending',
+                                                        after_status='rejected',
+                                                        description=temp2.description,
+                                                        semester=temp2.semester,
+                                                        yearp=temp2.yearp,
+                                                        project=temp2.project,
+                                                        category=temp2.activity,
+                                                        activity=temp2.category,
+                                                        resolve_user=auth.user.username,
+                                                        roll_resolve=nombreRol,
+                                                        date_request=temp2.date_request,
+                                                        date_request_resolve=str(datetime.now())
+                                                    ) 
+                    for var_chang_ins in db((db.request_change_grades_detail.request_change_grades ==  change.id)).select():
+                        db.request_change_grade_d_log.insert(request_change_g_log=temp3,
                                                                 operation_request=var_chang_ins.operation_request,
-                                                                category=var_chang_ins.category.category,
-                                                                after_grade=var_chang_ins.grade,
-                                                                after_specific_grade=var_chang_ins.specific_grade)
+                                                                academic=var_chang_ins.academic_assignation.carnet.carnet,
+                                                                after_grade=var_chang_ins.after_grade,
+                                                                before_grade=var_chang_ins.before_grade
+                                                               )
                     pass
-
                 pass
 
-                for categories in db((db.course_activity_category.semester==int(temp4.period)) & (db.course_activity_category.assignation==temp4.project) & (db.course_activity_category.laboratory==True)).select():
-                    var_chang = db(db.request_change_weighting_detail.course_category ==  str(categories.id)).select().first()
-                    if var_chang != None:
-                        if var_chang.operation_request == 'delete':
-                            
-                            cat_temp = db(db.course_activity_category.id == var_chang.course_category).select().first()
-
-                            temp44 = db(db.request_change_w_log.id == str(temp3) ).select().first() 
-                            db.request_change_w_detail_log.insert(request_change_w_log = str(temp3),
-                                                                    operation_request = str(var_chang.operation_request),
-                                                                    course_category = str(cat_temp.category.category),
-                                                                    before_grade = str(cat_temp.grade),
-                                                                    before_specific_grade = str(cat_temp.specific_grade) )
-
-                        pass
-                        if var_chang.operation_request == 'update':
-                            cat_temp = db(db.course_activity_category.id==var_chang.course_category).select().first()
-                            cat_temp2 = db(db.activity_category.id==var_chang.category).select().first()
-
+                #Weighting CHANGE REQUEST
+                request_change = db((db.request_change_weighting.status=='pending')&(db.request_change_weighting.period==int(year.id))&(db.request_change_weighting.project==int(project_var.id))).select()
+                for change in request_change:
+                    from datetime import datetime
+                    db(db.request_change_weighting.id==change.id).update(status = 'rejected', 
+                                                                        resolve_user = auth.user.id, 
+                                                                        roll_resolve =  nombreRol, 
+                                                                        date_request_resolve = str(datetime.now())
+                                                                    )
+                    temp2 = db(db.request_change_w_log.r_c_w_id == change.id).select().first()
+                    temp3 = db.request_change_w_log.insert(r_c_w_id=change.id,
+                                                        username=temp2.username,
+                                                        roll=temp2.roll,
+                                                        before_status='pending',
+                                                        after_status='rejected',
+                                                        description=temp2.description,
+                                                        semester=temp2.semester,
+                                                        yearp=temp2.yearp,
+                                                        project=temp2.project,
+                                                        resolve_user=auth.user.username,
+                                                        roll_resolve=nombreRol,
+                                                        date_request=temp2.date_request,
+                                                        date_request_resolve=str(datetime.now())
+                                                    ) 
+                    temp4 = db(db.request_change_weighting.id == change.id).select().first() 
+                    
+                    for var_chang_ins in db((db.request_change_weighting_detail.request_change_weighting ==  temp4.id) & (db.request_change_weighting_detail.operation_request == 'insert')).select():
+                        if var_chang_ins.operation_request == 'insert':
                             db.request_change_w_detail_log.insert(request_change_w_log=temp3,
-                                                                    operation_request=var_chang.operation_request,
-                                                                    course_category=cat_temp.category.category,
-                                                                    category=cat_temp2.category,
-                                                                    before_grade=cat_temp.grade,                                                                
-                                                                    after_specific_grade=var_chang.specific_grade,
-                                                                    after_grade=var_chang.grade,
-                                                                    before_specific_grade=cat_temp.specific_grade)
-
+                                                                    operation_request=var_chang_ins.operation_request,
+                                                                    category=var_chang_ins.category.category,
+                                                                    after_grade=var_chang_ins.grade,
+                                                                    after_specific_grade=var_chang_ins.specific_grade)
                         pass
-                        db(db.request_change_weighting_detail.id==var_chang.id).update(course_category = None)
-                    else:
-                        add_to_log = True
-                        for req_c_w_d_l in db(db.request_change_w_detail_log.request_change_w_log==temp3).select():
-                            if categories.category.category == req_c_w_d_l.category:
-                                add_to_log = False
+
+                    pass
+
+                    for categories in db((db.course_activity_category.semester==int(temp4.period)) & (db.course_activity_category.assignation==temp4.project) & (db.course_activity_category.laboratory==True)).select():
+                        var_chang = db(db.request_change_weighting_detail.course_category ==  str(categories.id)).select().first()
+                        if var_chang != None:
+                            if var_chang.operation_request == 'delete':
+                                
+                                cat_temp = db(db.course_activity_category.id == var_chang.course_category).select().first()
+
+                                temp44 = db(db.request_change_w_log.id == str(temp3) ).select().first() 
+                                db.request_change_w_detail_log.insert(request_change_w_log = str(temp3),
+                                                                        operation_request = str(var_chang.operation_request),
+                                                                        course_category = str(cat_temp.category.category),
+                                                                        before_grade = str(cat_temp.grade),
+                                                                        before_specific_grade = str(cat_temp.specific_grade) )
+
                             pass
+                            if var_chang.operation_request == 'update':
+                                cat_temp = db(db.course_activity_category.id==var_chang.course_category).select().first()
+                                cat_temp2 = db(db.activity_category.id==var_chang.category).select().first()
+
+                                db.request_change_w_detail_log.insert(request_change_w_log=temp3,
+                                                                        operation_request=var_chang.operation_request,
+                                                                        course_category=cat_temp.category.category,
+                                                                        category=cat_temp2.category,
+                                                                        before_grade=cat_temp.grade,                                                                
+                                                                        after_specific_grade=var_chang.specific_grade,
+                                                                        after_grade=var_chang.grade,
+                                                                        before_specific_grade=cat_temp.specific_grade)
+
+                            pass
+                            db(db.request_change_weighting_detail.id==var_chang.id).update(course_category = None)
+                        else:
+                            add_to_log = True
+                            for req_c_w_d_l in db(db.request_change_w_detail_log.request_change_w_log==temp3).select():
+                                if categories.category.category == req_c_w_d_l.category:
+                                    add_to_log = False
+                                pass
+                            pass
+                            if add_to_log == True:
+                                db.request_change_w_detail_log.insert(request_change_w_log=temp3,
+                                                                        operation_request='none',
+                                                                        category=categories.category.category,
+                                                                        after_grade=categories.grade,
+                                                                        after_specific_grade=categories.specific_grade)
+                            pass                                                        
                         pass
-                        if add_to_log == True:
-                            db.request_change_w_detail_log.insert(request_change_w_log=temp3,
-                                                                    operation_request='none',
-                                                                    category=categories.category.category,
-                                                                    after_grade=categories.grade,
-                                                                    after_specific_grade=categories.specific_grade)
-                        pass                                                        
                     pass
                 pass
-            pass
 
-            #Weighting CHANGE REQUEST
-            request_change = db((db.requestchange_activity.status=='Pending')&(db.requestchange_activity.semester==int(year.id))&(db.requestchange_activity.course==int(project_var.id))).select()
-            for change in request_change:
-                from datetime import datetime
-                Pending = change
-                rol_temp = nombreRol
+                #Weighting CHANGE REQUEST
+                request_change = db((db.requestchange_activity.status=='Pending')&(db.requestchange_activity.semester==int(year.id))&(db.requestchange_activity.course==int(project_var.id))).select()
+                for change in request_change:
+                    from datetime import datetime
+                    Pending = change
+                    rol_temp = nombreRol
+                    
+                    db(db.requestchange_activity.id==int(change.id)).update(status = 'Rejected', user_resolve = auth.user.id, roll_resolve =  rol_temp, date_request_resolve =  datetime.now())
+                    #Log of request change activity
+                    Rejected = db(db.requestchange_activity.id==int(change.id)).select().first()
+                    if Rejected is not None:
+                        idR = db.requestchange_activity_log.insert(user_request=Rejected.user_id.username, 
+                                                                    roll_request=Rejected.roll, status='Rejected', 
+                                                                    user_resolve=Rejected.user_resolve.username, 
+                                                                    roll_resolve=Rejected.roll_resolve,
+                                                                    description=Rejected.description,
+                                                                    date_request=Rejected.date_request, 
+                                                                    date_request_resolve=Rejected.date_request_resolve, 
+                                                                    category_request=Rejected.course_activity_category.category.category, 
+                                                                    semester=Rejected.semester.period.name, 
+                                                                    yearp=Rejected.semester.yearp, 
+                                                                    course=Rejected.course.name)
+                        activitiesChange = db(db.requestchange_course_activity.requestchange_activity==Rejected.id).select()
+                        for actChange in activitiesChange:
+                            db.requestchange_course_activity_log.insert(requestchange_activity=idR, 
+                                                                        operation_request=actChange.operation_request, 
+                                                                        activity=actChange.activity, 
+                                                                        name=actChange.name, 
+                                                                        description=actChange.description, 
+                                                                        grade=actChange.grade, 
+                                                                        date_start=actChange.date_start, 
+                                                                        date_finish=actChange.date_finish)
+                pass
+                #Insert to course_ended           
+                db.course_ended.insert(project = project_var.id,
+                                period = year.id,
+                                finish =  True)
                 
-                db(db.requestchange_activity.id==int(change.id)).update(status = 'Rejected', user_resolve = auth.user.id, roll_resolve =  rol_temp, date_request_resolve =  datetime.now())
-                #Log of request change activity
-                Rejected = db(db.requestchange_activity.id==int(change.id)).select().first()
-                if Rejected is not None:
-                    idR = db.requestchange_activity_log.insert(user_request=Rejected.user_id.username, 
-                                                                roll_request=Rejected.roll, status='Rejected', 
-                                                                user_resolve=Rejected.user_resolve.username, 
-                                                                roll_resolve=Rejected.roll_resolve,
-                                                                description=Rejected.description,
-                                                                date_request=Rejected.date_request, 
-                                                                date_request_resolve=Rejected.date_request_resolve, 
-                                                                category_request=Rejected.course_activity_category.category.category, 
-                                                                semester=Rejected.semester.period.name, 
-                                                                yearp=Rejected.semester.yearp, 
-                                                                course=Rejected.course.name)
-                    activitiesChange = db(db.requestchange_course_activity.requestchange_activity==Rejected.id).select()
-                    for actChange in activitiesChange:
-                        db.requestchange_course_activity_log.insert(requestchange_activity=idR, 
-                                                                    operation_request=actChange.operation_request, 
-                                                                    activity=actChange.activity, 
-                                                                    name=actChange.name, 
-                                                                    description=actChange.description, 
-                                                                    grade=actChange.grade, 
-                                                                    date_start=actChange.date_start, 
-                                                                    date_finish=actChange.date_finish)
-            pass
-            #Insert to course_ended           
-            db.course_ended.insert(project = project_var.id,
-                            period = year.id,
-                            finish =  True)
-        #Generate csv file format technical school
-        session.flash = T('Request has been canceled')
-        #
-        #redirect(URL('activity_control','Course_Format_Technical_School',vars=dict(project = project_var.id, period = year.id)))
-    
+                #Generate csv file format technical school
+                action_Export=True
+            else:
+                #Generate csv file format technical school
+                if (request.vars['op'] is None) or (request.vars['op'] == '') or (request.vars['op']  == '1') or (request.vars['op']  == '0'):
+                    redirect(URL('activity_control','Course_Format_Technical_School',vars=dict(project = project_var.id, period = year.id, type=request.vars['type'], op=1)))
+                elif request.vars['op']  == '2':
+                    redirect(URL('activity_control','Course_Format_Technical_School',vars=dict(project = project_var.id, period = year.id, type=request.vars['type'], op=2)))
+                elif request.vars['op']  == '3':
+                    redirect(URL('activity_control','Course_Format_Technical_School',vars=dict(project = project_var.id, period = year.id, type=request.vars['type'], op=3)))
+                else:
+                    redirect(URL('activity_control','General_report_activities',vars=dict(project = project_var.id, period = year.id, type=request.vars['type'])))
+        else:
+            session.flash = T('Not valid Action.')
+            redirect(URL('default','index'))
+
+
     controlP = db((db.student_control_period.period_name==(T(year.period.name)+" "+str(year.yearp)))).select().first()
     requirement = db((db.course_requirement.semester==year.id)&(db.course_requirement.project==project_var.id)).select().first()
-    
-    course_ended_var = db((db.course_ended.project==project_var.id) & (db.course_ended.period==year.id) ).select().first()
 
     course_ended = False
     course_ended_var = db((db.course_ended.project==project_var.id) & (db.course_ended.period==year.id) ).select().first()
@@ -4779,12 +4881,6 @@ def General_report_activities():
     if request.vars['op'] == '0':
         response.flash= T('Course hasn’t finalized.')
 
-    exception_query = db(db.course_laboratory_exception.project == project_var.id).select().first()
-    exception_s_var = False
-    exception_t_var = False
-    if exception_query is not None:
-        exception_t_var = exception_query.t_edit_lab
-        exception_s_var = exception_query.s_edit_course
 
     return dict(project = project_var,
                 year = year, 
@@ -4804,7 +4900,8 @@ def General_report_activities():
                 course_ended = course_ended,
                 exception_s_var=exception_s_var,
                 exception_t_var=exception_t_var,
-                tutor_access = tutor_access)
+                tutor_access = tutor_access,
+                action_Export=action_Export)
 
 
 

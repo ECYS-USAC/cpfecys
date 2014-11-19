@@ -13,5 +13,4 @@ nameFile = filename+'.csv'
 response.headers['Content-Type']='application/vnd.ms-excel'
 response.headers['Content-disposition']='attachment; filename=' +nameFile
 response.write(stream.getvalue(), escape=False)
-
 }}

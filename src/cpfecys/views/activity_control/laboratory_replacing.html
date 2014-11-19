@@ -3,7 +3,7 @@
 	<a href="{{=URL('activity_control', 'students_control', vars=dict(project = project.id, period = year.id))}}" class="btn" ><i class="icon-arrow-left"></i> {{=T('Back')}}</a>
 </div>
 <h2>
-	{{=T('Laboratory replacing')}} <a href="#myModalReplacing" role="button" class="btn btn-primary"data-toggle="modal"><span class="icon-white icon-question-sign"></span></a>
+	{{=T('Laboratory Equivalence')}} <a href="#myModalReplacing" role="button" class="btn btn-primary"data-toggle="modal"><span class="icon-white icon-question-sign"></span></a>
 	<br>
 	<small>
 		{{=project.name}} - {{=T(year.period.name)}} {{=str(year.yearp)}}
@@ -17,19 +17,19 @@ aria-labelledby="myModalLabel" aria-hidden="true">
   <div class="modal-header">
     <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
       <h3 id="myModalLabel">
-          <span class="icon-question-sign"></span>{{=T('Help')}} {{=T('Laboratory replacing')}}
+          <span class="icon-question-sign"></span>{{=T('Help')}} {{=T('Laboratory Equivalence')}}
       </h3>
   </div>
   <div class="modal-body">
     <div class="well">
         <p>
-            {{=T('Within this space you can create, edit or delete records from laboratory replacements.')}}
+            {{=T('Within this space you can create, edit or delete records from laboratory equivalence.')}}
         </p>
         <p>
-            {{=T('Laboratory replacements are substitutions approved lab in class by the student.')}}
+            {{=T('Laboratory equivalence are substitutions approved lab in class by the student.')}}
         </p>
         <p>
-            {{=T('Laboratory replacement example:')}}
+            {{=T('Laboratory equivalence example:')}}
             <br>
             *) {{=T('Laboratories of India')}}
         </p>
@@ -47,7 +47,7 @@ aria-labelledby="myModalLabel" aria-hidden="true">
     <div id ="a" class="modal-header">
       <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
         <h3 id="myModalLabel">
-            {{=T('Reason for Replacement Laboratory')}}
+            {{=T('Reason for Equivalence Laboratory')}}
         </h3>
     </div>
     <div class="modal-body">
@@ -89,7 +89,7 @@ aria-labelledby="myModalLabel" aria-hidden="true">
   }
 	
 	$("#submit_record__row").empty();
-	$("#submit_record__row").append("<td class=\"w2p_fl\"><label>{{=T('Reason for Replacement Laboratory')}}:</label></td>");
+	$("#submit_record__row").append("<td class=\"w2p_fl\"><label>{{=T('Reason for Equivalence Laboratory')}}:</label></td>");
 	$("#submit_record__row").append("<td class=\"w2p_fw\"><textarea class=\"string\" cols=\"40\" type=\"text\" value=\"\" id=\"description_request\" name=\"description_request\" style=\"width:280px; height:100px;\"></textarea><br><input type=\"submit\" value=\"Continuar\" /></td>");
 	$("#submit_record__row").append("<td class=\"w2p_fc\"></td>");
 </script>
