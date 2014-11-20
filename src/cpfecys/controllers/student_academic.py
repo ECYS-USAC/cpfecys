@@ -366,16 +366,29 @@ def academic_assignation():
             response.flash = T('Error.')
     #update form finish
 
+    def get_button_clas(carnet_pa):
+        review = db((db.photo_review.user_id == str(db(db.academic.id==int(carnet_pa)).select(db.academic.id_auth_user).first().id_auth_user))).select().first()
+        if review is None:
+            class_button = 'btn btn-info'
+        else:
+            if review.accepted == True:
+                class_button = 'btn btn-success'
+            else:
+                class_button = 'btn btn-danger'
+        return class_button
+
     links = [lambda row: A(str( db(db.academic.id==int(row.carnet)).select(db.academic.email).first().email ),
         _role='label',
         _title=str( db(db.academic.id==int(row.carnet)).select(db.academic.email).first().email ),
         _style='width: 250px; ')]
 
+    
+
     links += [lambda row: A(T('View photo'),
         _role='button', 
-        _class='btn btn-success', 
+        _class=get_button_clas(row.carnet), 
         _onclick='set_photo("'+str(db(db.academic.id==int(row.carnet)).select(db.academic.id_auth_user).first().id_auth_user)+'");', 
-        _title=T('Edit academic information') ,**{"_data-toggle":"modal", "_data-target": "#picModal"})]   
+        _title=T('View photo') ,**{"_data-toggle":"modal", "_data-target": "#picModal"})]   
         
 
     if (request.vars['year_period'] is None) or (str(request.vars['year_period']) == str(cpfecys.current_year_period().id)):
@@ -914,9 +927,20 @@ def academic():
         
         db.academic.email.readable = True        
         #Modal photo
+        def get_button_clas(carnet_pa):
+            review = db((db.photo_review.user_id == carnet_pa)).select().first()
+            if review is None:
+                class_button = 'btn btn-info'
+            else:
+                if review.accepted == True:
+                    class_button = 'btn btn-success'
+                else:
+                    class_button = 'btn btn-danger'
+            return class_button
+
         links = [lambda row: A(T('View photo'),
         _role='button', 
-        _class='btn btn-success', 
+        _class= get_button_clas(row.id_auth_user), 
         _onclick='set_values("'+str(row.id_auth_user)+'");', 
         _title=T('Edit academic information') ,**{"_data-toggle":"modal", "_data-target": "#picModal"})]   
         

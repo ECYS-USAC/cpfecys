@@ -1123,10 +1123,17 @@ def split_num(var):
 ##############################AUTH_USER TRIGGERS####################################
 def auth_user_update(*args):    
     try:
+        try:
+            review = db((db.photo_review.user_id == str(int(split_num(args[1]))) )).select().first()
+            if (review.photo != str(args[0]['photo'])):
+                db(db.photo_review.id==review.id).delete()
+        except:
+            None
+
         academic_var = db.academic(db.academic.id_auth_user==str(int(split_num(args[1]))))
         if academic_var == None:
             academic_var = db.academic(db.academic.carnet==args[0]['username'])
-            
+
         db(db.academic.id == academic_var.id).update(id_auth_user = str(int(split_num(args[1]))),
                                                     carnet = str(args[0]['username']),
                                                     email = str(args[0]['email']))
@@ -1377,6 +1384,12 @@ db.define_table('validate_student_parameters',
 db.define_table('page_visited',
     Field('user_id', 'integer', notnull=True, label=T('username')),
     Field('page_name', 'string', notnull=True, label=T('Page'))
+)
+
+db.define_table('photo_review',
+    Field('user_id', 'integer', notnull=True, label=T('username')),
+    Field('photo', 'text', notnull=True, label=T('photo')),
+    Field('accepted', 'boolean', notnull=True, label=T('accepted'))
 )
 
 ## after defining tables, uncomment below to enable auditing

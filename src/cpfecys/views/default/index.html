@@ -1,6 +1,22 @@
 {{extend 'template.html'}}
 <script type="text/javascript" src="{{=URL('static','markitup')}}/sets/markmin/set.js"></script>
 <link rel="stylesheet" type="text/css" href="{{=URL('static','markitup')}}/sets/markmin/style.css"/>
+
+{{if auth.has_membership('Academic') or auth.has_membership('Student'):}}
+   
+{{review = db((db.photo_review.user_id == auth.user.id)).select().first()
+if review is not None:
+    if review.accepted == False:
+        }}<div class="alert"  style="width:90%;" id="notice_1">
+            <center><strong><font color="red">¡{{=T('Photo Rejected')}}, {{=T('please enter a new photo')}}!</font></strong><br>
+                {{=T('Remember that photography is for academic use; therefore must be commensurate with the seriousness of the case, otherwise it will be blocked.')}}
+            </center>
+            </div>
+    {{pass
+pass
+}}
+            
+{{pass}}
 <table style="width:100%;">
     <tr>
 </td>

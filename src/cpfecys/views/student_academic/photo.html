@@ -1,0 +1,28 @@
+{{if request.vars['option'] is None:}}
+	<!--<img id="img_img" src="{{=cpfecys.get_domain() + URL('default/download', db(db.auth_user.id==request.vars['id_user']).select(db.auth_user.photo).first().photo)}}" alt="No photo" > -->
+
+	{{var_query=db(db.auth_user.id==request.vars['id_user']).select().first()}}
+	<img id="img_img" src="{{= URL('default/download', var_query.photo)}}" alt="No photo" height="50%" width="50%">
+	<br>
+	<h3>
+	{{= var_query.username}} - {{= var_query.first_name}} {{= var_query.last_name}}
+	<br>
+	<small>{{=var_query.email}}</small>
+	</h3>
+	<div id='div_action'>
+	</div>
+	<script>
+		function click_acept() {
+			$("#div_action").load("{{=URL('student_academic', 'photo.load', vars=dict(option = 'accept', id_user = request.vars['id_user']))}}");
+		}
+		function click_reject() {
+			$("#div_action").load("{{=URL('student_academic', 'photo.load', vars=dict(option = 'reject', id_user = request.vars['id_user']))}}");
+		}
+	</script>
+	<a class="btn btn-success" onclik="click_acept()">{{=T('Accept Photo')}}</a>
+	<a class="btn btn-danger" onclik="click_reject()">{{=T('Reject Photo')}}</a>
+{{elif if request.vars['option'] == 'accept':}}
+	{{db.photo_review.insert(user_id = request.vars['id_user'], accepted = True)}}
+{{elif if request.vars['option'] == 'reject':}}
+	{{db.photo_review.insert(user_id = request.vars['id_user'], accepted = False)}}
+{{pass}}
