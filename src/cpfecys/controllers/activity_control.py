@@ -4077,7 +4077,7 @@ def Course_Format_Technical_School():
 
     
 @auth.requires_login()
-@auth.requires(auth.has_membership('Student') or auth.has_membership('Teacher') or auth.has_membership('Super-Administrator') or auth.has_membership('Ecys-Administrator'))
+@auth.requires(auth.has_membership('Academic') or auth.has_membership('Student') or auth.has_membership('Teacher') or auth.has_membership('Super-Administrator') or auth.has_membership('Ecys-Administrator'))
 def general_report_activities_export():
     #vars
     year = None

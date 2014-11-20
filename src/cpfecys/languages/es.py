@@ -1939,7 +1939,7 @@
 'Unable to download app': 'No es posible descarga la aplicación',
 'Unable to edit category because it already has some activity associated': 'No se pudo editar categoría porque ya tiene asociada alguna actividad',
 'unable to parse csv file': 'no es posible analizar el archivo CSV',
-'Unable to send email': 'Unable to send email',
+'Unable to send email': 'No es posible enviar el correo electrónico',
 'Unable to send the request as long as other pending requests': 'No se puede enviar la solicitud mientras existan solicitudes pendientes de actividades',
 'unable to uninstall "%s"': 'no es posible instalar "%s"',
 'Unassigned': 'Sin Asignar',
