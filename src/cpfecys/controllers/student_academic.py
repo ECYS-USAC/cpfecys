@@ -367,15 +367,18 @@ def academic_assignation():
     #update form finish
 
     def get_button_clas(carnet_pa):
-        review = db((db.photo_review.user_id == str(db(db.academic.id==int(carnet_pa)).select(db.academic.id_auth_user).first().id_auth_user))).select().first()
-        if review is None:
-            class_button = 'btn btn-info'
-        else:
-            if review.accepted == True:
-                class_button = 'btn btn-success'
+        try:
+            review = db((db.photo_review.user_id == str(db(db.academic.id==int(carnet_pa)).select(db.academic.id_auth_user).first().id_auth_user))).select().first()
+            if review is None:
+                class_button = 'btn btn-info'
             else:
-                class_button = 'btn btn-danger'
-        return class_button
+                if review.accepted == True:
+                    class_button = 'btn btn-success'
+                else:
+                    class_button = 'btn btn-danger'
+            return class_button
+        except:
+            return 'btn'
 
     links = [lambda row: A(str( db(db.academic.id==int(row.carnet)).select(db.academic.email).first().email ),
         _role='label',

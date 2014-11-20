@@ -308,7 +308,7 @@ def send_mail_to_users(users, message, subject, semester,year, project_name):
     
     academic_var = db.academic(db.academic.id_auth_user==auth.user.id)
 
-    messageC = '<html>' + message  +'<br><br>Estudiante: '+ auth.user.first_name +' '+ auth.user.last_name +'<br>Carnet: '+auth.user.username +'<br>Correo: '+auth.user.email+'<br>'+auth.user.username+"<br>"+str(period)+'<br>Sistema de Seguimiento de La Escuela de Ciencias y Sistemas<br> Facultad de Ingeniería - Universidad de San Carlos de Guatemala </html>'    
+    messageC = '<html>' + message  +'<br><br>Estudiante: '+ auth.user.first_name +' '+ auth.user.last_name +'<br>Carnet: '+auth.user.username +'<br>Correo: '+auth.user.email+"<br>"+str(period)+'<br>Sistema de Seguimiento de La Escuela de Ciencias y Sistemas<br> Facultad de Ingeniería - Universidad de San Carlos de Guatemala </html>'    
     control = 0
 
     
