@@ -1,0 +1,73 @@
+{{if showLevel==False:}}
+	<center>{{=T('Action not allowed')}}</center>
+	<script type="text/javascript">
+		alert("{{=T('Action not allowed')}}");
+		window.location.href = "{{=URL('default', 'index.html')}}";
+	</script>
+{{else:}}
+	<table class="table table-bordered">
+		<tr bgcolor="#F3F781">
+			<td colspan="8">
+			<div align="left">
+				<a href="{{=URL(vars=dict(list='False',level='5',level_project=project.id, level_month=month, level_tipo=tipo, level_rol=roll, level_user=userr))}}" title="{{=T('Export reporting level')}}"><img src="{{=URL('static','images')}}/icono_CSV.png"></a>
+			</div>
+			</td>
+		</tr>
+		<tr bgcolor="#F3F781">
+			<th>
+				{{=T('User resolution')}}
+			</th>
+			<th>
+				{{=T('Role resolution')}}
+			</th>
+			<th>
+				{{=T('Date of resolution')}}
+			</th>
+			<th>
+				{{=T('Operation')}}
+			</th>
+			<th>
+				{{=T('Description')}}
+			</th>
+			<th>
+				{{=T('Rol Academic')}}
+			</th>
+			<th>
+				{{=T('Before Grade')}}
+			</th>
+			<th>
+				{{=T('Grade edited')}}
+			</th>
+		</tr>
+		{{for field in vecAllUserRoleMonth:}}
+			{{for camp in field:}}
+				<tr bgcolor="#F2F5A9">
+					<td>
+						{{=str(camp.user_name)}}
+					</td>
+					<td>
+						{{=T('Rol '+str(camp.roll))}}
+					</td>
+					<td>
+						{{=str(camp.date_log)}}
+					</td>
+					<td>
+						{{=str(camp.operation_log)}}
+					</td>
+					<td>
+						{{=str(camp.description)}}
+					</td>
+					<td>
+						{{=str(camp.academic)}}
+					</td>
+					<td>
+						{{=str(camp.before_grade)}}
+					</td>
+					<td>
+						{{=str(camp.after_grade)}}
+					</td>
+				</tr>
+			{{pass}}
+		{{pass}}
+	</table>
+{{pass}}
