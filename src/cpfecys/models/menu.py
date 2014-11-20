@@ -139,13 +139,6 @@ if auth.has_membership(role="Academic"):
                 pass
             pass
         
-
-
-#(T('Grades'), False, URL('activity_control', 'grades_management'), []),
-#(T('Laboratory Revalidation'), False, URL('activity_control','validate_laboratory_management'), []),    
-#(T('General List of Academic'), False, URL('student_academic','academic'), [])
-#(T('View Events'), False, URL('default','events'), [])
-
 if auth.has_membership(role="Student"):
     response.menu.extend([(T('Final Practice'), False,  URL('student', 'index'), [])
     ])
