@@ -1486,6 +1486,7 @@
 'Report Data': 'Report Data',
 'Report Dates': 'Fechas de Reporte',
 'Report detail': 'Detalle del reporte',
+'Report Equivalence Management Laboratory': 'Reporte de Gestión de Equivalencias de Laboratorio',
 'Report Footer': 'Pie de Reporte',
 'Report Grading': 'Calificación de Reporte',
 'Report has been sent         to be improved by student': 'El reporte ha sido enviado para ser mejorado por el estudiante',

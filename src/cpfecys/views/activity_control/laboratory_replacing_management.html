@@ -1,0 +1,242 @@
+{{extend 'template.html'}}
+{{from datetime import datetime}}
+<div class="row-fluid">
+	<h1>
+		{{=T('Report Equivalence Management Laboratory')}}
+		<br>
+		<small>
+			{{=T(year.period.name)}} {{=str(year.yearp)}}
+		</small>
+	</h1>
+	<div align="right">
+		<a class="btn btn-success" href="{{=URL(vars=dict(list='True'))}}"><i class="icon-download icon-white"></i>{{=T('Export Report')}} (CSV)</a>
+    </div>
+	<!--Search in report-->
+	<div>
+		<div>
+			<form action="{{=URL('activity_control', 'laboratory_replacing_management/search')}}" method="post">
+				<table>
+					<tr>
+						<td>
+							<label>{{=T('Carnet')}}:</label>
+						</td>
+						<td>
+							{{if session.search_laboratory_replacing_management is None or session.search_laboratory_replacing_management == "":}}
+								<input type="text" id="querySearch" name="querySearch" value=""/>
+							{{else:}}
+								<input type="text" id="querySearch" name="querySearch" value="{{=session.search_laboratory_replacing_management}}" readonly="readonly"/>
+							{{pass}}
+						</td>
+						<td>
+							<button type="submit"  class="btn">{{=T('Search')}}</button>
+							<a id="cancelSearch" class="btn">{{=T('Clear')}}</a>
+						</td>
+					</tr>
+				</table>
+			</form>
+		</div>
+	</div>
+	<!--Search in report-->
+	<div style="overflow:auto; width:100%;">
+		<table class="table table-bordered">
+			<thead>
+				<tr bgcolor="#D8D8D8">
+					<th>
+						<div>
+							<div>
+								<a href="{{=URL(vars=dict(list='False',level='1'))}}" title="{{=T('Export reporting level')}}"><img src="{{=URL('static','images')}}/icono_CSV.png"></a>
+							</div>
+							<div>
+								<center><font Color="Black">{{=T('Course')}}</font></center>
+							</div>
+						</div>
+					</th>
+					<th><center><font Color="Black">{{=T('Total inserted')}}</font></center></th>
+					<th><center><font Color="Black">{{=T('Total modified')}}</font></center></th>
+					<th><center><font Color="Black">{{=T('Total out')}}</font></center></th>
+				</tr>
+			</thead>
+			<tbody>
+				{{for assigantion in assigantions:}}
+					<tr bgcolor="#E6E6E6">
+						<td width="500px">
+							<font Color="Black">
+							<a id="p{{=str(assigantion.project)}}_all" style="white-space:nowrap; cursor:pointer;"><b>{{=str(assigantion.project.name)}}</b></a>
+							</font>
+						</td>
+						<td>
+							<center>
+								<a class="badge badge-success" style="white-space:nowrap;">
+									{{if session.search_laboratory_replacing_management == "" or session.search_laboratory_replacing_management is None:}}
+										{{=str(db((db.validate_laboratory_log.project==assigantion.project.name)&(db.validate_laboratory_log.yearp==str(year.yearp))&(db.validate_laboratory_log.period==str(T(year.period.name)))&(db.validate_laboratory_log.operation_log=='insert')&(db.validate_laboratory_log.validation_type==False)).count(db.validate_laboratory_log.id))}}
+									{{else:}}
+										{{=str(db((db.validate_laboratory_log.project==assigantion.project.name)&(db.validate_laboratory_log.yearp==str(year.yearp))&(db.validate_laboratory_log.period==str(T(year.period.name)))&(db.validate_laboratory_log.operation_log=='insert')&(db.validate_laboratory_log.validation_type==False)&(db.validate_laboratory_log.academic.like('%'+str(session.search_laboratory_replacing_management)+'%'))).count(db.validate_laboratory_log.id))}}
+									{{pass}}
+								</a>
+							</center>
+						</td>
+						<td>
+							<center>
+								<a class="badge badge-info" style="white-space:nowrap;">
+									{{if session.search_laboratory_replacing_management == "" or session.search_laboratory_replacing_management is None:}}
+										{{=str(db((db.validate_laboratory_log.project==assigantion.project.name)&(db.validate_laboratory_log.yearp==str(year.yearp))&(db.validate_laboratory_log.period==str(T(year.period.name)))&(db.validate_laboratory_log.operation_log=='update')&(db.validate_laboratory_log.validation_type==False)).count(db.validate_laboratory_log.id))}}
+									{{else:}}
+										{{=str(db((db.validate_laboratory_log.project==assigantion.project.name)&(db.validate_laboratory_log.yearp==str(year.yearp))&(db.validate_laboratory_log.period==str(T(year.period.name)))&(db.validate_laboratory_log.operation_log=='update')&(db.validate_laboratory_log.validation_type==False)&(db.validate_laboratory_log.academic.like('%'+str(session.search_laboratory_replacing_management)+'%'))).count(db.validate_laboratory_log.id))}}
+									{{pass}}
+								</a>
+							</center>
+						</td>
+						<td>
+							<center>
+								<a class="badge badge-important" style="white-space:nowrap;">
+									{{if session.search_laboratory_replacing_management == "" or session.search_laboratory_replacing_management is None:}}
+										{{=str(db((db.validate_laboratory_log.project==assigantion.project.name)&(db.validate_laboratory_log.yearp==str(year.yearp))&(db.validate_laboratory_log.period==str(T(year.period.name)))&(db.validate_laboratory_log.operation_log=='delete')&(db.validate_laboratory_log.validation_type==False)).count(db.validate_laboratory_log.id))}}
+									{{else:}}
+										{{=str(db((db.validate_laboratory_log.project==assigantion.project.name)&(db.validate_laboratory_log.yearp==str(year.yearp))&(db.validate_laboratory_log.period==str(T(year.period.name)))&(db.validate_laboratory_log.operation_log=='delete')&(db.validate_laboratory_log.validation_type==False)&(db.validate_laboratory_log.academic.like('%'+str(session.search_laboratory_replacing_management)+'%'))).count(db.validate_laboratory_log.id))}}
+									{{pass}}
+								</a>
+							</center>
+						</td>
+					</tr>
+					<tr bgcolor="#F2F2F2">
+						<td colspan="4">
+							<div id="div_p{{=assigantion.project}}" style="display: none;">
+								<table class="table table-bordered">
+									<thead>
+										<tr bgcolor="#58D3F7">
+											<th width="490px">
+												<div>
+													<div>
+														<a href="{{=URL(vars=dict(list='False',level='2',level_project=assigantion.project))}}" title="{{=T('Export reporting level')}}"><img src="{{=URL('static','images')}}/icono_CSV.png"></a>
+													</div>
+													<div>
+														<center>{{=T('Month')}}</center>
+													</div>
+												</div>
+											</th>
+											<th><center>{{=T('Total inserted')}}</center></th>
+											<th><center>{{=T('Total modified')}}</center></th>
+											<th><center>{{=T('Total out')}}</center></th>
+										</tr>
+									</thead>
+									<tbody>
+										{{for month in vecMonth:}}
+											{{start = datetime.strptime(str(year.yearp) + '-' + str(month[0]) +'-01', "%Y-%m-%d")}}
+											{{if month[2]==1:}}
+							        			{{end = datetime.strptime(str(year.yearp+1) + '-' + str(month[2]) +'-01', "%Y-%m-%d")}}
+							        		{{else:}}
+							        			{{end = datetime.strptime(str(year.yearp) + '-' + str(month[2]) +'-01', "%Y-%m-%d")}}
+							        		{{pass}}
+							        		<tr bgcolor="#81DAF5">
+												<td>
+														<a id="p{{=str(assigantion.project)}}_all_m{{=month[0]}}_all" style="white-space:nowrap; cursor:pointer;"><b>{{=month[1]}}</b></a>
+												</td>
+												<td>
+													<center>
+														<a id="p{{=str(assigantion.project)}}_all_m{{=month[0]}}_i" style="white-space:nowrap; cursor:pointer;" class="badge badge-success">
+															{{if session.search_laboratory_replacing_management == "" or session.search_laboratory_replacing_management is None:}}
+																{{=str(db((db.validate_laboratory_log.project==assigantion.project.name)&(db.validate_laboratory_log.yearp==str(year.yearp))&(db.validate_laboratory_log.period==str(T(year.period.name)))&(db.validate_laboratory_log.date_log>=str(start))&(db.validate_laboratory_log.date_log<str(end))&(db.validate_laboratory_log.operation_log=='insert')&(db.validate_laboratory_log.validation_type==False)).count(db.validate_laboratory_log.id))}}
+															{{else:}}
+																{{=str(db((db.validate_laboratory_log.project==assigantion.project.name)&(db.validate_laboratory_log.yearp==str(year.yearp))&(db.validate_laboratory_log.period==str(T(year.period.name)))&(db.validate_laboratory_log.date_log>=str(start))&(db.validate_laboratory_log.date_log<str(end))&(db.validate_laboratory_log.operation_log=='insert')&(db.validate_laboratory_log.validation_type==False)&(db.validate_laboratory_log.academic.like('%'+str(session.search_laboratory_replacing_management)+'%'))).count(db.validate_laboratory_log.id))}}
+															{{pass}}
+														</a>
+													</center>
+												</td>
+												<td>
+													<center>
+														<a id="p{{=str(assigantion.project)}}_all_m{{=month[0]}}_u" style="white-space:nowrap; cursor:pointer;" class="badge badge-info">
+															{{if session.search_laboratory_replacing_management == "" or session.search_laboratory_replacing_management is None:}}
+																{{=str(db((db.validate_laboratory_log.project==assigantion.project.name)&(db.validate_laboratory_log.yearp==str(year.yearp))&(db.validate_laboratory_log.period==str(T(year.period.name)))&(db.validate_laboratory_log.date_log>=str(start))&(db.validate_laboratory_log.date_log<str(end))&(db.validate_laboratory_log.operation_log=='update')&(db.validate_laboratory_log.validation_type==False)).count(db.validate_laboratory_log.id))}}
+															{{else:}}
+																{{=str(db((db.validate_laboratory_log.project==assigantion.project.name)&(db.validate_laboratory_log.yearp==str(year.yearp))&(db.validate_laboratory_log.period==str(T(year.period.name)))&(db.validate_laboratory_log.date_log>=str(start))&(db.validate_laboratory_log.date_log<str(end))&(db.validate_laboratory_log.operation_log=='update')&(db.validate_laboratory_log.validation_type==False)&(db.validate_laboratory_log.academic.like('%'+str(session.search_laboratory_replacing_management)+'%'))).count(db.validate_laboratory_log.id))}}
+															{{pass}}
+														</a>
+													</center>
+												</td>
+												<td>
+													<center>
+														<a id="p{{=str(assigantion.project)}}_all_m{{=month[0]}}_d" style="white-space:nowrap; cursor:pointer;" class="badge badge-important">
+															{{if session.search_laboratory_replacing_management == "" or session.search_laboratory_replacing_management is None:}}
+																{{=str(db((db.validate_laboratory_log.project==assigantion.project.name)&(db.validate_laboratory_log.yearp==str(year.yearp))&(db.validate_laboratory_log.period==str(T(year.period.name)))&(db.validate_laboratory_log.date_log>=str(start))&(db.validate_laboratory_log.date_log<str(end))&(db.validate_laboratory_log.operation_log=='delete')&(db.validate_laboratory_log.validation_type==False)).count(db.validate_laboratory_log.id))}}
+															{{else:}}
+																{{=str(db((db.validate_laboratory_log.project==assigantion.project.name)&(db.validate_laboratory_log.yearp==str(year.yearp))&(db.validate_laboratory_log.period==str(T(year.period.name)))&(db.validate_laboratory_log.date_log>=str(start))&(db.validate_laboratory_log.date_log<str(end))&(db.validate_laboratory_log.operation_log=='delete')&(db.validate_laboratory_log.validation_type==False)&(db.validate_laboratory_log.academic.like('%'+str(session.search_laboratory_replacing_management)+'%'))).count(db.validate_laboratory_log.id))}}
+															{{pass}}
+														</a>
+													</center>
+												</td>
+											</tr>
+											<tr bgcolor="#A9E2F3">
+												<td colspan="4">
+													<div id="div_p{{=assigantion.project}}_m{{=month[0]}}" style="display: none;">
+														<center>{{=T('Loading')}}...</center>
+													</div>
+												</td>
+											</tr>
+										{{pass}}
+									</tbody>
+								</table>
+							</div>
+						</td>
+					</tr>
+				{{pass}}
+			</tbody>
+		</table>
+	</div>
+</div>
+
+<script type="text/javascript">
+	$(document).ready(function(){
+		//INICIO --- Botones para realizar la ejecución o cancelación de la busqueda
+		$("#cancelSearch").click(function(){
+			window.location.href = "{{=URL('activity_control', 'laboratory_replacing_management')}}";
+		});
+		//FIN --- Botones para realizar la ejecución o cancelación de la busqueda
+
+
+		//INICIO --- Botones para mostrar el nivel 2 del reporte
+		{{for assigantion in assigantions:}}
+			$("#p{{=str(assigantion.project)}}_all").click(function(){
+				$("#div_p{{=assigantion.project}}").toggle();
+				{{for month in vecMonth:}}
+					jQuery('#div_p{{=assigantion.project}}_m{{=month[0]}}').empty();
+					jQuery('#div_p{{=assigantion.project}}_m{{=month[0]}}').append("{{=T('Loading')}}...");
+					$("#div_p{{=assigantion.project}}_m{{=month[0]}}").css("display", "none");
+				{{pass}}
+			});
+
+
+			{{for month in vecMonth:}}
+				$("#p{{=str(assigantion.project)}}_all_m{{=month[0]}}_all").click(function(){
+					$("#div_p{{=assigantion.project}}_m{{=month[0]}}").toggle();
+					jQuery('#div_p{{=assigantion.project}}_m{{=month[0]}}').empty();
+					jQuery('#div_p{{=assigantion.project}}_m{{=month[0]}}').append("{{=T('Loading')}}...");
+					$("#div_p{{=assigantion.project}}_m{{=month[0]}}").load("{{=URL('activity_control','laboratory_replacing_management_n2')}}?tipo=all&amp;month={{=month[0]}}&amp;project="+encodeURIComponent({{=assigantion.project}}));
+				});
+
+				$("#p{{=str(assigantion.project)}}_all_m{{=month[0]}}_i").click(function(){
+					$("#div_p{{=assigantion.project}}_m{{=month[0]}}").toggle();
+					jQuery('#div_p{{=assigantion.project}}_m{{=month[0]}}').empty();
+					jQuery('#div_p{{=assigantion.project}}_m{{=month[0]}}').append("{{=T('Loading')}}...");
+					$("#div_p{{=assigantion.project}}_m{{=month[0]}}").load("{{=URL('activity_control','laboratory_replacing_management_n2')}}?tipo=i&amp;month={{=month[0]}}&amp;project="+encodeURIComponent({{=assigantion.project}}));
+				});
+
+				$("#p{{=str(assigantion.project)}}_all_m{{=month[0]}}_u").click(function(){
+					$("#div_p{{=assigantion.project}}_m{{=month[0]}}").toggle();
+					jQuery('#div_p{{=assigantion.project}}_m{{=month[0]}}').empty();
+					jQuery('#div_p{{=assigantion.project}}_m{{=month[0]}}').append("{{=T('Loading')}}...");
+					$("#div_p{{=assigantion.project}}_m{{=month[0]}}").load("{{=URL('activity_control','laboratory_replacing_management_n2')}}?tipo=u&amp;month={{=month[0]}}&amp;project="+encodeURIComponent({{=assigantion.project}}));
+				});
+
+				$("#p{{=str(assigantion.project)}}_all_m{{=month[0]}}_d").click(function(){
+					$("#div_p{{=assigantion.project}}_m{{=month[0]}}").toggle();
+					jQuery('#div_p{{=assigantion.project}}_m{{=month[0]}}').empty();
+					jQuery('#div_p{{=assigantion.project}}_m{{=month[0]}}').append("{{=T('Loading')}}...");
+					$("#div_p{{=assigantion.project}}_m{{=month[0]}}").load("{{=URL('activity_control','laboratory_replacing_management_n2')}}?tipo=d&amp;month={{=month[0]}}&amp;project="+encodeURIComponent({{=assigantion.project}}));
+				});
+			{{pass}}
+		{{pass}}
+		//FIN --- Botones para mostrar el nivel 2 del reporte
+	});
+
+	
+</script>

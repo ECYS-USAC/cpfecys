@@ -5113,7 +5113,7 @@ def management_approval_students_requirement():
 #********************************************************************************************************************************************************************************************************
 #********************************************************************************************************************************************************************************************************
 #********************************************************************************************************************************************************************************************************
-#***************************************************Management Report Revalidations laboratory***************************************************
+#***************************************************Management Report Grades***************************************************
 
 #********************************************************
 #Export full management reporting grade
@@ -6663,7 +6663,6 @@ def grades_management_n4():
 ########################################################################################################################################################################################################################################################################
 ########################################################################################################################################################################################################################################################################
 #####################################################Management Report Revalidations laboratory#####################################################
-
 #********************************************************
 #Export full management reporting laboratory revalidation
 @auth.requires_login()
@@ -6989,7 +6988,7 @@ def validate_laboratory_management_export():
 
 
 #********************************************************
-#Export management reporting laboratory revalidation levels 1 and 2
+#Export management reporting laboratory revalidation
 @auth.requires_login()
 @auth.requires(auth.has_membership('Teacher'))
 def validate_laboratory_management_level_export():
@@ -7517,7 +7516,6 @@ def validate_laboratory_management_level_export():
 
 
 
-#********************************************************BIEN BIEN BIEN
 #Management Report revalidation laboratory levels 1 and 2
 @auth.requires_login()
 @auth.requires(auth.has_membership('Teacher'))
@@ -8198,5 +8196,1550 @@ def validate_laboratory_management_n4():
                 vecAllUserRoleMonth.append(db((db.validate_laboratory_log.project==project.name)&(db.validate_laboratory_log.yearp==str(period.yearp))&(db.validate_laboratory_log.period==str(T(period.period.name)))&(db.validate_laboratory_log.date_log>=str(start))&(db.validate_laboratory_log.date_log<str(end))&(db.validate_laboratory_log.operation_log=='delete')&(db.validate_laboratory_log.validation_type==True)&(db.validate_laboratory_log.roll==roll)&(db.validate_laboratory_log.user_name==userr)).select())
             else:
                 vecAllUserRoleMonth.append(db((db.validate_laboratory_log.project==project.name)&(db.validate_laboratory_log.yearp==str(period.yearp))&(db.validate_laboratory_log.period==str(T(period.period.name)))&(db.validate_laboratory_log.date_log>=str(start))&(db.validate_laboratory_log.date_log<str(end))&(db.validate_laboratory_log.operation_log=='delete')&(db.validate_laboratory_log.validation_type==True)&(db.validate_laboratory_log.roll==roll)&(db.validate_laboratory_log.user_name==userr)&(db.validate_laboratory_log.academic.like('%'+str(session.search_validate_laboratory_management)+'%'))).select())
+            pass
+    return dict(showLevel=showLevel, project=project, tipo=tipo, month=month, vecAllUserRoleMonth=vecAllUserRoleMonth, roll=roll, userr=userr, messageError=messageError)
+
+
+
+
+
+########################################################################################################################################################################################################################################################################
+########################################################################################################################################################################################################################################################################
+########################################################################################################################################################################################################################################################################
+########################################################################################################################################################################################################################################################################
+#####################################################Management Report Equivalence  laboratory#####################################################
+#********************************************************
+#Export full management reporting laboratory revalidation
+@auth.requires_login()
+@auth.requires(auth.has_membership('Teacher'))
+def laboratory_replacing_management_export():
+    #Vars of the report
+    report=[]
+    tempRemport1=[]
+    tempRemport2=[]
+    tempRemport3=[]
+    tempRemport4=[]
+    tempRemport5=[]
+    #Obtain the current period of the system and all the register periods
+    import cpfecys
+    from datetime import datetime
+    year = cpfecys.current_year_period()
+
+    #Check if the user is assigned to the course
+    assigantions = db((db.user_project.assigned_user == auth.user.id) & (db.user_project.period == year.id)).select()
+    if assigantions.first() is None:
+        session.flash = T('Not valid Action.')
+        redirect(URL('default','index'))
+
+    #Check if a search exist, verify that they are just numbers
+    if session.search_laboratory_replacing_management != "" and session.search_laboratory_replacing_management is not None:
+        if str(session.search_laboratory_replacing_management).isdigit()==False:
+            session.search_laboratory_replacing_management = ""
+            session.flash=T('The lookup value is not allowed.')
+            redirect(URL('activity_control','grades_management'))
+
+    #Vec with the months of the current period
+    vecMonth=[]
+    tmpMonth=[]
+    if year.period == 1:
+        tmpMonth=[]
+        tmpMonth.append(1)
+        tmpMonth.append('Enero')
+        tmpMonth.append(2)
+        vecMonth.append(tmpMonth)
+
+        tmpMonth=[]
+        tmpMonth.append(2)
+        tmpMonth.append('Febrero')
+        tmpMonth.append(3)
+        vecMonth.append(tmpMonth)
+
+        tmpMonth=[]
+        tmpMonth.append(3)
+        tmpMonth.append('Marzo')
+        tmpMonth.append(4)
+        vecMonth.append(tmpMonth)
+
+        tmpMonth=[]
+        tmpMonth.append(4)
+        tmpMonth.append('Abril')
+        tmpMonth.append(5)
+        vecMonth.append(tmpMonth)
+
+        tmpMonth=[]
+        tmpMonth.append(5)
+        tmpMonth.append('Mayo')
+        tmpMonth.append(6)
+        vecMonth.append(tmpMonth)
+    else:
+        tmpMonth=[]
+        tmpMonth.append(6)
+        tmpMonth.append('Junio')
+        tmpMonth.append(7)
+        vecMonth.append(tmpMonth)
+
+        tmpMonth=[]
+        tmpMonth.append(7)
+        tmpMonth.append('Julio')
+        tmpMonth.append(8)
+        vecMonth.append(tmpMonth)
+
+        tmpMonth=[]
+        tmpMonth.append(8)
+        tmpMonth.append('Agosto')
+        tmpMonth.append(9)
+        vecMonth.append(tmpMonth)
+
+        tmpMonth=[]
+        tmpMonth.append(9)
+        tmpMonth.append('Septiembre')
+        tmpMonth.append(10)
+        vecMonth.append(tmpMonth)
+
+        tmpMonth=[]
+        tmpMonth.append(10)
+        tmpMonth.append('Octubre')
+        tmpMonth.append(11)
+        vecMonth.append(tmpMonth)
+
+        tmpMonth=[]
+        tmpMonth.append(11)
+        tmpMonth.append('Noviembre')
+        tmpMonth.append(12)
+        vecMonth.append(tmpMonth)
+
+        tmpMonth=[]
+        tmpMonth.append(12)
+        tmpMonth.append('Diciembre')
+        tmpMonth.append(1)
+        vecMonth.append(tmpMonth)
+
+    #report.append()
+
+    #Report heading
+    tempRemport1=[]
+    tempRemport1.append('Reporte de Gestión de Equivalencias de Laboratorio')
+    report.append(tempRemport1)
+    tempRemport1=[]
+    tempRemport1.append(T(year.period.name)+' '+str(year.yearp))
+    report.append(tempRemport1)
+
+    #LEVEL 1
+    #Heading Level 1
+    tempRemport1=[]
+    tempRemport1.append(T('Course'))
+    tempRemport1.append(T('Total inserted'))
+    tempRemport1.append(T('Total modified'))
+    tempRemport1.append(T('Total out'))
+    report.append(tempRemport1)
+    #Body Level 1
+    for assigantion in assigantions:
+        tempRemport1=[]
+        tempRemport1.append(assigantion.project.name)
+        if session.search_laboratory_replacing_management == "" or session.search_laboratory_replacing_management is None:
+            tempRemport1.append(str(db((db.validate_laboratory_log.project==assigantion.project.name)&(db.validate_laboratory_log.yearp==str(year.yearp))&(db.validate_laboratory_log.period==str(T(year.period.name)))&(db.validate_laboratory_log.operation_log=='insert')&(db.validate_laboratory_log.validation_type==False)).count(db.validate_laboratory_log.id)))
+            tempRemport1.append(str(db((db.validate_laboratory_log.project==assigantion.project.name)&(db.validate_laboratory_log.yearp==str(year.yearp))&(db.validate_laboratory_log.period==str(T(year.period.name)))&(db.validate_laboratory_log.operation_log=='update')&(db.validate_laboratory_log.validation_type==False)).count(db.validate_laboratory_log.id)))
+            tempRemport1.append(str(db((db.validate_laboratory_log.project==assigantion.project.name)&(db.validate_laboratory_log.yearp==str(year.yearp))&(db.validate_laboratory_log.period==str(T(year.period.name)))&(db.validate_laboratory_log.operation_log=='delete')&(db.validate_laboratory_log.validation_type==False)).count(db.validate_laboratory_log.id)))
+        else:
+            tempRemport1.append(str(db((db.validate_laboratory_log.project==assigantion.project.name)&(db.validate_laboratory_log.yearp==str(year.yearp))&(db.validate_laboratory_log.period==str(T(year.period.name)))&(db.validate_laboratory_log.operation_log=='insert')&(db.validate_laboratory_log.validation_type==False)&(db.validate_laboratory_log.academic.like('%'+str(session.search_laboratory_replacing_management)+'%'))).count(db.validate_laboratory_log.id)))
+            tempRemport1.append(str(db((db.validate_laboratory_log.project==assigantion.project.name)&(db.validate_laboratory_log.yearp==str(year.yearp))&(db.validate_laboratory_log.period==str(T(year.period.name)))&(db.validate_laboratory_log.operation_log=='update')&(db.validate_laboratory_log.validation_type==False)&(db.validate_laboratory_log.academic.like('%'+str(session.search_laboratory_replacing_management)+'%'))).count(db.validate_laboratory_log.id)))
+            tempRemport1.append(str(db((db.validate_laboratory_log.project==assigantion.project.name)&(db.validate_laboratory_log.yearp==str(year.yearp))&(db.validate_laboratory_log.period==str(T(year.period.name)))&(db.validate_laboratory_log.operation_log=='delete')&(db.validate_laboratory_log.validation_type==False)&(db.validate_laboratory_log.academic.like('%'+str(session.search_laboratory_replacing_management)+'%'))).count(db.validate_laboratory_log.id)))
+        pass
+        report.append(tempRemport1)
+
+        #LEVEL 2
+        #Heading Level 2
+        tempRemport2=[]
+        tempRemport2.append('')
+        tempRemport2.append(T('Month'))
+        tempRemport2.append(T('Total inserted'))
+        tempRemport2.append(T('Total modified'))
+        tempRemport2.append(T('Total out'))
+        report.append(tempRemport2)
+        #Body Level 2
+        for month in vecMonth:
+            tempRemport2=[]
+            tempRemport2.append('')
+            start = datetime.strptime(str(year.yearp) + '-' + str(month[0]) +'-01', "%Y-%m-%d")
+            if month[2]==1:
+                end = datetime.strptime(str(year.yearp+1) + '-' + str(month[2]) +'-01', "%Y-%m-%d")
+            else:
+                end = datetime.strptime(str(year.yearp) + '-' + str(month[2]) +'-01', "%Y-%m-%d")
+            pass
+            tempRemport2.append(month[1])
+            if session.search_laboratory_replacing_management == "" or session.search_laboratory_replacing_management is None:
+                tempRemport2.append(str(db((db.validate_laboratory_log.project==assigantion.project.name)&(db.validate_laboratory_log.yearp==str(year.yearp))&(db.validate_laboratory_log.period==str(T(year.period.name)))&(db.validate_laboratory_log.operation_log=='insert')&(db.validate_laboratory_log.date_log>=str(start))&(db.validate_laboratory_log.date_log<str(end))&(db.validate_laboratory_log.validation_type==False)).count(db.validate_laboratory_log.id)))
+                tempRemport2.append(str(db((db.validate_laboratory_log.project==assigantion.project.name)&(db.validate_laboratory_log.yearp==str(year.yearp))&(db.validate_laboratory_log.period==str(T(year.period.name)))&(db.validate_laboratory_log.operation_log=='update')&(db.validate_laboratory_log.date_log>=str(start))&(db.validate_laboratory_log.date_log<str(end))&(db.validate_laboratory_log.validation_type==False)).count(db.validate_laboratory_log.id)))
+                tempRemport2.append(str(db((db.validate_laboratory_log.project==assigantion.project.name)&(db.validate_laboratory_log.yearp==str(year.yearp))&(db.validate_laboratory_log.period==str(T(year.period.name)))&(db.validate_laboratory_log.operation_log=='delete')&(db.validate_laboratory_log.date_log>=str(start))&(db.validate_laboratory_log.date_log<str(end))&(db.validate_laboratory_log.validation_type==False)).count(db.validate_laboratory_log.id)))
+            else:
+                tempRemport2.append(str(db((db.validate_laboratory_log.project==assigantion.project.name)&(db.validate_laboratory_log.yearp==str(year.yearp))&(db.validate_laboratory_log.period==str(T(year.period.name)))&(db.validate_laboratory_log.operation_log=='insert')&(db.validate_laboratory_log.date_log>=str(start))&(db.validate_laboratory_log.date_log<str(end))&(db.validate_laboratory_log.validation_type==False)&(db.validate_laboratory_log.academic.like('%'+str(session.search_laboratory_replacing_management)+'%'))).count(db.validate_laboratory_log.id)))
+                tempRemport2.append(str(db((db.validate_laboratory_log.project==assigantion.project.name)&(db.validate_laboratory_log.yearp==str(year.yearp))&(db.validate_laboratory_log.period==str(T(year.period.name)))&(db.validate_laboratory_log.operation_log=='update')&(db.validate_laboratory_log.date_log>=str(start))&(db.validate_laboratory_log.date_log<str(end))&(db.validate_laboratory_log.validation_type==False)&(db.validate_laboratory_log.academic.like('%'+str(session.search_laboratory_replacing_management)+'%'))).count(db.validate_laboratory_log.id)))
+                tempRemport2.append(str(db((db.validate_laboratory_log.project==assigantion.project.name)&(db.validate_laboratory_log.yearp==str(year.yearp))&(db.validate_laboratory_log.period==str(T(year.period.name)))&(db.validate_laboratory_log.operation_log=='delete')&(db.validate_laboratory_log.date_log>=str(start))&(db.validate_laboratory_log.date_log<str(end))&(db.validate_laboratory_log.validation_type==False)&(db.validate_laboratory_log.academic.like('%'+str(session.search_laboratory_replacing_management)+'%'))).count(db.validate_laboratory_log.id)))
+            pass
+            report.append(tempRemport2)
+
+            #LEVEL 3
+            #Heading Level 3
+            tempRemport3=[]
+            tempRole = []
+            tempRemport3.append('')
+            tempRemport3.append('')
+            tempRemport3.append(T('Role'))
+            tempRemport3.append(T('Total inserted'))
+            tempRemport3.append(T('Total modified'))
+            tempRemport3.append(T('Total out'))
+            report.append(tempRemport3)
+            #Body Level 3
+            for tempR in db((db.auth_group.role!='Academic')&(db.auth_group.role!='DSI')).select():
+                tempRole.append(tempR.role)
+            for tempR in db((db.validate_laboratory_log.yearp==year.yearp)&(db.validate_laboratory_log.period==T(year.period.name))&(db.validate_laboratory_log.project==assigantion.project.name)&(~db.validate_laboratory_log.roll.belongs(tempRole))).select(db.validate_laboratory_log.roll, distinct=True):
+                tempRole.append(tempR.roll)
+            for roll in tempRole:
+                tempRemport3=[]
+                tempRemport3.append('')
+                tempRemport3.append('')
+                if roll=='Student':
+                    tempRemport3.append(T('Rol Student'))
+                else:
+                    tempRemport3.append(T(roll))
+                pass
+                if session.search_laboratory_replacing_management == "" or session.search_laboratory_replacing_management is None:
+                    tempRemport3.append(str(db((db.validate_laboratory_log.project==assigantion.project.name)&(db.validate_laboratory_log.yearp==str(year.yearp))&(db.validate_laboratory_log.period==str(T(year.period.name)))&(db.validate_laboratory_log.operation_log=='insert')&(db.validate_laboratory_log.date_log>=str(start))&(db.validate_laboratory_log.date_log<str(end))&(db.validate_laboratory_log.roll==roll)&(db.validate_laboratory_log.validation_type==False)).count(db.validate_laboratory_log.id)))
+                    tempRemport3.append(str(db((db.validate_laboratory_log.project==assigantion.project.name)&(db.validate_laboratory_log.yearp==str(year.yearp))&(db.validate_laboratory_log.period==str(T(year.period.name)))&(db.validate_laboratory_log.operation_log=='update')&(db.validate_laboratory_log.date_log>=str(start))&(db.validate_laboratory_log.date_log<str(end))&(db.validate_laboratory_log.roll==roll)&(db.validate_laboratory_log.validation_type==False)).count(db.validate_laboratory_log.id)))
+                    tempRemport3.append(str(db((db.validate_laboratory_log.project==assigantion.project.name)&(db.validate_laboratory_log.yearp==str(year.yearp))&(db.validate_laboratory_log.period==str(T(year.period.name)))&(db.validate_laboratory_log.operation_log=='delete')&(db.validate_laboratory_log.date_log>=str(start))&(db.validate_laboratory_log.date_log<str(end))&(db.validate_laboratory_log.roll==roll)&(db.validate_laboratory_log.validation_type==False)).count(db.validate_laboratory_log.id)))
+                else:
+                    tempRemport3.append(str(db((db.validate_laboratory_log.project==assigantion.project.name)&(db.validate_laboratory_log.yearp==str(year.yearp))&(db.validate_laboratory_log.period==str(T(year.period.name)))&(db.validate_laboratory_log.operation_log=='insert')&(db.validate_laboratory_log.date_log>=str(start))&(db.validate_laboratory_log.date_log<str(end))&(db.validate_laboratory_log.roll==roll)&(db.validate_laboratory_log.validation_type==False)&(db.validate_laboratory_log.academic.like('%'+str(session.search_laboratory_replacing_management)+'%'))).count(db.validate_laboratory_log.id)))
+                    tempRemport3.append(str(db((db.validate_laboratory_log.project==assigantion.project.name)&(db.validate_laboratory_log.yearp==str(year.yearp))&(db.validate_laboratory_log.period==str(T(year.period.name)))&(db.validate_laboratory_log.operation_log=='update')&(db.validate_laboratory_log.date_log>=str(start))&(db.validate_laboratory_log.date_log<str(end))&(db.validate_laboratory_log.roll==roll)&(db.validate_laboratory_log.validation_type==False)&(db.validate_laboratory_log.academic.like('%'+str(session.search_laboratory_replacing_management)+'%'))).count(db.validate_laboratory_log.id)))
+                    tempRemport3.append(str(db((db.validate_laboratory_log.project==assigantion.project.name)&(db.validate_laboratory_log.yearp==str(year.yearp))&(db.validate_laboratory_log.period==str(T(year.period.name)))&(db.validate_laboratory_log.operation_log=='delete')&(db.validate_laboratory_log.date_log>=str(start))&(db.validate_laboratory_log.date_log<str(end))&(db.validate_laboratory_log.roll==roll)&(db.validate_laboratory_log.validation_type==False)&(db.validate_laboratory_log.academic.like('%'+str(session.search_laboratory_replacing_management)+'%'))).count(db.validate_laboratory_log.id)))
+                pass
+                report.append(tempRemport3)
+
+                #LEVEL 4
+                #Heading Level 4
+                tempRemport4=[]
+                tempUsers=[]
+                tempRemport4.append('')
+                tempRemport4.append('')
+                tempRemport4.append('')
+                tempRemport4.append(T('User'))
+                tempRemport4.append(T('Total inserted'))
+                tempRemport4.append(T('Total modified'))
+                tempRemport4.append(T('Total out'))
+                report.append(tempRemport4)
+                #Body Level 4
+                tempUsers2=[]
+                registerRol = db(db.auth_group.role==roll).select().first()
+                if ((roll=='Super-Administrator') or (roll=='Ecys-Administrator')):
+                    for valueU in db((db.auth_membership.group_id==registerRol.id)).select(db.auth_membership.user_id, distinct=True):
+                        tempUsers.append(valueU.user_id.username)
+                else:
+                    for valueU in db((db.auth_membership.group_id==registerRol.id)).select(db.auth_membership.user_id, distinct=True):
+                        tempUsers2.append(valueU.user_id)
+                    for valueU in db((db.user_project.period==year.id)&(db.user_project.project==assigantion.project)&(db.user_project.assigned_user.belongs(tempUsers2))).select(db.user_project.assigned_user, distinct=True):
+                        tempUsers.append(valueU.assigned_user.username)
+                pass
+                for valueU in db((db.validate_laboratory_log.yearp==year.yearp)&(db.validate_laboratory_log.period==T(year.period.name))&(db.validate_laboratory_log.project==assigantion.project.name)&(db.validate_laboratory_log.roll==roll)&(~db.validate_laboratory_log.user_name.belongs(tempUsers))).select(db.validate_laboratory_log.user_name, distinct=True):
+                    tempUsers.append(valueU.user_name)
+                for userr in tempUsers:
+                    tempRemport4=[]
+                    tempRemport4.append('')
+                    tempRemport4.append('')
+                    tempRemport4.append('')
+                    tempRemport4.append(userr)
+                    if session.search_laboratory_replacing_management == "" or session.search_laboratory_replacing_management is None:
+                        tempRemport4.append(str(db((db.validate_laboratory_log.project==assigantion.project.name)&(db.validate_laboratory_log.yearp==str(year.yearp))&(db.validate_laboratory_log.period==str(T(year.period.name)))&(db.validate_laboratory_log.operation_log=='insert')&(db.validate_laboratory_log.date_log>=str(start))&(db.validate_laboratory_log.date_log<str(end))&(db.validate_laboratory_log.roll==roll)&(db.validate_laboratory_log.user_name==userr)&(db.validate_laboratory_log.validation_type==False)).count(db.validate_laboratory_log.id)))
+                        tempRemport4.append(str(db((db.validate_laboratory_log.project==assigantion.project.name)&(db.validate_laboratory_log.yearp==str(year.yearp))&(db.validate_laboratory_log.period==str(T(year.period.name)))&(db.validate_laboratory_log.operation_log=='update')&(db.validate_laboratory_log.date_log>=str(start))&(db.validate_laboratory_log.date_log<str(end))&(db.validate_laboratory_log.roll==roll)&(db.validate_laboratory_log.user_name==userr)&(db.validate_laboratory_log.validation_type==False)).count(db.validate_laboratory_log.id)))
+                        tempRemport4.append(str(db((db.validate_laboratory_log.project==assigantion.project.name)&(db.validate_laboratory_log.yearp==str(year.yearp))&(db.validate_laboratory_log.period==str(T(year.period.name)))&(db.validate_laboratory_log.operation_log=='delete')&(db.validate_laboratory_log.date_log>=str(start))&(db.validate_laboratory_log.date_log<str(end))&(db.validate_laboratory_log.roll==roll)&(db.validate_laboratory_log.user_name==userr)&(db.validate_laboratory_log.validation_type==False)).count(db.validate_laboratory_log.id)))
+                    else:
+                        tempRemport4.append(str(db((db.validate_laboratory_log.project==assigantion.project.name)&(db.validate_laboratory_log.yearp==str(year.yearp))&(db.validate_laboratory_log.period==str(T(year.period.name)))&(db.validate_laboratory_log.operation_log=='insert')&(db.validate_laboratory_log.date_log>=str(start))&(db.validate_laboratory_log.date_log<str(end))&(db.validate_laboratory_log.roll==roll)&(db.validate_laboratory_log.user_name==userr)&(db.validate_laboratory_log.validation_type==False)&(db.validate_laboratory_log.academic.like('%'+str(session.search_laboratory_replacing_management)+'%'))).count(db.validate_laboratory_log.id)))
+                        tempRemport4.append(str(db((db.validate_laboratory_log.project==assigantion.project.name)&(db.validate_laboratory_log.yearp==str(year.yearp))&(db.validate_laboratory_log.period==str(T(year.period.name)))&(db.validate_laboratory_log.operation_log=='update')&(db.validate_laboratory_log.date_log>=str(start))&(db.validate_laboratory_log.date_log<str(end))&(db.validate_laboratory_log.roll==roll)&(db.validate_laboratory_log.user_name==userr)&(db.validate_laboratory_log.validation_type==False)&(db.validate_laboratory_log.academic.like('%'+str(session.search_laboratory_replacing_management)+'%'))).count(db.validate_laboratory_log.id)))
+                        tempRemport4.append(str(db((db.validate_laboratory_log.project==assigantion.project.name)&(db.validate_laboratory_log.yearp==str(year.yearp))&(db.validate_laboratory_log.period==str(T(year.period.name)))&(db.validate_laboratory_log.operation_log=='delete')&(db.validate_laboratory_log.date_log>=str(start))&(db.validate_laboratory_log.date_log<str(end))&(db.validate_laboratory_log.roll==roll)&(db.validate_laboratory_log.user_name==userr)&(db.validate_laboratory_log.validation_type==False)&(db.validate_laboratory_log.academic.like('%'+str(session.search_laboratory_replacing_management)+'%'))).count(db.validate_laboratory_log.id)))
+                    pass
+                    report.append(tempRemport4)
+
+                    #LEVEL 5
+                    temp_vecAllUserRoleMonth=[]
+                    tempRemport5=[]
+                    #Body Level 5
+                    if session.search_laboratory_replacing_management == "" or session.search_laboratory_replacing_management is None:
+                        temp_vecAllUserRoleMonth.append(db((db.validate_laboratory_log.project==assigantion.project.name)&(db.validate_laboratory_log.yearp==str(year.yearp))&(db.validate_laboratory_log.period==str(T(year.period.name)))&(db.validate_laboratory_log.operation_log=='insert')&(db.validate_laboratory_log.date_log>=str(start))&(db.validate_laboratory_log.date_log<str(end))&(db.validate_laboratory_log.roll==roll)&(db.validate_laboratory_log.user_name==userr)&(db.validate_laboratory_log.validation_type==False)).select())
+                        temp_vecAllUserRoleMonth.append(db((db.validate_laboratory_log.project==assigantion.project.name)&(db.validate_laboratory_log.yearp==str(year.yearp))&(db.validate_laboratory_log.period==str(T(year.period.name)))&(db.validate_laboratory_log.operation_log=='update')&(db.validate_laboratory_log.date_log>=str(start))&(db.validate_laboratory_log.date_log<str(end))&(db.validate_laboratory_log.roll==roll)&(db.validate_laboratory_log.user_name==userr)&(db.validate_laboratory_log.validation_type==False)).select())
+                        temp_vecAllUserRoleMonth.append(db((db.validate_laboratory_log.project==assigantion.project.name)&(db.validate_laboratory_log.yearp==str(year.yearp))&(db.validate_laboratory_log.period==str(T(year.period.name)))&(db.validate_laboratory_log.operation_log=='delete')&(db.validate_laboratory_log.date_log>=str(start))&(db.validate_laboratory_log.date_log<str(end))&(db.validate_laboratory_log.roll==roll)&(db.validate_laboratory_log.user_name==userr)&(db.validate_laboratory_log.validation_type==False)).select())
+                    else:
+                        temp_vecAllUserRoleMonth.append(db((db.validate_laboratory_log.project==assigantion.project.name)&(db.validate_laboratory_log.yearp==str(year.yearp))&(db.validate_laboratory_log.period==str(T(year.period.name)))&(db.validate_laboratory_log.operation_log=='insert')&(db.validate_laboratory_log.date_log>=str(start))&(db.validate_laboratory_log.date_log<str(end))&(db.validate_laboratory_log.roll==roll)&(db.validate_laboratory_log.user_name==userr)&(db.validate_laboratory_log.validation_type==False)&(db.validate_laboratory_log.academic.like('%'+str(session.search_laboratory_replacing_management)+'%'))).select())
+                        temp_vecAllUserRoleMonth.append(db((db.validate_laboratory_log.project==assigantion.project.name)&(db.validate_laboratory_log.yearp==str(year.yearp))&(db.validate_laboratory_log.period==str(T(year.period.name)))&(db.validate_laboratory_log.operation_log=='update')&(db.validate_laboratory_log.date_log>=str(start))&(db.validate_laboratory_log.date_log<str(end))&(db.validate_laboratory_log.roll==roll)&(db.validate_laboratory_log.user_name==userr)&(db.validate_laboratory_log.validation_type==False)&(db.validate_laboratory_log.academic.like('%'+str(session.search_laboratory_replacing_management)+'%'))).select())
+                        temp_vecAllUserRoleMonth.append(db((db.validate_laboratory_log.project==assigantion.project.name)&(db.validate_laboratory_log.yearp==str(year.yearp))&(db.validate_laboratory_log.period==str(T(year.period.name)))&(db.validate_laboratory_log.operation_log=='delete')&(db.validate_laboratory_log.date_log>=str(start))&(db.validate_laboratory_log.date_log<str(end))&(db.validate_laboratory_log.roll==roll)&(db.validate_laboratory_log.user_name==userr)&(db.validate_laboratory_log.validation_type==False)&(db.validate_laboratory_log.academic.like('%'+str(session.search_laboratory_replacing_management)+'%'))).select())
+                    pass
+                    varTypeHead=0
+                    for field in temp_vecAllUserRoleMonth:
+                        for camp in field:
+                            if varTypeHead==0:
+                                #Heading Level 5
+                                tempRemport5=[]
+                                tempRemport5.append('')
+                                tempRemport5.append('')
+                                tempRemport5.append('')
+                                tempRemport5.append('')
+                                tempRemport5.append(T('User resolution'))
+                                tempRemport5.append(T('Role resolution'))
+                                tempRemport5.append(T('Date of resolution'))
+                                tempRemport5.append(T('Operation'))
+                                tempRemport5.append(T('Description'))
+                                tempRemport5.append(T('Rol Academic'))
+                                tempRemport5.append(T('Before Grade'))
+                                tempRemport5.append(T('Grade edited'))
+                                report.append(tempRemport5)
+                                varTypeHead=1
+                            tempRemport5=[]
+                            tempRemport5.append('')
+                            tempRemport5.append('')
+                            tempRemport5.append('')
+                            tempRemport5.append('')
+                            tempRemport5.append(str(camp.user_name))
+                            tempRemport5.append(T('Rol '+str(camp.roll)))
+                            tempRemport5.append(str(camp.date_log))
+                            tempRemport5.append(str(camp.operation_log))
+                            tempRemport5.append(str(camp.description))
+                            tempRemport5.append(str(camp.academic))
+                            tempRemport5.append(str(camp.before_grade))
+                            tempRemport5.append(str(camp.after_grade))
+                            report.append(tempRemport5)
+                        pass
+                    pass
+                    #End Level 5
+                pass
+                #End Level 4
+                report.append('')
+                report.append('')
+            pass
+            #End Level 3
+            report.append('')
+            report.append('')
+            report.append('')
+            report.append('')
+        pass
+        #End Level 2
+        report.append('')
+        report.append('')
+        report.append('')
+        report.append('')
+        report.append('')
+        report.append('')
+    pass
+    #End Level 1
+
+    return dict(filename='ReporteGestionEquivalencias', csvdata=report)
+
+
+
+#********************************************************
+#Export management reporting laboratory Equivalence
+@auth.requires_login()
+@auth.requires(auth.has_membership('Teacher'))
+def laboratory_replacing_management_level_export():
+    #Vars of the report
+    createReport = True
+    report=[]
+    tempRemport1=[]
+    #Obtain the current period of the system and all the register periods
+    import cpfecys
+    from datetime import datetime
+    year = cpfecys.current_year_period()
+
+    #Check if the user is assigned to the course
+    assigantions = db((db.user_project.assigned_user == auth.user.id) & (db.user_project.period == year.id)).select()
+    if assigantions.first() is None:
+        createReport=False
+
+    #Check if a search exist, verify that they are just numbers
+    if session.search_laboratory_replacing_management != "" and session.search_laboratory_replacing_management is not None:
+        if str(session.search_laboratory_replacing_management).isdigit()==False:
+            session.search_laboratory_replacing_management = ""
+            createReport=False
+
+    #Vec with the months of the current period
+    vecMonth=[]
+    tmpMonth=[]
+    if year.period == 1:
+        tmpMonth=[]
+        tmpMonth.append(1)
+        tmpMonth.append('Enero')
+        tmpMonth.append(2)
+        vecMonth.append(tmpMonth)
+
+        tmpMonth=[]
+        tmpMonth.append(2)
+        tmpMonth.append('Febrero')
+        tmpMonth.append(3)
+        vecMonth.append(tmpMonth)
+
+        tmpMonth=[]
+        tmpMonth.append(3)
+        tmpMonth.append('Marzo')
+        tmpMonth.append(4)
+        vecMonth.append(tmpMonth)
+
+        tmpMonth=[]
+        tmpMonth.append(4)
+        tmpMonth.append('Abril')
+        tmpMonth.append(5)
+        vecMonth.append(tmpMonth)
+
+        tmpMonth=[]
+        tmpMonth.append(5)
+        tmpMonth.append('Mayo')
+        tmpMonth.append(6)
+        vecMonth.append(tmpMonth)
+    else:
+        tmpMonth=[]
+        tmpMonth.append(6)
+        tmpMonth.append('Junio')
+        tmpMonth.append(7)
+        vecMonth.append(tmpMonth)
+
+        tmpMonth=[]
+        tmpMonth.append(7)
+        tmpMonth.append('Julio')
+        tmpMonth.append(8)
+        vecMonth.append(tmpMonth)
+
+        tmpMonth=[]
+        tmpMonth.append(8)
+        tmpMonth.append('Agosto')
+        tmpMonth.append(9)
+        vecMonth.append(tmpMonth)
+
+        tmpMonth=[]
+        tmpMonth.append(9)
+        tmpMonth.append('Septiembre')
+        tmpMonth.append(10)
+        vecMonth.append(tmpMonth)
+
+        tmpMonth=[]
+        tmpMonth.append(10)
+        tmpMonth.append('Octubre')
+        tmpMonth.append(11)
+        vecMonth.append(tmpMonth)
+
+        tmpMonth=[]
+        tmpMonth.append(11)
+        tmpMonth.append('Noviembre')
+        tmpMonth.append(12)
+        vecMonth.append(tmpMonth)
+
+        tmpMonth=[]
+        tmpMonth.append(12)
+        tmpMonth.append('Diciembre')
+        tmpMonth.append(1)
+        vecMonth.append(tmpMonth)
+
+    #Check the parameters
+    if request.vars['level']=='1' or request.vars['level']=='2' or request.vars['level']=='3' or request.vars['level']=='4' or request.vars['level']=='5':
+        if int(request.vars['level']) > 1 and createReport==True:
+            #Check if the project is correct
+            if request.vars['level_project'] is None or request.vars['level_project']=='':
+                createReport=False
+            else:
+                level_project = request.vars['level_project']
+                level_project = db(db.project.id==level_project).select().first()
+                if level_project is None:
+                    createReport=False
+                else:
+                    exportReport=False
+                    for assigantion in assigantions:
+                        if assigantion.project==level_project.id:
+                            exportReport=True
+                    if exportReport==False:
+                        createReport=False
+        pass
+
+        if int(request.vars['level']) > 2 and createReport==True:
+            #Check if the Month is correct
+            if request.vars['level_month'] is None or request.vars['level_month']=='':
+                createReport=False
+            else:
+                if year.period == 1:
+                    try:
+                        if int(request.vars['level_month']) >= 1 and int(request.vars['level_month']) <=5:
+                            level_month=str(request.vars['level_month'])
+                        else:
+                            createReport=False
+                    except:
+                        createReport=False
+                else:
+                    try:
+                        if int(request.vars['level_month']) >= 6 and int(request.vars['level_month']) <=12:
+                            level_month=str(request.vars['level_month'])
+                        else:
+                            createReport=False
+                    except:
+                        createReport=False
+                
+            #Check if the type is correct
+            if request.vars['level_tipo'] is None or request.vars['level_tipo']=='':
+                createReport=False
+            else:
+                if str(request.vars['level_tipo'])!='all' and str(request.vars['level_tipo'])!='i' and str(request.vars['level_tipo'])!='u' and str(request.vars['level_tipo'])!='d':
+                    createReport=False
+                else:
+                    level_tipo = str(request.vars['level_tipo'])
+        pass
+
+        if int(request.vars['level']) > 3 and createReport==True:
+            if request.vars['level_rol'] is None or request.vars['level_rol']=='':
+                createReport=False
+            else:
+                value = db(db.auth_group.role==str(request.vars['level_rol'])).select().first()
+                if value is None:
+                    #Check if the log has a roll that is not register
+                    value = db((db.validate_laboratory_log.yearp==year.yearp)&(db.validate_laboratory_log.period==T(year.period.name))&(db.validate_laboratory_log.project==level_project.name)&(db.validate_laboratory_log.roll==str(request.vars['level_rol']))).select(db.validate_laboratory_log.roll, distinct=True).first()
+                    if value is None:
+                        createReport=False
+                    else:
+                        level_rol=str(value.roll)
+                else:
+                    level_rol=str(value.role)
+        pass
+
+        if int(request.vars['level']) > 4 and createReport==True:
+            if request.vars['level_user'] is None or request.vars['level_user']=='':
+                createReport=False
+            else:
+                flagCheck = False
+                #User Temp of auth_user where the username is equal
+                userr = db(db.auth_user.username==str(request.vars['level_user'])).select().first()
+                if ((level_rol=='Super-Administrator') or (level_rol=='Ecys-Administrator')):
+                    if userr is not None:
+                        #Check if the user has the rol specific
+                        userrT = db(db.auth_membership.user_id==userr.id).select()
+                        for tempUserCheck in userrT:
+                            if tempUserCheck.group_id.role==level_rol:
+                                flagCheck = True
+                else:
+                    if userr is not None:
+                        #Check if the user has the rol specific
+                        userrT = db(db.auth_membership.user_id==userr.id).select()
+                        for tempUserCheck in userrT:
+                            if tempUserCheck.group_id.role==level_rol:
+                                if db((db.user_project.period==year.id)&(db.user_project.project==level_project.id)&(db.user_project.assigned_user==userr.id)).select().first() is not None:
+                                    flagCheck = True
+
+                if flagCheck==False:
+                    #Check if the log has a roll that is not register
+                    userr = db((db.validate_laboratory_log.yearp==year.yearp)&(db.validate_laboratory_log.period==T(year.period.name))&(db.validate_laboratory_log.project==level_project.name)&(db.validate_laboratory_log.roll==level_rol)&(db.validate_laboratory_log.user_name==str(request.vars['userr']))).select().first()
+                    if value is None:
+                        createReport=False
+                    else:
+                        level_user=userr.user_name
+                else:
+                    level_user=userr.username
+        pass
+    else:
+        createReport=False
+
+    #MAKE REPORT
+    if createReport==True:
+        #Report heading
+        tempRemport1=[]
+        tempRemport1.append('Reporte de Gestión de Equivalencias de Laboratorio')
+        report.append(tempRemport1)
+        tempRemport1=[]
+        tempRemport1.append(T(year.period.name)+' '+str(year.yearp))
+        report.append(tempRemport1)
+
+        #LEVEL 1
+        if request.vars['level']=='1':
+            #Heading Level 1
+            tempRemport1=[]
+            tempRemport1.append('')
+            report.append(tempRemport1)
+
+            tempRemport1=[]
+            tempRemport1.append(T('Detail'))
+            report.append(tempRemport1)
+
+            tempRemport1=[]
+            tempRemport1.append(T('Course'))
+            tempRemport1.append(T('Total inserted'))
+            tempRemport1.append(T('Total modified'))
+            tempRemport1.append(T('Total out'))
+            report.append(tempRemport1)
+            #Body Level 1
+            for assigantion in assigantions:
+                tempRemport1=[]
+                tempRemport1.append(assigantion.project.name)
+                if session.search_laboratory_replacing_management == "" or session.search_laboratory_replacing_management is None:
+                    tempRemport1.append(str(db((db.validate_laboratory_log.project==assigantion.project.name)&(db.validate_laboratory_log.yearp==str(year.yearp))&(db.validate_laboratory_log.period==str(T(year.period.name)))&(db.validate_laboratory_log.operation_log=='insert')&(db.validate_laboratory_log.validation_type==False)).count(db.validate_laboratory_log.id)))
+                    tempRemport1.append(str(db((db.validate_laboratory_log.project==assigantion.project.name)&(db.validate_laboratory_log.yearp==str(year.yearp))&(db.validate_laboratory_log.period==str(T(year.period.name)))&(db.validate_laboratory_log.operation_log=='update')&(db.validate_laboratory_log.validation_type==False)).count(db.validate_laboratory_log.id)))
+                    tempRemport1.append(str(db((db.validate_laboratory_log.project==assigantion.project.name)&(db.validate_laboratory_log.yearp==str(year.yearp))&(db.validate_laboratory_log.period==str(T(year.period.name)))&(db.validate_laboratory_log.operation_log=='delete')&(db.validate_laboratory_log.validation_type==False)).count(db.validate_laboratory_log.id)))
+                else:
+                    tempRemport1.append(str(db((db.validate_laboratory_log.project==assigantion.project.name)&(db.validate_laboratory_log.yearp==str(year.yearp))&(db.validate_laboratory_log.period==str(T(year.period.name)))&(db.validate_laboratory_log.operation_log=='insert')&(db.validate_laboratory_log.validation_type==False)&(db.validate_laboratory_log.academic.like('%'+str(session.search_laboratory_replacing_management)+'%'))).count(db.validate_laboratory_log.id)))
+                    tempRemport1.append(str(db((db.validate_laboratory_log.project==assigantion.project.name)&(db.validate_laboratory_log.yearp==str(year.yearp))&(db.validate_laboratory_log.period==str(T(year.period.name)))&(db.validate_laboratory_log.operation_log=='update')&(db.validate_laboratory_log.validation_type==False)&(db.validate_laboratory_log.academic.like('%'+str(session.search_laboratory_replacing_management)+'%'))).count(db.validate_laboratory_log.id)))
+                    tempRemport1.append(str(db((db.validate_laboratory_log.project==assigantion.project.name)&(db.validate_laboratory_log.yearp==str(year.yearp))&(db.validate_laboratory_log.period==str(T(year.period.name)))&(db.validate_laboratory_log.operation_log=='delete')&(db.validate_laboratory_log.validation_type==False)&(db.validate_laboratory_log.academic.like('%'+str(session.search_laboratory_replacing_management)+'%'))).count(db.validate_laboratory_log.id)))
+                pass
+                report.append(tempRemport1)
+            pass
+        
+
+        #LEVEL 2
+        elif request.vars['level']=='2':
+            #Heading Level 2
+            tempRemport1=[]
+            tempRemport1.append(T('Course'))
+            tempRemport1.append(level_project.name)
+            report.append(tempRemport1)
+            
+            tempRemport1=[]
+            tempRemport1.append('')
+            report.append(tempRemport1)
+
+            tempRemport1=[]
+            tempRemport1.append(T('Detail'))
+            report.append(tempRemport1)
+
+            tempRemport1=[]
+            tempRemport1.append(T('Month'))
+            tempRemport1.append(T('Total inserted'))
+            tempRemport1.append(T('Total modified'))
+            tempRemport1.append(T('Total out'))
+            report.append(tempRemport1)
+            #Body Level 2
+            for month in vecMonth:
+                tempRemport1=[]
+                start = datetime.strptime(str(year.yearp) + '-' + str(month[0]) +'-01', "%Y-%m-%d")
+                if month[2]==1:
+                    end = datetime.strptime(str(year.yearp+1) + '-' + str(month[2]) +'-01', "%Y-%m-%d")
+                else:
+                    end = datetime.strptime(str(year.yearp) + '-' + str(month[2]) +'-01', "%Y-%m-%d")
+                pass
+                tempRemport1.append(month[1])
+                if session.search_laboratory_replacing_management == "" or session.search_laboratory_replacing_management is None:
+                    tempRemport1.append(str(db((db.validate_laboratory_log.project==level_project.name)&(db.validate_laboratory_log.yearp==str(year.yearp))&(db.validate_laboratory_log.period==str(T(year.period.name)))&(db.validate_laboratory_log.date_log>=str(start))&(db.validate_laboratory_log.date_log<str(end))&(db.validate_laboratory_log.operation_log=='insert')&(db.validate_laboratory_log.validation_type==False)).count(db.validate_laboratory_log.id)))
+                    tempRemport1.append(str(db((db.validate_laboratory_log.project==level_project.name)&(db.validate_laboratory_log.yearp==str(year.yearp))&(db.validate_laboratory_log.period==str(T(year.period.name)))&(db.validate_laboratory_log.date_log>=str(start))&(db.validate_laboratory_log.date_log<str(end))&(db.validate_laboratory_log.operation_log=='update')&(db.validate_laboratory_log.validation_type==False)).count(db.validate_laboratory_log.id)))
+                    tempRemport1.append(str(db((db.validate_laboratory_log.project==level_project.name)&(db.validate_laboratory_log.yearp==str(year.yearp))&(db.validate_laboratory_log.period==str(T(year.period.name)))&(db.validate_laboratory_log.date_log>=str(start))&(db.validate_laboratory_log.date_log<str(end))&(db.validate_laboratory_log.operation_log=='delete')&(db.validate_laboratory_log.validation_type==False)).count(db.validate_laboratory_log.id)))
+                else:
+                    tempRemport1.append(str(db((db.validate_laboratory_log.project==level_project.name)&(db.validate_laboratory_log.yearp==str(year.yearp))&(db.validate_laboratory_log.period==str(T(year.period.name)))&(db.validate_laboratory_log.date_log>=str(start))&(db.validate_laboratory_log.date_log<str(end))&(db.validate_laboratory_log.operation_log=='insert')&(db.validate_laboratory_log.validation_type==False)&(db.validate_laboratory_log.academic.like('%'+str(session.search_laboratory_replacing_management)+'%'))).count(db.validate_laboratory_log.id)))
+                    tempRemport1.append(str(db((db.validate_laboratory_log.project==level_project.name)&(db.validate_laboratory_log.yearp==str(year.yearp))&(db.validate_laboratory_log.period==str(T(year.period.name)))&(db.validate_laboratory_log.date_log>=str(start))&(db.validate_laboratory_log.date_log<str(end))&(db.validate_laboratory_log.operation_log=='update')&(db.validate_laboratory_log.validation_type==False)&(db.validate_laboratory_log.academic.like('%'+str(session.search_laboratory_replacing_management)+'%'))).count(db.validate_laboratory_log.id)))
+                    tempRemport1.append(str(db((db.validate_laboratory_log.project==level_project.name)&(db.validate_laboratory_log.yearp==str(year.yearp))&(db.validate_laboratory_log.period==str(T(year.period.name)))&(db.validate_laboratory_log.date_log>=str(start))&(db.validate_laboratory_log.date_log<str(end))&(db.validate_laboratory_log.operation_log=='delete')&(db.validate_laboratory_log.validation_type==False)&(db.validate_laboratory_log.academic.like('%'+str(session.search_laboratory_replacing_management)+'%'))).count(db.validate_laboratory_log.id)))
+                pass
+                report.append(tempRemport1)
+        
+
+        #LEVEL 3
+        elif request.vars['level']=='3':
+            #Heading Level 3
+            tempRemport1=[]
+            tempRemport1.append(T('Course'))
+            tempRemport1.append(level_project.name)
+            report.append(tempRemport1)
+
+            tempRemport1=[]
+            tempRemport1.append(T('Month'))
+            for tempMonth in vecMonth:
+                if str(tempMonth[0])==level_month:
+                    tempRemport1.append(tempMonth[1])
+                    start = datetime.strptime(str(year.yearp) + '-' + str(tempMonth[0]) +'-01', "%Y-%m-%d")
+                    if tempMonth[2]==1:
+                        end = datetime.strptime(str(year.yearp+1) + '-' + str(tempMonth[2]) +'-01', "%Y-%m-%d")
+                    else:
+                        end = datetime.strptime(str(year.yearp) + '-' + str(tempMonth[2]) +'-01', "%Y-%m-%d")
+                    pass
+            report.append(tempRemport1)
+
+            tempRemport1=[]
+            tempRemport1.append('')
+            report.append(tempRemport1)
+
+            tempRemport1=[]
+            tempRemport1.append(T('Detail'))
+            report.append(tempRemport1)
+
+            tempRemport1=[]
+            tempRole = []
+            tempRemport1.append(T('Role'))
+            if ((level_tipo=='all') or (level_tipo=='i')):
+                tempRemport1.append(T('Total inserted'))
+            if ((level_tipo=='all') or (level_tipo=='u')):
+                tempRemport1.append(T('Total modified'))
+            if ((level_tipo=='all') or (level_tipo=='d')):
+                tempRemport1.append(T('Total out'))
+            report.append(tempRemport1)
+            #Body Level 3
+            for tempR in db((db.auth_group.role!='Academic')&(db.auth_group.role!='DSI')).select():
+                tempRole.append(tempR.role)
+            for tempR in db((db.validate_laboratory_log.yearp==year.yearp)&(db.validate_laboratory_log.period==T(year.period.name))&(db.validate_laboratory_log.project==level_project.name)&(~db.validate_laboratory_log.roll.belongs(tempRole))).select(db.validate_laboratory_log.roll, distinct=True):
+                tempRole.append(tempR.roll)
+            for roll in tempRole:
+                tempRemport1=[]
+                tempRemport1.append(T('Rol '+str(roll)))
+                if session.search_laboratory_replacing_management == "" or session.search_laboratory_replacing_management is None:
+                    if ((level_tipo=='all') or (level_tipo=='i')):
+                        tempRemport1.append(str(db((db.validate_laboratory_log.project==level_project.name)&(db.validate_laboratory_log.yearp==str(year.yearp))&(db.validate_laboratory_log.period==str(T(year.period.name)))&(db.validate_laboratory_log.date_log>=str(start))&(db.validate_laboratory_log.date_log<str(end))&(db.validate_laboratory_log.operation_log=='insert')&(db.validate_laboratory_log.roll==roll)&(db.validate_laboratory_log.validation_type==False)).count(db.validate_laboratory_log.id)))
+                    if ((level_tipo=='all') or (level_tipo=='u')):
+                        tempRemport1.append(str(db((db.validate_laboratory_log.project==level_project.name)&(db.validate_laboratory_log.yearp==str(year.yearp))&(db.validate_laboratory_log.period==str(T(year.period.name)))&(db.validate_laboratory_log.date_log>=str(start))&(db.validate_laboratory_log.date_log<str(end))&(db.validate_laboratory_log.operation_log=='update')&(db.validate_laboratory_log.roll==roll)&(db.validate_laboratory_log.validation_type==False)).count(db.validate_laboratory_log.id)))
+                    if ((level_tipo=='all') or (level_tipo=='d')):
+                        tempRemport1.append(str(db((db.validate_laboratory_log.project==level_project.name)&(db.validate_laboratory_log.yearp==str(year.yearp))&(db.validate_laboratory_log.period==str(T(year.period.name)))&(db.validate_laboratory_log.date_log>=str(start))&(db.validate_laboratory_log.date_log<str(end))&(db.validate_laboratory_log.operation_log=='delete')&(db.validate_laboratory_log.roll==roll)&(db.validate_laboratory_log.validation_type==False)).count(db.validate_laboratory_log.id)))
+                else:
+                    if ((level_tipo=='all') or (level_tipo=='i')):
+                        tempRemport1.append(str(db((db.validate_laboratory_log.project==level_project.name)&(db.validate_laboratory_log.yearp==str(year.yearp))&(db.validate_laboratory_log.period==str(T(year.period.name)))&(db.validate_laboratory_log.date_log>=str(start))&(db.validate_laboratory_log.date_log<str(end))&(db.validate_laboratory_log.operation_log=='insert')&(db.validate_laboratory_log.roll==roll)&(db.validate_laboratory_log.validation_type==False)&(db.validate_laboratory_log.academic.like('%'+str(session.search_laboratory_replacing_management)+'%'))).count(db.validate_laboratory_log.id)))
+                    if ((level_tipo=='all') or (level_tipo=='u')):
+                        tempRemport1.append(str(db((db.validate_laboratory_log.project==level_project.name)&(db.validate_laboratory_log.yearp==str(year.yearp))&(db.validate_laboratory_log.period==str(T(year.period.name)))&(db.validate_laboratory_log.date_log>=str(start))&(db.validate_laboratory_log.date_log<str(end))&(db.validate_laboratory_log.operation_log=='update')&(db.validate_laboratory_log.roll==roll)&(db.validate_laboratory_log.validation_type==False)&(db.validate_laboratory_log.academic.like('%'+str(session.search_laboratory_replacing_management)+'%'))).count(db.validate_laboratory_log.id)))
+                    if ((level_tipo=='all') or (level_tipo=='d')):
+                        tempRemport1.append(str(db((db.validate_laboratory_log.project==level_project.name)&(db.validate_laboratory_log.yearp==str(year.yearp))&(db.validate_laboratory_log.period==str(T(year.period.name)))&(db.validate_laboratory_log.date_log>=str(start))&(db.validate_laboratory_log.date_log<str(end))&(db.validate_laboratory_log.operation_log=='delete')&(db.validate_laboratory_log.roll==roll)&(db.validate_laboratory_log.validation_type==False)&(db.validate_laboratory_log.academic.like('%'+str(session.search_laboratory_replacing_management)+'%'))).count(db.validate_laboratory_log.id)))
+                pass
+                report.append(tempRemport1)
+
+
+        #LEVEL 4
+        elif request.vars['level']=='4':
+            #Heading Level 4
+            tempRemport1=[]
+            tempRemport1.append(T('Course'))
+            tempRemport1.append(level_project.name)
+            report.append(tempRemport1)
+
+            tempRemport1=[]
+            tempRemport1.append(T('Month'))
+            for tempMonth in vecMonth:
+                if str(tempMonth[0])==level_month:
+                    tempRemport1.append(tempMonth[1])
+                    start = datetime.strptime(str(year.yearp) + '-' + str(tempMonth[0]) +'-01', "%Y-%m-%d")
+                    if tempMonth[2]==1:
+                        end = datetime.strptime(str(year.yearp+1) + '-' + str(tempMonth[2]) +'-01', "%Y-%m-%d")
+                    else:
+                        end = datetime.strptime(str(year.yearp) + '-' + str(tempMonth[2]) +'-01', "%Y-%m-%d")
+                    pass
+            report.append(tempRemport1)
+
+            tempRemport1=[]
+            tempRemport1.append(T('Role'))
+            tempRemport1.append(T('Rol '+level_rol))
+            report.append(tempRemport1)
+
+            tempRemport1=[]
+            tempRemport1.append('')
+            report.append(tempRemport1)
+
+            tempRemport1=[]
+            tempRemport1.append(T('Detail'))
+            report.append(tempRemport1)
+
+            tempRemport1=[]
+            tempUsers=[]
+            tempRemport1.append(T('User'))
+            if ((level_tipo=='all') or (level_tipo=='i')):
+                tempRemport1.append(T('Total inserted'))
+            if ((level_tipo=='all') or (level_tipo=='u')):
+                tempRemport1.append(T('Total modified'))
+            if ((level_tipo=='all') or (level_tipo=='d')):
+                tempRemport1.append(T('Total out'))
+            report.append(tempRemport1)
+            #Body Level 4
+            tempUsers2=[]
+            registerRol = db(db.auth_group.role==level_rol).select().first()
+            if ((level_rol=='Super-Administrator') or (level_rol=='Ecys-Administrator')):
+                for valueU in db((db.auth_membership.group_id==registerRol.id)).select(db.auth_membership.user_id, distinct=True):
+                    tempUsers.append(valueU.user_id.username)
+            else:
+                for valueU in db((db.auth_membership.group_id==registerRol.id)).select(db.auth_membership.user_id, distinct=True):
+                    tempUsers2.append(valueU.user_id)
+                for valueU in db((db.user_project.period==year.id)&(db.user_project.project==level_project.id)&(db.user_project.assigned_user.belongs(tempUsers2))).select(db.user_project.assigned_user, distinct=True):
+                    tempUsers.append(valueU.assigned_user.username)
+            pass
+            for valueU in db((db.validate_laboratory_log.yearp==year.yearp)&(db.validate_laboratory_log.period==T(year.period.name))&(db.validate_laboratory_log.project==level_project.name)&(db.validate_laboratory_log.roll==level_rol)&(~db.validate_laboratory_log.user_name.belongs(tempUsers))).select(db.validate_laboratory_log.user_name, distinct=True):
+                tempUsers.append(valueU.user_name)
+            for userr in tempUsers:
+                tempRemport1=[]
+                tempRemport1.append(userr)
+                if session.search_laboratory_replacing_management == "" or session.search_laboratory_replacing_management is None:
+                    if ((level_tipo=='all') or (level_tipo=='i')):
+                        tempRemport1.append(str(db((db.validate_laboratory_log.project==level_project.name)&(db.validate_laboratory_log.yearp==str(year.yearp))&(db.validate_laboratory_log.period==str(T(year.period.name)))&(db.validate_laboratory_log.date_log>=str(start))&(db.validate_laboratory_log.date_log<str(end))&(db.validate_laboratory_log.operation_log=='insert')&(db.validate_laboratory_log.validation_type==False)&(db.validate_laboratory_log.roll==level_rol)&(db.validate_laboratory_log.user_name==userr)).count(db.validate_laboratory_log.id)))
+                    if ((level_tipo=='all') or (level_tipo=='u')):
+                        tempRemport1.append(str(db((db.validate_laboratory_log.project==level_project.name)&(db.validate_laboratory_log.yearp==str(year.yearp))&(db.validate_laboratory_log.period==str(T(year.period.name)))&(db.validate_laboratory_log.date_log>=str(start))&(db.validate_laboratory_log.date_log<str(end))&(db.validate_laboratory_log.operation_log=='update')&(db.validate_laboratory_log.validation_type==False)&(db.validate_laboratory_log.roll==level_rol)&(db.validate_laboratory_log.user_name==userr)).count(db.validate_laboratory_log.id)))
+                    if ((level_tipo=='all') or (level_tipo=='d')):
+                        tempRemport1.append(str(db((db.validate_laboratory_log.project==level_project.name)&(db.validate_laboratory_log.yearp==str(year.yearp))&(db.validate_laboratory_log.period==str(T(year.period.name)))&(db.validate_laboratory_log.date_log>=str(start))&(db.validate_laboratory_log.date_log<str(end))&(db.validate_laboratory_log.operation_log=='delete')&(db.validate_laboratory_log.validation_type==False)&(db.validate_laboratory_log.roll==level_rol)&(db.validate_laboratory_log.user_name==userr)).count(db.validate_laboratory_log.id)))
+                else:
+                    if ((level_tipo=='all') or (level_tipo=='i')):
+                        tempRemport1.append(str(db((db.validate_laboratory_log.project==level_project.name)&(db.validate_laboratory_log.yearp==str(year.yearp))&(db.validate_laboratory_log.period==str(T(year.period.name)))&(db.validate_laboratory_log.date_log>=str(start))&(db.validate_laboratory_log.date_log<str(end))&(db.validate_laboratory_log.operation_log=='insert')&(db.validate_laboratory_log.validation_type==False)&(db.validate_laboratory_log.roll==level_rol)&(db.validate_laboratory_log.user_name==userr)&(db.validate_laboratory_log.academic.like('%'+str(session.search_laboratory_replacing_management)+'%'))).count(db.validate_laboratory_log.id)))
+                    if ((level_tipo=='all') or (level_tipo=='u')):
+                        tempRemport1.append(str(db((db.validate_laboratory_log.project==level_project.name)&(db.validate_laboratory_log.yearp==str(year.yearp))&(db.validate_laboratory_log.period==str(T(year.period.name)))&(db.validate_laboratory_log.date_log>=str(start))&(db.validate_laboratory_log.date_log<str(end))&(db.validate_laboratory_log.operation_log=='update')&(db.validate_laboratory_log.validation_type==False)&(db.validate_laboratory_log.roll==level_rol)&(db.validate_laboratory_log.user_name==userr)&(db.validate_laboratory_log.academic.like('%'+str(session.search_laboratory_replacing_management)+'%'))).count(db.validate_laboratory_log.id)))
+                    if ((level_tipo=='all') or (level_tipo=='d')):
+                        tempRemport1.append(str(db((db.validate_laboratory_log.project==level_project.name)&(db.validate_laboratory_log.yearp==str(year.yearp))&(db.validate_laboratory_log.period==str(T(year.period.name)))&(db.validate_laboratory_log.date_log>=str(start))&(db.validate_laboratory_log.date_log<str(end))&(db.validate_laboratory_log.operation_log=='delete')&(db.validate_laboratory_log.validation_type==False)&(db.validate_laboratory_log.roll==level_rol)&(db.validate_laboratory_log.user_name==userr)&(db.validate_laboratory_log.academic.like('%'+str(session.search_laboratory_replacing_management)+'%'))).count(db.validate_laboratory_log.id)))
+                pass
+                report.append(tempRemport1)
+        
+
+        #LEVEL 5
+        elif request.vars['level']=='5':
+            #Head of Level 5
+            tempRemport1=[]
+            tempRemport1.append(T('Course'))
+            tempRemport1.append(level_project.name)
+            report.append(tempRemport1)
+
+            tempRemport1=[]
+            tempRemport1.append(T('Month'))
+            for tempMonth in vecMonth:
+                if str(tempMonth[0])==level_month:
+                    tempRemport1.append(tempMonth[1])
+                    start = datetime.strptime(str(year.yearp) + '-' + str(tempMonth[0]) +'-01', "%Y-%m-%d")
+                    if tempMonth[2]==1:
+                        end = datetime.strptime(str(year.yearp+1) + '-' + str(tempMonth[2]) +'-01', "%Y-%m-%d")
+                    else:
+                        end = datetime.strptime(str(year.yearp) + '-' + str(tempMonth[2]) +'-01', "%Y-%m-%d")
+                    pass
+            report.append(tempRemport1)
+
+            tempRemport1=[]
+            tempRemport1.append(T('Role'))
+            tempRemport1.append(T('Rol '+level_rol))
+            report.append(tempRemport1)
+
+            tempRemport1=[]
+            tempRemport1.append(T('User resolution'))
+            tempRemport1.append(level_user)
+            report.append(tempRemport1)
+
+            tempRemport1=[]
+            tempRemport1.append('')
+            report.append(tempRemport1)
+
+            tempRemport1=[]
+            tempRemport1.append(T('Detail'))
+            report.append(tempRemport1)
+
+            temp_vecAllUserRoleMonth=[]
+            tempRemport1=[]
+            #Body Level 5
+            if session.search_laboratory_replacing_management == "" or session.search_laboratory_replacing_management is None:
+                if ((level_tipo=='all') or (level_tipo=='i')):
+                    temp_vecAllUserRoleMonth.append(db((db.validate_laboratory_log.project==level_project.name)&(db.validate_laboratory_log.yearp==str(year.yearp))&(db.validate_laboratory_log.period==str(T(year.period.name)))&(db.validate_laboratory_log.date_log>=str(start))&(db.validate_laboratory_log.date_log<str(end))&(db.validate_laboratory_log.operation_log=='insert')&(db.validate_laboratory_log.validation_type==False)&(db.validate_laboratory_log.roll==level_rol)&(db.validate_laboratory_log.user_name==level_user)).select())
+                if ((level_tipo=='all') or (level_tipo=='u')):
+                    temp_vecAllUserRoleMonth.append(db((db.validate_laboratory_log.project==level_project.name)&(db.validate_laboratory_log.yearp==str(year.yearp))&(db.validate_laboratory_log.period==str(T(year.period.name)))&(db.validate_laboratory_log.date_log>=str(start))&(db.validate_laboratory_log.date_log<str(end))&(db.validate_laboratory_log.operation_log=='update')&(db.validate_laboratory_log.validation_type==False)&(db.validate_laboratory_log.roll==level_rol)&(db.validate_laboratory_log.user_name==level_user)).select())
+                if ((level_tipo=='all') or (level_tipo=='d')):
+                    temp_vecAllUserRoleMonth.append(db((db.validate_laboratory_log.project==level_project.name)&(db.validate_laboratory_log.yearp==str(year.yearp))&(db.validate_laboratory_log.period==str(T(year.period.name)))&(db.validate_laboratory_log.date_log>=str(start))&(db.validate_laboratory_log.date_log<str(end))&(db.validate_laboratory_log.operation_log=='delete')&(db.validate_laboratory_log.validation_type==False)&(db.validate_laboratory_log.roll==level_rol)&(db.validate_laboratory_log.user_name==level_user)).select())
+            else:
+                if ((level_tipo=='all') or (level_tipo=='i')):
+                    temp_vecAllUserRoleMonth.append(db((db.validate_laboratory_log.project==level_project.name)&(db.validate_laboratory_log.yearp==str(year.yearp))&(db.validate_laboratory_log.period==str(T(year.period.name)))&(db.validate_laboratory_log.date_log>=str(start))&(db.validate_laboratory_log.date_log<str(end))&(db.validate_laboratory_log.operation_log=='insert')&(db.validate_laboratory_log.validation_type==False)&(db.validate_laboratory_log.roll==level_rol)&(db.validate_laboratory_log.user_name==level_user)&(db.validate_laboratory_log.academic.like('%'+str(session.search_laboratory_replacing_management)+'%'))).select())
+                if ((level_tipo=='all') or (level_tipo=='u')):
+                    temp_vecAllUserRoleMonth.append(db((db.validate_laboratory_log.project==level_project.name)&(db.validate_laboratory_log.yearp==str(year.yearp))&(db.validate_laboratory_log.period==str(T(year.period.name)))&(db.validate_laboratory_log.date_log>=str(start))&(db.validate_laboratory_log.date_log<str(end))&(db.validate_laboratory_log.operation_log=='update')&(db.validate_laboratory_log.validation_type==False)&(db.validate_laboratory_log.roll==level_rol)&(db.validate_laboratory_log.user_name==level_user)&(db.validate_laboratory_log.academic.like('%'+str(session.search_laboratory_replacing_management)+'%'))).select())
+                if ((level_tipo=='all') or (level_tipo=='d')):
+                    temp_vecAllUserRoleMonth.append(db((db.validate_laboratory_log.project==level_project.name)&(db.validate_laboratory_log.yearp==str(year.yearp))&(db.validate_laboratory_log.period==str(T(year.period.name)))&(db.validate_laboratory_log.date_log>=str(start))&(db.validate_laboratory_log.date_log<str(end))&(db.validate_laboratory_log.operation_log=='delete')&(db.validate_laboratory_log.validation_type==False)&(db.validate_laboratory_log.roll==level_rol)&(db.validate_laboratory_log.user_name==level_user)&(db.validate_laboratory_log.academic.like('%'+str(session.search_laboratory_replacing_management)+'%'))).select())
+            pass
+            varTypeHead=0
+            for field in temp_vecAllUserRoleMonth:
+                for camp in field:
+                    if varTypeHead==0:
+                        #Heading Level 5
+                        tempRemport1=[]
+                        tempRemport1.append(T('User resolution'))
+                        tempRemport1.append(T('Role resolution'))
+                        tempRemport1.append(T('Date of resolution'))
+                        tempRemport1.append(T('Operation'))
+                        tempRemport1.append(T('Description'))
+                        tempRemport1.append(T('Rol Academic'))
+                        tempRemport1.append(T('Before Grade'))
+                        tempRemport1.append(T('Grade edited'))
+                        report.append(tempRemport1)
+                        varTypeHead=1
+                    tempRemport1=[]
+                    tempRemport1.append(str(camp.user_name))
+                    tempRemport1.append(T('Rol '+str(camp.roll)))
+                    tempRemport1.append(str(camp.date_log))
+                    tempRemport1.append(str(camp.operation_log))
+                    tempRemport1.append(str(camp.description))
+                    tempRemport1.append(str(camp.academic))
+                    tempRemport1.append(str(camp.before_grade))
+                    tempRemport1.append(str(camp.after_grade))
+                    report.append(tempRemport1)
+                pass
+            pass
+        return dict(filename='ReporteGestionEquivalencia', csvdata=report)
+    else:
+        session.flash = T('Not valid Action.')
+        redirect(URL('activity_control','validate_laboratory_management'))
+
+
+
+#Management Report Equivalence laboratory levels 1 and 2
+@auth.requires_login()
+@auth.requires(auth.has_membership('Teacher'))
+def laboratory_replacing_management():
+    #Export Report to CSV
+    if request.vars['list'] =='True':
+        redirect(URL('activity_control','laboratory_replacing_management_export'))
+
+    #Export Report Nivel 0
+    if request.vars['list'] =='False':
+        if request.vars['level'] =='1':
+            redirect(URL('activity_control','laboratory_replacing_management_level_export',vars=dict(level=request.vars['level'])))
+        elif request.vars['level'] =='2':
+            if request.vars['level_project'] is None or request.vars['level_project']=='':
+                redirect(URL('activity_control','laboratory_replacing_management'))
+            else:
+                redirect(URL('activity_control','laboratory_replacing_management_level_export',vars=dict(level=request.vars['level'],level_project=request.vars['level_project'])))
+        else:
+            redirect(URL('activity_control','laboratory_replacing_management'))
+
+
+    import cpfecys
+    #Obtain the current period of the system and all the register periods
+    period = cpfecys.current_year_period()
+
+    #Check if the user is assigned to the course
+    assigantions = db((db.user_project.assigned_user == auth.user.id) & (db.user_project.period == period.id)).select()
+    if assigantions.first() is None:
+        session.flash = T('Not valid Action.')
+        redirect(URL('default','index'))
+
+    #Vec with the months of the current period
+    vecMonth=[]
+    tmpMonth=[]
+    if period.period == 1:
+        tmpMonth=[]
+        tmpMonth.append(1)
+        tmpMonth.append('Enero')
+        tmpMonth.append(2)
+        vecMonth.append(tmpMonth)
+
+        tmpMonth=[]
+        tmpMonth.append(2)
+        tmpMonth.append('Febrero')
+        tmpMonth.append(3)
+        vecMonth.append(tmpMonth)
+
+        tmpMonth=[]
+        tmpMonth.append(3)
+        tmpMonth.append('Marzo')
+        tmpMonth.append(4)
+        vecMonth.append(tmpMonth)
+
+        tmpMonth=[]
+        tmpMonth.append(4)
+        tmpMonth.append('Abril')
+        tmpMonth.append(5)
+        vecMonth.append(tmpMonth)
+
+        tmpMonth=[]
+        tmpMonth.append(5)
+        tmpMonth.append('Mayo')
+        tmpMonth.append(6)
+        vecMonth.append(tmpMonth)
+    else:
+        tmpMonth=[]
+        tmpMonth.append(6)
+        tmpMonth.append('Junio')
+        tmpMonth.append(7)
+        vecMonth.append(tmpMonth)
+
+        tmpMonth=[]
+        tmpMonth.append(7)
+        tmpMonth.append('Julio')
+        tmpMonth.append(8)
+        vecMonth.append(tmpMonth)
+
+        tmpMonth=[]
+        tmpMonth.append(8)
+        tmpMonth.append('Agosto')
+        tmpMonth.append(9)
+        vecMonth.append(tmpMonth)
+
+        tmpMonth=[]
+        tmpMonth.append(9)
+        tmpMonth.append('Septiembre')
+        tmpMonth.append(10)
+        vecMonth.append(tmpMonth)
+
+        tmpMonth=[]
+        tmpMonth.append(10)
+        tmpMonth.append('Octubre')
+        tmpMonth.append(11)
+        vecMonth.append(tmpMonth)
+
+        tmpMonth=[]
+        tmpMonth.append(11)
+        tmpMonth.append('Noviembre')
+        tmpMonth.append(12)
+        vecMonth.append(tmpMonth)
+
+        tmpMonth=[]
+        tmpMonth.append(12)
+        tmpMonth.append('Diciembre')
+        tmpMonth.append(1)
+        vecMonth.append(tmpMonth)
+
+
+        if (request.args(0) == 'search'):
+            if str(request.vars['querySearch']) == "":
+                session.search_laboratory_replacing_management = ""
+            else:
+                if str(request.vars['querySearch']).isdigit()==True:
+                    session.search_laboratory_replacing_management = str(request.vars['querySearch'])
+                else:
+                    session.search_laboratory_replacing_management = ""
+                    session.flash=T('The lookup value is not allowed.')
+                    redirect(URL('activity_control','laboratory_replacing_management'))
+        else:
+            session.search_laboratory_replacing_management = ""
+
+    return dict(year=period, assigantions=assigantions, vecMonth=vecMonth)
+
+
+
+#********************************************************
+#Management Report Equivalence  laboratory level 3
+@auth.requires_login()
+@auth.requires(auth.has_membership('Teacher'))
+def laboratory_replacing_management_n2():
+    import cpfecys
+    #Obtain the current period of the system and all the register periods
+    period = cpfecys.current_year_period()
+    showLevel = True
+    project = None
+    tipo = None
+    month=None
+    vecRoleMonth=None
+    messageError=''
+
+    #Check if a search exist, verify that they are just numbers
+    if session.search_laboratory_replacing_management != "" and session.search_laboratory_replacing_management is not None:
+        if str(session.search_laboratory_replacing_management).isdigit()==False:
+            session.search_laboratory_replacing_management = ""
+            messageError=T('The lookup value is not allowed.')
+            showLevel = False
+
+    #Check the correct parameters
+    if request.vars['list'] =='False':
+        if request.vars['level'] =='3':
+            if request.vars['level_project'] is None or request.vars['level_project']=='':
+                messageError=T('Error. Unable to export the reporting level for lack of parameters.')
+                showLevel = False
+            else:
+                if request.vars['level_month'] is None or request.vars['level_month']=='':
+                    messageError=T('Error. Unable to export the reporting level for lack of parameters.')
+                    showLevel = False
+                else:
+                    if request.vars['level_tipo'] is None or request.vars['level_tipo']=='':
+                        messageError=T('Error. Unable to export the reporting level for lack of parameters.')
+                        showLevel = False
+                    else:
+                        redirect(URL('activity_control','laboratory_replacing_management_level_export',vars=dict(level=request.vars['level'],level_project=request.vars['level_project'],level_month=request.vars['level_month'],level_tipo=request.vars['level_tipo'])))
+        else:
+            messageError=T('Error. Unable to export the reporting level for lack of parameters.')
+            showLevel = False
+
+    #Check if the project is correct
+    if request.vars['tipo'] is None or request.vars['tipo']=='':
+        messageError=T('Error. Unable to show the reporting level for lack of parameters.')
+        showLevel = False
+    else:
+        if str(request.vars['tipo'])!='all' and str(request.vars['tipo'])!='i' and str(request.vars['tipo'])!='u' and str(request.vars['tipo'])!='d':
+            messageError=T('Error. Unable to show the reporting level for lack of parameters.')
+            showLevel = False
+        else:
+            tipo = str(request.vars['tipo'])
+
+
+    #Check if the project is correct
+    if request.vars['project'] is None or request.vars['project']=='':
+        messageError=T('Error. Unable to show the reporting level for lack of parameters.')
+        showLevel = False
+    else:
+        project = request.vars['project']
+        project = db(db.project.id==project).select().first()
+        if project is None:
+            messageError=T('Action not allowed')
+            showLevel = False
+
+
+    #Check if the user is assigned to the project
+    if project is None or tipo is None:
+        messageError=T('Error. Unable to show the reporting level for lack of parameters.')
+        showLevel = False
+    else:
+        if auth.has_membership('Teacher'):
+            course = db((db.user_project.assigned_user == auth.user.id) & (db.user_project.period == period.id) & (db.user_project.project==project.id)).select().first()
+            if course is None:
+                messageError=T('Action not allowed')
+                showLevel = False
+        else:
+            messageError=T('Action not allowed')
+            showLevel = False
+
+
+    #Check if the month is correct
+    if showLevel==True:
+        if request.vars['month'] is None or request.vars['month']=='':
+            messageError=T('Error. Unable to show the reporting level for lack of parameters.')
+            showLevel = False
+        else:
+            if period.period == 1:
+                if int(request.vars['month']) >= 1 and int(request.vars['month']) <=5:
+                    month=str(request.vars['month'])
+                else:
+                    messageError=T('Action not allowed')
+                    showLevel = False
+            else:
+                if int(request.vars['month']) >= 6 and int(request.vars['month']) <=12:
+                    month=str(request.vars['month'])
+                else:
+                    messageError=T('Action not allowed')
+                    showLevel = False
+
+
+    #***************************************************************************************************************************************************************************************************************
+    #***************************************************************************************************************************************************************************************************************
+    #***************************************************************************************************************************************************************************************************************
+    #***************************************************************************************************************************************************************************************************************
+
+
+    #All the parameters are ok, start to build the report level 2
+    if showLevel==True:
+        from datetime import datetime
+        start = datetime.strptime(str(period.yearp) + '-' + month +'-01', "%Y-%m-%d")
+        if month=='12':
+            end = datetime.strptime(str(period.yearp+1) + '-' + '01-01', "%Y-%m-%d")
+        else:
+            end = datetime.strptime(str(period.yearp) + '-' + str(int(month)+1) +'-01', "%Y-%m-%d")
+        pass
+        vecRoleMonth=[]
+        roleTemp=[]
+        for value in db((db.auth_group.role!='Academic')&(db.auth_group.role!='DSI')).select():
+            optionSearch=[]
+            optionSearch.append(value.role)
+            roleTemp.append(value.role)
+            if str(request.vars['tipo'])=='all' or str(request.vars['tipo'])=='i':
+                if session.search_laboratory_replacing_management == "" or session.search_laboratory_replacing_management is None:
+                    optionSearch.append(str(db((db.validate_laboratory_log.project==project.name)&(db.validate_laboratory_log.yearp==str(period.yearp))&(db.validate_laboratory_log.period==str(T(period.period.name)))&(db.validate_laboratory_log.date_log>=str(start))&(db.validate_laboratory_log.date_log<str(end))&(db.validate_laboratory_log.operation_log=='insert')&(db.validate_laboratory_log.roll==value.role)&(db.validate_laboratory_log.validation_type==False)).count(db.validate_laboratory_log.id)))
+                else:
+                    optionSearch.append(str(db((db.validate_laboratory_log.project==project.name)&(db.validate_laboratory_log.yearp==str(period.yearp))&(db.validate_laboratory_log.period==str(T(period.period.name)))&(db.validate_laboratory_log.date_log>=str(start))&(db.validate_laboratory_log.date_log<str(end))&(db.validate_laboratory_log.operation_log=='insert')&(db.validate_laboratory_log.roll==value.role)&(db.validate_laboratory_log.validation_type==False)&(db.validate_laboratory_log.academic.like('%'+str(session.search_laboratory_replacing_management)+'%'))).count(db.validate_laboratory_log.id)))
+                pass
+            if str(request.vars['tipo'])=='all' or str(request.vars['tipo'])=='u':
+                if session.search_laboratory_replacing_management == "" or session.search_laboratory_replacing_management is None:
+                    optionSearch.append(str(db((db.validate_laboratory_log.project==project.name)&(db.validate_laboratory_log.yearp==str(period.yearp))&(db.validate_laboratory_log.period==str(T(period.period.name)))&(db.validate_laboratory_log.date_log>=str(start))&(db.validate_laboratory_log.date_log<str(end))&(db.validate_laboratory_log.operation_log=='update')&(db.validate_laboratory_log.roll==value.role)&(db.validate_laboratory_log.validation_type==False)).count(db.validate_laboratory_log.id)))
+                else:
+                    optionSearch.append(str(db((db.validate_laboratory_log.project==project.name)&(db.validate_laboratory_log.yearp==str(period.yearp))&(db.validate_laboratory_log.period==str(T(period.period.name)))&(db.validate_laboratory_log.date_log>=str(start))&(db.validate_laboratory_log.date_log<str(end))&(db.validate_laboratory_log.operation_log=='update')&(db.validate_laboratory_log.roll==value.role)&(db.validate_laboratory_log.validation_type==False)&(db.validate_laboratory_log.academic.like('%'+str(session.search_laboratory_replacing_management)+'%'))).count(db.validate_laboratory_log.id)))
+                pass
+            if str(request.vars['tipo'])=='all' or str(request.vars['tipo'])=='d':
+                if session.search_laboratory_replacing_management == "" or session.search_laboratory_replacing_management is None:
+                    optionSearch.append(str(db((db.validate_laboratory_log.project==project.name)&(db.validate_laboratory_log.yearp==str(period.yearp))&(db.validate_laboratory_log.period==str(T(period.period.name)))&(db.validate_laboratory_log.date_log>=str(start))&(db.validate_laboratory_log.date_log<str(end))&(db.validate_laboratory_log.operation_log=='delete')&(db.validate_laboratory_log.roll==value.role)&(db.validate_laboratory_log.validation_type==False)).count(db.validate_laboratory_log.id)))
+                else:
+                    optionSearch.append(str(db((db.validate_laboratory_log.project==project.name)&(db.validate_laboratory_log.yearp==str(period.yearp))&(db.validate_laboratory_log.period==str(T(period.period.name)))&(db.validate_laboratory_log.date_log>=str(start))&(db.validate_laboratory_log.date_log<str(end))&(db.validate_laboratory_log.operation_log=='delete')&(db.validate_laboratory_log.roll==value.role)&(db.validate_laboratory_log.validation_type==False)&(db.validate_laboratory_log.academic.like('%'+str(session.search_laboratory_replacing_management)+'%'))).count(db.validate_laboratory_log.id)))
+                pass
+            vecRoleMonth.append(optionSearch)
+        #Check if the log has a roll that is not register
+        for value in db((db.validate_laboratory_log.yearp==period.yearp)&(db.validate_laboratory_log.period==T(period.period.name))&(db.validate_laboratory_log.project==project.name)&(~db.validate_laboratory_log.roll.belongs(roleTemp))).select(db.validate_laboratory_log.roll, distinct=True):
+            optionSearch=[]
+            optionSearch.append(value.roll)
+            if str(request.vars['tipo'])=='all' or str(request.vars['tipo'])=='i':
+                if session.search_laboratory_replacing_management == "" or session.search_laboratory_replacing_management is None:
+                    optionSearch.append(str(db((db.validate_laboratory_log.project==project.name)&(db.validate_laboratory_log.yearp==str(period.yearp))&(db.validate_laboratory_log.period==str(T(period.period.name)))&(db.validate_laboratory_log.date_log>=str(start))&(db.validate_laboratory_log.date_log<str(end))&(db.validate_laboratory_log.operation_log=='insert')&(db.validate_laboratory_log.roll==value.roll)&(db.validate_laboratory_log.validation_type==False)).count(db.validate_laboratory_log.id)))
+                else:
+                    optionSearch.append(str(db((db.validate_laboratory_log.project==project.name)&(db.validate_laboratory_log.yearp==str(period.yearp))&(db.validate_laboratory_log.period==str(T(period.period.name)))&(db.validate_laboratory_log.date_log>=str(start))&(db.validate_laboratory_log.date_log<str(end))&(db.validate_laboratory_log.operation_log=='insert')&(db.validate_laboratory_log.roll==value.roll)&(db.validate_laboratory_log.validation_type==False)&(db.validate_laboratory_log.academic.like('%'+str(session.search_laboratory_replacing_management)+'%'))).count(db.validate_laboratory_log.id)))
+                pass
+            if str(request.vars['tipo'])=='all' or str(request.vars['tipo'])=='u':
+                if session.search_laboratory_replacing_management == "" or session.search_laboratory_replacing_management is None:
+                    optionSearch.append(str(db((db.validate_laboratory_log.project==project.name)&(db.validate_laboratory_log.yearp==str(period.yearp))&(db.validate_laboratory_log.period==str(T(period.period.name)))&(db.validate_laboratory_log.date_log>=str(start))&(db.validate_laboratory_log.date_log<str(end))&(db.validate_laboratory_log.operation_log=='update')&(db.validate_laboratory_log.roll==value.roll)&(db.validate_laboratory_log.validation_type==False)).count(db.validate_laboratory_log.id)))
+                else:
+                    optionSearch.append(str(db((db.validate_laboratory_log.project==project.name)&(db.validate_laboratory_log.yearp==str(period.yearp))&(db.validate_laboratory_log.period==str(T(period.period.name)))&(db.validate_laboratory_log.date_log>=str(start))&(db.validate_laboratory_log.date_log<str(end))&(db.validate_laboratory_log.operation_log=='update')&(db.validate_laboratory_log.roll==value.roll)&(db.validate_laboratory_log.validation_type==False)&(db.validate_laboratory_log.academic.like('%'+str(session.search_laboratory_replacing_management)+'%'))).count(db.validate_laboratory_log.id)))
+                pass
+            if str(request.vars['tipo'])=='all' or str(request.vars['tipo'])=='d':
+                if session.search_laboratory_replacing_management == "" or session.search_laboratory_replacing_management is None:
+                    optionSearch.append(str(db((db.validate_laboratory_log.project==project.name)&(db.validate_laboratory_log.yearp==str(period.yearp))&(db.validate_laboratory_log.period==str(T(period.period.name)))&(db.validate_laboratory_log.date_log>=str(start))&(db.validate_laboratory_log.date_log<str(end))&(db.validate_laboratory_log.operation_log=='delete')&(db.validate_laboratory_log.roll==value.roll)&(db.validate_laboratory_log.validation_type==False)).count(db.validate_laboratory_log.id)))
+                else:
+                    optionSearch.append(str(db((db.validate_laboratory_log.project==project.name)&(db.validate_laboratory_log.yearp==str(period.yearp))&(db.validate_laboratory_log.period==str(T(period.period.name)))&(db.validate_laboratory_log.date_log>=str(start))&(db.validate_laboratory_log.date_log<str(end))&(db.validate_laboratory_log.operation_log=='delete')&(db.validate_laboratory_log.roll==value.roll)&(db.validate_laboratory_log.validation_type==False)&(db.validate_laboratory_log.academic.like('%'+str(session.search_laboratory_replacing_management)+'%'))).count(db.validate_laboratory_log.id)))
+                pass
+            vecRoleMonth.append(optionSearch)
+    return dict(showLevel=showLevel, project=project, tipo=tipo, month=month, vecRoleMonth=vecRoleMonth, messageError=messageError)
+
+
+
+#********************************************************
+#Management Report Equivalence laboratory level 4
+@auth.requires_login()
+@auth.requires(auth.has_membership('Teacher'))
+def laboratory_replacing_management_n3():
+    import cpfecys
+    #Obtain the current period of the system and all the register periods
+    period = cpfecys.current_year_period()
+    showLevel = True
+    project = None
+    tipo = None
+    month=None
+    roll=None
+    vecUserRoleMonth=None
+    messageError=''
+
+    #Check if a search exist, verify that they are just numbers
+    if session.search_laboratory_replacing_management != "" and session.search_laboratory_replacing_management is not None:
+        if str(session.search_laboratory_replacing_management).isdigit()==False:
+            session.search_laboratory_replacing_management = ""
+            messageError=T('The lookup value is not allowed.')
+            showLevel = False
+
+    #Check the correct parameters
+    if request.vars['list'] =='False':
+        if request.vars['level'] =='4':
+            if request.vars['level_project'] is None or request.vars['level_project']=='':
+                messageError=T('Error. Unable to export the reporting level for lack of parameters.')
+                showLevel = False
+            else:
+                if request.vars['level_month'] is None or request.vars['level_month']=='':
+                    messageError=T('Error. Unable to export the reporting level for lack of parameters.')
+                    showLevel = False
+                else:
+                    if request.vars['level_tipo'] is None or request.vars['level_tipo']=='':
+                        messageError=T('Error. Unable to export the reporting level for lack of parameters.')
+                        showLevel = False
+                    else:
+                        if request.vars['level_rol'] is None or request.vars['level_rol']=='':
+                            messageError=T('Error. Unable to export the reporting level for lack of parameters.')
+                            showLevel = False
+                        else:
+                            redirect(URL('activity_control','laboratory_replacing_management_level_export',vars=dict(level=request.vars['level'],level_project=request.vars['level_project'],level_month=request.vars['level_month'],level_tipo=request.vars['level_tipo'],level_rol=request.vars['level_rol'])))
+        else:
+            messageError=T('Error. Unable to export the reporting level for lack of parameters.')
+            showLevel = False
+
+    #Check if the project is correct
+    if request.vars['tipo'] is None or request.vars['tipo']=='':
+        messageError=T('Error. Unable to show the reporting level for lack of parameters.')
+        showLevel = False
+    else:
+        if str(request.vars['tipo'])!='all' and str(request.vars['tipo'])!='i' and str(request.vars['tipo'])!='u' and str(request.vars['tipo'])!='d':
+            messageError=T('Error. Unable to show the reporting level for lack of parameters.')
+            showLevel = False
+        else:
+            tipo = str(request.vars['tipo'])
+
+
+    #Check if the project is correct
+    if request.vars['project'] is None or request.vars['project']=='':
+        messageError=T('Error. Unable to show the reporting level for lack of parameters.')
+        showLevel = False
+    else:
+        project = request.vars['project']
+        project = db(db.project.id==project).select().first()
+        if project is None:
+            messageError=T('Action not allowed')
+            showLevel = False
+
+
+    #Check if the user is assigned to the project
+    if project is None or tipo is None:
+        messageError=T('Error. Unable to show the reporting level for lack of parameters.')
+        showLevel = False
+    else:
+        if auth.has_membership('Teacher'):
+            course = db((db.user_project.assigned_user == auth.user.id) & (db.user_project.period == period.id) & (db.user_project.project==project.id)).select().first()
+            if course is None:
+                messageError=T('Action not allowed')
+                showLevel = False
+        else:
+            messageError=T('Action not allowed')
+            showLevel = False
+
+
+    #Check if the month is correct
+    if showLevel==True:
+        if request.vars['month'] is None or request.vars['month']=='':
+            messageError=T('Error. Unable to show the reporting level for lack of parameters.')
+            showLevel = False
+        else:
+            if period.period == 1:
+                if int(request.vars['month']) >= 1 and int(request.vars['month']) <=5:
+                    month=str(request.vars['month'])
+                else:
+                    messageError=T('Action not allowed')
+                    showLevel = False
+            else:
+                if int(request.vars['month']) >= 6 and int(request.vars['month']) <=12:
+                    month=str(request.vars['month'])
+                else:
+                    messageError=T('Action not allowed')
+                    showLevel = False
+
+
+    #Check if the roll is correct
+    if showLevel==True:
+        if request.vars['roll'] is None or request.vars['roll']=='':
+            messageError=T('Error. Unable to show the reporting level for lack of parameters.')
+            showLevel = False
+        else:
+            value = db(db.auth_group.role==str(request.vars['roll'])).select().first()
+            if value is None:
+                #Check if the log has a roll that is not register
+                value = db((db.validate_laboratory_log.yearp==period.yearp)&(db.validate_laboratory_log.period==T(period.period.name))&(db.validate_laboratory_log.project==project.name)&(db.validate_laboratory_log.roll==str(request.vars['roll']))).select(db.validate_laboratory_log.roll, distinct=True).first()
+                if value is None:
+                    messageError=T('Action not allowed')
+                    showLevel = False
+                else:
+                    roll=str(value.roll)
+            else:
+                roll=str(value.role)
+
+
+    #***************************************************************************************************************************************************************************************************************
+    #***************************************************************************************************************************************************************************************************************
+    #***************************************************************************************************************************************************************************************************************
+    #***************************************************************************************************************************************************************************************************************
+
+
+    #All the parameters are ok, start to build the report level 2
+    if showLevel==True:
+        from datetime import datetime
+        start = datetime.strptime(str(period.yearp) + '-' + month +'-01', "%Y-%m-%d")
+        if month=='12':
+            end = datetime.strptime(str(period.yearp+1) + '-' + '01-01', "%Y-%m-%d")
+        else:
+            end = datetime.strptime(str(period.yearp) + '-' + str(int(month)+1) +'-01', "%Y-%m-%d")
+        pass
+
+        #Users in the actual registers
+        tempUsers=[]
+        tempUsers2=[]
+        registerRol = db(db.auth_group.role==roll).select().first()
+        if registerRol is not None:
+            if ((roll=='Super-Administrator') or (roll=='Ecys-Administrator')):
+                for value in db((db.auth_membership.group_id==registerRol.id)).select(db.auth_membership.user_id, distinct=True):
+                    tempUsers.append(value.user_id.username)
+            else:
+                for value in db((db.auth_membership.group_id==registerRol.id)).select(db.auth_membership.user_id, distinct=True):
+                    tempUsers2.append(value.user_id)
+                for value in db((db.user_project.period==period.id)&(db.user_project.project==project.id)&(db.user_project.assigned_user.belongs(tempUsers2))).select(db.user_project.assigned_user, distinct=True):
+                    tempUsers.append(value.assigned_user.username)
+            pass
+        pass
+        #Check if the log has an username that is not register
+        for value in db((db.validate_laboratory_log.yearp==period.yearp)&(db.validate_laboratory_log.period==T(period.period.name))&(db.validate_laboratory_log.project==project.name)&(db.validate_laboratory_log.roll==roll)&(~db.validate_laboratory_log.user_name.belongs(tempUsers))).select(db.validate_laboratory_log.user_name, distinct=True):
+            tempUsers.append(value.user_name)
+        
+        vecUserRoleMonth=[]
+        for value in tempUsers:
+            optionSearch=[]
+            optionSearch.append(value)
+            if str(request.vars['tipo'])=='all' or str(request.vars['tipo'])=='i':
+                if session.search_laboratory_replacing_management == "" or session.search_laboratory_replacing_management is None:
+                    optionSearch.append(str(db((db.validate_laboratory_log.project==project.name)&(db.validate_laboratory_log.yearp==str(period.yearp))&(db.validate_laboratory_log.period==str(T(period.period.name)))&(db.validate_laboratory_log.date_log>=str(start))&(db.validate_laboratory_log.date_log<str(end))&(db.validate_laboratory_log.operation_log=='insert')&(db.validate_laboratory_log.validation_type==False)&(db.validate_laboratory_log.roll==roll)&(db.validate_laboratory_log.user_name==value)).count(db.validate_laboratory_log.id)))
+                else:
+                    optionSearch.append(str(db((db.validate_laboratory_log.project==project.name)&(db.validate_laboratory_log.yearp==str(period.yearp))&(db.validate_laboratory_log.period==str(T(period.period.name)))&(db.validate_laboratory_log.date_log>=str(start))&(db.validate_laboratory_log.date_log<str(end))&(db.validate_laboratory_log.operation_log=='insert')&(db.validate_laboratory_log.validation_type==False)&(db.validate_laboratory_log.roll==roll)&(db.validate_laboratory_log.user_name==value)&(db.validate_laboratory_log.academic.like('%'+str(session.search_laboratory_replacing_management)+'%'))).count(db.validate_laboratory_log.id)))
+                pass
+            if str(request.vars['tipo'])=='all' or str(request.vars['tipo'])=='u':
+                if session.search_laboratory_replacing_management == "" or session.search_laboratory_replacing_management is None:
+                    optionSearch.append(str(db((db.validate_laboratory_log.project==project.name)&(db.validate_laboratory_log.yearp==str(period.yearp))&(db.validate_laboratory_log.period==str(T(period.period.name)))&(db.validate_laboratory_log.date_log>=str(start))&(db.validate_laboratory_log.date_log<str(end))&(db.validate_laboratory_log.operation_log=='update')&(db.validate_laboratory_log.validation_type==False)&(db.validate_laboratory_log.roll==roll)&(db.validate_laboratory_log.user_name==value)).count(db.validate_laboratory_log.id)))
+                else:
+                    optionSearch.append(str(db((db.validate_laboratory_log.project==project.name)&(db.validate_laboratory_log.yearp==str(period.yearp))&(db.validate_laboratory_log.period==str(T(period.period.name)))&(db.validate_laboratory_log.date_log>=str(start))&(db.validate_laboratory_log.date_log<str(end))&(db.validate_laboratory_log.operation_log=='update')&(db.validate_laboratory_log.validation_type==False)&(db.validate_laboratory_log.roll==roll)&(db.validate_laboratory_log.user_name==value)&(db.validate_laboratory_log.academic.like('%'+str(session.search_laboratory_replacing_management)+'%'))).count(db.validate_laboratory_log.id)))
+                pass
+            if str(request.vars['tipo'])=='all' or str(request.vars['tipo'])=='d':
+                if session.search_laboratory_replacing_management == "" or session.search_laboratory_replacing_management is None:
+                    optionSearch.append(str(db((db.validate_laboratory_log.project==project.name)&(db.validate_laboratory_log.yearp==str(period.yearp))&(db.validate_laboratory_log.period==str(T(period.period.name)))&(db.validate_laboratory_log.date_log>=str(start))&(db.validate_laboratory_log.date_log<str(end))&(db.validate_laboratory_log.operation_log=='delete')&(db.validate_laboratory_log.validation_type==False)&(db.validate_laboratory_log.roll==roll)&(db.validate_laboratory_log.user_name==value)).count(db.validate_laboratory_log.id)))
+                else:
+                    optionSearch.append(str(db((db.validate_laboratory_log.project==project.name)&(db.validate_laboratory_log.yearp==str(period.yearp))&(db.validate_laboratory_log.period==str(T(period.period.name)))&(db.validate_laboratory_log.date_log>=str(start))&(db.validate_laboratory_log.date_log<str(end))&(db.validate_laboratory_log.operation_log=='delete')&(db.validate_laboratory_log.validation_type==False)&(db.validate_laboratory_log.roll==roll)&(db.validate_laboratory_log.user_name==value)&(db.validate_laboratory_log.academic.like('%'+str(session.search_laboratory_replacing_management)+'%'))).count(db.validate_laboratory_log.id)))
+                pass
+            vecUserRoleMonth.append(optionSearch)
+    return dict(showLevel=showLevel, project=project, tipo=tipo, month=month, vecUserRoleMonth=vecUserRoleMonth, roll=roll, messageError=messageError)
+
+
+
+#********************************************************
+#Management Report Equivalence laboratory level 5
+@auth.requires_login()
+@auth.requires(auth.has_membership('Teacher'))
+def laboratory_replacing_management_n4():
+    import cpfecys
+    #Obtain the current period of the system and all the register periods
+    period = cpfecys.current_year_period()
+    showLevel = True
+    project = None
+    tipo = None
+    month=None
+    roll=None
+    userr=None
+    vecAllUserRoleMonth=None
+    messageError=''
+
+    #Check if a search exist, verify that they are just numbers
+    if session.search_laboratory_replacing_management != "" and session.search_laboratory_replacing_management is not None:
+        if str(session.search_laboratory_replacing_management).isdigit()==False:
+            session.search_laboratory_replacing_management = ""
+            messageError=T('The lookup value is not allowed.')
+            showLevel = False
+
+    #Check the correct parameters
+    if request.vars['list'] =='False':
+        if request.vars['level'] =='5':
+            if request.vars['level_project'] is None or request.vars['level_project']=='':
+                messageError=T('Error. Unable to export the reporting level for lack of parameters.')
+                showLevel = False
+            else:
+                if request.vars['level_month'] is None or request.vars['level_month']=='':
+                    messageError=T('Error. Unable to export the reporting level for lack of parameters.')
+                    showLevel = False
+                else:
+                    if request.vars['level_tipo'] is None or request.vars['level_tipo']=='':
+                        messageError=T('Error. Unable to export the reporting level for lack of parameters.')
+                        showLevel = False
+                    else:
+                        if request.vars['level_rol'] is None or request.vars['level_rol']=='':
+                            messageError=T('Error. Unable to export the reporting level for lack of parameters.')
+                            showLevel = False
+                        else:
+                            if request.vars['level_user'] is None or request.vars['level_user']=='':
+                                messageError=T('Error. Unable to export the reporting level for lack of parameters.')
+                                showLevel = False
+                            else:
+                                redirect(URL('activity_control','laboratory_replacing_management_level_export',vars=dict(level=request.vars['level'],level_project=request.vars['level_project'],level_month=request.vars['level_month'],level_tipo=request.vars['level_tipo'],level_rol=request.vars['level_rol'],level_user=request.vars['level_user'])))
+        else:
+            messageError=T('Error. Unable to export the reporting level for lack of parameters.')
+            showLevel = False
+
+    #Check if the project is correct
+    if request.vars['tipo'] is None or request.vars['tipo']=='':
+        messageError=T('Error. Unable to export the reporting level for lack of parameters.')
+        showLevel = False
+    else:
+        if str(request.vars['tipo'])!='all' and str(request.vars['tipo'])!='i' and str(request.vars['tipo'])!='u' and str(request.vars['tipo'])!='d':
+            messageError=T('Error. Unable to export the reporting level for lack of parameters.')
+            showLevel = False
+        else:
+            tipo = str(request.vars['tipo'])
+
+
+    #Check if the project is correct
+    if request.vars['project'] is None or request.vars['project']=='':
+        messageError=T('Error. Unable to export the reporting level for lack of parameters.')
+        showLevel = False
+    else:
+        project = request.vars['project']
+        project = db(db.project.id==project).select().first()
+        if project is None:
+            messageError=T('Action not allowed')
+            showLevel = False
+
+
+    #Check if the user is assigned to the project
+    if project is None or tipo is None:
+        messageError=T('Error. Unable to export the reporting level for lack of parameters.')
+        showLevel = False
+    else:
+        if auth.has_membership('Teacher'):
+            course = db((db.user_project.assigned_user == auth.user.id) & (db.user_project.period == period.id) & (db.user_project.project==project.id)).select().first()
+            if course is None:
+                messageError=T('Action not allowed')
+                showLevel = False
+        else:
+            messageError=T('Action not allowed')
+            showLevel = False
+
+
+    #Check if the month is correct
+    if showLevel==True:
+        if request.vars['month'] is None or request.vars['month']=='':
+            messageError=T('Error. Unable to export the reporting level for lack of parameters.')
+            showLevel = False
+        else:
+            if period.period == 1:
+                if int(request.vars['month']) >= 1 and int(request.vars['month']) <=5:
+                    month=str(request.vars['month'])
+                else:
+                    messageError=T('Action not allowed')
+                    showLevel = False
+            else:
+                if int(request.vars['month']) >= 6 and int(request.vars['month']) <=12:
+                    month=str(request.vars['month'])
+                else:
+                    messageError=T('Action not allowed')
+                    showLevel = False
+
+
+    #Check if the roll is correct
+    if showLevel==True:
+        if request.vars['roll'] is None or request.vars['roll']=='':
+            messageError=T('Error. Unable to export the reporting level for lack of parameters.')
+            showLevel = False
+        else:
+            value = db(db.auth_group.role==str(request.vars['roll'])).select().first()
+            if value is None:
+                #Check if the log has a roll that is not register
+                value = db((db.validate_laboratory_log.yearp==period.yearp)&(db.validate_laboratory_log.period==T(period.period.name))&(db.validate_laboratory_log.project==project.name)&(db.validate_laboratory_log.roll==str(request.vars['roll']))).select(db.validate_laboratory_log.roll, distinct=True).first()
+                if value is None:
+                    messageError=T('Action not allowed')
+                    showLevel = False
+                else:
+                    roll=value
+            else:
+                roll=value.role
+
+    #Check if the user is correct
+    if showLevel==True:
+        if request.vars['userr'] is None or request.vars['userr']=='':
+            messageError=T('Error. Unable to export the reporting level for lack of parameters.')
+            showLevel = False
+        else:
+            flagCheck = False
+            #User Temp of auth_user where the username is equal
+            userr = db(db.auth_user.username==str(request.vars['userr'])).select().first()
+            if ((roll=='Super-Administrator') or (roll=='Ecys-Administrator')):
+                if userr is not None:
+                    #Check if the user has the rol specific
+                    userrT = db(db.auth_membership.user_id==userr.id).select()
+                    for tempUserCheck in userrT:
+                        if tempUserCheck.group_id.role==roll:
+                            flagCheck = True
+            else:
+                if userr is not None:
+                    #Check if the user has the rol specific
+                    userrT = db(db.auth_membership.user_id==userr.id).select()
+                    for tempUserCheck in userrT:
+                        if tempUserCheck.group_id.role==roll:
+                            if db((db.user_project.period==period.id)&(db.user_project.project==project.id)&(db.user_project.assigned_user==userr.id)).select().first() is not None:
+                                flagCheck = True
+
+            if flagCheck==False:
+                #Check if the log has a roll that is not register
+                userr = db((db.validate_laboratory_log.yearp==period.yearp)&(db.validate_laboratory_log.period==T(period.period.name))&(db.validate_laboratory_log.project==project.name)&(db.validate_laboratory_log.roll==roll)&(db.validate_laboratory_log.user_name==str(request.vars['userr']))).select().first()
+                if value is None:
+                    messageError=T('Action not allowed')
+                    showLevel = False
+                else:
+                    userr=userr.user_name
+            else:
+                userr=userr.username
+
+
+    #***************************************************************************************************************************************************************************************************************
+    #***************************************************************************************************************************************************************************************************************
+    #***************************************************************************************************************************************************************************************************************
+    #***************************************************************************************************************************************************************************************************************
+
+
+    #All the parameters are ok, start to build the report level 2
+    if showLevel==True:
+        from datetime import datetime
+        start = datetime.strptime(str(period.yearp) + '-' + month +'-01', "%Y-%m-%d")
+        if month=='12':
+            end = datetime.strptime(str(period.yearp+1) + '-' + '01-01', "%Y-%m-%d")
+        else:
+            end = datetime.strptime(str(period.yearp) + '-' + str(int(month)+1) +'-01', "%Y-%m-%d")
+        pass
+        
+        vecAllUserRoleMonth=[]
+        if str(request.vars['tipo'])=='all' or str(request.vars['tipo'])=='i':            
+            if session.search_laboratory_replacing_management == "" or session.search_laboratory_replacing_management is None:
+                vecAllUserRoleMonth.append(db((db.validate_laboratory_log.project==project.name)&(db.validate_laboratory_log.yearp==str(period.yearp))&(db.validate_laboratory_log.period==str(T(period.period.name)))&(db.validate_laboratory_log.date_log>=str(start))&(db.validate_laboratory_log.date_log<str(end))&(db.validate_laboratory_log.operation_log=='insert')&(db.validate_laboratory_log.validation_type==False)&(db.validate_laboratory_log.roll==roll)&(db.validate_laboratory_log.user_name==userr)).select())
+            else:
+                vecAllUserRoleMonth.append(db((db.validate_laboratory_log.project==project.name)&(db.validate_laboratory_log.yearp==str(period.yearp))&(db.validate_laboratory_log.period==str(T(period.period.name)))&(db.validate_laboratory_log.date_log>=str(start))&(db.validate_laboratory_log.date_log<str(end))&(db.validate_laboratory_log.operation_log=='insert')&(db.validate_laboratory_log.validation_type==False)&(db.validate_laboratory_log.roll==roll)&(db.validate_laboratory_log.user_name==userr)&(db.validate_laboratory_log.academic.like('%'+str(session.search_laboratory_replacing_management)+'%'))).select())
+            pass
+        if str(request.vars['tipo'])=='all' or str(request.vars['tipo'])=='u':
+            if session.search_laboratory_replacing_management == "" or session.search_laboratory_replacing_management is None:
+                vecAllUserRoleMonth.append(db((db.validate_laboratory_log.project==project.name)&(db.validate_laboratory_log.yearp==str(period.yearp))&(db.validate_laboratory_log.period==str(T(period.period.name)))&(db.validate_laboratory_log.date_log>=str(start))&(db.validate_laboratory_log.date_log<str(end))&(db.validate_laboratory_log.operation_log=='update')&(db.validate_laboratory_log.validation_type==False)&(db.validate_laboratory_log.roll==roll)&(db.validate_laboratory_log.user_name==userr)).select())
+            else:
+                vecAllUserRoleMonth.append(db((db.validate_laboratory_log.project==project.name)&(db.validate_laboratory_log.yearp==str(period.yearp))&(db.validate_laboratory_log.period==str(T(period.period.name)))&(db.validate_laboratory_log.date_log>=str(start))&(db.validate_laboratory_log.date_log<str(end))&(db.validate_laboratory_log.operation_log=='update')&(db.validate_laboratory_log.validation_type==False)&(db.validate_laboratory_log.roll==roll)&(db.validate_laboratory_log.user_name==userr)&(db.validate_laboratory_log.academic.like('%'+str(session.search_laboratory_replacing_management)+'%'))).select())
+            pass
+        if str(request.vars['tipo'])=='all' or str(request.vars['tipo'])=='d':
+            if session.search_laboratory_replacing_management == "" or session.search_laboratory_replacing_management is None:
+                vecAllUserRoleMonth.append(db((db.validate_laboratory_log.project==project.name)&(db.validate_laboratory_log.yearp==str(period.yearp))&(db.validate_laboratory_log.period==str(T(period.period.name)))&(db.validate_laboratory_log.date_log>=str(start))&(db.validate_laboratory_log.date_log<str(end))&(db.validate_laboratory_log.operation_log=='delete')&(db.validate_laboratory_log.validation_type==False)&(db.validate_laboratory_log.roll==roll)&(db.validate_laboratory_log.user_name==userr)).select())
+            else:
+                vecAllUserRoleMonth.append(db((db.validate_laboratory_log.project==project.name)&(db.validate_laboratory_log.yearp==str(period.yearp))&(db.validate_laboratory_log.period==str(T(period.period.name)))&(db.validate_laboratory_log.date_log>=str(start))&(db.validate_laboratory_log.date_log<str(end))&(db.validate_laboratory_log.operation_log=='delete')&(db.validate_laboratory_log.validation_type==False)&(db.validate_laboratory_log.roll==roll)&(db.validate_laboratory_log.user_name==userr)&(db.validate_laboratory_log.academic.like('%'+str(session.search_laboratory_replacing_management)+'%'))).select())
             pass
     return dict(showLevel=showLevel, project=project, tipo=tipo, month=month, vecAllUserRoleMonth=vecAllUserRoleMonth, roll=roll, userr=userr, messageError=messageError)
