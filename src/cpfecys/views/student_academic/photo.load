@@ -35,22 +35,30 @@
 	<a class="btn btn-danger" onclick="click_reject()">{{=T('Reject Photo')}}</a>
 {{elif request.vars['option'] == 'accept':}}
 	{{
-		review = db((db.photo_review.user_id == request.vars['id_user'])).select().first()
-		if review is None:
-			db.photo_review.insert(user_id = request.vars['id_user'], accepted = True, photo = db(db.auth_user.id==request.vars['id_user']).select(db.auth_user.photo).first().photo)
-		else:
-			db(db.photo_review.id==review.id).update(accepted=True)
+		try:
+			review = db((db.photo_review.user_id == request.vars['id_user'])).select().first()
+			if review is None:
+				db.photo_review.insert(user_id = request.vars['id_user'], accepted = True, photo = db(db.auth_user.id==request.vars['id_user']).select(db.auth_user.photo).first().photo)
+			else:
+				db(db.photo_review.id==review.id).update(accepted=True)
+			pass
+			response.flash = T('Photo has been accepted')
+		except:
+			None
 		pass
-		response.flash = T('Photo has been accepted')
 	}}
 {{elif request.vars['option'] == 'reject':}}
 	{{
-		review = db((db.photo_review.user_id == request.vars['id_user'])).select().first()
-		if review is None:
-			db.photo_review.insert(user_id = request.vars['id_user'], accepted = False, photo = db(db.auth_user.id==request.vars['id_user']).select(db.auth_user.photo).first().photo )
-		else:
-			db(db.photo_review.id==review.id).update(accepted=False)
+		try:
+			review = db((db.photo_review.user_id == request.vars['id_user'])).select().first()
+			if review is None:
+				db.photo_review.insert(user_id = request.vars['id_user'], accepted = False, photo = db(db.auth_user.id==request.vars['id_user']).select(db.auth_user.photo).first().photo )
+			else:
+				db(db.photo_review.id==review.id).update(accepted=False)
+			pass
+			response.flash = T('Photo has been rejected')
+		except:
+			None
 		pass
-		response.flash = T('Photo has been rejected')
 	}}
 {{pass}}

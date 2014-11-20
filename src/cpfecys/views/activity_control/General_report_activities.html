@@ -1,4 +1,5 @@
 {{extend 'template.html'}}
+{{activityPermition=db((db.course_requirement.semester==year.id)&(db.course_requirement.project==project.id)&(db.course_requirement.teacher_permition==True)).count()}}
 <div class="navbar navbar-fixed-bottom ">
     <div class="navbar-inner">
         <a class="brand" href="#">
