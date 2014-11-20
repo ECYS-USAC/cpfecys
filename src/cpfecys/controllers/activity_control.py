@@ -2093,7 +2093,7 @@ def oncreate_validate_laboratory(form):
         usr2 = db((db.validate_laboratory.id != form.vars.id) & (db.validate_laboratory.semester == request.vars['year']) & (db.validate_laboratory.project == request.vars['project']) & (db.validate_laboratory.carnet == form.vars.carnet)).select().first()
         if usr2 is not None:
             db(db.validate_laboratory.id==form.vars.id).delete()
-            session.flash = T('Error. There is a registration renewal or replacement laboratory student in the course.')
+            session.flash = T('Error. There is a registration renewal or equivalence laboratory student in the course.')
         else:
             academic_s = db(db.academic.id==form.vars.carnet).select().first()
             db.validate_laboratory_log.insert(user_name = auth.user.username,
