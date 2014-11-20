@@ -120,8 +120,32 @@ def user():
     to decorate functions that need access control
     """
     if request.args(0) == 'profile':
-        if auth.has_membership('Super-Administrator') == False:
+        if ((auth.has_membership('Super-Administrator') == False) & (auth.has_membership('Teacher') == False) & (auth.has_membership('Ecys-Administrator') == False)):
+            db.auth_user.first_name.writable = False
+            db.auth_user.last_name.writable = False
             db.auth_user.username.writable = False
+
+            db.auth_user.email.writable = False
+
+            import cpfecys
+            currentyear_period = cpfecys.current_year_period()
+
+            for date_var in db((db.student_control_period.period_name==T(str(currentyear_period.period.name))+" "+str(currentyear_period.yearp))).select():
+                var_date_finish = date_var.date_finish
+                from datetime import datetime
+                if datetime.now() > date_var.date_start and datetime.now() < var_date_finish:
+                    db.auth_user.email.writable = True
+                pass
+            pass          
+
+            db.auth_user.photo.writable = True
+            review = db((db.photo_review.user_id == auth.user.id)).select().first()
+            if review is not None:
+                if review.accepted == True:
+                    db.auth_user.photo.writable = False
+                pass
+            pass
+        pass            
     pass
     return dict(form=auth())
 
