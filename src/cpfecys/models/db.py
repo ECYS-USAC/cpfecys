@@ -1123,8 +1123,12 @@ def split_num(var):
 ##############################AUTH_USER TRIGGERS####################################
 def auth_user_update(*args):    
     try:
-        academic_var = db.academic(db.academic.carnet==args[0]['username'])
+        academic_var = db.academic(db.academic.id_auth_user==str(int(split_num(args[1]))))
+        if academic_var == None:
+            academic_var = db.academic(db.academic.carnet==args[0]['username'])
+            
         db(db.academic.id == academic_var.id).update(id_auth_user = str(int(split_num(args[1]))),
+                                                    carnet = str(args[0]['username']),
                                                     email = str(args[0]['email']))
         #log
         import cpfecys
@@ -1132,7 +1136,7 @@ def auth_user_update(*args):
         db.academic_log.insert(user_name = 'system',
                         roll = 'system',
                         operation_log = 'update', 
-                        before_carnet = args[0]['username'],
+                        before_carnet = academic_var.carnet,
                         before_email = academic_var.email,
                         after_carnet = args[0]['username'],
                         after_email = str(args[0]['email']),
