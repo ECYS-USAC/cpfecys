@@ -1889,6 +1889,7 @@
 'To consider assignation to be valid, report grades should be above: ': 'Para considerar la asignación como válida, las notas de reporte deben ser mayores a:',
 'To send message to DSI users, No course must be selected': 'Para enviar mensaje a usuarios de DSI únicamente ningun curso debe estar seleccionado',
 'too short': 'muy corto',
+'Too short': 'Too short',
 'total': '',
 'Total': 'Total',
 'Total Activities': 'Total Activities',

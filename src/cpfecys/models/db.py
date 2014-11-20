@@ -38,9 +38,9 @@ def zip(self, request, files, db, chunk_size= \
     import zipfile
     import os
     import re
-    #print request.args[-1]
+    
     dst = os.path.join(request.folder,'private',request.args[-1])
-    #print dst
+    
     zf = zipfile.ZipFile(dst, "w")
     i = 0
     for name in files:
@@ -57,8 +57,7 @@ def zip(self, request, files, db, chunk_size= \
         try:
             (filename, stream) = field.retrieve(name)
             stream.close()
-            #print filename
-            #print stream.name
+            
             zf.write(stream.name, (str(i)+filename))
         except IOError:
             raise HTTP(404)
@@ -1074,7 +1073,7 @@ def check_student(check_carnet):
 
             #PREPARE FOR RETURNED XML WEB SERVICE
             xml = back.as_xml()
-            print xml
+            
             xml=xml.replace('&lt;','<')
             xml=xml.replace('&gt;','>')
             inicio = xml.find("<"+svp.receive+">")
@@ -1169,6 +1168,8 @@ def academic_delete(*args):
             academic_var = db.auth_group(db.auth_group.role=='Academic')
             membership_var = db.auth_membership((db.auth_membership.user_id==user_var.id) & (db.auth_membership.group_id==academic_var.id))
             db(db.auth_membership.id==membership_var.id).delete()
+            if db(db.auth_membership.user_id==academic_var.id).select().first() is None:
+                db(db.auth_user.id==user_var.id).delete()
     except:
         None
 
@@ -1181,28 +1182,29 @@ def academic_insert(*args):
     if user_var is None:
         #WEBSERVICE
         web_service = check_student(str(args[0]['carnet']))
-        
-        if web_service['flag'] == True:
-            print "erooooooooooooooooooooooooo 1"
-            print "erooooooooooooooooooooooooo 1" + str(web_service['nombres'])
-            print "erooooooooooooooooooooooooo 1" + str(web_service['apellidos'])
-            print "erooooooooooooooooooooooooo 1" + str(web_service['correo'])
-            print "erooooooooooooooooooooooooo 1" + str(args[0]['carnet'])
-            
+        if auth.has_membership('Super-Administrator'):
+            id_user = db.auth_user.insert(first_name = str(args[0]['carnet']),
+                        last_name =  " ",
+                        email = str(args[0]['email']),
+                        username = str(args[0]['carnet']),
+                        phone = '12345678',
+                        home_address = T('Enter your address'))
+            #Add the id_auth_user to academic.
+            db(db.academic.id == args[1]['id']).update(id_auth_user = id_user.id)
+            #Create membership to academic
+            db.auth_membership.insert(user_id = id_user.id, group_id =  academic_var.id)   
 
+        elif web_service['flag'] == True:
             id_user = db.auth_user.insert(first_name = web_service['nombres'],
                         last_name =  web_service['apellidos'],
                         email = web_service['correo'],
                         username = str(args[0]['carnet']),
                         phone = '12345678',
                         home_address = T('Enter your address'))
-            print "erooooooooooooooooooooooooo 5"
             #Add the id_auth_user to academic.
             db(db.academic.id == args[1]['id']).update(id_auth_user = id_user.id)
-            print "erooooooooooooooooooooooooo 6"
             #Create membership to academic
             db.auth_membership.insert(user_id = id_user.id, group_id =  academic_var.id)   
-            print "erooooooooooooooooooooooooo 7"
         else:
 
             if session.academic_update != None:
@@ -1232,7 +1234,10 @@ def academic_insert(*args):
                             before_carnet = str(args[0]['carnet']), 
                             before_email = str(args[0]['email']), 
                             id_period = str(currentyear_period.id),
-                            description = T('The record was removed because it failed the webservice validation'))   
+                            description = T('The record was removed because it failed the webservice validation')) 
+            pass
+        pass
+
     else:
         membership_var = db.auth_membership((db.auth_membership.user_id==user_var.id) & (db.auth_membership.group_id==academic_var.id))
         if membership_var is None:
