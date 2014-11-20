@@ -107,6 +107,7 @@ data-toggle="tab">
             $(input1Str).insertAfter("#w2p_keywords");
           }); 
         </script>
+        <a class="btn btn-info" href="{{=URL('student_academic','academic')}}">{{=T('General List of Academic')}}</a>
         <a class="btn btn-success" href="{{=URL(vars=dict(listado='True'))}}">{{=T('Create Assistance List')}}</a>
         <a class="btn btn-warning" href="{{=(URL('student_academic','attendance_list',vars=dict(list='true',project=check.project,period=currentyear_period.id)))}}">{{=T('Create profiles for academic')}}</a>
           {{=grid}}
@@ -126,19 +127,41 @@ data-toggle="tab">
           <table >
             <tr>
               <td align="left">
-              <input name="_formname" type="hidden" value="update_form">
-              <input name="academic_id" type="hidden" id="academic_id">
-              <label>{{=T('Carnet')}}:</label>
-              <input class="string" name="academic_carnet" type="text" value="" id="academic_carnet">
-              <input class="string" name="academic_carnet2" type="hidden" value="" id="academic_carnet2">
-              <label>{{=T('Email')}}:</label>
-              <input class="string" name="academic_email" type="text" value="" id="academic_email">
-              <input class="string" name="academic_email2" type="hidden" value="" id="academic_email2">
-              <label>{{=T('Delete')}}&nbsp &nbsp<input type="checkbox" name="delete_check" onclick="delete_checked(this)" id="delete_check"></label>              
-            </td>
+                <input name="_formname" type="hidden" value="update_form">
+                <input name="assignation_id" type="hidden" id="assignation_id">
+                <input name="academic_carnet" type="hidden" id="academic_carnet">
+                <input name="laboratory_before" type="hidden" id="laboratory_before">
+
+                <label><b>{{=T('Carnet')}}:</label>
+              </td>
+              <td>
+                <label id="lcarnet"></label>
+              </td>
+            </tr>
+            <tr>
+              <td>
+                <label><b>{{=T('Email')}}:</b></label>
+              </td>
+              <td>
+                <label id="lemail"></label>
+              </td>
+            </tr>
+            <tr>
+              <td>
+                <label><b>{{=T('Laboratory')}}:</b></label>
+              </td>
+              <td>
+                <input type="checkbox" name="laboratory_check" id="laboratory_check"></label>
+              </td>
+            </tr>
+            <tr>
+              <td colspan="2">
+                <br>
+                <label>{{=T('Delete')}}&nbsp &nbsp<input type="checkbox" name="delete_check" onclick="delete_checked(this)" id="delete_check"></label>              
+              </td>
           </tr>
           <tr >
-            <td >
+            <td colspan="2">
             <div align="right"> 
               <input type="submit" class="btn btn-primary" value="{{=T('Edit')}}" id="button_action">
               <button class="btn" data-dismiss="modal" aria-hidden="true">{{=T('Close')}}</button>
@@ -159,12 +182,19 @@ data-toggle="tab">
   $(document).ready(function(){   
 
   })
-  function set_values(id,carnet,email){      
-      document.getElementById('academic_id').value = id;
+  function set_values(id,carnet,email,laboratory){   
+      document.getElementById('lcarnet').innerHTML = carnet;   
+      document.getElementById('lemail').innerHTML = email;   
+      document.getElementById('assignation_id').value = id;
       document.getElementById('academic_carnet').value = carnet;
-      document.getElementById('academic_carnet2').value = carnet;
-      document.getElementById('academic_email').value = email;
-      document.getElementById('academic_email2').value = email;
+      document.getElementById('laboratory_before').value = laboratory;
+      
+      if (laboratory=='True'){
+        $("#laboratory_check").attr("checked", true);
+      }else{
+        $("#laboratory_check").attr("checked", false);
+      }
+      
   }
   function delete_checked(object) {
       if(object.checked == true){   

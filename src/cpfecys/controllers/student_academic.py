@@ -286,10 +286,9 @@ def academic_assignation():
 
     #update form start
     update_form = FORM(INPUT(_name='academic_carnet',_type='text'),
-                        INPUT(_name='academic_carnet2',_type='text'),
-                        INPUT(_name='academic_email',_type='text'),
-                        INPUT(_name='academic_email2',_type='text'),
-                        INPUT(_name='academic_id',_type='text'),
+                        INPUT(_name='laboratory_check',_type='checkbox'),
+                        INPUT(_name='assignation_id',_type='text'),
+                        INPUT(_name='laboratory_before',_type='text'),                        
                         INPUT(_name='delete_check',_type='checkbox'))
 
     if update_form.accepts(request.vars,formname='update_form'):
@@ -305,33 +304,64 @@ def academic_assignation():
                 else:
                    roll_var = roll_var + ',' + a.group_id.role
 
-            if update_form.vars.delete_check:
-                db(db.academic.id==update_form.vars.academic_id).delete()
-                db.academic_log.insert(user_name = auth.user.username, 
-                                roll =  str(roll_var), 
-                                operation_log = 'delete', 
-                                before_carnet = update_form.vars.academic_carnet, 
-                                before_email = update_form.vars.academic_email, 
-                                id_period = str(currentyear_period.id),
-                                description = T('Registration is removed from the page students'))
-                response.flash = T('Deleted register.')
+            if update_form.vars.laboratory_check == 'on':
+                var_labo =  True
             else:
-                if ( update_form.vars.academic_carnet is "" ) or ( update_form.vars.academic_email is ""):
-                    response.flash = T('You must enter all fields.')
-                else: 
-                    db(db.academic.id==update_form.vars.academic_id).update(carnet=update_form.vars.academic_carnet,email=update_form.vars.academic_email)
-                    db.academic_log.insert(user_name = auth.user.username, 
+                var_labo =  False
+
+            if update_form.vars.delete_check:
+                var_aca = db(db.academic_course_assignation.id==update_form.vars.assignation_id).select().first()
+                if db(db.grades.academic_assignation==update_form.vars.assignation_id).select().first() is None:
+                    db(db.academic_course_assignation.id==update_form.vars.assignation_id).delete()
+                    
+                    db.academic_course_assignation_log.insert(user_name = auth.user.username, 
+                                                            roll =  str(roll_var), 
+                                                            operation_log = 'delete', 
+                                                            before_carnet = update_form.vars.academic_carnet, 
+                                                            before_course = var_aca.assignation.name,
+                                                            before_year = var_aca.semester.yearp,
+                                                            before_semester = var_aca.semester.period.name,
+                                                            before_laboratory = str(var_labo),
+                                                            id_period = str(currentyear_period.id),
+                                                            description = T('Registration is removed from the page students'))
+                    response.flash = T('Deleted register.')
+                else:
+                    response.flash = T('Can not be deleted because it has grades associated')
+            else:
+                if update_form.vars.laboratory_before != str(var_labo):
+                    var_aca = db(db.academic_course_assignation.id==update_form.vars.assignation_id).select().first()
+
+                    dont_delete = False
+
+                    if var_labo == False:
+                        grades = db(db.grades.academic_assignation==var_aca.id).select()
+                        for g in grades:
+                            if g.activity.laboratory == True:
+                                dont_delete = True
+
+                    if dont_delete == False:
+                        db(db.academic_course_assignation.id==update_form.vars.assignation_id).update(laboratorio=var_labo)
+
+                        db.academic_course_assignation_log.insert(user_name = auth.user.username, 
                                                 roll =  roll_var, 
                                                 operation_log = 'update', 
-                                                before_carnet = update_form.vars.academic_carnet2, 
-                                                before_email = update_form.vars.academic_email2, 
-                                                after_carnet = update_form.vars.academic_carnet, 
-                                                after_email = update_form.vars.academic_email, 
-                                                id_academic = update_form.vars.academic_id, 
+                                                before_carnet = str(var_aca.carnet.carnet), 
+                                                before_course = var_aca.assignation.name,
+                                                before_year = str(var_aca.semester.yearp),
+                                                before_semester = var_aca.semester.period.name,
+                                                before_laboratory = update_form.vars.laboratory_before,
+                                                after_carnet = str(var_aca.carnet.carnet), 
+                                                after_course = var_aca.assignation.name,
+                                                after_year = str(var_aca.semester.yearp) ,
+                                                after_semester = var_aca.semester.period.name,
+                                                after_laboratory = str(var_labo),
+                                                id_academic_course_assignation = update_form.vars.assignation_id,
                                                 id_period = str(currentyear_period.id),
-                                                description = T('Registration modified from the page from students'))    
-        
-                    response.flash = T('Updated register.')
+                                                description = T('Registration modified from the page from students')) 
+    
+                        response.flash = T('Updated register.')
+                    else:
+                        response.flash = T('Can not be modify because it has grades associated')
         except:
             response.flash = T('Error.')
     #update form finish
@@ -348,21 +378,22 @@ def academic_assignation():
         _title=T('Edit academic information') ,**{"_data-toggle":"modal", "_data-target": "#picModal"})]   
         
 
-    links += [lambda row: A(T('Edit academic'), 
-        _role='button', 
-        _class='btn btn-info', 
-        _onclick='set_values('+str(row.carnet)+','\
-            +str( db(db.academic.id==int(row.carnet)).select(db.academic.carnet).first().carnet )+','\
-            +'"'+str( db(db.academic.id==int(row.carnet)).select(db.academic.email).first().email )+'")', 
-        _title=T('Edit academic information')+' '+str( db(db.academic.id==int(row.carnet)).select(db.academic.carnet).first().carnet ) ,**{"_data-toggle":"modal", "_data-target": "#attachModal"})]
+    if (request.vars['year_period'] is None) or (str(request.vars['year_period']) == str(cpfecys.current_year_period().id)):
+        links += [lambda row: A(T('Edit assignation'), 
+            _role='button', 
+            _class='btn', 
+            _onclick='set_values('+str(row.id)+','\
+                +str( db(db.academic.id==int(row.carnet)).select(db.academic.carnet).first().carnet )+','\
+                +'"'+str( db(db.academic.id==int(row.carnet)).select(db.academic.email).first().email )+'",'\
+                +'"'+str(row.laboratorio)+'")', 
+            _title=T('Edit academic information')+' '+str( db(db.academic.id==int(row.carnet)).select(db.academic.carnet).first().carnet ) ,**{"_data-toggle":"modal", "_data-target": "#attachModal"})]
+        
     links += [lambda row: A('   ',
         _role='label')]
-    links += [lambda row: A(T('Assignation:'),
-        _role='label',
-        _title=T('Edit or delete academic assignation')+' '+str( db(db.academic.id==int(row.carnet)).select(db.academic.carnet).first().carnet ) )]
+   
     
     if (currentyear_period.id == cpfecys.current_year_period().id):
-        grid = SQLFORM.grid(query, details=False, fields=fields, links=links, oncreate=oncreate_academic_assignation, onupdate=onupdate_academic_assignation, ondelete=ondelete_academic_assignation, csv=False)
+        grid = SQLFORM.grid(query, details=False, fields=fields, links=links, oncreate=oncreate_academic_assignation, onupdate=onupdate_academic_assignation, ondelete=ondelete_academic_assignation, csv=False, deletable=False, editable=False,)
     else:
         checkProject = db((db.user_project.project == check.project) & (db.user_project.assigned_user==check.assigned_user) & (db.user_project.period==currentyear_period.id)).select()
         b=0
