@@ -13,84 +13,157 @@
 
 	{{for category_var in db((db.course_activity_category.assignation == request.vars['project']) &(db.course_activity_category.semester== request.vars['period'])&(db.course_activity_category.laboratory==laboratory_var)).select() :}}
 		{{if category_var.category.category != 'Laboratorio':}}
-			{{average=float(0)}}
-			{{total_activity=float(0)}}
-			{{num_activity=0}}
-			{{matrix_specific_grade = []}}
-			{{activity_grade_total=float(0)}}
-			{{for activity_var in db((db.course_activity.course_activity_category == category_var.id)).select() :}}	
-				{{if request.vars['op'] !='1':}}
-					{{total_grades = db(db.grades.activity==activity_var.id).count()}}
-				{{else:}}
-					{{#total_grades = db((db.grades.activity==activity_var.id)&(db.grades.academic_assignation == request.vars['academic'])).count()}}
+			{{dont_pass = False}}
+			{{if category_var.category.category == 'Examen Final':
+				course_first_recovery_test_var = None
+				course_second_recovery_test_var = None
+				academic_assig = None
+				try:
+					academic_assig = db(db.academic_course_assignation.id == request.vars['academic'] ).select().first()
+					course_first_recovery_test_var = db((db.course_first_recovery_test.carnet == academic_assig.carnet) & (db.course_first_recovery_test.semester == academic_assig.semester) & (db.course_first_recovery_test.project == academic_assig.assignation)).select().first()
+					try:
+						course_second_recovery_test_var = db((db.course_second_recovery_test.carnet == academic_assig.carnet) & (db.course_second_recovery_test.semester == academic_assig.semester) & (db.course_second_recovery_test.project == academic_assig.assignation)).select().first()
+					except:
+						None
+					pass
+				except:
+					None
+				pass
 
-					{{total_grades = db(db.grades.activity==activity_var.id).count()}}
+				if academic_assig is not None:
+					final_grade = 0
+					if course_second_recovery_test_var is not None:
+						final_grade = float(course_second_recovery_test_var.grade)
+						dont_pass = True
+					pass
+					if course_first_recovery_test_var is not None:
+						if float(course_first_recovery_test_var.grade) > float(final_grade):
+							final_grade = float(course_first_recovery_test_var.grade)
+							dont_pass = True
+						pass
+					pass
 					
-				{{pass}}
-				{{if total_grades != 0:}}
-					
-					{{if request.vars['op'] !='1':}}
-						{{averageA = db.executesql('select avg(grade) as average from grades where activity='+str(activity_var.id)+';',as_dict=True)}}
-						{{for d0 in averageA:}}
-							{{if d0['average']!=None:}}
-								{{average=float(d0['average'])}}
-							{{pass}}
-						{{pass}}
-					{{else:}}
-						{{averageA = db((db.grades.activity==activity_var.id)&(db.grades.academic_assignation == request.vars['academic'])).select().first()}}
-						{{if averageA!=  None:}}
-							{{average=float(averageA.grade)}}
-						{{else:}}
-							{{average=float(00.001)}}
-						{{pass}}
+					activity_var = db((db.course_activity.course_activity_category == category_var.id)).select().first()
+					try:
+						grade_var = db((db.grades.activity==activity_var.id)&(db.grades.academic_assignation == academic_assig.id)).select().first()
+						if float(grade_var.grade) > float(final_grade):
+							final_grade = float(grade_var.grade)
+							dont_pass = True
+						pass 
+					except:
+						None
+					pass
 
-					{{pass}}
+					temp_vect = []
+					temp_vect.append(final_grade)
+					temp_vect.append(float(category_var.grade))
+					matrix_category.append(temp_vect)
+					category_grade_total = category_grade_total + category_var.grade
+					num_category = num_category + 1
+				pass
 
-					{{if category_var.specific_grade==False:}}
-						{{total_activity=total_activity+average}}
-					{{else:}}
-						{{temp_vect2 = []}}
-						{{temp_vect2.append(average*(float(activity_var.grade))/100)}}
-						{{temp_vect2.append(float(activity_var.grade))}}
-						{{matrix_specific_grade.append(temp_vect2)}}
-						{{activity_grade_total=activity_grade_total+float(activity_var.grade)}}
-					{{pass}} {{#-------if-category_var.specific_grade==False}}
-					{{num_activity=num_activity+1}}
-				{{pass}} {{#-------if total_grades != 0}}
 				
-			{{pass}} {{#-------for-activity_var}}
-			{{try:}}
-				{{if category_var.specific_grade==False:}}
-					{{temp_vect = []}}
+			pass
+			if dont_pass == False:}}
+
+				{{average=float(0)}}
+				{{total_activity=float(0)}}
+				{{num_activity=0}}
+				{{matrix_specific_grade = []}}
+				{{activity_grade_total=float(0)}}
+				{{for activity_var in db((db.course_activity.course_activity_category == category_var.id)).select() :}}	
+					{{if request.vars['op'] !='1':}}
+						{{total_grades = db(db.grades.activity==activity_var.id).count()}}
+					{{else:}}
+						{{#total_grades = db((db.grades.activity==activity_var.id)&(db.grades.academic_assignation == request.vars['academic'])).count()}}
+
+						{{total_grades = db(db.grades.activity==activity_var.id).count()}}
+						
+					{{pass}}
+					{{if total_grades != 0:}}
+						
+						{{if request.vars['op'] !='1':}}
+							{{averageA = db.executesql('select avg(grade) as average from grades where activity='+str(activity_var.id)+';',as_dict=True)}}
+							{{for d0 in averageA:}}
+								{{if d0['average']!=None:}}
+									{{average=float(d0['average'])}}
+								{{pass}}
+							{{pass}}
+						{{else:}}
+							{{averageA = db((db.grades.activity==activity_var.id)&(db.grades.academic_assignation == request.vars['academic'])).select().first()}}
+							{{if averageA!=  None:}}
+								{{average=float(averageA.grade)}}
+							{{else:}}
+								{{average=float(00.001)}}
+							{{pass}}
+
+						{{pass}}
+
+						{{if category_var.specific_grade==False:}}
+							{{total_activity=total_activity+average}}
+						{{else:}}
+							{{temp_vect2 = []}}
+							{{temp_vect2.append(average*(float(activity_var.grade))/100)}}
+							{{temp_vect2.append(float(activity_var.grade))}}
+							{{matrix_specific_grade.append(temp_vect2)}}
+							{{activity_grade_total=activity_grade_total+float(activity_var.grade)}}
+						{{pass}} {{#-------if-category_var.specific_grade==False}}
+						{{num_activity=num_activity+1}}
+					{{pass}} {{#-------if total_grades != 0}}
 					
-					{{temp_vect.append((total_activity)/(num_activity)) }}
-					{{temp_vect.append(float(category_var.grade)) }}
-					{{matrix_category.append(temp_vect) }}
-					{{if total_activity != 0:}}
-						{{category_grade_total = category_grade_total + category_var.grade}}
-					{{pass}}
-				{{else:}}
-					{{temp_vect = []}}
-					{{for var_x in matrix_specific_grade: }}
-						{{total_activity = total_activity+((var_x[0])*float(category_var.grade)/(activity_grade_total))}}
-
-					{{pass}}
-
-					{{if total_activity != 0:}}
-						{{temp_vect.append(total_activity*100/float(category_var.grade)) }}
+				{{pass}} {{#-------for-activity_var}}
+				{{try:}}
+					{{if category_var.specific_grade==False:}}
+						{{temp_vect = []}}
+						
+						{{temp_vect.append((total_activity)/(num_activity)) }}
 						{{temp_vect.append(float(category_var.grade)) }}
 						{{matrix_category.append(temp_vect) }}
-						{{category_grade_total = category_grade_total + category_var.grade}}
-					{{pass}}
-				{{pass}}
+						{{if total_activity != 0:}}
+							{{category_grade_total = category_grade_total + category_var.grade}}
+						{{pass}}
+					{{else:}}
+						{{temp_vect = []}}
+						{{for var_x in matrix_specific_grade: }}
+							{{total_activity = total_activity+((var_x[0])*float(category_var.grade)/(activity_grade_total))}}
 
-			{{except:}}
+						{{pass}}
+
+						{{if total_activity != 0:}}
+							{{temp_vect.append(total_activity*100/float(category_var.grade)) }}
+							{{temp_vect.append(float(category_var.grade)) }}
+							{{matrix_category.append(temp_vect) }}
+							{{category_grade_total = category_grade_total + category_var.grade}}
+						{{pass}}
+					{{pass}}
+
+				{{except:}}
+					{{None}}
+				{{pass}}
 				
+				{{num_category = num_category + 1}}
+
 			{{pass}}
-			
-			{{num_category = num_category + 1}}
+		
 		{{else:}}
-			{{if average_laboratory != 0:}}
+			{{
+			validate_laboratory_var = None
+			try:
+				academic_assig = db(db.academic_course_assignation.id == request.vars['academic'] ).select().first()
+				validate_laboratory_var = db((db.validate_laboratory.carnet == academic_assig.carnet) & (db.validate_laboratory.semester == academic_assig.semester) & (db.validate_laboratory.project == academic_assig.assignation)).select().first()
+			except:
+				None
+			pass
+			
+			}}
+
+			{{if validate_laboratory_var is not None:}}
+				{{temp_vect = []}}
+				{{temp_vect.append(validate_laboratory_var.grade) }}
+				{{temp_vect.append(float(category_var.grade)) }}
+				{{matrix_category.append(temp_vect) }}
+				{{category_grade_total = category_grade_total + category_var.grade}}
+			{{elif average_laboratory != 0:}}
 				{{temp_vect = []}}
 				{{temp_vect.append(average_laboratory) }}
 				{{temp_vect.append(float(category_var.grade)) }}

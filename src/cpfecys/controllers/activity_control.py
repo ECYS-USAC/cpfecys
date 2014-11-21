@@ -356,8 +356,8 @@ def courses_list():
         redirect(URL('default','index'))
 
 
-
-    return dict(coursesAdmin = coursesAdmin, countcoursesAdminT=countcoursesAdminT, coursesStudent=coursesStudent, coursesStudentT=coursesStudentT, split_name=split_name, split_section=split_section, periods=periods,period=period,periodo=period, currentyear_period = cpfecys.current_year_period())
+    visited = db((db.page_visited.user_id == auth.user.id) & (db.page_visited.page_name == 'courses_list')).select().first()
+    return dict(visited = visited, coursesAdmin = coursesAdmin, countcoursesAdminT=countcoursesAdminT, coursesStudent=coursesStudent, coursesStudentT=coursesStudentT, split_name=split_name, split_section=split_section, periods=periods,period=period,periodo=period, currentyear_period = cpfecys.current_year_period())
 
 
 @auth.requires_login()

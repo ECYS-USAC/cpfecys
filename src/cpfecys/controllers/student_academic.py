@@ -983,8 +983,7 @@ def oncreate_academic(form):
                                 id_period = str(currentyear_period.id),
                                 description = 'Se agrego registro desde la pagina agregar estudiantes.')
 
-    #Probar funcion
-    check_student(form.vars.carnet)
+    
 
 
 
