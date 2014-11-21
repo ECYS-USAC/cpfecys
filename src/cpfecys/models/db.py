@@ -1088,22 +1088,80 @@ def check_student(check_carnet):
             NOMBRES = xml.NOMBRES
             APELLIDOS= xml.APELLIDOS
             CORREO = xml.CORREO
+
+            #Unicode Nombres
+            try:
+                str(NOMBRES)
+            except:
+                apellidos_var = unicode(NOMBRES).split(' ')
+                appellidos_return = None
+                for apellido in apellidos_var:                
+                    try:
+                        if appellidos_return is None:
+                            appellidos_return = str(apellido)
+                        else:                        
+                            appellidos_return = appellidos_return + " " + str(apellido)
+                    except:          
+                        try:
+
+                            temp = unicode(apellido).encode('utf-8').replace('Ã¡','á').replace('Ã©','é').replace('Ã­','í').replace('Ã³','ó').replace('Ãº','ú').replace('Ã±','ñ')
+                        except:
+                            None
+
+                        apellido = temp
+                        if appellidos_return is None:
+                            appellidos_return = str(apellido)
+                        else:                        
+                            appellidos_return = appellidos_return + " " + str(apellido)
+                        
+                NOMBRES = appellidos_return
+            #Unicode APELLIDOS
+            try:
+                str(APELLIDOS)
+            except:
+                apellidos_var = unicode(APELLIDOS).split(' ')
+                appellidos_return = None
+                for apellido in apellidos_var:                
+                    try:
+                        if appellidos_return is None:
+                            appellidos_return = str(apellido)
+                        else:                        
+                            appellidos_return = appellidos_return + " " + str(apellido)
+                    except:          
+                        try:
+
+                            temp = unicode(apellido).encode('utf-8').replace('Ã¡','á').replace('Ã©','é').replace('Ã­','í').replace('Ã³','ó').replace('Ãº','ú').replace('Ã±','ñ')
+                        except:
+                            None
+
+                        apellido = temp
+                        if appellidos_return is None:
+                            appellidos_return = str(apellido)
+                        else:                        
+                            appellidos_return = appellidos_return + " " + str(apellido)
+                        
+                APELLIDOS = appellidos_return
+
+
+            
+
             if (CARNET is None or CARNET=='') and (NOMBRES is None or NOMBRES=='') and (APELLIDOS is None or APELLIDOS=='') and (CORREO is None or CORREO==''):
-                return dict(flag=False)
+                return dict(flag=False,error=False,message=T('The record was removed because the user is not registered to the academic cycle'))
             else:
                 isStuden=False
                 for c in root.findall('CARRERA'):
-                    if c.find('UNIDAD').text=="08" and c.find('EXTENSION').text=="00" and (c.find('CARRERA').text=="05" or c.find('CARRERA').text=="09"):
+                    if c.find('UNIDAD').text=="08" and c.find('EXTENSION').text=="00" and (c.find('CARRERA').text=="05" or c.find('CARRERA').text=="09" or c.find('CARRERA').text=="07"):
                         isStuden=True
 
                 if isStuden==False:
-                    return dict(flag=False)
+                    return dict(flag=False,error=False,message=T('The record was removed because students not enrolled in career allowed to use the system'))
                 else:
-                    return dict(flag=True, carnet=int(str(CARNET)), nombres=str(NOMBRES), apellidos=str(APELLIDOS), correo=str(CORREO))
+                    return dict(flag=True, carnet=int(str(CARNET)), nombres=(NOMBRES), apellidos=(APELLIDOS), correo=str(CORREO),error=False)
         except:
-            return dict(flag=False)
+            return dict(flag=False,error=True,message=T('Error with web service validation'))
     else:
-        return dict(flag=False)
+        return dict(flag=False,error=True,message=T('Error with web service validation'))
+
 
 
 
