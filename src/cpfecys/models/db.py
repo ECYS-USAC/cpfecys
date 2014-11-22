@@ -1279,9 +1279,15 @@ def academic_insert(*args):
             if session.academic_update != None:
                 if session.assignation_error is None:
                     session.assignation_error = []
-                    session.assignation_error.append(str(args[0]['carnet']))
+                    message = [] 
+                    message.append(str(args[0]['carnet']))
+                    message.append(web_service['message'])
+                    session.assignation_error.append(message)
                 else:
-                    session.assignation_error.append(str(args[0]['carnet']))
+                    message = [] 
+                    message.append(str(args[0]['carnet']))
+                    message.append(web_service['message'])
+                    session.assignation_error.append(message)
             else:
                 session.flash = T('The user is not registered to the academic cycle')
                 db(db.academic.id == args[1]['id']).delete()

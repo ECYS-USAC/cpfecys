@@ -246,6 +246,7 @@ data-toggle="tab">
             <div class="accordion" id="accordion2">
               <div class="accordion-group">
                 <div class="accordion-heading">
+                  {{try:}}
                   <a class="accordion-toggle" data-toggle="collapse" data-parent="#accordion2" href="#collapseOne">
                       <span class="icon-remove"></span> {{=T('Errors')}}
                       <span class="pull-right">{{=T('Total Errors: ') + len(session.assignation_error)}}</span>
@@ -261,12 +262,16 @@ data-toggle="tab">
                 
                 </li>
                 {{pass}}
+                {{except:}}
+                  {{None}}
+                {{pass}}
                 </ul>
                 </div>
                 </div>
               </div>
               <div class="accordion-group">
                 <div class="accordion-heading">
+                {{try:}}
                   <a class="accordion-toggle" data-toggle="collapse" data-parent="#accordion2" href="#collapseTwo">
                       <span class="icon-warning-sign"></span> {{=T('Notifications')}}
                       <span class="pull-right">{{=T('Total Notifications: ') + len(session.assignation_message)}}</span>
@@ -281,6 +286,9 @@ data-toggle="tab">
                 {{for row in var_error:}}{{=row}}  -  {{pass}}
                 
                 </li>
+                {{pass}}
+                {{except:}}
+                  {{None}}
                 {{pass}}
                 </ul>
                 </div>

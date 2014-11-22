@@ -140,7 +140,7 @@ def check_student(check_carnet):
             
 
             if (CARNET is None or CARNET=='') and (NOMBRES is None or NOMBRES=='') and (APELLIDOS is None or APELLIDOS=='') and (CORREO is None or CORREO==''):
-                return dict(flag=False,error=False,message=T('The user is not registered to the academic cycle'))
+                return dict(flag=False,error=False,message=T('The record was removed because the user is not registered to the academic cycle'))
             else:
                 isStuden=False
                 for c in root.findall('CARRERA'):
@@ -819,13 +819,16 @@ def academic_assignation_upload():
                                 #add user to the course
                                 ingresado = db.academic_course_assignation.insert(carnet = usr.id, semester = current_period, assignation = check.project, laboratorio = rlaboratorio)
                                 #Add to log
+                                print "entroppp1"
                                 lab_var = ''
                                 if rlaboratorio == 'T':
                                     lab_var = 'True'
                                 else:
                                     lab_var = 'False'
                                 #Search for user roles
+                                print "entroppp2"
                                 result = db(db.auth_membership.user_id==auth.user.id).select()
+                                print "entroppp3"
                                 roll_var = ''
                                 i = 0;
                                 for a in result:
@@ -847,8 +850,8 @@ def academic_assignation_upload():
                                 
                                 try:
                                     for var_error in session.assignation_error:
-                                        var_ac = db(db.academic.carnet == var_error).select().first()
-                                        db(db.academic.carnet == var_error).delete()
+                                        var_ac = db(db.academic.carnet == var_error[0]).select().first()
+                                        db(db.academic.carnet == var_error[0]).delete()
                                         result = db(db.auth_membership.user_id==auth.user.id).select()
                                         roll_var = ''
                                         i = 0;
@@ -863,7 +866,7 @@ def academic_assignation_upload():
                                         db.academic_log.insert(user_name = auth.user.username, 
                                                     roll =  str(roll_var), 
                                                     operation_log = 'delete', 
-                                                    before_carnet = str(var_error), 
+                                                    before_carnet = str(var_error[0]), 
                                                     before_email = str(var_ac.email), 
                                                     id_period = str(current_period.id),
                                                     description = T('The record was removed because it failed the webservice validation'))
@@ -874,10 +877,11 @@ def academic_assignation_upload():
                                     row.append(T('Aviso: ') + T('Successful assignment to the course'))
                                     aviso_users.append(row)
                                 else:
-                                    row.append(T('Error: ') + ' '+ T('The user is not registered to the academic cycle'))
-                                    error_users.append(row)
+                                    for var_error in session.assignation_error:
+                                        row.append(T('Error: ') + ' '+ str(var_error[1]))
+                                        error_users.append(row)
                                 session.academic_update = None
-                                session.assignation_error = None
+                                session.assignation_error = None                                
                 else:
                     
                     usr2 = db.academic_course_assignation((db.academic_course_assignation.semester == current_period) & (db.academic_course_assignation.assignation == check.project) & (db.academic_course_assignation.carnet == usr.id))
