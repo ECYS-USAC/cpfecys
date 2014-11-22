@@ -777,8 +777,7 @@ def academic_assignation_upload():
             for row in cr:
                 ## parameters
                 rcarnet = row[0]
-                remail = row[1]
-                rlaboratorio = row[2]
+                rlaboratorio = row[1]
                 ## check if user exists                
                 check = db.user_project(id =assignation, assigned_user = auth.user.id)                      
                 usr = db.academic(db.academic.carnet == rcarnet)        
@@ -788,100 +787,93 @@ def academic_assignation_upload():
                         row.append(T('Error: ') + T('The id is a required field.'))
                         error_users.append(row)
                     else:            
-                        if IS_EMAIL()(remail)[1]:
-                            row.append(T('Error: ') + T('The email entered is incorrect.'))
+                        #T o F validation
+                        if rlaboratorio == 'TRUE':
+                            rlaboratorio = 'T'
+                        if rlaboratorio == 'FALSE':
+                            rlaboratorio = 'F'
+
+                        if rlaboratorio != 'T' and rlaboratorio != 'F':
+                            row.append(T('Error: ') + T('The type of laboratory entered is incorrect. This must be T or F.'))
                             error_users.append(row)
                         else:
-                            #T o F validation
-                            if rlaboratorio == 'TRUE':
-                                rlaboratorio = 'T'
-                            if rlaboratorio == 'FALSE':
-                                rlaboratorio = 'F'
-
-                            if rlaboratorio != 'T' and rlaboratorio != 'F':
-                                row.append(T('Error: ') + T('The type of laboratory entered is incorrect. This must be T or F.'))
-                                error_users.append(row)
+                            #insert a new user with csv data
+                            session.academic_update = True
+                            #aqui
+                            usr = db.academic.insert(carnet = rcarnet,
+                                                          email = "email@email.com")
+                            #Add log
+                            db.academic_log.insert(user_name = auth.user.username, 
+                                                    roll =  'Student', 
+                                                    operation_log = 'insert', 
+                                                    after_carnet = rcarnet, 
+                                                    after_email = "email@email.com", 
+                                                    id_academic = usr.id,
+                                                    id_period = current_period.id,
+                                                    description = T('Inserted from CSV file.'))
+                            #add user to the course
+                            ingresado = db.academic_course_assignation.insert(carnet = usr.id, semester = current_period, assignation = check.project, laboratorio = rlaboratorio)
+                            #Add to log
+                            lab_var = ''
+                            if rlaboratorio == 'T':
+                                lab_var = 'True'
                             else:
-                                #insert a new user with csv data
-                                session.academic_update = True
-                                #aqui
-                                usr = db.academic.insert(carnet = rcarnet,
-                                                              email = remail)
-                                #Add log
-                                db.academic_log.insert(user_name = auth.user.username, 
-                                                        roll =  'Student', 
-                                                        operation_log = 'insert', 
-                                                        after_carnet = rcarnet, 
-                                                        after_email = remail, 
-                                                        id_academic = usr.id,
-                                                        id_period = current_period.id,
-                                                        description = T('Inserted from CSV file.'))
-                                #add user to the course
-                                ingresado = db.academic_course_assignation.insert(carnet = usr.id, semester = current_period, assignation = check.project, laboratorio = rlaboratorio)
-                                #Add to log
-                                print "entroppp1"
-                                lab_var = ''
-                                if rlaboratorio == 'T':
-                                    lab_var = 'True'
+                                lab_var = 'False'
+                            #Search for user roles
+                            result = db(db.auth_membership.user_id==auth.user.id).select()
+                            roll_var = ''
+                            i = 0;
+                            for a in result:
+                                if i == 0:
+                                    roll_var = a.group_id.role
+                                    i = i+1
                                 else:
-                                    lab_var = 'False'
-                                #Search for user roles
-                                print "entroppp2"
-                                result = db(db.auth_membership.user_id==auth.user.id).select()
-                                print "entroppp3"
-                                roll_var = ''
-                                i = 0;
-                                for a in result:
-                                    if i == 0:
-                                        roll_var = a.group_id.role
-                                        i = i+1
-                                    else:
-                                        roll_var = roll_var + ',' + a.group_id.role
-                                db.academic_course_assignation_log.insert(user_name = auth.user.username, roll =  roll_var, 
-                                                        operation_log = 'insert', 
-                                                        after_carnet = rcarnet, 
-                                                        after_course = str(check.project.name), 
-                                                        after_year = str(current_period.yearp) ,
-                                                        after_semester = str(current_period.period),
-                                                        after_laboratory = lab_var,
-                                                        id_academic_course_assignation = str(ingresado.id),
-                                                        id_period = current_period.id,
-                                                        description = T('Inserted from CSV file.'))
-                                
-                                try:
-                                    for var_error in session.assignation_error:
-                                        var_ac = db(db.academic.carnet == var_error[0]).select().first()
-                                        db(db.academic.carnet == var_error[0]).delete()
-                                        result = db(db.auth_membership.user_id==auth.user.id).select()
-                                        roll_var = ''
-                                        i = 0;
-                                        for a in result:
-                                            if i == 0:
-                                                roll_var = a.group_id.role
-                                                i = i+1
-                                            else:
-                                               roll_var = roll_var + ',' + a.group_id.role
-                                        
+                                    roll_var = roll_var + ',' + a.group_id.role
+                            db.academic_course_assignation_log.insert(user_name = auth.user.username, roll =  roll_var, 
+                                                    operation_log = 'insert', 
+                                                    after_carnet = rcarnet, 
+                                                    after_course = str(check.project.name), 
+                                                    after_year = str(current_period.yearp) ,
+                                                    after_semester = str(current_period.period),
+                                                    after_laboratory = lab_var,
+                                                    id_academic_course_assignation = str(ingresado.id),
+                                                    id_period = current_period.id,
+                                                    description = T('Inserted from CSV file.'))
+                            
+                            try:
+                                for var_error in session.assignation_error:
+                                    var_ac = db(db.academic.carnet == var_error[0]).select().first()
+                                    db(db.academic.carnet == var_error[0]).delete()
+                                    result = db(db.auth_membership.user_id==auth.user.id).select()
+                                    roll_var = ''
+                                    i = 0;
+                                    for a in result:
+                                        if i == 0:
+                                            roll_var = a.group_id.role
+                                            i = i+1
+                                        else:
+                                           roll_var = roll_var + ',' + a.group_id.role
+                                    
 
-                                        db.academic_log.insert(user_name = auth.user.username, 
-                                                    roll =  str(roll_var), 
-                                                    operation_log = 'delete', 
-                                                    before_carnet = str(var_error[0]), 
-                                                    before_email = str(var_ac.email), 
-                                                    id_period = str(current_period.id),
-                                                    description = T('The record was removed because it failed the webservice validation'))
-                                except:
-                                    None
-                                if session.assignation_error == None:
-                                    #Agregar la advertencia que el usuario ya se encuentra registrado en el sistema
-                                    row.append(T('Aviso: ') + T('Successful assignment to the course'))
-                                    aviso_users.append(row)
-                                else:
-                                    for var_error in session.assignation_error:
-                                        row.append(T('Error: ') + ' '+ str(var_error[1]))
-                                        error_users.append(row)
-                                session.academic_update = None
-                                session.assignation_error = None                                
+                                    db.academic_log.insert(user_name = auth.user.username, 
+                                                roll =  str(roll_var), 
+                                                operation_log = 'delete', 
+                                                before_carnet = str(var_error[0]), 
+                                                before_email = str(var_ac.email), 
+                                                id_period = str(current_period.id),
+                                                description = T('The record was removed because it failed the webservice validation'))
+                            except:
+                                None
+                            if session.assignation_error == None:
+                                #Agregar la advertencia que el usuario ya se encuentra registrado en el sistema
+                                row.append(T('Aviso: ') + T('Successful assignment to the course'))
+                                aviso_users.append(row)
+                            else:
+                                for var_error in session.assignation_error:
+                                    row.append(T('Error: ') + ' '+ str(var_error[1]))
+                                    error_users.append(row)
+                            session.academic_update = None
+                            session.assignation_error = None                                
                 else:
                     
                     usr2 = db.academic_course_assignation((db.academic_course_assignation.semester == current_period) & (db.academic_course_assignation.assignation == check.project) & (db.academic_course_assignation.carnet == usr.id))
