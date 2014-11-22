@@ -2788,8 +2788,10 @@ def oncreate_laboratory_replacing(form):
             db(db.validate_laboratory.id==form.vars.id).delete()
             session.flash=T('You must enter a description of the modification.')
         else:
-            roll_var='Super-Administrator'
-            if auth.has_membership('Ecys-Administrator'):
+            roll_var=''
+            if auth.has_membership('Super-Administrator'):
+                roll_var='Super-Administrator'
+            elif auth.has_membership('Ecys-Administrator'):
                 roll_var='Ecys-Administrator'
             elif auth.has_membership('Teacher'):
                 roll_var='Teacher'
