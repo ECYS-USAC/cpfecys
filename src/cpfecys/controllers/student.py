@@ -1,3 +1,120 @@
+#***********************************************************************************************************************
+#******************************************************PHASE 2 DTT******************************************************
+def metric_statistics(actTempo):
+    activity=[]
+    #Description of Activity
+    description = '****Nombre: '+actTempo.name+'****\n****'+actTempo.description+'****'
+    activity.append(description)
+
+
+    #**********************************************
+    #Metric Type
+    category = actTempo.course_activity_category.category.category.upper()
+    metricType=None
+    if category=='TAREAS':
+        metricType=db(db.metrics_type.name=='TAREA').select(db.metrics_type.id).first()[db.metrics_type.id]
+    elif category=='EXAMEN CORTO':
+        metricType=db(db.metrics_type.name=='EXAMEN CORTO').select(db.metrics_type.id).first()[db.metrics_type.id]
+    elif category=='HOJAS DE TRABAJO':
+        metricType=db(db.metrics_type.name=='HOJA DE TRABAJO').select(db.metrics_type.id).first()[db.metrics_type.id]
+    elif category=='PARCIALES':
+        metricType=db(db.metrics_type.name==actTempo.name.upper()).select(db.metrics_type.id).first()[db.metrics_type.id]
+    elif category=='EXAMEN FINAL':
+        metricType=db(db.metrics_type.name=='EXAMEN FINAL').select(db.metrics_type.id).first()[db.metrics_type.id]
+    elif category=='PRACTICAS':
+        metricType=db(db.metrics_type.name=='PRACTICA').select(db.metrics_type.id).first()[db.metrics_type.id]
+    elif category=='PROYECTOS':
+        name_search = actTempo.name.upper()
+        if "FASE FINAL" in name_search:
+            metricType=db(db.metrics_type.name=='FASE FINAL').select(db.metrics_type.id).first()[db.metrics_type.id]
+        elif "FASE" in name_search:
+            metricType=db(db.metrics_type.name=='FASE DE PROYECTO').select(db.metrics_type.id).first()[db.metrics_type.id]
+        elif "PRIMER PROYECTO" in name_search or "1ER PROYECTO" in name_search  or "1ER. PROYECTO" in name_search or "PROYECTO1" in name_search or "PROYECTO 1" in name_search or "PROYECTO NO.1" in name_searchor or "PROYECTO NO1" in name_search   or "PROYECTO NUMERO 1" in name_search or "PROYECTO NUMERO1" in name_search or "PROYECTO #1" in name_searchor or "PROYECTO#1" in name_search:
+            metricType=db(db.metrics_type.name=='PROYECTO 1').select(db.metrics_type.id).first()[db.metrics_type.id]
+        elif "SEGUNDO PROYECTO" in name_search or "1DO PROYECTO" in name_search  or "2DO. PROYECTO" in name_search or "PROYECTO2" in name_search or "PROYECTO 2" in name_search or "PROYECTO NO.2" in name_searchor or "PROYECTO NO2" in name_search   or "PROYECTO NUMERO 2" in name_search or "PROYECTO NUMERO2" in name_search or "PROYECTO #2" in name_searchor or "PROYECTO#2" in name_search:
+            metricType=db(db.metrics_type.name=='PROYECTO 2').select(db.metrics_type.id).first()[db.metrics_type.id]
+    if metricType is None:
+        metricType=db(db.metrics_type.name=='OTRA ACTIVIDAD').select(db.metrics_type.id).first()[db.metrics_type.id]
+    activity.append(int(metricType))
+
+
+    #*********************************************Statistics Activity*********************************************
+    #Get the data
+    tempData = db(db.grades.activity == actTempo.id).select(db.grades.grade, orderby=db.grades.grade)
+    data=[]
+    Sum_Data=float(0)
+    totalReprobate=0
+    totalApproved=0
+    for d1 in tempData:
+        if d1.grade is None:
+            data.append(float(0))
+            totalReprobate+=1
+        else:
+            data.append(float(d1.grade))
+            Sum_Data+=float(d1.grade)
+            if float(d1.grade)>float(61):
+                totalReprobate+=1
+            else:
+                totalApproved+=1
+    #*********************************************
+    #Total Students
+    totalStudents = int(len(data))
+    #*********************************************
+    #Minimum
+    activity.append(data[0])
+    if totalStudents==1:
+        #Maximum
+        activity.append(data[0])
+        #Rank
+        activity.append(0)
+        #Mean
+        activity.append(float(Sum_Data))
+        #Standard error
+        #Median
+        activity.append(float(Sum_Data))
+        #Mode
+    else:
+        #Maximum
+        activity.append(data[totalStudents-1])
+        #Rank
+        activity.append(data[totalStudents-1] - data[0])
+        #Mean
+        activity.append(float(Sum_Data/totalStudents))
+        #Standard error
+        #Median
+        if totalStudents%2 == 1:
+            median =data[totalStudents//2]
+        else:
+            i = totalStudents//2
+            median = (data[i - 1] + data[i])/2
+        activity.append(median)
+        #Mode
+    #*********************************************
+    #Total Students
+    activity.append(totalStudents)
+    #Total Reprobate
+    activity.append(totalReprobate)
+    #Total Approved
+    activity.append(totalApproved)
+
+
+    #Activity to return
+    print str(activity)
+
+
+
+
+
+
+#***********************************************************************************************************************
+#******************************************************PHASE 2 DTT******************************************************
+
+
+
+
+
+
+
 # coding: utf8
 # intente algo como
 @auth.requires_login()
@@ -916,6 +1033,7 @@ def final():
 @auth.requires_membership('Student')
 def report():
     import cpfecys
+    import datetime
     if (request.args(0) == 'create'):
         #get the data & save the report
         assignation = request.vars['assignation']
@@ -989,9 +1107,21 @@ def report():
         reqs = db(db.area_report_requirement.area_level == \
             report.assignation.project.area_level).select()
         minimal_requirements = True
-        activities_count = db(db.log_entry.report == report.id).count()
-        metrics_count = db(db.log_metrics.report == report.id).count()
+        
+
+        #***********************************************************************************************************************
+        #******************************************************PHASE 2 DTT******************************************************
+        if report.assignation.project.area_level.name=='DTT Tutor Académico':
+            activities_count=1
+            metrics_count=1
+        else:
+            activities_count = db(db.log_entry.report == report.id).count()
+            metrics_count = db(db.log_metrics.report == report.id).count()
         final_stats = db(db.log_final.report == report.id).count()
+        #***********************************************************************************************************************
+        #******************************************************PHASE 2 DTT******************************************************
+        
+
         for req in reqs:
             if (req.report_requirement.name == 'Registrar Estadisticas Finales de Curso') \
             and (report.report_restriction.is_final) \
@@ -1019,6 +1149,179 @@ def report():
         mandatory_requirements = ''
         for req in reqs:
             mandatory_requirements += req.report_requirement.name  + ', '
+
+
+        #***********************************************************************************************************************
+        #******************************************************PHASE 2 DTT******************************************************
+        activities_WM=None
+        activities_M=None
+        activities_F=None
+        if report.assignation.project.area_level.name=='DTT Tutor Académico':
+            #Get the minimum and maximum date of the report
+            cperiod = cpfecys.current_year_period()
+            parameters_period = db(db.student_control_period.period_name==(T(cperiod.period.name)+' '+str(cperiod.yearp))).select().first()
+            endDateActivity=None
+            initSemester=None
+            if cperiod.period == 1:
+                initSemester = datetime.strptime(str(cperiod.yearp) + '-' + '01-01', "%Y-%m-%d")
+                if report.report_restriction.is_final==False:
+                    activities_F=[]
+                    nameReportSplit = report.report_restriction.name.upper()
+                    nameReportSplit = nameReportSplit.split(' ')
+                    for word in nameReportSplit:
+                        if word=='ENERO':
+                            endDateActivity = datetime.strptime(str(cperiod.yearp) + '-' + '02-01', "%Y-%m-%d")
+                        elif word=='FEBRERO':
+                            endDateActivity = datetime.strptime(str(cperiod.yearp) + '-' + '03-01', "%Y-%m-%d")
+                        elif word=='MARZO':
+                            endDateActivity = datetime.strptime(str(cperiod.yearp) + '-' + '04-01', "%Y-%m-%d")
+                        elif word=='ABRIL':
+                            endDateActivity = datetime.strptime(str(cperiod.yearp) + '-' + '05-01', "%Y-%m-%d")
+                        elif word=='MAYO':
+                            endDateActivity = datetime.strptime(str(cperiod.yearp) + '-' + '06-01', "%Y-%m-%d")
+                else:
+                    endDateActivity = datetime.strptime(str(cperiod.yearp) + '-' + '06-01', "%Y-%m-%d")
+            else:
+                initSemester = datetime.datetime.strptime(str(cperiod.yearp) + '-' + '06-01', "%Y-%m-%d")
+                if report.report_restriction.is_final==False:
+                    activities_F=[]
+                    nameReportSplit = report.report_restriction.name.upper()
+                    nameReportSplit = nameReportSplit.split(' ')
+                    for word in nameReportSplit:
+                        if word=='JUNIO':
+                            endDateActivity = datetime.datetime.strptime(str(cperiod.yearp) + '-' + '07-01', "%Y-%m-%d")
+                        elif word=='JULIO':
+                            endDateActivity = datetime.datetime.strptime(str(cperiod.yearp) + '-' + '08-01', "%Y-%m-%d")
+                        elif word=='AGOSTO':
+                            endDateActivity = datetime.datetime.strptime(str(cperiod.yearp) + '-' + '09-01', "%Y-%m-%d")
+                        elif word=='SEPTIEMBRE':
+                            endDateActivity = datetime.datetime.strptime(str(cperiod.yearp) + '-' + '10-01', "%Y-%m-%d")
+                        elif word=='OCTUBRE':
+                            endDateActivity = datetime.datetime.strptime(str(cperiod.yearp) + '-' + '11-01', "%Y-%m-%d")
+                        elif word=='NOVIEMBRE':
+                            endDateActivity = datetime.datetime.strptime(str(cperiod.yearp) + '-' + '12-01', "%Y-%m-%d")
+                        elif word=='DICIEMBRE':
+                            endDateActivity = datetime.datetime.strptime(str(cperiod.yearp+1) + '-' + '01-01', "%Y-%m-%d")
+                else:
+                    endDateActivity = datetime.datetime.strptime(str(cperiod.yearp+1) + '-' + '01-01', "%Y-%m-%d")
+
+            #Verify that the date range of the period and the parameters are defined
+            if initSemester is  None or endDateActivity is None or parameters_period is None:
+                session.flash = T('Error. Is not defined date range of the report or do not have the required parameters. --- Contact the system administrator.')
+                redirect(URL('student','index'))
+            else:
+                #Get the latest reports and are of this semester
+                beforeReportsRestriction = db((db.report_restriction.id<report.report_restriction)&(db.report_restriction.start_date>=initSemester)).select(db.report_restriction.id)
+                if beforeReportsRestriction.first() is None:
+                    beforeReports=[]
+                    beforeReports.append(-1)
+                else:
+                    beforeReports = db((db.report.assignation==report.assignation)&(db.report.report_restriction.belongs(beforeReportsRestriction))).select(db.report.id)
+                    if beforeReports.first() is None:
+                        beforeReports=[]
+                        beforeReports.append(-1)
+
+            #Check the id of the log type thtat is activity
+            temp_logType = db(db.log_type.name=='Activity').select().first()
+
+            #Verify that there is a category activity report
+            if temp_logType is None:
+                session.flash = T('Error. Is not defined date range of the report or do not have the required parameters. --- Contact the system administrator.')
+                redirect(URL('student','index'))
+            else:
+                #*******************Activities to record activities unless already recorded in previous reports
+                #Activities without metric
+                activitiesWMBefore = db((db.log_entry.log_type==temp_logType)&(db.log_entry.period==cperiod.id)&(db.log_entry.tActivity==False)&(db.log_entry.report.belongs(beforeReports))).select(db.log_entry.idActivity.with_alias('id'))
+                if activitiesWMBefore.first() is None:
+                    activities_WM = db((db.course_activity_without_metric.semester == cperiod.id)&(db.course_activity_without_metric.assignation == report.assignation.project)&(db.course_activity_without_metric.date_start < endDateActivity)).select()
+                    #Future activities without metric
+                    if report.report_restriction.is_final==False:
+                        activities_F_temp = db((db.course_activity_without_metric.semester == cperiod.id)&(db.course_activity_without_metric.assignation == report.assignation.project)&(db.course_activity_without_metric.date_start >= endDateActivity)).select()
+                        for awmt in activities_F_temp:
+                            activities_F.append(awmt)
+                else:
+                    activities_WM = db((db.course_activity_without_metric.semester == cperiod.id)&(db.course_activity_without_metric.assignation == report.assignation.project)&(~db.course_activity_without_metric.id.belongs(activitiesWMBefore))&(db.course_activity_without_metric.date_start < endDateActivity)).select()
+                    #Future activities without metric
+                    if report.report_restriction.is_final==False:
+                        activities_F_temp = db((db.course_activity_without_metric.semester == cperiod.id)&(db.course_activity_without_metric.assignation == report.assignation.project)&(~db.course_activity_without_metric.id.belongs(activitiesWMBefore))&(db.course_activity_without_metric.date_start >= endDateActivity)).select()
+                        for awmt in activities_F_temp:
+                            activities_F.append(awmt)
+
+                #Activities with metric
+                activitiesMBefore = db((db.log_entry.log_type==temp_logType)&(db.log_entry.period==cperiod.id)&(db.log_entry.tActivity==True)&(db.log_entry.report.belongs(beforeReports))).select(db.log_entry.idActivity.with_alias('id'))
+                activitiesGrades = db(db.grades).select(db.grades.activity.with_alias('id'), distinct=True)
+                if activitiesGrades.first() is not None:
+                    activities_M_Real=[]
+                    if activitiesMBefore.first() is None:
+                        #Complete with measuring activities
+                        activities_M = db((db.course_activity.semester == cperiod.id)&(db.course_activity.assignation == report.assignation.project)&(db.course_activity.date_start < endDateActivity)&(db.course_activity.id.belongs(activitiesGrades))).select()
+                        for actTempo in activities_M:
+                            if report.report_restriction.is_final==False:
+                                tempEndAct = actTempo.date_finish + datetime.timedelta(days=parameters_period.timeout_income_notes)
+                                tempEndAct = datetime.datetime(tempEndAct.year, tempEndAct.month, tempEndAct.day)
+                                endDateActivityt1 = datetime.datetime(endDateActivity.year, endDateActivity.month, endDateActivity.day)
+                                if tempEndAct<endDateActivityt1:
+                                    #Check if you have the minimum of notes recorded in the activity amount that you are worth in the report
+                                    if (((int(db((db.grades_log.activity_id == actTempo.id)&(db.grades_log.operation_log=='insert')&(db.grades_log.user_name==auth.user.username)).count())*100)/int(db(db.grades.activity == actTempo.id).count()))>=int(parameters_period.percentage_income_activity)):
+                                        metric_statistics(actTempo)
+                                        activities_M_Real.append(actTempo)
+                                else:
+                                    #Future activities with metric
+                                    activities_F.append(actTempo)
+                            else:
+                                #Check if you have the minimum of notes recorded in the activity amount that you are worth in the report
+                                if (((int(db((db.grades_log.activity_id == actTempo.id)&(db.grades_log.operation_log=='insert')&(db.grades_log.user_name==auth.user.username)).count())*100)/int(db(db.grades.activity == actTempo.id).count()))>=int(parameters_period.percentage_income_activity)):
+                                    activities_M_Real.append(actTempo)
+                        activities_M = activities_M_Real
+                        #Complete with measuring future activities
+                        if report.report_restriction.is_final==False:
+                            activities_F_temp = db((db.course_activity.semester == cperiod.id)&(db.course_activity.assignation == report.assignation.project)&(db.course_activity.date_start >= endDateActivity)).select()
+                            for awmt in activities_F_temp:
+                                activities_F.append(awmt)
+                    else:
+                        #Complete with measuring activities
+                        activities_M = db((db.course_activity.semester == cperiod.id)&(db.course_activity.assignation == report.assignation.project)&(db.course_activity.date_start < endDateActivity)&(~db.course_activity.id.belongs(activitiesMBefore))&(db.course_activity.id.belongs(activitiesGrades))).select()
+                        for actTempo in activities_M:
+                            if report.report_restriction.is_final==False:
+                                tempEndAct = actTempo.date_finish + datetime.timedelta(days=parameters_period.timeout_income_notes)
+                                tempEndAct = datetime.datetime(tempEndAct.year, tempEndAct.month, tempEndAct.day)
+                                endDateActivityt1 = datetime.datetime(endDateActivity.year, endDateActivity.month, endDateActivity.day)
+                                if tempEndAct<endDateActivityt1:
+                                    #Check if you have the minimum of notes recorded in the activity amount that you are worth in the report
+                                    if (((int(db((db.grades_log.activity_id == actTempo.id)&(db.grades_log.operation_log=='insert')&(db.grades_log.user_name==auth.user.username)).count())*100)/int(db(db.grades.activity == actTempo.id).count()))>=int(parameters_period.percentage_income_activity)):
+                                        activities_M_Real.append(actTempo)
+                                else:
+                                    #Future activities with metric
+                                    activities_F.append(actTempo)
+                            else:
+                                #Check if you have the minimum of notes recorded in the activity amount that you are worth in the report
+                                if (((int(db((db.grades_log.activity_id == actTempo.id)&(db.grades_log.operation_log=='insert')&(db.grades_log.user_name==auth.user.username)).count())*100)/int(db(db.grades.activity == actTempo.id).count()))>=int(parameters_period.percentage_income_activity)):
+                                    activities_M_Real.append(actTempo)
+                        activities_M = activities_M_Real
+                        #Complete with measuring future activities
+                        if report.report_restriction.is_final==False:
+                            activities_F_temp = db((db.course_activity.semester == cperiod.id)&(db.course_activity.assignation == report.assignation.project)&(db.course_activity.date_start >= endDateActivity)&(~db.course_activity.id.belongs(activitiesMBefore))).select()
+                            for awmt in activities_F_temp:
+                                activities_F.append(awmt)
+                
+
+                #activitiesMBefore = db((db.log_entry.log_type==temp_logType)&(db.log_entry.period==cperiod.period)&(db.log_entry.tActivity==True)&(db.log_entry.report.belongs(beforeReports))).select(db.log_entry.idActivity)
+                #if activitiesMBefore.first() is None:
+                #    activities_WM = db((db.course_activity.semester == cperiod.period)&(db.course_activity.assignation == report.assignation.project)&(db.course_activity.date_start < endDateActivity)).select()
+                #else:
+                #    activities_WM = db((db.course_activity.semester == cperiod.period)&(db.course_activity.assignation == report.assignation.project)&(~db.course_activity.id.belongs(activitiesWMBefore))&(db.course_activity.date_start < endDateActivity)).select()
+                #print '----------------------------'
+                #print 'Actividades con metrica'
+                #print str(activ)
+
+
+
+
+
+        #***********************************************************************************************************************
+        #******************************************************PHASE 2 DTT******************************************************
+
+
         return dict(log_types = db(db.log_type.id > 0).select(),
                     mandatory_requirements = mandatory_requirements,
                     minimal_requirements = minimal_requirements,
@@ -1031,7 +1334,10 @@ def report():
                                    (db.log_entry.log_type == db.log_type.id)&
                                    (db.log_entry.report == report.id)).count(),
                     markmin_settings = cpfecys.get_markmin,
-                    report = report)
+                    report = report,
+                    activities_WM=None,#Phase2 DTT
+                    activities_M=None,#Phase2 DTT
+                    activities_F=None)#Phase2 DTT
     elif (request.args(0) == 'acceptance'):
         #get the data & save the report
         report = request.vars['report']

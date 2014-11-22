@@ -764,9 +764,10 @@ db.define_table('student_control_period',
     Field('period_name', 'string', notnull=True, unique=False, label = T('period name')),
     Field('date_start', 'datetime', notnull = True, default = datetime.datetime.now(), label = T('Date Start')),
     Field('date_finish', 'datetime', notnull = True, default = datetime.datetime.now(), label = T('Date Finish')),
-    Field('timeout_income_notes', 'integer', notnull=True, unique=False, label = T('timeout_income_notes')),
-    Field('min_average', 'decimal(5,2)', notnull=False, default=61.00, label=T('Min Average')),
-    Field('max_average', 'decimal(5,2)', notnull=False, default=85.00, label=T('Max Average')),
+    Field('timeout_income_notes', 'integer', notnull=True,  label = T('timeout_income_notes')),
+    Field('percentage_income_activity', 'integer', notnull=True, default=35, label = T('Percentage income activity')),
+    Field('min_average', 'decimal(5,2)', notnull=True, default=61.00, label=T('Min Average')),
+    Field('max_average', 'decimal(5,2)', notnull=True, default=85.00, label=T('Max Average')),
     Field('date_start_semester', 'date', notnull = True, label = T('Date Start Semester')),
     Field('date_finish_semester', 'date', notnull = True, label = T('Date Finish Semester'))
     )
@@ -1377,6 +1378,10 @@ db.define_table('validate_student_parameters',
 db.define_table('page_visited',
     Field('user_id', 'integer', notnull=True, label=T('username')),
     Field('page_name', 'string', notnull=True, label=T('Page'))
+)
+
+db.define_table('course_report_exception',
+    Field('project', 'reference project', notnull = True, unique=True, label = T('Course'))
 )
 
 ## after defining tables, uncomment below to enable auditing

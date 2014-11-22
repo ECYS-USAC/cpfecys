@@ -77,6 +77,7 @@ if auth.has_membership(role="Super-Administrator"):
              (T('General Report'), False, URL('admin', 'general_report'), []),
              (T('System-wide Mail Logs'), False, URL('mailer', 'index'), []),
              (T('Scheduler Report'), False, URL('admin', 'scheduler_activity'), []),
+             (T('Course Report Exceptions'), False, URL('admin', 'course_report_exception'), []),
              ]),
     ])
 
