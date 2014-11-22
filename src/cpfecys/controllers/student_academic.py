@@ -778,6 +778,7 @@ def academic_assignation_upload():
                 ## parameters
                 rcarnet = row[0]
                 rlaboratorio = row[1]
+                rlaboratorio = rlaboratorio.upper()
                 ## check if user exists                
                 check = db.user_project(id =assignation, assigned_user = auth.user.id)                      
                 usr = db.academic(db.academic.carnet == rcarnet)        
