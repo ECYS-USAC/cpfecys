@@ -1,176 +1,345 @@
-{{metric = inc_vars['metric']}}
-<div class="row-fluid">
-    <div class="well span12">
-        <div class="span12">
-            <strong>{{=T('Date')}}:</strong> {{=metric.created}}
-            {{if inc_vars['editable']:}}
-            <div class="pull-right">
-                <div class="btn-group">
-                    <a href="#{{=inc_vars['edit_action']}}"
-                       data-toggle="modal" class="btn">
-                        <span class="icon-edit"></span>
-                    </a>
-                    <a href="#{{=inc_vars['delete_action']}}"
-                       data-toggle="modal" class="btn btn-danger">
-                        <span class="icon-remove icon-white"></span>
-                    </a>
-                </div>
+<!--#****************************************************************************-->
+<!--#****************************PHASE 2 DTT*************************************-->
+{{if report.assignation.project.area_level.name=='DTT Tutor Académico' and (report.status==1 or report.status==3):}}
+    {{metric = inc_vars['metric']}}
+    <div class="row-fluid">
+        <div class="well span12">
+            <div class="span12">
+                <strong>{{=T('Date')}}:</strong> {{=metric[0]}}
             </div>
-            {{pass}}
-        </div>
-        <div class="span12">
-            <h2 class="center">{{=metric.metrics_type.name}}</h2>
-            <p>
-                {{=MARKMIN(metric.description, markmin_settings)}}
-            </p>
-            <div class="span6">
-                <table class="table table-striped table-bordered">
-                    <thead>
-                        <tr>
-                            <td>
-                                <strong>{{=T('Metric')}}</strong>
-                            </td>
-                            <td>
-                                <strong>{{=T('Value')}}</strong>
-                            </td>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr>
-                            <td><strong>{{=T('Media')}}</strong> </td>
-                            <td>{{=metric.media}}</td></tr>
-                        <tr><td><strong>{{=T('Error')}}</strong> </td>
-                            <td>{{=metric.error}}</td></tr>
-                        <tr><td><strong>{{=T('Mediana')}}</strong></td>
-                            <td> {{=metric.mediana}}</td></tr>
-                        <tr><td><strong>{{=T('Moda')}}</strong> </td>
-                            <td>{{=metric.moda}}</td></tr>
-                        <tr><td><strong>{{=T('Desviacion')}}</strong></td>
-                            <td> {{=metric.desviacion}}</td></tr>
-                        <tr><td><strong>{{=T('Varianza')}}</strong></td>
-                            <td> {{=metric.varianza}}</td></tr>
-                        <tr><td><strong>{{=T('Curtosis')}}</strong></td>
-                            <td> {{=metric.curtosis}}</td></tr>
-                        <tr><td><strong>{{=T('Coeficiente')}}</strong></td>
-                            <td> {{=metric.coeficiente}}</td></tr>
-                        <tr><td><strong>{{=T('Rango')}}</strong> </td>
-                            <td>{{=metric.rango}}</td></tr>
-                        <tr><td><strong>{{=T('Minimo')}}</strong> </td>
-                            <td>{{=metric.minimo}}</td></tr>
-                        <tr><td><strong>{{=T('Maximo')}}</strong> </td>
-                            <td>{{=metric.maximo}}</td></tr>
-                        <tr><td><strong>{{=T('Total')}}</strong> </td>
-                            <td>{{=metric.total}}</td></tr>
-                        <tr><td><strong>{{=T('Reprobados')}}</strong></td>
-                            <td> {{=metric.reprobados}}</td></tr>
-                        <tr><td><strong>{{=T('Aprobados')}}</strong></td>
-                            <td> {{=metric.aprobados}}</td></tr>
-                    </tbody>
-                </table>
-            </div>
-            <div class="span5 center">
-                <div>
-                    <h3>
-                        {{=T('Aproved vrs. Failed Students')}}
-                    </h3>
-                    <div style="width:100%; height:300px;" id="graphpie{{=metric.id}}"></div>
+            <div class="span12">
+                <h2 class="center">{{=db(db.metrics_type.id==metric[16]).select(db.metrics_type.name).first()[db.metrics_type.name]}}</h2>
+                <p>
+                    {{=MARKMIN(metric[1], markmin_settings)}}
+                </p>
+                <div class="span6">
+                    <table class="table table-striped table-bordered">
+                        <thead>
+                            <tr>
+                                <td>
+                                    <strong>{{=T('Metric')}}</strong>
+                                </td>
+                                <td>
+                                    <strong>{{=T('Value')}}</strong>
+                                </td>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong>{{=T('Media')}}</strong> </td>
+                                <td>{{=metric[2]}}</td></tr>
+                            <tr><td><strong>{{=T('Error')}}</strong> </td>
+                                <td>{{=metric[3]}}</td></tr>
+                            <tr><td><strong>{{=T('Mediana')}}</strong></td>
+                                <td> {{=metric[4]}}</td></tr>
+                            <tr><td><strong>{{=T('Moda')}}</strong> </td>
+                                <td>{{=metric[5]}}</td></tr>
+                            <tr><td><strong>{{=T('Desviacion')}}</strong></td>
+                                <td> {{=metric[6]}}</td></tr>
+                            <tr><td><strong>{{=T('Varianza')}}</strong></td>
+                                <td> {{=metric[7]}}</td></tr>
+                            <tr><td><strong>{{=T('Curtosis')}}</strong></td>
+                                <td> {{=metric[8]}}</td></tr>
+                            <tr><td><strong>{{=T('Coeficiente')}}</strong></td>
+                                <td> {{=metric[9]}}</td></tr>
+                            <tr><td><strong>{{=T('Rango')}}</strong> </td>
+                                <td>{{=metric[10]}}</td></tr>
+                            <tr><td><strong>{{=T('Minimo')}}</strong> </td>
+                                <td>{{=metric[11]}}</td></tr>
+                            <tr><td><strong>{{=T('Maximo')}}</strong> </td>
+                                <td>{{=metric[12]}}</td></tr>
+                            <tr><td><strong>{{=T('Total')}}</strong> </td>
+                                <td>{{=metric[13]}}</td></tr>
+                            <tr><td><strong>{{=T('Reprobados')}}</strong></td>
+                                <td> {{=metric[14]}}</td></tr>
+                            <tr><td><strong>{{=T('Aprobados')}}</strong></td>
+                                <td> {{=metric[15]}}</td></tr>
+                        </tbody>
+                    </table>
                 </div>
-                <div>
-                    <div style="width:100%; height:300px;" id="graphbars{{=metric.id}}"></div>
-                </div>
-                {{if metric.total > 0:}}
-                <script type="text/javascript">
-                    $(function () {
-                        $('#graphpie{{=metric.id}}').highcharts({
-                            chart: {
-                                plotBackgroundColor: null,
-                                plotBorderWidth: null,
-                                plotShadow: false
-                            },
-                            title: {
-                                text: '{{=T("Aproved vrs. Failed Students")}}'
-                            },
-                            tooltip: {
-                                pointFormat: '{series.name}: <b>{point.percentage:.1f}%</b>'
-                            },
-                            plotOptions: {
-                                pie: {
-                                    allowPointSelect: true,
-                                    cursor: 'pointer',
+                <div class="span5 center">
+                    <div>
+                        <h3>
+                            {{=T('Aproved vrs. Failed Students')}}
+                        </h3>
+                        <div style="width:100%; height:300px;" id="graphpie{{=metric[17]}}"></div>
+                    </div>
+                    <div>
+                        <div style="width:100%; height:300px;" id="graphbars{{=metric[17]}}"></div>
+                    </div>
+                    {{if metric[13] > 0:}}
+                    <script type="text/javascript">
+                        $(function () {
+                            $('#graphpie{{=metric[17]}}').highcharts({
+                                chart: {
+                                    plotBackgroundColor: null,
+                                    plotBorderWidth: null,
+                                    plotShadow: false
+                                },
+                                title: {
+                                    text: '{{=T("Aproved vrs. Failed Students")}}'
+                                },
+                                tooltip: {
+                                    pointFormat: '{series.name}: <b>{point.percentage:.1f}%</b>'
+                                },
+                                plotOptions: {
+                                    pie: {
+                                        allowPointSelect: true,
+                                        cursor: 'pointer',
+                                        dataLabels: {
+                                            enabled: true,
+                                            color: '#000000',
+                                            connectorColor: '#000000',
+                                            format: '<b>{point.name}</b>: {point.percentage:.1f} %'
+                                        }
+                                    }
+                                },
+                                series: [{
+                                    type: 'pie',
+                                    name: '{{=T("Aproved vrs. Failed Students")}}',
+                                    data: [
+                                        ['{{=T("Aproved")}}',   {{=100.0*metric[15]/metric[13]}}],
+                                        ['{{=T("Failed")}}',   {{=100.0*metric[14]/metric[13]}}]
+                                    ]
+                                }]
+                            });
+                            $('#graphbars{{=metric[17]}}').highcharts({
+                                chart: {
+                                    type: 'column',
+                                    margin: [ 50, 50, 100, 80]
+                                },
+                                title: {
+                                    text: '{{=T("Aproved vrs. Failed Students")}}'
+                                },
+                                xAxis: {
+                                    categories: [
+                                        '{{=T("Aproved")}}',
+                                        '{{=T("Failed")}}'
+                                    ],
+                                    labels: {
+                                        rotation: -45,
+                                        align: 'right',
+                                        style: {
+                                            fontSize: '13px',
+                                            fontFamily: 'Verdana, sans-serif'
+                                        }
+                                    }
+                                },
+                                yAxis: {
+                                    min: 0,
+                                    title: {
+                                        text: '{{=T("Students")}}'
+                                    }
+                                },
+                                legend: {
+                                    enabled: false
+                                },
+                                tooltip: {
+                                    pointFormat: '{{=T("Students")}}: <b>{point.y:.1f}</b>',
+                                },
+                                series: [{
+                                    name: '{{=T("Students")}}',
+                                    data: [{{=metric[15]}},
+                                           {{=metric[14]}}],
                                     dataLabels: {
                                         enabled: true,
-                                        color: '#000000',
-                                        connectorColor: '#000000',
-                                        format: '<b>{point.name}</b>: {point.percentage:.1f} %'
+                                        rotation: -90,
+                                        color: '#FFFFFF',
+                                        align: 'right',
+                                        x: 4,
+                                        y: 10,
+                                        style: {
+                                            fontSize: '13px',
+                                            fontFamily: 'Verdana, sans-serif',
+                                            textShadow: '0 0 3px black'
+                                        }
                                     }
-                                }
-                            },
-                            series: [{
-                                type: 'pie',
-                                name: '{{=T("Aproved vrs. Failed Students")}}',
-                                data: [
-                                    ['{{=T("Aproved")}}',   {{=100.0*metric.aprobados/metric.total}}],
-                                    ['{{=T("Failed")}}',   {{=100.0*metric.reprobados/metric.total}}]
-                                ]
-                            }]
+                                }]
+                            });
                         });
-                        $('#graphbars{{=metric.id}}').highcharts({
-                            chart: {
-                                type: 'column',
-                                margin: [ 50, 50, 100, 80]
-                            },
-                            title: {
-                                text: '{{=T("Aproved vrs. Failed Students")}}'
-                            },
-                            xAxis: {
-                                categories: [
-                                    '{{=T("Aproved")}}',
-                                    '{{=T("Failed")}}'
-                                ],
-                                labels: {
-                                    rotation: -45,
-                                    align: 'right',
-                                    style: {
-                                        fontSize: '13px',
-                                        fontFamily: 'Verdana, sans-serif'
-                                    }
-                                }
-                            },
-                            yAxis: {
-                                min: 0,
-                                title: {
-                                    text: '{{=T("Students")}}'
-                                }
-                            },
-                            legend: {
-                                enabled: false
-                            },
-                            tooltip: {
-                                pointFormat: '{{=T("Students")}}: <b>{point.y:.1f}</b>',
-                            },
-                            series: [{
-                                name: '{{=T("Students")}}',
-                                data: [{{=metric.aprobados}},
-                                       {{=metric.reprobados}}],
-                                dataLabels: {
-                                    enabled: true,
-                                    rotation: -90,
-                                    color: '#FFFFFF',
-                                    align: 'right',
-                                    x: 4,
-                                    y: 10,
-                                    style: {
-                                        fontSize: '13px',
-                                        fontFamily: 'Verdana, sans-serif',
-                                        textShadow: '0 0 3px black'
-                                    }
-                                }
-                            }]
-                        });
-                    });
-                </script>
-                {{pass}}
+                    </script>
+                    {{pass}}
+                </div>
             </div>
         </div>
     </div>
-</div>
+{{else:}}
+    {{metric = inc_vars['metric']}}
+    <div class="row-fluid">
+        <div class="well span12">
+            <div class="span12">
+                <strong>{{=T('Date')}}:</strong> {{=metric.created}}
+                {{if inc_vars['editable']:}}
+                <div class="pull-right">
+                    <div class="btn-group">
+                        <a href="#{{=inc_vars['edit_action']}}"
+                           data-toggle="modal" class="btn">
+                            <span class="icon-edit"></span>
+                        </a>
+                        <a href="#{{=inc_vars['delete_action']}}"
+                           data-toggle="modal" class="btn btn-danger">
+                            <span class="icon-remove icon-white"></span>
+                        </a>
+                    </div>
+                </div>
+                {{pass}}
+            </div>
+            <div class="span12">
+                <h2 class="center">{{=metric.metrics_type.name}}</h2>
+                <p>
+                    {{=MARKMIN(metric.description, markmin_settings)}}
+                </p>
+                <div class="span6">
+                    <table class="table table-striped table-bordered">
+                        <thead>
+                            <tr>
+                                <td>
+                                    <strong>{{=T('Metric')}}</strong>
+                                </td>
+                                <td>
+                                    <strong>{{=T('Value')}}</strong>
+                                </td>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong>{{=T('Media')}}</strong> </td>
+                                <td>{{=metric.media}}</td></tr>
+                            <tr><td><strong>{{=T('Error')}}</strong> </td>
+                                <td>{{=metric.error}}</td></tr>
+                            <tr><td><strong>{{=T('Mediana')}}</strong></td>
+                                <td> {{=metric.mediana}}</td></tr>
+                            <tr><td><strong>{{=T('Moda')}}</strong> </td>
+                                <td>{{=metric.moda}}</td></tr>
+                            <tr><td><strong>{{=T('Desviacion')}}</strong></td>
+                                <td> {{=metric.desviacion}}</td></tr>
+                            <tr><td><strong>{{=T('Varianza')}}</strong></td>
+                                <td> {{=metric.varianza}}</td></tr>
+                            <tr><td><strong>{{=T('Curtosis')}}</strong></td>
+                                <td> {{=metric.curtosis}}</td></tr>
+                            <tr><td><strong>{{=T('Coeficiente')}}</strong></td>
+                                <td> {{=metric.coeficiente}}</td></tr>
+                            <tr><td><strong>{{=T('Rango')}}</strong> </td>
+                                <td>{{=metric.rango}}</td></tr>
+                            <tr><td><strong>{{=T('Minimo')}}</strong> </td>
+                                <td>{{=metric.minimo}}</td></tr>
+                            <tr><td><strong>{{=T('Maximo')}}</strong> </td>
+                                <td>{{=metric.maximo}}</td></tr>
+                            <tr><td><strong>{{=T('Total')}}</strong> </td>
+                                <td>{{=metric.total}}</td></tr>
+                            <tr><td><strong>{{=T('Reprobados')}}</strong></td>
+                                <td> {{=metric.reprobados}}</td></tr>
+                            <tr><td><strong>{{=T('Aprobados')}}</strong></td>
+                                <td> {{=metric.aprobados}}</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="span5 center">
+                    <div>
+                        <h3>
+                            {{=T('Aproved vrs. Failed Students')}}
+                        </h3>
+                        <div style="width:100%; height:300px;" id="graphpie{{=metric.id}}"></div>
+                    </div>
+                    <div>
+                        <div style="width:100%; height:300px;" id="graphbars{{=metric.id}}"></div>
+                    </div>
+                    {{if metric.total > 0:}}
+                    <script type="text/javascript">
+                        $(function () {
+                            $('#graphpie{{=metric.id}}').highcharts({
+                                chart: {
+                                    plotBackgroundColor: null,
+                                    plotBorderWidth: null,
+                                    plotShadow: false
+                                },
+                                title: {
+                                    text: '{{=T("Aproved vrs. Failed Students")}}'
+                                },
+                                tooltip: {
+                                    pointFormat: '{series.name}: <b>{point.percentage:.1f}%</b>'
+                                },
+                                plotOptions: {
+                                    pie: {
+                                        allowPointSelect: true,
+                                        cursor: 'pointer',
+                                        dataLabels: {
+                                            enabled: true,
+                                            color: '#000000',
+                                            connectorColor: '#000000',
+                                            format: '<b>{point.name}</b>: {point.percentage:.1f} %'
+                                        }
+                                    }
+                                },
+                                series: [{
+                                    type: 'pie',
+                                    name: '{{=T("Aproved vrs. Failed Students")}}',
+                                    data: [
+                                        ['{{=T("Aproved")}}',   {{=100.0*metric.aprobados/metric.total}}],
+                                        ['{{=T("Failed")}}',   {{=100.0*metric.reprobados/metric.total}}]
+                                    ]
+                                }]
+                            });
+                            $('#graphbars{{=metric.id}}').highcharts({
+                                chart: {
+                                    type: 'column',
+                                    margin: [ 50, 50, 100, 80]
+                                },
+                                title: {
+                                    text: '{{=T("Aproved vrs. Failed Students")}}'
+                                },
+                                xAxis: {
+                                    categories: [
+                                        '{{=T("Aproved")}}',
+                                        '{{=T("Failed")}}'
+                                    ],
+                                    labels: {
+                                        rotation: -45,
+                                        align: 'right',
+                                        style: {
+                                            fontSize: '13px',
+                                            fontFamily: 'Verdana, sans-serif'
+                                        }
+                                    }
+                                },
+                                yAxis: {
+                                    min: 0,
+                                    title: {
+                                        text: '{{=T("Students")}}'
+                                    }
+                                },
+                                legend: {
+                                    enabled: false
+                                },
+                                tooltip: {
+                                    pointFormat: '{{=T("Students")}}: <b>{point.y:.1f}</b>',
+                                },
+                                series: [{
+                                    name: '{{=T("Students")}}',
+                                    data: [{{=metric.aprobados}},
+                                           {{=metric.reprobados}}],
+                                    dataLabels: {
+                                        enabled: true,
+                                        rotation: -90,
+                                        color: '#FFFFFF',
+                                        align: 'right',
+                                        x: 4,
+                                        y: 10,
+                                        style: {
+                                            fontSize: '13px',
+                                            fontFamily: 'Verdana, sans-serif',
+                                            textShadow: '0 0 3px black'
+                                        }
+                                    }
+                                }]
+                            });
+                        });
+                    </script>
+                    {{pass}}
+                </div>
+            </div>
+        </div>
+    </div>
+{{pass}}
+<!--#****************************************************************************-->
+<!--#****************************PHASE 2 DTT*************************************-->

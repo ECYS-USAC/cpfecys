@@ -1,10 +1,116 @@
 #***********************************************************************************************************************
 #******************************************************PHASE 2 DTT******************************************************
+import math
 def metric_statistics(actTempo):
     activity=[]
     #Description of Activity
-    description = '****Nombre: '+actTempo.name+'****\n****'+actTempo.description+'****'
-    activity.append(description)
+    description = 'Nombre: "'+actTempo.name+'" Descripción: "'+actTempo.description+'"'
+    
+
+
+    #*********************************************Statistics Activity*********************************************
+    #Get the data
+    tempData = db(db.grades.activity == actTempo.id).select(db.grades.grade, orderby=db.grades.grade)
+    #tempData=[40,60,75,75,75,75,80,80,85,85,85,85,85,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100]
+    data=[]
+    Sum_Data=float(0)
+    Sum_Data_Squared=float(0)
+    totalReprobate=0
+    totalApproved=0
+    for d1 in tempData:
+        if d1.grade is None:
+            data.append(float(0))
+            totalReprobate+=1
+        else:
+            data.append(float(d1.grade))
+            Sum_Data+=float(d1.grade)
+            Sum_Data_Squared+=(float(d1.grade)*float(d1.grade))
+            if float(d1.grade)>=float(61):
+                totalApproved+=1
+            else:
+                totalReprobate+=1
+    
+
+
+    #*********************************************
+    #Total Students
+    totalStudents = int(len(data))
+    
+
+
+    #*********************************************
+    #Mean
+    mean = float(Sum_Data/totalStudents)
+    #Variance
+    try:
+        variance=((Sum_Data_Squared/totalStudents)-(mean*mean))
+    except:
+        variance=float(0)
+    #Standard Deviation
+    try:
+        standard_deviation=math.sqrt(variance)
+    except:
+        standard_deviation=float(0)
+    #Standard Error
+    try:
+        standard_error=standard_deviation/math.sqrt(totalStudents)
+    except:
+        standard_error=float(0)
+    #Kurtosis
+    try:
+        #Numerator
+        numerator=0
+        for i in data:
+            numerator+=(i-mean)*(i-mean)*(i-mean)*(i-mean)
+        numerator=numerator*totalStudents
+        #Denominator
+        denominator=0
+        for i in data:
+            denominator+=(i-mean)*(i-mean)
+        denominator=denominator*denominator
+        Fraction
+        kurtosis=(numerator/denominator)-3
+    except:
+        kurtosis=float(0)
+    #Minimum
+    minimum=float(data[0])
+    if totalStudents==1:
+        #Maximum
+        maximum=float(data[0])
+        #Rank
+        rank=float(0)
+        #Median
+        median=float(Sum_Data)
+        #Mode
+        mode=float(Sum_Data)
+    else:
+        #Maximum
+        maximum=float(data[totalStudents-1])
+        #Rank
+        rank=float(data[totalStudents-1] - data[0])
+        #Median
+        if totalStudents%2 == 1:
+            median = float(data[totalStudents//2])
+        else:
+            i = totalStudents//2
+            median = float((data[i - 1] + data[i])/2)
+        #Mode
+        try:
+            table = collections.Counter(iter(data)).most_common()
+            maxfreq = table[0][1]
+            for i in range(1, len(table)):
+                if table[i][1] != maxfreq:
+                    table = table[:i]
+                    break
+            mode=float(table[0][0])
+        except:
+            mode=minimum
+    #Skewness
+    try:
+        skewness=float((3*(mean-median))/standard_error)
+    except:
+        skewness=float(0)
+    
 
 
     #**********************************************
@@ -35,77 +141,36 @@ def metric_statistics(actTempo):
             metricType=db(db.metrics_type.name=='PROYECTO 2').select(db.metrics_type.id).first()[db.metrics_type.id]
     if metricType is None:
         metricType=db(db.metrics_type.name=='OTRA ACTIVIDAD').select(db.metrics_type.id).first()[db.metrics_type.id]
-    activity.append(int(metricType))
 
 
-    #*********************************************Statistics Activity*********************************************
-    #Get the data
-    tempData = db(db.grades.activity == actTempo.id).select(db.grades.grade, orderby=db.grades.grade)
-    data=[]
-    Sum_Data=float(0)
-    totalReprobate=0
-    totalApproved=0
-    for d1 in tempData:
-        if d1.grade is None:
-            data.append(float(0))
-            totalReprobate+=1
-        else:
-            data.append(float(d1.grade))
-            Sum_Data+=float(d1.grade)
-            if float(d1.grade)>float(61):
-                totalReprobate+=1
-            else:
-                totalApproved+=1
-    #*********************************************
-    #Total Students
-    totalStudents = int(len(data))
-    #*********************************************
-    #Minimum
-    activity.append(data[0])
-    if totalStudents==1:
-        #Maximum
-        activity.append(data[0])
-        #Rank
-        activity.append(0)
-        #Mean
-        activity.append(float(Sum_Data))
-        #Standard error
-        #Median
-        activity.append(float(Sum_Data))
-        #Mode
-    else:
-        #Maximum
-        activity.append(data[totalStudents-1])
-        #Rank
-        activity.append(data[totalStudents-1] - data[0])
-        #Mean
-        activity.append(float(Sum_Data/totalStudents))
-        #Standard error
-        #Median
-        if totalStudents%2 == 1:
-            median =data[totalStudents//2]
-        else:
-            i = totalStudents//2
-            median = (data[i - 1] + data[i])/2
-        activity.append(median)
-        #Mode
-    #*********************************************
+
+    #******************************************************
+    #Fill the activity
+    activity.append(actTempo.date_start)
+    activity.append(description)
+    activity.append(mean)
+    activity.append(standard_error)
+    activity.append(median)
+    activity.append(mode)
+    activity.append(standard_deviation)
+    activity.append(variance)
+    activity.append(kurtosis)
+    activity.append(skewness)
+    activity.append(rank)
+    activity.append(minimum)
+    activity.append(maximum)
     #Total Students
     activity.append(totalStudents)
     #Total Reprobate
     activity.append(totalReprobate)
     #Total Approved
     activity.append(totalApproved)
-
+    #Metric Type
+    activity.append(int(metricType))
+    activity.append(actTempo.id)
 
     #Activity to return
-    print str(activity)
-
-
-
-
-
-
+    return activity
 #***********************************************************************************************************************
 #******************************************************PHASE 2 DTT******************************************************
 
@@ -1111,13 +1176,18 @@ def report():
 
         #***********************************************************************************************************************
         #******************************************************PHASE 2 DTT******************************************************
+        #if (T(cpfecys.current_year_period().period.name) + ' ' +str(cpfecys.current_year_period().yearp)).upper()!='SEGUNDO SEMESTRE 2014':
         if report.assignation.project.area_level.name=='DTT Tutor Académico':
             activities_count=1
             metrics_count=1
         else:
             activities_count = db(db.log_entry.report == report.id).count()
             metrics_count = db(db.log_metrics.report == report.id).count()
+        #else:
+            #activities_count = db(db.log_entry.report == report.id).count()
+            #metrics_count = db(db.log_metrics.report == report.id).count()
         final_stats = db(db.log_final.report == report.id).count()
+
         #***********************************************************************************************************************
         #******************************************************PHASE 2 DTT******************************************************
         
@@ -1156,6 +1226,7 @@ def report():
         activities_WM=None
         activities_M=None
         activities_F=None
+        #if (T(cpfecys.current_year_period().period.name) + ' ' +str(cpfecys.current_year_period().yearp)).upper()!='SEGUNDO SEMESTRE 2014':
         if report.assignation.project.area_level.name=='DTT Tutor Académico':
             #Get the minimum and maximum date of the report
             cperiod = cpfecys.current_year_period()
@@ -1263,8 +1334,7 @@ def report():
                                 if tempEndAct<endDateActivityt1:
                                     #Check if you have the minimum of notes recorded in the activity amount that you are worth in the report
                                     if (((int(db((db.grades_log.activity_id == actTempo.id)&(db.grades_log.operation_log=='insert')&(db.grades_log.user_name==auth.user.username)).count())*100)/int(db(db.grades.activity == actTempo.id).count()))>=int(parameters_period.percentage_income_activity)):
-                                        metric_statistics(actTempo)
-                                        activities_M_Real.append(actTempo)
+                                        activities_M_Real.append(metric_statistics(actTempo))
                                 else:
                                     #Future activities with metric
                                     activities_F.append(actTempo)
@@ -1289,37 +1359,24 @@ def report():
                                 if tempEndAct<endDateActivityt1:
                                     #Check if you have the minimum of notes recorded in the activity amount that you are worth in the report
                                     if (((int(db((db.grades_log.activity_id == actTempo.id)&(db.grades_log.operation_log=='insert')&(db.grades_log.user_name==auth.user.username)).count())*100)/int(db(db.grades.activity == actTempo.id).count()))>=int(parameters_period.percentage_income_activity)):
-                                        activities_M_Real.append(actTempo)
+                                        activities_M_Real.append(metric_statistics(actTempo))
                                 else:
                                     #Future activities with metric
                                     activities_F.append(actTempo)
                             else:
                                 #Check if you have the minimum of notes recorded in the activity amount that you are worth in the report
                                 if (((int(db((db.grades_log.activity_id == actTempo.id)&(db.grades_log.operation_log=='insert')&(db.grades_log.user_name==auth.user.username)).count())*100)/int(db(db.grades.activity == actTempo.id).count()))>=int(parameters_period.percentage_income_activity)):
-                                    activities_M_Real.append(actTempo)
+                                    activities_M_Real.append(metric_statistics(actTempo))
                         activities_M = activities_M_Real
                         #Complete with measuring future activities
                         if report.report_restriction.is_final==False:
                             activities_F_temp = db((db.course_activity.semester == cperiod.id)&(db.course_activity.assignation == report.assignation.project)&(db.course_activity.date_start >= endDateActivity)&(~db.course_activity.id.belongs(activitiesMBefore))).select()
                             for awmt in activities_F_temp:
                                 activities_F.append(awmt)
-                
-
-                #activitiesMBefore = db((db.log_entry.log_type==temp_logType)&(db.log_entry.period==cperiod.period)&(db.log_entry.tActivity==True)&(db.log_entry.report.belongs(beforeReports))).select(db.log_entry.idActivity)
-                #if activitiesMBefore.first() is None:
-                #    activities_WM = db((db.course_activity.semester == cperiod.period)&(db.course_activity.assignation == report.assignation.project)&(db.course_activity.date_start < endDateActivity)).select()
-                #else:
-                #    activities_WM = db((db.course_activity.semester == cperiod.period)&(db.course_activity.assignation == report.assignation.project)&(~db.course_activity.id.belongs(activitiesWMBefore))&(db.course_activity.date_start < endDateActivity)).select()
-                #print '----------------------------'
-                #print 'Actividades con metrica'
-                #print str(activ)
-
-
-
-
-
         #***********************************************************************************************************************
         #******************************************************PHASE 2 DTT******************************************************
+
+
 
 
         return dict(log_types = db(db.log_type.id > 0).select(),
@@ -1335,9 +1392,9 @@ def report():
                                    (db.log_entry.report == report.id)).count(),
                     markmin_settings = cpfecys.get_markmin,
                     report = report,
-                    activities_WM=None,#Phase2 DTT
-                    activities_M=None,#Phase2 DTT
-                    activities_F=None)#Phase2 DTT
+                    activities_WM=activities_WM,#Phase2 DTT
+                    activities_M=activities_M,#Phase2 DTT
+                    activities_F=activities_F)#Phase2 DTT
     elif (request.args(0) == 'acceptance'):
         #get the data & save the report
         report = request.vars['report']

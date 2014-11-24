@@ -160,25 +160,41 @@ url = '#')}}
                         </a>
                     </li>
                     {{pass}}
-                    <li class="divider"></li>
-                    <li class="disabled"><a tabindex="-1" href="#">{{=T('General Activities')}}</a></li>
-                    <li>
-                        <a data-toggle="modal" href="#log-new-activity">
-                            <span class="icon-tasks"></span> {{=T('Log Activity')}}
-                        </a>
-                    </li>
-                    <li>
-                        <a data-toggle="modal" href="#log-new-future-activity">
-                            <span class="icon-time"></span> {{=T('Log Future Activities')}}
-                        </a>
-                    </li>
-                    <li class="divider"></li>
-                    <li class="disabled"><a tabindex="-1" href="#">{{=T('Auxiliar Activities')}}</a></li>
-                    <li>
-                        <a data-toggle="modal" href="#log-new-metrics-activity">
-                            <span class="icon-adjust"></span> {{=T('Log Metrics')}}
-                        </a>
-                    </li>
+                    <!--#********************************************************************************-->
+                    <!--#******************************PHASE 2 DTT***************************************-->
+                    {{if report.assignation.project.area_level.name=='DTT Tutor Académico':}}
+                        <li class="divider"></li>
+                        <li class="disabled"><a tabindex="-1" href="#">{{=T('General Activities')}}</a></li>
+                        <li>
+                            <a data-toggle="modal" href="#log-new-activity">
+                                <span class="icon-tasks"></span> {{=T('Log Anomaly')}}
+                            </a>
+                        </li>
+                        <li class="divider"></li>
+                        <li class="disabled"><a tabindex="-1" href="#">{{=T('Auxiliar Activities')}}</a></li>
+                    {{else:}}
+                        <li class="divider"></li>
+                        <li class="disabled"><a tabindex="-1" href="#">{{=T('General Activities')}}</a></li>
+                        <li>
+                            <a data-toggle="modal" href="#log-new-activity">
+                                <span class="icon-tasks"></span> {{=T('Log Activity')}}
+                            </a>
+                        </li>
+                        <li>
+                            <a data-toggle="modal" href="#log-new-future-activity">
+                                <span class="icon-time"></span> {{=T('Log Future Activities')}}
+                            </a>
+                        </li>
+                        <li class="divider"></li>
+                        <li class="disabled"><a tabindex="-1" href="#">{{=T('Auxiliar Activities')}}</a></li>
+                        <li>
+                            <a data-toggle="modal" href="#log-new-metrics-activity">
+                                <span class="icon-adjust"></span> {{=T('Log Metrics')}}
+                            </a>
+                        </li>
+                    {{pass}}
+                    <!--#********************************************************************************-->
+                    <!--#******************************PHASE 2 DTT***************************************-->
                     {{if report.desertion_started is None:}}
                     <li>
                         <a data-toggle="modal" href="#log-new-desertion-activity">
@@ -186,14 +202,20 @@ url = '#')}}
                         </a>
                     </li>
                     {{pass}}
-                    {{if report.report_restriction.is_final and db(db.log_final.report == report.id).count() == 0:}}
-                    <li class="disabled"><a tabindex="-1" href="#">{{=T('Final Report')}}</a></li>
-                    <li>
-                        <a data-toggle="modal" href="#log-final-statistics">
-                            <span class="icon-flag"></span> {{=T('Log Final Statistics')}}
-                        </a>
-                    </li>
+                    <!--#********************************************************************************-->
+                    <!--#******************************PHASE 2 DTT***************************************-->
+                    {{if report.assignation.project.area_level.name!='DTT Tutor Académico':}}
+                        {{if report.report_restriction.is_final and db(db.log_final.report == report.id).count() == 0:}}
+                        <li class="disabled"><a tabindex="-1" href="#">{{=T('Final Report')}}</a></li>
+                        <li>
+                            <a data-toggle="modal" href="#log-final-statistics">
+                                <span class="icon-flag"></span> {{=T('Log Final Statistics')}}
+                            </a>
+                        </li>
+                        {{pass}}
                     {{pass}}
+                    <!--#********************************************************************************-->
+                    <!--#******************************PHASE 2 DTT***************************************-->
                     {{if report.hours is None:}}
                     <li class="divider"></li>
                     <li class="disabled"><a tabindex="-1" href="#">{{=T('Other Activities')}}</a></li>
@@ -243,41 +265,112 @@ url = '#')}}
                 </h1>
                 <span>
                     <span><strong>{{=T('Total Anomalies')}}:</strong> {{=anomalies}} </span> |
-                    <span><strong>{{=T('Total Registered Activities')}}:</strong> {{=len(logs)}} </span>
+                    <!--#********************************************************************************-->
+                    <!--#******************************PHASE 2 DTT***************************************-->
+                    {{if report.assignation.project.area_level.name=='DTT Tutor Académico':}}
+                        <span><strong>{{=T('Total Registered Activities')}}:</strong> {{=(len(activities_WM)+len(activities_M))}} </span>
+                    {{else:}}
+                        <span><strong>{{=T('Total Registered Activities')}}:</strong> {{=len(logs)}} </span>
+                    {{pass}}
+                    <!--#********************************************************************************-->
+                    <!--#******************************PHASE 2 DTT***************************************-->
                 </span>
             </div>
         </div>
         <div class="row-fluid">
-            {{for log in logs:}}
-            <!-- Helpers for Edition -->
-            {{inc_vars = dict(id = 'log-edit-activity-' + str(log.id),
-            url = URL('log/update', vars=dict(log = log.id)),
-            date = log.entry_date,
-            log_type = log.log_type,
-            log_types = log_types,
-            content = log.description) }}
-            {{include 'include/log-activity.html'}}
-            <!-- // Helpers for Edition -->
-            <!-- Helpers for deletion -->
-            {{inc_vars = dict(id = 'delete-log-' + str(log.id),
-            title = T('Confirm') + ' ' + T('Delete'),
-            content = T('Delete operation can\'t be undone, do you want to continue?'),
-            action = T('Delete'),
-            _class = 'btn-danger',
-            url = URL('log/delete', vars=dict(log = log.id)))}}
-            {{include 'include/delete-helper.html'}}
-            <!-- // Helpers for deletion -->
-            <!-- Display Helper -->
-            {{inc_vars = dict(editable = True,
-            anomaly =  (log.log_type['name'] == 'Anomaly'),
-            log_type = T(log.log_type['name']),
-            date = log.entry_date,
-            edit_action = 'log-edit-activity-' + str(log.id),
-            delete_action = 'delete-log-' + str(log.id),
-            content = MARKMIN(log.description, markmin_settings))}}
-            {{include 'include/display-report-log.html'}}
-            <!-- //Display Helper -->
+            <!--#********************************************************************************-->
+            <!--#******************************PHASE 2 DTT***************************************-->
+            {{if report.assignation.project.area_level.name!='DTT Tutor Académico':}}
+                {{for log in logs:}}
+                <!-- Helpers for Edition -->
+                {{inc_vars = dict(id = 'log-edit-activity-' + str(log.id),
+                url = URL('log/update', vars=dict(log = log.id)),
+                date = log.entry_date,
+                log_type = log.log_type,
+                log_types = log_types,
+                content = log.description) }}
+                {{include 'include/log-activity.html'}}
+                <!-- // Helpers for Edition -->
+                <!-- Helpers for deletion -->
+                {{inc_vars = dict(id = 'delete-log-' + str(log.id),
+                title = T('Confirm') + ' ' + T('Delete'),
+                content = T('Delete operation can\'t be undone, do you want to continue?'),
+                action = T('Delete'),
+                _class = 'btn-danger',
+                url = URL('log/delete', vars=dict(log = log.id)))}}
+                {{include 'include/delete-helper.html'}}
+                <!-- // Helpers for deletion -->
+                <!-- Display Helper -->
+                {{inc_vars = dict(editable = True,
+                anomaly =  (log.log_type['name'] == 'Anomaly'),
+                log_type = T(log.log_type['name']),
+                date = log.entry_date,
+                edit_action = 'log-edit-activity-' + str(log.id),
+                delete_action = 'delete-log-' + str(log.id),
+                content = MARKMIN(log.description, markmin_settings))}}
+                {{include 'include/display-report-log.html'}}
+                <!-- //Display Helper -->
+                {{pass}}
+            {{else:}}
+                {{for log in logs:}}
+                <!-- Helpers for Edition -->
+                {{inc_vars = dict(id = 'log-edit-activity-' + str(log.id),
+                url = URL('log/update', vars=dict(log = log.id)),
+                date = log.entry_date,
+                log_type = log.log_type,
+                log_types = log_types,
+                content = log.description) }}
+                {{include 'include/log-activity.html'}}
+                <!-- // Helpers for Edition -->
+                <!-- Helpers for deletion -->
+                {{inc_vars = dict(id = 'delete-log-' + str(log.id),
+                title = T('Confirm') + ' ' + T('Delete'),
+                content = T('Delete operation can\'t be undone, do you want to continue?'),
+                action = T('Delete'),
+                _class = 'btn-danger',
+                url = URL('log/delete', vars=dict(log = log.id)))}}
+                {{include 'include/delete-helper.html'}}
+                <!-- // Helpers for deletion -->
+                <!-- Display Helper -->
+                {{inc_vars = dict(editable = True,
+                anomaly =  (log.log_type['name'] == 'Anomaly'),
+                log_type = T(log.log_type['name']),
+                date = log.entry_date,
+                edit_action = 'log-edit-activity-' + str(log.id),
+                delete_action = 'delete-log-' + str(log.id),
+                content = MARKMIN(log.description, markmin_settings))}}
+                {{include 'include/display-report-log.html'}}
+                <!-- //Display Helper -->
+                {{pass}}
+
+                <!--ACTIVITIES WITHOUT METRIC-->
+                {{for awm in activities_WM:}}
+                    {{inc_vars = dict(editable = False,
+                    anomaly =  False,
+                    log_type = T('Activity'),
+                    date = awm.date_start,
+                    edit_action = None,
+                    delete_action = None,
+                    content = MARKMIN('Nombre: "'+awm.name+'"      Descripción: "'+awm.description+'"', markmin_settings))}}
+                    {{include 'include/display-report-log.html'}}
+                {{pass}}
+                <!--ACTIVITIES WITHOUT METRIC-->
+
+                <!--ACTIVITIES WITH METRIC-->
+                {{for awm in activities_M:}}
+                    {{inc_vars = dict(editable = False,
+                    anomaly =  False,
+                    log_type = T('Activity'),
+                    date = awm[0],
+                    edit_action = None,
+                    delete_action = None,
+                    content = MARKMIN(awm[1], markmin_settings))}}
+                    {{include 'include/display-report-log.html'}}
+                {{pass}}
+                <!--ACTIVITIES WITH METRIC-->
             {{pass}}
+            <!--#********************************************************************************-->
+            <!--#******************************PHASE 2 DTT***************************************-->
         </div>
         <hr />
         <div class="row-fluid">
@@ -287,53 +380,79 @@ url = '#')}}
                     <strong>{{=T('Activities Log with metrics')}}</strong>
                 </h1>
                 <span>
-                    <span><strong>{{=T('Total activity logs with metrics')}}:</strong> {{=len(metrics)}}</span>
+                    <span>
+                        <!--#****************************************************************************-->
+                        <!--#****************************PHASE 2 DTT*************************************-->
+                        {{if report.assignation.project.area_level.name=='DTT Tutor Académico':}}
+                            <strong>{{=T('Total activity logs with metrics')}}:</strong> {{=len(activities_M)}}
+                        {{else:}}
+                            <strong>{{=T('Total activity logs with metrics')}}:</strong> {{=len(metrics)}}
+                        {{pass}}
+                        <!--#****************************************************************************-->
+                        <!--#****************************PHASE 2 DTT*************************************-->
+                    </span>
                 </span>
             </div>
         </div>
         <div class="row-fluid">
-            {{for metric in metrics:}}
-            <!-- Metric edit Helper-->
-            {{inc_vars = dict(id = 'metric-edit-activity-' + str(metric.id),
-            url = URL('metrics/update', vars=dict(metric = metric.id)),
-            description = metric.description,
-            date = metric.created,
-            metrics_t = metric.metrics_type,
-            metrics_type = metrics_type,
-            media = metric.media,
-            error_tipico = metric.error,
-            mediana = metric.mediana,
-            moda = metric.moda,
-            desviacion_estandar = metric.desviacion,
-            varianza = metric.varianza,
-            curtosis = metric.curtosis,
-            coeficiente = metric.coeficiente,
-            rango = metric.rango,
-            minimo = metric.minimo,
-            maximo = metric.maximo,
-            total = metric.total,
-            reprobados = metric.reprobados,
-            aprobados = metric.aprobados
-            ) }}
-            {{include 'include/log-metrics-activity.html'}}
-            <!-- //Metric edit Helper-->
-            <!-- Metric delete Helper-->
-            {{inc_vars = dict(id = 'delete-metric-' + str(metric.id),
-            title = T('Confirm') + ' ' + T('Delete'),
-            content = T('Delete operation can\'t be undone, do you want to continue?'),
-            action = T('Delete'),
-            _class = 'btn-danger',
-            url = URL('metrics/delete', vars=dict(metric = metric.id)))}}
-            {{include 'include/delete-helper.html'}}
-            <!-- //Metric delete Helper-->
-            <!-- Display Helper -->
-            {{inc_vars = dict(editable = True,
-            metric = metric,
-            edit_action = 'metric-edit-activity-' + str(metric.id),
-            delete_action = 'delete-metric-' + str(metric.id))}}
-            {{include 'include/display-report-metric.html'}}
-            <!-- //Display Helper -->
+            <!--#****************************************************************************-->
+            <!--#****************************PHASE 2 DTT*************************************-->
+            {{if report.assignation.project.area_level.name=='DTT Tutor Académico':}}
+                {{for metric in activities_M:}}
+                    <!-- Display Helper -->
+                    {{inc_vars = dict(editable = False,
+                    metric = metric,
+                    edit_action = None,
+                    delete_action = None)}}
+                    {{include 'include/display-report-metric.html'}}
+                    <!-- //Display Helper -->
+                {{pass}}
+            {{else:}}
+                {{for metric in metrics:}}
+                <!-- Metric edit Helper-->
+                {{inc_vars = dict(id = 'metric-edit-activity-' + str(metric.id),
+                url = URL('metrics/update', vars=dict(metric = metric.id)),
+                description = metric.description,
+                date = metric.created,
+                metrics_t = metric.metrics_type,
+                metrics_type = metrics_type,
+                media = metric.media,
+                error_tipico = metric.error,
+                mediana = metric.mediana,
+                moda = metric.moda,
+                desviacion_estandar = metric.desviacion,
+                varianza = metric.varianza,
+                curtosis = metric.curtosis,
+                coeficiente = metric.coeficiente,
+                rango = metric.rango,
+                minimo = metric.minimo,
+                maximo = metric.maximo,
+                total = metric.total,
+                reprobados = metric.reprobados,
+                aprobados = metric.aprobados
+                ) }}
+                {{include 'include/log-metrics-activity.html'}}
+                <!-- //Metric edit Helper-->
+                <!-- Metric delete Helper-->
+                {{inc_vars = dict(id = 'delete-metric-' + str(metric.id),
+                title = T('Confirm') + ' ' + T('Delete'),
+                content = T('Delete operation can\'t be undone, do you want to continue?'),
+                action = T('Delete'),
+                _class = 'btn-danger',
+                url = URL('metrics/delete', vars=dict(metric = metric.id)))}}
+                {{include 'include/delete-helper.html'}}
+                <!-- //Metric delete Helper-->
+                <!-- Display Helper -->
+                {{inc_vars = dict(editable = True,
+                metric = metric,
+                edit_action = 'metric-edit-activity-' + str(metric.id),
+                delete_action = 'delete-metric-' + str(metric.id))}}
+                {{include 'include/display-report-metric.html'}}
+                <!-- //Display Helper -->
+                {{pass}}
             {{pass}}
+            <!--#****************************************************************************-->
+            <!--#****************************PHASE 2 DTT*************************************-->
             {{for final in final_r:}}
             <!-- Final Report edit Helper-->
             {{inc_vars = dict(id = 'final-edit-activity-' + str(final.id),
@@ -469,32 +588,49 @@ url = '#')}}
             </div>
         </div>
         <div class="row-fluid">
-            {{for log in report.log_future.select():}}
-            <!-- Helpers for Edition -->
-            {{inc_vars = dict(id = 'log-future-edit-activity-' + str(log.id),
-            url = URL('log_future/update', vars=dict(log = log.id)),
-            date = log.entry_date,
-            content = log.description) }}
-            {{include 'include/log-future-activity.html'}}
-            <!-- // Helpers for Edition -->
-            <!-- Helpers for deletion -->
-            {{inc_vars = dict(id = 'delete-log-future-' + str(log.id),
-            title = T('Confirm') + ' ' + T('Delete'),
-            content = T('Delete operation can\'t be undone, do you want to continue?'),
-            action = T('Delete'),
-            _class = 'btn-danger',
-            url = URL('log_future/delete', vars=dict(log = log.id)))}}
-            {{include 'include/delete-helper.html'}}
-            <!-- // Helpers for deletion -->
-            <!-- Display Helper -->
-            {{inc_vars = dict(editable = True,
-            date = log.entry_date,
-            edit_action = 'log-future-edit-activity-' + str(log.id),
-            delete_action = 'delete-log-future-' + str(log.id),
-            content = MARKMIN(log.description, markmin_settings))}}
-            {{include 'include/display-report-log-future.html'}}
-            <!-- //Display Helper -->
+            <!--#****************************************************************************-->
+            <!--#****************************PHASE 2 DTT*************************************-->
+            {{if report.assignation.project.area_level.name=='DTT Tutor Académico':}}
+                {{for log in activities_F:}}
+                    <!-- Display Helper -->
+                    {{inc_vars = dict(editable = False,
+                    date = log.date_start,
+                    edit_action = None,
+                    delete_action = None,
+                    content = MARKMIN('Nombre: "'+log.name+'" Descripción: "'+log.description+'"', markmin_settings))}}
+                    {{include 'include/display-report-log-future.html'}}
+                    <!-- //Display Helper -->
+                {{pass}}
+            {{else:}}
+                {{for log in report.log_future.select():}}
+                <!-- Helpers for Edition -->
+                {{inc_vars = dict(id = 'log-future-edit-activity-' + str(log.id),
+                url = URL('log_future/update', vars=dict(log = log.id)),
+                date = log.entry_date,
+                content = log.description) }}
+                {{include 'include/log-future-activity.html'}}
+                <!-- // Helpers for Edition -->
+                <!-- Helpers for deletion -->
+                {{inc_vars = dict(id = 'delete-log-future-' + str(log.id),
+                title = T('Confirm') + ' ' + T('Delete'),
+                content = T('Delete operation can\'t be undone, do you want to continue?'),
+                action = T('Delete'),
+                _class = 'btn-danger',
+                url = URL('log_future/delete', vars=dict(log = log.id)))}}
+                {{include 'include/delete-helper.html'}}
+                <!-- // Helpers for deletion -->
+                <!-- Display Helper -->
+                {{inc_vars = dict(editable = True,
+                date = log.entry_date,
+                edit_action = 'log-future-edit-activity-' + str(log.id),
+                delete_action = 'delete-log-future-' + str(log.id),
+                content = MARKMIN(log.description, markmin_settings))}}
+                {{include 'include/display-report-log-future.html'}}
+                <!-- //Display Helper -->
+                {{pass}}
             {{pass}}
+            <!--#****************************************************************************-->
+            <!--#****************************PHASE 2 DTT*************************************-->
         </div>
         
     </div>
