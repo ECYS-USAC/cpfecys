@@ -1,7 +1,3 @@
-{{print "request.vars['option']"+str(request.vars['option'])}}
-{{print "request.vars['option']"+str(request.vars['option'])}}
-{{print "request.vars['option']"+str(request.vars['option'])}}
-{{print "-------"}}
 {{if request.vars['option'] is None:}}
 	{{try:}}
 		{{photo = db(db.auth_user.id==request.vars['id_user']).select(db.auth_user.photo).first().photo}}
