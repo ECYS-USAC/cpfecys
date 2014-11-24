@@ -98,7 +98,7 @@ def check_student(check_carnet):
                     except:          
                         try:
 
-                            temp = unicode(apellido).encode('utf-8').replace('Ã¡','á').replace('Ã©','é').replace('Ã­','í').replace('Ã³','ó').replace('Ãº','ú').replace('Ã±','ñ')
+                            temp = unicode(apellido).encode('utf-8').replace('Ã¡','á').replace('Ã©','é').replace('Ã­','í').replace('Ã³','ó').replace('Ãº','ú').replace('Ã±','ñ').replace('Ã','Á').replace('Ã‰','É').replace('Ã','Í').replace('Ã“','Ó').replace('Ãš','Ú').replace('Ã‘','Ñ').replace('Ã¼‘','ü')
                         except:
                             None
 
@@ -124,7 +124,7 @@ def check_student(check_carnet):
                     except:          
                         try:
 
-                            temp = unicode(apellido).encode('utf-8').replace('Ã¡','á').replace('Ã©','é').replace('Ã­','í').replace('Ã³','ó').replace('Ãº','ú').replace('Ã±','ñ')
+                            temp = unicode(apellido).encode('utf-8').replace('Ã¡','á').replace('Ã©','é').replace('Ã­','í').replace('Ã³','ó').replace('Ãº','ú').replace('Ã±','ñ').replace('Ã','Á').replace('Ã‰','É').replace('Ã','Í').replace('Ã“','Ó').replace('Ãš','Ú').replace('Ã‘','Ñ').replace('Ã¼‘','ü')
                         except:
                             None
 
@@ -558,7 +558,6 @@ def academic_assignation():
                 _onclick="click_reject_photo("+str(has_foto(db(db.academic.id==int(row.carnet)).select(db.academic.id_auth_user).first().id_auth_user))+")")]
    
    
-    #aqui
     if (currentyear_period.id == cpfecys.current_year_period().id):
         grid = SQLFORM.grid(query, details=False, fields=fields, links=links, oncreate=oncreate_academic_assignation, onupdate=onupdate_academic_assignation, ondelete=ondelete_academic_assignation, csv=False, deletable=False, editable=False, paginate=100)
     else:

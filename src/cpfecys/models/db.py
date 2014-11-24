@@ -1104,7 +1104,7 @@ def check_student(check_carnet):
                     except:          
                         try:
 
-                            temp = unicode(apellido).encode('utf-8').replace('Ã¡','á').replace('Ã©','é').replace('Ã­','í').replace('Ã³','ó').replace('Ãº','ú').replace('Ã±','ñ')
+                            temp = unicode(apellido).encode('utf-8').replace('Ã¡','á').replace('Ã©','é').replace('Ã­','í').replace('Ã³','ó').replace('Ãº','ú').replace('Ã±','ñ').replace('Ã','Á').replace('Ã‰','É').replace('Ã','Í').replace('Ã“','Ó').replace('Ãš','Ú').replace('Ã‘','Ñ').replace('Ã¼‘','ü')
                         except:
                             None
 
@@ -1130,7 +1130,7 @@ def check_student(check_carnet):
                     except:          
                         try:
 
-                            temp = unicode(apellido).encode('utf-8').replace('Ã¡','á').replace('Ã©','é').replace('Ã­','í').replace('Ã³','ó').replace('Ãº','ú').replace('Ã±','ñ')
+                            temp = unicode(apellido).encode('utf-8').replace('Ã¡','á').replace('Ã©','é').replace('Ã­','í').replace('Ã³','ó').replace('Ãº','ú').replace('Ã±','ñ').replace('Ã','Á').replace('Ã‰','É').replace('Ã','Í').replace('Ã“','Ó').replace('Ãš','Ú').replace('Ã‘','Ñ').replace('Ã¼‘','ü')
                         except:
                             None
 
