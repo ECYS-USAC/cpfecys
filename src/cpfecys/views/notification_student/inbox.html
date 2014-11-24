@@ -1,4 +1,6 @@
 {{extend 'template.html'}}
+{{cont_news_1 = 0}}
+{{cont_news_2 = 0}}
 <center>
 <h1>
 	{{=T('Inbox')}}
@@ -115,6 +117,7 @@
 								            pass
 								        pass}}
 
+								        {{cont_news_1 = cont_news}}
 
 										{{mails2 = db((db.notification_general_log4.yearp==course.user_project.period.yearp) & (db.notification_general_log4.period==course.user_project.period.period.name) & (db.notification_general_log4.course==course.user_project.project.name)).select()}}
 										{{for a in range(len(mails2)-1, -1, -1):}}
@@ -123,9 +126,11 @@
 									            if var_query != None:
 									                if db((db.read_mail.id_auth_user == auth.user.id) & (db.read_mail.id_mail == mails2[a].id) ).select().first() == None:
 									                    cont_news = cont_news + 1
+									                    cont_news_2 = cont_news_2 + 1
 									                pass
 									            pass}}
 										{{pass}}
+										
 
 										<table class="table table-bordered" >
 											<tr bgcolor="#FAFAFA">
@@ -197,7 +202,7 @@
 
 	function click_link2(var_id){
   		$("#mail_"+var_id).toggle(700);
-  		$("#mail_"+var_id).load("{{=URL('notification_student','inbox_student_mails_load.html')}}?operation=mails_list&amp;email={{=email}}&amp;period_id={{=period_id}}&amp;project_id="+var_id);
+  		$("#mail_"+var_id).load("{{=URL('notification_student','inbox_student_mails_load.html')}}?operation=mails_list&amp;email={{=email}}&amp;period_id={{=period_id}}&amp;cont_news={{=cont_news_1}}&amp;cont_mails={{=cont_news_2}}&amp;project_id="+var_id);
 	}
 	
 </script>

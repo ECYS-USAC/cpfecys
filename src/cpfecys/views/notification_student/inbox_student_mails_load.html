@@ -1,5 +1,19 @@
 {{if request.vars['operation'] == "mails_list": }}
-	<table class="table  " >
+	<table class="table table-bordered">
+		<td>
+			<a onclick="click_academic();" style="cursor:pointer;">
+				{{=T('Academic')}}
+			</a>
+		</td>
+		{{cont_news=request.vars['cont_news']}}
+		{{if cont_news is not None and int(cont_news)>0:}}
+			<td align="right" width="10px">
+				<span id="information_text" class="badge btn-success">{{=T('New Mails')}} {{=cont_news}}</span> 
+			</td>
+		{{pass}}
+	</table>
+	<div id="academics" style="display:none;">		
+	<table class="table">
 
 		{{for a in range(len(mails)-1, -1, -1):}}
 			{{	
@@ -68,7 +82,31 @@
 				</tr>
 			{{pass}}
 		{{pass}}
-
+	</table>
+	</div>
+	<br>
+	<table class="table table-bordered">
+		<td>
+			<a onclick="click_others();" style="cursor:pointer;">
+				{{if auth.has_membership('Teacher'):}}
+					{{=T('Rol Student')}}
+				{{else:}}
+					{{=T('Rol Teacher')}}
+				{{pass}}
+			</a>
+		</td>
+		{{cont_mails=request.vars['cont_mails']}}
+		{{if cont_news is None:}}
+			{{cont_news=0}}
+		{{pass}}
+		{{if cont_mails is not None and (int(cont_mails))>0:}}
+			<td align="right" width="10px">
+				<span id="information_text" class="badge btn-success">{{=T('New Mails')}} {{=str(int(cont_mails))}}</span> 
+			</td>
+		{{pass}}
+	</table>
+	<div id="others" style="display:none;">
+	<table class="table">
 		{{mails=mails2}}
 		{{for a in range(len(mails)-1, -1, -1):}}
 			{{	#SHOW JUST EMAILS SENDED TO ME
@@ -237,9 +275,15 @@
 
 <script type="text/javascript">
 	$(document).ready(function(){
-		
+
   	});
 
+	function click_academic(){
+		$("#academics").toggle(700);
+	}
+	function click_others(){
+		$("#others").toggle(700);
+	}
 	function view_mail(var_id, var_project_id){ 
 
   		$("#mail_div").load("{{=URL('notification_student','inbox_student_mails_load.html')}}?operation=view_mail&amp;mail_id="+var_id+"&amp;var_project_id="+var_project_id);
