@@ -124,9 +124,9 @@ auth.settings.extra_fields['auth_user']= [
                   Field('load_alerted', 'boolean', notnull=False, \
                     writable=False, readable=False),
                   Field('photo', 'upload', notnull=False, label = T('Photo'), \
-                    requires=[IS_UPLOAD_FILENAME(extension = '(png|jpg)',\
+                    requires=[IS_IMAGE(extensions =('jpeg', 'png'), maxsize=(200, 300),\
                     error_message=T('Only files are accepted with extension') +\
-                    ' png|jpg'),IS_LENGTH(2097152,error_message=T('The maximum file size is')+' 2MB')]),]
+                    ' png|jpg'+" "+T('with 200x300px size')+".")]),]
 
 crud, service, plugins = Crud(db), Service(), PluginManager()
 
@@ -1258,8 +1258,10 @@ def academic_insert(*args):
                         username = str(args[0]['carnet']),
                         phone = '12345678',
                         home_address = T('Enter your address'))
+            
             #Add the id_auth_user to academic.
-            db(db.academic.id == args[1]['id']).update(id_auth_user = id_user.id)
+            db(db.academic.id == str(args[1]['id'])).update(id_auth_user = id_user.id)
+            
             #Create membership to academic
             db.auth_membership.insert(user_id = id_user.id, group_id =  academic_var.id)   
 
@@ -1271,7 +1273,19 @@ def academic_insert(*args):
                         phone = '12345678',
                         home_address = T('Enter your address'))
             #Add the id_auth_user to academic.
-            db(db.academic.id == args[1]['id']).update(id_auth_user = id_user.id)
+            db(db.academic.id == str(args[1]['id'])).update(id_auth_user = id_user.id,email=str(web_service['correo']))
+            import cpfecys
+            cperiod = cpfecys.current_year_period()
+            db.academic_log.insert(user_name = 'system',
+                            roll = 'system',
+                            operation_log = 'update', 
+                            after_carnet = str(args[0]['carnet']), 
+                            after_email = str(web_service['correo']), 
+                            before_carnet = str(args[0]['carnet']), 
+                            before_email = str(args[0]['email']), 
+                            id_academic = str(args[1]['id']), 
+                            id_period = cperiod,
+                            description = T('Registration data was updated, set with the information of the web service'))
             #Create membership to academic
             db.auth_membership.insert(user_id = id_user.id, group_id =  academic_var.id)   
         else:

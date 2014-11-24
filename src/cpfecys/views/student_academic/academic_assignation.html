@@ -301,13 +301,22 @@ data-toggle="tab">
         </div>
     </div>
   </div>
-  <div class="modal-footer">
-      <button onclick="close_errors()">{{=T('Close')}}</button>
-  </div>
+  
 </div>
+<div id="div_action_2">
+</div>
+
 <script type="text/javascript">
   function close_errors(){
       $("#error_modal").css("display", "none");
+  }
+  function click_acept_photo(var_id) {
+    $("#div_action_2").load("{{=URL('student_academic','photo.load')}}?option=accept&amp;id_user="+var_id );
+    $("#label_"+var_id).replaceWith('<a data-target="#picModal" data-toggle="modal" id="label_'+var_id+'" onclick="set_photo('+var_id+');" style="cursor: pointer; color: green;">{{=T('Accepted')}}</a>');
+  }
+  function click_reject_photo(var_id) {
+    $("#div_action_2").load("{{=URL('student_academic','photo.load')}}?option=reject&amp;id_user="+var_id );
+    $("#label_"+var_id).replaceWith('<a data-target="#picModal" data-toggle="modal" id="label_'+var_id+'" onclick="set_photo('+var_id+');" style="cursor: pointer; color: red;">{{=T('rejected')}}</a>');
   }
 </script>
 {{session.assignation_error=None}}

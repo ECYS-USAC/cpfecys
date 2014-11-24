@@ -25,9 +25,11 @@
 	        </h2>
 		    {{else:}}
 		    <h2>{{=T('My Courses')}}
+		    	{{if (auth.has_membership('Super-Administrator') == False )and (auth.has_membership('Ecys-Administrator') == False) :}}
 		    	<a onclick="javascript:introJs().setOptions({ 'skipLabel': '{{=T('Skip')}}', 'nextLabel': '{{=T('Next')}}', 'prevLabel': '{{=T('Previous')}}', 'doneLabel': '{{=T('Exit')}}' }).start();" href='javascript:void(0);' class="btn btn-primary" >
 				  <span class="icon-white icon-question-sign"></span>
 				</a>
+				{{pass}}
 				<br>
 				<small>{{=T(periodo.period.name)}} {{=str(periodo.yearp)}}</small>
 	        </h2>
@@ -662,10 +664,12 @@
 		{{pass}}
 	</div>
 </div>
-{{if visited is None:}}
-<script type="text/javascript">
-      var introguide = introJs().setOptions({ 'skipLabel': '{{=T('Skip')}}', 'nextLabel': '{{=T('Next')}}', 'prevLabel': '{{=T('Previous')}}', 'doneLabel': '{{=T('Exit')}}' });
-      introguide.start(); 
-  </script>
-    {{db.page_visited.insert(user_id = auth.user.id, page_name ='courses_list')}}
+{{if (auth.has_membership('Super-Administrator') == False )and (auth.has_membership('Ecys-Administrator') == False) :}}
+	{{if visited is None:}}
+	<script type="text/javascript">
+	      var introguide = introJs().setOptions({ 'skipLabel': '{{=T('Skip')}}', 'nextLabel': '{{=T('Next')}}', 'prevLabel': '{{=T('Previous')}}', 'doneLabel': '{{=T('Exit')}}' });
+	      introguide.start(); 
+	  </script>
+	    {{db.page_visited.insert(user_id = auth.user.id, page_name ='courses_list')}}
+	{{pass}}
 {{pass}}

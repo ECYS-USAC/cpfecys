@@ -79,15 +79,20 @@
 					<td style="width:25%;" >
 						<div style="height:140px; overflow:hidden">
 							<!--<img id="img_img" src="{{=cpfecys.get_domain() + URL('default/download', emisor.photo)}}" alt="No photo" > -->
-							{{review = db((db.photo_review.user_id == emisor.id)).select().first()}}
-				            {{if review is None:}}
-				                <img id="img_img" alt="No photo" height="100%" width="100%">
-				            {{else:}}
-				                {{if review.accepted == False:}}
-				                    <img id="img_img" alt="No photo" height="100%" width="100%">
-				                {{else:}}
-				                    <img id="img_img" src="{{= URL('default/download', emisor.photo)}}" alt="No photo" height="100%" width="100%">
-				                {{pass}}
+							{{user_auth = db((db.auth_membership.user_id == emisor.id)&(db.auth_membership.group_id == db.auth_group.id)&((db.auth_group.role == 'Teacher')|(db.auth_group.role == 'Ecys-Administrator')|(db.auth_group.role == 'Super-Administrator'))).select().first()}}
+							{{if user_auth is not None:}}
+								<img id="img_img" src="{{= URL('default/download', emisor.photo)}}" alt="No photo" height="100%" width="100%">
+							{{else:}}
+								{{review = db((db.photo_review.user_id == emisor.id)).select().first()}}
+					            {{if review is None:}}
+					                <img id="img_img" alt="No photo" height="100%" width="100%">
+					            {{else:}}
+					                {{if review.accepted == False:}}
+					                    <img id="img_img" alt="No photo" height="100%" width="100%">
+					                {{else:}}
+					                    <img id="img_img" src="{{= URL('default/download', emisor.photo)}}" alt="No photo" height="100%" width="100%">
+					                {{pass}}
+					            {{pass}}
 				            {{pass}}
 
 						</div>

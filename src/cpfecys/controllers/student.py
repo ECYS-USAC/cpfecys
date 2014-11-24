@@ -216,6 +216,14 @@ def update_data():
                                       INPUT(_name="home_address",
                                         _type="text", _id="home_address",
                                         _value=cuser.home_address)),
+                        DIV(LABEL(T('Photo')),
+                                      INPUT(_name="photo",
+                                        _class="upload",
+                                        _type="file", _id="photo",
+                                        requires=[IS_IMAGE(extensions =('jpeg', 'png'), maxsize=(200, 300),\
+                    error_message=T('Only files are accepted with extension') +\
+                    ' png|jpg'+" "+T('with 200x300px size')+".")],
+                                        _value=cuser.photo)),
                         BR(),
                         DIV(INPUT(_type='submit',
                             _id="update_data",
@@ -234,6 +242,8 @@ def update_data():
             company_name = request.vars['company_name']
             work_phone = request.vars['work_phone']
             home_address = request.vars['home_address']
+            photo = request.vars['photo']
+
 
             #TODO analyze for aditional security steps
             cuser=db(db.auth_user.id==auth.user.id).select().first()
@@ -245,6 +255,7 @@ def update_data():
                 cuser.company_name = company_name
                 cuser.work_phone = work_phone
                 cuser.home_address = home_address
+                cuser.photo = photo
                 cuser.data_updated = True
                 if password == repass and len(repass) > 0:
                     #TODO Fix password update
@@ -254,15 +265,15 @@ def update_data():
                     cuser.work_address = work_address
 
                 cuser.update_record()
-                response.flash = 'User data updated!'
+                response.flash = T('User data updated!')
                 redirect(URL('default', 'index'))
             else:
                 response.flash = 'Error!'
 
         elif form.errors:
-            response.flash = 'form has errors'
+            response.flash = T('form has errors')
         else:
-            response.flash = 'please fill the form'
+            response.flash = T('please fill the form')
     return dict(form=form, update_data_form=True)
 
 @cache.action()

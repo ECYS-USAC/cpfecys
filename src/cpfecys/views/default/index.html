@@ -4,17 +4,20 @@
 
 {{if auth.has_membership('Academic') or auth.has_membership('Student'):}}
    
-{{review = db((db.photo_review.user_id == auth.user.id)).select().first()
-if review is not None:
-    if review.accepted == False:
-        }}<div class="alert"  style="width:90%;" id="notice_1">
-            <center><strong><font color="red">¡{{=T('Photo Rejected')}}, {{=T('please enter a new photo')}}!</font></strong><br>
-                {{=T('Remember that photography is for academic use; therefore must be commensurate with the seriousness of the case, otherwise it will be blocked.')}}
-            </center>
-            </div>
-    {{pass
-pass
-}}
+    {{review = db((db.photo_review.user_id == auth.user.id)).select().first()
+    if review is None:}}
+        <script>
+            alert("{{=T('Your photo has not been reviewed. Please contact an academic tutor to be accepted.')}}");
+        </script>
+    {{else:
+        if review.accepted == False:
+            }}
+            <script>
+                alert("¡{{=T('Photo Rejected')}}, {{=T('please enter a new photo')}}!\n{{=T('Remember that photography is for academic use; therefore must be commensurate with the seriousness of the case, otherwise it will be blocked.')}}");
+            </script>
+        {{pass
+    pass
+    }}
             
 {{pass}}
 <table style="width:100%;">

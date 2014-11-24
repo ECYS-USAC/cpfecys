@@ -257,6 +257,12 @@ def attendance_list():
         session.flash = T('Profiles created')
         redirect(URL('student_academic','academic_assignation',vars=dict(assignation=str(request.vars['project']))))
     else:
+        def get_name(id_auth):
+            var_return = db(db.auth_user.id == id_auth).select().first()
+            if var_return is None:
+                return ""
+            else:
+                return var_return.first_name + " " + var_return.last_name
         if request.vars['usuario_proyecto'] != None:
             check = db.user_project(id=request.vars['usuario_proyecto'], assigned_user = auth.user.id)
             project = db(db.project.id==check.project).select().first()
@@ -264,7 +270,7 @@ def attendance_list():
             alumnos = db((db.academic.id==db.academic_course_assignation.carnet)&(db.academic_course_assignation.assignation==project.id)&(db.academic_course_assignation.semester==periodo.id)).select()
             l=[]
             t=[]
-            t.append('Listado de Asistencia')
+            t.append(T('Assistance List'))
             l.append(t)
 
             t=[]
@@ -278,17 +284,19 @@ def attendance_list():
             l.append(t)
             
             t=[]
-            t.append('Carnet')
-            t.append('Email')
-            t.append('Laboratorio')
-            t.append('Firma')
+            t.append(T('Carnet'))
+            t.append(T('Name'))
+            t.append(T('Email'))
+            t.append(T('Laboratory'))
+            t.append(T('Signature'))
             l.append(t)
             for i in alumnos:
                 t=[]
                 t.append(i.academic.carnet)
+                t.append(get_name(db(db.academic.id==int(i.academic.id)).select(db.academic.id_auth_user).first().id_auth_user))
                 t.append(i.academic.email)
                 if i.academic_course_assignation.laboratorio==True:
-                    t.append('Si')
+                    t.append(T('Yes'))
                 else:
                     t.append('No')
                 l.append(t)
@@ -327,10 +335,11 @@ def academic_assignation():
         session.last_assignation = check.id
     cyearperiod = cpfecys.current_year_period()
 
+    #Temporal---------------------------------------------------------------------------------------------
     if request.vars['listado'] =='True':
         redirect(URL('student_academic','attendance_list',vars=dict(usuario_proyecto=str(check.id))))
 
-    #Temporal---------------------------------------------------------------------------------------------
+    
     #Temporal---------------------------------------------------------------------------------------------
 
 
@@ -349,21 +358,14 @@ def academic_assignation():
     
     fields = (db.academic_course_assignation.carnet, db.academic_course_assignation.laboratorio)
 
-    #db.academic.id.readable = False
-    #db.academic.id.writable = False
-    #db.academic.carnet.readable = False    
-    #db.academic.carnet.writable = False
-    #db.academic.email.writable = False
-    #db.academic.email.readable = True
-    
-
-
     db.academic_course_assignation.assignation.default = check.project
     db.academic_course_assignation.assignation.writable = False
     db.academic_course_assignation.assignation.readable = False
     db.academic_course_assignation.semester.default = currentyear_period.id
     db.academic_course_assignation.semester.writable = False
     db.academic_course_assignation.semester.readable = False
+    db.academic_course_assignation.carnet.readable = False
+    db.academic_course_assignation.laboratorio.readable = False
 
     #update form start
     update_form = FORM(INPUT(_name='academic_carnet',_type='text'),
@@ -461,43 +463,111 @@ def academic_assignation():
         except:
             return 'btn'
 
-    links = [lambda row: A(str( db(db.academic.id==int(row.carnet)).select(db.academic.email).first().email ),
-        _role='label',
-        _title=str( db(db.academic.id==int(row.carnet)).select(db.academic.email).first().email ),
-        _style='width: 250px; ')]
-
+    def get_auth_user(id_auth):
+        var_return = db(db.auth_user.id == id_auth).select().first()
+        if var_return is None:
+            class temp:
+                photo = ''
+                first_name = ''
+                last_name = ''
+            return temp
+        else:
+            return var_return
     
+    def get_photo_state(id_auth):
+        review = db((db.photo_review.user_id == id_auth)).select().first()
+        if review is None:
+            class temp:
+                result = T('Pending')
+                color = 'blue'
+            return temp
+        else:
+            if review.accepted == True:
+                class temp:
+                    result = T('Accepted')
+                    color = 'green'
+                return temp
+            else:
+                class temp:
+                    result = T('rejected')
+                    color = 'red'
+                return temp
+            pass
+        pass
 
-    links += [lambda row: A(T('View photo'),
-        _role='button', 
-        _class=get_button_clas(row.carnet), 
+    def has_foto(id_auth):
+        var_return = db(db.auth_user.id == id_auth).select().first()
+        if var_return is None:
+            return -1
+        else:
+            if var_return.photo is None:
+                return -1
+            else:
+                return id_auth
+        
+    
+    links = [{'header':T('Photo'), 
+                'body':lambda row: A(IMG(_src= URL('default/download', get_auth_user((db(db.academic.id==int(row.carnet)).select(db.academic.id_auth_user).first().id_auth_user)).photo ), 
+                    _width=50, _height=40, _id='image'), 
+        _style="cursor:pointer;"        ,
         _onclick='set_photo("'+str(db(db.academic.id==int(row.carnet)).select(db.academic.id_auth_user).first().id_auth_user)+'");', 
-        _title=T('View photo') ,**{"_data-toggle":"modal", "_data-target": "#picModal"})]   
+        _title=T('View photo') ,**{"_data-toggle":"modal", "_data-target": "#picModal"}) 
+                
+
+                }]
+
+    links += [{'header':T('Carnet'), 
+                'body':lambda row:  str(db(db.academic.id==int(row.carnet)).select(db.academic.carnet).first().carnet)}]
+
+    links += [{'header':T('Name'), 
+                'body':lambda row:  str(get_auth_user((db(db.academic.id==int(row.carnet)).select(db.academic.id_auth_user).first().id_auth_user)).first_name) + " " + str(get_auth_user((db(db.academic.id==int(row.carnet)).select(db.academic.id_auth_user).first().id_auth_user)).last_name )}]
+
+
+    links += [{'header':T('Email'), 
+                'body':lambda row: (str( db(db.academic.id==int(row.carnet)).select(db.academic.email).first().email ))}]
+
+    links += [{'header':T('Laboratory'), 
+                'body':lambda row: T(str(row.laboratorio))}] 
+
+    links += [{'header':T('Photo State'), 
+                'body':lambda row: A(get_photo_state((db(db.academic.id==int(row.carnet)).select(db.academic.id_auth_user).first().id_auth_user)).result,
+                    _id="label_"+str(db(db.academic.id==int(row.carnet)).select(db.academic.id_auth_user).first().id_auth_user),
+                    _style="cursor:pointer; color:"+get_photo_state((db(db.academic.id==int(row.carnet)).select(db.academic.id_auth_user).first().id_auth_user)).color+";",
+                    _onclick='set_photo("'+str(db(db.academic.id==int(row.carnet)).select(db.academic.id_auth_user).first().id_auth_user)+'");',**{"_data-toggle":"modal", "_data-target": "#picModal"} ) }] 
+
+
         
 
     if (request.vars['year_period'] is None) or (str(request.vars['year_period']) == str(cpfecys.current_year_period().id)):
-        links += [lambda row: A(T('Edit assignation'), 
+        links += [{'header':T('Assignation'), 
+                'body':lambda row: A(T('Edit'), 
             _role='button', 
             _class='btn', 
             _onclick='set_values('+str(row.id)+','\
                 +str( db(db.academic.id==int(row.carnet)).select(db.academic.carnet).first().carnet )+','\
                 +'"'+str( db(db.academic.id==int(row.carnet)).select(db.academic.email).first().email )+'",'\
                 +'"'+str(row.laboratorio)+'")', 
-            _title=T('Edit academic information')+' '+str( db(db.academic.id==int(row.carnet)).select(db.academic.carnet).first().carnet ) ,**{"_data-toggle":"modal", "_data-target": "#attachModal"})]
-        
-    links += [lambda row: A('   ',
-        _role='label')]
-   
+            _title=T('Edit academic assignation')+' '+str( db(db.academic.id==int(row.carnet)).select(db.academic.carnet).first().carnet ) ,**{"_data-toggle":"modal", "_data-target": "#attachModal"})}]
     
+    links += [lambda row: A(T('Accept Photo'),
+                _class="btn btn-success",
+                _onclick="click_acept_photo("+str(has_foto(db(db.academic.id==int(row.carnet)).select(db.academic.id_auth_user).first().id_auth_user))+")")]
+
+    links += [lambda row: A(T('Reject Photo'),
+                _class="btn btn-danger",
+                _onclick="click_reject_photo("+str(has_foto(db(db.academic.id==int(row.carnet)).select(db.academic.id_auth_user).first().id_auth_user))+")")]
+   
+   
+    #aqui
     if (currentyear_period.id == cpfecys.current_year_period().id):
-        grid = SQLFORM.grid(query, details=False, fields=fields, links=links, oncreate=oncreate_academic_assignation, onupdate=onupdate_academic_assignation, ondelete=ondelete_academic_assignation, csv=False, deletable=False, editable=False,)
+        grid = SQLFORM.grid(query, details=False, fields=fields, links=links, oncreate=oncreate_academic_assignation, onupdate=onupdate_academic_assignation, ondelete=ondelete_academic_assignation, csv=False, deletable=False, editable=False, paginate=100)
     else:
         checkProject = db((db.user_project.project == check.project) & (db.user_project.assigned_user==check.assigned_user) & (db.user_project.period==currentyear_period.id)).select()
         b=0
         for a in checkProject:
             b=b+1
         if b!=0:
-            grid = SQLFORM.grid(query, details=False , fields=fields, links=links, deletable=False, editable=False, create=False,csv=False)
+            grid = SQLFORM.grid(query, details=False , fields=fields, links=links, deletable=False, editable=False, create=False,csv=False, paginate=100)
         else:
             session.flash  =T('Not authorized')
             redirect(URL('default','index'))
@@ -800,7 +870,7 @@ def academic_assignation_upload():
                         else:
                             #insert a new user with csv data
                             session.academic_update = True
-                            #aqui
+                            
                             usr = db.academic.insert(carnet = rcarnet,
                                                           email = "email@email.com")
                             #Add log
