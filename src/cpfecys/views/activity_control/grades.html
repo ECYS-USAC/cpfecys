@@ -187,11 +187,11 @@
   <th >
     {{=T('Name')}}
   </th>
-  <th >
+  <th width="15%">
     {{=T('Grade')}}
   </th>
   {{if request_change_var == False:}}
-    <th >
+    <th style="width:25%;">
       <center>
         {{=T('Actions')}}
       </center>
@@ -274,7 +274,7 @@
       </td>
       {{var_grade = db((db.grades.academic_assignation==academic.id) & (db.grades.activity==var_activity.id)).select().first()}}
       {{if var_grade is None:}}
-        <td >
+        <td width="15%">
           <div id="div_edit_grade_{{=academic.carnet.carnet}}" style="display:none;">
             {{if (exist_request_change == False) | (request_change_var == False):}}
               <input class="string" name="edit_grade_{{=academic.carnet.carnet}}" type="text" value="" id="edit_grade_{{=academic.carnet.carnet}}" style="width:100px;">
@@ -322,7 +322,7 @@
           </td>
         {{pass}}
       {{else:}}
-        <td style="width:25%;">
+        <td>
           <div id="div_edit_grade_{{=academic.carnet.carnet}}" style="display:none;">
            {{if (exist_request_change == False) | (request_change_var == False):}}
               <input class="string" name="edit_grade_{{=academic.carnet.carnet}}" type="text" value="{{=var_grade.grade}}" id="edit_grade_{{=academic.carnet.carnet}}" style="width:100px;">

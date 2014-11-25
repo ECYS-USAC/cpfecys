@@ -2167,4 +2167,6 @@
 'Your photo has not been reviewed. Please contact an academic tutor to be accepted.': 'Su foto no ha sido revisada. Por favor contactar a un tutor académico para que sea aceptada.',
 'Your username is: %(username)s': 'Your username is: %(username)s',
 'YYYY-MM-DD': 'YYYY-MM-DD',
+'Performance in the course':'Desempeño en el curso',
+'Laboratory performance':'Desempeño en el laboratorio',
 }

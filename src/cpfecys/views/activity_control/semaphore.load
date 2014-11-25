@@ -15,54 +15,57 @@
 		{{if category_var.category.category != 'Laboratorio':}}
 			{{dont_pass = False}}
 			{{if category_var.category.category == 'Examen Final':
-				course_first_recovery_test_var = None
-				course_second_recovery_test_var = None
-				academic_assig = None
-				try:
-					academic_assig = db(db.academic_course_assignation.id == request.vars['academic'] ).select().first()
-					course_first_recovery_test_var = db((db.course_first_recovery_test.carnet == academic_assig.carnet) & (db.course_first_recovery_test.semester == academic_assig.semester) & (db.course_first_recovery_test.project == academic_assig.assignation)).select().first()
+				if laboratory_var == False:
+					course_first_recovery_test_var = None
+					course_second_recovery_test_var = None
+					academic_assig = None
 					try:
-						course_second_recovery_test_var = db((db.course_second_recovery_test.carnet == academic_assig.carnet) & (db.course_second_recovery_test.semester == academic_assig.semester) & (db.course_second_recovery_test.project == academic_assig.assignation)).select().first()
+						academic_assig = db(db.academic_course_assignation.id == request.vars['academic'] ).select().first()
+						course_first_recovery_test_var = db((db.course_first_recovery_test.carnet == academic_assig.carnet) & (db.course_first_recovery_test.semester == academic_assig.semester) & (db.course_first_recovery_test.project == academic_assig.assignation)).select().first()
+						try:
+							course_second_recovery_test_var = db((db.course_second_recovery_test.carnet == academic_assig.carnet) & (db.course_second_recovery_test.semester == academic_assig.semester) & (db.course_second_recovery_test.project == academic_assig.assignation)).select().first()
+						except:
+							None
+						pass
 					except:
 						None
 					pass
-				except:
-					None
-				pass
 
-				if academic_assig is not None:
-					final_grade = 0
-					if course_second_recovery_test_var is not None:
-						final_grade = float(course_second_recovery_test_var.grade)
-						dont_pass = True
-					pass
-					if course_first_recovery_test_var is not None:
-						if float(course_first_recovery_test_var.grade) > float(final_grade):
-							final_grade = float(course_first_recovery_test_var.grade)
+					if academic_assig is not None:
+						final_grade = 0
+						if course_second_recovery_test_var is not None:
+							final_grade = float(course_second_recovery_test_var.grade)
 							dont_pass = True
 						pass
-					pass
-					
-					activity_var = db((db.course_activity.course_activity_category == category_var.id)).select().first()
-					try:
-						grade_var = db((db.grades.activity==activity_var.id)&(db.grades.academic_assignation == academic_assig.id)).select().first()
-						if float(grade_var.grade) > float(final_grade):
-							final_grade = float(grade_var.grade)
-							dont_pass = True
-						pass 
-					except:
-						None
+						if course_first_recovery_test_var is not None:
+							if float(course_first_recovery_test_var.grade) > float(final_grade):
+								final_grade = float(course_first_recovery_test_var.grade)
+								dont_pass = True
+							pass
+						pass
+						
+						activity_var = db((db.course_activity.course_activity_category == category_var.id)).select().first()
+						try:
+							grade_var = db((db.grades.activity==activity_var.id)&(db.grades.academic_assignation == academic_assig.id)).select().first()
+							if float(grade_var.grade) > float(final_grade):
+								final_grade = float(grade_var.grade)
+								dont_pass = True
+							pass 
+						except:
+							None
+						pass
+
+						if dont_pass == True:
+							temp_vect = []
+							temp_vect.append(final_grade)
+							temp_vect.append(float(category_var.grade))
+							matrix_category.append(temp_vect)
+							category_grade_total = category_grade_total + category_var.grade
+							num_category = num_category + 1
+						pass
 					pass
 
-					temp_vect = []
-					temp_vect.append(final_grade)
-					temp_vect.append(float(category_var.grade))
-					matrix_category.append(temp_vect)
-					category_grade_total = category_grade_total + category_var.grade
-					num_category = num_category + 1
-				pass
-
-				
+				pass				
 			pass
 			if dont_pass == False:}}
 

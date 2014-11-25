@@ -566,7 +566,7 @@
 										<b>{{=T('Section')}}:</b> {{=split_section(course.academic_course_assignation.assignation.name)}}
 										
 										<br>
-										<b>{{=T('Course Average')}}:</b>
+										<b>{{=T('Performance in the course')}}:</b>
 										<span id="average_course_{{=course.academic_course_assignation.assignation}}_academic" >
 										</span>
 										<font id="label_average_course_{{=course.academic_course_assignation.assignation}}">{{=T('Calculating')}}...</font>
@@ -574,7 +574,7 @@
 										<script type="text/javascript">
 											 $("#label_average_course_{{=course.academic_course_assignation.assignation}}").load("{{=URL('activity_control','semaphore.load')}}?project={{=course.academic_course_assignation.assignation}}&amp;period={{=periodo.id}}&amp;op=1&amp;academic={{=course.academic_course_assignation.id}}");
 										</script>
-										<b>{{=T('Laboratory Average')}}:</b>
+										<b>{{=T('Laboratory performance')}}:</b>
 										<span id="average_lab_{{=course.academic_course_assignation.assignation}}_academic" >
 											{{=T('Calculating')}}...
 										</span>
