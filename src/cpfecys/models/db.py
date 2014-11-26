@@ -1470,6 +1470,53 @@ db.define_table('photo_review',
     Field('accepted', 'boolean', notnull=True, label=T('accepted'))
 )
 
+db.define_table('evaluation',
+    Field('date_start', 'datetime', notnull = True, label = T('Date start')),
+    Field('date_finish', 'datetime', notnull = True, label = T('Date finish')),
+    Field('semester_repeat', 'boolean', notnull = True, label = T('Repeat')),
+    Field('description', 'text', notnull=False, label=T('Description'))
+)
+
+
+db.define_table('evaluation_type',
+    Field('name', 'string', length = 255 ,notnull = True, unique=True, label = T('Name')),
+    Field('description', 'text', notnull = True, label = T('Description')),
+    Field('user_type_evaluated', 'reference auth_group', notnull = True, label = T('Evaluated')),
+    Field('user_type_evaluator', 'reference auth_group', notnull = True, label = T('Evaluator'))
+)
+
+db.define_table('evaluation_template',
+    Field('name', 'string', length = 255, notnull = True, unique=True, label = T('Name')),
+    Field('date_created', 'datetime', notnull = True, label = T('Date created')),
+    Field('description', 'text', notnull = True, label = T('Description')),
+    Field('evaluation_type', 'reference evaluation_type', notnull=True, label=T('Evaluation type'))
+)
+
+db.define_table('answer_type',
+    Field('name', 'string', length = 255, notnull = True, unique=True, label = T('Name')),
+    Field('exclusive_one_answer', 'boolean', notnull = True, label = T('Exclusive one answer')),
+    Field('description', 'text', notnull = True, label = T('Description'))
+)
+
+db.define_table('answer',
+    Field('answer', 'string', length = 255, notnull = True, unique=True, label = T('Answer')),
+    Field('answer_type', 'reference answer_type', notnull = True, label = T('Answer type'))
+)
+
+db.define_table('evaluation_question',
+    Field('question', 'string', length = 255, notnull = True, unique=True, label = T('Question')),
+    Field('answer_type', 'reference answer_type', notnull = True, label = T('Evaluation question'))
+)
+
+db.define_table('evaluation_template_detail',
+    Field('evaluation_template', 'reference evaluation_template', notnull = True, label = T('Evaluation template')),
+    Field('evaluation_question', 'reference evaluation_question', notnull = True, label = T('Evaluation question'))
+)
+
+
+
+
+
 ## after defining tables, uncomment below to enable auditing
     # auth.enable_record_versioning(db)
 # automatic forcing spanish language
