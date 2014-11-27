@@ -184,24 +184,197 @@
 
 									<td>{{=split_name(course.name)}}</td>
 									<td>{{=split_section(course.name)}}</td>
-									<td>
-										<div id="label_average_{{=course.id}}"><center>{{=T('Calculating')}}...</center></div>
-										<script type="text/javascript">
-											 $("#label_average_{{=course.id}}").load("{{=URL('activity_control','semaphore.load')}}?project={{=course.id}}&amp;period={{=periodo.id}}&amp;laboratory=False");
-										</script>
-										<center>
-											<span id="average_course_{{=course.id}}" >
+									
+									{{average_laboratory = float(0)}}
+									{{average_class = float(0)}}
 
-			          						</span>
+									{{for letter in 'lc':}}
+										{{matrix_category = []}}
+										{{num_category = 0}}
+										{{category_grade_total = 0}}
+
+										{{laboratory_var = False}}
+										{{if letter == 'l':}}
+											{{laboratory_var=True}}
+										{{pass}}
+
+										{{for category_var in db((db.course_activity_category.assignation == course.id) &(db.course_activity_category.semester== periodo.id)&(db.course_activity_category.laboratory==laboratory_var)).select() :}}
+											{{if category_var.category.category != 'Laboratorio':}}
+												{{dont_pass = False}}
+												
+												{{if dont_pass == False:}}
+
+													{{average=float(0)}}
+													{{total_activity=float(0)}}
+													{{num_activity=0}}
+													{{matrix_specific_grade = []}}
+													{{activity_grade_total=float(0)}}
+													{{for activity_var in db((db.course_activity.course_activity_category == category_var.id)).select() :}}	
+														{{if request.vars['op'] !='1':}}
+															{{total_grades = db(db.grades.activity==activity_var.id).count()}}
+														{{else:}}
+															{{#total_grades = db((db.grades.activity==activity_var.id)&(db.grades.academic_assignation == request.vars['academic'])).count()}}
+
+															{{total_grades = db(db.grades.activity==activity_var.id).count()}}
+															
+														{{pass}}
+														{{if total_grades != 0:}}
+															
+															{{if request.vars['op'] !='1':}}
+																{{averageA = db.executesql('select avg(grade) as average from grades where activity='+str(activity_var.id)+';',as_dict=True)}}
+																{{for d0 in averageA:}}
+																	{{if d0['average']!=None:}}
+																		{{average=float(d0['average'])}}
+																	{{pass}}
+																{{pass}}
+															{{else:}}
+																{{averageA = db((db.grades.activity==activity_var.id)&(db.grades.academic_assignation == request.vars['academic'])).select().first()}}
+																{{if averageA!=  None:}}
+																	{{average=float(averageA.grade)}}
+																{{else:}}
+																	{{average=float(00.001)}}
+																{{pass}}
+
+															{{pass}}
+
+															{{if category_var.specific_grade==False:}}
+																{{total_activity=total_activity+average}}
+															{{else:}}
+																{{temp_vect2 = []}}
+																{{temp_vect2.append(average*(float(activity_var.grade))/100)}}
+																{{temp_vect2.append(float(activity_var.grade))}}
+																{{matrix_specific_grade.append(temp_vect2)}}
+																{{activity_grade_total=activity_grade_total+float(activity_var.grade)}}
+															{{pass}} {{#-------if-category_var.specific_grade==False}}
+															{{num_activity=num_activity+1}}
+														{{pass}} {{#-------if total_grades != 0}}
+														
+													{{pass}} {{#-------for-activity_var}}
+													{{try:}}
+														{{if category_var.specific_grade==False:}}
+															{{temp_vect = []}}
+															
+															{{temp_vect.append((total_activity)/(num_activity)) }}
+															{{temp_vect.append(float(category_var.grade)) }}
+															{{matrix_category.append(temp_vect) }}
+															{{if total_activity != 0:}}
+																{{category_grade_total = category_grade_total + category_var.grade}}
+															{{pass}}
+														{{else:}}
+															{{temp_vect = []}}
+															{{for var_x in matrix_specific_grade: }}
+																{{total_activity = total_activity+((var_x[0])*float(category_var.grade)/(activity_grade_total))}}
+
+															{{pass}}
+
+															{{if total_activity != 0:}}
+																{{temp_vect.append(total_activity*100/float(category_var.grade)) }}
+																{{temp_vect.append(float(category_var.grade)) }}
+																{{matrix_category.append(temp_vect) }}
+																{{category_grade_total = category_grade_total + category_var.grade}}
+															{{pass}}
+														{{pass}}
+
+													{{except:}}
+														{{None}}
+													{{pass}}
+													
+													{{num_category = num_category + 1}}
+
+												{{pass}}
+											
+											{{else:}}
+												{{
+												validate_laboratory_var = None
+												try:
+													academic_assig = db(db.academic_course_assignation.id == request.vars['academic'] ).select().first()
+													validate_laboratory_var = db((db.validate_laboratory.carnet == academic_assig.carnet) & (db.validate_laboratory.semester == academic_assig.semester) & (db.validate_laboratory.project == academic_assig.assignation)).select().first()
+												except:
+													None
+												pass
+												
+												}}
+
+												{{if validate_laboratory_var is not None:}}
+													{{temp_vect = []}}
+													{{temp_vect.append(validate_laboratory_var.grade) }}
+													{{temp_vect.append(float(category_var.grade)) }}
+													{{matrix_category.append(temp_vect) }}
+													{{category_grade_total = category_grade_total + category_var.grade}}
+												{{elif average_laboratory != 0:}}
+													{{temp_vect = []}}
+													{{temp_vect.append(average_laboratory) }}
+													{{temp_vect.append(float(category_var.grade)) }}
+													{{matrix_category.append(temp_vect) }}
+													{{category_grade_total = category_grade_total + category_var.grade}}
+												{{pass}}
+											{{pass}}
+										{{pass}} {{#-------for-category_var}}
+
+
+										{{#----------------------Calculing Total Average----------}}
+										{{total_average=float(0)}}
+										{{for var_x in matrix_category: }}
+											{{total_average = total_average + (var_x[0]*var_x[1]/float(category_grade_total))}}
+										{{pass}}
+
+										{{if letter == 'l':}}
+											{{average_laboratory = total_average}}
+										{{else:}}
+											{{average_class = total_average}}
+										{{pass}}
+
+									{{pass}}
+
+
+									{{comparation = T(period.period.name)+" "+str(period.yearp)}}
+
+									{{controlP = db((db.student_control_period.period_name==comparation)).select().first()}}
+
+
+									{{string_temp=""}}
+									{{try:}}
+										{{if request.vars['academic'] != None:}}
+											{{string_temp="_academic"}}
+										{{pass}}
+									{{except:}}
+										{{string_temp=""}}
+									{{pass}}
+									<td>
+										<center>
+										{{if average_class < float(controlP.min_average):}}		
+											<span class = "label label-important">
+												{{=round(average_class,2)}}
+											</span>		
+										{{elif average_class>=float(controlP.min_average) and average_class <= float(controlP.max_average):}}
+											<span class = "label label-warning">
+												{{=round(average_class,2)}}
+											</span>
+										{{else:}}
+											<span class = "label label-success">
+												{{=round(average_class,2)}}
+											</span>
+										{{pass}}
 										</center>
 									</td>
 									<td>
 										<center>
-											<span id="average_lab_{{=course.id}}" >
-												{{=T('Calculating')}}...
-				          					</span>
-			          					</center>
+										{{if average_laboratory < float(controlP.min_average):}}
+											<span class = "label label-important">
+												{{=round(average_laboratory,2)}}
+											</span>	
+										{{elif average_laboratory >= float(controlP.min_average) and average_laboratory <= float(controlP.max_average):}}
+											<span class = "label label-warning">
+												{{=round(average_laboratory,2)}}
+											</span>
+										{{else:}}
+											<span class = "label label-success">
+												{{=round(average_laboratory,2)}}
+											</span>
+										{{pass}}
+										</center>
 									</td>
+
 								{{pass}}
 							</td>
 
