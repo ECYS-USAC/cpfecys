@@ -331,7 +331,7 @@ def courses_list():
             redirect(URL('default','index'))
 
     response.view='activity_control/courses_list.html'
-    if auth.has_membership('Super-Administrator'):
+    if (auth.has_membership('Super-Administrator') or auth.has_membership('Ecys-Administrator')):
         coursesAdmin = db(db.project.area_level==area.id).select()
     elif auth.has_membership('Teacher'):
         coursesAdmin = db((db.user_project.assigned_user == auth.user.id) & (db.user_project.period == period.id) & (db.user_project.project==db.project.id) & (db.project.area_level==area.id)).select()

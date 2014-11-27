@@ -139,6 +139,10 @@ if auth.has_membership(role="Academic"):
                 pass
             pass
         
+if auth.has_membership(role="Ecys-Administrator"):
+    response.menu.extend([(T('Manage')+" "+T('Academic Control'), False, URL('activity_control','courses_list'), [])
+    ])
+
 if auth.has_membership(role="Student"):
     response.menu.extend([(T('Final Practice'), False,  URL('student', 'index'), [])
     ])
