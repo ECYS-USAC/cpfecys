@@ -1,5 +1,424 @@
 #***********************************************************************************************************************
 #******************************************************PHASE 2 DTT******************************************************
+def obtainPeriodReport(report):
+    #Get the minimum and maximum date of the report
+    tmp_period=1
+    tmp_year=report.report_restriction.start_date.year
+    if report.report_restriction.start_date.month >= 6:
+        tmp_period=2
+    return db((db.period_year.yearp==tmp_year)&(db.period_year.period==tmp_period)).select().first()
+
+
+import math
+def metric_statistics(actTempo, recovery, dataIncoming):
+    activity=[]
+    if dataIncoming is None:
+        if recovery==1 or recovery==2:
+            if recovery==1:
+                #Description of Activity
+                description = 'Nombre: "PRIMERA RETRASADA"'
+                tempData = db((db.course_first_recovery_test.semester==obtainPeriodReport(actTempo).id)&(db.course_first_recovery_test.project==actTempo.assignation.project)).select(db.course_first_recovery_test.grade, orderby=db.course_first_recovery_test.grade)
+            else:
+                #Description of Activity
+                description = 'Nombre: "SEGUNDA RETRASADA"'
+                tempData = db((db.course_second_recovery_test.semester==obtainPeriodReport(actTempo).id)&(db.course_second_recovery_test.project==actTempo.assignation.project)).select(db.course_second_recovery_test.grade, orderby=db.course_second_recovery_test.grade)
+            data=[]
+            Sum_Data=float(0)
+            Sum_Data_Squared=float(0)
+            totalReprobate=0
+            totalApproved=0
+            for d1 in tempData:
+                if d1.grade is None:
+                    data.append(float(0))
+                    totalReprobate+=1
+                else:
+                    data.append(float(d1.grade))
+                    Sum_Data+=float(d1.grade)
+                    Sum_Data_Squared+=(float(d1.grade)*float(d1.grade))
+                    if float(d1.grade)>=float(61):
+                        totalApproved+=1
+                    else:
+                        totalReprobate+=1
+        else:
+            #Description of Activity
+            description = 'Nombre: "'+actTempo.name+'" Descripción: "'+actTempo.description+'"'
+            
+            #*********************************************Statistics Activity*********************************************
+            #Get the data
+            tempData = db(db.grades.activity == actTempo.id).select(db.grades.grade, orderby=db.grades.grade)
+            #tempData=[40,60,75,75,75,75,80,80,85,85,85,85,85,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100]
+            data=[]
+            Sum_Data=float(0)
+            Sum_Data_Squared=float(0)
+            totalReprobate=0
+            totalApproved=0
+            for d1 in tempData:
+                if d1.grade is None:
+                    data.append(float(0))
+                    totalReprobate+=1
+                else:
+                    data.append(float(d1.grade))
+                    Sum_Data+=float(d1.grade)
+                    Sum_Data_Squared+=(float(d1.grade)*float(d1.grade))
+                    if float(d1.grade)>=float(61):
+                        totalApproved+=1
+                    else:
+                        totalReprobate+=1
+    else:
+        data=[]
+        Sum_Data=float(0)
+        Sum_Data_Squared=float(0)
+        totalReprobate=0
+        totalApproved=0
+        for d1 in dataIncoming:
+            if d1 is None:
+                data.append(float(0))
+                totalReprobate+=1
+            else:
+                data.append(float(d1))
+                Sum_Data+=float(d1)
+                Sum_Data_Squared+=(float(d1)*float(d1))
+                if float(d1)>=float(61):
+                    totalApproved+=1
+                else:
+                    totalReprobate+=1
+    
+
+
+    #*********************************************
+    #Total Students
+    totalStudents = int(len(data))
+    
+
+
+    #*********************************************
+    #Mean
+    mean = float(Sum_Data/totalStudents)
+    #Variance
+    try:
+        variance=((Sum_Data_Squared/totalStudents)-(mean*mean))
+    except:
+        variance=float(0)
+    #Standard Deviation
+    try:
+        standard_deviation=math.sqrt(variance)
+    except:
+        standard_deviation=float(0)
+    #Standard Error
+    try:
+        standard_error=standard_deviation/math.sqrt(totalStudents)
+    except:
+        standard_error=float(0)
+    #Kurtosis
+    try:
+        #Numerator
+        numerator=0
+        for i in data:
+            numerator+=(i-mean)*(i-mean)*(i-mean)*(i-mean)
+        numerator=numerator*totalStudents
+        #Denominator
+        denominator=0
+        for i in data:
+            denominator+=(i-mean)*(i-mean)
+        denominator=denominator*denominator
+        #Fraction
+        kurtosis=(numerator/denominator)-3
+    except:
+        kurtosis=float(0)
+    #Minimum
+    minimum=float(data[0])
+    if totalStudents==1:
+        #Maximum
+        maximum=float(data[0])
+        #Rank
+        rank=float(0)
+        #Median
+        median=float(Sum_Data)
+        #Mode
+        mode=float(Sum_Data)
+    else:
+        #Maximum
+        maximum=float(data[totalStudents-1])
+        #Rank
+        rank=float(data[totalStudents-1] - data[0])
+        #Median
+        if totalStudents%2 == 1:
+            median = float(data[totalStudents//2])
+        else:
+            i = totalStudents//2
+            median = float((data[i - 1] + data[i])/2)
+        #Mode
+        try:
+            table = collections.Counter(iter(data)).most_common()
+            maxfreq = table[0][1]
+            for i in range(1, len(table)):
+                if table[i][1] != maxfreq:
+                    table = table[:i]
+                    break
+            mode=float(table[0][0])
+        except:
+            mode=minimum
+    #Skewness
+    try:
+        skewness=float((3*(mean-median))/standard_error)
+    except:
+        skewness=float(0)
+    
+
+
+    #**********************************************
+    #Metric Type
+    if dataIncoming is None:
+        if recovery==1 or recovery==2:
+            if recovery==1:
+                metricType=db(db.metrics_type.name=='PRIMERA RETRASADA').select(db.metrics_type.id).first()[db.metrics_type.id]
+            else:
+                metricType=db(db.metrics_type.name=='SEGUNDA RETRASADA').select(db.metrics_type.id).first()[db.metrics_type.id]
+        else:
+            category = actTempo.course_activity_category.category.category.upper()
+            metricType=None
+            if category=='TAREAS':
+                metricType=db(db.metrics_type.name=='TAREA').select(db.metrics_type.id).first()[db.metrics_type.id]
+            elif category=='EXAMEN CORTO':
+                metricType=db(db.metrics_type.name=='EXAMEN CORTO').select(db.metrics_type.id).first()[db.metrics_type.id]
+            elif category=='HOJAS DE TRABAJO':
+                metricType=db(db.metrics_type.name=='HOJA DE TRABAJO').select(db.metrics_type.id).first()[db.metrics_type.id]
+            elif category=='PARCIALES':
+                metricType=db(db.metrics_type.name==actTempo.name.upper()).select(db.metrics_type.id).first()[db.metrics_type.id]
+            elif category=='EXAMEN FINAL':
+                metricType=db(db.metrics_type.name=='EXAMEN FINAL').select(db.metrics_type.id).first()[db.metrics_type.id]
+            elif category=='PRACTICAS':
+                metricType=db(db.metrics_type.name=='PRACTICA').select(db.metrics_type.id).first()[db.metrics_type.id]
+            elif category=='PROYECTOS':
+                name_search = actTempo.name.upper()
+                if "FASE FINAL" in name_search:
+                    metricType=db(db.metrics_type.name=='FASE FINAL').select(db.metrics_type.id).first()[db.metrics_type.id]
+                elif "FASE" in name_search:
+                    metricType=db(db.metrics_type.name=='FASE DE PROYECTO').select(db.metrics_type.id).first()[db.metrics_type.id]
+                elif "PRIMER PROYECTO" in name_search or "1ER PROYECTO" in name_search  or "1ER. PROYECTO" in name_search or "PROYECTO1" in name_search or "PROYECTO 1" in name_search or "PROYECTO NO.1" in name_searchor or "PROYECTO NO1" in name_search   or "PROYECTO NUMERO 1" in name_search or "PROYECTO NUMERO1" in name_search or "PROYECTO #1" in name_searchor or "PROYECTO#1" in name_search:
+                    metricType=db(db.metrics_type.name=='PROYECTO 1').select(db.metrics_type.id).first()[db.metrics_type.id]
+                elif "SEGUNDO PROYECTO" in name_search or "1DO PROYECTO" in name_search  or "2DO. PROYECTO" in name_search or "PROYECTO2" in name_search or "PROYECTO 2" in name_search or "PROYECTO NO.2" in name_searchor or "PROYECTO NO2" in name_search   or "PROYECTO NUMERO 2" in name_search or "PROYECTO NUMERO2" in name_search or "PROYECTO #2" in name_searchor or "PROYECTO#2" in name_search:
+                    metricType=db(db.metrics_type.name=='PROYECTO 2').select(db.metrics_type.id).first()[db.metrics_type.id]
+            if metricType is None:
+                metricType=db(db.metrics_type.name=='OTRA ACTIVIDAD').select(db.metrics_type.id).first()[db.metrics_type.id]
+
+
+
+    #******************************************************
+    #Fill the activity
+    if dataIncoming is None:
+        if recovery==1 or recovery==2:
+            import datetime
+            activity.append(datetime.datetime.now().date())
+        else:
+            activity.append(actTempo.date_start)
+        activity.append(description)
+    activity.append(mean)
+    activity.append(standard_error)
+    activity.append(median)
+    activity.append(mode)
+    activity.append(standard_deviation)
+    activity.append(variance)
+    activity.append(kurtosis)
+    activity.append(skewness)
+    activity.append(rank)
+    activity.append(minimum)
+    activity.append(maximum)
+    #Total Students
+    activity.append(totalStudents)
+    #Total Reprobate
+    activity.append(totalReprobate)
+    #Total Approved
+    activity.append(totalApproved)
+    #Metric Type
+    if dataIncoming is None:
+        activity.append(int(metricType))
+        if recovery==1:
+            activity.append(-1)
+        elif recovery==2:
+            activity.append(-2)
+        else:
+            activity.append(actTempo.id)
+
+    #Activity to return
+    return activity
+
+
+def activities_report_tutor(report):
+    activities_WM=None
+    activities_M=None
+    activities_F=None
+    if report.assignation.project.area_level.name=='DTT Tutor Académico' and (report.status.name=='Draft' or report.status.name=='Recheck'):
+        #Get the minimum and maximum date of the report
+        cperiod = obtainPeriodReport(report)
+        parameters_period = db(db.student_control_period.period_name==(T(cperiod.period.name)+' '+str(cperiod.yearp))).select().first()
+        endDateActivity=None
+        initSemester=None
+        if cperiod.period == 1:
+            initSemester = datetime.strptime(str(cperiod.yearp) + '-' + '01-01', "%Y-%m-%d")
+            if report.report_restriction.is_final==False:
+                activities_F=[]
+                nameReportSplit = report.report_restriction.name.upper()
+                nameReportSplit = nameReportSplit.split(' ')
+                for word in nameReportSplit:
+                    if word=='ENERO':
+                        endDateActivity = datetime.strptime(str(cperiod.yearp) + '-' + '02-01', "%Y-%m-%d")
+                    elif word=='FEBRERO':
+                        endDateActivity = datetime.strptime(str(cperiod.yearp) + '-' + '03-01', "%Y-%m-%d")
+                    elif word=='MARZO':
+                        endDateActivity = datetime.strptime(str(cperiod.yearp) + '-' + '04-01', "%Y-%m-%d")
+                    elif word=='ABRIL':
+                        endDateActivity = datetime.strptime(str(cperiod.yearp) + '-' + '05-01', "%Y-%m-%d")
+                    elif word=='MAYO':
+                        endDateActivity = datetime.strptime(str(cperiod.yearp) + '-' + '06-01', "%Y-%m-%d")
+            else:
+                endDateActivity = datetime.strptime(str(cperiod.yearp) + '-' + '06-01', "%Y-%m-%d")
+        else:
+            initSemester = datetime.datetime.strptime(str(cperiod.yearp) + '-' + '06-01', "%Y-%m-%d")
+            if report.report_restriction.is_final==False:
+                activities_F=[]
+                nameReportSplit = report.report_restriction.name.upper()
+                nameReportSplit = nameReportSplit.split(' ')
+                for word in nameReportSplit:
+                    if word=='JUNIO':
+                        endDateActivity = datetime.datetime.strptime(str(cperiod.yearp) + '-' + '07-01', "%Y-%m-%d")
+                    elif word=='JULIO':
+                        endDateActivity = datetime.datetime.strptime(str(cperiod.yearp) + '-' + '08-01', "%Y-%m-%d")
+                    elif word=='AGOSTO':
+                        endDateActivity = datetime.datetime.strptime(str(cperiod.yearp) + '-' + '09-01', "%Y-%m-%d")
+                    elif word=='SEPTIEMBRE':
+                        endDateActivity = datetime.datetime.strptime(str(cperiod.yearp) + '-' + '10-01', "%Y-%m-%d")
+                    elif word=='OCTUBRE':
+                        endDateActivity = datetime.datetime.strptime(str(cperiod.yearp) + '-' + '11-01', "%Y-%m-%d")
+                    elif word=='NOVIEMBRE':
+                        endDateActivity = datetime.datetime.strptime(str(cperiod.yearp) + '-' + '12-01', "%Y-%m-%d")
+                    elif word=='DICIEMBRE':
+                        endDateActivity = datetime.datetime.strptime(str(cperiod.yearp+1) + '-' + '01-01', "%Y-%m-%d")
+            else:
+                endDateActivity = datetime.datetime.strptime(str(cperiod.yearp+1) + '-' + '01-01', "%Y-%m-%d")
+
+        #Get the latest reports and are of this semester
+        beforeReportsRestriction = db((db.report_restriction.id<report.report_restriction)&(db.report_restriction.start_date>=initSemester)).select(db.report_restriction.id)
+        if beforeReportsRestriction.first() is None:
+            beforeReports=[]
+            beforeReports.append(-1)
+        else:
+            beforeReports = db((db.report.assignation==report.assignation)&(db.report.report_restriction.belongs(beforeReportsRestriction))).select(db.report.id)
+            if beforeReports.first() is None:
+                beforeReports=[]
+                beforeReports.append(-1)
+
+        #Check the id of the log type thtat is activity
+        temp_logType = db(db.log_type.name=='Activity').select().first()
+
+        #*******************Activities to record activities unless already recorded in previous reports
+        #Activities without metric
+        activitiesWMBefore = db((db.log_entry.log_type==temp_logType)&(db.log_entry.period==cperiod.id)&(db.log_entry.tActivity==False)&(db.log_entry.report.belongs(beforeReports))).select(db.log_entry.idActivity.with_alias('id'))
+        if activitiesWMBefore.first() is None:
+            activities_WM = db((db.course_activity_without_metric.semester == cperiod.id)&(db.course_activity_without_metric.assignation == report.assignation.project)&(db.course_activity_without_metric.date_start < endDateActivity)).select()
+            #Future activities without metric
+            if report.report_restriction.is_final==False:
+                activities_F_temp = db((db.course_activity_without_metric.semester == cperiod.id)&(db.course_activity_without_metric.assignation == report.assignation.project)&(db.course_activity_without_metric.date_start >= endDateActivity)).select()
+                for awmt in activities_F_temp:
+                    activities_F.append(awmt)
+        else:
+            activities_WM = db((db.course_activity_without_metric.semester == cperiod.id)&(db.course_activity_without_metric.assignation == report.assignation.project)&(~db.course_activity_without_metric.id.belongs(activitiesWMBefore))&(db.course_activity_without_metric.date_start < endDateActivity)).select()
+            #Future activities without metric
+            if report.report_restriction.is_final==False:
+                activities_F_temp = db((db.course_activity_without_metric.semester == cperiod.id)&(db.course_activity_without_metric.assignation == report.assignation.project)&(~db.course_activity_without_metric.id.belongs(activitiesWMBefore))&(db.course_activity_without_metric.date_start >= endDateActivity)).select()
+                for awmt in activities_F_temp:
+                    activities_F.append(awmt)
+
+        #Activities with metric
+        activitiesMBefore = db((db.log_entry.log_type==temp_logType)&(db.log_entry.period==cperiod.id)&(db.log_entry.tActivity==True)&(db.log_entry.report.belongs(beforeReports))).select(db.log_entry.idActivity.with_alias('id'))
+        activitiesGrades = db(db.grades).select(db.grades.activity.with_alias('id'), distinct=True)
+        if activitiesGrades.first() is not None:
+            activities_M_Real=[]
+            if activitiesMBefore.first() is None:
+                #Complete with measuring activities
+                activities_M = db((db.course_activity.semester == cperiod.id)&(db.course_activity.assignation == report.assignation.project)&(db.course_activity.date_start < endDateActivity)&(db.course_activity.id.belongs(activitiesGrades))).select()
+                for actTempo in activities_M:
+                    if report.report_restriction.is_final==False:
+                        tempEndAct = actTempo.date_finish + datetime.timedelta(days=parameters_period.timeout_income_notes)
+                        tempEndAct = datetime.datetime(tempEndAct.year, tempEndAct.month, tempEndAct.day)
+                        endDateActivityt1 = datetime.datetime(endDateActivity.year, endDateActivity.month, endDateActivity.day)
+                        if tempEndAct<endDateActivityt1:
+                            #Check if you have the minimum of notes recorded in the activity amount that you are worth in the report
+                            if (((int(db((db.grades_log.activity_id == actTempo.id)&(db.grades_log.operation_log=='insert')&(db.grades_log.user_name==report.assignation.assigned_user.username)).count())*100)/int(db(db.grades.activity == actTempo.id).count()))>=int(parameters_period.percentage_income_activity)):
+                                activities_M_Real.append(metric_statistics(actTempo,0,None))
+                        else:
+                            #Future activities with metric
+                            activities_F.append(actTempo)
+                    else:
+                        #Check if you have the minimum of notes recorded in the activity amount that you are worth in the report
+                        if (((int(db((db.grades_log.activity_id == actTempo.id)&(db.grades_log.operation_log=='insert')&(db.grades_log.user_name==report.assignation.assigned_user.username)).count())*100)/int(db(db.grades.activity == actTempo.id).count()))>=int(parameters_period.percentage_income_activity)):
+                            activities_M_Real.append(metric_statistics(actTempo,0,None))
+                activities_M = activities_M_Real
+                #Complete with measuring future activities
+                if report.report_restriction.is_final==False:
+                    activities_F_temp = db((db.course_activity.semester == cperiod.id)&(db.course_activity.assignation == report.assignation.project)&(db.course_activity.date_start >= endDateActivity)).select()
+                    for awmt in activities_F_temp:
+                        activities_F.append(awmt)
+            else:
+                #Complete with measuring activities
+                activities_M = db((db.course_activity.semester == cperiod.id)&(db.course_activity.assignation == report.assignation.project)&(db.course_activity.date_start < endDateActivity)&(~db.course_activity.id.belongs(activitiesMBefore))&(db.course_activity.id.belongs(activitiesGrades))).select()
+                for actTempo in activities_M:
+                    if report.report_restriction.is_final==False:
+                        tempEndAct = actTempo.date_finish + datetime.timedelta(days=parameters_period.timeout_income_notes)
+                        tempEndAct = datetime.datetime(tempEndAct.year, tempEndAct.month, tempEndAct.day)
+                        endDateActivityt1 = datetime.datetime(endDateActivity.year, endDateActivity.month, endDateActivity.day)
+                        if tempEndAct<endDateActivityt1:
+                            #Check if you have the minimum of notes recorded in the activity amount that you are worth in the report
+                            if (((int(db((db.grades_log.activity_id == actTempo.id)&(db.grades_log.operation_log=='insert')&(db.grades_log.user_name==report.assignation.assigned_user.username)).count())*100)/int(db(db.grades.activity == actTempo.id).count()))>=int(parameters_period.percentage_income_activity)):
+                                activities_M_Real.append(metric_statistics(actTempo,0,None))
+                        else:
+                            #Future activities with metric
+                            activities_F.append(actTempo)
+                    else:
+                        #Check if you have the minimum of notes recorded in the activity amount that you are worth in the report
+                        if (((int(db((db.grades_log.activity_id == actTempo.id)&(db.grades_log.operation_log=='insert')&(db.grades_log.user_name==report.assignation.assigned_user.username)).count())*100)/int(db(db.grades.activity == actTempo.id).count()))>=int(parameters_period.percentage_income_activity)):
+                            activities_M_Real.append(metric_statistics(actTempo,0,None))
+                activities_M = activities_M_Real
+                #Complete with measuring future activities
+                if report.report_restriction.is_final==False:
+                    activities_F_temp = db((db.course_activity.semester == cperiod.id)&(db.course_activity.assignation == report.assignation.project)&(db.course_activity.date_start >= endDateActivity)&(~db.course_activity.id.belongs(activitiesMBefore))).select()
+                    for awmt in activities_F_temp:
+                        activities_F.append(awmt)
+    
+
+        #RECOVERY 1 y 2
+        if report.report_restriction.is_final==True:
+            #students_first_recovery
+            try:
+                frt = int(db((db.course_first_recovery_test.semester==cperiod.id)&(db.course_first_recovery_test.project==report.assignation.project)).count())
+            except:
+                frt = int(0)
+            if frt>0:
+                if activities_M_Real is None:
+                    activities_M_Real=[]
+                activities_M_Real.append(metric_statistics(report,1,None))
+
+
+            #students_second_recovery
+            try:
+                srt = int(db((db.course_second_recovery_test.semester==cperiod.id)&(db.course_second_recovery_test.project==report.assignation.project)).count())
+            except:
+                srt = int(0)
+            if srt>0:
+                if activities_M_Real is None:
+                    activities_M_Real=[]
+                activities_M_Real.append(metric_statistics(report,2,None))
+
+    if activities_M is None:
+        activities_M=[]
+    if activities_WM is None:
+        activities_WM=[]
+    if activities_F is None:
+        activities_F=[]
+    return dict(activities_F=activities_F, activities_WM=activities_WM, activities_M=activities_M)
+
+
+
 @auth.requires_login()
 @auth.requires_membership('Super-Administrator')
 def course_report_exception():
@@ -38,8 +457,8 @@ def dtt_general_approval():
         reports = db((db.report.created>start)&
                      (db.report.created<end)).select()
         for report in reports:
-            entries = count_log_entries(report.id)[0]['COUNT(log_entry.id)']
-            metrics = count_metrics_report(report.id)[0]['COUNT(log_metrics.id)']
+            entries = count_log_entries(report)
+            metrics = count_metrics_report(report)
             anomalies = count_anomalies(report)[0]['COUNT(log_entry.id)']
             if entries != 0 or metrics!= 0 or anomalies != 0:
                 report.update_record(dtt_approval = approve)
@@ -50,8 +469,8 @@ def dtt_general_approval():
             (db.report.min_score!=None)&
             (db.report.min_score!=0)).select()
         for report in reports:
-            entries = count_log_entries(report.id)[0]['COUNT(log_entry.id)']
-            metrics = count_metrics_report(report.id)[0]['COUNT(log_metrics.id)']
+            entries = count_log_entries(report)
+            metrics = count_metrics_report(report)
             anomalies = count_anomalies(report)[0]['COUNT(log_entry.id)']
             if entries != 0 or metrics!= 0 or anomalies != 0:
                 report.update_record(dtt_approval = approve)
@@ -60,8 +479,8 @@ def dtt_general_approval():
             (db.report.created<end)&
             (db.report.status==status)).select()
         for report in reports:
-            entries = count_log_entries(report.id)[0]['COUNT(log_entry.id)']
-            metrics = count_metrics_report(report.id)[0]['COUNT(log_metrics.id)']
+            entries = count_log_entries(report)
+            metrics = count_metrics_report(report)
             anomalies = count_anomalies(report)[0]['COUNT(log_entry.id)']
             if entries != 0 or metrics!= 0 or anomalies != 0:
                 report.update_record(dtt_approval = approve)
@@ -166,16 +585,30 @@ def general_report():
 @auth.requires_login()
 @auth.requires_membership('Super-Administrator')
 def count_log_entries(report):
-    log_entries = db((db.log_entry.report== \
-        report)).select(db.log_entry.id.count())
+    #***********************************************************************************************************************
+    #******************************************************PHASE 2 DTT******************************************************
+    if report.assignation.project.area_level.name=='DTT Tutor Académico' and (report.status.name=='Draft' or report.status.name=='Recheck'):
+        activitiesTutor = activities_report_tutor(report)
+        log_entries=len(activitiesTutor['activities_WM'])+len(activitiesTutor['activities_M'])
+    else:
+        log_entries = db((db.log_entry.report==report.id)).select(db.log_entry.id.count())[0]['COUNT(log_entry.id)']
     return log_entries
+    #***********************************************************************************************************************
+    #******************************************************PHASE 2 DTT******************************************************
 
 @auth.requires_login()
 @auth.requires_membership('Super-Administrator')
 def count_metrics_report(report):
-    log_metrics = db((db.log_metrics.report== \
-        report)).select(db.log_metrics.id.count())
+    #***********************************************************************************************************************
+    #******************************************************PHASE 2 DTT******************************************************
+    if report.assignation.project.area_level.name=='DTT Tutor Académico' and (report.status.name=='Draft' or report.status.name=='Recheck'):
+        activitiesTutor = activities_report_tutor(report)
+        log_metrics=len(activitiesTutor['activities_M'])
+    else:
+        log_metrics = db((db.log_metrics.report== report.id)).select(db.log_metrics.id.count())[0]['COUNT(log_metrics.id)']
     return log_metrics
+    #***********************************************************************************************************************
+    #******************************************************PHASE 2 DTT******************************************************
 
 @auth.requires_login()
 @auth.requires_membership('Super-Administrator')
@@ -528,6 +961,11 @@ def report():
             response.view = 'admin/report_view.html'
             assignation_reports = db(db.report.assignation== \
                 report.assignation).select()
+            #***********************************************************************************************************************
+            #******************************************************PHASE 2 DTT******************************************************
+            activitiesTutor=None
+            if report.assignation.project.area_level.name=='DTT Tutor Académico' and (report.status.name=='Draft' or report.status.name=='Recheck'):
+                activitiesTutor = activities_report_tutor(report)
             return dict(
                 log_types=db(db.log_type.id > 0).select(),
                 assignation_reports = assignation_reports,
@@ -543,7 +981,10 @@ def report():
                 next_date=next_date,
                 status_list=db(db.report_status).select(),
                 add_timing=add_timing,
-                teacher=teacher)
+                teacher=teacher,
+                activitiesTutor=activitiesTutor)
+            #***********************************************************************************************************************
+            #******************************************************PHASE 2 DTT******************************************************
         else:
             session.flash = T('Selected report can\'t be viewed. \
                                 Select a valid report.')
@@ -576,6 +1017,18 @@ def report():
             if comment == '': comment = report.teacher_comment
             status =db.report_status(id=status)
             if status.id != report.status:
+                #***********************************************************************************************************************
+                #******************************************************PHASE 2 DTT******************************************************
+                if report.assignation.project.area_level.name=='DTT Tutor Académico' and (status.name=='Draft' or status.name=='Recheck'):
+                    try:
+                        temp_logType = db(db.log_type.name=='Activity').select().first()
+                        db((db.log_entry.report==report.id)&(db.log_entry.log_type==temp_logType.id)).delete()
+                    except:
+                        db(db.log_entry.report==report.id).delete()
+                    db(db.log_metrics.report==report.id).delete()
+                    db(db.log_future.report==report.id).delete()
+                #***********************************************************************************************************************
+                #******************************************************PHASE 2 DTT******************************************************
                 report.update_record(
                     admin_score=score,
                     min_score=cpfecys.get_custom_parameters().min_score,
@@ -1169,10 +1622,8 @@ def report_list():
         array = []
         for report in reports:
             hours = report.hours
-            entries = count_log_entries(\
-                report)[0]['COUNT(log_entry.id)']
-            metrics = count_metrics_report(\
-                report)[0]['COUNT(log_metrics.id)']
+            entries = count_log_entries(report)
+            metrics = count_metrics_report(report)
             anomalies = count_anomalies(\
                 report)[0]['COUNT(log_entry.id)']
             string = string + str(entries) + ' ' + str(metrics) + ' ' +str(anomalies) + '<br/>'
@@ -1201,10 +1652,10 @@ def report_list():
             (db.report.status==db.report_status(name='Draft'))).select()
         for report in reports:
             hours = report.hours
-            entries = count_log_entries(\
-                report)[0]['COUNT(log_entry.id)']
-            metrics = count_metrics_report(\
-                report)[0]['COUNT(log_metrics.id)']
+            #***********************************************************************************************************************
+            #******************************************************PHASE 2 DTT******************************************************
+            entries = count_log_entries(report)
+            metrics = count_metrics_report(report)
             anomalies = count_anomalies(\
                 report)[0]['COUNT(log_entry.id)']
             string = string + str(entries) + ' ' + str(metrics) + ' ' +str(anomalies) + '<br/>'
@@ -1212,6 +1663,8 @@ def report_list():
                     'DTT Tutor Académico':
                 if entries != 0 or metrics != 0 or anomalies != 0:
                             total += 1
+            #***********************************************************************************************************************
+            #******************************************************PHASE 2 DTT******************************************************
             else:
                 if hours != None and hours != 0:
                     total += 1
@@ -1287,13 +1740,27 @@ def report_filter():
     period = request.vars['period']
     valid = period != None
     def count_log_entries(report):
-        log_entries = db((db.log_entry.report== \
-            report.id)).select(db.log_entry.id.count())
+        #***********************************************************************************************************************
+        #******************************************************PHASE 2 DTT******************************************************
+        if report.assignation.project.area_level.name=='DTT Tutor Académico' and (report.status.name=='Draft' or report.status.name=='Recheck'):
+            activitiesTutor = activities_report_tutor(report)
+            log_entries=len(activitiesTutor['activities_WM'])+len(activitiesTutor['activities_M'])
+        else:
+            log_entries = db((db.log_entry.report==report.id)).select(db.log_entry.id.count())[0]['COUNT(log_entry.id)']
         return log_entries
+        #***********************************************************************************************************************
+        #******************************************************PHASE 2 DTT******************************************************
     def count_metrics_report(report):
-        log_metrics = db((db.log_metrics.report== \
-            report.id)).select(db.log_metrics.id.count())
+        #***********************************************************************************************************************
+        #******************************************************PHASE 2 DTT******************************************************
+        if report.assignation.project.area_level.name=='DTT Tutor Académico' and (report.status.name=='Draft' or report.status.name=='Recheck'):
+            activitiesTutor = activities_report_tutor(report)
+            log_metrics=len(activitiesTutor['activities_M'])
+        else:
+            log_metrics = db((db.log_metrics.report== report.id)).select(db.log_metrics.id.count())[0]['COUNT(log_metrics.id)']
         return log_metrics
+        #***********************************************************************************************************************
+        #******************************************************PHASE 2 DTT******************************************************
     def count_anomalies(report):
         log_entries = db((db.log_entry.report== \
             report.id)&
@@ -1330,7 +1797,7 @@ def report_filter():
         reports = db((db.report.created>start)&
             (db.report.created<end)).select(db.report.ALL)
         status_instance = False
-    elif int(status) == -1:
+    elif int(status) == -1:#Aprobados
         reports = db((db.report.created>start)&
             (db.report.created<end)&
             ((db.report.admin_score>=db.report.min_score) |\
@@ -1338,7 +1805,7 @@ def report_filter():
             (db.report.min_score!=None)&
             (db.report.min_score!=0)).select()
         status_instance = db(db.report_status.id==status).select().first()
-    elif int(status) == -2:
+    elif int(status) == -2:#Reprobados
         reports = db((db.report.created>start)&
             (db.report.created<end)&
             (db.report.score<=db.report.min_score)&
@@ -1347,7 +1814,7 @@ def report_filter():
             (db.report.never_delivered==None or
                 db.report.never_delivered==False)).select()
         status_instance = db(db.report_status.id==status).select().first()
-    elif int(status) == -3:
+    elif int(status) == -3:#Pendientes
         result = []
         existing = []
         restrictions = db((db.report_restriction.start_date>=start)&
@@ -1368,12 +1835,9 @@ def report_filter():
                     result.append(temp)
                 else:
                     hours = report.hours
-                    entries = count_log_entries(\
-                        report)[0]['COUNT(log_entry.id)']
-                    metrics = count_metrics_report(\
-                        report)[0]['COUNT(log_metrics.id)']
-                    anomalies = count_anomalies(\
-                        report)[0]['COUNT(log_entry.id)']
+                    entries = count_log_entries(report)
+                    metrics = count_metrics_report(report)
+                    anomalies = count_anomalies(report)[0]['COUNT(log_entry.id)']
                     temp = dict(assignation=assignation, 
                             restriction=restriction,
                             report=report)
@@ -1390,7 +1854,7 @@ def report_filter():
             count_log_entries=count_log_entries,
             count_metrics_report=count_metrics_report,
             count_anomalies=count_anomalies,)
-    elif int(status) == -4:
+    elif int(status) == -4:#No entregados
         reports = db((db.report_restriction.start_date>=start)&
             (db.report_restriction.end_date<=end)&
             (db.report.report_restriction==db.report_restriction.id)&

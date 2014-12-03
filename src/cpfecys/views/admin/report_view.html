@@ -13,6 +13,7 @@
       <div class="well span12">
         <h3>{{=T('Report Grading')}}</h3>
         <div id="grading-notification"></div>
+        {{if (report.assignation.project.area_level.name!='DTT Tutor Académico')or(report.assignation.project.area_level.name=='DTT Tutor Académico' and (report.status.name!='Draft' and report.status.name!='Recheck')):}}
           <form class="form-horizontal" action="{{=URL('admin', 'report/grade')}}" method="POST">
             <div class="control-group">
               <label class="control-label" for="status-drop">{{=T('Status')}}</label>
@@ -132,6 +133,8 @@
               </div>
             </div>
           </form>
+          {{pass}}
+
           <table class="pull-right">
             <tr>
               <td>
@@ -264,11 +267,16 @@
                 </h1>
                 <span>
                     <span><strong>{{=T('Total Anomalies')}}:</strong> {{=anomalies}} </span> |
-                    <span><strong>{{=T('Total Registered Activities')}}:</strong> {{=len(logs)}} </span>
+                    {{if report.assignation.project.area_level.name=='DTT Tutor Académico' and (report.status.name=='Draft' or report.status.name=='Recheck'):}}
+                        <span><strong>{{=T('Total Registered Activities')}}:</strong> {{=len(activitiesTutor['activities_WM'])+len(activitiesTutor['activities_M'])}} </span>
+                    {{else:}}
+                        <span><strong>{{=T('Total Registered Activities')}}:</strong> {{=len(logs)}} </span>
+                    {{pass}}
                 </span>
             </div>
         </div>
         <div class="row-fluid">
+          {{if report.assignation.project.area_level.name=='DTT Tutor Académico' and (report.status.name=='Draft' or report.status.name=='Recheck'):}}
             {{for log in logs:}}
             <!-- Display Helper -->
             {{inc_vars = dict(editable = False,
@@ -281,6 +289,46 @@
             {{include 'include/display-report-log.html'}}
             <!-- //Display Helper -->
             {{pass}}
+            
+            <!--ACTIVITIES WITHOUT METRIC-->
+            {{for awm in activitiesTutor['activities_WM']:}}
+                {{inc_vars = dict(editable = False,
+                anomaly =  False,
+                log_type = T('Activity'),
+                date = awm.date_start,
+                edit_action = None,
+                delete_action = None,
+                content = MARKMIN('Nombre: "'+awm.name+'"      Descripción: "'+awm.description+'"', markmin_settings))}}
+                {{include 'include/display-report-log.html'}}
+            {{pass}}
+            <!--ACTIVITIES WITHOUT METRIC-->
+
+            <!--ACTIVITIES WITH METRIC-->
+            {{for awm in activitiesTutor['activities_M']:}}
+                {{inc_vars = dict(editable = False,
+                anomaly =  False,
+                log_type = T('Activity'),
+                date = awm[0],
+                edit_action = None,
+                delete_action = None,
+                content = MARKMIN(awm[1], markmin_settings))}}
+                {{include 'include/display-report-log.html'}}
+            {{pass}}
+            <!--ACTIVITIES WITH METRIC-->
+          {{else:}}
+            {{for log in logs:}}
+            <!-- Display Helper -->
+            {{inc_vars = dict(editable = False,
+            anomaly =  (log.log_type['name'] == 'Anomaly'),
+            log_type = T(log.log_type['name']),
+            date = log.entry_date,
+            edit_action = '',
+            delete_action = '',
+            content = MARKMIN(log.description, markmin_settings))}}
+            {{include 'include/display-report-log.html'}}
+            <!-- //Display Helper -->
+            {{pass}}
+          {{pass}}
         </div>
         <hr />
         <div class="row-fluid">
@@ -290,11 +338,26 @@
                     <strong>{{=T('Activities Log with metrics')}}</strong>
                 </h1>
                 <span>
-                    <span><strong>{{=T('Total activity logs with metrics')}}:</strong> {{=len(metrics)}}</span>
+                    {{if report.assignation.project.area_level.name=='DTT Tutor Académico' and (report.status.name=='Draft' or report.status.name=='Recheck'):}}
+                        <strong>{{=T('Total activity logs with metrics')}}:</strong> {{=len(activitiesTutor['activities_M'])}}
+                    {{else:}}
+                        <span><strong>{{=T('Total activity logs with metrics')}}:</strong> {{=len(metrics)}}</span>
+                    {{pass}}
                 </span>
             </div>
         </div>
         <div class="row-fluid">
+          {{if report.assignation.project.area_level.name=='DTT Tutor Académico' and (report.status.name=='Draft' or report.status.name=='Recheck'):}}
+            {{for metric in activitiesTutor['activities_M']:}}
+                <!-- Display Helper -->
+                {{inc_vars = dict(editable = False,
+                metric = metric,
+                edit_action = None,
+                delete_action = None)}}
+                {{include 'include/display-report-metric.html'}}
+                <!-- //Display Helper -->
+            {{pass}}
+          {{else:}}
             {{for metric in metrics:}}
             <!-- Display Helper -->
             {{inc_vars = dict(editable = False,
@@ -304,15 +367,16 @@
             {{include 'include/display-report-metric.html'}}
             <!-- //Display Helper -->
             {{pass}}
-            {{for final in final_r:}}
-            <!-- Display Helper -->
-            {{inc_vars = dict(editable = False,
-            final = final,
-            edit_action = 'final-edit-activity-' + str(final.id),
-            delete_action = 'delete-final-' + str(final.id))}}
-            {{include 'include/display-final-report.html'}}
-            <!-- //Display Helper -->
-            {{pass}}
+          {{pass}}
+          {{for final in final_r:}}
+          <!-- Display Helper -->
+          {{inc_vars = dict(editable = False,
+          final = final,
+          edit_action = 'final-edit-activity-' + str(final.id),
+          delete_action = 'delete-final-' + str(final.id))}}
+          {{include 'include/display-final-report.html'}}
+          <!-- //Display Helper -->
+          {{pass}}
         </div>
         <hr />
         {{if not(report.hours is None):}}

@@ -32,9 +32,21 @@
                 <span class="add-on">{{=T('Type')}}</span>
                 <select id="log-type-{{=inc_vars['id']}}" name="log-type">
                     {{for log_type in inc_vars['log_types']:}}
-                    <option value = "{{=log_type.id}}"
-                            {{if log_type.id == inc_vars['log_type']:}} selected {{pass}}
-                            >{{=T(log_type.name)}}</option>
+                    <!--#****************************************************************************-->
+                    <!--#****************************PHASE 2 DTT*************************************-->
+                    {{if report.assignation.project.area_level.name!='DTT Tutor Académico':}}
+                      <option value = "{{=log_type.id}}"
+                              {{if log_type.id == inc_vars['log_type']:}} selected {{pass}}
+                              >{{=T(log_type.name)}}</option>
+                    {{else:}}
+                      {{if T(log_type.name)=='Anomalia':}}
+                        <option value = "{{=log_type.id}}"
+                                {{if log_type.id == inc_vars['log_type']:}} selected {{pass}}
+                                >{{=T(log_type.name)}}</option>
+                      {{pass}}
+                    {{pass}}
+                    <!--#****************************************************************************-->
+                    <!--#****************************PHASE 2 DTT*************************************-->
                     {{pass}}
                 </select>
             </div>
