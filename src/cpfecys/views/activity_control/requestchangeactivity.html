@@ -453,17 +453,45 @@
 			            window.location.href = "{{=URL('default', 'index')}}";
 			        </script>
 				{{else:}}
-					{{date1=None}}
-					{{dateInicialP = db.executesql('SELECT date(\''+request.vars['edit_dateInit_var']+'\');',as_dict=True)}}
-					{{for d0 in dateInicialP:}}
-						{{date1=d0['date(\''+request.vars['edit_dateInit_var']+'\')']}}
-					{{pass}}
-					{{date2=None}}
-					{{dateInicialP2 = db.executesql('SELECT date(\''+request.vars['edit_dateEnd_var']+'\');',as_dict=True)}}
-					{{for d0 in dateInicialP2:}}
-						{{date2=d0['date(\''+request.vars['edit_dateEnd_var']+'\')']}}
-					{{pass}}
+					{{
+						from datetime import datetime
+						date1=None
+					    try:
+					        date1 = datetime.strptime(request.vars['edit_dateInit_var'], "%Y/%m/%d")
+					    except:
+					        try:
+					        	date1 = datetime.strptime(request.vars['edit_dateInit_var'], "%Y-%m-%d")
+					        except:
+					        	date1=None
+					        pass
+					    pass
+					    if date1 is not None:
+							dateInicialP = db.executesql('SELECT date(\''+request.vars['edit_dateInit_var']+'\');',as_dict=True)
+							for d0 in dateInicialP:
+								date1=d0['date(\''+request.vars['edit_dateInit_var']+'\')']
+							pass
+					    pass
 
+					    #********************************************************************************
+					    #********************************************************************************
+					    #********************************************************************************
+					    date2=None
+					    try:
+					        date2 = datetime.strptime(request.vars['edit_dateEnd_var'], "%Y/%m/%d")
+					    except:
+					    	try:
+					    		date2 = datetime.strptime(request.vars['edit_dateEnd_var'], "%Y-%m-%d")
+					    	except:
+					        	date2=None
+					        pass
+					    pass
+					    if date2 is not None:
+					    	dateInicialP2 = db.executesql('SELECT date(\''+request.vars['edit_dateEnd_var']+'\');',as_dict=True)
+							for d0 in dateInicialP2:
+								date2=d0['date(\''+request.vars['edit_dateEnd_var']+'\')']
+							pass
+					    pass
+					}}
 					{{if date1==None or date2==None:}}
 						<script type="text/javascript"> 
 							alert("{{=T('One of the date or both are incorrect')}}"); 
@@ -680,16 +708,45 @@
 			            window.location.href = "{{=URL('default', 'index')}}";
 			        </script>
 				{{else:}}
-					{{date1=None}}
-					{{dateInicialP = db.executesql('SELECT date(\''+request.vars['dateInit_var']+'\');',as_dict=True)}}
-					{{for d0 in dateInicialP:}}
-						{{date1=d0['date(\''+request.vars['dateInit_var']+'\')']}}
-					{{pass}}
-					{{date2=None}}
-					{{dateInicialP2 = db.executesql('SELECT date(\''+request.vars['dateEnd_var']+'\');',as_dict=True)}}
-					{{for d0 in dateInicialP2:}}
-						{{date2=d0['date(\''+request.vars['dateEnd_var']+'\')']}}
-					{{pass}}
+					{{
+						from datetime import datetime
+						date1=None
+					    try:
+					        date1 = datetime.strptime(request.vars['dateInit_var'], "%Y/%m/%d")
+					    except:
+					        try:
+					        	date1 = datetime.strptime(request.vars['dateInit_var'], "%Y-%m-%d")
+					        except:
+					        	date1=None
+					        pass
+					    pass
+					    if date1 is not None:
+							dateInicialP = db.executesql('SELECT date(\''+request.vars['dateInit_var']+'\');',as_dict=True)
+							for d0 in dateInicialP:
+								date1=d0['date(\''+request.vars['dateInit_var']+'\')']
+							pass
+					    pass
+
+					    #********************************************************************************
+					    #********************************************************************************
+					    #********************************************************************************
+					    date2=None
+					    try:
+					        date2 = datetime.strptime(request.vars['dateEnd_var'], "%Y/%m/%d")
+					    except:
+					    	try:
+					    		date2 = datetime.strptime(request.vars['dateEnd_var'], "%Y-%m-%d")
+					    	except:
+					        	date2=None
+					        pass
+					    pass
+					    if date2 is not None:
+					    	dateInicialP2 = db.executesql('SELECT date(\''+request.vars['dateEnd_var']+'\');',as_dict=True)
+							for d0 in dateInicialP2:
+								date2=d0['date(\''+request.vars['dateEnd_var']+'\')']
+							pass
+					    pass
+					}}
 					{{if date1==None or date2==None:}}
 						<script type="text/javascript">
 							alert("{{=T('One of the date or both are incorrect')}}"); 
