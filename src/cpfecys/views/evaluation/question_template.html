@@ -1,0 +1,100 @@
+<link rel="stylesheet" href="{{=URL('static','css')}}/jquery-ui.css">
+<script src="{{=URL('static','js')}}/jquery.js"></script>
+<script src="{{=URL('static','js')}}/jquery-ui.js"></script>
+
+
+<table>
+	<tr>
+		<td>
+			<label>{{=T('Question type')}}:</label>
+		</td>
+		<td>
+			<select tabindex="1" name="question_type_select" id="question_type_select">
+				{{for question_type_temp in db(db.question_type).select():}}
+					{{if str(question_type_temp.id) == str(question_type):}}
+						{{var_sel="selected='selected'"}}
+					{{else:}}
+						{{var_sel=''}}
+					{{pass}}
+				  <option value="{{=question_type_temp.id}}" {{=var_sel}}>
+				  	{{=question_type_temp.name}}
+				  </option>
+				{{pass}}
+			</select>
+		</td>
+	</tr>
+	<tr>
+		<td>
+			<label>{{=T('Question')}}:</label>
+		</td>
+		<td>
+			<input tabindex="2" id="question_input"  name="question_input"  type="text" >
+		</td>
+	</tr>
+	<tr>
+		<td>
+			<label>{{=T('Answer type')}}:</label>
+		</td>
+		<td>
+			<select tabindex="3" name="answer_type_select" id="answer_type_select" >
+				{{for answer_type_temp in db(db.answer_type).select():}}
+					{{if str(answer_type_temp.id) == str(answer_type):}}
+						{{var_sel="selected='selected'"}}
+					{{else:}}
+						{{var_sel=''}}
+					{{pass}}
+				  <option value="{{=answer_type_temp.id}}" {{=var_sel}}>
+					{{=answer_type_temp.name}}
+				  </option>
+				{{pass}}
+			</select>
+		</td>
+	</tr>
+	<tr>
+		<td>
+		</td>
+		<td>
+			<a  tabindex="4" class="btn btn-success" role="button" onkeypress="key_press_add_question(event);" onclick="click_add_question();">{{=T('Add question')}}</a>
+		</td>
+	</tr>
+</table>
+<script type="text/javascript">
+	$("#div_detail_template").load("{{=URL('evaluation','evaluation_template_detail.html',vars=dict(template_id=template_id) )}}");
+	function click_add_question(){
+		var question_type_var = document.getElementById('question_type_select').value;
+		var answer_type_var = document.getElementById('answer_type_select').value;
+		var question_var = document.getElementById('question_input').value;
+		if (question_var.length > 255){
+			alert("{{=T('The maximum number of characters to the question is 255')}}. \n{{=T('Number of characters that have the question')}}: "+question_var.length);
+		}else{
+			$("#div_add_question").load("{{=URL('evaluation','question_template.html')}}?template_id={{=template_id}}&amp;operation=add_question&amp;question_type="+question_type_var+"&amp;answer_type="+answer_type_var+"&amp;question="+encodeURIComponent(question_var));
+		}
+		
+	}
+
+	function key_press_add_question(e){
+    var evtobj=window.event? event : e
+    var unicode=evtobj.charCode? evtobj.charCode : evtobj.keyCode
+      
+    if(unicode==32 || unicode==13){
+      click_add_question();
+    }
+  }
+
+	
+
+	$(document).ready(function(){ 
+		var availableTags = [{{for question_temp in db(db.evaluation_question).select():}}"{{=str(question_temp.question)}}",{{pass}}"" ];
+		$("#question_input").autocomplete({
+		  source: availableTags
+		});
+	});
+</script>
+
+{{if message_var is not None:}}
+	<script type="text/javascript">
+		$(document).ready(function(){ 
+			alert("{{=message_var}}");
+		});
+	</script>
+{{pass}}

@@ -545,6 +545,21 @@
 										</a>
 									</center>
 								</td>
+								<td width="20%"
+								{{if var_do==True:}}
+									data-step="{{step_count+=1}}{{=step_count}}" data-intro="Al seleccionar esta opción podrá visualizar las solicitudes de cambio de ponderación, actividades y notas."
+								{{pass}}
+								>
+									
+									<center>
+										<a class="btn" href="{{=URL('activity_control', 'courses_list_request', vars=dict( project = course.user_project.project, period=periodo.id, type = 'course_list'))}}" style="height:32px; width:32px;">
+											<img src="{{=URL('static','images')}}/academic_control/verification5.png" height="32" width="32">
+										</a><br>
+										<a  href="{{=URL('activity_control', 'courses_list_request', vars=dict(project = course.user_project.project, type='list'))}}">
+											{{=T('Evaluations')}} 360 ({{=var_count}})
+										</a>
+									</center>
+								</td>
 								{{pass}}
 							</tr>
 						</table>
