@@ -9745,3 +9745,104 @@ def laboratory_replacing_management_n4():
                 vecAllUserRoleMonth.append(db((db.validate_laboratory_log.project==project.name)&(db.validate_laboratory_log.yearp==str(period.yearp))&(db.validate_laboratory_log.period==str(T(period.period.name)))&(db.validate_laboratory_log.date_log>=str(start))&(db.validate_laboratory_log.date_log<str(end))&(db.validate_laboratory_log.operation_log=='delete')&(db.validate_laboratory_log.validation_type==False)&(db.validate_laboratory_log.roll==roll)&(db.validate_laboratory_log.user_name==userr)&(db.validate_laboratory_log.academic.like('%'+str(session.search_laboratory_replacing_management)+'%'))).select())
             pass
     return dict(showLevel=showLevel, project=project, tipo=tipo, month=month, vecAllUserRoleMonth=vecAllUserRoleMonth, roll=roll, userr=userr, messageError=messageError)
+
+
+
+#------------------------------------------------------------------------------------------------------------------------
+#------------------------------------------------------------------------------------------------------------------------
+#------------------------------------------------------------------------------------------------------------------------
+#------------------------------------------------------------------------------------------------------------------------
+@auth.requires_login()
+def control_assigned_activity():
+    try:
+        year = db(db.period_year.id == request.vars['year']).select().first() 
+        year_semester = year.period
+        project = db(db.project.id==request.vars['project']).select().first()
+
+        assigantion = db((db.user_project.assigned_user == auth.user.id) & (db.user_project.period == year.id) & (db.user_project.project == project.id)).select().first()
+        if assigantion is None:
+            assigned_to_project = False
+        else:
+            assigned_to_project = True
+    except:
+        assigned_to_project = False
+
+    return dict(semestre2 = year,
+            project = project,
+            assigned_to_project = assigned_to_project)
+
+
+@auth.requires_login()
+@auth.requires(auth.has_membership('Student') or auth.has_membership('Teacher'))
+def management_assigned_activity():
+    #Check if the period is correct
+    if request.vars['year'] is None or request.vars['year']=='':
+        session.flash = T('Not valid Action.')
+        redirect(URL('default','index'))
+    else:
+        year = request.vars['year']
+        year = db(db.period_year.id==year).select().first()
+        if year is None:
+            session.flash = T('Not valid Action.')
+            redirect(URL('default','index'))
+        else:
+            if cpfecys.current_year_period().id != year.id:
+                session.flash = T('Not valid Action.')
+                redirect(URL('default','index'))
+
+    #Check if the project is correct
+    if request.vars['project'] is None or request.vars['project']=='':
+        session.flash = T('Not valid Action.')
+        redirect(URL('default','index'))
+    else:
+        project = request.vars['project']
+        project = db(db.project.id==project).select().first()
+        if project is None:
+            session.flash = T('Not valid Action.')
+            redirect(URL('default','index'))
+        else:
+            assigantion = db((db.user_project.assigned_user == auth.user.id) & (db.user_project.period == year.id) & (db.user_project.project == project)).select().first()
+            if assigantion is None:
+                session.flash = T('Not valid Action.')
+                redirect(URL('default','index'))
+
+    if auth.has_membership('Teacher'):
+        db.course_assigned_activity.assignation.readable = False
+        db.course_assigned_activity.assignation.writable = False
+        db.course_assigned_activity.assignation.default = project.id
+        db.course_assigned_activity.semester.readable = False
+        db.course_assigned_activity.semester.writable = False
+        db.course_assigned_activity.semester.default = year.id
+        db.course_assigned_activity.fileReport.readable = False
+        db.course_assigned_activity.fileReport.writable = False
+        query = ((db.course_assigned_activity.semester==year.id) & (db.course_assigned_activity.assignation==project.id))
+        grid = SQLFORM.grid(query, csv=False, paginate=10, searchable=False)
+        return dict(year = year, project = project, grid=grid)
+    else:
+        if request.vars['activity'] is None or request.vars['activity']=='':
+            session.flash = T('Not valid Action.')
+            redirect(URL('default','index'))
+        else:
+            activity = request.vars['activity']
+            activity = db((db.course_assigned_activity.semester==year.id)&(db.course_assigned_activity.assignation==project.id)&(db.course_assigned_activity.id==activity)).select().first()
+            if activity is None:
+                session.flash = T('Not valid Action.')
+                redirect(URL('default','index'))
+
+            upload_form = FORM(INPUT(_name='activity_id',_type='text'),
+                        INPUT(_name='file_upload',_type='file',requires=[IS_UPLOAD_FILENAME(extension = '(pdf|zip)',error_message='Solo se aceptan archivos con extension zip|pdf'),IS_LENGTH(2097152,error_message='El tamaño máximo del archivo es 2MB')]))
+
+            if upload_form.accepts(request.vars,formname='upload_form'):
+                try:
+                    print str(project)
+                    if ( upload_form.vars.activity_id is "" ) or ( upload_form.vars.file_upload is ""):
+                        response.flash = T('You must enter all fields.')
+                    else:
+                        file_var = db.course_assigned_activity.fileReport.store(upload_form.vars.file_upload.file, upload_form.vars.file_upload.filename)
+                        db(db.course_assigned_activity.id==int(upload_form.vars.activity_id)).update(fileReport = file_var)
+                        response.flash = T('File loaded successfully.')
+                        activity = db(db.course_assigned_activity.id==int(upload_form.vars.activity_id)).select().first()
+                except:
+                    response.flash = T('Error loading file.')
+
+            return dict(year = year, project = project, activity=activity)

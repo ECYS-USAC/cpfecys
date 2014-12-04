@@ -1,0 +1,471 @@
+{{if assigned_to_project==False:}}
+	<center>{{=T('Not valid Action.')}}</center>
+	<script type="text/javascript">
+		alert("{{=T('Not valid Action.')}}");
+		window.location.href = "{{=URL('default', 'index.html')}}";
+	</script>
+{{else:}}
+	{{if request.vars['operation'] == "menu_update": }}
+		<ul class="dropdown"  class="close" aria-hidden="true"  style="height:10px;">
+			<a style="color:#f0ad4e;text-shadow:none;" class="dropdown-toggle" data-toggle="dropdown" href="">
+		    	<span class="icon-list"></span>
+		  	</a>
+		  	<h3 class="icon-white" style="text-shadow: -1px 0 white, 0 1px white, 1px 0 white, 0 -1px white;">
+				{{=T('Scheduler') }}
+			</h3> 
+			{{import cpfecys}}
+			{{if cpfecys.current_year_period().id==semestre2.id and auth.has_membership('Teacher'):}}
+			<ul class="dropdown-menu">
+			  	<li>
+			  			<a tabindex="-1" id="menu_management_assigned_activity" href="{{=URL('activity_control', 'management_assigned_activity',vars=dict(project = request.vars['project'], year = request.vars['year']))}}">
+						<span class="icon-black icon-edit"></span>
+						{{=T('Management Activities')}}
+					</a>
+				</li>
+			</ul>
+			{{pass}}
+		</ul> 
+	{{pass}}
+
+
+
+	{{if request.vars['operation'] == "div_update": }}
+		<div align="right">
+			<table class="table-striped table-bordered">
+				<tr>
+					<th colspan="5">
+						<center>{{=T('Activity logs')}}</center>
+					</th>
+				</tr>
+				<tr>
+					<th colspan="2">
+						<center>{{=T('Executed')}}</center>
+					</th>
+					<th>
+						<center>{{=T('Activated')}}</center>
+					</th>
+					<th>
+						<center>{{=T('Earrings')}}</center>
+					</th>
+					<th>
+						<center>{{=T('All')}}</center>
+					</th>
+				</tr>
+				<tr>
+					<td>
+						<span class="label label-info">&nbsp;&nbsp;&nbsp;</span>
+						<a id="aaAccomplished" style="cursor:pointer;" onclick="visible_assigned_activities(2);">
+                    		{{=T('Accomplished')}}
+                    	</a>
+					</td>
+					<td>
+						<span class="label label-important">&nbsp;&nbsp;&nbsp;</span>
+						<a id="aaDeliverableEarrings" style="cursor:pointer;" onclick="visible_assigned_activities(1);">
+                    		{{=T('Deliverable Earrings')}}
+                    	</a>
+					</td>
+					<td>
+						<span class="label label-success">&nbsp;&nbsp;&nbsp;</span>
+						<a id="aaActivated" style="cursor:pointer;" onclick="visible_assigned_activities(3);">
+                    		{{=T('Activated')}}
+                    	</a>
+					</td>
+					<td>
+						<span class="label label-warning">&nbsp;&nbsp;&nbsp;</span>
+						<a id="aaEarrings" style="cursor:pointer;" onclick="visible_assigned_activities(4);">
+                    		{{=T('Earrings')}}
+                    	</a>
+					</td>
+					<td>
+						<span class="label label-inverse">&nbsp;&nbsp;&nbsp;</span>
+						<a id="aaAll" style="cursor:pointer;" onclick="visible_assigned_activities(0);">
+                    		{{=T('All')}}
+                    	</a>
+					</td>
+				</tr>
+			</table>
+			<br>
+			<a id="activityButtonVisibleAA" role="button" style="cursor:pointer;" onclick="visible_detail();"> 
+	    		{{=T('View Detail')}}
+	    	</a>
+	    	<a id="activityButtonVisible2AA" role="button" onclick="no_visible_detail();" style="display:none; cursor:pointer;"> 
+	    		{{=T('Close Detail')}}
+	    	</a>
+		</div>
+		<center>
+			<table class="table table-bordered">
+		  		<tr bgcolor="#E6E6E6">
+		  			<th>
+		  				{{=T('Status')}}
+		  			</th>
+		  			<th class="showDetailAA" style="display:none;">
+						{{=T('Name')}}
+					</th>
+					<th>
+						{{=T('Description')}}
+					</th>
+					<th>
+						{{=T('Report')}}<br>{{=T('Required')}}
+					</th>
+					<th class="showDetailAA" style="display:none;">
+						{{=T('Report')}}
+					</th>
+					<th>
+						{{=T('Date')}}
+					</th>
+					{{if cpfecys.current_year_period().id==semestre2.id and auth.has_membership('Student'):}}
+						<th>
+							{{=T('Action')}}
+						</th>
+					{{pass}}
+		  		</tr>
+		  		{{
+		  			import time
+					from datetime import date
+					tiempo = date.today()
+		  		}}
+		  		{{for tActivitiesAAA in db((db.course_assigned_activity.semester==semestre2.id)&(db.course_assigned_activity.assignation==project.id)&(db.course_assigned_activity.date_start<tiempo)).select():}}
+		  			{{doAction=True}}
+		  			{{if tActivitiesAAA.report_required==True:}}
+		  				{{if tActivitiesAAA.fileReport is None:}}
+		  					<tr class="assignedActivityPR">
+		  						<td>
+		  							<center><span class="label label-important">{{=T('Pending')}}<br>{{=T('Item Delivery')}}</span></center>
+			                    </td>
+		  						<td class="showDetailAA" style="display:none;">
+									<center>{{=tActivitiesAAA.name}}</center>
+								</td>
+								<td>
+									<div style="width:200px;">
+										<center>{{=tActivitiesAAA.description[:100]}}</center>
+										{{if len(tActivitiesAAA.description) > 100:}}
+											...
+											<br>
+											<div align="right">
+												<a type="button" style ="cursor:pointer;" role="button" data-toggle="modal" data-target="#ac_ass_des_modal_{{=tActivitiesAAA.id}}" >{{=T('View more')}}</span></a>
+											</div>
+									
+											<!--MODAL -->
+											<div id="ac_ass_des_modal_{{=tActivitiesAAA.id}}" class="modal hide fade" tabindex="-1" role="dialog"  aria-hidden="true"> 
+											  <div class="modal-header">
+											    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+											      <h3 id="myModalLabel">
+											          {{=T('Activity')}} : {{=tActivitiesAAA.name}}<br>
+											          {{=T('Date')}} : {{=tActivitiesAAA.date_start}}
+											      </h3>
+											  </div>
+											  <div class="modal-body">
+											    <div class="well">
+											        <pre>{{=tActivitiesAAA.description}}</pre>
+											    </div>
+											  </div>
+											  <div class="modal-footer">
+											      <button class="btn" data-dismiss="modal" aria-hidden="true">{{=T('Close')}}</button>
+											  </div>
+											</div>
+											<!--Finish MODaL-->
+										{{pass}}
+									</div>
+								</td>
+								<td>
+									<center>
+									{{if tActivitiesAAA.report_required==True:}}
+										{{=T('Yes')}}
+									{{else:}}
+										{{=T('No')}}
+									{{pass}}
+									</center>
+								</td>
+								<td class="showDetailAA" style="display:none;">
+									<center>
+									{{if tActivitiesAAA.fileReport is None:}}
+										{{=T('Without')}}<br>{{=T('Report')}}
+									{{else:}}
+										<a href="{{=cpfecys.get_domain()}}default/download/{{=tActivitiesAAA.fileReport}}" target="blank">{{=T('Report')}}</a>
+									{{pass}}
+									</center>
+								</td>
+								<td>
+									<center>{{=tActivitiesAAA.date_start}}</center>
+								</td>
+								{{if cpfecys.current_year_period().id==semestre2.id and auth.has_membership('Student'):}}
+								<td>
+									<center>
+									<a id="gradeButton" role="button" title="{{=T('Sign deliverable activity')}}" class="btn" href="{{=URL('activity_control','management_assigned_activity', vars=dict(project=project.id, year=semestre2.id, activity=tActivitiesAAA.id))}}">
+		                    			{{=T('Sign in')}}<br>{{=T('Report')}}
+			                    	</a>
+			                    	</center>
+								</td>
+								{{pass}}
+		  					</tr>
+		  					{{doAction=False}}
+		  				{{pass}}
+		  			{{pass}}
+		  			{{if doAction==True:}}
+			  			<tr class="assignedActivityA">
+	  						<td>
+		  						<center><span class="label label-info">{{=T('Completed')}}</span></center>
+		                    </td>
+	  						<td class="showDetailAA" style="display:none;">
+								<center>{{=tActivitiesAAA.name}}</center>
+							</td>
+							<td>
+								<div style="width:200px;">
+									<center>{{=tActivitiesAAA.description[:100]}}</center>
+									{{if len(tActivitiesAAA.description) > 100:}}
+										...
+										<br>
+										<div align="right">
+											<a type="button" style ="cursor:pointer;" role="button" data-toggle="modal" data-target="#ac_ass_des_modal_{{=tActivitiesAAA.id}}" >{{=T('View more')}}</span></a>
+										</div>
+								
+										<!--MODAL -->
+										<div id="ac_ass_des_modal_{{=tActivitiesAAA.id}}" class="modal hide fade" tabindex="-1" role="dialog"  aria-hidden="true"> 
+										  <div class="modal-header">
+										    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+										      <h3 id="myModalLabel">
+										          {{=T('Activity')}} : {{=tActivitiesAAA.name}}<br>
+										          {{=T('Date')}} : {{=tActivitiesAAA.date_start}}
+										      </h3>
+										  </div>
+										  <div class="modal-body">
+										    <div class="well">
+										        <pre>{{=tActivitiesAAA.description}}</pre>
+										    </div>
+										  </div>
+										  <div class="modal-footer">
+										      <button class="btn" data-dismiss="modal" aria-hidden="true">{{=T('Close')}}</button>
+										  </div>
+										</div>
+										<!--Finish MODaL-->
+									{{pass}}
+								</div>
+							</td>
+							<td>
+								<center>
+								{{if tActivitiesAAA.report_required==True:}}
+									{{=T('Yes')}}
+								{{else:}}
+									{{=T('No')}}
+								{{pass}}
+								</center>
+							</td>
+							<td class="showDetailAA" style="display:none;">
+								<center>
+								{{if tActivitiesAAA.fileReport is None:}}
+									{{=T('Without')}}<br>{{=T('Report')}}
+								{{else:}}
+									<a href="{{=cpfecys.get_domain()}}default/download/{{=tActivitiesAAA.fileReport}}" target="blank">{{=T('Report')}}</a>
+								{{pass}}
+								</center>
+							</td>
+							<td>
+								<center>{{=tActivitiesAAA.date_start}}</center>
+							</td>
+							{{if cpfecys.current_year_period().id==semestre2.id and auth.has_membership('Student'):}}
+								<td>
+								{{if tActivitiesAAA.report_required==True:}}
+									<center>
+									<a id="gradeButton" role="button" title="{{=T('Sign deliverable activity')}}" class="btn" href="{{=URL('activity_control','management_assigned_activity', vars=dict(project=project.id, year=semestre2.id, activity=tActivitiesAAA.id))}}">
+		                    			{{=T('Replace')}}<br>{{=T('Report')}}
+			                    	</a>
+			                    	</center>
+								{{else:}}
+									<center>{{=T('No Action')}}</center>
+								{{pass}}
+								</td>
+							{{pass}}
+	  					</tr>
+		  			{{pass}}
+		  		{{pass}}
+
+		  		{{for tActivitiesAAA in db((db.course_assigned_activity.semester==semestre2.id)&(db.course_assigned_activity.assignation==project.id)&(db.course_assigned_activity.date_start==tiempo)).select():}}
+		  			<tr class="assignedActivityAct">
+  						<td>
+	  						<center><span class="label label-success">{{=T('Active')}}</span></center>
+	                    </td>
+  						<td class="showDetailAA" style="display:none;">
+							<center>{{=tActivitiesAAA.name}}</center>
+						</td>
+						<td>
+							<div style="width:200px;">
+								<center>{{=tActivitiesAAA.description[:100]}}</center>
+								{{if len(tActivitiesAAA.description) > 100:}}
+									...
+									<br>
+									<div align="right">
+										<a type="button" style ="cursor:pointer;" role="button" data-toggle="modal" data-target="#ac_ass_des_modal_{{=tActivitiesAAA.id}}" >{{=T('View more')}}</span></a>
+									</div>
+							
+									<!--MODAL -->
+									<div id="ac_ass_des_modal_{{=tActivitiesAAA.id}}" class="modal hide fade" tabindex="-1" role="dialog"  aria-hidden="true"> 
+									  <div class="modal-header">
+									    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+									      <h3 id="myModalLabel">
+									          {{=T('Activity')}} : {{=tActivitiesAAA.name}}<br>
+									          {{=T('Date')}} : {{=tActivitiesAAA.date_start}}
+									      </h3>
+									  </div>
+									  <div class="modal-body">
+									    <div class="well">
+									        <pre>{{=tActivitiesAAA.description}}</pre>
+									    </div>
+									  </div>
+									  <div class="modal-footer">
+									      <button class="btn" data-dismiss="modal" aria-hidden="true">{{=T('Close')}}</button>
+									  </div>
+									</div>
+									<!--Finish MODaL-->
+								{{pass}}
+							</div>
+						</td>
+						<td>
+							<center>
+							{{if tActivitiesAAA.report_required==True:}}
+								{{=T('Yes')}}
+							{{else:}}
+								{{=T('No')}}
+							{{pass}}
+							</center>
+						</td>
+						<td class="showDetailAA" style="display:none;">
+							<center>
+							{{if tActivitiesAAA.fileReport is None:}}
+								{{=T('Without')}}<br>{{=T('Report')}}
+							{{else:}}
+								<a href="{{=cpfecys.get_domain()}}default/download/{{=tActivitiesAAA.fileReport}}" target="blank">{{=T('Report')}}</a>
+							{{pass}}
+							</center>
+						</td>
+						<td>
+							<center>{{=tActivitiesAAA.date_start}}</center>
+						</td>
+						{{if cpfecys.current_year_period().id==semestre2.id and auth.has_membership('Student'):}}
+						<td>
+							<center>{{=T('No Action')}}</center>
+						</td>
+						{{pass}}
+  					</tr>
+		  		{{pass}}
+
+		  		{{for tActivitiesAAA in db((db.course_assigned_activity.semester==semestre2.id)&(db.course_assigned_activity.assignation==project.id)&(db.course_assigned_activity.date_start>tiempo)).select():}}
+		  			<tr class="assignedActivityP">
+  						<td>
+	  						<center><span class="label label-warning">{{=T('Pending')}}</span></center>
+	                    </td>
+  						<td class="showDetailAA" style="display:none;">
+							<center>{{=tActivitiesAAA.name}}</center>
+						</td>
+						<td>
+							<div style="width:200px;">
+								<center>{{=tActivitiesAAA.description[:100]}}</center>
+								{{if len(tActivitiesAAA.description) > 100:}}
+									...
+									<br>
+									<div align="right">
+										<a type="button" style ="cursor:pointer;" role="button" data-toggle="modal" data-target="#ac_ass_des_modal_{{=tActivitiesAAA.id}}" >{{=T('View more')}}</span></a>
+									</div>
+							
+									<!--MODAL -->
+									<div id="ac_ass_des_modal_{{=tActivitiesAAA.id}}" class="modal hide fade" tabindex="-1" role="dialog"  aria-hidden="true"> 
+									  <div class="modal-header">
+									    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+									      <h3 id="myModalLabel">
+									          {{=T('Activity')}} : {{=tActivitiesAAA.name}}<br>
+									          {{=T('Date')}} : {{=tActivitiesAAA.date_start}}
+									      </h3>
+									  </div>
+									  <div class="modal-body">
+									    <div class="well">
+									        <pre>{{=tActivitiesAAA.description}}</pre>
+									    </div>
+									  </div>
+									  <div class="modal-footer">
+									      <button class="btn" data-dismiss="modal" aria-hidden="true">{{=T('Close')}}</button>
+									  </div>
+									</div>
+									<!--Finish MODaL-->
+								{{pass}}
+							</div>
+						</td>
+						<td>
+							<center>
+							{{if tActivitiesAAA.report_required==True:}}
+								{{=T('Yes')}}
+							{{else:}}
+								{{=T('No')}}
+							{{pass}}
+							</center>
+						</td>
+						<td class="showDetailAA" style="display:none;">
+							<center>
+							{{if tActivitiesAAA.fileReport is None:}}
+								{{=T('Without')}}<br>{{=T('Report')}}
+							{{else:}}
+								<a href="{{=cpfecys.get_domain()}}default/download/{{=tActivitiesAAA.fileReport}}" target="blank">{{=T('Report')}}</a>
+							{{pass}}
+							</center>
+						</td>
+						<td>
+							<center>{{=tActivitiesAAA.date_start}}</center>
+						</td>
+						{{if cpfecys.current_year_period().id==semestre2.id and auth.has_membership('Student'):}}
+						<td>
+							<center>{{=T('No Action')}}</center>
+						</td>
+						{{pass}}
+  					</tr>
+		  		{{pass}}
+			</table>
+		</center>
+
+		<script type="text/javascript">
+			function visible_detail(){
+				$("#activityButtonVisibleAA").css("display", "none");
+				$("#activityButtonVisible2AA").css("display", "table-cell");
+				$(".showDetailAA").css("display", "table-cell");
+			}
+
+			function no_visible_detail(){
+				$("#activityButtonVisibleAA").css("display", "table-cell");
+				$("#activityButtonVisible2AA").css("display", "none");
+				$(".showDetailAA").css("display", "none");
+			}
+
+			function visible_assigned_activities(idType){
+				if (idType==1){
+					$(".assignedActivityPR").css("display", "");
+					$(".assignedActivityA").css("display", "none");
+					$(".assignedActivityAct").css("display", "none");
+					$(".assignedActivityP").css("display", "none");
+				}else{
+					if(idType==2){
+						$(".assignedActivityPR").css("display", "none");
+						$(".assignedActivityA").css("display", "");
+						$(".assignedActivityAct").css("display", "none");
+						$(".assignedActivityP").css("display", "none");
+					}else{
+						if(idType==3){
+							$(".assignedActivityPR").css("display", "none");
+							$(".assignedActivityA").css("display", "none");
+							$(".assignedActivityAct").css("display", "");
+							$(".assignedActivityP").css("display", "none");
+						}else{
+							if (idType==4){
+								$(".assignedActivityPR").css("display", "none");
+								$(".assignedActivityA").css("display", "none");
+								$(".assignedActivityAct").css("display", "none");
+								$(".assignedActivityP").css("display", "");
+							}else{
+								$(".assignedActivityPR").css("display", "");
+								$(".assignedActivityA").css("display", "");
+								$(".assignedActivityAct").css("display", "");
+								$(".assignedActivityP").css("display", "");
+							}
+						}
+					}
+				}
+			}
+		</script>
+	{{pass}}
+{{pass}}
