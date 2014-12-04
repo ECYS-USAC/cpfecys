@@ -1,0 +1,78 @@
+<div style=" height:500px; overflow-y:auto;">
+{{if len(list_evaluation_template_detail) > 0:}}
+	<table class="table well">
+
+		{{for question_type_temp in db(db.question_type.id.belongs( list_evaluation_template_detail )).select():}}
+			<tr>
+				<td width="500px">
+
+					<a style="cursor:pointer;" id="a_{{=question_type_temp.id}}">
+						<font size="3">
+							{{=question_type_temp.name}}
+						</font>
+					</a>
+					<div id="div_{{=question_type_temp.id}}">
+						<script type="text/javascript">
+							$("#a_{{=question_type_temp.id}}").click(function(){         
+					            $("#div_{{=question_type_temp.id}}").toggle(300);
+					        })
+						</script>
+						<table class="table">
+							{{for ev_te_de in db((db.evaluation_template_detail.evaluation_template == template_id)&(db.evaluation_template_detail.question_type == question_type_temp.id)).select():}}
+								<tr>
+									<td>
+										<table>
+											<tr>
+												<td width="10%">
+													<label>{{=T('Question')}}:</label> 
+												</td>
+												<td colspan="2">
+													<font size='3'><b>{{=ev_te_de.evaluation_question.question}}</b></font>
+												</td>
+											</tr>
+											<tr>
+												<td width="10%">
+													<label>{{=T('Answer')}}:</label>
+												</td>
+												<td>
+													{{answers_type = db(db.answer.answer_type == ev_te_de.evaluation_question.answer_type).select()}}
+													{{if len(answers_type) == 0:}}
+														<div class="alert"  >
+												            
+												            <div align="left">
+												            	{{=ev_te_de.evaluation_question.answer_type.name}}:
+												            	<i>
+												            	{{=T('This type has no associated responses will therefore be taken as an open answer')}}.
+												            	</i>
+												          </div>
+												        </div>
+														
+													{{else:}}
+														{{for answer in answers_type:}}
+															{{=answer.answer}},
+														{{pass}}
+													{{pass}}
+												</td>
+												<td width="10%"> 
+													<form  method='post'>
+														<input name="_formname" type="hidden" value="remove_question">
+														<input name="ev_te_de_id" type="hidden" id="ev_te_de_id" value="{{=ev_te_de.id}}">
+														<center>
+															<input class="btn btn-danger" type="submit" title="{{=T('Remove Question')}}" value="{{=T('Remove')}}">
+														</center>
+													</form>
+												</td>
+											</tr>
+										</table>
+
+									</td>
+								</tr>
+							{{pass}}
+						</table>
+					</div>
+				</td>
+			</tr>
+		{{pass}}
+	</table>
+{{pass}}
+</div>

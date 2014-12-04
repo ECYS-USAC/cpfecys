@@ -196,6 +196,19 @@ if auth.has_membership(role="Super-Administrator"):
             (T('Course Time Limit Exception'), False, URL('activity_control','course_limit_exception'), [])
         ]))
     ]))
+    user_menu.append((T('Evaluations'), False, URL(), [
+        (T('Manage Templates'), False, URL('evaluation','evaluation_template'), []),
+        (T('Manage Evaluations'), False, URL('evaluation','evaluation'), []),
+        (T('History Evaluations'), False, URL('evaluation','evaluation_history'), []),
+
+        ((T('Template Parameters'), False, URL(), [    
+            (T('Answers'), False, URL('evaluation','answer'), []),
+            (T('Type answer'), False, URL('evaluation','answer_type'), []),
+            (T('Type question'), False, URL('evaluation','question_type'), []),
+            (T('Type evaluation'), False, URL('evaluation','evaluation_type'), [])
+        ]))
+        
+    ]))
 
 if auth.has_membership(role="Super-Administrator"):
     user_menu.append((T('Audit'), False, URL(), [

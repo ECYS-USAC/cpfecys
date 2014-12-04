@@ -1470,24 +1470,17 @@ db.define_table('photo_review',
     Field('accepted', 'boolean', notnull=True, label=T('accepted'))
 )
 
-db.define_table('evaluation',
-    Field('date_start', 'datetime', notnull = True, label = T('Date start')),
-    Field('date_finish', 'datetime', notnull = True, label = T('Date finish')),
-    Field('semester_repeat', 'boolean', notnull = True, label = T('Repeat')),
-    Field('description', 'text', notnull=False, label=T('Description'))
-)
-
-
 db.define_table('evaluation_type',
     Field('name', 'string', length = 255 ,notnull = True, unique=True, label = T('Name')),
     Field('description', 'text', notnull = True, label = T('Description')),
     Field('user_type_evaluated', 'reference auth_group', notnull = True, label = T('Evaluated')),
-    Field('user_type_evaluator', 'reference auth_group', notnull = True, label = T('Evaluator'))
+    Field('user_type_evaluator', 'reference auth_group', notnull = True, label = T('Evaluator')),
+    format='%(name)s'
 )
 
 db.define_table('evaluation_template',
     Field('name', 'string', length = 255, notnull = True, unique=True, label = T('Name')),
-    Field('date_created', 'datetime', notnull = True, label = T('Date created')),
+    Field('date_created', 'date', default = datetime.datetime.now() , notnull = True, label = T('Date created')),
     Field('description', 'text', notnull = True, label = T('Description')),
     Field('evaluation_type', 'reference evaluation_type', notnull=True, label=T('Evaluation type'))
 )
@@ -1495,7 +1488,8 @@ db.define_table('evaluation_template',
 db.define_table('answer_type',
     Field('name', 'string', length = 255, notnull = True, unique=True, label = T('Name')),
     Field('exclusive_one_answer', 'boolean', notnull = True, label = T('Exclusive one answer')),
-    Field('description', 'text', notnull = True, label = T('Description'))
+    Field('description', 'text', notnull = True, label = T('Description')),
+    format='%(name)s'
 )
 
 db.define_table('answer',
@@ -1508,11 +1502,48 @@ db.define_table('evaluation_question',
     Field('answer_type', 'reference answer_type', notnull = True, label = T('Evaluation question'))
 )
 
-db.define_table('evaluation_template_detail',
-    Field('evaluation_template', 'reference evaluation_template', notnull = True, label = T('Evaluation template')),
-    Field('evaluation_question', 'reference evaluation_question', notnull = True, label = T('Evaluation question'))
+db.define_table('question_type',
+    Field('name', 'string', length = 255, notnull = True, unique=True, label = T('Name')),
+    Field('description', 'text', notnull = True, label = T('Description')),
+    format='%(name)s'
 )
 
+db.define_table('evaluation_template_detail',
+    Field('evaluation_template', 'reference evaluation_template', notnull = True, label = T('Evaluation template')),
+    Field('evaluation_question', 'reference evaluation_question', notnull = True, label = T('Evaluation question')),
+    Field('question_type', 'reference question_type', notnull = True, label = T('Question type'))
+)
+
+db.define_table('evaluation_history',
+    Field('template_name', 'string', length = 255 ,notnull = True, label = T('Template')),
+    Field('evaluation_type_name', 'string', notnull = True, label = T('Evaluation Type')),
+    Field('date_created', 'date', default = datetime.datetime.now() , notnull = True, label = T('Date created')),
+    Field('user_type_evaluated', 'reference auth_group', notnull = True, label = T('Evaluated')),
+    Field('user_type_evaluator', 'reference auth_group', notnull = True, label = T('Evaluator')),
+    format='%(template_name)s'
+)
+
+db.define_table('question_history',
+    Field('question', 'string', notnull = True, label = T('Question')),
+    Field('question_type_name', 'string', notnull = True, label = T('Question Type')),
+    Field('evaluation_history', 'reference evaluation_history', notnull = True, label = T('Evaluation History')),
+    format='%(question)s'
+)
+
+db.define_table('answer_history',
+    Field('answer', 'string', notnull = True, label = T('Answer')),
+    Field('answer_type_name', 'string', notnull = True, label = T('Answer Type')),
+    Field('question_history', 'reference question_history', notnull = True, label = T('Question History')),
+    format='%(answer)s'
+)
+
+db.define_table('evaluation',
+    Field('date_start', 'datetime', notnull = True, label = T('Date start')),
+    Field('date_finish', 'datetime', notnull = True, label = T('Date finish')),
+    Field('semester_repeat', 'boolean', notnull = True, label = T('Repeat')),
+    Field('description', 'text', notnull=False, label=T('Description')),
+    Field('evaluation_history', 'reference evaluation_history', notnull = True, label = T('Evaluation History'))
+)
 
 db.define_table('course_assigned_activity',
     Field('name', 'string', notnull=True, unique=False, label = T('Name')),
@@ -1522,7 +1553,7 @@ db.define_table('course_assigned_activity',
     Field('semester', 'reference period_year', notnull=True),
     Field('assignation', 'reference project', notnull=True),
     Field('date_start', 'date', notnull = True, default = datetime.datetime.now(), label = T('Date'))
-    )
+)
 
 
 ## after defining tables, uncomment below to enable auditing
