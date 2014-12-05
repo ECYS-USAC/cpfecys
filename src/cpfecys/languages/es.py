@@ -150,7 +150,7 @@
 'All request': 'Todas las Solicitudes',
 'All requests': 'All requests',
 'Allocation management activities of academic tutor': 'Gestión de asignacion de actividades al tutor academico',
-'Already delivered a report on this activity. If you upload a new report that will be taken as the official.': 'Ya se ha entregado un reporte en esta actividad. Si sube un nuevo reporte ese será tomado como el oficial.',
+'Already delivered a report on this activity. If you upload a new report that will be taken as the official.': 'Ya se ha entregado un reporte en esta actividad. Si sube un nuevo reporte será tomado como el oficial.',
 'Already existing users:': 'Usuarios ya existentes:',
 'Already have an associated grade': 'Ya tiene una nota asociada',
 'Alumnos en Examen Final': 'Alumnos en Examen Final',
