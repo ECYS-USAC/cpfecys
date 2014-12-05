@@ -209,6 +209,11 @@ if auth.has_membership(role="Super-Administrator"):
         ]))
         
     ]))
+    user_menu.append((T('Management Reports'), False, URL(), [
+        (T('Grades'), False, URL('management_reports','grades_management'), []),
+        (T('Manage Evaluations'), False, URL('evaluation','evaluation'), []),
+        (T('History Evaluations'), False, URL('evaluation','evaluation_history'), [])
+    ]))
 
 if auth.has_membership(role="Super-Administrator"):
     user_menu.append((T('Audit'), False, URL(), [

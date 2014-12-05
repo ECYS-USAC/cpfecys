@@ -1,0 +1,120 @@
+{{extend 'template.html'}}
+<div class="row-fluid">
+	<h1>
+		{{=T('Report management grades')}}
+	</h1>
+	<div align="right">
+		<a class="btn btn-success" href="{{=URL(vars=dict(list='True'))}}"><i class="icon-download icon-white"></i>{{=T('Export Report')}} (CSV)</a>
+    </div>
+    <!--Search in report-->
+    <div>
+    	<div>
+			<form action="{{=URL('management_reports', 'grades_management/search')}}" method="post">
+				<input type="text" id="querySearch" name="querySearch" value="{{=personal_query}}" readonly="readonly"/>
+				<a id="buildSearch" class="btn">{{=T('Build Search')}}</a>
+				<button type="submit"  class="btn">{{=T('Search')}}</button>
+				<a id="cancelSearch" class="btn">{{=T('Clear')}}</a>
+			</form>
+		</div>
+		<div id="div_search" style="display: none;">
+			<table>
+				<tr>
+					<td>
+						<select class="generic-widget" id="fieldSearch">
+						{{for field in fsearch:}}
+							<option value="grades_log.{{=str(field[0])}}">{{=str(field[1])}}</option>
+						{{pass}}
+						</select>
+					</td>
+					<td>
+						{{conadorF=0}}
+						{{for field in fsearch:}}
+							{{if conadorF==0:}}
+								<select class="generic-widget" id="optionSearch_{{=str(field[0])}}">
+							{{else:}}
+								<select class="generic-widget" id="optionSearch_{{=str(field[0])}}" style="display:none;">
+							{{pass}}
+							{{for option in (filtered_by(field[2])):}}
+								<option value="{{=str(option[0])}}">{{=str(option[1])}}</option>
+							{{pass}}
+							</select>
+							{{conadorF+=1}}
+						{{pass}}
+					</td>
+					<td>
+						{{conadorF=0}}
+						{{for field in fsearch:}}
+							{{if field[3][0]==1:}}
+								{{if conadorF==0:}}
+									<input id="value_{{=str(field[0])}}" type="text" />
+								{{else:}}
+									<input id="value_{{=str(field[0])}}" type="text" style="display:none;"/>
+								{{pass}}
+							{{elif field[3][0]==2:}}
+								{{if conadorF==0:}}
+									<input id="value_{{=str(field[0])}}" class="datetime" placeholder="YYYY-MM-DD HH:MM:SS" type="text" value = ""/>
+								{{else:}}
+									<input id="value_{{=str(field[0])}}" class="datetime" placeholder="YYYY-MM-DD HH:MM:SS" type="text" value = "" style="display:none;"/>
+								{{pass}}
+							{{pass}}
+							{{conadorF+=1}}
+						{{pass}}
+					</td>
+					<td>
+						<a id="newSearch" class="btn" title="{{=T('Start building a new search')}}">{{=T('New Search')}}</a>
+						<a id="andSearch" class="btn" title="{{=T('Add this to the search as an AND term')}}">{{=T('+ And')}}</a>
+						<a id="orSearch" class="btn" title="{{=T('Add this to the search as an OR term')}}">{{=T('+ Or')}}</a>
+						<a id="closeSearch" class="btn">{{=T('Close')}}</a>
+					</td>
+				</tr>
+			</table>
+		</div>
+	</div>
+    <!--Search in report-->
+</div>
+
+<script type="text/javascript">
+	$(document).ready(function(){
+		//HOME --- Buttons for execution or cancellation search
+		$("#buildSearch").click(function(){
+			$("#div_search").slideDown();
+		});
+
+		$("#cancelSearch").click(function(){
+			window.location.href = "{{=URL('management_reports', 'grades_management')}}";
+		});
+		//END --- Buttons for execution or cancellation search
+
+		
+		//HOME --- Buttons for building the query
+		$("#closeSearch").click(function(){
+			$("#div_search").slideUp();
+		});
+
+		$("#fieldSearch").change(function(){
+			{{for fieldSearch in fsearch:}}
+				{{optionSearch = 'optionSearch_'+fieldSearch[0]}}
+				{{valuesSearch = 'value_'+fieldSearch[0]}}
+				$("#{{=optionSearch}}").css("display", "none");
+				$("#{{=valuesSearch}}").css("display", "none");
+				if (document.getElementById('fieldSearch').value == 'grades_log.{{=str(fieldSearch[0])}}'){
+					$("#{{=optionSearch}}").css("display", "block");
+					$("#{{=valuesSearch}}").css("display", "block");
+				}
+			{{pass}}
+		});
+
+
+		$("#newSearch").click(function(){
+			{{for fieldSearch in fsearch:}}
+				{{optionSearch = 'optionSearch_'+fieldSearch[0]}}
+				{{valuesSearch = 'value_'+fieldSearch[0]}}
+				if (document.getElementById('fieldSearch').value == 'grades_log.{{=str(fieldSearch[0])}}'){
+					document.getElementById('querySearch').value = document.getElementById('fieldSearch').value+ ' '+ document.getElementById('{{=optionSearch}}').value +' "' +document.getElementById('{{=valuesSearch}}').value+'"';
+				}
+			{{pass}}
+		});
+		//END --- Buttons for query construction
+
+	});
+</script>
