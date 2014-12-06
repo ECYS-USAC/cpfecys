@@ -377,6 +377,19 @@
                               "
                         {{pass}}
                         >{{=T('Activity without metric')}}</a></li>
+                        {{if ((auth.has_membership('Teacher') or auth.has_membership('Student')) and assigned_to_project==True):}}
+                          <li id="assignedactivities"><a href="#" data-toggle="tab"
+                          {{if auth.has_membership('Teacher'):}}
+                              data-step="{{step_count+=1}}{{=step_count}}" data-intro="
+                                Al seleccionar la pestaña <b>Actividades Asignadas</b>, podrá gestionar todas aquellas actividades que le quiere asignar al tutor académico.
+                                "
+                          {{elif auth.has_membership('Student'):}}
+                               data-step="{{step_count+=1}}{{=step_count}}" data-intro="
+                                Al seleccionar la pestaña <b>Actividades Asignadas</b>, podrá visualizar todas aquellas actividades que el catedratico le haya solicitado realizar.
+                                "
+                          {{pass}}
+                          >{{=T('Assigned Activities')}}</a></li>
+                        {{pass}}
                     </ul>
                     <div  style=" width:800px; overflow:auto;">
                       <div style=" width:100%;" >
@@ -488,6 +501,13 @@
       jQuery('#activity_inside').append("<center>{{=T('Loading')}}...</center>");
       $("#activity_inside").load('{{=URL('activity_control','control_activity_without_metric.html',vars=dict(operation="div_update",year = year, project = project))}}' );
       $("#activity_menu").load('{{=URL('activity_control','control_activity_without_metric.html',vars=dict(operation="menu_update",year = year, project = project))}}');
+    });
+
+    $("#assignedactivities").click(function(){
+      jQuery('#activity_inside').empty();
+      jQuery('#activity_inside').append("<center>{{=T('Loading')}}...</center>");
+      $("#activity_inside").load('{{=URL('activity_control','control_assigned_activity.html',vars=dict(operation="div_update",year = year, project = project))}}');
+      $("#activity_menu").load('{{=URL('activity_control','control_assigned_activity.html',vars=dict(operation="menu_update",year = year, project = project))}}');
     });
 
   });

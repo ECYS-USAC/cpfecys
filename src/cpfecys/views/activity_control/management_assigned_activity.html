@@ -1,0 +1,64 @@
+{{extend 'template.html'}}
+<div>
+	<a href="{{=URL('activity_control', 'students_control', vars=dict(project = project.id, period = year.id))}}" class="btn" ><i class="icon-arrow-left"></i> {{=T('Back')}}</a>
+</div>
+{{if auth.has_membership('Teacher'):}}
+	<h2>
+		{{=T('Allocation management activities of academic tutor')}}
+	    <br>
+	    <small>{{=project.name}} - {{=T(year.period.name)}} {{=str(year.yearp)}} </small>
+	</h2>
+	{{=grid}}
+{{else:}}
+	<h2>
+		{{=T('Activity assigned by the professor')}}
+	    <br>
+	    <small>{{=project.name}} - {{=T(year.period.name)}} {{=str(year.yearp)}} </small>
+	</h2>
+
+	<div class="row-fluid">
+    	<div class="well span12" style="overflow:auto;">
+    		<form action="" enctype="multipart/form-data" method="post" >
+    			<input name="_formname" type="hidden" value="upload_form">
+	    		<b>{{=T('Name')}} :</b><br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{{=activity.name}}
+	    		<br>
+	    		<b>{{=T('Date')}} :</b><br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{{=activity.date_start}}
+	    		<br>
+	    		<b>{{=T('Description')}} :</b><br><pre>{{=activity.description}}</pre>
+	    		{{if activity.fileReport is not None:}}
+		    		<div class="alert alert-warning">
+						<b>{{=T('Already delivered a report on this activity. If you upload a new report that will be taken as the official.')}}</b>
+						<br>
+						<a href="{{=cpfecys.get_domain()}}default/download/{{=activity.fileReport}}" target="blank">{{=T('Download')}} {{=T('Report')}}</a>
+					</div>
+				{{pass}}
+	    		<b>{{=T('Report')}} :</b><br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<input class="upload" name="file_upload" type="file" id="upload_button">
+				<div id="uploadError" style="display: none;" class="alert-error">
+					{{=T('File size must be 2MB or below with pdf or zip extension')}}
+				</div>
+				<input class="string" name="activity_id" type="text" value="{{=activity.id}} " style="Display:None;">
+				<div align="right">	
+					<input type="submit" class="btn btn-primary" value="{{=T('Finalize')}} {{=T('Activity')}}">
+				</div>
+	    	</form>
+    	</div>
+    </div>
+
+    <script type="text/javascript">
+		$(document).ready(function(){
+			var upload = document.getElementById('upload_button');
+			upload.onchange = function() {
+			    var file = upload.files[0];
+			    if (file.size > 2097152) {		    	
+			    	$("#uploadError").css("display", "block");		       
+			    }else{
+			    	$("#uploadError").css("display", "none");
+			    }
+			    var ext = $('#upload_button').val().split('.').pop().toLowerCase();
+				if($.inArray(ext, ['zip','pdf']) == -1) {
+				    $("#uploadError").css("display", "block");
+				}
+			};
+		});
+	</script>
+{{pass}}
