@@ -30,11 +30,48 @@
 
 
 	{{if request.vars['operation'] == "div_update": }}
+		<!--Init help activities assigned -->
+		  <div id="help_modal_aa" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true"> 
+		    <div class="modal-header">
+		      <button type="button" class="close" data-dismiss="modal"
+		  aria-hidden="true">×</button>
+		        <h3 id="myModalLabel">
+		            <span class="icon-question-sign"></span>
+		            Ayuda Actividades Asignadas
+		        </h3>
+		    </div>
+		    <div class="modal-body">
+		      <div class="well">
+		          <p>
+		              Las actividades asignadas son las actividades que el Catedrático le ha delegado al Tutor Academico para que realice.
+		              <br>
+		              <br>
+		              Los estados posibles de las actividades son:
+		              <br>
+		              *) <b>Completado:</b> Son todas las actividades que han sido desarrolladas y completadas
+		              <br>
+		              *) <b>Pendiente Entregable:</b> Son todas las actividades que han sido desarrolladas pero no han sido completadas por falta de ingreso de reporte
+		              <br>
+		              *) <b>Activo:</b> Son todas las actividades que deben de desarrollarse en la fecha actual
+		              <br>
+		              *) <b>Pendiente:</b> Son todas las actividades que la fecha de ejecución aún no ha llegado
+		          </p>
+		      </div>
+		    </div>
+		    <div class="modal-footer">
+		        <button class="btn" data-dismiss="modal"
+		  aria-hidden="true">{{=T('Close')}}</button>
+		    </div>
+		  </div>
+		  <!--Finish help activities assigned-->
+
 		<div align="right">
 			<table class="table-striped table-bordered">
 				<tr>
 					<th colspan="5">
-						<center>{{=T('Activity logs')}}</center>
+						<center>{{=T('Activity logs')}}</center><a type="button" class="close" title="Ayuda Actividades Asignadas" aria-hidden="true" role="button" class="btn btn-warning" data-toggle="modal" data-target="#help_modal_aa" >
+                      <span class="icon-black icon-question-sign"></span>
+                  </a>
 					</th>
 				</tr>
 				<tr>
@@ -53,32 +90,32 @@
 				</tr>
 				<tr>
 					<td>
-						<span class="label label-info">&nbsp;&nbsp;&nbsp;</span>
-						<a id="aaAccomplished" style="cursor:pointer;" onclick="visible_assigned_activities(2);">
+						<span class="label label-success">&nbsp;&nbsp;&nbsp;</span>
+						<a id="aaAccomplished" style="cursor:pointer;" onclick="visible_assigned_activities(2);" title="Todas las actividades que han sido desarrolladas y completadas">
                     		{{=T('Accomplished')}}
                     	</a>
 					</td>
 					<td>
 						<span class="label label-important">&nbsp;&nbsp;&nbsp;</span>
-						<a id="aaDeliverableEarrings" style="cursor:pointer;" onclick="visible_assigned_activities(1);">
+						<a id="aaDeliverableEarrings" style="cursor:pointer;" onclick="visible_assigned_activities(1);" title="Todas las actividades que han sido desarrolladas pero no han sido completadas por falta de ingreso de reporte">
                     		{{=T('Deliverable Earrings')}}
                     	</a>
 					</td>
 					<td>
-						<span class="label label-success">&nbsp;&nbsp;&nbsp;</span>
-						<a id="aaActivated" style="cursor:pointer;" onclick="visible_assigned_activities(3);">
+						<span class="label label-info">&nbsp;&nbsp;&nbsp;</span>
+						<a id="aaActivated" style="cursor:pointer;" onclick="visible_assigned_activities(3);" title="Todas las actividades que deben de desarrollarse en la fecha actual">
                     		{{=T('Activated')}}
                     	</a>
 					</td>
 					<td>
 						<span class="label label-warning">&nbsp;&nbsp;&nbsp;</span>
-						<a id="aaEarrings" style="cursor:pointer;" onclick="visible_assigned_activities(4);">
+						<a id="aaEarrings" style="cursor:pointer;" onclick="visible_assigned_activities(4);" title="Todas las actividades que la fecha de ejecución aún no ha llegado">
                     		{{=T('Earrings')}}
                     	</a>
 					</td>
 					<td>
 						<span class="label label-inverse">&nbsp;&nbsp;&nbsp;</span>
-						<a id="aaAll" style="cursor:pointer;" onclick="visible_assigned_activities(0);">
+						<a id="aaAll" style="cursor:pointer;" onclick="visible_assigned_activities(0);" title="Todas las actividades">
                     		{{=T('All')}}
                     	</a>
 					</td>
@@ -204,7 +241,7 @@
 		  			{{if doAction==True:}}
 			  			<tr class="assignedActivityA">
 	  						<td>
-		  						<center><span class="label label-info">{{=T('Completed')}}</span></center>
+		  						<center><span class="label label-success">{{=T('Completed')}}</span></center>
 		                    </td>
 	  						<td class="showDetailAA" style="display:none;">
 								<center>{{=tActivitiesAAA.name}}</center>
@@ -266,7 +303,7 @@
 								<td>
 								{{if tActivitiesAAA.report_required==True:}}
 									<center>
-									<a id="gradeButton" role="button" title="{{=T('Sign deliverable activity')}}" class="btn" href="{{=URL('activity_control','management_assigned_activity', vars=dict(project=project.id, year=semestre2.id, activity=tActivitiesAAA.id))}}">
+									<a id="gradeButton" role="button" title="{{=T('Replace deliverable activity')}}" class="btn" href="{{=URL('activity_control','management_assigned_activity', vars=dict(project=project.id, year=semestre2.id, activity=tActivitiesAAA.id))}}">
 		                    			{{=T('Replace')}}<br>{{=T('Report')}}
 			                    	</a>
 			                    	</center>
@@ -282,7 +319,7 @@
 		  		{{for tActivitiesAAA in db((db.course_assigned_activity.semester==semestre2.id)&(db.course_assigned_activity.assignation==project.id)&(db.course_assigned_activity.date_start==tiempo)).select():}}
 		  			<tr class="assignedActivityAct">
   						<td>
-	  						<center><span class="label label-success">{{=T('Active')}}</span></center>
+	  						<center><span class="label label-info">{{=T('Active')}}</span></center>
 	                    </td>
   						<td class="showDetailAA" style="display:none;">
 							<center>{{=tActivitiesAAA.name}}</center>

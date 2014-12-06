@@ -51,147 +51,170 @@ def grades_management():
         return fsearch_Option
     
     #ALL INFORMATION OF SEARCH
-    fsearch = []
-    #
-    fsearch_Temp=[]
-    fsearch_Temp.append('user_name')
-    fsearch_Temp.append('Usuario Registro')
-    fsearch_Temp.append(True)
-    fsearch_Values=[]
-    fsearch_Values.append(1)
-    fsearch_Temp.append(fsearch_Values)
-    fsearch.append(fsearch_Temp)
+    noVisibleSearch=True
+    if noVisibleSearch==True:
+        fsearch = []
+        #
+        fsearch_Temp=[]
+        fsearch_Temp.append('user_name')
+        fsearch_Temp.append('Usuario Registro')
+        fsearch_Temp.append(True)
+        fsearch_Values=[]
+        fsearch_Values.append(1)
+        fsearch_Temp.append(fsearch_Values)
+        fsearch.append(fsearch_Temp)
 
-    fsearch_Temp=[]
-    fsearch_Temp.append('roll')
-    fsearch_Temp.append('Rol')
-    fsearch_Temp.append(True)
-    fsearch_Values=[]
-    fsearch_Values.append(1)
-    fsearch_Temp.append(fsearch_Values)
-    fsearch.append(fsearch_Temp)
+        fsearch_Temp=[]
+        fsearch_Temp.append('roll')
+        fsearch_Temp.append('Rol')
+        fsearch_Temp.append(True)
+        fsearch_Values=[]
+        fsearch_Values.append(1)
+        fsearch_Temp.append(fsearch_Values)
+        fsearch.append(fsearch_Temp)
 
-    fsearch_Temp=[]
-    fsearch_Temp.append('operation_log')
-    fsearch_Temp.append('Operación Registrada')
-    fsearch_Temp.append(True)
-    fsearch_Values=[]
-    fsearch_Values.append(1)
-    fsearch_Temp.append(fsearch_Values)
-    fsearch.append(fsearch_Temp)
+        fsearch_Temp=[]
+        fsearch_Temp.append('operation_log')
+        fsearch_Temp.append('Operación Registrada')
+        fsearch_Temp.append(True)
+        fsearch_Values=[]
+        fsearch_Values.append(1)
+        fsearch_Temp.append(fsearch_Values)
+        fsearch.append(fsearch_Temp)
 
-    fsearch_Temp=[]
-    fsearch_Temp.append('academic_assignation_id')
-    fsearch_Temp.append('ID Asignación Estudiante')
-    fsearch_Temp.append(True)
-    fsearch_Values=[]
-    fsearch_Values.append(1)
-    fsearch_Temp.append(fsearch_Values)
-    fsearch.append(fsearch_Temp)
+        fsearch_Temp=[]
+        fsearch_Temp.append('academic_assignation_id')
+        fsearch_Temp.append('ID Asignación Estudiante')
+        fsearch_Temp.append(True)
+        fsearch_Values=[]
+        fsearch_Values.append(1)
+        fsearch_Temp.append(fsearch_Values)
+        fsearch.append(fsearch_Temp)
 
-    fsearch_Temp=[]
-    fsearch_Temp.append('academic')
-    fsearch_Temp.append('Estudiante')
-    fsearch_Temp.append(True)
-    fsearch_Values=[]
-    fsearch_Values.append(1)
-    fsearch_Temp.append(fsearch_Values)
-    fsearch.append(fsearch_Temp)
+        fsearch_Temp=[]
+        fsearch_Temp.append('academic')
+        fsearch_Temp.append('Estudiante')
+        fsearch_Temp.append(True)
+        fsearch_Values=[]
+        fsearch_Values.append(1)
+        fsearch_Temp.append(fsearch_Values)
+        fsearch.append(fsearch_Temp)
 
-    fsearch_Temp=[]
-    fsearch_Temp.append('activity')
-    fsearch_Temp.append('Actividad')
-    fsearch_Temp.append(True)
-    fsearch_Values=[]
-    fsearch_Values.append(1)
-    fsearch_Temp.append(fsearch_Values)
-    fsearch.append(fsearch_Temp)
+        fsearch_Temp=[]
+        fsearch_Temp.append('activity')
+        fsearch_Temp.append('Actividad')
+        fsearch_Temp.append(True)
+        fsearch_Values=[]
+        fsearch_Values.append(1)
+        fsearch_Temp.append(fsearch_Values)
+        fsearch.append(fsearch_Temp)
 
-    fsearch_Temp=[]
-    fsearch_Temp.append('activity_id')
-    fsearch_Temp.append('ID Actividad')
-    fsearch_Temp.append(True)
-    fsearch_Values=[]
-    fsearch_Values.append(1)
-    fsearch_Temp.append(fsearch_Values)
-    fsearch.append(fsearch_Temp)
+        fsearch_Temp=[]
+        fsearch_Temp.append('activity_id')
+        fsearch_Temp.append('ID Actividad')
+        fsearch_Temp.append(True)
+        fsearch_Values=[]
+        fsearch_Values.append(1)
+        fsearch_Temp.append(fsearch_Values)
+        fsearch.append(fsearch_Temp)
 
-    fsearch_Temp=[]
-    fsearch_Temp.append('category')
-    fsearch_Temp.append('Categoria')
-    fsearch_Temp.append(True)
-    fsearch_Values=[]
-    fsearch_Values.append(1)
-    fsearch_Temp.append(fsearch_Values)
-    fsearch.append(fsearch_Temp)
+        fsearch_Temp=[]
+        fsearch_Temp.append('category')
+        fsearch_Temp.append('Categoria')
+        fsearch_Temp.append(True)
+        fsearch_Values=[]
+        fsearch_Values.append(1)
+        fsearch_Temp.append(fsearch_Values)
+        fsearch.append(fsearch_Temp)
 
-    fsearch_Temp=[]
-    fsearch_Temp.append('project')
-    fsearch_Temp.append('Curso')
-    fsearch_Temp.append(True)
-    fsearch_Values=[]
-    fsearch_Values.append(1)
-    fsearch_Temp.append(fsearch_Values)
-    fsearch.append(fsearch_Temp)
+        fsearch_Temp=[]
+        fsearch_Temp.append('project')
+        fsearch_Temp.append('Curso')
+        fsearch_Temp.append(True)
+        fsearch_Values=[]
+        fsearch_Values.append(1)
+        fsearch_Temp.append(fsearch_Values)
+        fsearch.append(fsearch_Temp)
 
-    fsearch_Temp=[]
-    fsearch_Temp.append('yearp')
-    fsearch_Temp.append('Año')
-    fsearch_Temp.append(True)
-    fsearch_Values=[]
-    fsearch_Values.append(1)
-    fsearch_Temp.append(fsearch_Values)
-    fsearch.append(fsearch_Temp)
+        fsearch_Temp=[]
+        fsearch_Temp.append('yearp')
+        fsearch_Temp.append('Año')
+        fsearch_Temp.append(True)
+        fsearch_Values=[]
+        fsearch_Values.append(1)
+        fsearch_Temp.append(fsearch_Values)
+        fsearch.append(fsearch_Temp)
 
-    fsearch_Temp=[]
-    fsearch_Temp.append('period')
-    fsearch_Temp.append('Periodo')
-    fsearch_Temp.append(True)
-    fsearch_Values=[]
-    fsearch_Values.append(1)
-    fsearch_Temp.append(fsearch_Values)
-    fsearch.append(fsearch_Temp)
+        fsearch_Temp=[]
+        fsearch_Temp.append('period')
+        fsearch_Temp.append('Periodo')
+        fsearch_Temp.append(True)
+        fsearch_Values=[]
+        fsearch_Values.append(1)
+        fsearch_Temp.append(fsearch_Values)
+        fsearch.append(fsearch_Temp)
 
-    fsearch_Temp=[]
-    fsearch_Temp.append('before_grade')
-    fsearch_Temp.append('Nota Historica')
-    fsearch_Temp.append(False)
-    fsearch_Values=[]
-    fsearch_Values.append(1)
-    fsearch_Temp.append(fsearch_Values)
-    fsearch.append(fsearch_Temp)
+        fsearch_Temp=[]
+        fsearch_Temp.append('before_grade')
+        fsearch_Temp.append('Nota Historica')
+        fsearch_Temp.append(False)
+        fsearch_Values=[]
+        fsearch_Values.append(1)
+        fsearch_Temp.append(fsearch_Values)
+        fsearch.append(fsearch_Temp)
 
-    fsearch_Temp=[]
-    fsearch_Temp.append('after_grade')
-    fsearch_Temp.append('Nota Oficial')
-    fsearch_Temp.append(False)
-    fsearch_Values=[]
-    fsearch_Values.append(1)
-    fsearch_Temp.append(fsearch_Values)
-    fsearch.append(fsearch_Temp)
+        fsearch_Temp=[]
+        fsearch_Temp.append('after_grade')
+        fsearch_Temp.append('Nota Oficial')
+        fsearch_Temp.append(False)
+        fsearch_Values=[]
+        fsearch_Values.append(1)
+        fsearch_Temp.append(fsearch_Values)
+        fsearch.append(fsearch_Temp)
 
-    fsearch_Temp=[]
-    fsearch_Temp.append('description')
-    fsearch_Temp.append('Descripción')
-    fsearch_Temp.append(True)
-    fsearch_Values=[]
-    fsearch_Values.append(1)
-    fsearch_Temp.append(fsearch_Values)
-    fsearch.append(fsearch_Temp)
+        fsearch_Temp=[]
+        fsearch_Temp.append('description')
+        fsearch_Temp.append('Descripción')
+        fsearch_Temp.append(True)
+        fsearch_Values=[]
+        fsearch_Values.append(1)
+        fsearch_Temp.append(fsearch_Values)
+        fsearch.append(fsearch_Temp)
 
-    fsearch_Temp=[]
-    fsearch_Temp.append('date_log')
-    fsearch_Temp.append('Fecha')
-    fsearch_Temp.append(False)
-    fsearch_Values=[]
-    fsearch_Values.append(2)
-    fsearch_Temp.append(fsearch_Values)
-    fsearch.append(fsearch_Temp)
+        fsearch_Temp=[]
+        fsearch_Temp.append('date_log')
+        fsearch_Temp.append('Fecha')
+        fsearch_Temp.append(False)
+        fsearch_Values=[]
+        fsearch_Values.append(2)
+        fsearch_Temp.append(fsearch_Values)
+        fsearch.append(fsearch_Temp)
+    
+    #CHECK IF THERE IS A PERSONALIZED QUERY
+    personal_query = ''
+    if request.vars['querySearch'] is not None and str(request.vars['querySearch']) != "":
+        personal_query = str(request.vars['querySearch'])
     #****************************************************************************************************************
     #****************************************************************************************************************
     #*****************************************************SEARCH*****************************************************
 
-    personal_query = ''
+
+
+    #****************************************************************************************************************
+    #****************************************************************************************************************
+    #*****************************************************REPORT*****************************************************
+    #LEVELS OF REPORT
+    if request.vars['querySearch'] is None or request.vars['querySearch']=='1':
+        None
+    #*****************************************************REPORT*****************************************************
+    #****************************************************************************************************************
+    #****************************************************************************************************************
+    
+
+
+
+    
+
 
 
     return dict(fsearch=fsearch, filtered_by=filtered_by, personal_query=personal_query)

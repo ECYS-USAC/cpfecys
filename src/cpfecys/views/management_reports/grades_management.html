@@ -114,6 +114,34 @@
 				}
 			{{pass}}
 		});
+
+		$("#andSearch").click(function(){
+			{{for fieldSearch in fsearch:}}
+				{{optionSearch = 'optionSearch_'+fieldSearch[0]}}
+				{{valuesSearch = 'value_'+fieldSearch[0]}}
+				if (document.getElementById('fieldSearch').value == 'grades_log.{{=str(fieldSearch[0])}}'){
+					if (document.getElementById('querySearch').value==''){
+						document.getElementById('querySearch').value = document.getElementById('fieldSearch').value+ ' '+ document.getElementById('{{=optionSearch}}').value +' "' +document.getElementById('{{=valuesSearch}}').value+'"';
+					}else{
+						document.getElementById('querySearch').value = document.getElementById('querySearch').value +" and "+ document.getElementById('fieldSearch').value+ ' '+ document.getElementById('{{=optionSearch}}').value +' "' +document.getElementById('{{=valuesSearch}}').value+'"';
+					}
+				}
+			{{pass}}
+		});
+
+		$("#orSearch").click(function(){
+			{{for fieldSearch in fsearch:}}
+				{{optionSearch = 'optionSearch_'+fieldSearch[0]}}
+				{{valuesSearch = 'value_'+fieldSearch[0]}}
+				if (document.getElementById('fieldSearch').value == 'grades_log.{{=str(fieldSearch[0])}}'){
+					if (document.getElementById('querySearch').value==''){
+						document.getElementById('querySearch').value = document.getElementById('fieldSearch').value+ ' '+ document.getElementById('{{=optionSearch}}').value +' "' +document.getElementById('{{=valuesSearch}}').value+'"';
+					}else{
+						document.getElementById('querySearch').value = document.getElementById('querySearch').value +" or "+ document.getElementById('fieldSearch').value+ ' '+ document.getElementById('{{=optionSearch}}').value +' "' +document.getElementById('{{=valuesSearch}}').value+'"';
+					}
+				}
+			{{pass}}
+		});
 		//END --- Buttons for query construction
 
 	});
