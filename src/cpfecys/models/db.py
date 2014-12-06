@@ -1515,6 +1515,7 @@ db.define_table('evaluation_template_detail',
 )
 
 db.define_table('evaluation_history',
+    Field('name', 'string', length = 255 ,notnull = True, unique=True, label = T('Name')),
     Field('template_name', 'string', length = 255 ,notnull = True, label = T('Template')),
     Field('evaluation_type_name', 'string', notnull = True, label = T('Evaluation Type')),
     Field('date_created', 'date', default = datetime.datetime.now() , notnull = True, label = T('Date created')),

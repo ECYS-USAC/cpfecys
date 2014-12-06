@@ -58,9 +58,9 @@ def question_type():
     return dict(grid=grid)
 
 @auth.requires_login()
-@auth.requires_membership('Super-Administrator')
-def evaluation_template_detail():
-    query=db.evaluation_template_detail
+@auth.requires(auth.has_membership('Student') or auth.has_membership('Teacher') or auth.has_membership('Academic'))
+def evaluation_list():
+    query=db.evaluation
     grid = SQLFORM.grid(query, csv=False)
     return dict(grid=grid)
 
@@ -119,35 +119,47 @@ def evaluation_template_detail():
 def evaluation_template():
     template_id = request.vars['template_id']
     op_select = request.vars['op_select']
-    
+    ev_type = request.vars['ev_type']
+
+    if (ev_type is not None) and (template_id is not None):
+        db(db.evaluation_template.id == template_id).update(evaluation_type = ev_type)
+
+
     select_form = FORM(INPUT(_name='ev_te_de_id',_type='text'))
    
     if select_form.accepts(request.vars,formname='remove_question'):
         db(db.evaluation_template_detail.id==select_form.vars.ev_te_de_id).delete()
         response.flash = T('Question removed')
 
-    add_to_history = FORM()
+    add_to_history = FORM(INPUT(_name='hitory_name',_type='text'))    
     if add_to_history.accepts(request.vars,formname='add_to_history'):
-        var_template = db(db.evaluation_template.id == template_id).select().first()
-        eval_h_id = db.evaluation_history.insert(template_name = var_template.name,
-                                    evaluation_type_name = var_template.evaluation_type.name,
-                                    user_type_evaluated = var_template.evaluation_type.user_type_evaluated,
-                                    user_type_evaluator = var_template.evaluation_type.user_type_evaluator)
+        if add_to_history.vars.hitory_name == "":
+            response.flash = "Error! " + T('You must enter a name')
+        else:
+            try:
+                var_template = db(db.evaluation_template.id == template_id).select().first()
+                eval_h_id = db.evaluation_history.insert(name = add_to_history.vars.hitory_name,
+                                            template_name = var_template.name,
+                                            evaluation_type_name = var_template.evaluation_type.name,
+                                            user_type_evaluated = var_template.evaluation_type.user_type_evaluated,
+                                            user_type_evaluator = var_template.evaluation_type.user_type_evaluator)
 
-        
-        var_template_detail = db(db.evaluation_template_detail.evaluation_template == template_id).select()
-        for v_t_d in var_template_detail:
-            question_h_id = db.question_history.insert(question = v_t_d.evaluation_question.question,
-                                    question_type_name = v_t_d.question_type.name,
-                                    evaluation_history = eval_h_id)
+                
+                var_template_detail = db(db.evaluation_template_detail.evaluation_template == template_id).select()
+                for v_t_d in var_template_detail:
+                    question_h_id = db.question_history.insert(question = v_t_d.evaluation_question.question,
+                                            question_type_name = v_t_d.question_type.name,
+                                            evaluation_history = eval_h_id)
 
-            var_answer_type = db(db.answer.answer_type == v_t_d.evaluation_question.answer_type).select()
-            for v_a_t in var_answer_type:
-                db.answer_history.insert(answer = v_a_t.answer,
-                                        answer_type_name = v_a_t.answer_type.name,
-                                        question_history = question_h_id)
-    
-        response.flash = T('Evaluation has been added to the evaluation history')
+                    var_answer_type = db(db.answer.answer_type == v_t_d.evaluation_question.answer_type).select()
+                    for v_a_t in var_answer_type:
+                        db.answer_history.insert(answer = v_a_t.answer,
+                                                answer_type_name = v_a_t.answer_type.name,
+                                                question_history = question_h_id)
+            
+                response.flash = T('Evaluation has been added to the evaluation history')
+            except:
+                response.flash = "Error! " + T('An assessment already exists in the history of evaluations with that name')
 
     add_question_form = FORM(INPUT(_name='question_id',_type='text'))
    

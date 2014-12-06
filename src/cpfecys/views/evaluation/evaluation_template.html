@@ -234,7 +234,7 @@
 						{{else:}}
 							{{var_sel=''}}
 						{{pass}}
-					  <option value="{{=template.id}}" {{=var_sel}}>
+					  <option value="{{=template.id}}" title="{{=template.description}}"  {{=var_sel}}>
 					  {{=template.name}}
 					  </option>
 					{{pass}}
@@ -258,7 +258,24 @@
 								</b>
 							</td>
 							<td>
-								{{=actual_template.evaluation_type.name}}
+								<form class="form-inline" action="{{=URL('evaluation','evaluation_template')}}" method='get'>
+									<input name="template_id" type="hidden" value="{{=template_id}}">
+									<select name="ev_type">
+									{{for ev_type in db(db.evaluation_type).select():}}
+										{{if str(ev_type.id) == str(actual_template.evaluation_type.id):}}
+											{{var_sel="selected='selected'"}}
+											{{actual_template=template}}
+										{{else:}}
+											{{var_sel=''}}
+										{{pass}}
+									  <option value="{{=ev_type.id}}"   title="{{=ev_type.description}}"  {{=var_sel}}>
+									  {{=ev_type.name}}
+									  </option>
+									{{pass}}
+									</select>
+									<input class="btn" type="submit" value="{{=T('Update')}}">
+								</form>
+								
 							</td>
 						<tr>
 						<tr>
@@ -268,7 +285,9 @@
 								</b>
 							</td>
 							<td colspan="3">
-								{{=actual_template.description}}
+								<pre>
+{{=actual_template.description}}
+								</pre>
 							</td>
 						<tr>
 					</table>
@@ -309,7 +328,10 @@
 										<form  method='post'>
 											<input name="_formname" type="hidden" value="add_to_history">
 											<center>
-												<input class="btn btn-warning" type="submit" title="{{=T('Add to history')}}" value="{{=T('Add to history')}}">
+												{{=T('Name')}}:
+												<input tabindex="4" id="hitory_name"  name="hitory_name"  type="text" style="width:220px;">
+												<br>
+												<input  tabindex="5" class="btn btn-warning" type="submit" title="{{=T('Add to history')}}" value="{{=T('Add to history')}}">
 											</center>
 										</form>
 									</div>
