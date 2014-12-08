@@ -186,9 +186,9 @@ def metric_statistics(actTempo, recovery, dataIncoming):
                     metricType=db(db.metrics_type.name=='FASE FINAL').select(db.metrics_type.id).first()[db.metrics_type.id]
                 elif "FASE" in name_search:
                     metricType=db(db.metrics_type.name=='FASE DE PROYECTO').select(db.metrics_type.id).first()[db.metrics_type.id]
-                elif "PRIMER PROYECTO" in name_search or "1ER PROYECTO" in name_search  or "1ER. PROYECTO" in name_search or "PROYECTO1" in name_search or "PROYECTO 1" in name_search or "PROYECTO NO.1" in name_searchor or "PROYECTO NO1" in name_search   or "PROYECTO NUMERO 1" in name_search or "PROYECTO NUMERO1" in name_search or "PROYECTO #1" in name_searchor or "PROYECTO#1" in name_search:
+                elif "PRIMER PROYECTO" in name_search or "1ER PROYECTO" in name_search  or "1ER. PROYECTO" in name_search or "PROYECTO1" in name_search or "PROYECTO 1" in name_search or "PROYECTO NO.1" in name_search or "PROYECTO NO1" in name_search   or "PROYECTO NUMERO 1" in name_search or "PROYECTO NUMERO1" in name_search or "PROYECTO #1" in name_search or "PROYECTO#1" in name_search:
                     metricType=db(db.metrics_type.name=='PROYECTO 1').select(db.metrics_type.id).first()[db.metrics_type.id]
-                elif "SEGUNDO PROYECTO" in name_search or "1DO PROYECTO" in name_search  or "2DO. PROYECTO" in name_search or "PROYECTO2" in name_search or "PROYECTO 2" in name_search or "PROYECTO NO.2" in name_searchor or "PROYECTO NO2" in name_search   or "PROYECTO NUMERO 2" in name_search or "PROYECTO NUMERO2" in name_search or "PROYECTO #2" in name_searchor or "PROYECTO#2" in name_search:
+                elif "SEGUNDO PROYECTO" in name_search or "1DO PROYECTO" in name_search  or "2DO. PROYECTO" in name_search or "PROYECTO2" in name_search or "PROYECTO 2" in name_search or "PROYECTO NO.2" in name_search or "PROYECTO NO2" in name_search   or "PROYECTO NUMERO 2" in name_search or "PROYECTO NUMERO2" in name_search or "PROYECTO #2" in name_search or "PROYECTO#2" in name_search:
                     metricType=db(db.metrics_type.name=='PROYECTO 2').select(db.metrics_type.id).first()[db.metrics_type.id]
             if metricType is None:
                 metricType=db(db.metrics_type.name=='OTRA ACTIVIDAD').select(db.metrics_type.id).first()[db.metrics_type.id]
@@ -937,9 +937,9 @@ def report_header():
         ## Validate report TIMING restriction
         #if valid: valid = cpfecys.student_validation_report_restrictions(report.report_restriction.id)
         ## Validate assignation
-        if valid: valid = cpfecys.assignation_is_locked(report.assignation)
+        if valid: valid = not cpfecys.assignation_is_locked(report.assignation)
         ## Validate that the report belongs to user
-        if valid: valid = not cpfecys.student_validation_report_owner(report.id)
+        if valid: valid = cpfecys.student_validation_report_owner(report.id)
         ## Validate that the report status is editable (it is either 'Draft' or 'Recheck')
         if valid: valid = cpfecys.student_validation_report_status(report)
         if valid:
@@ -948,6 +948,7 @@ def report_header():
             session.flash = T('Report updated.')
             redirect(URL('student','report/edit', vars = dict(report = report.id)))
         else:
+            print 5
             session.flash = T('Selected report can\'t be edited. Select a valid report.')
             redirect(URL('student','index'))
     raise HTTP(404)
@@ -1565,6 +1566,11 @@ def report():
             session.flash = T('Selected report can\'t be edited. \
                 Is not in a editable state.')
             redirect(URL('student','index'))
+        ## Validate that the administrator of DTT has not failed the student
+        if report.dtt_approval is not None and report.dtt_approval==False:
+            session.flash = T('Selected report can\'t be edited. \
+                Select a valid report.')
+            redirect(URL('student','index'))
         ## Markmin formatting of reports
         response.view = 'student/report_edit.html'
         assignation_reports = db(db.report.assignation == \
@@ -2093,6 +2099,13 @@ def report():
             if not(dated < next_date):
                 session.flash = T('Selected report can\'t be edited. Select a valid report.')
                 redirect(URL('student','index'))
+
+        ## Validate that the administrator of DTT has not failed the student
+        if report.dtt_approval is not None and report.dtt_approval==False:
+            session.flash = T('Selected report can\'t be edited. \
+                Select a valid report.')
+            redirect(URL('student','index'))
+            
         report.update_record(created = current_date,
                       status = db.report_status(name = 'Grading'))
 

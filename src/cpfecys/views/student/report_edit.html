@@ -148,14 +148,14 @@ url = '#')}}
                     {{pass}}
                     {{if report.heading is None:}}
                     <li>
-                        <a data-toggle="modal" href="#report-header-new">
+                        <a data-toggle="modal" href="#report-header-new" title="{{=T('Consisting of introduction, objectives, scope, etc.')}}">
                             <span class="icon-align-left"></span> {{=T('Heading')}}
                         </a>
                     </li>
                     {{pass}}
                     {{if report.footer is None:}}
                     <li>
-                        <a data-toggle="modal" href="#report-footer-new">
+                        <a data-toggle="modal" href="#report-footer-new" title="{{=T('Consisting of conclusions, recommendations, etc.')}}">
                             <span class="icon-align-left"></span> {{=T('Footer')}}
                         </a>
                     </li>
@@ -168,6 +168,11 @@ url = '#')}}
                         <li>
                             <a data-toggle="modal" href="#log-new-activity">
                                 <span class="icon-tasks"></span> {{=T('Log Anomaly')}}
+                            </a>
+                        </li>
+                        <li>
+                            <a data-toggle="modal" title="{{=T('Register activity or activity metric')}}" href="{{=URL('activity_control', 'students_control', vars=dict(project = report.assignation.project, period = report.assignation.period))}}">
+                                <span class="icon-adjust"></span> {{=T('Log Activity')}}
                             </a>
                         </li>
                         <li class="divider"></li>

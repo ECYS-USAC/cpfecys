@@ -85,7 +85,9 @@ def student_validation_report_status(report):
     if report.score_date == None:
         if report.report_restriction.start_date <= current_date \
             and report.report_restriction.end_date >= current_date \
-            and report.report_restriction.is_enabled == True:
+            and report.report_restriction.is_enabled == True \
+            and ((report.status.name == 'Draft') 
+             or (report.status.name == 'Recheck')):
             return True
         return False
 
@@ -115,7 +117,7 @@ def teacher_validation_report_access(report):
         return False
     project = report.assignation.project
     assignation = db((db.user_project.assigned_user==auth.user.id)&
-                (db.user_project.project==project.id))
+                (db.user_project.project==project.id)).select().first()
     return assignation != None
 
 #

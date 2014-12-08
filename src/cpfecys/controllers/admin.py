@@ -195,9 +195,9 @@ def metric_statistics(actTempo, recovery, dataIncoming):
                     metricType=db(db.metrics_type.name=='FASE FINAL').select(db.metrics_type.id).first()[db.metrics_type.id]
                 elif "FASE" in name_search:
                     metricType=db(db.metrics_type.name=='FASE DE PROYECTO').select(db.metrics_type.id).first()[db.metrics_type.id]
-                elif "PRIMER PROYECTO" in name_search or "1ER PROYECTO" in name_search  or "1ER. PROYECTO" in name_search or "PROYECTO1" in name_search or "PROYECTO 1" in name_search or "PROYECTO NO.1" in name_searchor or "PROYECTO NO1" in name_search   or "PROYECTO NUMERO 1" in name_search or "PROYECTO NUMERO1" in name_search or "PROYECTO #1" in name_searchor or "PROYECTO#1" in name_search:
+                elif "PRIMER PROYECTO" in name_search or "1ER PROYECTO" in name_search  or "1ER. PROYECTO" in name_search or "PROYECTO1" in name_search or "PROYECTO 1" in name_search or "PROYECTO NO.1" in name_search or "PROYECTO NO1" in name_search   or "PROYECTO NUMERO 1" in name_search or "PROYECTO NUMERO1" in name_search or "PROYECTO #1" in name_search or "PROYECTO#1" in name_search:
                     metricType=db(db.metrics_type.name=='PROYECTO 1').select(db.metrics_type.id).first()[db.metrics_type.id]
-                elif "SEGUNDO PROYECTO" in name_search or "1DO PROYECTO" in name_search  or "2DO. PROYECTO" in name_search or "PROYECTO2" in name_search or "PROYECTO 2" in name_search or "PROYECTO NO.2" in name_searchor or "PROYECTO NO2" in name_search   or "PROYECTO NUMERO 2" in name_search or "PROYECTO NUMERO2" in name_search or "PROYECTO #2" in name_searchor or "PROYECTO#2" in name_search:
+                elif "SEGUNDO PROYECTO" in name_search or "1DO PROYECTO" in name_search  or "2DO. PROYECTO" in name_search or "PROYECTO2" in name_search or "PROYECTO 2" in name_search or "PROYECTO NO.2" in name_search or "PROYECTO NO2" in name_search   or "PROYECTO NUMERO 2" in name_search or "PROYECTO NUMERO2" in name_search or "PROYECTO #2" in name_search or "PROYECTO#2" in name_search:
                     metricType=db(db.metrics_type.name=='PROYECTO 2').select(db.metrics_type.id).first()[db.metrics_type.id]
             if metricType is None:
                 metricType=db(db.metrics_type.name=='OTRA ACTIVIDAD').select(db.metrics_type.id).first()[db.metrics_type.id]
@@ -416,6 +416,293 @@ def activities_report_tutor(report):
     if activities_F is None:
         activities_F=[]
     return dict(activities_F=activities_F, activities_WM=activities_WM, activities_M=activities_M)
+
+
+def final_metric(cperiod, report):
+    final_stats_vec=[]
+
+    #***********************************************************************************************
+    #********************************Attendance and dropout in exams********************************
+    #students_minutes
+    try:
+        final_stats_vec.append(int(db((db.academic_course_assignation.semester==cperiod.id)&(db.academic_course_assignation.assignation==report.assignation.project)).count()))
+    except:
+        final_stats_vec.append(int(0))
+
+    #students_partial
+    try:
+        Partials = db(db.activity_category.category=='Parciales').select().first()
+        catPartials = db((db.course_activity_category.category==Partials.id)&(db.course_activity_category.semester==cperiod.id)&(db.course_activity_category.assignation==report.assignation.project)&(db.course_activity_category.laboratory==False)).select().first()
+        Partials = db((db.course_activity.course_activity_category==catPartials.id)&(db.course_activity.semester==cperiod.id)&(db.course_activity.assignation==report.assignation.project)&(db.course_activity.laboratory==False)).select(db.course_activity.id)
+        final_stats_vec.append(int(db(db.grades.activity.belongs(Partials)).count()/db((db.course_activity.course_activity_category==catPartials.id)&(db.course_activity.semester==cperiod.id)&(db.course_activity.assignation==report.assignation.project)&(db.course_activity.laboratory==False)).count()))
+    except:
+        final_stats_vec.append(int(0))
+
+    #students_final
+    try:
+        Final = db(db.activity_category.category=='Examen Final').select().first()
+        catFinal = db((db.course_activity_category.category==Final.id)&(db.course_activity_category.semester==cperiod.id)&(db.course_activity_category.assignation==report.assignation.project)&(db.course_activity_category.laboratory==False)).select().first()
+        Final = db((db.course_activity.course_activity_category==catFinal.id)&(db.course_activity.semester==cperiod.id)&(db.course_activity.assignation==report.assignation.project)&(db.course_activity.laboratory==False)).select(db.course_activity.id)
+        final_stats_vec.append(int(db(db.grades.activity.belongs(Final)).count()))
+    except:
+        final_stats_vec.append(int(0))
+
+    #students_first_recovery
+    try:
+        final_stats_vec.append(int(db((db.course_first_recovery_test.semester==cperiod.id)&(db.course_first_recovery_test.project==report.assignation.project)).count()))
+    except:
+        final_stats_vec.append(int(0))
+
+    #students_second_recovery
+    try:
+        final_stats_vec.append(int(db((db.course_second_recovery_test.semester==cperiod.id)&(db.course_second_recovery_test.project==report.assignation.project)).count()))
+    except:
+        final_stats_vec.append(int(0))
+
+
+    #Students
+    students = db((db.academic_course_assignation.semester == cperiod.id) & (db.academic_course_assignation.assignation==report.assignation.project)).select()
+
+
+    #***********************************************************************************************
+    #********************************FINAL RESULTS OF LABORATORY************************************
+    #students_in_lab
+    existLab=False
+    totalClass=float(0)
+    totalLab=float(0)
+    totalFinalLab=float(0)
+    totalW=float(0)
+    try:
+        CourseCategory = db((db.course_activity_category.semester==cperiod.id)&(db.course_activity_category.assignation==report.assignation.project)&(db.course_activity_category.laboratory==False)).select()
+        catCourseTemp=None
+        catVecCourseTemp=[]
+        CourseActivities = []
+        for categoryC in CourseCategory:
+            totalW=totalW+float(categoryC.grade)
+            if categoryC.category.category=="Laboratorio":
+                existLab=True
+                totalLab=float(categoryC.grade)
+                catVecCourseTemp.append(categoryC)
+            elif categoryC.category.category=="Examen Final":
+                var_final_grade = categoryC.grade
+                catCourseTemp=categoryC
+            else:
+                catVecCourseTemp.append(categoryC)
+                CourseActivities.append(db((db.course_activity.semester==cperiod.id)&(db.course_activity.assignation==report.assignation.project)&(db.course_activity.laboratory==False)&(db.course_activity.course_activity_category==categoryC.id)).select())
+        if catCourseTemp != None:
+            catVecCourseTemp.append(catCourseTemp)
+            CourseActivities.append(db((db.course_activity.semester==cperiod.id)&(db.course_activity.assignation==report.assignation.project)&(db.course_activity.laboratory==False)&(db.course_activity.course_activity_category==catCourseTemp.id)).select())
+        CourseCategory=catVecCourseTemp
+        totalClass=totalW
+
+
+        totalW=float(0)
+        LabCategory=None
+        catLabTemp=None
+        catVecLabTemp=[]
+        LabActivities = None
+        validateLaboratory=None
+        LabCategory = db((db.course_activity_category.semester==cperiod.id)&(db.course_activity_category.assignation==report.assignation.project)&(db.course_activity_category.laboratory==True)).select()
+        if LabCategory.first() is not None:
+            validateLaboratory = db((db.validate_laboratory.semester==cperiod.id)&(db.validate_laboratory.project==report.assignation.project)).select()
+            LabCategory = db((db.course_activity_category.semester==cperiod.id)&(db.course_activity_category.assignation==report.assignation.project)&(db.course_activity_category.laboratory==True)).select()
+            LabActivities = []
+            for categoryL in LabCategory:
+                if categoryL.category.category=="Examen Final":
+                    totalW=totalW+float(categoryL.grade)
+                    catLabTemp=categoryL
+                else:
+                    catVecLabTemp.append(categoryL)
+                    totalW=totalW+float(categoryL.grade)
+                    LabActivities.append(db((db.course_activity.semester==cperiod.id)&(db.course_activity.assignation==report.assignation.project)&(db.course_activity.laboratory==True)&(db.course_activity.course_activity_category==categoryL.id)).select())
+            if catLabTemp != None:
+                catVecLabTemp.append(catLabTemp)
+                LabActivities.append(db((db.course_activity.semester==cperiod.id)&(db.course_activity.assignation==report.assignation.project)&(db.course_activity.laboratory==True)&(db.course_activity.course_activity_category==catLabTemp.id)).select())
+            LabCategory=catVecLabTemp
+            totalFinalLab=totalW
+
+
+        requirement = db((db.course_requirement.semester==cperiod.id)&(db.course_requirement.project==report.assignation.project)).select().first()
+    except:
+        totalClass=float(0)
+        totalFinalLab=float(0)
+
+    #COMPUTING LABORATORY NOTES
+    students_in_lab=[]
+    temp_students_in_lab=[]
+    approved=0
+    reprobate=0
+    sum_laboratory_grades=0
+    try:
+        if totalFinalLab==float(100):
+            for t1 in students:
+                tempData=[]
+                totalCategory=float(0)
+                isValidate=False
+                #<!--Revalidation of laboratory-->
+                for validate in validateLaboratory:
+                    if validate.carnet==t1.carnet:
+                        isValidate=True
+                        tempData.append(t1.carnet.carnet)
+                        tempData.append(int(round(validate.grade,0)))
+                        students_in_lab.append(tempData)
+
+
+                #<!--Doesnt has a revalidation-->
+                if isValidate==False:
+                    #<!--Position in the vector of activities-->
+                    posVCC_Lab=0
+                    #<!--Vars to the control of grade of the student-->
+                    totalCategory_Lab=float(0)
+                    totalActivities_Lab=0
+                    totalCarry_Lab=float(0)
+
+                    #<!--****************************************FILL THE GRADES OF THE STUDENT****************************************-->
+                    #<!--LAB ACTIVITIES-->
+                    for category_Lab in LabCategory:
+                        totalCategory_Lab=float(0)
+                        totalActivities_Lab=0
+                        for c_Lab in LabActivities[posVCC_Lab]:
+                            studentGrade = db((db.grades.activity==c_Lab.id)&(db.grades.academic_assignation==t1.id)).select().first()
+                            if studentGrade is None or studentGrade.grade is None:
+                                totalCategory_Lab=totalCategory_Lab+float(0)
+                            else:
+                                if category_Lab.specific_grade==True:
+                                    totalCategory_Lab=totalCategory_Lab+float((studentGrade.grade*c_Lab.grade)/100)
+                                else:
+                                    totalCategory_Lab=totalCategory_Lab+float(studentGrade.grade)
+                            totalActivities_Lab=totalActivities_Lab+1
+                        
+
+                        if category_Lab.specific_grade==False:
+                            if totalActivities_Lab==0:
+                                totalActivities_Lab=1
+                            totalActivities_Lab=totalActivities_Lab*100
+                            totalCategory_Lab=float((totalCategory_Lab*float(category_Lab.grade))/float(totalActivities_Lab))
+                        totalCarry_Lab=totalCarry_Lab+totalCategory_Lab
+                        posVCC_Lab=posVCC_Lab+1
+                    tempData.append(t1.carnet.carnet)
+                    tempData.append(int(round(totalCarry_Lab,0)))
+                    students_in_lab.append(tempData)
+                    temp_students_in_lab.append(tempData)
+                    sum_laboratory_grades+=int(round(totalCarry_Lab,0))
+                    if int(round(totalCarry_Lab,0))<61:
+                        reprobate+=1
+                    else:
+                        approved+=1
+
+            #APPROVED
+            final_stats_vec.append(approved)
+            #FAILED
+            final_stats_vec.append(reprobate)
+            #MEAN
+            final_stats_vec.append(float(sum_laboratory_grades)/float(len(temp_students_in_lab)))
+            #AVERAGE
+            final_stats_vec.append(float((float(approved)/float(len(temp_students_in_lab)))*float(100)))
+        else:
+            #APPROVED
+            final_stats_vec.append(int(0))
+            #FAILED
+            final_stats_vec.append(int(0))
+            #MEAN
+            final_stats_vec.append(int(0))
+            #AVERAGE
+            final_stats_vec.append(int(0))
+    except:
+        countFail=int(len(final_stats_vec))
+        for countFail in range(9):
+            final_stats_vec.append(int(0))
+    
+
+    #Class Final Results
+    dataFinalClass=[]
+    try:
+        if totalClass==100:
+            for t1 in students:
+                posStudent=0
+                posVCC=0
+                totalCategory=float(0)
+                totalActivities=0
+                totalCarry=float(0)
+                for category in CourseCategory:
+                    if category.category.category!="Laboratorio" and category.category.category!="Examen Final":
+                        totalCategory=float(0)
+                        totalActivities=0
+                        for c in CourseActivities[posVCC]:
+                            studentGrade = db((db.grades.activity==c.id)&(db.grades.academic_assignation==t1.id)).select().first()
+                            if studentGrade is None or studentGrade.grade is None:
+                                totalCategory=totalCategory+float(0)
+                            else:
+                                if category.specific_grade==True:
+                                    totalCategory=totalCategory+float((studentGrade.grade*c.grade)/100)
+                                else:
+                                    totalCategory=totalCategory+float(studentGrade.grade)
+                            totalActivities=totalActivities+1
+
+                        if category.specific_grade==True:
+                            None
+                        else:
+                            if totalActivities==0:
+                                totalActivities=1
+                            totalActivities=totalActivities*100
+                            totalCategory=float((totalCategory*float(category.grade))/float(totalActivities))
+                        totalCarry=totalCarry+totalCategory
+                        posVCC=posVCC+1
+                    elif category.category.category=="Examen Final":
+                        totalCarry=int(round(totalCarry,0))
+                        totalCategory=float(0)
+                        totalActivities=0
+                        for c in CourseActivities[posVCC]:
+                            studentGrade = db((db.grades.activity==c.id)&(db.grades.academic_assignation==t1.id)).select().first()
+                            if studentGrade is None or studentGrade.grade is None:
+                                totalCategory=totalCategory+float(0)
+                            else:
+                                if category.specific_grade==True:
+                                    totalCategory=totalCategory+float((studentGrade.grade*c.grade)/100)
+                                else:
+                                    totalCategory=totalCategory+float(studentGrade.grade)
+                            totalActivities=totalActivities+1
+
+                        if category.specific_grade==True:
+                            None
+                        else:
+                            if totalActivities==0:
+                                totalActivities=1
+                            totalActivities=totalActivities*100
+                            totalCategory=float((totalCategory*float(category.grade))/float(totalActivities))
+                        totalCategory=int(round(totalCategory,0))
+                        totalCarry=totalCarry+totalCategory
+                        posVCC=posVCC+1
+                
+                #Make
+                if existLab==True:
+                    totalCategory=float((int(students_in_lab[posStudent][1])*totalLab)/100)
+                    totalCarry=totalCarry+totalCategory
+
+                if requirement is not None:
+                    if db((db.course_requirement_student.carnet==t1.carnet)&(db.course_requirement_student.requirement==requirement.id)).select().first() is not None:
+                        dataFinalClass.append(int(round(totalCarry,0)))
+                    else:
+                        dataFinalClass.append(int(0))
+                else:
+                    dataFinalClass.append(int(round(totalCarry,0)))
+                posStudent+=1
+
+            #Calculate metric_statistics
+            dataFinalClass=sorted(dataFinalClass)
+            dataFinalClass = metric_statistics(None, 0, dataFinalClass)
+            for posFinal in dataFinalClass:
+                final_stats_vec.append(posFinal)
+        else:
+            countFailFinal=int(len(final_stats_vec))
+            for countFailFinal in range(23):
+                final_stats_vec.append(int(0))
+    except:
+        countFailFinal=int(len(final_stats_vec))
+        for countFailFinal in range(23):
+                final_stats_vec.append(int(0))
+
+    return final_stats_vec
 
 
 
@@ -1815,6 +2102,123 @@ def report_filter():
                 db.report.never_delivered==False)).select()
         status_instance = db(db.report_status.id==status).select().first()
     elif int(status) == -3:#Pendientes
+        #***********************************************************************************************************************
+        #******************************************************PHASE 2 DTT******************************************************    
+        #INIT Check if there is a pending report has created
+        if request.vars['report'] != None and request.vars['assignation'] != None:
+            #Check for restriction exists and is valid
+            rr_ID = db((db.report_restriction.start_date>=start)&
+                (db.report_restriction.end_date<=end)&
+                (db.report_restriction.is_enabled==True)&
+                (db.report_restriction.id==int(request.vars['report']))).select().first()
+            if rr_ID is None:
+                session.flash = T('Incomplete Information')
+                redirect(URL('admin', 'report_filter',vars=dict(status = request.vars['status'], period = request.vars['period'])))
+
+            #Verify that the user exists and is student specific period
+            assignations_ID = db(
+                    (db.auth_user.id==db.user_project.assigned_user)&
+                    (db.auth_user.id==db.auth_membership.user_id)&
+                    (db.auth_membership.group_id==db.auth_group.id)&
+                    (db.auth_group.role=='Student')&
+                    (db.user_project.id==int(request.vars['assignation']))&
+                    (db.user_project.period == db.period_year.id)&
+                    ((db.user_project.period <= cperiod.id)&
+                 ((db.user_project.period + db.user_project.periods) > \
+                  cperiod.id))
+                    ).select().first()
+            if assignations_ID is None:
+                session.flash = T('Incomplete Information')
+                redirect(URL('admin', 'report_filter',vars=dict(status = request.vars['status'], period = request.vars['period'])))
+
+            #Verify that the specified user does not have a report from the constraint specified
+            report_delivered = db((db.report.report_restriction==int(request.vars['report']))&(db.report.assignation==int(request.vars['assignation']))).select().first()
+            if report_delivered is not None:
+                session.flash = T('Incomplete Information')
+                redirect(URL('admin', 'report_filter',vars=dict(status = request.vars['status'], period = request.vars['period'])))    
+
+            #Create the report and place it in draft status so that you can edit the student
+            status_draft = db.report_status(db.report_status.name == 'Draft')
+            current_date = datetime.now().date()
+            new_Report = db.report.insert(created = rr_ID.end_date,
+                                 assignation = int(request.vars['assignation']),
+                                 report_restriction = rr_ID.id,
+                                 admin_score = cpfecys.get_custom_parameters().min_score,
+                                 min_score = cpfecys.get_custom_parameters().min_score,
+                                 status = status_draft,
+                                 admin_comment =  T('Created by admin'),
+                                 score_date=current_date,
+                                 dtt_approval=True,
+                                 never_delivered=False)
+            if new_Report.assignation.project.area_level.name=='DTT Tutor Académico' and new_Report.report_restriction.is_final==True:
+                #CREATE THE FINAL METRICS
+                cperiod = obtainPeriodReport(new_Report)
+                final_metrics = final_metric(cperiod,new_Report)
+                try:
+                    average=float((final_metrics[22]*100)/final_metrics[20])
+                except:
+                    average=float(0)
+                db.log_final.insert(curso_asignados_actas=int(final_metrics[0]),
+                                    curso_en_parciales=int(final_metrics[1]),
+                                    curso_en_final=int(final_metrics[2]),
+                                    curso_en_primera_restrasada=int(final_metrics[3]),
+                                    curso_en_segunda_restrasada=int(final_metrics[4]),
+                                    lab_aprobados=int(final_metrics[5]),
+                                    lab_reprobados=int(final_metrics[6]),
+                                    lab_media=final_metrics[7],
+                                    lab_promedio=final_metrics[8],
+                                    curso_media=final_metrics[9],
+                                    curso_error=final_metrics[10],
+                                    curso_mediana=final_metrics[11],
+                                    curso_moda=final_metrics[12],
+                                    curso_desviacion=final_metrics[13],
+                                    curso_varianza=final_metrics[14],
+                                    curso_curtosis=final_metrics[15],
+                                    curso_coeficiente=final_metrics[16],
+                                    curso_rango=final_metrics[17],
+                                    curso_minimo=final_metrics[18],
+                                    curso_maximo=final_metrics[19],
+                                    curso_total=int(final_metrics[20]),
+                                    curso_reprobados=int(final_metrics[21]),
+                                    curso_aprobados=int(final_metrics[22]),
+                                    curso_promedio=average,
+                                    curso_created=current_date,
+                                    report=new_Report.id
+                                    )
+            
+            #Report by email to the academic tutor who can edit your report
+            user = new_Report.assignation.assigned_user
+            subject = T('[DTT]Automatic Notification - Report created ') \
+            +T('BY ADMIN USER')
+            signat = cpfecys.get_custom_parameters().email_signature or ''
+            cstatus = db(db.report_status.id==new_Report.status).select().first()
+            message = '<html>' + T('You have created the report') + ' ' \
+            + '<b>' + XML(new_Report.report_restriction.name) + '</b>.<br/>' \
+            + T('The report is set to Draft status. You can proceed to edit the report.') \
+            +'<br/>' \
+            + T('DTT-ECYS') \
+            + ' ' + cpfecys.get_domain() + '<br />' + signat + '</html>'
+            print message
+            was_sent = mail.send(to=user.email,
+              subject=subject,
+              message=message)
+            #MAILER LOG
+            db.mailer_log.insert(sent_message = message,
+                         destination = str(user.email),
+                         result_log = str(mail.error or '') + ':' + str(mail.result),
+                         success = was_sent)
+            
+
+
+            session.flash = T('You have created the report and has notified the academic tutor by email')
+            redirect(URL('admin', 'report/view',vars=dict(report = new_Report.id)))
+        elif request.vars['report'] != None or request.vars['assignation'] != None:
+            session.flash = T('Incomplete Information')
+            redirect(URL('admin', 'report_filter',vars=dict(status = request.vars['status'], period = request.vars['period'])))
+        #END Check if there is a pending report has created
+        #***********************************************************************************************************************
+        #******************************************************PHASE 2 DTT******************************************************
+
         result = []
         existing = []
         restrictions = db((db.report_restriction.start_date>=start)&
@@ -1848,7 +2252,6 @@ def report_filter():
                     else:
                         if hours == None:
                             existing.append(temp)
-              
         response.view = 'admin/report_filter_pending.html'      
         return dict(result=result, existing=existing,
             count_log_entries=count_log_entries,
