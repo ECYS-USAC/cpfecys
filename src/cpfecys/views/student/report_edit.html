@@ -501,13 +501,22 @@ url = '#')}}
             {{include 'include/delete-helper.html'}}
             <!-- //Final Report delete Helper-->
             
+            
             <!-- Display Helper -->
             {{if report.assignation.project.area_level.name!='DTT Tutor Académico' or (report.assignation.project.area_level.name=='DTT Tutor Académico' and final_stats_flag==True):}}
-                {{inc_vars = dict(editable = True,
-                final = final,
-                edit_action = 'final-edit-activity-' + str(final.id),
-                delete_action = 'delete-final-' + str(final.id))}}
-                {{include 'include/display-final-report.html'}}
+                {{if report.assignation.project.area_level.name=='DTT Tutor Académico':}}
+                    {{inc_vars = dict(editable = True,
+                    final = final,
+                    edit_action = 'final-edit-activity-' + str(final.id),
+                    delete_action = None)}}
+                    {{include 'include/display-final-report.html'}}
+                {{else:}}
+                    {{inc_vars = dict(editable = True,
+                    final = final,
+                    edit_action = 'final-edit-activity-' + str(final.id),
+                    delete_action = 'delete-final-' + str(final.id))}}
+                    {{include 'include/display-final-report.html'}}
+                {{pass}}
             {{else:}}
                 {{inc_vars = dict(editable = False,
                 final = final,

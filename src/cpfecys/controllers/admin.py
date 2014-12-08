@@ -1314,6 +1314,42 @@ def report():
                         db(db.log_entry.report==report.id).delete()
                     db(db.log_metrics.report==report.id).delete()
                     db(db.log_future.report==report.id).delete()
+
+                    if db(db.log_final.report==report.id).select().first() is None:
+                        #CREATE THE FINAL METRICS
+                        cperiod = obtainPeriodReport(report)
+                        final_metrics = final_metric(cperiod,report)
+                        try:
+                            average=float((final_metrics[22]*100)/final_metrics[20])
+                        except:
+                            average=float(0)
+                        db.log_final.insert(curso_asignados_actas=int(final_metrics[0]),
+                                            curso_en_parciales=int(final_metrics[1]),
+                                            curso_en_final=int(final_metrics[2]),
+                                            curso_en_primera_restrasada=int(final_metrics[3]),
+                                            curso_en_segunda_restrasada=int(final_metrics[4]),
+                                            lab_aprobados=int(final_metrics[5]),
+                                            lab_reprobados=int(final_metrics[6]),
+                                            lab_media=final_metrics[7],
+                                            lab_promedio=final_metrics[8],
+                                            curso_media=final_metrics[9],
+                                            curso_error=final_metrics[10],
+                                            curso_mediana=final_metrics[11],
+                                            curso_moda=final_metrics[12],
+                                            curso_desviacion=final_metrics[13],
+                                            curso_varianza=final_metrics[14],
+                                            curso_curtosis=final_metrics[15],
+                                            curso_coeficiente=final_metrics[16],
+                                            curso_rango=final_metrics[17],
+                                            curso_minimo=final_metrics[18],
+                                            curso_maximo=final_metrics[19],
+                                            curso_total=int(final_metrics[20]),
+                                            curso_reprobados=int(final_metrics[21]),
+                                            curso_aprobados=int(final_metrics[22]),
+                                            curso_promedio=average,
+                                            curso_created=report.created,
+                                            report=report.id
+                                            )
                 #***********************************************************************************************************************
                 #******************************************************PHASE 2 DTT******************************************************
                 report.update_record(
