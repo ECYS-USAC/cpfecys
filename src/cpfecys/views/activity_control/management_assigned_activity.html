@@ -11,7 +11,7 @@
 	{{=grid}}
 	<script type="text/javascript">
 		var valueDescription = document.getElementById('course_assigned_activity_description').value
-		$("#course_assigned_activity_description__row").replaceWith("<tr id=\"course_assigned_activity_description__row\"><td class=\"w2p_fl\"><label for=\"course_assigned_activity_description\" id=\"course_assigned_activity_description__label\">Descripción: </label></td><td class=\"w2p_fw\"><textarea class=\"text\" cols=\"40\" id=\"course_assigned_activity_description\" name=\"description\" rows=\"10\">"+valueDescription+"</textarea></td><td class=\"w2p_fc\"></td></tr><tr><td colspan=\"3\"><div class=\"alert alert-warning\"><b>Si desea que el tutor académico deba de ingresar un reporte sobre la actividad activar la casilla de reporte requerido</b></div></td></tr>");
+		$("#course_assigned_activity_description__row").replaceWith("<tr id=\"course_assigned_activity_description__row\"><td class=\"w2p_fl\"><label for=\"course_assigned_activity_description\" id=\"course_assigned_activity_description__label\">Descripción: </label></td><td class=\"w2p_fw\"><textarea class=\"text\" cols=\"40\" id=\"course_assigned_activity_description\" name=\"description\" rows=\"10\">"+valueDescription+"</textarea></td><td class=\"w2p_fc\"></td></tr><tr><td colspan=\"3\"><div class=\"alert alert-warning\"><b>{{=T('If you want the academic tutor must enter a report about the activity, check the box required report.')}}</b></div></td></tr>");
 	</script>
 {{else:}}
 	<h2>

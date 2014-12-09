@@ -1548,7 +1548,7 @@ db.define_table('evaluation',
 
 db.define_table('course_assigned_activity',
     Field('name', 'string', notnull=True, unique=False, label = T('Name')),
-    Field('description', 'text', notnull=False, unique=False, label = T('Description')),
+    Field('description', 'text', notnull=True, unique=False, label = T('Description')),
     Field('report_required', 'boolean', notnull=True, label = T('Report Required')),
     Field('fileReport', 'upload', notnull=False, label='Reporte', requires=[IS_NULL_OR(IS_UPLOAD_FILENAME(extension = '(pdf|zip)',error_message='Solo se aceptan archivos con extension zip|pdf')),IS_LENGTH(2097152,error_message='El tamaño máximo del archivo es 2MB')]),
     Field('semester', 'reference period_year', notnull=True),
