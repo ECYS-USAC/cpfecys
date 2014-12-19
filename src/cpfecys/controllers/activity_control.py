@@ -9755,21 +9755,28 @@ def laboratory_replacing_management_n4():
 @auth.requires_login()
 def control_assigned_activity():
     try:
+        import time
+        from datetime import date, datetime, timedelta
+        officialTime = date.today()
+        futureTime = officialTime + timedelta(days=1)
+
         year = db(db.period_year.id == request.vars['year']).select().first() 
         year_semester = year.period
         project = db(db.project.id==request.vars['project']).select().first()
 
-        assigantion = db((db.user_project.assigned_user == auth.user.id) & (db.user_project.period == year.id) & (db.user_project.project == project.id)).select().first()
+        assigantion = db((db.user_project.assigned_user == auth.user.id) & (db.user_project.project == project.id) & ((db.user_project.period <= year.id) & ((db.user_project.period + db.user_project.periods) > year.id))).select().first()
         if assigantion is None:
             assigned_to_project = False
         else:
             assigned_to_project = True
+            activities = db((db.course_assigned_activity.semester==year.id)&(db.course_assigned_activity.assignation==project.id)).select()
     except:
         assigned_to_project = False
 
     return dict(semestre2 = year,
             project = project,
-            assigned_to_project = assigned_to_project)
+            assigned_to_project = assigned_to_project,
+            activities=activities)
 
 
 @auth.requires_login()
@@ -9801,7 +9808,7 @@ def management_assigned_activity():
             session.flash = T('Not valid Action.')
             redirect(URL('default','index'))
         else:
-            assigantion = db((db.user_project.assigned_user == auth.user.id) & (db.user_project.period == year.id) & (db.user_project.project == project)).select().first()
+            assigantion = db((db.user_project.assigned_user == auth.user.id) & (db.user_project.project == project.id) & ((db.user_project.period <= year.id) & ((db.user_project.period + db.user_project.periods) > year.id))).select().first()
             if assigantion is None:
                 session.flash = T('Not valid Action.')
                 redirect(URL('default','index'))
@@ -9816,7 +9823,7 @@ def management_assigned_activity():
         db.course_assigned_activity.fileReport.readable = False
         db.course_assigned_activity.fileReport.writable = False
         query = ((db.course_assigned_activity.semester==year.id) & (db.course_assigned_activity.assignation==project.id))
-        grid = SQLFORM.grid(query, csv=False, paginate=10, searchable=False)
+        grid = SQLFORM.grid(query, csv=False, paginate=10, searchable=False, oncreate=oncreate_assigned_activity, onupdate=onupdate_assigned_activity, ondelete=ondelete_assigned_activity)
         return dict(year = year, project = project, grid=grid)
     else:
         if request.vars['activity'] is None or request.vars['activity']=='':
@@ -9828,21 +9835,552 @@ def management_assigned_activity():
             if activity is None:
                 session.flash = T('Not valid Action.')
                 redirect(URL('default','index'))
+            else:
+                if activity.report_required==False:
+                    session.flash=T('Action invalid. The activity does not require climbing a report.')
+                    redirect(URL('activity_control', 'students_control', vars=dict(project = project.id, period = year.id)))
+
+                import time
+                from datetime import date
+                if activity.date_start>=date.today():
+                    session.flash=T('Action invalid. The activity has not yet completed.')
+                    redirect(URL('activity_control', 'students_control', vars=dict(project = project.id, period = year.id)))
 
             upload_form = FORM(INPUT(_name='activity_id',_type='text'),
                         INPUT(_name='file_upload',_type='file',requires=[IS_UPLOAD_FILENAME(extension = '(pdf|zip)',error_message='Solo se aceptan archivos con extension zip|pdf'),IS_LENGTH(2097152,error_message='El tamaño máximo del archivo es 2MB')]))
 
             if upload_form.accepts(request.vars,formname='upload_form'):
                 try:
-                    print str(project)
                     if ( upload_form.vars.activity_id is "" ) or ( upload_form.vars.file_upload is ""):
                         response.flash = T('You must enter all fields.')
                     else:
+                        #FILE UPLOAD
                         file_var = db.course_assigned_activity.fileReport.store(upload_form.vars.file_upload.file, upload_form.vars.file_upload.filename)
-                        db(db.course_assigned_activity.id==int(upload_form.vars.activity_id)).update(fileReport = file_var)
+
+                        #STATUS OF ACTIVITY
+                        status=T('Teacher Failed')
+                        if activity.status!=T('Teacher Failed'):
+                            status = T('Completed')
+                            if activity.automatic_approval==False:
+                                status = T('Grade pending')
+
+                        #CHECK IF THE ACTIVITY HAS A REPORT OF HAS BEEN REPLACED THE REPORT
+                        if activity.fileReport is None:
+                            description_log=T('The academic tutor has recorded the activity report.')
+                        else:
+                            description_log=T('The academic tutor has replaced the activity report.')
+
+                        #LOG OF ACTIVITY
+                        db.course_assigned_activity_log.insert(user_name = auth.user.username,
+                                                roll = 'Student',
+                                                operation_log = 'update',
+                                                description_log=description_log,
+                                                id_course_assigned_activity=activity.id,
+                                                project = project.name,
+                                                period = T(year.period.name),
+                                                yearp = year.yearp,
+                                                before_name=activity.name,
+                                                before_description=activity.description,
+                                                before_report_required=activity.report_required,
+                                                before_status=activity.status,
+                                                before_automatic_approval=activity.automatic_approval,
+                                                before_date_start=activity.date_start,
+                                                before_fileReport=activity.fileReport,
+                                                after_name=activity.name,
+                                                after_description=activity.description,
+                                                after_report_required=activity.report_required,
+                                                after_status=status,
+                                                after_automatic_approval=activity.automatic_approval,
+                                                after_date_start=activity.date_start,
+                                                after_fileReport=file_var
+                                                )
+
+                        db(db.course_assigned_activity.id==int(upload_form.vars.activity_id)).update(fileReport = file_var, status=status)
                         response.flash = T('File loaded successfully.')
                         activity = db(db.course_assigned_activity.id==int(upload_form.vars.activity_id)).select().first()
                 except:
                     response.flash = T('Error loading file.')
 
             return dict(year = year, project = project, activity=activity)
+
+def oncreate_assigned_activity(form):
+    #Check if has one of this roles
+    if auth.has_membership('Teacher')==False:
+        db(db.course_assigned_activity.id==form.vars.id).delete()
+        session.flash = T('Not valid Action.')
+        redirect(URL('default','index'))
+
+    #Start the process
+    import cpfecys
+    #Check if the period is correct
+    if request.vars['year'] is None or request.vars['year']=='':
+        db(db.course_assigned_activity.id==form.vars.id).delete()
+        session.flash = T('Not valid Action.')
+        redirect(URL('default','index'))
+    else:
+        year = request.vars['year']
+        year = db(db.period_year.id==year).select().first()
+        if year is None:
+            db(db.course_assigned_activity.id==form.vars.id).delete()
+            session.flash = T('Not valid Action.')
+            redirect(URL('default','index'))
+        else:
+            if cpfecys.current_year_period().id != year.id:
+                db(db.course_assigned_activity.id==form.vars.id).delete()
+                session.flash = T('Not valid Action.')
+                redirect(URL('default','index'))
+
+    #Check if the project is correct
+    if request.vars['project'] is None or request.vars['project']=='':
+        db(db.course_assigned_activity.id==form.vars.id).delete()
+        session.flash = T('Not valid Action.')
+        redirect(URL('default','index'))
+    else:
+        project = request.vars['project']
+        project = db(db.project.id==project).select().first()
+        if project is None:
+            db(db.course_assigned_activity.id==form.vars.id).delete()
+            session.flash = T('Not valid Action.')
+            redirect(URL('default','index'))
+        else:
+            assigantion = db((db.user_project.assigned_user == auth.user.id) & (db.user_project.project == project) & ((db.user_project.period <= year.id) & ((db.user_project.period + db.user_project.periods) > year.id))).select().first()
+            if assigantion is None:
+                db(db.course_assigned_activity.id==form.vars.id).delete()
+                session.flash = T('Not valid Action.')
+                redirect(URL('default','index'))
+
+    #Check the periods
+    from datetime import datetime
+    if period.period.id==1:
+        start = datetime.strptime(str(period.yearp) + '-01-01', "%Y-%m-%d")
+        end = datetime.strptime(str(period.yearp) + '-06-01', "%Y-%m-%d")
+    else:
+        start = datetime.strptime(str(period.yearp) + '-06-01', "%Y-%m-%d")
+        end = datetime.strptime(str(period.yearp+1) + '-01-01', "%Y-%m-%d")
+
+    #Check if the date of activity is intro the valid dates
+    activityAssigned = db((db.course_assigned_activity.id==form.vars.id)&(db.course_assigned_activity.semester==period.id)&(db.course_assigned_activity.assignation==project.id)&(db.course_assigned_activity.date_start>=start)&(db.course_assigned_activity.date_start<end)).select().first()
+    if activityAssigned is None:
+        db(db.course_assigned_activity.id==form.vars.id).delete()
+        session.flash = T('The activity date is out of this semester.')
+
+    #Check status of activity
+    import time
+    from datetime import date
+    tiempo = date.today()
+    #STATUS OF ACTIVITY
+    if activityAssigned.date_start>=tiempo:
+        status=T('Pending')
+        if activityAssigned.date_start==tiempo:
+            status=T('Active')
+        #SEND MAIL TO THE STUDENTS
+        subject = T('Activity assigned by the professor')
+        message = '<html>' +T('Please be advised that the Professor:')+' "'+auth.user.username+'" '+ T('has been assigned an activity that should develop.')+'<br>'
+        message += T('Activity data:')+'<br>'
+        message += T('Name')+': '+form.vars.name+'<br>'
+        message += T('Description')+': '+form.vars.description+'<br>'
+        message += T('Date')+': '+str(form.vars.date_start)+'<br>'
+        if form.vars.report_required == True:
+            message += T('Report Required')+': '+T('You need to enter a report of the activity to be taken as valid.')+'<br>'
+        message += project.name+'<br>'+T(period.period.name)+' '+str(period.yearp)+'<br>Sistema de Seguimiento de La Escuela de Ciencias y Sistemas<br> Facultad de Ingeniería - Universidad de San Carlos de Guatemala</html>'
+        #Log General del Envio
+        row = db.notification_general_log4.insert(subject=subject,
+                                            sent_message=message,
+                                            emisor=auth.user.username,
+                                            course=project.name,
+                                            yearp=period.yearp,
+                                            period=T(period.period.name))
+        ListadoCorreos=None
+        email_list_log=None
+        for usersT in db((db.user_project.project==project.id) & (db.user_project.assigned_user != auth.user.id) & ((db.user_project.period <= period.id) & ((db.user_project.period + db.user_project.periods) > period.id))).select():
+            if ListadoCorreos is None:
+                ListadoCorreos=[]
+                email_list_log=usersT.assigned_user.email
+            else:
+                email_list_log+=','+usersT.assigned_user.email
+            ListadoCorreos.append(usersT.assigned_user.email)
+        if ListadoCorreos is not None:
+            was_sent = mail.send(to='dtt.ecys@dtt-ecys.org',subject=subject,message=message, bcc=ListadoCorreos)
+            db.mailer_log.insert(sent_message = message, destination = email_list_log, result_log = str(mail.error or '') + ':' + str(mail.result), success = was_sent, emisor=str(auth.user.username))
+            #Notification LOG
+            email_list =str(email_list_log).split(",")
+            for email_temp in email_list:
+                user_var = db((db.auth_user.email == email_temp)).select().first()
+                if user_var is not None:
+                    username_var = user_var.username
+                else:
+                    user_var = db((db.academic.email == email_temp)).select().first()
+                    if user_var is not None:
+                        username_var = user_var.carnet
+                    else:
+                        username_var = 'None'
+                db.notification_log4.insert(destination = email_temp, 
+                                            username = username_var,
+                                            result_log = str(mail.error or '') + ':' + str(mail.result), 
+                                            success = was_sent, 
+                                            register=row.id)
+    else:
+        status = T('Completed')
+        if activityAssigned.report_required==True:
+            status = T('Pending') +' '+T('Item Delivery')
+        else:
+            if activityAssigned.automatic_approval==False:
+                status = T('Grade pending')
+    #LOG OF ACTIVITY
+    db.course_assigned_activity_log.insert(id_course_assigned_activity = form.vars.id,
+                            user_name = auth.user.username,
+                            roll = 'Teacher',
+                            operation_log = 'insert',
+                            description_log=T('An activity is assigned to the academic tutor from the administration page of activities assigned'),
+                            project = project.name,
+                            period = T(year.period.name),
+                            yearp = year.yearp,
+                            after_name=form.vars.name,
+                            after_description=form.vars.description,
+                            after_report_required=form.vars.report_required,
+                            after_status=status,
+                            after_automatic_approval=form.vars.automatic_approval,
+                            after_date_start=form.vars.date_start
+                            )
+    #STATUS OF ACTIVITY
+    db(db.course_assigned_activity.id == form.vars.id).update(status = status)
+
+def ondelete_assigned_activity(table_involved, id_of_the_deleted_record):
+    #Check if has one of this roles
+    if auth.has_membership('Teacher')==False:
+        session.flash = T('Not valid Action.')
+        redirect(URL('default','index'))
+
+    #Start the process
+    import cpfecys
+    #Check if the period is correct
+    if request.vars['year'] is None or request.vars['year']=='':
+        session.flash = T('Not valid Action.')
+        redirect(URL('default','index'))
+    else:
+        year = request.vars['year']
+        year = db(db.period_year.id==year).select().first()
+        if year is None:
+            session.flash = T('Not valid Action.')
+            redirect(URL('default','index'))
+        else:
+            if cpfecys.current_year_period().id != year.id:
+                session.flash = T('Not valid Action.')
+                redirect(URL('default','index'))
+
+    #Check if the project is correct
+    if request.vars['project'] is None or request.vars['project']=='':
+        session.flash = T('Not valid Action.')
+        redirect(URL('default','index'))
+    else:
+        project = request.vars['project']
+        project = db(db.project.id==project).select().first()
+        if project is None:
+            session.flash = T('Not valid Action.')
+            redirect(URL('default','index'))
+        else:
+            assigantion = db((db.user_project.assigned_user == auth.user.id) & (db.user_project.project == project) & ((db.user_project.period <= year.id) & ((db.user_project.period + db.user_project.periods) > year.id))).select().first()
+            if assigantion is None:
+                session.flash = T('Not valid Action.')
+                redirect(URL('default','index'))
+
+    #Check if the activity is correct
+    course_assigned_activity_log_var = db.course_assigned_activity(id_of_the_deleted_record)
+
+    #Check if the activity is of the course and the period
+    if (course_assigned_activity_log_var is None) and (course_assigned_activity_log_var is not None and (course_assigned_activity_log_var.assignation != project.id or course_assigned_activity_log_var.semester!=year.id)):
+        session.flash = T('Not valid Action.')
+        redirect(URL('default','index'))
+
+    #LOG OF ACTIVITY
+    db.course_assigned_activity_log.insert(user_name = auth.user.username,
+                            roll = 'Teacher',
+                            operation_log = 'delete',
+                            description_log=T('Activity has been removed from the site administration activities assigned'),
+                            project = project.name,
+                            period = T(year.period.name),
+                            yearp = year.yearp,
+                            before_name=course_assigned_activity_log_var.name,
+                            before_description=course_assigned_activity_log_var.description,
+                            before_report_required=course_assigned_activity_log_var.report_required,
+                            before_status=course_assigned_activity_log_var.status,
+                            before_automatic_approval=course_assigned_activity_log_var.automatic_approval,
+                            before_date_start=course_assigned_activity_log_var.date_start,
+                            before_fileReport=course_assigned_activity_log_var.fileReport
+                            )
+
+def onupdate_assigned_activity(form):
+    failCheck=0
+    messageFail=''
+    #Check if has one of this roles
+    if auth.has_membership('Teacher')==False:
+        failCheck=2
+        messageFail=T('Not valid Action.')
+
+    #Start the process
+    import cpfecys
+    #Check if the period is correct
+    if request.vars['year'] is None or request.vars['year']=='':
+        failCheck=2
+        messageFail=T('Not valid Action.')
+    else:
+        year = request.vars['year']
+        year = db(db.period_year.id==year).select().first()
+        if year is None:
+            failCheck=2
+            messageFail=T('Not valid Action.')
+        else:
+            if cpfecys.current_year_period().id != year.id:
+                failCheck=2
+                messageFail=T('Not valid Action.')
+
+    #Check if the project is correct
+    if request.vars['project'] is None or request.vars['project']=='':
+        failCheck=2
+        messageFail=T('Not valid Action.')
+    else:
+        project = request.vars['project']
+        project = db(db.project.id==project).select().first()
+        if project is None:
+            failCheck=2
+            messageFail=T('Not valid Action.')
+        else:
+            assigantion = db((db.user_project.assigned_user == auth.user.id) & (db.user_project.project == project) & ((db.user_project.period <= year.id) & ((db.user_project.period + db.user_project.periods) > year.id))).select().first()
+            if assigantion is None:
+                failCheck=2
+                messageFail=T('Not valid Action.')
+
+    #LOG OF ACTIVITY
+    nameA=None
+    descriptionA=None
+    report_requiredA=None
+    statusA=None
+    automatic_approvalA=None
+    fileReportA=None
+    date_startA=None
+    idlogA=None
+    projectA=None
+    periodA=None
+    yearpA=None
+    for activityLog in db(db.course_assigned_activity_log.id_course_assigned_activity == form.vars.id).select(orderby=db.course_assigned_activity_log.id):
+        nameA = activityLog.after_name
+        descriptionA=activityLog.after_description
+        report_requiredA=activityLog.after_report_required
+        statusA=activityLog.after_status
+        automatic_approvalA=activityLog.after_automatic_approval
+        fileReportA=activityLog.after_fileReport
+        date_startA=activityLog.after_date_start
+        idlogA=activityLog.id_course_assigned_activity
+        projectA=activityLog.project
+        periodA=activityLog.period
+        yearpA=activityLog.yearp
+
+    #Check if the activity is of the course and the period
+    if projectA!=project.name or yearpA!=str(year.yearp) and periodA!=T(year.period.name):
+        failCheck=2
+        messageFail=T('Not valid Action.')
+        project=db(db.project.name==nameA).select().first()
+        if periodA=='Primer Semestre':
+            year=db((db.period_year.period==1)&(db.period_year.yearp==int(yearpA))).select().first()
+        else:
+            year=db((db.period_year.period==2)&(db.period_year.yearp==int(yearpA))).select().first()
+    else:
+        #Check the periods
+        from datetime import datetime
+        if period.period.id==1:
+            start = datetime.strptime(str(period.yearp) + '-01-01', "%Y-%m-%d")
+            end = datetime.strptime(str(period.yearp) + '-06-01', "%Y-%m-%d")
+        else:
+            start = datetime.strptime(str(period.yearp) + '-06-01', "%Y-%m-%d")
+            end = datetime.strptime(str(period.yearp+1) + '-01-01', "%Y-%m-%d")
+
+        #Check if the date of activity is intro the valid dates
+        activityAssigned = db((db.course_assigned_activity.id==form.vars.id)&(db.course_assigned_activity.semester==period.id)&(db.course_assigned_activity.assignation==project.id)&(db.course_assigned_activity.date_start>=start)&(db.course_assigned_activity.date_start<end)).select().first()
+        if activityAssigned is None:
+            failCheck=1
+            messageFail= T('The activity date is out of this semester.')
+
+
+    #Check if has to show the message or save the log
+    if failCheck >0:
+        if form.vars.delete_this_record != None:
+            oldActivityAssigned = db.course_assigned_activity.insert(name=nameA,
+                description=descriptionA,
+                report_required=report_requiredA,
+                status=statusA,
+                automatic_approval=automatic_approvalA,
+                fileReport=fileReportA,
+                date_start=date_startA,
+                semester=period.id,
+                assigantion=project.id
+                )
+            db(db.course_assigned_activity.id==oldActivityAssigned).update(id=idlogA)
+        else:
+            db(db.course_assigned_activity.id==idlogA).update(name=nameA,
+                description=descriptionA,
+                report_required=report_requiredA,
+                status=statusA,
+                automatic_approval=automatic_approvalA,
+                fileReport=fileReportA,
+                date_start=date_startA,
+                semester=period.id,
+                assigantion=project.id
+                )
+
+        session.flash = messageFail
+        if failCheck==2:
+            redirect(URL('default','index'))
+    else:
+        if form.vars.delete_this_record != None:
+            #LOG OF ACTIVITY
+            db.course_assigned_activity_log.insert(user_name = auth.user.username,
+                                    roll = 'Teacher',
+                                    operation_log = 'delete',
+                                    description_log=T('Activity has been removed from the site administration activities assigned'),
+                                    project = project.name,
+                                    period = T(year.period.name),
+                                    yearp = year.yearp,
+                                    before_name=nameA,
+                                    before_description=descriptionA,
+                                    before_report_required=report_requiredA,
+                                    before_status=statusA,
+                                    before_automatic_approval=automatic_approvalA,
+                                    before_date_start=date_startA,
+                                    before_fileReport=fileReportA
+                                    )
+        else:
+            #Check the periods
+            from datetime import datetime
+            if period.period.id==1:
+                start = datetime.strptime(str(period.yearp) + '-01-01', "%Y-%m-%d")
+                end = datetime.strptime(str(period.yearp) + '-06-01', "%Y-%m-%d")
+            else:
+                start = datetime.strptime(str(period.yearp) + '-06-01', "%Y-%m-%d")
+                end = datetime.strptime(str(period.yearp+1) + '-01-01', "%Y-%m-%d")
+            activityAssigned = db(db.course_assigned_activity.id==form.vars.id).select().first()
+            if (activityAssigned.name!=nameA or activityAssigned.description!=descriptionA or activityAssigned.report_required!=report_requiredA or activityAssigned.automatic_approval!=automatic_approvalA or activityAssigned.fileReport!=fileReportA or activityAssigned.date_start!=date_startA):
+                import time
+                from datetime import date
+                tiempo = date.today()
+                #STATUS OF ACTIVITY
+                status = activityAssigned.status
+                if activityAssigned.date_start>=tiempo:
+                    status=T('Pending')
+                    if activityAssigned.date_start==tiempo:
+                        status=T('Active')
+                    #REPORT OF ACTIVITY
+                    db(db.course_assigned_activity.id == form.vars.id).update(fileReport = None)
+                else:
+                    if activityAssigned.report_required==False and report_requiredA==True:
+                        db(db.course_assigned_activity.id == form.vars.id).update(fileReport = None)
+                    status = activityAssigned.status
+                    if activityAssigned.status!=T('Teacher Failed'):
+                        if activityAssigned.status==T('Accomplished'):
+                            if activityAssigned.report_required==True and activityAssigned.fileReport is None:
+                                status = T('Pending') +' '+T('Item Delivery')
+                        else:
+                            if activityAssigned.report_required==True:
+                                if activityAssigned.fileReport is None:
+                                    status = T('Pending') +' '+T('Item Delivery')
+                                else:
+                                    if activityAssigned.automatic_approval == False:
+                                        status = T('Grade pending')
+                                    else:
+                                        status = T('Accomplished')
+                            else:
+                                if activityAssigned.automatic_approval == False:
+                                    status = T('Grade pending')
+                                else:
+                                    status = T('Accomplished')
+                
+                #STATUS OF ACTIVITY
+                db(db.course_assigned_activity.id == form.vars.id).update(status = status)
+
+                #LOG OF ACTIVITY
+                db.course_assigned_activity_log.insert(user_name = auth.user.username,
+                                        roll = 'Teacher',
+                                        operation_log = 'update',
+                                        description_log=T('Updated the activity from the site administration activities assigned'),
+                                        id_course_assigned_activity=form.vars.id,
+                                        project = project.name,
+                                        period = T(year.period.name),
+                                        yearp = year.yearp,
+                                        before_name=nameA,
+                                        before_description=descriptionA,
+                                        before_report_required=report_requiredA,
+                                        before_status=statusA,
+                                        before_automatic_approval=automatic_approvalA,
+                                        before_date_start=date_startA,
+                                        before_fileReport=fileReportA,
+                                        after_name=form.vars.name,
+                                        after_description=form.vars.description,
+                                        after_report_required=form.vars.report_required,
+                                        after_status=status,
+                                        after_automatic_approval=form.vars.automatic_approval,
+                                        after_date_start=form.vars.date_start,
+                                        after_fileReport=fileReportA
+                                        )
+
+
+@auth.requires_login()
+@auth.requires_membership('Teacher')
+def rate_assigned_activity():
+    try:
+        #Check if the period is correct
+        if request.vars['year'] is None or request.vars['year']=='':
+            session.flash = T('Not valid Action.')
+            redirect(URL('default','index'))
+        else:
+            year = request.vars['year']
+            year = db(db.period_year.id==year).select().first()
+            if year is None:
+                session.flash = T('Not valid Action.')
+                redirect(URL('default','index'))
+            else:
+                if cpfecys.current_year_period().id != year.id:
+                    session.flash = T('Not valid Action.')
+                    redirect(URL('default','index'))
+
+        #Check if the project is correct
+        if request.vars['project'] is None or request.vars['project']=='':
+            session.flash = T('Not valid Action.')
+            redirect(URL('default','index'))
+        else:
+            project = request.vars['project']
+            project = db(db.project.id==project).select().first()
+            if project is None:
+                session.flash = T('Not valid Action.')
+                redirect(URL('default','index'))
+            else:
+                assigantion = db((db.user_project.assigned_user == auth.user.id) & (db.user_project.project == project.id) & ((db.user_project.period <= year.id) & ((db.user_project.period + db.user_project.periods) > year.id))).select().first()
+                if assigantion is None:
+                    session.flash = T('Not valid Action.')
+                    redirect(URL('default','index'))
+
+        #Check if the activity is valid or the operation on the activity is valid
+        if request.vars['activity'] is None or request.vars['activity']=='' or request.vars['op'] is None or request.vars['op']=='' or (request.vars['op']!='1' and request.vars['op']!='2'):
+            session.flash = T('Not valid Action.')
+            redirect(URL('default','index'))
+
+        activity = db((db.course_assigned_activity.semester==year.id)&(db.course_assigned_activity.assignation==project.id)&(db.course_assigned_activity.id==request.vars['activity'])).select().first()
+        if activity is None:
+            session.flash = T('Not valid Action.')
+            redirect(URL('default','index'))
+    except:
+        session.flash = T('Not valid Action.')
+        redirect(URL('default','index'))
+
+    if activity.status==T('Pending') or activity.status==T('Active'):
+        session.flash=T('Action invalid. The activity has not yet completed.')
+        redirect(URL('activity_control', 'students_control.html', vars=dict(project = project.id, period = year.id)))
+
+    if request.vars['op']=='2':
+        status = T('Teacher Failed')
+    else:
+        status = T('Accomplished')
+        if activity.report_required==True:
+            if activity.fileReport is None:
+                status = T('Pending') +' '+T('Item Delivery')
+    db(db.course_assigned_activity.id == activity.id).update(status = status)
+    session.flash=T('Qualified Activity')
+    redirect(URL('activity_control', 'students_control', vars=dict(project = project.id, period = year.id)))

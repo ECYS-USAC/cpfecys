@@ -197,6 +197,91 @@ def check_exception_semester_repeat():
                         db(db.course_limit_exception.id==exception.id).delete()	
     db.commit()
 
+def automation_activities_assigned():
+    #ACTUAL AND FUTURE TIME
+    import time
+    from datetime import date, datetime, timedelta
+    officialTime = date.today()
+    futureTime = officialTime + timedelta(days=1)
+    #CURRENT PERIOD
+    import cpfecys
+    year = cpfecys.current_year_period()
+    #ALL ACTIVITIES OF THE CURRENT PERIOD
+    for activity in db(db.course_assigned_activity.semester==year.id).select():
+        if activity.status==T('Pending') and activity.date_start==futureTime:
+            #REMINDER
+            subject = T('[DTT]Automatic Notification - Reminder activity assigned by the professor')
+            message = '<html>' +T('You are reminded that tomorrow should develop the following activity:')+'<br>'
+            message += T('Activity data:')+'<br>'
+            message += T('Name')+': '+activity.name+'<br>'
+            message += T('Description')+': '+activity.description+'<br>'
+            message += T('Date')+': '+str(activity.date_start)+'<br>'
+            if activity.report_required == True:
+                message += T('Report Required')+': '+T('You need to enter a report of the activity to be taken as valid.')+'<br>'
+            message += activity.assignation.name+'<br>'+T(activity.semester.period.name)+' '+str(activity.semester.yearp)+'<br>Sistema de Seguimiento de La Escuela de Ciencias y Sistemas<br> Facultad de Ingeniería - Universidad de San Carlos de Guatemala</html>'
+            #Log General del Envio
+            row = db.notification_general_log4.insert(subject=subject,
+                                                sent_message=message,
+                                                emisor='DTT-ECYS',
+                                                course=activity.assignation.name,
+                                                yearp=activity.semester.yearp,
+                                                period=T(activity.semester.period.name))
+            ListadoCorreos=None
+            email_list_log=None
+            students = db((db.user_project.project == activity.assignation)&
+                      ((db.user_project.period <= activity.semester) & ((db.user_project.period + db.user_project.periods) > activity.semester))&
+                      (db.user_project.assigned_user == db.auth_user.id)&
+                      (db.auth_membership.user_id == db.auth_user.id)&
+                      (db.auth_membership.group_id == db.auth_group.id)&
+                      (db.auth_group.role == 'student')).select()
+
+            for usersT in students:
+                if ListadoCorreos is None:
+                    ListadoCorreos=[]
+                    email_list_log=usersT.auth_user.email
+                else:
+                    email_list_log+=','+usersT.auth_user.email
+                ListadoCorreos.append(usersT.auth_user.email)
+
+            if ListadoCorreos is not None:
+                was_sent = mail.send(to='dtt.ecys@dtt-ecys.org',subject=subject,message=message, bcc=ListadoCorreos)
+                db.mailer_log.insert(sent_message = message, destination = email_list_log, result_log = str(mail.error or '') + ':' + str(mail.result), success = was_sent, emisor='DTT-ECYS')
+                #Notification LOG
+                email_list =str(email_list_log).split(",")
+                for email_temp in email_list:
+                    user_var = db((db.auth_user.email == email_temp)).select().first()
+                    if user_var is not None:
+                        username_var = user_var.username
+                    else:
+                        user_var = db((db.academic.email == email_temp)).select().first()
+                        if user_var is not None:
+                            username_var = user_var.carnet
+                        else:
+                            username_var = 'None'
+                    db.notification_log4.insert(destination = email_temp, 
+                                                username = username_var,
+                                                result_log = str(mail.error or '') + ':' + str(mail.result), 
+                                                success = was_sent, 
+                                                register=row.id)
+        elif activity.status==T('Pending') and activity.date_start==officialTime:
+            db(db.course_assigned_activity.id == activity.id).update(status = T('Active'))
+        elif (activity.status==T('Active') and activity.date_start<officialTime) or (activity.status==T('Pending') and activity.date_start<officialTime):
+            status = T('Completed')
+            #Activity requires report
+            if activity.report_required==True:
+                if activity.fileReport is None:
+                    status = T('Pending') +' '+T('Item Delivery')
+                else:
+                    if activity.automatic_approval==False:
+                        status = T('Grade pending')
+            else:
+                if activity.automatic_approval==False:
+                    status = T('Grade pending')
+            db(db.course_assigned_activity.id == activity.id).update(status = status)
+    db.commit()
+
+
+
 
 
 #This thing kills reports that where never done to an empty report with score 0
@@ -362,6 +447,7 @@ def auto_daily():
     db.commit()
     auto_freeze()
     check_exception_semester_repeat()
+    automation_activities_assigned()
     return T('Total Updated Reports: ') + str(total_recheckies + total_drafties + missed_reports) + ' ' + \
             T('Automatically Updated Draft Reports: ') + str(total_drafties) + ' ' + \
             T('Automatically Updated Recheck Reports: ') + str(total_recheckies) + ' ' + \
