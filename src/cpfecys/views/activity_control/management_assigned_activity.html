@@ -9,6 +9,15 @@
 	    <small>{{=project.name}} - {{=T(year.period.name)}} {{=str(year.yearp)}} </small>
 	</h2>
 	{{=grid}}
+	<script type="text/javascript">
+		var valueDescription = document.getElementById('course_assigned_activity_description').value
+		$("#course_assigned_activity_description__row").replaceWith("<tr id=\"course_assigned_activity_description__row\"><td class=\"w2p_fl\"><label for=\"course_assigned_activity_description\" id=\"course_assigned_activity_description__label\">Descripción: </label></td><td class=\"w2p_fw\"><textarea class=\"text\" cols=\"40\" id=\"course_assigned_activity_description\" name=\"description\" rows=\"10\">"+valueDescription+"</textarea></td><td class=\"w2p_fc\"></td></tr><tr><td colspan=\"3\"><div class=\"alert alert-warning\"><b>{{=T('If you want the academic tutor must enter a report about the activity, check the box required report.')}}</b></div></td></tr>");
+
+		var valueStatus = document.getElementById('course_assigned_activity_status').value
+		if (valueStatus=='')
+			valueStatus='{{=T('Pending')}}';
+		$("#course_assigned_activity_status__row").replaceWith("<tr id=\"course_assigned_activity_status__row\"><td class=\"w2p_fl\"><label for=\"course_assigned_activity_status\" id=\"course_assigned_activity_status__label\">Estado: </label></td><td class=\"w2p_fw\"><input class=\"string\" id=\"course_assigned_activity_status\" name=\"status\" type=\"text\" value=\""+valueStatus+"\" disabled=true/></td><td class=\"w2p_fc\"></td></tr><tr><td colspan=\"3\"><div class=\"alert alert-warning\"><b>{{=T('If you want the activity chosen should be automatically filled by passing the execution date, activate the automatic approval box.')}}</b></div></td></tr>");
+	</script>
 {{else:}}
 	<h2>
 		{{=T('Activity assigned by the professor')}}
@@ -25,6 +34,7 @@
 	    		<b>{{=T('Date')}} :</b><br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{{=activity.date_start}}
 	    		<br>
 	    		<b>{{=T('Description')}} :</b><br><pre>{{=activity.description}}</pre>
+	    		<b>{{=T('Status')}} :</b><br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{{=activity.status}}
 	    		{{if activity.fileReport is not None:}}
 		    		<div class="alert alert-warning">
 						<b>{{=T('Already delivered a report on this activity. If you upload a new report that will be taken as the official.')}}</b>

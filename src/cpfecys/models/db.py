@@ -1553,8 +1553,10 @@ db.define_table('evaluation',
 
 db.define_table('course_assigned_activity',
     Field('name', 'string', notnull=True, unique=False, label = T('Name')),
-    Field('description', 'text', notnull=False, unique=False, label = T('Description')),
+    Field('description', 'text', notnull=True, unique=False, label = T('Description')),
     Field('report_required', 'boolean', notnull=True, label = T('Report Required')),
+    Field('status', 'string', label = T('Status')),
+    Field('automatic_approval', 'boolean', notnull=True, label = T('Automatic Approval')),
     Field('fileReport', 'upload', notnull=False, label='Reporte', requires=[IS_NULL_OR(IS_UPLOAD_FILENAME(extension = '(pdf|zip)',error_message='Solo se aceptan archivos con extension zip|pdf')),IS_LENGTH(2097152,error_message='El tamaño máximo del archivo es 2MB')]),
     Field('semester', 'reference period_year', notnull=True),
     Field('assignation', 'reference project', notnull=True),
@@ -1585,6 +1587,34 @@ db.define_table('evaluation_solve_text',
     Field('question_repository', 'reference question_repository', notnull = True, label = T('Question Repository')),
     Field('answer', 'text', notnull = True, label = T('Answer'))
 )
+
+db.define_table('course_assigned_activity_log',
+    Field('before_name', 'string', notnull=False,  label = T('Historical Name')),
+    Field('after_name', 'string', notnull=False,  label = T('Official Name')),
+    Field('before_description', 'text', notnull=False, label = T('Historical Description')),
+    Field('after_description', 'text', notnull=False, label = T('Official Description')),
+    Field('before_report_required', 'boolean', notnull=False, label = T('Historical Report Required')),
+    Field('after_report_required', 'boolean', notnull=False, label = T('Official Report Required')),
+    Field('before_status', 'string', notnull = False, label = T('Historical Status')),
+    Field('after_status', 'string', notnull = False, label = T('Official Status')),
+    Field('before_automatic_approval', 'boolean', notnull=False, label = T('Historical Automatic Approval')),
+    Field('after_automatic_approval', 'boolean', notnull=False, label = T('Official Automatic Approval')),
+    Field('before_fileReport', 'upload', notnull=False, label=T('Historical Report')),
+    Field('after_fileReport', 'upload', notnull=False, label=T('Official Report')),
+    Field('before_date_start', 'date', notnull = False, label = T('Historical Date')),
+    Field('after_date_start', 'date', notnull = False, label = T('Official Date')),
+    Field('id_course_assigned_activity', 'text', notnull = False, label = 'id_course_assigned_activity'),
+    Field('user_name', 'string', notnull = True, label = T('User')),
+    Field('roll', 'string', notnull = False, label = 'Rol'),
+    Field('operation_log', 'string', notnull = False, label = T('Operation')),
+    Field('description_log', 'text', notnull=True, label = T('Detail of Request')),
+    Field('date_log', 'datetime', notnull = True, default = datetime.datetime.now(), label = T('Date Request')),
+    Field('project', 'string', notnull=True, label=T('Course')),
+    Field('yearp', 'string', notnull=True, label=T('Year')),
+    Field('period', 'string', notnull=True, label=T('Period'))
+)
+
+
 
 ## after defining tables, uncomment below to enable auditing
     # auth.enable_record_versioning(db)

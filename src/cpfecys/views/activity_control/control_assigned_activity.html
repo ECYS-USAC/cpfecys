@@ -30,15 +30,54 @@
 
 
 	{{if request.vars['operation'] == "div_update": }}
+		<!--Init help activities assigned -->
+		  <div id="help_modal_aa" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true"> 
+		    <div class="modal-header">
+		      <button type="button" class="close" data-dismiss="modal"
+		  aria-hidden="true">×</button>
+		        <h3 id="myModalLabel">
+		            <span class="icon-question-sign"></span>
+		            {{=T('Help Assigned Activities')}}
+		        </h3>
+		    </div>
+		    <div class="modal-body">
+		      <div class="well">
+		          <p>
+		          		{{=T('The assigned activities are the activities that the professor has delegated the Academic Tutor to perform.')}}
+		              <br>
+		              <br>
+		              {{=T('The possible states of the activities are:')}}
+		              <br>
+		              *) <b>{{=T('Accomplished')}}:</b> {{=T('They are all activities that have been developed and completed.')}}
+		              <br>
+		              *) <b>{{=T('Teacher Failed')}}:</b> {{=T('All activities that the professor has described as failed.')}}
+		              <br>
+		              *) <b>{{=T('Grade pending')}}:</b> {{=T('All activities that the professor has not yet qualified.')}}
+		              <br>
+		              *) <b>{{=T('Deliverable Earrings')}}:</b> {{=T('They are all activities that have been developed but have not been completed due to lack of income reporting.')}}
+		              <br>
+		              *) <b>{{=T('Activated')}}:</b> {{=T('They are all activities that must be developed on the current date.')}}
+		              <br>
+		              *) <b>{{=T('Earrings')}}:</b> {{=T('They are all activities that the execution date has not yet arrived.')}}
+		          </p>
+		      </div>
+		    </div>
+		    <div class="modal-footer">
+		        <button class="btn" data-dismiss="modal"
+		  aria-hidden="true">{{=T('Close')}}</button>
+		    </div>
+		  </div>
+		  <!--Finish help activities assigned-->
+
 		<div align="right">
 			<table class="table-striped table-bordered">
 				<tr>
-					<th colspan="5">
-						<center>{{=T('Activity logs')}}</center>
+					<th colspan="6">
+						<center>{{=T('Activity logs')}}</center><a type="button" class="close" title="{{=T('Help Assigned Activities')}}" aria-hidden="true" role="button" class="btn btn-warning" data-toggle="modal" data-target="#help_modal_aa" ><span class="icon-black icon-question-sign"></span></a><br><a id="aaAll" style="cursor:pointer;" onclick="visible_assigned_activities(0);" title="{{=T('All activities')}}">{{=T('All activities')}}</a>
 					</th>
 				</tr>
 				<tr>
-					<th colspan="2">
+					<th colspan="4">
 						<center>{{=T('Executed')}}</center>
 					</th>
 					<th>
@@ -47,39 +86,36 @@
 					<th>
 						<center>{{=T('Earrings')}}</center>
 					</th>
-					<th>
-						<center>{{=T('All')}}</center>
-					</th>
 				</tr>
 				<tr>
 					<td>
-						<span class="label label-info">&nbsp;&nbsp;&nbsp;</span>
-						<a id="aaAccomplished" style="cursor:pointer;" onclick="visible_assigned_activities(2);">
-                    		{{=T('Accomplished')}}
+						<a id="aaAccomplished" style="cursor:pointer;" onclick="visible_assigned_activities(1);" title="{{=T('They are all activities that have been developed and completed.')}}">
+                    		<span class="label label-success">&nbsp;&nbsp;&nbsp;</span>{{=T('Accomplished')}}
                     	</a>
 					</td>
 					<td>
-						<span class="label label-important">&nbsp;&nbsp;&nbsp;</span>
-						<a id="aaDeliverableEarrings" style="cursor:pointer;" onclick="visible_assigned_activities(1);">
-                    		{{=T('Deliverable Earrings')}}
+						<a id="aaAccomplished" style="cursor:pointer;" onclick="visible_assigned_activities(2);" title="{{=T('All activities that the professor has described as failed.')}}">
+                    		<span class="label label-inverse">&nbsp;&nbsp;&nbsp;</span>{{=T('Failed')}}<br>&nbsp;&nbsp;&nbsp;&nbsp;{{=T('Rol Teacher')}}
                     	</a>
 					</td>
 					<td>
-						<span class="label label-success">&nbsp;&nbsp;&nbsp;</span>
-						<a id="aaActivated" style="cursor:pointer;" onclick="visible_assigned_activities(3);">
-                    		{{=T('Activated')}}
+						<a id="aaDeliverableEarrings" style="cursor:pointer;" onclick="visible_assigned_activities(3);" title="{{=T('All activities that the professor has not yet qualified.')}}">
+                    		<span class="label">&nbsp;&nbsp;&nbsp;</span>{{=T('Earrings')}}<br>&nbsp;&nbsp;&nbsp;&nbsp;{{=T('Qualification')}}
                     	</a>
 					</td>
 					<td>
-						<span class="label label-warning">&nbsp;&nbsp;&nbsp;</span>
-						<a id="aaEarrings" style="cursor:pointer;" onclick="visible_assigned_activities(4);">
-                    		{{=T('Earrings')}}
+						<a id="aaDeliverableEarrings" style="cursor:pointer;" onclick="visible_assigned_activities(4);" title="{{=T('They are all activities that have been developed but have not been completed due to lack of income reporting.')}}">
+                    		<span class="label label-important">&nbsp;&nbsp;&nbsp;</span>{{=T('Earrings')}}<br>&nbsp;&nbsp;&nbsp;&nbsp;{{=T('Delivery Items')}}
                     	</a>
 					</td>
 					<td>
-						<span class="label label-inverse">&nbsp;&nbsp;&nbsp;</span>
-						<a id="aaAll" style="cursor:pointer;" onclick="visible_assigned_activities(0);">
-                    		{{=T('All')}}
+						<a id="aaActivated" style="cursor:pointer;" onclick="visible_assigned_activities(5);" title="{{=T('They are all activities that must be developed on the current date.')}}">
+                    		<span class="label label-info">&nbsp;&nbsp;&nbsp;</span>{{=T('Activated')}}
+                    	</a>
+					</td>
+					<td>
+						<a id="aaEarrings" style="cursor:pointer;" onclick="visible_assigned_activities(6);" title="{{=T('They are all activities that the execution date has not yet arrived.')}}">
+                    		<span class="label label-warning">&nbsp;&nbsp;&nbsp;</span>{{=T('Earrings')}}
                     	</a>
 					</td>
 				</tr>
@@ -94,8 +130,8 @@
 		</div>
 		<center>
 			<table class="table table-bordered">
-		  		<tr bgcolor="#E6E6E6">
-		  			<th>
+				<tr bgcolor="#E6E6E6">
+					<th>
 		  				{{=T('Status')}}
 		  			</th>
 		  			<th class="showDetailAA" style="display:none;">
@@ -104,7 +140,7 @@
 					<th>
 						{{=T('Description')}}
 					</th>
-					<th>
+					<th class="showDetailAA" style="display:none;">
 						{{=T('Report')}}<br>{{=T('Required')}}
 					</th>
 					<th class="showDetailAA" style="display:none;">
@@ -113,202 +149,65 @@
 					<th>
 						{{=T('Date')}}
 					</th>
-					{{if cpfecys.current_year_period().id==semestre2.id and auth.has_membership('Student'):}}
+					{{if cpfecys.current_year_period().id==semestre2.id:}}
 						<th>
 							{{=T('Action')}}
 						</th>
 					{{pass}}
-		  		</tr>
-		  		{{
-		  			import time
-					from datetime import date
-					tiempo = date.today()
-		  		}}
-		  		{{for tActivitiesAAA in db((db.course_assigned_activity.semester==semestre2.id)&(db.course_assigned_activity.assignation==project.id)&(db.course_assigned_activity.date_start<tiempo)).select():}}
-		  			{{doAction=True}}
-		  			{{if tActivitiesAAA.report_required==True:}}
-		  				{{if tActivitiesAAA.fileReport is None:}}
-		  					<tr class="assignedActivityPR">
-		  						<td>
-		  							<center><span class="label label-important">{{=T('Pending')}}<br>{{=T('Item Delivery')}}</span></center>
-			                    </td>
-		  						<td class="showDetailAA" style="display:none;">
-									<center>{{=tActivitiesAAA.name}}</center>
-								</td>
-								<td>
-									<div style="width:200px;">
-										<center>{{=tActivitiesAAA.description[:100]}}</center>
-										{{if len(tActivitiesAAA.description) > 100:}}
-											...
-											<br>
-											<div align="right">
-												<a type="button" style ="cursor:pointer;" role="button" data-toggle="modal" data-target="#ac_ass_des_modal_{{=tActivitiesAAA.id}}" >{{=T('View more')}}</span></a>
-											</div>
-									
-											<!--MODAL -->
-											<div id="ac_ass_des_modal_{{=tActivitiesAAA.id}}" class="modal hide fade" tabindex="-1" role="dialog"  aria-hidden="true"> 
-											  <div class="modal-header">
-											    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
-											      <h3 id="myModalLabel">
-											          {{=T('Activity')}} : {{=tActivitiesAAA.name}}<br>
-											          {{=T('Date')}} : {{=tActivitiesAAA.date_start}}
-											      </h3>
-											  </div>
-											  <div class="modal-body">
-											    <div class="well">
-											        <pre>{{=tActivitiesAAA.description}}</pre>
-											    </div>
-											  </div>
-											  <div class="modal-footer">
-											      <button class="btn" data-dismiss="modal" aria-hidden="true">{{=T('Close')}}</button>
-											  </div>
-											</div>
-											<!--Finish MODaL-->
-										{{pass}}
-									</div>
-								</td>
-								<td>
-									<center>
-									{{if tActivitiesAAA.report_required==True:}}
-										{{=T('Yes')}}
-									{{else:}}
-										{{=T('No')}}
-									{{pass}}
-									</center>
-								</td>
-								<td class="showDetailAA" style="display:none;">
-									<center>
-									{{if tActivitiesAAA.fileReport is None:}}
-										{{=T('Without')}}<br>{{=T('Report')}}
-									{{else:}}
-										<a href="{{=cpfecys.get_domain()}}default/download/{{=tActivitiesAAA.fileReport}}" target="blank">{{=T('Report')}}</a>
-									{{pass}}
-									</center>
-								</td>
-								<td>
-									<center>{{=tActivitiesAAA.date_start}}</center>
-								</td>
-								{{if cpfecys.current_year_period().id==semestre2.id and auth.has_membership('Student'):}}
-								<td>
-									<center>
-									<a id="gradeButton" role="button" title="{{=T('Sign deliverable activity')}}" class="btn" href="{{=URL('activity_control','management_assigned_activity', vars=dict(project=project.id, year=semestre2.id, activity=tActivitiesAAA.id))}}">
-		                    			{{=T('Sign in')}}<br>{{=T('Report')}}
-			                    	</a>
-			                    	</center>
-								</td>
-								{{pass}}
-		  					</tr>
-		  					{{doAction=False}}
-		  				{{pass}}
-		  			{{pass}}
-		  			{{if doAction==True:}}
-			  			<tr class="assignedActivityA">
-	  						<td>
-		  						<center><span class="label label-info">{{=T('Completed')}}</span></center>
-		                    </td>
-	  						<td class="showDetailAA" style="display:none;">
-								<center>{{=tActivitiesAAA.name}}</center>
-							</td>
+				</tr>
+				{{for activity in activities:}}
+					{{if activity.status==T('Accomplished'):}}
+						<tr class="assigned1">
 							<td>
-								<div style="width:200px;">
-									<center>{{=tActivitiesAAA.description[:100]}}</center>
-									{{if len(tActivitiesAAA.description) > 100:}}
-										...
-										<br>
-										<div align="right">
-											<a type="button" style ="cursor:pointer;" role="button" data-toggle="modal" data-target="#ac_ass_des_modal_{{=tActivitiesAAA.id}}" >{{=T('View more')}}</span></a>
-										</div>
-								
-										<!--MODAL -->
-										<div id="ac_ass_des_modal_{{=tActivitiesAAA.id}}" class="modal hide fade" tabindex="-1" role="dialog"  aria-hidden="true"> 
-										  <div class="modal-header">
-										    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
-										      <h3 id="myModalLabel">
-										          {{=T('Activity')}} : {{=tActivitiesAAA.name}}<br>
-										          {{=T('Date')}} : {{=tActivitiesAAA.date_start}}
-										      </h3>
-										  </div>
-										  <div class="modal-body">
-										    <div class="well">
-										        <pre>{{=tActivitiesAAA.description}}</pre>
-										    </div>
-										  </div>
-										  <div class="modal-footer">
-										      <button class="btn" data-dismiss="modal" aria-hidden="true">{{=T('Close')}}</button>
-										  </div>
-										</div>
-										<!--Finish MODaL-->
-									{{pass}}
-								</div>
-							</td>
+								<center><span class="label label-success">
+					{{elif activity.status==T('Teacher Failed'):}}
+						<tr class="assigned2">
 							<td>
-								<center>
-								{{if tActivitiesAAA.report_required==True:}}
-									{{=T('Yes')}}
-								{{else:}}
-									{{=T('No')}}
-								{{pass}}
-								</center>
-							</td>
-							<td class="showDetailAA" style="display:none;">
-								<center>
-								{{if tActivitiesAAA.fileReport is None:}}
-									{{=T('Without')}}<br>{{=T('Report')}}
-								{{else:}}
-									<a href="{{=cpfecys.get_domain()}}default/download/{{=tActivitiesAAA.fileReport}}" target="blank">{{=T('Report')}}</a>
-								{{pass}}
-								</center>
-							</td>
+								<center><span class="label label-inverse">
+					{{elif activity.status==T('Grade pending'):}}
+						<tr class="assigned3">
 							<td>
-								<center>{{=tActivitiesAAA.date_start}}</center>
-							</td>
-							{{if cpfecys.current_year_period().id==semestre2.id and auth.has_membership('Student'):}}
-								<td>
-								{{if tActivitiesAAA.report_required==True:}}
-									<center>
-									<a id="gradeButton" role="button" title="{{=T('Sign deliverable activity')}}" class="btn" href="{{=URL('activity_control','management_assigned_activity', vars=dict(project=project.id, year=semestre2.id, activity=tActivitiesAAA.id))}}">
-		                    			{{=T('Replace')}}<br>{{=T('Report')}}
-			                    	</a>
-			                    	</center>
-								{{else:}}
-									<center>{{=T('No Action')}}</center>
-								{{pass}}
-								</td>
-							{{pass}}
-	  					</tr>
-		  			{{pass}}
-		  		{{pass}}
-
-		  		{{for tActivitiesAAA in db((db.course_assigned_activity.semester==semestre2.id)&(db.course_assigned_activity.assignation==project.id)&(db.course_assigned_activity.date_start==tiempo)).select():}}
-		  			<tr class="assignedActivityAct">
-  						<td>
-	  						<center><span class="label label-success">{{=T('Active')}}</span></center>
-	                    </td>
-  						<td class="showDetailAA" style="display:none;">
-							<center>{{=tActivitiesAAA.name}}</center>
+								<center><span class="label">
+					{{elif activity.status==(T('Pending') +' '+T('Item Delivery')):}}
+						<tr class="assigned4">
+							<td>
+								<center><span class="label label-important">
+					{{elif activity.status==T('Active'):}}
+						<tr class="assigned5">
+							<td>
+								<center><span class="label label-info">
+					{{else:}}
+						<tr class="assigned6">
+							<td>
+								<center><span class="label label-warning">
+					{{pass}}
+							{{=str(activity.status)}}</span></center>
+						</td>
+						<td class="showDetailAA" style="display:none;">
+							<center>{{=activity.name}}</center>
 						</td>
 						<td>
 							<div style="width:200px;">
-								<center>{{=tActivitiesAAA.description[:100]}}</center>
-								{{if len(tActivitiesAAA.description) > 100:}}
+								{{=activity.description[:100]}}
+								{{if len(activity.description) > 100:}}
 									...
 									<br>
 									<div align="right">
-										<a type="button" style ="cursor:pointer;" role="button" data-toggle="modal" data-target="#ac_ass_des_modal_{{=tActivitiesAAA.id}}" >{{=T('View more')}}</span></a>
+										<a type="button" style ="cursor:pointer;" role="button" data-toggle="modal" data-target="#ac_ass_des_modal_{{=activity.id}}" >{{=T('View more')}}</span></a>
 									</div>
 							
 									<!--MODAL -->
-									<div id="ac_ass_des_modal_{{=tActivitiesAAA.id}}" class="modal hide fade" tabindex="-1" role="dialog"  aria-hidden="true"> 
+									<div id="ac_ass_des_modal_{{=activity.id}}" class="modal hide fade" tabindex="-1" role="dialog"  aria-hidden="true"> 
 									  <div class="modal-header">
 									    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
 									      <h3 id="myModalLabel">
-									          {{=T('Activity')}} : {{=tActivitiesAAA.name}}<br>
-									          {{=T('Date')}} : {{=tActivitiesAAA.date_start}}
+									          {{=T('Activity')}} : {{=activity.name}}<br>
+									          {{=T('Date')}} : {{=activity.date_start}}
 									      </h3>
 									  </div>
 									  <div class="modal-body">
 									    <div class="well">
-									        <pre>{{=tActivitiesAAA.description}}</pre>
+									        <pre>{{=activity.description}}</pre>
 									    </div>
 									  </div>
 									  <div class="modal-footer">
@@ -319,9 +218,9 @@
 								{{pass}}
 							</div>
 						</td>
-						<td>
+						<td class="showDetailAA" style="display:none;">
 							<center>
-							{{if tActivitiesAAA.report_required==True:}}
+							{{if activity.report_required==True:}}
 								{{=T('Yes')}}
 							{{else:}}
 								{{=T('No')}}
@@ -330,92 +229,43 @@
 						</td>
 						<td class="showDetailAA" style="display:none;">
 							<center>
-							{{if tActivitiesAAA.fileReport is None:}}
+							{{if activity.fileReport is None:}}
 								{{=T('Without')}}<br>{{=T('Report')}}
 							{{else:}}
-								<a href="{{=cpfecys.get_domain()}}default/download/{{=tActivitiesAAA.fileReport}}" target="blank">{{=T('Report')}}</a>
+								<a href="{{=cpfecys.get_domain()}}default/download/{{=activity.fileReport}}" target="blank">{{=T('Report')}}</a>
 							{{pass}}
 							</center>
 						</td>
 						<td>
-							<center>{{=tActivitiesAAA.date_start}}</center>
+							<center>{{=activity.date_start}}</center>
 						</td>
-						{{if cpfecys.current_year_period().id==semestre2.id and auth.has_membership('Student'):}}
+						{{if cpfecys.current_year_period().id==semestre2.id:}}
 						<td>
-							<center>{{=T('No Action')}}</center>
-						</td>
-						{{pass}}
-  					</tr>
-		  		{{pass}}
-
-		  		{{for tActivitiesAAA in db((db.course_assigned_activity.semester==semestre2.id)&(db.course_assigned_activity.assignation==project.id)&(db.course_assigned_activity.date_start>tiempo)).select():}}
-		  			<tr class="assignedActivityP">
-  						<td>
-	  						<center><span class="label label-warning">{{=T('Pending')}}</span></center>
-	                    </td>
-  						<td class="showDetailAA" style="display:none;">
-							<center>{{=tActivitiesAAA.name}}</center>
-						</td>
-						<td>
-							<div style="width:200px;">
-								<center>{{=tActivitiesAAA.description[:100]}}</center>
-								{{if len(tActivitiesAAA.description) > 100:}}
-									...
-									<br>
-									<div align="right">
-										<a type="button" style ="cursor:pointer;" role="button" data-toggle="modal" data-target="#ac_ass_des_modal_{{=tActivitiesAAA.id}}" >{{=T('View more')}}</span></a>
-									</div>
-							
-									<!--MODAL -->
-									<div id="ac_ass_des_modal_{{=tActivitiesAAA.id}}" class="modal hide fade" tabindex="-1" role="dialog"  aria-hidden="true"> 
-									  <div class="modal-header">
-									    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
-									      <h3 id="myModalLabel">
-									          {{=T('Activity')}} : {{=tActivitiesAAA.name}}<br>
-									          {{=T('Date')}} : {{=tActivitiesAAA.date_start}}
-									      </h3>
-									  </div>
-									  <div class="modal-body">
-									    <div class="well">
-									        <pre>{{=tActivitiesAAA.description}}</pre>
-									    </div>
-									  </div>
-									  <div class="modal-footer">
-									      <button class="btn" data-dismiss="modal" aria-hidden="true">{{=T('Close')}}</button>
-									  </div>
-									</div>
-									<!--Finish MODaL-->
+							{{if auth.has_membership('Teacher') and (activity.status!=T('Pending') and activity.status!=T('Active')):}}
+								<center>
+									<a id="gradeButtonT" role="button" class="badge btn-success" title="{{=T('Approve')}} {{=T('Activity')}}" class="btn" href="{{=URL('activity_control','rate_assigned_activity', vars=dict(project=project.id, year=semestre2.id, activity=activity.id, op=1))}}">
+										<span class="icon-white icon-ok-sign"></span>
+									</a>
+									<a id="gradeButtonF" role="button" class="badge btn-danger" title="{{=T('Reprobate')}} {{=T('Activity')}}" class="btn" href="{{=URL('activity_control','rate_assigned_activity', vars=dict(project=project.id, year=semestre2.id, activity=activity.id, op=2))}}">
+										<span class="icon-white icon-remove-sign"></span>
+									</a>
+								</center>
+							{{elif auth.has_membership('Student') and (activity.status!=T('Pending') and activity.status!=T('Active')) and activity.report_required==True:}}
+								<center>
+								{{if activity.fileReport is None:}}
+									<a id="gradeButton" role="button" class="badge btn-success" title="{{=T('Sign deliverable activity')}}" class="btn" href="{{=URL('activity_control','management_assigned_activity', vars=dict(project=project.id, year=semestre2.id, activity=activity.id))}}">
+										<span class="icon-white icon-share"></span>
+								{{else:}}
+									<a id="gradeButton" role="button" class="badge btn-info" title="{{=T('Replace deliverable activity')}}" class="btn" href="{{=URL('activity_control','management_assigned_activity', vars=dict(project=project.id, year=semestre2.id, activity=activity.id))}}">
+		                    			<span class="icon-white icon-edit"></span>
 								{{pass}}
-							</div>
-						</td>
-						<td>
-							<center>
-							{{if tActivitiesAAA.report_required==True:}}
-								{{=T('Yes')}}
-							{{else:}}
-								{{=T('No')}}
+									</a>
+			                    </center>
 							{{pass}}
-							</center>
-						</td>
-						<td class="showDetailAA" style="display:none;">
-							<center>
-							{{if tActivitiesAAA.fileReport is None:}}
-								{{=T('Without')}}<br>{{=T('Report')}}
-							{{else:}}
-								<a href="{{=cpfecys.get_domain()}}default/download/{{=tActivitiesAAA.fileReport}}" target="blank">{{=T('Report')}}</a>
-							{{pass}}
-							</center>
-						</td>
-						<td>
-							<center>{{=tActivitiesAAA.date_start}}</center>
-						</td>
-						{{if cpfecys.current_year_period().id==semestre2.id and auth.has_membership('Student'):}}
-						<td>
-							<center>{{=T('No Action')}}</center>
 						</td>
 						{{pass}}
-  					</tr>
-		  		{{pass}}
+					</tr>
+				{{pass}}
 			</table>
 		</center>
 
@@ -434,33 +284,61 @@
 
 			function visible_assigned_activities(idType){
 				if (idType==1){
-					$(".assignedActivityPR").css("display", "");
-					$(".assignedActivityA").css("display", "none");
-					$(".assignedActivityAct").css("display", "none");
-					$(".assignedActivityP").css("display", "none");
+					$(".assigned1").css("display", "");
+					$(".assigned2").css("display", "none");
+					$(".assigned3").css("display", "none");
+					$(".assigned4").css("display", "none");
+					$(".assigned5").css("display", "none");
+					$(".assigned6").css("display", "none");
 				}else{
 					if(idType==2){
-						$(".assignedActivityPR").css("display", "none");
-						$(".assignedActivityA").css("display", "");
-						$(".assignedActivityAct").css("display", "none");
-						$(".assignedActivityP").css("display", "none");
+						$(".assigned1").css("display", "none");
+						$(".assigned2").css("display", "");
+						$(".assigned3").css("display", "none");
+						$(".assigned4").css("display", "none");
+						$(".assigned5").css("display", "none");
+						$(".assigned6").css("display", "none");
 					}else{
 						if(idType==3){
-							$(".assignedActivityPR").css("display", "none");
-							$(".assignedActivityA").css("display", "none");
-							$(".assignedActivityAct").css("display", "");
-							$(".assignedActivityP").css("display", "none");
+							$(".assigned1").css("display", "none");
+							$(".assigned2").css("display", "none");
+							$(".assigned3").css("display", "");
+							$(".assigned4").css("display", "none");
+							$(".assigned5").css("display", "none");
+							$(".assigned6").css("display", "none");
 						}else{
 							if (idType==4){
-								$(".assignedActivityPR").css("display", "none");
-								$(".assignedActivityA").css("display", "none");
-								$(".assignedActivityAct").css("display", "none");
-								$(".assignedActivityP").css("display", "");
+								$(".assigned1").css("display", "none");
+								$(".assigned2").css("display", "none");
+								$(".assigned3").css("display", "none");
+								$(".assigned4").css("display", "");
+								$(".assigned5").css("display", "none");
+								$(".assigned6").css("display", "none");
 							}else{
-								$(".assignedActivityPR").css("display", "");
-								$(".assignedActivityA").css("display", "");
-								$(".assignedActivityAct").css("display", "");
-								$(".assignedActivityP").css("display", "");
+								if (idType==5){
+									$(".assigned1").css("display", "none");
+									$(".assigned2").css("display", "none");
+									$(".assigned3").css("display", "none");
+									$(".assigned4").css("display", "none");
+									$(".assigned5").css("display", "");
+									$(".assigned6").css("display", "none");
+								}else{
+									if (idType==6){
+										$(".assigned1").css("display", "none");
+										$(".assigned2").css("display", "none");
+										$(".assigned3").css("display", "none");
+										$(".assigned4").css("display", "none");
+										$(".assigned5").css("display", "none");
+										$(".assigned6").css("display", "");
+									}else{
+										$(".assigned1").css("display", "");
+										$(".assigned2").css("display", "");
+										$(".assigned3").css("display", "");
+										$(".assigned4").css("display", "");
+										$(".assigned5").css("display", "");
+										$(".assigned6").css("display", "");
+									}
+								}
 							}
 						}
 					}
