@@ -552,11 +552,11 @@
 								>
 									
 									<center>
-										<a class="btn" href="{{=URL('evaluation', 'evaluation_list', vars=dict( project = course.user_project.project, period=periodo.id, type = 'course_list'))}}" style="height:32px; width:32px;">
+										<a class="btn" href="{{=URL('evaluation', 'evaluation_list', vars=dict( project = course.user_project.project, period=periodo.id))}}" style="height:32px; width:32px;">
 											<img src="{{=URL('static','images')}}/academic_control/verification5.png" height="32" width="32">
 										</a><br>
-										<a  href="{{=URL('evaluation', 'evaluation_list', vars=dict(project = course.user_project.project, type='list'))}}">
-											{{=T('Evaluations')}} 360 ({{=var_count}})
+										<a  href="{{=URL('evaluation', 'evaluation_list', vars=dict(project = course.user_project.project, period=periodo.id))}}">
+											{{=T('Performance Evaluations')}} 360
 										</a>
 									</center>
 								</td>

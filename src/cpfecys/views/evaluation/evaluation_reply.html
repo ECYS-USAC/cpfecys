@@ -1,0 +1,194 @@
+{{extend 'template.html'}}
+<div class="well">
+	<a onclick="window.history.back()" class="btn" ><i class="icon-arrow-left"></i>{{=T('Back')}}</a>
+	<form action="{{=URL('evaluation', 'evaluation_reply/send')}}" method="post">
+		<input name="project" type="hidden" value="{{=request.vars['project']}}">
+		<input name="period" type="hidden" value="{{=request.vars['period']}}">
+		<input name="evaluation" type="hidden" value="{{=request.vars['evaluation']}}">
+		<input name="evaluated" type="hidden" value="{{=request.vars['evaluated']}}">
+
+	<table class="table table-striped table-bordered">
+		<tr>
+			<th colspan="4">
+			  <center>
+			    <h5>{{=str(var_repository_evaluation.name)}}</h5>
+			  </center>
+			</th>
+		</tr>
+		<tr>
+			<td  style="width:15%;">
+				<b>{{=T('Date Start')}}</b>
+			</td>
+			<td  style="width:35%;">
+				{{=str(var_evaluation.date_start)}}
+			</td>
+			<td  style="width:15%;">
+				<b>{{=T('Date Finish')}}</b>
+			</td>
+			<td  style="width:35%;">
+				{{=str(var_evaluation.date_finish)}}
+			</td>
+		</tr>
+		<tr>
+			<td  style="width:15%;">
+				<b>{{=T('Evaluator')}}</b>
+			</td>
+			<td  style="width:35%;">
+				<img id="img_img" src="{{= URL('default/download', auth.user.photo)}}" alt="No photo" height="30px" width="30px">
+				{{=str(auth.user.first_name)}}
+				{{=str(auth.user.last_name)}}
+			</td>
+			<td  style="width:15%;">
+				<b>{{=T('Evaluated')}}</b>
+			</td>
+			<td  style="width:35%;">
+				{{review = db((db.photo_review.user_id == evaluated.auth_user.id)).select().first()}}
+				{{if review is None:}}
+					{{None}}
+				{{else:}}
+					{{if review.accepted == True:}}
+						<img id="img_img" src="{{= URL('default/download', evaluated.auth_user.photo)}}" alt="No photo" height="30px" width="30px">
+					{{pass}}
+				{{pass}}
+				
+				{{=str(evaluated.auth_user.first_name)}}
+				{{=str(evaluated.auth_user.last_name)}}
+				
+			</td>
+		</tr>
+		<tr>
+			<td>
+				<b>{{=T('Description')}}</b>
+			</td>
+			<td colspan="3">
+				<pre>
+	{{=str(var_evaluation.description)}}
+				</pre>
+			</td>
+		</tr>
+	</table>
+	<table class="table table-striped table-bordered">
+		{{for category in question_category:}}
+			{{category = db(db.question_repository.question_type_name == category.question_type_name).select().first() }}
+			<tr id = "tr_{{=category.id}}">
+				<td >
+					<a onclick="cat_toggle_{{=category.id}}();" style="cursor:pointer;">
+						{{=category.question_type_name}}
+					</a>
+					<table class="table table-striped table-bordered" id="div_{{=category.id}}">
+						{{question_query = db((db.question_repository.repository_evaluation == var_evaluation.repository_evaluation) & (db.question_repository.question_type_name == category.question_type_name)).select() }}
+						
+						{{question_count=0}}
+						<script type="text/javascript">
+							var cat_{{=category.id}} = [];
+							var count_cat = 0;
+							function cat_toggle_{{=category.id}}(){
+								$("#div_{{=category.id}}").toggle(500);
+							}
+						</script>
+						{{for question in question_query:}}
+
+							<tr>
+								<td>
+									{{=question.question}}
+
+									{{answer_query = db((db.repository_answer.question_repository == question.id) ).select() }}
+									{{if len(answer_query) == 0:}}
+										<br>
+										<textarea id="group_{{=question.id}}" name="group_{{=question.id}}" rows="2" ></textarea>
+										<script type="text/javascript">
+											var group_{{=question.id}} = document.getElementById('group_{{=question.id}}');
+											group_{{=question.id}}.onchange = function() {
+												cat_{{=category.id}}[{{=question_count}}] = true;
+												category_validate_{{=category.id}}(false);
+											};
+										</script>
+									{{pass}}
+									{{for answer in answer_query:}}
+										{{if answer.exclusive_one_answer ==  True:}}
+											<br>
+											<input type="radio"  id="group_{{=question.id}}_{{=answer.id}}" name="group_{{=question.id}}" value="{{=answer.id}}"> {{=answer.answer}}
+											<script type="text/javascript">
+												var group_{{=question.id}}_{{=answer.id}} = document.getElementById('group_{{=question.id}}_{{=answer.id}}');
+												group_{{=question.id}}_{{=answer.id}}.onchange = function() {
+													cat_{{=category.id}}[{{=question_count}}] = true;
+													category_validate_{{=category.id}}(false);
+												};
+											</script>
+										{{else:}}
+											<br>
+											<input type="checkbox" id="group_{{=question.id}}_{{=answer.id}}" name="group_{{=question.id}}_{{=answer.id}}" value="{{=answer.id}}"> {{=answer.answer}}
+											<script type="text/javascript">
+												var group_{{=question.id}}_{{=answer.id}} = document.getElementById('group_{{=question.id}}_{{=answer.id}}');
+												group_{{=question.id}}_{{=answer.id}}.onchange = function() {
+													cat_{{=category.id}}[{{=question_count}}] = true;
+													category_validate_{{=category.id}}(true);
+												};
+											</script>
+										{{pass}}
+									{{pass}}
+									
+									{{if (question.obligatory == False):}}
+										<script type="text/javascript">
+										cat_{{=category.id}}[{{=question_count}}] = true;
+										</script>
+									{{pass}}
+
+									{{if (answer.exclusive_one_answer ==  True) and (question.obligatory ==  True):}}
+										<br>
+										<input type="radio"  id="group_{{=question.id}}_000" name="group_{{=question.id}}" value="-1"> {{=T('Without reference')}}
+										<script type="text/javascript">
+											var group_{{=question.id}}_000 = document.getElementById('group_{{=question.id}}_000');
+											group_{{=question.id}}_000.onchange = function() {
+												cat_{{=category.id}}[{{=question_count}}] = true;
+												category_validate_{{=category.id}}(false);
+											};
+										</script>
+									{{pass}}
+									
+								</td>
+							</tr>
+							{{question_count = question_count + 1}}
+						{{pass}}
+						
+					</table>
+				</td>
+			</tr>
+			<script type="text/javascript">
+				function category_validate_{{=category.id}}(sigue_mostrando){
+					hide_cat = true
+					for (i = 0; i < ({{=question_count}}); i++){
+						if (cat_{{=category.id}}[i] != true ){
+							hide_cat = false
+						}
+					}
+					if(hide_cat == true){
+						if  (sigue_mostrando == false){
+							$("#div_{{=category.id}}").hide(500);
+						}
+						
+						if (document.getElementById('tr_{{=category.id}}').className != "success"){
+							count_cat++;
+						}
+						document.getElementById('tr_{{=category.id}}').className = "success";
+						if(count_cat == {{=len(question_category)}}){
+							$("#button_disabled").hide();
+							$("#button_enabled").toggle();
+							
+						}
+
+					}
+				}
+			</script>
+		{{pass}}
+	</table>
+	<div id="button_enabled" align="right" style="display:none;">
+		<button type="submit" class="btn btn-success">{{=T('Send')}}</button>
+	</div>
+	<div id="button_disabled" align="right">
+		<a class="btn btn-success disabled" title="{{=T('You must answer all questions to continue')}}" href="#">
+			{{=T('Send')}}
+		</a>
+	</div>
+	<form>
+</div>

@@ -1,0 +1,8 @@
+{{extend 'template.html'}}
+<h1>
+    {{=T('Evaluations Results')}}
+</h1>
+<a onclick="window.history.back()" class="btn" ><i class="icon-arrow-left"></i>{{=T('Back')}}</a>
+<div align="right">
+	<a class="btn btn-success" href="{{=URL(vars=dict(list='True'))}}"><i class="icon-download icon-white"></i>{{=T('Export Report')}} (CSV)</a>
+</div>

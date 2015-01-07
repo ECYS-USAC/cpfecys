@@ -4251,6 +4251,7 @@ def general_report_activities_export():
     t=[]
     t.append(T('Carnet'))
     posVCC=0
+    t.append(T('Name'))
     if request.vars['type'] == 'class':
         for category in CourseCategory:
             if category.category.category!="Laboratorio":
@@ -4286,6 +4287,13 @@ def general_report_activities_export():
         t=[]
         if request.vars['type'] == 'class':
             t.append(str(t1.carnet.carnet))
+            
+            try:
+                var_auth_user = db((db.auth_user.id==t1.carnet.id_auth_user)).select().first()
+                t.append(str(var_auth_user.first_name) + " " + str(var_auth_user.last_name))
+            except:
+                t.append("")
+            pass
             #Position in the vector of activities-
             posVCC=0
             #Vars to the control of grade of the student

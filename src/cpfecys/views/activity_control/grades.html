@@ -70,8 +70,6 @@
             alert("{{=T('Can not make operation because there is a pending request change. Please resolve it before proceeding.')}}");
           </script>
   {{else:}}
-    {{print "entroo:"+str(request.vars['carnet'])}}
-    {{print "entroo:"+str(request.vars['grade'])}}
     {{carnet_list = str(request.vars['carnet']).split(',')}}
     {{grade_list = str(request.vars['grade']).split(',')}}
     {{cont_temp = 0}}

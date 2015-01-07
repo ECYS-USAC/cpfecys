@@ -33,10 +33,18 @@
 	</tr>
 	<tr>
 		<td>
+			<label>{{=T('Answer is required')}}:</label>
+		</td>
+		<td>
+			<input tabindex="3" name="answer_obligate" type="checkbox" id="answer_obligate" checked>
+		</td>
+	</tr>
+	<tr>
+		<td>
 			<label>{{=T('Answer type')}}:</label>
 		</td>
 		<td>
-			<select tabindex="3" name="answer_type_select" id="answer_type_select" >
+			<select tabindex="4" name="answer_type_select" id="answer_type_select" >
 				{{for answer_type_temp in db(db.answer_type).select():}}
 					{{if str(answer_type_temp.id) == str(answer_type):}}
 						{{var_sel="selected='selected'"}}
@@ -64,10 +72,12 @@
 		var question_type_var = document.getElementById('question_type_select').value;
 		var answer_type_var = document.getElementById('answer_type_select').value;
 		var question_var = document.getElementById('question_input').value;
+		var answer_obligate = document.getElementById('answer_obligate').checked;
+		
 		if (question_var.length > 255){
 			alert("{{=T('The maximum number of characters to the question is 255')}}. \n{{=T('Number of characters that have the question')}}: "+question_var.length);
 		}else{
-			$("#div_add_question").load("{{=URL('evaluation','question_template.html')}}?template_id={{=template_id}}&amp;operation=add_question&amp;question_type="+question_type_var+"&amp;answer_type="+answer_type_var+"&amp;question="+encodeURIComponent(question_var));
+			$("#div_add_question").load("{{=URL('evaluation','question_template.html')}}?template_id={{=template_id}}&amp;operation=add_question&amp;question_type="+question_type_var+"&amp;answer_type="+answer_type_var+"&amp;answer_obligate="+answer_obligate+"&amp;question="+encodeURIComponent(question_var));
 		}
 		
 	}

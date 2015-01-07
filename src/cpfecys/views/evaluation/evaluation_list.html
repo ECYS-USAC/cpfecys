@@ -1,6 +1,61 @@
 {{extend 'template.html'}}
+{{from datetime import date}}
 <h1>
-    {{=T('Answer Administration')}}
+    {{=T('Performance Evaluations')}}
 </h1>
-<a onclick="window.history.back()" class="btn" ><i class="icon-arrow-left"></i>{{=T('Back')}}</a>
-{{=grid}}
+<div class="well">
+	<a onclick="window.history.back()" class="btn" ><i class="icon-arrow-left"></i>{{=T('Back')}}</a>
+	<br>
+	<table class="table table-striped table-bordered">
+		<tr>
+			<th>
+				{{=T('Evaluation')}}
+			</th>
+			<th>
+				{{=T('Evaluated')}}
+			</th>
+			<th>
+				{{=T('Action')}}
+			</th>
+		</tr>
+		{{for evaluation in evaluations:}}
+		
+		
+			{{if auth.has_membership(evaluation.repository_evaluation.user_type_evaluator):}}
+				{{if ((evaluation.date_start <= date.today() ) & (evaluation.date_finish >= date.today() )):}}
+					{{for user_p in users_project:}}						
+						{{if db( (db.auth_membership.user_id == user_p.assigned_user.id) & (db.auth_membership.group_id == evaluation.repository_evaluation.user_type_evaluated) ).select().first() is not None:}}
+							{{
+							print "uno:"+str(evaluation.repository_evaluation)
+							print "uno:"+str(user_p.assigned_user.id)
+							print "uno:"+str(period)
+							print "uno:"+str(project)
+							print "uno:"
+
+							evaluation_result = db((db.evaluation_result.repository_evaluation == evaluation.repository_evaluation) & (db.evaluation_result.evaluated == user_p.assigned_user.id) & (db.evaluation_result.period == period) & (db.evaluation_result.project == project) ).select().first()
+                             }}
+							{{if (evaluation_result is None) or (db((db.evaluation_auth_user.evaluation_result == evaluation_result.id) &(db.evaluation_auth_user.evaluator == auth.user.id) ).select().first() is None):}}
+
+								<tr>
+									<td>
+										{{=evaluation.repository_evaluation.name}}
+									</td>
+									<td>
+										{{=user_p.assigned_user.username}} -
+										{{=user_p.assigned_user.first_name}}
+										{{=user_p.assigned_user.last_name}}
+									</td>
+									<td>
+										<center>
+											<a href="{{=URL('evaluation', 'evaluation_reply', vars=dict(project = project, evaluation = evaluation.id, period = period, evaluated = user_p.assigned_user.id))}}"  class="btn" >{{=T('Go')}}</a>
+										</center>
+									</td>
+								</tr>
+							{{pass}}
+						{{pass}}
+					{{pass}}
+				{{pass}}
+			{{pass}}
+		{{pass}}
+	</table>
+</div>

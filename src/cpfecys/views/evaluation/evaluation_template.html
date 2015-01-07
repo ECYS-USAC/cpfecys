@@ -180,6 +180,14 @@
 						<h3>
 							{{=T('Create answer')}}
 						</h3>
+					<!--div class="alert" style="width:65%;">
+						<div align="left" >
+							{{=T('Notice')}}:
+							<i>
+							{{=T('The sum of the grades for each answer the same type must be 100')}}.
+							</i>
+						</div>
+					</div-->
 					{{=form_answer_create}}
 					</center>
 				</div>
@@ -313,7 +321,7 @@
 								<tr>
 							
 									<center>
-										<h3><small>{{=T('Add to history of evaluations')}}</small></h3>
+										<h3><small>{{=T('Add to evaluations repository')}}</small></h3>
 									</center>
 									<div class="well">
 										<div class="alert"  >
@@ -321,7 +329,7 @@
 										    <div align="left">
 										    	{{=T('Notice')}}:
 										    	<i>
-										    	{{=T('After adding the template in the history of assessments may continue editing the template, however, may not edit or delete the history of evaluation.')}}.
+										    	{{=T('After adding the template in the evaluations repository may continue editing the template, however, may not edit or delete the evaluation of the repository')}}.
 										    	</i>
 										  </div>
 										</div>
@@ -331,7 +339,7 @@
 												{{=T('Name')}}:
 												<input tabindex="4" id="hitory_name"  name="hitory_name"  type="text" style="width:220px;">
 												<br>
-												<input  tabindex="5" class="btn btn-warning" type="submit" title="{{=T('Add to history')}}" value="{{=T('Add to history')}}">
+												<input  tabindex="5" class="btn btn-warning" type="submit" title="{{=T('Add to repository')}}" value="{{=T('Add to repository')}}">
 											</center>
 										</form>
 									</div>

@@ -33,14 +33,20 @@
 											<tr>
 												<td width="10%">
 													<label>{{=T('Answer')}}:</label>
+													{{if (ev_te_de.obligatory is not None) and (ev_te_de.obligatory == True) :}}
+														({{=T('Obligatory')}})
+													{{else:}}
+														({{=T('Optional')}})	
+													{{pass}}
+													
 												</td>
 												<td>
-													{{answers_type = db(db.answer.answer_type == ev_te_de.evaluation_question.answer_type).select()}}
+													{{answers_type = db(db.answer.answer_type == ev_te_de.answer_type).select()}}
 													{{if len(answers_type) == 0:}}
 														<div class="alert"  >
 												            
 												            <div align="left">
-												            	{{=ev_te_de.evaluation_question.answer_type.name}}:
+												            	{{=ev_te_de.answer_type.name}}:
 												            	<i>
 												            	{{=T('This type has no associated responses will therefore be taken as an open answer')}}.
 												            	</i>
