@@ -799,7 +799,15 @@
                                 {{else:}}
                                     <tr>
                                         <td>{{=t1.carnet.carnet}}</td>
+                                        <td>
+                                            {{try:}}
+                                              {{var_auth_user = db((db.auth_user.id==t1.carnet.id_auth_user)).select().first()}}
 
+                                              {{=var_auth_user.first_name}} {{=var_auth_user.last_name}} 
+                                            {{except:}}
+                                              {{None}}
+                                            {{pass}}
+                                        </td>
                                         <!--Position in the vector of activities-->
                                         {{posVCC=0}}
                                         <!--Vars to the control of grade of the student-->
