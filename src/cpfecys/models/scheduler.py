@@ -161,9 +161,9 @@ def check_exception_semester_repeat():
     #compareDate = datetime.strptime( + '-'+cdate.month+'-'+cdate.day, "%Y-%m-%d")
     if cperiod.period == 1:
         #Period
-        initSemester = datetime.strptime(year + '-01-01', "%Y-%m-%d")
+        initSemester = datetime.datetime(cdate.year, 1, 1)
         #Time exception for the courses
-        extraTime = datetime.strptime(year + '-03-01', "%Y-%m-%d")
+        extraTime = datetime.datetime(cdate.year, 3, 1)
 
         if compareDate==initSemester:
             db(db.course_limit_exception.semester_repet==False).delete()
@@ -195,6 +195,76 @@ def check_exception_semester_repeat():
                         db(db.course_limit_exception.id==exception.id).update(date_finish=extraTime)
                     else:
                         db(db.course_limit_exception.id==exception.id).delete()	
+    db.commit()
+
+def automation_evaluations():
+    import datetime
+    import cpfecys
+    cperiod = cpfecys.current_year_period()
+    year = str(cperiod.yearp)
+    cdate = datetime.datetime.now()
+
+    #First Semester date start
+    initSemester = datetime.date(cdate.year, 1, 1)
+    #Second Semester date start
+    initSemester2 = datetime.date(cdate.year, 6, 1)
+
+    #First Semester
+    if cperiod.period == 1:
+    
+            
+        evaluations = db((db.evaluation.date_finish<initSemester)).select()
+        if evaluations.first() is not None:
+            for evaluation in evaluations:
+                if evaluation.semester_repeat==True:
+                    db(db.evaluation.id==evaluation.id).update(semester_repeat=False)
+                    
+                    if (evaluation.date_start.month == 12 or evaluation.date_start.month == 11):
+                        sum_month_1 = 5
+                    else:
+                        sum_month_1 = 6
+
+                    if evaluation.date_finish.month == 12:
+                        sum_month_2 = 5
+                    else:
+                        sum_month_2 = 6
+
+                                
+                    
+                    date_start_temp = evaluation.date_start + relativedelta.relativedelta(months=sum_month_1)
+                    date_finish_temp = evaluation.date_finish + relativedelta.relativedelta(months=sum_month_2)
+                    
+                    db.evaluation.insert(date_start=date_start_temp,
+                                            date_finish=date_finish_temp,
+                                            semester_repeat=True,                                                
+                                            description=evaluation.description,
+                                            repository_evaluation=evaluation.repository_evaluation)
+                    
+    #Second Semester
+    else:            
+        evaluations = db((db.evaluation.date_finish<initSemester2)).select()
+        if evaluations.first() is not None:
+            for evaluation in evaluations:
+                if evaluation.semester_repeat==True:
+                    db(db.evaluation.id==evaluation.id).update(semester_repeat=False)
+                    
+                    sum_month_1 = 6
+
+                    if evaluation.date_finish.month == 5:
+                        sum_month_2 = 7
+                    else:
+                        sum_month_2 = 6
+                    
+                    from dateutil import relativedelta
+                    
+                    date_start_temp = evaluation.date_start + relativedelta.relativedelta(months=sum_month_1)
+                    date_finish_temp = evaluation.date_finish + relativedelta.relativedelta(months=sum_month_2)
+                    
+                    db.evaluation.insert(date_start=evaluation.date_start + datetime.timedelta(date_start_temp),
+                                            date_finish=evaluation.date_finish + datetime.timedelta(date_finish_temp),
+                                            semester_repeat=True,                                                
+                                            description=evaluation.description,
+                                            repository_evaluation=evaluation.repository_evaluation)
     db.commit()
 
 def automation_activities_assigned():
@@ -448,6 +518,7 @@ def auto_daily():
     auto_freeze()
     check_exception_semester_repeat()
     automation_activities_assigned()
+    automation_evaluations()
     return T('Total Updated Reports: ') + str(total_recheckies + total_drafties + missed_reports) + ' ' + \
             T('Automatically Updated Draft Reports: ') + str(total_drafties) + ' ' + \
             T('Automatically Updated Recheck Reports: ') + str(total_recheckies) + ' ' + \
