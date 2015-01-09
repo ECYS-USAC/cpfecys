@@ -4,3 +4,12 @@
 </h1>
 <a onclick="window.history.back()" class="btn" ><i class="icon-arrow-left"></i>{{=T('Back')}}</a>
 {{=grid}}
+
+
+<script type="text/javascript">
+	$(document).ready(function(){
+		
+		$("#evaluation_date_start__row").append("<tr><td class=\"w2p_fw\"><div class=\"alert\"  ><div align=\"left\">{{=T('The date must be within the current semester')}}.</div></div></td>");
+		$("#evaluation_date_finish__row").append("<tr><td class=\"w2p_fw\"><div class=\"alert\"  ><div align=\"left\">{{=T('The date must be within the current semester')}}.</div></div></td>");
+	});
+</script>

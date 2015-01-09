@@ -2313,6 +2313,7 @@
 'Yearp': 'Año',
 'YES': 'Export full report',
 'Yes': 'Si',
+'The date must be within the current semester':'Debe ser una fecha dentro del semestre actual',
 'Qualification': 'Calificación',
 'All activities that the professor has not yet qualified.': 'Todas las actividades que el catedrático aún no ha calificado.',
 'All activities that the professor has described as failed.': 'Todas las actividades que el catedrático ha calificado como fallidas.',
