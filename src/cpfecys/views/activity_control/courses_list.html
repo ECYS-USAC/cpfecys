@@ -545,9 +545,10 @@
 										</a>
 									</center>
 								</td>
+								{{pass}}
 								<td width="20%"
 								{{if var_do==True:}}
-									data-step="{{step_count+=1}}{{=step_count}}" data-intro="Al seleccionar esta opción podrá visualizar las solicitudes de cambio de ponderación, actividades y notas."
+									data-step="{{step_count+=1}}{{=step_count}}" data-intro="Al seleccionar esta opción podrá realizar las evaluaciones 360 que esten activas."
 								{{pass}}
 								>
 									
@@ -560,7 +561,6 @@
 										</a>
 									</center>
 								</td>
-								{{pass}}
 							</tr>
 						</table>
 					</td>
@@ -694,6 +694,8 @@
 												</a>
 											</center>
 										</td>
+									</tr>
+									<tr>
 										<td width="20%"
 										{{if var_do==True:}}
 											data-step="{{step_count+=1}}{{=step_count}}" data-intro="Al seleccionar esta opción podrá gestionar los eventos en relación al curso que podrán ser visualizados por todos los usuarios del sistema."
@@ -705,6 +707,21 @@
 												</a><br>
 												<a  href="{{=URL('default', 'event_editor', vars=dict( assignation = assignation_var.id))}}">
 													{{=T('Manage events')}}
+												</a>
+											</center>
+										</td>
+										<td width="20%"
+										{{if var_do==True:}}
+											data-step="{{step_count+=1}}{{=step_count}}" data-intro="Al seleccionar esta opción podrá realizar las evaluaciones 360 que esten activas."
+										{{pass}}
+										>
+											
+											<center>
+												<a class="btn" href="{{=URL('evaluation', 'evaluation_list', vars=dict( project = course.user_project.project, period=periodo.id))}}" style="height:32px; width:32px;">
+													<img src="{{=URL('static','images')}}/academic_control/verification5.png" height="32" width="32">
+												</a><br>
+												<a  href="{{=URL('evaluation', 'evaluation_list', vars=dict(project = course.user_project.project, period=periodo.id))}}">
+													{{=T('Performance Evaluations')}} 360
 												</a>
 											</center>
 										</td>
@@ -830,6 +847,21 @@
 														</a><br>
 														<a  href="{{=URL('library', 'file_managers', vars=dict( pro = course.academic_course_assignation.assignation.id, semester = periodo.id, tipo = '5'))}}">
 															{{=T('Library')}}
+														</a>
+													</center>
+												</td>
+												<td width="20%"
+												{{if var_do==True:}}
+													data-step="{{step_count+=1}}{{=step_count}}" data-intro="Al seleccionar esta opción podrá realizar las evaluaciones 360 que esten activas."
+												{{pass}}
+												>
+													
+													<center>
+														<a class="btn" href="{{=URL('evaluation', 'evaluation_list', vars=dict( project = course.academic_course_assignation.assignation.id, period=periodo.id))}}" style="height:32px; width:32px;">
+															<img src="{{=URL('static','images')}}/academic_control/verification5.png" height="32" width="32">
+														</a><br>
+														<a  href="{{=URL('evaluation', 'evaluation_list', vars=dict(project = course.academic_course_assignation.assignation.id, period=periodo.id))}}">
+															{{=T('Performance Evaluations')}} 360
 														</a>
 													</center>
 												</td>

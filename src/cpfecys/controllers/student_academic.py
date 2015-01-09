@@ -1082,7 +1082,7 @@ def academic():
         _title=T('Edit academic information') ,**{"_data-toggle":"modal", "_data-target": "#picModal"})]   
         
         grid = SQLFORM.grid(
-        query, oncreate=oncreate_academic,links=links, onupdate=onupdate_academic, ondelete=ondelete_academic,  maxtextlength=100,csv=False)
+        query, oncreate=oncreate_academic,links=links, editable=False, onupdate=onupdate_academic, ondelete=ondelete_academic,  maxtextlength=100,csv=False)
     else:
         grid = SQLFORM.grid(
         query, oncreate=oncreate_academic, onupdate=onupdate_academic, ondelete=ondelete_academic,  maxtextlength=100,csv=False,editable=False,deletable=False,details=False)
