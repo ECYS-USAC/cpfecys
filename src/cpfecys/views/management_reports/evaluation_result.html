@@ -1,0 +1,532 @@
+{{extend 'template.html'}}
+<!-- Additional Scripts for MARKMIN -->
+<script src="http://code.jquery.com/jquery-migrate-1.2.1.js"></script>
+<script type="text/javascript" src="{{=URL('static','markitup')}}/jquery.markitup.pack.js"></script>
+<script type="text/javascript" src="{{=URL('static','markitup')}}/sets/markmin/set.js"></script>
+<script type="text/javascript" src="{{=URL('static','js')}}/highcharts/js/highcharts.js"></script>
+<script type="text/javascript" src="{{=URL('static','js')}}/highcharts/js/modules/data.js"></script>
+<script type="text/javascript" src="{{=URL('static','js')}}/highcharts/js/modules/exporting.js"></script>
+<link rel="stylesheet" type="text/css" href="{{=URL('static','markitup')}}/skins/markitup/style.css"/>
+<link rel="stylesheet" type="text/css" href="{{=URL('static','markitup')}}/sets/markmin/style.css"/>
+<!-- //Additional Scripts for MARKMIN -->
+<div class="row-fluid container" style="overflow:auto; width:100%;">
+
+    <!--REPORT CONTENTS-->
+    <div>
+    	<!--HEADER OF REPORT-->
+	    	{{if request.vars['level'] is not None and str(request.vars['level'])!="1":}}
+	    	<div class="pull-left noPrint">
+	    		<a style="white-space:nowrap; cursor:pointer; align:right;" class="btn" onclick="levelUP();">
+	    			<span class="icon-black icon-arrow-up"></span><b>{{=T('Level Up')}}</b>
+	    		</a>
+	    	</div>
+	    	{{pass}}
+	    	<div class="pull-right noPrint">
+	    		<a onclick="exportCSV();"><img src="{{=URL('static','images')}}/icono_CSV.png"></a>
+				<a class="btn yesgraph" onclick="noPrint();"><i class="icon-print"></i></a>
+	    	</div>
+	    	<center><h1>{{=T('Report Summary')}}</h1></center>
+    	<!--HEADER OF REPORT-->
+    {{if request.vars['level'] is None or str(request.vars['level'])=="1":}}
+    	<table class="table">
+    		<tr>
+    			<td>
+			    	<div class="span10">
+						<div class="span6">
+							<img class="pull-left" src="{{=URL('static','images')}}/escudo.png">
+							<center>
+								<strong>Universidad de San Carlos de Guatemala</strong><br/>
+								<strong>Facultad de Ingeniería</strong><br/>
+								<strong>Escuela de Ciencias y Sistemas</strong><br/><br/>
+							</center><br>
+			    			<strong>{{=T('Type')}}: </strong> {{=T('Evaluations Results')}}<br/>
+				    		<strong>{{=T('Description')}}: </strong> {{=T('Report of transactions on the notes of students')}}<br/>
+				    		<strong>{{=T('Period')}}: </strong>
+							<form class="form-inline" 
+							action="{{=URL('management_reports','evaluation_result')}}" 
+							method='get'>
+								<select name="period">
+								{{for period in db(db.period_year).select():}}
+									{{if str(period.id) == str(period_var.id):}}
+										{{var_sel="selected='selected'"}}
+									{{else:}}
+										{{var_sel=''}}
+									{{pass}}
+								  <option value="{{=period.id}}" {{=var_sel}}>
+								  {{=T(period.period.name)}}-{{=period.yearp}}
+								  </option>
+								{{pass}}
+								</select>
+								<input class="btn" type="submit" value="{{=T('Go')}}">
+							</form>
+						</div>
+					    
+				</td>
+    		</tr>
+    	</table>
+
+	    <div>
+	  		<center><h1>{{=T('Detail')}}</h1></center>
+	  		<hr>
+	  	</div>
+    	
+		<!--REPORT IN TABLE-->
+			
+			<table class="table table-striped table-bordered nograph">
+				<tr>
+					<th><center>{{=T('Evaluations')}}</center></th>
+					<th><center>{{=T('Rol')}}</center></th>
+					<th><center>{{=T('Approveds')}}</center></th>
+					<th><center>{{=T('Reprobates')}}</center></th>
+					<th><center>{{=T('Total')}}</center></th>
+				</tr>
+				{{for evaluation in infoLevel:}}
+				<tr>
+					<td>
+						<a class="noPrint" style="white-space:nowrap;" href="{{=URL('management_reports', 'evaluation_result',vars=dict(period=period_var.id, evaluation = evaluation[0], level='2', type_L = 'all'))}}">{{=str(evaluation[1])}}</a>
+						<a class="yesPrint" style="white-space:nowrap; display:none;">{{=str(evaluation[1])}}</a>
+					</td>
+					<td>
+						<center><a class="noPrint" style="white-space:nowrap;" href="{{=URL('management_reports', 'evaluation_result',vars=dict(period=period_var.id, evaluation = evaluation[0], level='2', type_L = 'all'))}}">{{=str(evaluation[2])}}</a>
+						<a class="yesPrint" style="white-space:nowrap; display:none;">{{=str(evaluation[2])}}</a></center>
+					</td>
+					<td>
+						<center><a class="badge badge-success noPrint" style="white-space:nowrap;" href="{{=URL('management_reports', 'evaluation_result',vars=dict(period=period_var.id, evaluation = evaluation[0], level='2', type_L = 'a'))}}">{{=str(evaluation[3])}}</a>
+						<a class="badge badge-success yesPrint" style="white-space:nowrap; display:none;">{{=str(evaluation[3])}}</a></center>
+					</td>
+					<td>
+						<center><a class="badge badge-important noPrint" style="white-space:nowrap;" href="{{=URL('management_reports', 'evaluation_result',vars=dict(period=period_var.id, evaluation = evaluation[0], level='2', type_L = 'r'))}}">{{=str(evaluation[4])}}</a>
+						<a class="badge badge-important yesPrint" style="white-space:nowrap; display:none;">{{=str(evaluation[4])}}</a></center>
+					</td>
+					<td>
+						<center><a class="badge badge-info noPrint" style="white-space:nowrap;" href="{{=URL('management_reports', 'evaluation_result',vars=dict(period=period_var.id, evaluation = evaluation[0], level='2', type_L = 'all'))}}">{{=str(evaluation[5])}}</a>
+						<a class="badge badge-info yesPrint" style="white-space:nowrap; display:none;">{{=str(evaluation[5])}}</a></center>
+					</td>
+				</tr>
+				{{pass}}
+			</table>
+		<!--REPORT IN TABLE-->
+
+
+
+		
+    {{elif str(request.vars['level'])=="2":}}
+    	<table class="table">
+    		<tr>
+    			<td>
+			    	<div class="span10">
+						<div class="span6">
+							<img class="pull-left" src="{{=URL('static','images')}}/escudo.png">
+				    		<center>
+								<strong>Universidad de San Carlos de Guatemala</strong><br/>
+								<strong>Facultad de Ingeniería</strong><br/>
+								<strong>Escuela de Ciencias y Sistemas</strong><br/><br/>
+							</center>
+				    		<strong>{{=T('Type')}}: </strong> {{=T('Evaluations Results')}}<br/>
+				    		<strong>{{=T('Description')}}: </strong> {{=T('Report of transactions on the notes of students')}}<br/>
+				    		<strong>{{=T('Period')}}: </strong>{{=T(period_var.period.name)}} {{=period_var.yearp}}<br/>
+				    		<strong>{{=T('Evaluation')}}: </strong>{{=db((db.repository_evaluation.id==str(request.vars['evaluation']))).select().first().name}}
+				    		<br/>
+						</div>
+
+					    
+			    	</div>
+				</td>
+    		</tr>
+    	</table>	
+
+    	<div>
+	  		<center><h1>{{=T('Detail')}}</h1></center>
+	  		<hr>
+	  	</div>
+
+	  	<!--REPORT IN TABLE-->
+			
+			<table class="table table-striped table-bordered nograph">
+				<tr>
+					
+					<th><center>{{=T('Project')}}</center></th>
+					{{if (str(request.vars['type_L']) == "all") or (str(request.vars['type_L']) == "a"):}}
+						<th><center>{{=T('Approveds')}}</center></th>
+					{{pass}}
+					{{if (str(request.vars['type_L']) == "all") or (str(request.vars['type_L']) == "r"):}}
+						<th><center>{{=T('Reprobates')}}</center></th>
+					{{pass}}
+					{{if (str(request.vars['type_L']) == "all") :}}
+						<th><center>{{=T('Total')}}</center></th>
+					{{pass}}
+				</tr>
+				{{for evaluation in infoLevel:}}
+				<tr>
+					<td>
+						<a class="noPrint" style="white-space:nowrap;" href="{{=URL('management_reports', 'evaluation_result',vars=dict(period=period_var.id, evaluation = str(request.vars['evaluation']), project = evaluation[0], level='3', type_L = str(request.vars['type_L']), type_U = 'all'))}}">{{=str(evaluation[1])}}</a>
+						<a class="yesPrint" style="white-space:nowrap; display:none;">{{=str(evaluation[1])}}</a>
+					</td>
+					{{if (str(request.vars['type_L']) == "all") or (str(request.vars['type_L']) == "a"):}}
+					<td>
+						<center><a class="badge badge-success noPrint" style="white-space:nowrap;" href="{{=URL('management_reports', 'evaluation_result',vars=dict(period=period_var.id, evaluation = str(request.vars['evaluation']), project = evaluation[0], level='3', type_L = str(request.vars['type_L']), type_U = 'a'))}}">{{=str(evaluation[2])}}</a>
+						<a class="badge badge-success yesPrint" style="white-space:nowrap; display:none;">{{=str(evaluation[2])}}</a></center>
+					</td>
+					{{pass}}
+					{{if (str(request.vars['type_L']) == "all") or (str(request.vars['type_L']) == "r"):}}
+					<td>
+						<center><a class="badge badge-important noPrint" style="white-space:nowrap;" href="{{=URL('management_reports', 'evaluation_result',vars=dict(period=period_var.id, evaluation = str(request.vars['evaluation']), project = evaluation[0], level='3', type_L = str(request.vars['type_L']), type_U = 'r'))}}">{{=str(evaluation[3])}}</a>
+						<a class="badge badge-important yesPrint" style="white-space:nowrap; display:none;">{{=str(evaluation[3])}}</a></center>
+					</td>
+					{{pass}}
+					{{if (str(request.vars['type_L']) == "all") :}}
+					<td>
+						<center><a class="badge badge-info noPrint" style="white-space:nowrap;" href="{{=URL('management_reports', 'evaluation_result',vars=dict(period=period_var.id, evaluation = str(request.vars['evaluation']), project = evaluation[0], level='3', type_L = str(request.vars['type_L']), type_U = 'all'))}}">{{=str(evaluation[2]+evaluation[3])}}</a>
+						<a class="badge badge-info yesPrint" style="white-space:nowrap; display:none;">{{=str(evaluation[2]+evaluation[3])}}</a></center>
+					</td>
+					{{pass}}
+				</tr>
+				{{pass}}
+			</table>
+		<!--REPORT IN TABLE-->
+
+
+	  	
+
+	{{elif str(request.vars['level'])=="3":}}
+    	<table class="table">
+    		<tr>
+    			<td>
+			    	<div class="span10">
+						<div class="span6">
+							<img class="pull-left" src="{{=URL('static','images')}}/escudo.png">
+				    		<center>
+								<strong>Universidad de San Carlos de Guatemala</strong><br/>
+								<strong>Facultad de Ingeniería</strong><br/>
+								<strong>Escuela de Ciencias y Sistemas</strong><br/><br/>
+							</center>
+				    		<strong>{{=T('Type')}}: </strong> {{=T('Evaluations Results')}}<br/>
+				    		<strong>{{=T('Description')}}: </strong> {{=T('Report of transactions on the notes of students')}}<br/>
+				    		<strong>{{=T('Period')}}: </strong>{{=T(period_var.period.name)}} {{=period_var.yearp}}<br/>
+				    		<strong>{{=T('Evaluation')}}: </strong>{{=db((db.repository_evaluation.id==str(request.vars['evaluation']))).select().first().name}}<br/>
+				    		<strong>{{=T('Project')}}: </strong>{{=db((db.project.id==str(request.vars['project']))).select().first().name}}
+				    		<br/>
+						</div>
+
+					    
+			    	</div>
+				</td>
+    		</tr>
+    	</table>	
+
+    	<div>
+	  		<center><h1>{{=T('Detail')}}</h1></center>
+	  		<hr>
+	  	</div>
+
+	  	<!--REPORT IN TABLE-->
+	  	<div class="pull-right noPrint">
+			
+		</div>
+		<table class="table table-striped table-bordered nograph">
+			<tr>
+				<th><center>{{=T('User name')}}</center></th>
+				<th><center>{{=T('Name')}}</center></th>
+				<th><center>{{=T('Evaluation Result')}}</center></th>
+			</tr>
+			{{for user in infoLevel:}}
+			<tr>
+				<td>
+					<a class="noPrint" style="white-space:nowrap;" href="{{=URL('management_reports', 'evaluation_result',vars=dict(period = str(request.vars['period']), project = str(request.vars['project']),  evaluation = str(request.vars['evaluation']), user= user[0], level='4', type_L = str(request.vars['type_L']), type_U = str(request.vars['type_U'])))}}">
+						{{=user[1]}}
+					</a>
+					<a class="yesPrint" style="white-space:nowrap; display:none">
+						{{=user[1]}}
+					</a>
+				</td>
+				
+				<td>
+					<a class="noPrint" style="white-space:nowrap;" href="{{=URL('management_reports', 'evaluation_result',vars=dict(period = str(request.vars['period']), project = str(request.vars['project']), evaluation = str(request.vars['evaluation']), user= user[0], level='4', type_L = str(request.vars['type_L']), type_U = str(request.vars['type_U']) ) )}}">
+						{{=user[2]}}
+					</a>
+					<a class="yesPrint" style="white-space:nowrap; display:none">
+						{{=user[2]}}
+					</a></center>
+				</td>
+				<td>
+					<center><a 
+						{{if user[3]<61:}}
+							class="badge badge-important noPrint" 
+						{{else:}}
+							class="badge badge-success noPrint" 
+						{{pass}}
+						style="white-space:nowrap;" href="{{=URL('management_reports', 'evaluation_result',vars=dict(period = str(request.vars['period']), project = str(request.vars['project']), evaluation = str(request.vars['evaluation']), user= user[0], level='4', type_U = str(request.vars['type_U']), type_L = str(request.vars['type_L'])))}}">
+						{{=user[3]}}
+					</a>
+					<a {{if user[3]<61:}}
+							class="badge badge-important yesPrint" 
+						{{else:}}
+							class="badge badge-success yesPrint" 
+						{{pass}} style="white-space:nowrap; display:none">
+						{{=user[3]}}
+					</a></center>
+				</td>
+				
+			</tr>
+			{{pass}}
+		</table>
+	  	<!--REPORT IN TABLE-->
+
+	  	
+    {{elif str(request.vars['level'])=="4":}}
+    	<table class="table">
+    		<tr>
+    			<td>
+			    	<div class="span10">
+						<div class="span6">
+							<img class="pull-left" src="{{=URL('static','images')}}/escudo.png">
+				    		<center>
+								<strong>Universidad de San Carlos de Guatemala</strong><br/>
+								<strong>Facultad de Ingeniería</strong><br/>
+								<strong>Escuela de Ciencias y Sistemas</strong><br/><br/>
+							</center>
+				    		<strong>{{=T('Type')}}: </strong> {{=T('Evaluations Results')}}<br/>
+				    		<strong>{{=T('Description')}}: </strong> {{=T('Report of transactions on the notes of students')}}<br/>
+				    		<strong>{{=T('Period')}}: </strong>{{=T(period_var.period.name)}} {{=period_var.yearp}}<br/>
+				    		<strong>{{=T('Evaluation')}}: </strong>{{=db((db.repository_evaluation.id==str(request.vars['evaluation']))).select().first().name}}<br/>
+				    		<strong>{{=T('Project')}}: </strong>{{=db((db.project.id==str(request.vars['project']))).select().first().name}}<br/>
+				    		<strong>{{=T('User')}}: </strong> {{=db((db.auth_user.id==str(request.vars['user']))).select().first().username}}<br/>
+				    		
+						</div>
+					    
+			    	</div>
+				</td>
+    		</tr>
+    	</table>
+
+    	<div>
+	  		<center><h1>{{=T('Detail')}}</h1></center>
+	  		<hr>
+	  	</div>
+
+	  	<!--REPORT IN TABLE-->
+	  	<div class="pull-right noPrint">
+			
+		</div>
+		<table class="table table-striped table-bordered nograph">
+			<tr>
+				<th><center>{{=T('Category')}}</center></th>
+				<th><center>{{=T('Result')}}</center></th>
+			</tr>
+
+			{{for category in infoLevel:}}
+			<tr>
+				<td>
+					<a class="noPrint" style="white-space:nowrap;" href="{{=URL('management_reports', 'evaluation_result',vars=dict(period = str(request.vars['period']), project = str(request.vars['project']), user = str(request.vars['user']), category=category[0], evaluation = str(request.vars['evaluation']), level='5', type_L = str(request.vars['type_L']), type_U = str(request.vars['type_U']) ) )}}">
+						{{=category[0]}}
+					</a>
+					<a class="yesPrint" style="white-space:nowrap; display:none">
+						{{=category[0]}}
+					</a>
+				</td>
+				
+				<td>
+					<center><a {{if category[2]<61:}}
+							class="badge badge-important noPrint" 
+						{{else:}}
+							class="badge badge-success noPrint" 
+						{{pass}} style="white-space:nowrap;" href="{{=URL('management_reports', 'evaluation_result',vars=dict(period = str(request.vars['period']), project = str(request.vars['project']), user = str(request.vars['user']), category=category[0], evaluation = str(request.vars['evaluation']), level='5', type_L = str(request.vars['type_L']), type_U = str(request.vars['type_U']) ))}}">
+						{{=category[2]}}
+					</a>
+					<a {{if category[2]<61:}}
+							class="badge badge-important yesPrint" 
+						{{else:}}
+							class="badge badge-success yesPrint" 
+						{{pass}} style="white-space:nowrap; display:none">
+						{{=category[2]}}
+					</a></center>
+				</td>
+				
+				
+			</tr>
+			{{pass}}
+		</table>
+		<!--REPORT IN TABLE-->
+
+    	
+    	
+	
+	{{elif str(request.vars['level'])=="5":}}
+		<table class="table">
+    		<tr>
+    			<td>
+			    	<div class="span10">
+						<div class="span6">
+							<img class="pull-left" src="{{=URL('static','images')}}/escudo.png">
+				    		<center>
+								<strong>Universidad de San Carlos de Guatemala</strong><br/>
+								<strong>Facultad de Ingeniería</strong><br/>
+								<strong>Escuela de Ciencias y Sistemas</strong><br/><br/>
+							</center>
+				    		<strong>{{=T('Type')}}: </strong> {{=T('Evaluations Results')}}<br/>
+				    		<strong>{{=T('Description')}}: </strong> {{=T('Report of transactions on the notes of students')}}<br/>
+				    		<strong>{{=T('Period')}}: </strong>{{=T(period_var.period.name)}} {{=period_var.yearp}}<br/>
+				    		<strong>{{=T('Evaluation')}}: </strong>{{=db((db.repository_evaluation.id==str(request.vars['evaluation']))).select().first().name}}<br/>
+				    		<strong>{{=T('Project')}}: </strong>{{=db((db.project.id==str(request.vars['project']))).select().first().name}}<br/>
+				    		<strong>{{=T('User')}}: </strong> {{=db((db.auth_user.id==str(request.vars['user']))).select().first().username}}<br/>
+				    		<strong>{{=T('Category')}}: </strong> {{=request.vars['category']}}<br/>
+				    		
+						</div>
+					    
+			    	</div>
+				</td>
+    		</tr>
+    	</table>
+
+    	<div>
+	  		<center><h1>{{=T('Detail')}}</h1></center>
+	  		<hr>
+	  	</div>
+
+	  	<!--REPORT IN TABLE-->
+	  	<div class="pull-right noPrint">
+			
+		</div>
+		<table class="table table-striped table-bordered nograph">
+			<tr>
+				<th><center>{{=T('Question')}}</center></th>
+				<th><center>{{=T('Result')}}</center></th>
+			</tr>
+
+			{{for category in infoLevel:}}
+			<tr>
+				<td>
+					<a class="noPrint" style="white-space:nowrap;" href="{{=URL('management_reports', 'evaluation_result',vars=dict(period = str(request.vars['period']), project = str(request.vars['project']), user = str(request.vars['user']), category=category[0], evaluation = str(request.vars['evaluation']), level='5', type_L = str(request.vars['type_L']), type_U = str(request.vars['type_U']) ) )}}">
+						{{=category[0]}}
+					</a>
+					<a class="yesPrint" style="white-space:nowrap; display:none">
+						{{=category[0]}}
+					</a>
+				</td>
+				
+				<td>
+					<center><a {{if category[2]<61:}}
+							class="badge badge-important noPrint" 
+						{{else:}}
+							class="badge badge-success noPrint" 
+						{{pass}} style="white-space:nowrap;" href="{{=URL('management_reports', 'evaluation_result',vars=dict(period = str(request.vars['period']), project = str(request.vars['project']), user = str(request.vars['user']), category=category[0], evaluation = str(request.vars['evaluation']), level='5', type_L = str(request.vars['type_L']), type_U = str(request.vars['type_U']) ))}}">
+						{{=category[2]}}
+					</a>
+					<a {{if category[2]<61:}}
+							class="badge badge-important yesPrint" 
+						{{else:}}
+							class="badge badge-success yesPrint" 
+						{{pass}} style="white-space:nowrap; display:none">
+						{{=category[2]}}
+					</a></center>
+				</td>
+				
+				
+			</tr>
+			{{pass}}
+		</table>
+		<!--REPORT IN TABLE-->
+    {{pass}}
+	</div>
+    <!--REPORT CONTENTS-->
+</div>
+
+<script type="text/javascript">
+	$(document).ready(function(){
+		//HOME --- Buttons for execution or cancellation search
+		$("#buildSearch").click(function(){
+			$("#div_search").slideDown();
+		});
+
+		$("#cancelSearch").click(function(){
+			{{if request.vars['level'] is None or str(request.vars['level'])=="1":}}
+				window.location.href = "{{=URL('management_reports', 'grades_management')}}";
+			{{elif str(request.vars['level'])=="2":}}
+				window.location.href = "{{=URL(vars=dict(level = 2, period = request.vars['period'], type_L=request.vars['type_L']))}}";
+			{{elif str(request.vars['level'])=="3":}}
+				window.location.href = "{{=URL(vars=dict(level = 3, period = request.vars['period'], month = str(request.vars['month']), type_L=request.vars['type_L'], type_U=request.vars['type_U']))}}";
+			{{elif str(request.vars['level'])=="4":}}
+				window.location.href = "{{=URL(vars=dict(level = 4, period = request.vars['period'], month = str(request.vars['month']), project = str(request.vars['project']), type_L=request.vars['type_L'], type_U=request.vars['type_U']))}}";
+			{{elif str(request.vars['level'])=="5":}}
+				window.location.href = "{{=URL(vars=dict(level = 5, period = request.vars['period'], month = str(request.vars['month']), project = str(request.vars['project']), roll = str(request.vars['roll']), type_L=request.vars['type_L'], type_U=request.vars['type_U']))}}";
+			{{elif str(request.vars['level'])=="6":}}
+				window.location.href = "{{=URL(vars=dict(level = 6, period = request.vars['period'], month = str(request.vars['month']), project = str(request.vars['project']), roll = str(request.vars['roll']), userP = str(request.vars['userP']), type_L=request.vars['type_L'], type_U=request.vars['type_U']))}}";
+			{{pass}}
+		});
+	
+		{{if str(request.vars['level'])=="6":}}
+			$(".web2py_breadcrumbs").css("display", "none");
+		{{pass}}
+
+		$(".yesgraph").hide();
+		//END --- Buttons for execution or cancellation search
+
+		
+		
+	
+		//END --- Buttons for query construction
+	});
+
+	function noPrint(){
+		$(".noPrint").hide();
+		$(".yesPrint").show();
+		window.print();
+		$(".yesPrint").hide();
+		$(".noPrint").show();
+	}
+
+	function showGraph(id){
+		if(id==1){
+			$(".yesgraph").show();
+			$(".nograph").hide();
+			$(window).resize();
+		}else{
+			$(".yesgraph").hide();
+			$(".nograph").show();
+		}
+	}
+
+	function showAllGraph(id){
+		if(id==1){
+			$("#idVisible").hide();
+			$(".noVisible").show();
+		}else{
+			$(".noVisible").hide();
+			$("#idVisible").show();
+		}
+	}
+
+	//INIT LEVEL UP REPORT
+	{{if request.vars['level'] is not None and str(request.vars['level'])!="1":}}
+		function levelUP(){
+			{{if str(request.vars['level'])=="2":}}
+				window.location.href = "{{=URL('management_reports', 'evaluation_result',vars=dict(period=period_var.id))}}";
+			{{elif str(request.vars['level'])=="3":}}
+				window.location.href = "{{=URL('management_reports', 'evaluation_result',vars=dict(level='2',period = str(request.vars['period']), type_L = str(request.vars['type_L']), evaluation =  str(request.vars['evaluation']) ))}}";
+			{{elif str(request.vars['level'])=="4":}}
+				window.location.href = "{{=URL('management_reports', 'evaluation_result',vars=dict(level='3',period = str(request.vars['period']), type_L = str(request.vars['type_L']), type_U = str(request.vars['type_U']), evaluation =  str(request.vars['evaluation']), project =  str(request.vars['project']) ))}}";
+			{{elif str(request.vars['level'])=="5":}}
+				window.location.href = "{{=URL('management_reports', 'evaluation_result',vars=dict(level='4',period = str(request.vars['period']), type_L = str(request.vars['type_L']), type_U = str(request.vars['type_U']), user =  str(request.vars['user']), evaluation =  str(request.vars['evaluation']), project =  str(request.vars['project']) ))}}";
+			{{pass}}
+		}
+	{{pass}}
+	//END LEVEL UP REPORT
+
+	//INIT EXPORT REPORT TO CSV FILE
+	function exportCSV(){
+		{{if request.vars['level'] is None or str(request.vars['level'])=="1":}}
+			window.location.href = "{{=URL('management_reports','grades_management_export', vars=dict(list_type='csv', level='1'))}}";
+		{{elif str(request.vars['level'])=="2":}}
+			window.location.href = "{{=URL('management_reports','grades_management_export', vars=dict(list_type='csv', level='2',period = str(request.vars['period']), type_L = str(request.vars['type_L'])))}}";
+		{{elif str(request.vars['level'])=="3":}}
+			window.location.href = "{{=URL('management_reports','grades_management_export', vars=dict(list_type='csv', level='3',period = str(request.vars['period']), month = str(request.vars['month']), type_L = str(request.vars['type_L']), type_U = str(request.vars['type_U'])))}}";
+		{{elif str(request.vars['level'])=="4":}}
+			window.location.href = "{{=URL('management_reports','grades_management_export', vars=dict(list_type='csv', level='4',period = str(request.vars['period']), month = str(request.vars['month']), project = str(request.vars['project']), type_L = str(request.vars['type_L']), type_U = str(request.vars['type_U'])))}}";
+		{{elif str(request.vars['level'])=="5":}}
+			window.location.href = "{{=URL('management_reports','grades_management_export', vars=dict(list_type='csv', level='5',period = str(request.vars['period']), month = str(request.vars['month']), project = str(request.vars['project']), roll = str(request.vars['roll']), type_L = str(request.vars['type_L']), type_U = str(request.vars['type_U'])))}}";
+		{{elif str(request.vars['level'])=="6":}}
+			window.location.href = "{{=URL('management_reports','grades_management_export', vars=dict(list_type='csv', level='6',period = str(request.vars['period']), month = str(request.vars['month']), project = str(request.vars['project']), roll = str(request.vars['roll']), userP = str(request.vars['userP']), type_L = str(request.vars['type_L']), type_U = str(request.vars['type_U'])))}}";
+		{{pass}}
+	}
+	//END EXPORT REPORT TO CSV FILE
+</script>

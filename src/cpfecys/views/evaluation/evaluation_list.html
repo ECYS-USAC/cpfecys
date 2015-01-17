@@ -26,12 +26,7 @@
 					{{for user_p in users_project:}}						
 						{{if db( (db.auth_membership.user_id == user_p.assigned_user.id) & (db.auth_membership.group_id == evaluation.repository_evaluation.user_type_evaluated) ).select().first() is not None:}}
 							{{
-							print "uno:"+str(evaluation.repository_evaluation)
-							print "uno:"+str(user_p.assigned_user.id)
-							print "uno:"+str(period)
-							print "uno:"+str(project)
-							print "uno:"
-
+							
 							evaluation_result = db((db.evaluation_result.repository_evaluation == evaluation.repository_evaluation) & (db.evaluation_result.evaluated == user_p.assigned_user.id) & (db.evaluation_result.period == period) & (db.evaluation_result.project == project) ).select().first()
                              }}
 							{{if (evaluation_result is None) or (db((db.evaluation_auth_user.evaluation_result == evaluation_result.id) &(db.evaluation_auth_user.evaluator == auth.user.id) ).select().first() is None):}}
