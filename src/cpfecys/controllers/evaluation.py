@@ -74,59 +74,60 @@ def question_type():
 @auth.requires_login()
 @auth.requires(auth.has_membership('Student') or auth.has_membership('Teacher') or auth.has_membership('Academic'))
 def evaluation_reply():
-    try:
-        project = request.vars['project']
-        period = request.vars['period']
-        evaluation = request.vars['evaluation']
-        evaluated = request.vars['evaluated']
 
-        if db((db.auth_user.id==auth.user.id) & (db.user_project.project==project) & (db.user_project.period == period) & \
-            ((db.user_project.period <= period) & ((db.user_project.period + db.user_project.periods) > period))).select().first() is None:
-            session.flash  =T('Not authorized')
-            redirect(URL('default','index'))
+    project = request.vars['project']
+    period = request.vars['period']
+    evaluation = request.vars['evaluation']
+    evaluated = request.vars['evaluated']
 
-        evaluated = db((db.auth_user.id==evaluated) & (db.user_project.project==project) & (db.user_project.period == period) & \
-            ((db.user_project.period <= period) & ((db.user_project.period + db.user_project.periods) > period))).select().first() 
-        if evaluated is None:
-            session.flash  =T('Not authorized')
-            redirect(URL('default','index'))
+    if db((db.auth_user.id==auth.user.id) & (db.user_project.project==project) & (db.user_project.period == period) & \
+        ((db.user_project.period <= period) & ((db.user_project.period + db.user_project.periods) > period))).select().first() is None:
+        session.flash  =T('Not authorized')
+        redirect(URL('default','index'))
 
-        var_evaluation = db(db.evaluation.id == evaluation).select().first()
-        var_repository_evaluation = db(db.repository_evaluation.id == var_evaluation.repository_evaluation).select().first()
-        question_category = db(db.question_repository.repository_evaluation == var_evaluation.repository_evaluation).select(db.question_repository.question_type_name,distinct=True) 
+    evaluated = db((db.auth_user.id==evaluated) & (db.user_project.project==project) & (db.user_project.period == period) & \
+        ((db.user_project.period <= period) & ((db.user_project.period + db.user_project.periods) > period))).select().first() 
+    if evaluated is None:
+        session.flash  =T('Not authorized')
+        redirect(URL('default','index'))
+
+    var_evaluation = db(db.evaluation.id == evaluation).select().first()
+    var_repository_evaluation = db(db.repository_evaluation.id == var_evaluation.repository_evaluation).select().first()
+    question_category = db(db.question_repository.repository_evaluation == var_evaluation.repository_evaluation).select(db.question_repository.question_type_name,distinct=True) 
+    
+    if (request.args(0) == 'send'):
+        evaluation_result = db((db.evaluation_result.repository_evaluation == var_evaluation.repository_evaluation) &\
+                                (db.evaluation_result.evaluated == evaluated.auth_user.id) & \
+                                (db.evaluation_result.period == period) & \
+                                (db.evaluation_result.project == project) ).select().first()
         
-        if (request.args(0) == 'send'):
-            evaluation_result = db((db.evaluation_result.repository_evaluation == var_evaluation.repository_evaluation) &\
-                                    (db.evaluation_result.evaluated == evaluated.auth_user.id) & \
-                                    (db.evaluation_result.period == period) & \
-                                    (db.evaluation_result.project == project) ).select().first()
-            
-            if evaluation_result is None:
-                evaluation_result_id = db.evaluation_result.insert(repository_evaluation = var_evaluation.repository_evaluation,
-                                            evaluated = evaluated.auth_user.id,
-                                            period = period,
-                                            project = project)
+        if evaluation_result is None:
+            evaluation_result_id = db.evaluation_result.insert(repository_evaluation = var_evaluation.repository_evaluation,
+                                        evaluated = evaluated.auth_user.id,
+                                        period = period,
+                                        project = project)
+        else:
+            evaluation_result_id = evaluation_result.id
+
+        evaluation_auth_user = db((db.evaluation_auth_user.evaluation_result == evaluation_result_id) &\
+                                (db.evaluation_auth_user.evaluator == auth.user.id) ).select().first()
+        if evaluation_auth_user is None:
+            db.evaluation_auth_user.insert(evaluation_result = evaluation_result_id,
+                                        evaluator = auth.user.id)
+
+        question_query = db((db.question_repository.repository_evaluation == var_evaluation.repository_evaluation)).select()
+        for question in question_query:
+            answer_query = db((db.repository_answer.question_repository == question.id) ).select()
+            if len(answer_query) == 0:
+                if (request.vars['group_'+str(question.id)] is not None) & (request.vars['group_'+str(question.id)] != ""):
+                    db.evaluation_solve_text.insert(evaluation_result = evaluation_result_id,
+                                                question_repository = question.id,
+                                                answer = request.vars['group_'+str(question.id)])
             else:
-                evaluation_result_id = evaluation_result.id
-
-            evaluation_auth_user = db((db.evaluation_auth_user.evaluation_result == evaluation_result_id) &\
-                                    (db.evaluation_auth_user.evaluator == auth.user.id) ).select().first()
-            if evaluation_auth_user is None:
-                db.evaluation_auth_user.insert(evaluation_result = evaluation_result_id,
-                                            evaluator = auth.user.id)
-
-            question_query = db((db.question_repository.repository_evaluation == var_evaluation.repository_evaluation)).select()
-            for question in question_query:
-                answer_query = db((db.repository_answer.question_repository == question.id) ).select()
-                if len(answer_query) == 0:
-                    if (request.vars['group_'+str(question.id)] is not None) & (request.vars['group_'+str(question.id)] != ""):
-                        db.evaluation_solve_text.insert(evaluation_result = evaluation_result_id,
-                                                    question_repository = question.id,
-                                                    answer = request.vars['group_'+str(question.id)])
-                else:
-                    for answer in answer_query:
-                        if answer.exclusive_one_answer ==  True:
-                            if request.vars['group_'+str(question.id)] is not None:
+                for answer in answer_query:
+                    if answer.exclusive_one_answer ==  True:
+                        if request.vars['group_'+str(question.id)] is not None:
+                            if str(request.vars['group_'+str(question.id)]) == str(answer.id):
                                 evaluation_solve_detail = db((db.evaluation_solve_detail.evaluation_result == evaluation_result_id) &\
                                     (db.evaluation_solve_detail.question_repository == question.id) & \
                                     (db.evaluation_solve_detail.repository_answer == answer.id)).select().first()
@@ -138,15 +139,15 @@ def evaluation_reply():
                                 else:
                                     db(db.evaluation_solve_detail.id == evaluation_solve_detail.id).update(total_count = (evaluation_solve_detail.total_count + 1) )
 
-            response.flash = str(request.vars)
+        
+        session.flash = T('The evaluation has been sent')            
+        redirect(URL('evaluation','evaluation_list', vars=dict(period=period,project=project) ))
 
-        return dict(var_evaluation = var_evaluation,
-                    var_repository_evaluation = var_repository_evaluation,
-                    question_category = question_category,
-                    evaluated = evaluated)
-    except:
-        session.flash  =T('Not authorized')
-        redirect(URL('default','index'))
+    return dict(var_evaluation = var_evaluation,
+                var_repository_evaluation = var_repository_evaluation,
+                question_category = question_category,
+                evaluated = evaluated)
+    
 
 @auth.requires_login()
 @auth.requires(auth.has_membership('Student') or auth.has_membership('Teacher') or auth.has_membership('Academic'))
