@@ -15,15 +15,17 @@
     	<div class="navbar-inner">
 	    	<div>
 	    		{{if request.vars['level'] is None or str(request.vars['level'])=="1":}}
-					<form action="{{=URL('management_reports', 'student_management/search')}}" method="post">
+					<form action="{{=URL('management_reports', 'student_assignment_management/search')}}" method="post">
 				{{elif str(request.vars['level'])=="2":}}
-					<form action="{{=URL('management_reports', 'student_management/search', vars=dict(level = 2, period = request.vars['period'], type_L=request.vars['type_L']))}}" method="post">
+					<form action="{{=URL('management_reports', 'student_assignment_management/search', vars=dict(level = 2, period = request.vars['period'], type_L=request.vars['type_L']))}}" method="post">
 				{{elif str(request.vars['level'])=="3":}}
-					<form action="{{=URL('management_reports', 'student_management/search', vars=dict(level = 3, period = request.vars['period'], month = str(request.vars['month']), type_L=request.vars['type_L'], type_U=request.vars['type_U']))}}" method="post">
+					<form action="{{=URL('management_reports', 'student_assignment_management/search', vars=dict(level = 3, period = request.vars['period'], month = str(request.vars['month']), type_L=request.vars['type_L'], type_U=request.vars['type_U']))}}" method="post">
 				{{elif str(request.vars['level'])=="4":}}
-					<form action="{{=URL('management_reports', 'student_management/search', vars=dict(level = 4, period = request.vars['period'], month = str(request.vars['month']), roll = str(request.vars['roll']), type_L=request.vars['type_L'], type_U=request.vars['type_U']))}}" method="post">
+					<form action="{{=URL('management_reports', 'student_assignment_management/search', vars=dict(level = 4, period = request.vars['period'], month = str(request.vars['month']), project = str(request.vars['project']), type_L=request.vars['type_L'], type_U=request.vars['type_U']))}}" method="post">
 				{{elif str(request.vars['level'])=="5":}}
-					<form action="{{=URL('management_reports', 'student_management/search', vars=dict(level = 5, period = request.vars['period'], month = str(request.vars['month']), roll = str(request.vars['roll']), userP = str(request.vars['userP']), type_L=request.vars['type_L'], type_U=request.vars['type_U']))}}" method="post">
+					<form action="{{=URL('management_reports', 'student_assignment_management/search', vars=dict(level = 5, period = request.vars['period'], month = str(request.vars['month']), project = str(request.vars['project']), roll = str(request.vars['roll']), type_L=request.vars['type_L'], type_U=request.vars['type_U']))}}" method="post">
+				{{elif str(request.vars['level'])=="6":}}
+					<form action="{{=URL('management_reports', 'student_assignment_management/search', vars=dict(level = 6, period = request.vars['period'], month = str(request.vars['month']), project = str(request.vars['project']), roll = str(request.vars['roll']), userP = str(request.vars['userP']), type_L=request.vars['type_L'], type_U=request.vars['type_U']))}}" method="post">
 				{{pass}}
 					<input type="text" id="querySearch" name="querySearch" value="{{=personal_query}}" readonly="readonly"/>
 					<a id="buildSearch" class="btn">{{=T('Build Search')}}</a>
@@ -37,7 +39,7 @@
 						<td>
 							<select class="generic-widget" id="fieldSearch">
 							{{for field in fsearch:}}
-								<option value="academic_log.{{=str(field[0])}}">{{=str(field[1])}}</option>
+								<option value="academic_course_assignation_log.{{=str(field[0])}}">{{=str(field[1])}}</option>
 							{{pass}}
 							</select>
 						</td>
@@ -118,8 +120,8 @@
     </div>
     <!--Search in report-->
 
-	<!--REPORT CONTENTS-->
-		<div>
+    <!--REPORT CONTENTS-->
+    	<div>
     	<!--HEADER OF REPORT-->
 	    	{{if request.vars['level'] is not None and str(request.vars['level'])!="1":}}
 	    	<div class="pull-left noPrint">
@@ -146,8 +148,8 @@
 									<strong>Facultad de Ingeniería</strong><br/>
 									<strong>Escuela de Ciencias y Sistemas</strong><br/><br/>
 								</center><br>
-				    			<strong>{{=T('Type')}}: </strong> {{=T('Management Students')}}<br/>
-					    		<strong>{{=T('Description')}}: </strong> {{=T('Report of operations management students')}}<br/>
+				    			<strong>{{=T('Type')}}: </strong> {{=T('Student Assignment Management')}}<br/>
+					    		<strong>{{=T('Description')}}: </strong> {{=T('Report of operations management assignment of students')}}<br/>
 							</div>
 						    <div class="span5 center">
 						    	<div style="width:100%; height:300px;" id="graphbars"></div>
@@ -159,7 +161,7 @@
 				                                margin: [ 50, 50, 100, 80]
 				                            },
 				                            title: {
-				                                text: '{{=T("TOP 5: Semesters more operations students")}}'
+				                                text: '{{=T("TOP 5: Semesters more operations assignments")}}'
 				                            },
 				                            xAxis: {
 				                                categories: [
@@ -249,16 +251,16 @@
 					{{for period in infoLevel:}}
 					<tr>
 						<td>
-							<a style="white-space:nowrap;" href="{{=URL('management_reports', 'student_management',vars=dict(period = period[0], level='2', type_L = 'all', querySearch=personal_query))}}">{{=period[1]}}</a>
+							<a style="white-space:nowrap;" href="{{=URL('management_reports', 'student_assignment_management',vars=dict(period = period[0], level='2', type_L = 'all', querySearch=personal_query))}}">{{=period[1]}}</a>
 						</td>
 						<td>
-							<center><a class="badge badge-success" style="white-space:nowrap;" href="{{=URL('management_reports', 'student_management',vars=dict(period = period[0], level='2', type_L = 'i', querySearch=personal_query))}}">{{=period[2]}}</a></center>
+							<center><a class="badge badge-success" style="white-space:nowrap;" href="{{=URL('management_reports', 'student_assignment_management',vars=dict(period = period[0], level='2', type_L = 'i', querySearch=personal_query))}}">{{=period[2]}}</a></center>
 						</td>
 						<td>
-							<center><a class="badge badge-info" style="white-space:nowrap;" href="{{=URL('management_reports', 'student_management',vars=dict(period = period[0], level='2', type_L = 'u', querySearch=personal_query))}}">{{=period[3]}}</a></center>
+							<center><a class="badge badge-info" style="white-space:nowrap;" href="{{=URL('management_reports', 'student_assignment_management',vars=dict(period = period[0], level='2', type_L = 'u', querySearch=personal_query))}}">{{=period[3]}}</a></center>
 						</td>
 						<td>
-							<center><a class="badge badge-important" style="white-space:nowrap;" href="{{=URL('management_reports', 'student_management',vars=dict(period = period[0], level='2', type_L = 'd', querySearch=personal_query))}}">{{=period[4]}}</a></center>
+							<center><a class="badge badge-important" style="white-space:nowrap;" href="{{=URL('management_reports', 'student_assignment_management',vars=dict(period = period[0], level='2', type_L = 'd', querySearch=personal_query))}}">{{=period[4]}}</a></center>
 						</td>
 					</tr>
 					{{pass}}
@@ -317,27 +319,27 @@
 											<tr>
 												<th><center>{{=T('Total inserted')}}</center></th>
 												<td>
-													<center><a class="badge badge-success noPrint" style="white-space:nowrap;" href="{{=URL('management_reports', 'student_management',vars=dict(period = period[0], level='2', type_L = 'i', querySearch=personal_query))}}">{{=period[2]}}</a>
+													<center><a class="badge badge-success noPrint" style="white-space:nowrap;" href="{{=URL('management_reports', 'student_assignment_management',vars=dict(period = period[0], level='2', type_L = 'i', querySearch=personal_query))}}">{{=period[2]}}</a>
 													<a class="badge badge-success yesPrint" style="white-space:nowrap; display:none;">{{=period[2]}}</a></center>
 												</td>
 											</tr>
 											<tr>
 												<th><center>{{=T('Total modified')}}</center></th>
 												<td>
-													<center><a class="badge badge-info noPrint" style="white-space:nowrap;" href="{{=URL('management_reports', 'student_management',vars=dict(period = period[0], level='2', type_L = 'u', querySearch=personal_query))}}">{{=period[3]}}</a>
+													<center><a class="badge badge-info noPrint" style="white-space:nowrap;" href="{{=URL('management_reports', 'student_assignment_management',vars=dict(period = period[0], level='2', type_L = 'u', querySearch=personal_query))}}">{{=period[3]}}</a>
 													<a class="badge badge-info yesPrint" style="white-space:nowrap; display:none;">{{=period[3]}}</a></center>
 												</td>
 											</tr>
 											<tr>
 												<th><center>{{=T('Total out')}}</center></th>
 												<td>
-													<center><a class="badge badge-important noPrint" style="white-space:nowrap;" href="{{=URL('management_reports', 'student_management',vars=dict(period = period[0], level='2', type_L = 'd', querySearch=personal_query))}}">{{=period[4]}}</a>
+													<center><a class="badge badge-important noPrint" style="white-space:nowrap;" href="{{=URL('management_reports', 'student_assignment_management',vars=dict(period = period[0], level='2', type_L = 'd', querySearch=personal_query))}}">{{=period[4]}}</a>
 													<a class="badge badge-important yesPrint" style="white-space:nowrap; display:none;">{{=period[4]}}</a></center>
 												</td>
 											</tr>
 										</table>
 										<center>
-											<a class="btn noPrint" style="white-space:nowrap; cursor:pointer;" href="{{=URL('management_reports', 'student_management',vars=dict(period = period[0], level='2', type_L = 'all', querySearch=personal_query))}}"><b>{{=T('See')}} {{=T('Area Level')}} </b><span class="icon-black icon-arrow-right"></span></a>
+											<a class="btn noPrint" style="white-space:nowrap; cursor:pointer;" href="{{=URL('management_reports', 'student_assignment_management',vars=dict(period = period[0], level='2', type_L = 'all', querySearch=personal_query))}}"><b>{{=T('See')}} {{=T('Area Level')}} </b><span class="icon-black icon-arrow-right"></span></a>
 										</center>
 										<br><br>
 						    		</div>
@@ -353,7 +355,7 @@
 									                                plotShadow: false
 									                            },
 									                            title: {
-									                                text: '{{=T("Operations on students")}}'
+									                                text: '{{=T("Operations on assignments")}}'
 									                            },
 									                            tooltip: {
 									                                pointFormat: '{series.name}: <b>{point.percentage:.1f}%</b>'
@@ -393,7 +395,7 @@
 					{{pass}}
 				</table>
 			<!--REPORT WITH GRAPH-->
-		{{elif str(request.vars['level'])=="2":}}
+    	{{elif str(request.vars['level'])=="2":}}
 	    	<table class="table">
 	    		<tr>
 	    			<td>
@@ -405,8 +407,8 @@
 									<strong>Facultad de Ingeniería</strong><br/>
 									<strong>Escuela de Ciencias y Sistemas</strong><br/><br/>
 								</center><br>
-				    			<strong>{{=T('Type')}}: </strong> {{=T('Management Students')}}<br/>
-					    		<strong>{{=T('Description')}}: </strong> {{=T('Report of operations management students')}}<br/>
+				    			<strong>{{=T('Type')}}: </strong> {{=T('Student Assignment Management')}}<br/>
+					    		<strong>{{=T('Description')}}: </strong> {{=T('Report of operations management assignment of students')}}<br/>
 					    		<strong>{{=T('Period')}}: </strong> {{=infoLevel[0][0]}}<br/>
 							</div>
 						    <div class="span5 center">
@@ -419,7 +421,7 @@
 				                                margin: [ 50, 50, 100, 80]
 				                            },
 				                            title: {
-				                                text: '{{=T("Operations on the students in the semester")}}'
+				                                text: '{{=T("Operations on the assignments in the semester")}}'
 				                            },
 				                            xAxis: {
 				                                categories: [
@@ -520,20 +522,20 @@
 					{{for month in infoLevel:}}
 					<tr>
 						<td>
-							<a style="white-space:nowrap;" href="{{=URL('management_reports', 'student_management',vars=dict(period = str(request.vars['period']), month= month[1], level='3', type_U = str(request.vars['type_L']), type_L = 'all', querySearch=personal_query))}}">
+							<a style="white-space:nowrap;" href="{{=URL('management_reports', 'student_assignment_management',vars=dict(period = str(request.vars['period']), month= month[1], level='3', type_U = str(request.vars['type_L']), type_L = 'all', querySearch=personal_query))}}">
 								{{=month[2]}}
 							</a>
 						</td>
 						{{if str(request.vars['type_L'])=="all" or str(request.vars['type_L'])=="i":}}
 						<td>
-							<center><a class="badge badge-success" style="white-space:nowrap;" href="{{=URL('management_reports', 'student_management',vars=dict(period = str(request.vars['period']), month= month[1], level='3', type_U = str(request.vars['type_L']), type_L = 'i', querySearch=personal_query))}}">
+							<center><a class="badge badge-success" style="white-space:nowrap;" href="{{=URL('management_reports', 'student_assignment_management',vars=dict(period = str(request.vars['period']), month= month[1], level='3', type_U = str(request.vars['type_L']), type_L = 'i', querySearch=personal_query))}}">
 								{{=month[3]}}
 							</a></center>
 						</td>
 						{{pass}}
 						{{if str(request.vars['type_L'])=="all" or str(request.vars['type_L'])=="u":}}
 							<td>
-								<center><a class="badge badge-info" style="white-space:nowrap;" href="{{=URL('management_reports', 'student_management',vars=dict(period = str(request.vars['period']), month= month[1], level='3', type_U = str(request.vars['type_L']), type_L = 'u', querySearch=personal_query))}}">
+								<center><a class="badge badge-info" style="white-space:nowrap;" href="{{=URL('management_reports', 'student_assignment_management',vars=dict(period = str(request.vars['period']), month= month[1], level='3', type_U = str(request.vars['type_L']), type_L = 'u', querySearch=personal_query))}}">
 									{{if str(request.vars['type_L'])=="all":
 										=month[4]
 									else:
@@ -545,7 +547,7 @@
 						{{pass}}
 						{{if str(request.vars['type_L'])=="all" or str(request.vars['type_L'])=="d":}}
 							<td>
-								<center><a class="badge badge-important" style="white-space:nowrap;" href="{{=URL('management_reports', 'student_management',vars=dict(period = str(request.vars['period']), month= month[1], level='3', type_U = str(request.vars['type_L']), type_L = 'd', querySearch=personal_query))}}">
+								<center><a class="badge badge-important" style="white-space:nowrap;" href="{{=URL('management_reports', 'student_assignment_management',vars=dict(period = str(request.vars['period']), month= month[1], level='3', type_U = str(request.vars['type_L']), type_L = 'd', querySearch=personal_query))}}">
 									{{if str(request.vars['type_L'])=="all":
 										=month[5]
 									else:
@@ -618,7 +620,7 @@
 									<tr>
 										<th><center>{{=T('Total inserted')}}</center></th>
 										<td>
-											<center><a class="badge badge-success noPrint" style="white-space:nowrap;" href="{{=URL('management_reports', 'student_management',vars=dict(period = str(request.vars['period']), month= month[1], level='3', type_U = str(request.vars['type_L']), type_L = 'i', querySearch=personal_query))}}">
+											<center><a class="badge badge-success noPrint" style="white-space:nowrap;" href="{{=URL('management_reports', 'student_assignment_management',vars=dict(period = str(request.vars['period']), month= month[1], level='3', type_U = str(request.vars['type_L']), type_L = 'i', querySearch=personal_query))}}">
 												{{=month[3]}}
 											</a>
 											<a class="badge badge-success yesPrint" style="white-space:nowrap; display:none">
@@ -631,7 +633,7 @@
 									<tr>
 										<th><center>{{=T('Total modified')}}</center></th>
 										<td>
-											<center><a class="badge badge-info noPrint" style="white-space:nowrap;" href="{{=URL('management_reports', 'student_management',vars=dict(period = str(request.vars['period']), month= month[1], level='3', type_U = str(request.vars['type_L']), type_L = 'u', querySearch=personal_query))}}">
+											<center><a class="badge badge-info noPrint" style="white-space:nowrap;" href="{{=URL('management_reports', 'student_assignment_management',vars=dict(period = str(request.vars['period']), month= month[1], level='3', type_U = str(request.vars['type_L']), type_L = 'u', querySearch=personal_query))}}">
 												{{if str(request.vars['type_L'])=="all":
 													=month[4]
 												else:
@@ -654,7 +656,7 @@
 									<tr>
 										<th><center>{{=T('Total out')}}</center></th>
 										<td>
-											<center><a class="badge badge-important noPrint" style="white-space:nowrap;" href="{{=URL('management_reports', 'student_management',vars=dict(period = str(request.vars['period']), month= month[1], level='3', type_U = str(request.vars['type_L']), type_L = 'd', querySearch=personal_query))}}">
+											<center><a class="badge badge-important noPrint" style="white-space:nowrap;" href="{{=URL('management_reports', 'student_assignment_management',vars=dict(period = str(request.vars['period']), month= month[1], level='3', type_U = str(request.vars['type_L']), type_L = 'd', querySearch=personal_query))}}">
 												{{if str(request.vars['type_L'])=="all":
 													=month[5]
 												else:
@@ -675,7 +677,7 @@
 									{{pass}}
 								</table>
 								<center>
-									<a class="btn noPrint" style="white-space:nowrap;" href="{{=URL('management_reports', 'student_management',vars=dict(period = str(request.vars['period']), month= month[1], level='3', type_U = str(request.vars['type_L']), type_L = 'all', querySearch=personal_query))}}"><b>{{=T('See')}} {{=T('Area Level')}} </b><span class="icon-black icon-arrow-right"></span></a>
+									<a class="btn noPrint" style="white-space:nowrap;" href="{{=URL('management_reports', 'student_assignment_management',vars=dict(period = str(request.vars['period']), month= month[1], level='3', type_U = str(request.vars['type_L']), type_L = 'all', querySearch=personal_query))}}"><b>{{=T('See')}} {{=T('Area Level')}} </b><span class="icon-black icon-arrow-right"></span></a>
 								</center>
 								<br><br>
 				    		</div>
@@ -692,7 +694,7 @@
 							                                plotShadow: false
 							                            },
 							                            title: {
-							                                text: '{{=T("Operations on students")}}'
+							                                text: '{{=T("Operations on assignments")}}'
 							                            },
 							                            tooltip: {
 							                                pointFormat: '{series.name}: <b>{point.percentage:.1f}%</b>'
@@ -746,7 +748,7 @@
 				{{pass}}
 				</table>
 			<!--REPORT WITH GRAPH-->
-		{{elif str(request.vars['level'])=="3":}}
+    	{{elif str(request.vars['level'])=="3":}}
 	    	<table class="table">
 	    		<tr>
 	    			<td>
@@ -758,8 +760,8 @@
 									<strong>Facultad de Ingeniería</strong><br/>
 									<strong>Escuela de Ciencias y Sistemas</strong><br/><br/>
 								</center><br>
-				    			<strong>{{=T('Type')}}: </strong> {{=T('Management Students')}}<br/>
-					    		<strong>{{=T('Description')}}: </strong> {{=T('Report of operations management students')}}<br/>
+				    			<strong>{{=T('Type')}}: </strong> {{=T('Student Assignment Management')}}<br/>
+					    		<strong>{{=T('Description')}}: </strong> {{=T('Report of operations management assignment of students')}}<br/>
 					    		<strong>{{=T('Period')}}: </strong> {{=infoLevel[0][0]}}<br/>
 					    		<strong>{{=T('Month')}}: </strong> {{=infoLevel[0][1]}}<br/>
 							</div>
@@ -777,15 +779,14 @@
 				                            },
 				                            xAxis: {
 				                                categories: [
-				                                	{{for roll in infoLevel:}}
-				                                	'{{=roll[3]}}',
-				                                	{{pass}}
+				                                	{{for top in top5:}}
+										    			'{{=top[1]}}',
+										    		{{pass}}
 				                                ],
 				                                labels: {
-				                                    rotation: -45,
 				                                    align: 'right',
 				                                    style: {
-				                                        fontSize: '13px',
+				                                        fontSize: '6px',
 				                                        fontFamily: 'Verdana, sans-serif'
 				                                    }
 				                                }
@@ -805,13 +806,9 @@
 				                            series: [{
 				                                name: '{{=T("Operations")}}',
 				                                data: [
-				                                       	{{for roll in infoLevel:}}
-				                                       		{{if str(request.vars['type_L'])=="all":}}
-											    				{{=int(roll[4])+int(roll[5])+int(roll[6])}},
-											    			{{else:}}
-											    				{{=int(roll[4])}},
-											    			{{pass}}
-					                                	{{pass}}
+				                                       	{{for top in top5:}}
+				                                       		{{=top[0]}},
+				                                       	{{pass}}
 				                                       ],
 				                                dataLabels: {
 				                                    enabled: true,
@@ -860,7 +857,7 @@
 				</div>
 				<table class="table table-striped table-bordered nograph">
 					<tr>
-						<th><center>{{=T('Role')}}</center></th>
+						<th><center>{{=T('Project')}}</center></th>
 						{{if str(request.vars['type_L'])=="all" or str(request.vars['type_L'])=="i":}}
 							<th><center>{{=T('Total inserted')}}</center></th>
 						{{pass}}
@@ -871,38 +868,38 @@
 							<th><center>{{=T('Total out')}}</center></th>
 						{{pass}}
 					</tr>
-					{{for roll in infoLevel:}}
+					{{for project in infoLevel:}}
 					<tr>
 						<td>
-							<a style="white-space:nowrap;" href="{{=URL('management_reports', 'student_management',vars=dict(period = str(request.vars['period']), month= str(request.vars['month']), roll=roll[2], level='4', type_U = str(request.vars['type_L']), type_L = 'all', querySearch=personal_query))}}">
-								{{=roll[3]}}
+							<a style="white-space:nowrap;" href="{{=URL('management_reports', 'student_assignment_management',vars=dict(period = str(request.vars['period']), month= str(request.vars['month']), project=project[2], level='4', type_U = str(request.vars['type_L']), type_L = 'all', querySearch=personal_query))}}">
+								{{=project[3]}}
 							</a>
 						</td>
 						{{if str(request.vars['type_L'])=="all" or str(request.vars['type_L'])=="i":}}
 						<td>
-							<center><a class="badge badge-success" style="white-space:nowrap;" href="{{=URL('management_reports', 'student_management',vars=dict(period = str(request.vars['period']), month= str(request.vars['month']), roll=roll[2], level='4', type_U = str(request.vars['type_L']), type_L = 'i', querySearch=personal_query))}}">
-								{{=roll[4]}}
+							<center><a class="badge badge-success" style="white-space:nowrap;" href="{{=URL('management_reports', 'student_assignment_management',vars=dict(period = str(request.vars['period']), month= str(request.vars['month']), project=project[2], level='4', type_U = str(request.vars['type_L']), type_L = 'i', querySearch=personal_query))}}">
+								{{=project[4]}}
 							</a></center>
 						</td>
 						{{pass}}
 						{{if str(request.vars['type_L'])=="all" or str(request.vars['type_L'])=="u":}}
 						<td>
-							<center><a class="badge badge-info" style="white-space:nowrap;" href="{{=URL('management_reports', 'student_management',vars=dict(period = str(request.vars['period']), month= str(request.vars['month']), roll=roll[2], level='4', type_U = str(request.vars['type_L']), type_L = 'u', querySearch=personal_query))}}">
+							<center><a class="badge badge-info" style="white-space:nowrap;" href="{{=URL('management_reports', 'student_assignment_management',vars=dict(period = str(request.vars['period']), month= str(request.vars['month']), project=project[2], level='4', type_U = str(request.vars['type_L']), type_L = 'u', querySearch=personal_query))}}">
 								{{if str(request.vars['type_L'])=="all":
-									=roll[5]
+									=project[5]
 								else:
-									=roll[4]
+									=project[4]
 								pass
 								}}
 							</a></center>
 						{{pass}}
 						{{if str(request.vars['type_L'])=="all" or str(request.vars['type_L'])=="d":}}
 						<td>
-							<center><a class="badge badge-important" style="white-space:nowrap;" href="{{=URL('management_reports', 'student_management',vars=dict(period = str(request.vars['period']), month= str(request.vars['month']), roll=roll[2], level='4', type_U = str(request.vars['type_L']), type_L = 'd', querySearch=personal_query))}}">
+							<center><a class="badge badge-important" style="white-space:nowrap;" href="{{=URL('management_reports', 'student_assignment_management',vars=dict(period = str(request.vars['period']), month= str(request.vars['month']), project=project[2], level='4', type_U = str(request.vars['type_L']), type_L = 'd', querySearch=personal_query))}}">
 								{{if str(request.vars['type_L'])=="all":
-									=roll[6]
+									=project[6]
 								else:
-									=roll[4]
+									=project[4]
 								pass
 								}}
 							</a></center>
@@ -952,20 +949,20 @@
 				</div>
 		    	<table class="table table-striped table-bordered yesgraph">
 		    	{{pieGraphR=0}}
-				{{for roll in infoLevel:}}
+				{{for project in infoLevel:}}
 				{{pieGraphR+=1}}
 				{{if str(request.vars['type_L'])=="all":
-					totalRoll=float(int(roll[4])+int(roll[5])+int(roll[6]))
+					totalproject=float(int(project[4])+int(project[5])+int(project[6]))
 				else:
-					totalRoll=float(int(roll[4]))
+					totalproject=float(int(project[4]))
 				pass}}
-				{{if totalRoll>float(0):}}
+				{{if totalproject>float(0):}}
 					<tr>
 				{{else:}}
 					<tr class="noVisible" style="display:none;">
 				{{pass}}
 					<td>
-						<h1><small>{{=roll[3]}}</small></h1>
+						<h1><small>{{=project[3]}}</small></h1>
 						<div class="span10" align="center">
 							<div class="span6">
 								<table class="table table-striped table-bordered">
@@ -973,19 +970,19 @@
 									<tr>
 										<th><center>{{=T('Total inserted')}}</center></th>
 										<td>
-											<center><a class="badge badge-success noPrint" style="white-space:nowrap;" href="{{=URL('management_reports', 'student_management',vars=dict(period = str(request.vars['period']), month= str(request.vars['month']), roll=roll[2], level='4', type_U = str(request.vars['type_L']), type_L = 'i', querySearch=personal_query))}}">
+											<center><a class="badge badge-success noPrint" style="white-space:nowrap;" href="{{=URL('management_reports', 'student_assignment_management',vars=dict(period = str(request.vars['period']), month= str(request.vars['month']), project=project[2], level='4', type_U = str(request.vars['type_L']), type_L = 'i', querySearch=personal_query))}}">
 												{{if str(request.vars['type_L'])=="all":
-													=roll[4]
+													=project[4]
 												else:
-													=roll[4]
+													=project[4]
 												pass
 												}}
 											</a>
 											<a class="badge badge-success yesPrint" style="white-space:nowrap; display:none">
 												{{if str(request.vars['type_L'])=="all":
-													=roll[4]
+													=project[4]
 												else:
-													=roll[4]
+													=project[4]
 												pass
 												}}
 											</a></center>
@@ -996,19 +993,19 @@
 									<tr>
 										<th><center>{{=T('Total modified')}}</center></th>
 										<td>
-											<center><a class="badge badge-info noPrint" style="white-space:nowrap;" href="{{=URL('management_reports', 'student_management',vars=dict(period = str(request.vars['period']), month= str(request.vars['month']), roll=roll[2], level='4', type_U = str(request.vars['type_L']), type_L = 'u', querySearch=personal_query))}}">
+											<center><a class="badge badge-info noPrint" style="white-space:nowrap;" href="{{=URL('management_reports', 'student_assignment_management',vars=dict(period = str(request.vars['period']), month= str(request.vars['month']), project=project[2], level='4', type_U = str(request.vars['type_L']), type_L = 'u', querySearch=personal_query))}}">
 												{{if str(request.vars['type_L'])=="all":
-													=roll[5]
+													=project[5]
 												else:
-													=roll[4]
+													=project[4]
 												pass
 												}}
 											</a>
 											<a class="badge badge-info yesPrint" style="white-space:nowrap; display:none">
 												{{if str(request.vars['type_L'])=="all":
-													=roll[5]
+													=project[5]
 												else:
-													=roll[4]
+													=project[4]
 												pass
 												}}
 											</a></center>
@@ -1019,19 +1016,19 @@
 									<tr>
 										<th><center>{{=T('Total out')}}</center></th>
 										<td>
-											<center><a class="badge badge-important noPrint" style="white-space:nowrap;" href="{{=URL('management_reports', 'student_management',vars=dict(period = str(request.vars['period']), month= str(request.vars['month']), roll=roll[2], level='4', type_U = str(request.vars['type_L']), type_L = 'd', querySearch=personal_query))}}">
+											<center><a class="badge badge-important noPrint" style="white-space:nowrap;" href="{{=URL('management_reports', 'student_assignment_management',vars=dict(period = str(request.vars['period']), month= str(request.vars['month']), project=project[2], level='4', type_U = str(request.vars['type_L']), type_L = 'd', querySearch=personal_query))}}">
 												{{if str(request.vars['type_L'])=="all":
-													=roll[6]
+													=project[6]
 												else:
-													=roll[4]
+													=project[4]
 												pass
 												}}
 											</a>
 											<a class="badge badge-important yesPrint" style="white-space:nowrap; display:none">
 												{{if str(request.vars['type_L'])=="all":
-													=roll[6]
+													=project[6]
 												else:
-													=roll[4]
+													=project[4]
 												pass
 												}}
 											</a></center>
@@ -1040,13 +1037,13 @@
 									{{pass}}
 								</table>
 								<center>
-									<a class="btn noPrint" style="white-space:nowrap;" href="{{=URL('management_reports', 'student_management',vars=dict(period = str(request.vars['period']), month= str(request.vars['month']), roll=roll[2], level='4', type_U = str(request.vars['type_L']), type_L = 'all', querySearch=personal_query))}}"><b>{{=T('See')}} {{=T('Area Level')}} </b><span class="icon-black icon-arrow-right"></span></a>
+									<a class="btn noPrint" style="white-space:nowrap;" href="{{=URL('management_reports', 'student_assignment_management',vars=dict(period = str(request.vars['period']), month= str(request.vars['month']), project=project[2], level='4', type_U = str(request.vars['type_L']), type_L = 'all', querySearch=personal_query))}}"><b>{{=T('See')}} {{=T('Area Level')}} </b><span class="icon-black icon-arrow-right"></span></a>
 								</center>
 								<br><br>
 				    		</div>
 				    		<div class="span1 center"></div>
 				    		<div class="span5 center">
-				    			{{if totalRoll>float(0):}}
+				    			{{if totalproject>float(0):}}
 				    				<div style="width:100%; height:300px;" id="graphpie{{=pieGraphR}}"></div>
 				    				<script type="text/javascript">
 							                    $(function () {
@@ -1079,21 +1076,21 @@
 							                                name: '{{=T("Percentage of operation")}}',
 							                                data: [
 							                                {{if str(request.vars['type_L'])=="all":}}
-							                                	['{{=T("Modified")}}', {{=(100*float(roll[5]))/totalRoll}}],
-							                                    ['{{=T("Out")}}', {{=(100*float(roll[6]))/totalRoll}}],
-							                                    ['{{=T("Inserted")}}', {{=(100*float(roll[4]))/totalRoll}}]
+							                                	['{{=T("Modified")}}', {{=(100*float(project[5]))/totalproject}}],
+							                                    ['{{=T("Out")}}', {{=(100*float(project[6]))/totalproject}}],
+							                                    ['{{=T("Inserted")}}', {{=(100*float(project[4]))/totalproject}}]
 							                                {{elif str(request.vars['type_L'])=="i":}}
-							                                	['{{=T("Modified")}}',   {{=0/totalRoll}}],
-							                                    ['{{=T("Out")}}',   {{=0/totalRoll}}],
-							                                    ['{{=T("Inserted")}}',   {{=(100*float(roll[4]))/totalRoll}}]
+							                                	['{{=T("Modified")}}',   {{=0/totalproject}}],
+							                                    ['{{=T("Out")}}',   {{=0/totalproject}}],
+							                                    ['{{=T("Inserted")}}',   {{=(100*float(project[4]))/totalproject}}]
 							                                {{elif str(request.vars['type_L'])=="u":}}
-							                                	['{{=T("Modified")}}',   {{=(100*float(roll[4]))/totalRoll}}],
-							                                    ['{{=T("Out")}}',   {{=0/totalRoll}}],
-							                                    ['{{=T("Inserted")}}',   {{=0/totalRoll}}]
+							                                	['{{=T("Modified")}}',   {{=(100*float(project[4]))/totalproject}}],
+							                                    ['{{=T("Out")}}',   {{=0/totalproject}}],
+							                                    ['{{=T("Inserted")}}',   {{=0/totalproject}}]
 							                                {{elif str(request.vars['type_L'])=="d":}}
-							                                	['{{=T("Modified")}}',   {{=0/totalRoll}}],
-							                                    ['{{=T("Out")}}',   {{=(100*float(roll[4]))/totalRoll}}],
-							                                    ['{{=T("Inserted")}}',   {{=0/totalRoll}}]
+							                                	['{{=T("Modified")}}',   {{=0/totalproject}}],
+							                                    ['{{=T("Out")}}',   {{=(100*float(project[4]))/totalproject}}],
+							                                    ['{{=T("Inserted")}}',   {{=0/totalproject}}]
 							                                {{pass}}
 							                                ]
 							                            }]
@@ -1112,383 +1109,7 @@
 				</table>
 			<!--REPORT WITH GRAPH-->
 			<div align="right"> {{=T('Count')}} {{=T('Roles')}}: {{=pieGraphR}}</div>
-		{{elif str(request.vars['level'])=="4":}}
-	    	<table class="table">
-	    		<tr>
-	    			<td>
-				    	<div class="span10">
-							<div class="span6">
-								<img class="pull-left" src="{{=URL('static','images')}}/escudo.png">
-								<center>
-									<strong>Universidad de San Carlos de Guatemala</strong><br/>
-									<strong>Facultad de Ingeniería</strong><br/>
-									<strong>Escuela de Ciencias y Sistemas</strong><br/><br/>
-								</center><br>
-				    			<strong>{{=T('Type')}}: </strong> {{=T('Management Students')}}<br/>
-					    		<strong>{{=T('Description')}}: </strong> {{=T('Report of operations management students')}}<br/>
-					    		<strong>{{=T('Period')}}: </strong> {{=infoLevel[0][0]}}<br/>
-					    		<strong>{{=T('Month')}}: </strong> {{=infoLevel[0][1]}}<br/>
-					    		<strong>{{=T('Role')}}: </strong> {{=infoLevel[0][2]}}<br/>
-							</div>
-						    <div class="span5 center">
-						    	<div style="width:100%; height:300px;" id="graphbars"></div>
-						    	<script type="text/javascript">
-				                    $(function () {
-				                        $('#graphbars').highcharts({
-				                            chart: {
-				                                type: 'column',
-				                                margin: [ 50, 50, 100, 80]
-				                            },
-				                            title: {
-				                                text: '{{=T("TOP 5: Users more operations on students")}}'
-				                            },
-				                            xAxis: {
-				                                categories: [
-				                                	{{for top in top5:}}
-				                                	'{{=top["academic_log.user_name"]}}',
-				                                	{{pass}}
-				                                ],
-				                                labels: {
-				                                    rotation: -45,
-				                                    align: 'right',
-				                                    style: {
-				                                        fontSize: '13px',
-				                                        fontFamily: 'Verdana, sans-serif'
-				                                    }
-				                                }
-				                            },
-				                            yAxis: {
-				                                min: 0,
-				                                title: {
-				                                    text: '{{=T("Operations")}}'
-				                                }
-				                            },
-				                            legend: {
-				                                enabled: false
-				                            },
-				                            tooltip: {
-				                                pointFormat: '{{=T("Operations")}}: <b>{point.y:.1f}</b>',
-				                            },
-				                            series: [{
-				                                name: '{{=T("Operations")}}',
-				                                data: [
-				                                       	{{for top5 in top5:}}
-											    			{{=top5['COUNT(academic_log.id)']}},
-					                                	{{pass}}
-				                                       ],
-				                                dataLabels: {
-				                                    enabled: true,
-				                                    rotation: -90,
-				                                    color: '#FFFFFF',
-				                                    align: 'right',
-				                                    x: 4,
-				                                    y: 10,
-				                                    style: {
-				                                        fontSize: '13px',
-				                                        fontFamily: 'Verdana, sans-serif',
-				                                        textShadow: '0 0 3px black'
-				                                    }
-				                                }
-				                            }]
-				                        });
-				                    });
-				                </script>
-						    </div>
-				    	</div>
-					</td>
-	    		</tr>
-	    	</table>
-
-		    <div>
-		  		<center><h1>{{=T('Detail')}}</h1></center>
-		  		<hr>
-		  	</div>
-
-		  	<!--REPORT IN TABLE-->
-			  	<div class="pull-right noPrint">
-					<table class="nograph">
-						<tr>
-							<td>
-								<center>
-							    	<a class="btn"  style="height:40px; width:40px;" onclick="showGraph(1);">
-										<img src="{{=URL('static','images')}}/academic_control/ascending24.png" height="40" width="40">
-									</a><br>
-							    	<a onclick="showGraph(1);">
-										{{=T('Show Graphics')}}
-									</a>
-								</center>
-							</td>
-						</tr>
-					</table>
-				</div>
-				<table class="table table-striped table-bordered nograph">
-					<tr>
-						<th><center>{{=T('User')}}</center></th>
-						{{if str(request.vars['type_L'])=="all" or str(request.vars['type_L'])=="i":}}
-							<th><center>{{=T('Total inserted')}}</center></th>
-						{{pass}}
-						{{if str(request.vars['type_L'])=="all" or str(request.vars['type_L'])=="u":}}
-							<th><center>{{=T('Total modified')}}</center></th>
-						{{pass}}
-						{{if str(request.vars['type_L'])=="all" or str(request.vars['type_L'])=="d":}}
-							<th><center>{{=T('Total out')}}</center></th>
-						{{pass}}
-					</tr>
-					{{for userP in infoLevel:}}
-					<tr>
-						<td>
-							<a style="white-space:nowrap;" href="{{=URL('management_reports', 'student_management',vars=dict(period = str(request.vars['period']), month= str(request.vars['month']), roll = str(request.vars['roll']), userP=userP[3], level='5', type_U = str(request.vars['type_L']), type_L = 'all', querySearch=personal_query))}}">
-								{{=userP[4]}}
-							</a>
-						</td>
-						{{if str(request.vars['type_L'])=="all" or str(request.vars['type_L'])=="i":}}
-						<td>
-							<center><a class="badge badge-success" style="white-space:nowrap;" href="{{=URL('management_reports', 'student_management',vars=dict(period = str(request.vars['period']), month= str(request.vars['month']), roll = str(request.vars['roll']), userP=userP[3], level='5', type_U = str(request.vars['type_L']), type_L = 'i', querySearch=personal_query))}}">
-								{{=userP[5]}}
-							</a></center>
-						</td>
-						{{pass}}
-						{{if str(request.vars['type_L'])=="all" or str(request.vars['type_L'])=="u":}}
-						<td>
-							<center><a class="badge badge-info" style="white-space:nowrap;" href="{{=URL('management_reports', 'student_management',vars=dict(period = str(request.vars['period']), month= str(request.vars['month']), roll = str(request.vars['roll']), userP=userP[3], level='5', type_U = str(request.vars['type_L']), type_L = 'u', querySearch=personal_query))}}">
-								{{if str(request.vars['type_L'])=="all":
-									=userP[6]
-								else:
-									=userP[5]
-								pass
-								}}
-							</a></center>
-						</td>
-						{{pass}}
-						{{if str(request.vars['type_L'])=="all" or str(request.vars['type_L'])=="d":}}
-						<td>
-							<center><a class="badge badge-important" style="white-space:nowrap;" href="{{=URL('management_reports', 'student_management',vars=dict(period = str(request.vars['period']), month= str(request.vars['month']), roll = str(request.vars['roll']), userP=userP[3], level='5', type_U = str(request.vars['type_L']), type_L = 'd', querySearch=personal_query))}}">
-								{{if str(request.vars['type_L'])=="all":
-									=userP[7]
-								else:
-									=userP[5]
-								pass
-								}}
-							</a></center>
-						</td>
-						{{pass}}
-					</tr>
-					{{pass}}
-				</table>
-			<!--REPORT IN TABLE-->
-
-			<!--REPORT WITH GRAPH-->
-				<div class="pull-right noPrint">
-					<table class="yesgraph">
-						<tr>
-							<td id="idVisible">
-								<center>
-									<a style="height:40px; width:40px;" class="btn" onclick="showAllGraph(1);">
-							    		<img src="{{=URL('static','images')}}/plusView.png">
-							    	</a><br>
-							    	<a onclick="showGraph(1);">
-										{{=T('Show All')}}
-									</a>
-								</center>
-							</td>
-							<td class="noVisible" style="display:none;">
-								<center>
-									<a style="height:40px; width:40px;" class="btn" onclick="showAllGraph(2);">
-							    		<img src="{{=URL('static','images')}}/minusView.png">
-							    	</a><br>
-							    	<a onclick="showGraph(2);">
-										{{=T('False')}} {{=T('Show All')}}
-									</a>
-								</center>
-							</td>
-							<td>
-								<center>
-									<a class="btn"  style="height:40px; width:40px;" onclick="showGraph(2);">
-										<img src="{{=URL('static','images')}}/academic_control/seo47.png" height="40" width="40">
-									</a><br>
-							    	<a onclick="showGraph(2);">
-										{{=T('Tabulated Data')}}
-									</a>
-								</center>
-							</td>
-						</tr>
-					</table>
-				</div>
-		    	<table class="table table-striped table-bordered yesgraph">
-				{{pieGraphU=0}}
-				{{for userP in infoLevel:}}
-				{{pieGraphU+=1}}
-				{{if str(request.vars['type_L'])=="all":
-					totaluserP=float(int(userP[5])+int(userP[6])+int(userP[7]))
-				else:
-					totaluserP=float(int(userP[5]))
-				pass}}
-				{{if totaluserP>float(0):}}
-					<tr>
-				{{else:}}
-					<tr class="noVisible" style="display:none;">
-				{{pass}}
-					<td>
-						<h1><small>{{=userP[4]}}</small></h1>
-						<div class="span10" align="center">
-							<div class="span6">
-								<table class="table table-striped table-bordered">
-									{{if str(request.vars['type_L'])=="all" or str(request.vars['type_L'])=="i":}}
-									<tr>
-										<th><center>{{=T('Total inserted')}}</center></th>
-										<td>
-											<center><a class="badge badge-success noPrint" style="white-space:nowrap;" href="{{=URL('management_reports', 'student_management',vars=dict(period = str(request.vars['period']), month= str(request.vars['month']), roll = str(request.vars['roll']), userP=userP[3], level='5', type_U = str(request.vars['type_L']), type_L = 'i', querySearch=personal_query))}}">
-												{{=userP[5]}}
-											</a>
-											<a class="badge badge-success yesPrint" style="white-space:nowrap; display:none">
-												{{=userP[5]}}
-											</a></center>
-										</td>
-									</tr>
-									{{pass}}
-									{{if str(request.vars['type_L'])=="all" or str(request.vars['type_L'])=="u":}}
-									<tr>
-										<th><center>{{=T('Total modified')}}</center></th>
-										<td>
-											<center><a class="badge badge-info noPrint" style="white-space:nowrap;" href="{{=URL('management_reports', 'student_management',vars=dict(period = str(request.vars['period']), month= str(request.vars['month']), roll = str(request.vars['roll']), userP=userP[3], level='5', type_U = str(request.vars['type_L']), type_L = 'u', querySearch=personal_query))}}">
-												{{if str(request.vars['type_L'])=="all":
-													=userP[6]
-												else:
-													=userP[5]
-												pass
-												}}
-											</a>
-											<a class="badge badge-info yesPrint" style="white-space:nowrap; display:none">
-												{{if str(request.vars['type_L'])=="all":
-													=userP[6]
-												else:
-													=userP[5]
-												pass
-												}}
-											</a></center>
-										</td>
-									</tr>
-									{{pass}}
-									{{if str(request.vars['type_L'])=="all" or str(request.vars['type_L'])=="d":}}
-									<tr>
-										<th><center>{{=T('Total out')}}</center></th>
-										<td>
-											<center><a class="badge badge-important noPrint" style="white-space:nowrap;" href="{{=URL('management_reports', 'student_management',vars=dict(period = str(request.vars['period']), month= str(request.vars['month']), roll = str(request.vars['roll']), userP=userP[3], level='5', type_U = str(request.vars['type_L']), type_L = 'd', querySearch=personal_query))}}">
-												{{if str(request.vars['type_L'])=="all":
-													=userP[7]
-												else:
-													=userP[5]
-												pass
-												}}
-											</a>
-											<a class="badge badge-important yesPrint" style="white-space:nowrap; display:none">
-												{{if str(request.vars['type_L'])=="all":
-													=userP[7]
-												else:
-													=userP[5]
-												pass
-												}}
-											</a></center>
-										</td>
-									</tr>
-									{{pass}}
-								</table>
-								<center>
-									<a class="btn noPrint" style="white-space:nowrap;" href="{{=URL('management_reports', 'student_management',vars=dict(period = str(request.vars['period']), month= str(request.vars['month']), roll = str(request.vars['roll']), userP=userP[3], level='5', type_U = str(request.vars['type_L']), type_L = 'all', querySearch=personal_query))}}"><b>{{=T('See')}} {{=T('Area Level')}} </b><span class="icon-black icon-arrow-right"></span></a>
-								</center>
-								<br><br>
-				    		</div>
-				    		<div class="span1 center"></div>
-				    		<div class="span5 center">
-				    			{{if totaluserP>float(0):}}
-				    				<div style="width:100%; height:300px;" id="graphpie{{=pieGraphU}}"></div>
-				    				<script type="text/javascript">
-							                    $(function () {
-							                        $('#graphpie{{=pieGraphU}}').highcharts({
-							                            chart: {
-							                                plotBackgroundColor: null,
-							                                plotBorderWidth: null,
-							                                plotShadow: false
-							                            },
-							                            title: {
-							                                text: '{{=T("Operations on students")}}'
-							                            },
-							                            tooltip: {
-							                                pointFormat: '{series.name}: <b>{point.percentage:.1f}%</b>'
-							                            },
-							                            plotOptions: {
-							                                pie: {
-							                                    allowPointSelect: true,
-							                                    cursor: 'pointer',
-							                                    dataLabels: {
-							                                        enabled: true,
-							                                        color: '#000000',
-							                                        connectorColor: '#000000',
-							                                        format: '<b>{point.name}</b>: {point.percentage:.1f} %'
-							                                    }
-							                                }
-							                            },
-							                            series: [{
-							                                type: 'pie',
-							                                name: '{{=T("Percentage of operation")}}',
-							                                data: [
-							                                {{if str(request.vars['type_L'])=="all":}}
-							                                	['{{=T("Modified")}}', {{=(100*float(userP[6]))/totaluserP}}],
-							                                    ['{{=T("Out")}}', {{=(100*float(userP[7]))/totaluserP}}],
-							                                    ['{{=T("Inserted")}}', {{=(100*float(userP[5]))/totaluserP}}]
-							                                {{elif str(request.vars['type_L'])=="i":}}
-							                                	['{{=T("Modified")}}',   {{=0/totaluserP}}],
-							                                    ['{{=T("Out")}}',   {{=0/totaluserP}}],
-							                                    ['{{=T("Inserted")}}',   {{=(100*float(userP[5]))/totaluserP}}]
-							                                {{elif str(request.vars['type_L'])=="u":}}
-							                                	['{{=T("Modified")}}',   {{=(100*float(userP[5]))/totaluserP}}],
-							                                    ['{{=T("Out")}}',   {{=0/totaluserP}}],
-							                                    ['{{=T("Inserted")}}',   {{=0/totaluserP}}]
-							                                {{elif str(request.vars['type_L'])=="d":}}
-							                                	['{{=T("Modified")}}',   {{=0/totaluserP}}],
-							                                    ['{{=T("Out")}}',   {{=(100*float(userP[5]))/totaluserP}}],
-							                                    ['{{=T("Inserted")}}',   {{=0/totaluserP}}]
-							                                {{pass}}
-							                                ]
-							                            }]
-							                        });
-							                    });
-							                </script>
-				    			{{else:}}
-				    				<h1>{{=T('No visible graphic')}}</h1>
-				    			{{pass}}
-				    			<br>
-				    		</div>
-						</div>
-					</td>
-				</tr>
-				{{pass}}
-				</table>
-			<!--REPORT WITH GRAPH-->
-			<div align="right"> {{=T('Count')}} {{=T('Users')}}: {{=pieGraphU}}</div>
-		{{elif str(request.vars['level'])=="5":}}
-	    	<hr>
-			<img class="pull-left" src="{{=URL('static','images')}}/escudo.png">
-			<center>
-				<strong>Universidad de San Carlos de Guatemala</strong><br/>
-				<strong>Facultad de Ingeniería</strong><br/>
-				<strong>Escuela de Ciencias y Sistemas</strong><br/><br/>
-			</center><br>
-			<strong>{{=T('Type')}}: </strong> {{=T('Management Students')}}<br/>
-    		<strong>{{=T('Description')}}: </strong> {{=T('Report of operations management students')}}<br/>
-    		<strong>{{=T('Period')}}: </strong> {{=infoLevel[0][0]}}<br/>
-    		<strong>{{=T('Month')}}: </strong> {{=infoLevel[0][1]}}<br/>
-    		<strong>{{=T('Role')}}: </strong> {{=infoLevel[0][2]}}<br/>
-    		<strong>{{=T('User')}}: </strong> {{=infoLevel[0][3]}}<br/>
-			<div>
-		  		<center><h1>{{=T('Detail')}}</h1></center>
-		  		<hr>
-		  	</div>
-
-		  	<div>
-		  		{{=grid}}
-		  	</div>				
-		{{pass}}
+    	{{pass}}
     	</div>
 	<!--REPORT CONTENTS-->    
 </div>
@@ -1502,15 +1123,17 @@
 
 		$("#cancelSearch").click(function(){
 			{{if request.vars['level'] is None or str(request.vars['level'])=="1":}}
-				window.location.href = "{{=URL('management_reports', 'student_management')}}";
+				window.location.href = "{{=URL('management_reports', 'student_assignment_management')}}";
 			{{elif str(request.vars['level'])=="2":}}
 				window.location.href = "{{=URL(vars=dict(level = 2, period = request.vars['period'], type_L=request.vars['type_L']))}}";
 			{{elif str(request.vars['level'])=="3":}}
-				window.location.href = "{{=URL(vars=dict(level = 3, period = request.vars['period'], month = str(request.vars['month']), type_L=request.vars['type_L'], type_U=request.vars['type_U']))}}";
+				window.location.href = "{{=URL(vars=dict(level = 3, period = request.vars['period'], month = str(request.vars['month']), project = str(request.vars['project']), type_L=request.vars['type_L'], type_U=request.vars['type_U']))}}";
 			{{elif str(request.vars['level'])=="4":}}
-				window.location.href = "{{=URL(vars=dict(level = 4, period = request.vars['period'], month = str(request.vars['month']), roll = str(request.vars['roll']), type_L=request.vars['type_L'], type_U=request.vars['type_U']))}}";
+				window.location.href = "{{=URL(vars=dict(level = 4, period = request.vars['period'], month = str(request.vars['month']), project = str(request.vars['project']), type_L=request.vars['type_L'], type_U=request.vars['type_U']))}}";
 			{{elif str(request.vars['level'])=="5":}}
-				window.location.href = "{{=URL(vars=dict(level = 5, period = request.vars['period'], month = str(request.vars['month']), roll = str(request.vars['roll']), userP = str(request.vars['userP']), type_L=request.vars['type_L'], type_U=request.vars['type_U']))}}";
+				window.location.href = "{{=URL(vars=dict(level = 5, period = request.vars['period'], month = str(request.vars['month']), project = str(request.vars['project']), roll = str(request.vars['roll']), type_L=request.vars['type_L'], type_U=request.vars['type_U']))}}";
+			{{elif str(request.vars['level'])=="6":}}
+				window.location.href = "{{=URL(vars=dict(level = 6, period = request.vars['period'], month = str(request.vars['month']), project = str(request.vars['project']), roll = str(request.vars['roll']), userP = str(request.vars['userP']), type_L=request.vars['type_L'], type_U=request.vars['type_U']))}}";
 			{{pass}}
 		});
 	
@@ -1533,7 +1156,7 @@
 				{{valuesSearch = 'value_'+fieldSearch[0]}}
 				$("#{{=optionSearch}}").css("display", "none");
 				$("#{{=valuesSearch}}").css("display", "none");
-				if (document.getElementById('fieldSearch').value == 'academic_log.{{=str(fieldSearch[0])}}'){
+				if (document.getElementById('fieldSearch').value == 'academic_course_assignation_log.{{=str(fieldSearch[0])}}'){
 					$("#{{=optionSearch}}").css("display", "block");
 					$("#{{=valuesSearch}}").css("display", "block");
 				}
@@ -1545,7 +1168,7 @@
 			{{for fieldSearch in fsearch:}}
 				{{optionSearch = 'optionSearch_'+fieldSearch[0]}}
 				{{valuesSearch = 'value_'+fieldSearch[0]}}
-				if (document.getElementById('fieldSearch').value == 'academic_log.{{=str(fieldSearch[0])}}'){
+				if (document.getElementById('fieldSearch').value == 'academic_course_assignation_log.{{=str(fieldSearch[0])}}'){
 					document.getElementById('querySearch').value = document.getElementById('fieldSearch').value+ ' '+ document.getElementById('{{=optionSearch}}').value +' "' +document.getElementById('{{=valuesSearch}}').value+'"';
 				}
 			{{pass}}
@@ -1555,7 +1178,7 @@
 			{{for fieldSearch in fsearch:}}
 				{{optionSearch = 'optionSearch_'+fieldSearch[0]}}
 				{{valuesSearch = 'value_'+fieldSearch[0]}}
-				if (document.getElementById('fieldSearch').value == 'academic_log.{{=str(fieldSearch[0])}}'){
+				if (document.getElementById('fieldSearch').value == 'academic_course_assignation_log.{{=str(fieldSearch[0])}}'){
 					if (document.getElementById('querySearch').value==''){
 						document.getElementById('querySearch').value = document.getElementById('fieldSearch').value+ ' '+ document.getElementById('{{=optionSearch}}').value +' "' +document.getElementById('{{=valuesSearch}}').value+'"';
 					}else{
@@ -1569,7 +1192,7 @@
 			{{for fieldSearch in fsearch:}}
 				{{optionSearch = 'optionSearch_'+fieldSearch[0]}}
 				{{valuesSearch = 'value_'+fieldSearch[0]}}
-				if (document.getElementById('fieldSearch').value == 'academic_log.{{=str(fieldSearch[0])}}'){
+				if (document.getElementById('fieldSearch').value == 'academic_course_assignation_log.{{=str(fieldSearch[0])}}'){
 					if (document.getElementById('querySearch').value==''){
 						document.getElementById('querySearch').value = document.getElementById('fieldSearch').value+ ' '+ document.getElementById('{{=optionSearch}}').value +' "' +document.getElementById('{{=valuesSearch}}').value+'"';
 					}else{
@@ -1614,13 +1237,15 @@
 	{{if request.vars['level'] is not None and str(request.vars['level'])!="1":}}
 		function levelUP(){
 			{{if str(request.vars['level'])=="2":}}
-				window.location.href = "{{=URL('management_reports', 'student_management',vars=dict(querySearch=personal_query))}}";
+				window.location.href = "{{=URL('management_reports', 'student_assignment_management',vars=dict(querySearch=personal_query))}}";
 			{{elif str(request.vars['level'])=="3":}}
-				window.location.href = "{{=URL('management_reports', 'student_management',vars=dict(list='level',level='2',period = str(request.vars['period']), type_L = str(request.vars['type_U']), querySearch=personal_query))}}";
+				window.location.href = "{{=URL('management_reports', 'student_assignment_management',vars=dict(list='level',level='2',period = str(request.vars['period']), type_L = str(request.vars['type_U']), querySearch=personal_query))}}";
 			{{elif str(request.vars['level'])=="4":}}
-				window.location.href = "{{=URL('management_reports', 'student_management',vars=dict(list='level',level='3', period = str(request.vars['period']), month = str(request.vars['month']), type_L = str(request.vars['type_U']), type_U = str(request.vars['type_U']), querySearch=personal_query))}}";
+				window.location.href = "{{=URL('management_reports', 'student_assignment_management',vars=dict(list='level',level='3',period = str(request.vars['period']), month = str(request.vars['month']), type_L = str(request.vars['type_U']), querySearch=personal_query))}}";
 			{{elif str(request.vars['level'])=="5":}}
-				window.location.href = "{{=URL('management_reports', 'student_management',vars=dict(list='level',level='4', period = str(request.vars['period']), month = str(request.vars['month']), roll = str(request.vars['roll']), type_L = str(request.vars['type_U']), type_U = str(request.vars['type_U']), querySearch=personal_query))}}";
+				window.location.href = "{{=URL('management_reports', 'student_assignment_management',vars=dict(list='level',level='4', period = str(request.vars['period']), month = str(request.vars['month']), project = str(request.vars['project']), type_L = str(request.vars['type_U']), type_U = str(request.vars['type_U']), querySearch=personal_query))}}";
+			{{elif str(request.vars['level'])=="6":}}
+				window.location.href = "{{=URL('management_reports', 'student_assignment_management',vars=dict(list='level',level='5', period = str(request.vars['period']), month = str(request.vars['month']), project = str(request.vars['project']), roll = str(request.vars['roll']), type_L = str(request.vars['type_U']), type_U = str(request.vars['type_U']), querySearch=personal_query))}}";
 			{{pass}}
 		}
 	{{pass}}
@@ -1629,15 +1254,17 @@
 	//INIT EXPORT REPORT TO CSV FILE
 	function exportCSV(){
 		{{if request.vars['level'] is None or str(request.vars['level'])=="1":}}
-			window.location.href = "{{=URL('management_reports','student_management_export', vars=dict(list_type='csv', level='1', querySearch=personal_query))}}";
+			window.location.href = "{{=URL('management_reports','student_assignment_management_export', vars=dict(list_type='csv', level='1', querySearch=personal_query))}}";
 		{{elif str(request.vars['level'])=="2":}}
-			window.location.href = "{{=URL('management_reports','student_management_export', vars=dict(list_type='csv', level='2',period = str(request.vars['period']), type_L = str(request.vars['type_L']), querySearch=personal_query))}}";
+			window.location.href = "{{=URL('management_reports','student_assignment_management_export', vars=dict(list_type='csv', level='2',period = str(request.vars['period']), type_L = str(request.vars['type_L']), querySearch=personal_query))}}";
 		{{elif str(request.vars['level'])=="3":}}
-			window.location.href = "{{=URL('management_reports','student_management_export', vars=dict(list_type='csv', level='3',period = str(request.vars['period']), month = str(request.vars['month']), type_L = str(request.vars['type_L']), type_U = str(request.vars['type_U']), querySearch=personal_query))}}";
+			window.location.href = "{{=URL('management_reports','student_assignment_management_export', vars=dict(list_type='csv', level='3',period = str(request.vars['period']), month = str(request.vars['month']), type_L = str(request.vars['type_L']), type_U = str(request.vars['type_U']), querySearch=personal_query))}}";
 		{{elif str(request.vars['level'])=="4":}}
-			window.location.href = "{{=URL('management_reports','student_management_export', vars=dict(list_type='csv', level='4',period = str(request.vars['period']), month = str(request.vars['month']), roll = str(request.vars['roll']), type_L = str(request.vars['type_L']), type_U = str(request.vars['type_U']), querySearch=personal_query))}}";
+			window.location.href = "{{=URL('management_reports','student_assignment_management_export', vars=dict(list_type='csv', level='4',period = str(request.vars['period']), month = str(request.vars['month']), project = str(request.vars['project']), type_L = str(request.vars['type_L']), type_U = str(request.vars['type_U']), querySearch=personal_query))}}";
 		{{elif str(request.vars['level'])=="5":}}
-			window.location.href = "{{=URL('management_reports','student_management_export', vars=dict(list_type='csv', level='5',period = str(request.vars['period']), month = str(request.vars['month']), roll = str(request.vars['roll']), userP = str(request.vars['userP']), type_L = str(request.vars['type_L']), type_U = str(request.vars['type_U']), querySearch=personal_query))}}";
+			window.location.href = "{{=URL('management_reports','student_assignment_management_export', vars=dict(list_type='csv', level='5',period = str(request.vars['period']), month = str(request.vars['month']), project = str(request.vars['project']), roll = str(request.vars['roll']), type_L = str(request.vars['type_L']), type_U = str(request.vars['type_U']), querySearch=personal_query))}}";
+		{{elif str(request.vars['level'])=="6":}}
+			window.location.href = "{{=URL('management_reports','student_assignment_management_export', vars=dict(list_type='csv', level='6',period = str(request.vars['period']), month = str(request.vars['month']), project = str(request.vars['project']), roll = str(request.vars['roll']), userP = str(request.vars['userP']), type_L = str(request.vars['type_L']), type_U = str(request.vars['type_U']), querySearch=personal_query))}}";
 		{{pass}}
 	}
 	//END EXPORT REPORT TO CSV FILE

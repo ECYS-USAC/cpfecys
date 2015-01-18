@@ -215,6 +215,7 @@ if auth.has_membership(role="Super-Administrator"):
         (T('Grades'), False, URL('management_reports','grades_management'), []),
         (T('Activities Metric'), False, URL('management_reports','activities_withmetric_management'), []),
         (T('Academic'), False, URL('management_reports','student_management'), []),
+        (T('Student Assignment'), False, URL('management_reports','student_assignment_management'), []),
         (T('History Evaluations'), False, URL('evaluation','evaluation_history'), [])
     ]))
 
