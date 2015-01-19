@@ -190,7 +190,7 @@ def VALIDATE_PROJECT(projectI,typeReport):
                 project=project.course
         elif typeReport=='academic_course_assignation_log':
             flag=True
-            project=db((db.course_activity_log.before_course==projectI)|(db.course_activity_log.after_course==projectI)).select().first()
+            project=db((db.academic_course_assignation_log.before_course==projectI)|(db.academic_course_assignation_log.after_course==projectI)).select().first()
             if project is not None:
                 if project.before_course is not None:
                     project=project.before_course
@@ -426,8 +426,6 @@ def GET_USERS(period,project,roll,typeReport):
                 for userT in db((db.auth_membership.group_id==rollT.id)&(db.auth_membership.user_id==db.auth_user.id)&(db.auth_user.id==db.user_project.assigned_user)&(db.user_project.period == db.period_year.id)&((db.user_project.period <= period.id) & ((db.user_project.period + db.user_project.periods) > period.id))).select(db.auth_user.ALL, distinct=True):
                     usersProject.append(userT.username)
 
-            
-
     #USERS IN LOGS
     if typeReport == 'grades_log':
         if len(usersProject) ==0:
@@ -450,6 +448,13 @@ def GET_USERS(period,project,roll,typeReport):
             usersProjectT = db((db.academic_log.id_period==period.id)&(db.academic_log.roll.like('%'+str(roll)+'%'))&(~db.academic_log.user_name.belongs(usersProject))).select(db.academic_log.user_name, distinct=True)
         for userT in usersProjectT:
             usersProject.append(userT.user_name)
+    elif typeReport == 'academic_course_assignation_log':
+        if len(usersProject) == 0:
+            usersProjectT = db((db.academic_course_assignation_log.id_period==period.id)&((db.academic_course_assignation_log.before_course==project)|(db.academic_course_assignation_log.after_course==project))&(db.academic_course_assignation_log.roll.like('%'+str(roll)+'%'))).select(db.academic_course_assignation_log.user_name, distinct=True)
+        else:
+            usersProjectT = db((db.academic_course_assignation_log.id_period==period.id)&((db.academic_course_assignation_log.before_course==project)|(db.academic_course_assignation_log.after_course==project))&(db.academic_course_assignation_log.roll.like('%'+str(roll)+'%'))&(~db.academic_course_assignation_log.user_name.belongs(usersProject))).select(db.academic_course_assignation_log.user_name, distinct=True)
+        for userT in usersProjectT:
+            usersProject.append(userT.user_name)
     elif typeReport == 'evaluation_result':
         condition = ''
         for userTT in usersProject:
@@ -461,7 +466,7 @@ def GET_USERS(period,project,roll,typeReport):
         for userT in db.smart_query(db.academic_log,searchT).select(db.academic_log.user_name, distinct=True):
             usersProject.append(userT.user_name)
     else:
-        session.flash = T('Not valid Action.')+'2'
+        session.flash = T('Not valid Action.')
         redirect(URL('default','index'))
     return usersProject
 
@@ -3682,6 +3687,517 @@ def student_management():
 #*****************************************************MANAGEMENT REPORT STUDENTS ASSIGNMENT*******************************************
 @auth.requires_login()
 @auth.requires_membership('Super-Administrator')
+def student_assignment_management_export():
+    #VERIFI THAT ACCURATE PARAMETERS
+    try:
+        #CHECK IF THE TYPE OF EXPORT IS VALID
+        if request.vars['list_type'] is None or str(request.vars['list_type'])!="csv":
+            session.flash = T('Not valid Action.')
+            redirect(URL('default','index'))
+
+        #CHECK THAT THE LEVEL OF REPORT IS VALID
+        if request.vars['level'] is not None and (int(request.vars['level'])<1 and int(request.vars['level'])>6):
+            session.flash = T('Report no visible: There are no parameters required to display the report.')
+            redirect(URL('default','index'))
+
+        #VERIFY THAT THE PARAMETERS OF EACH LEVEL BE VALID
+        if request.vars['level'] is not None:
+            #LEVEL MORE THAN 1
+            if int(request.vars['level'])>1:
+                #CHECK IF THE TYPE OF REPORT IS VALID
+                if request.vars['type_L'] is None or (str(request.vars['type_L'])!="all" and str(request.vars['type_L'])!="i" and str(request.vars['type_L'])!="u" and str(request.vars['type_L'])!="d"):
+                    session.flash = T('Report no visible: There are no parameters required to display the report.')
+                    redirect(URL('default','index'))
+
+                period = VALIDATE_PERIOD(request.vars['period'])
+                if period is None:
+                    session.flash = T('Report no visible: There are no parameters required to display the report.')
+                    redirect(URL('default','index'))
+            
+            #LEVEL MORE THAN 2
+            if int(request.vars['level'])>2:
+                #CHECK IF THE TYPE OF REPORT IS VALID
+                if request.vars['type_U'] is None or (str(request.vars['type_U'])!="all" and str(request.vars['type_U'])!="i" and str(request.vars['type_U'])!="u" and str(request.vars['type_U'])!="d"):
+                    session.flash = T('Report no visible: There are no parameters required to display the report.')
+                    redirect(URL('default','index'))
+
+                #CHECK IF THE MONTH IS VALID
+                month = VALIDATE_MONTH(request.vars['month'],period)
+                if month is None:
+                    session.flash = T('Report no visible: There are no parameters required to display the report.')
+                    redirect(URL('default','index'))
+            
+            #LEVEL MORE THAN 3
+            if int(request.vars['level'])>3:
+                #CHECK IF THE PROJECT IS VALID
+                project = VALIDATE_PROJECT(request.vars['project'],'academic_course_assignation_log')
+                if project is None:
+                    session.flash = T('Report no visible: There are no parameters required to display the report.')
+                    redirect(URL('default','index'))
+            #LEVEL MORE THAN 4
+            if int(request.vars['level'])>4:
+                #CHECK IF THE ROLE IS VALID
+                roll = VALIDATE_ROLE(request.vars['roll'],'academic_course_assignation_log')
+                if roll is None:
+                    session.flash = T('Report no visible: There are no parameters required to display the report.')
+                    redirect(URL('default','index'))
+
+            #LEVEL MORE THAN 5
+            if int(request.vars['level'])>5:
+                #CHECK IF THE USER IS VALID
+                userP = VALIDATE_USER(period,project,roll,request.vars['userP'],'academic_course_assignation_log')
+                if userP is None:
+                    session.flash = T('Report no visible: There are no parameters required to display the report.')
+                    redi*rect(URL('default','index'))
+    except:
+        session.flash = T('Not valid Action.')
+        redirect(URL('default','index'))
+
+    #CHECK IF THERE IS A PERSONALIZED QUERY
+    personal_query = ''
+    if request.vars['querySearch'] is not None and str(request.vars['querySearch']) != "":
+        #PERSONALIZED QUERY SURE WORK
+        try:
+            personal_query = str(request.vars['querySearch'])
+            countI = db.smart_query(db.academic_course_assignation_log,personal_query).count()
+        except:
+            personal_query = ''
+
+    #****************************************************************************************************************
+    #****************************************************************************************************************
+    #*****************************************************REPORT*****************************************************
+    from datetime import datetime
+    #TITLE
+    infoLevel = []
+    infoeLevelTemp=[]
+    infoeLevelTemp.append('Universidad de San Carlos de Guatemala')
+    infoLevel.append(infoeLevelTemp)
+    infoeLevelTemp=[]
+    infoeLevelTemp.append('Facultad de Ingeniería')
+    infoLevel.append(infoeLevelTemp)
+    infoeLevelTemp=[]
+    infoeLevelTemp.append('Escuela de Ciencias y Sistemas')
+    infoLevel.append(infoeLevelTemp)
+    #TYPE OF REPORT
+    infoeLevelTemp=[]
+    infoeLevelTemp.append(T('Type'))
+    infoeLevelTemp.append(T('Student Assignment Management'))
+    infoLevel.append(infoeLevelTemp)
+    #DESCRIPTION OF REPORT
+    infoeLevelTemp=[]
+    infoeLevelTemp.append(T('Description'))
+    infoeLevelTemp.append(T('Report of operations management assignment of students'))
+    infoLevel.append(infoeLevelTemp)
+    #LEVELS OF REPORT
+    #ALL SEMESTERS
+    if request.vars['level'] is None or str(request.vars['level'])=="1":
+        #MIDDLE LINE OF REPORT
+        infoeLevelTemp=[]
+        infoLevel.append(infoeLevelTemp)
+        #LABLE DETAIL OF REPORT
+        infoeLevelTemp=[]
+        infoeLevelTemp.append(T('Detail'))
+        infoLevel.append(infoeLevelTemp)
+        #LABELS OF DATA OF REPORT
+        infoeLevelTemp=[]
+        infoeLevelTemp.append(T('Period'))
+        infoeLevelTemp.append(T('Total inserted'))
+        infoeLevelTemp.append(T('Total modified'))
+        infoeLevelTemp.append(T('Total out'))
+        infoLevel.append(infoeLevelTemp)
+        for period in db(db.period_year).select(orderby=~db.period_year.id):
+            infoeLevelTemp = []
+            #NAME OF PERIOD
+            infoeLevelTemp.append(T(period.period.name)+' '+str(period.yearp))
+            #INSERT
+            if personal_query == '':
+                search='academic_course_assignation_log.id_period = "'+str(period.id)+'" and academic_course_assignation_log.operation_log = "insert"'
+            else:
+                search='academic_course_assignation_log.id_period = "'+str(period.id)+'" and academic_course_assignation_log.operation_log = "insert" and '+personal_query
+            countI = db.smart_query(db.academic_course_assignation_log,search).count()
+            infoeLevelTemp.append(countI)
+            #UPDATE
+            if personal_query == '':
+                search='academic_course_assignation_log.id_period = "'+str(period.id)+'" and academic_course_assignation_log.operation_log = "update"'
+            else:
+                search='academic_course_assignation_log.id_period = "'+str(period.id)+'" and academic_course_assignation_log.operation_log = "update" and '+personal_query
+            countI = db.smart_query(db.academic_course_assignation_log,search).count()
+            infoeLevelTemp.append(countI)
+            #DELETE
+            if personal_query == '':
+                search='academic_course_assignation_log.id_period = "'+str(period.id)+'" and academic_course_assignation_log.operation_log = "delete"'
+            else:
+                search='academic_course_assignation_log.id_period = "'+str(period.id)+'" and academic_course_assignation_log.operation_log = "delete" and '+personal_query
+            countI = db.smart_query(db.academic_course_assignation_log,search).count()
+            infoeLevelTemp.append(countI)
+            #INSERT PERIOD
+            infoLevel.append(infoeLevelTemp)
+    #PER MONTH
+    elif str(request.vars['level'])=="2":
+        #PERIOD OF REPORT
+        infoeLevelTemp=[]
+        infoeLevelTemp.append(T('Period'))
+        infoeLevelTemp.append(T(period.period.name)+' '+str(period.yearp))
+        infoLevel.append(infoeLevelTemp)
+        #MIDDLE LINE OF REPORT
+        infoeLevelTemp=[]
+        infoLevel.append(infoeLevelTemp)
+        #LABLE DETAIL OF REPORT
+        infoeLevelTemp=[]
+        infoeLevelTemp.append(T('Detail'))
+        infoLevel.append(infoeLevelTemp)
+        #LABELS OF DATA OF REPORT
+        infoeLevelTemp=[]
+        infoeLevelTemp.append(T('Month'))
+        if str(request.vars['type_L'])=="all" or str(request.vars['type_L'])=="i":
+            infoeLevelTemp.append(T('Total inserted'))
+        if str(request.vars['type_L'])=="all" or str(request.vars['type_L'])=="u":
+            infoeLevelTemp.append(T('Total modified'))
+        if str(request.vars['type_L'])=="all" or str(request.vars['type_L'])=="d":
+            infoeLevelTemp.append(T('Total out'))
+        infoLevel.append(infoeLevelTemp)
+
+        for month in GET_MONTH_PERIOD(period):
+            start = datetime.strptime(str(period.yearp) + '-' + str(month[0]) +'-01', "%Y-%m-%d")
+            if month[2]==1:
+                end = datetime.strptime(str(period.yearp+1) + '-' + str(month[2]) +'-01', "%Y-%m-%d")
+            else:
+                end = datetime.strptime(str(period.yearp) + '-' + str(month[2]) +'-01', "%Y-%m-%d")
+            infoeLevelTemp = []
+            #NAME OF MONTH
+            infoeLevelTemp.append(month[1]+' '+str(period.yearp))
+            #INSERT
+            if str(request.vars['type_L'])=="all" or str(request.vars['type_L'])=="i":
+                if personal_query == '':
+                    search='academic_course_assignation_log.id_period = "'+str(period.id)+'" and academic_course_assignation_log.operation_log = "insert" and academic_course_assignation_log.date_log >="'+str(start)+'" and academic_course_assignation_log.date_log<="'+str(end)+'"'
+                else:
+                    search='academic_course_assignation_log.id_period = "'+str(period.id)+'" and academic_course_assignation_log.operation_log = "insert" and academic_course_assignation_log.date_log >="'+str(start)+'" and academic_course_assignation_log.date_log<="'+str(end)+'" and '+personal_query
+                countI = db.smart_query(db.academic_course_assignation_log,search).count()
+                infoeLevelTemp.append(countI)
+            #UPDATE
+            if str(request.vars['type_L'])=="all" or str(request.vars['type_L'])=="u":
+                if personal_query == '':
+                    search='academic_course_assignation_log.id_period = "'+str(period.id)+'" and academic_course_assignation_log.operation_log = "update" and academic_course_assignation_log.date_log>="'+str(start)+'" and academic_course_assignation_log.date_log<="'+str(end)+'"'
+                else:
+                    search='academic_course_assignation_log.id_period = "'+str(period.id)+'" and academic_course_assignation_log.operation_log = "update" and academic_course_assignation_log.date_log>="'+str(start)+'" and academic_course_assignation_log.date_log<="'+str(end)+'" and '+personal_query
+                countI = db.smart_query(db.academic_course_assignation_log,search).count()
+                infoeLevelTemp.append(countI)
+            #DELETE
+            if str(request.vars['type_L'])=="all" or str(request.vars['type_L'])=="d":
+                if personal_query == '':
+                    search='academic_course_assignation_log.id_period = "'+str(period.id)+'" and academic_course_assignation_log.operation_log = "delete" and academic_course_assignation_log.date_log>="'+str(start)+'" and academic_course_assignation_log.date_log<="'+str(end)+'"'
+                else:
+                    search='academic_course_assignation_log.id_period = "'+str(period.id)+'" and academic_course_assignation_log.operation_log = "delete" and academic_course_assignation_log.date_log>="'+str(start)+'" and academic_course_assignation_log.date_log<="'+str(end)+'" and '+personal_query
+                countI = db.smart_query(db.academic_course_assignation_log,search).count()
+                infoeLevelTemp.append(countI)
+            #INSERT MONTH
+            infoLevel.append(infoeLevelTemp)
+    #PER PROJECT
+    elif str(request.vars['level'])=="3":
+        #PROJECTS
+        projects = GET_PROJECTS('academic_course_assignation_log')
+        projects=sorted(projects)
+        #PERIOD OF REPORT
+        infoeLevelTemp=[]
+        infoeLevelTemp.append(T('Period'))
+        infoeLevelTemp.append(T(period.period.name)+' '+str(period.yearp))
+        infoLevel.append(infoeLevelTemp)
+        #MONTH OF REPORT
+        infoeLevelTemp=[]
+        infoeLevelTemp.append(T('Month'))
+        infoeLevelTemp.append(str(month[0]))
+        infoLevel.append(infoeLevelTemp)
+        #MIDDLE LINE OF REPORT
+        infoeLevelTemp=[]
+        infoLevel.append(infoeLevelTemp)
+        #LABLE DETAIL OF REPORT
+        infoeLevelTemp=[]
+        infoeLevelTemp.append(T('Detail'))
+        infoLevel.append(infoeLevelTemp)
+        #LABELS OF DATA OF REPORT
+        infoeLevelTemp=[]
+        infoeLevelTemp.append(T('Project'))
+        if str(request.vars['type_L'])=="all" or str(request.vars['type_L'])=="i":
+            infoeLevelTemp.append(T('Total inserted'))
+        if str(request.vars['type_L'])=="all" or str(request.vars['type_L'])=="u":
+            infoeLevelTemp.append(T('Total modified'))
+        if str(request.vars['type_L'])=="all" or str(request.vars['type_L'])=="d":
+            infoeLevelTemp.append(T('Total out'))
+        infoLevel.append(infoeLevelTemp)
+
+        for projectT in projects:
+            project=db(db.project.name==projectT).select().first()
+            if project is None:
+                project=db((db.course_activity_log.before_course==projectT)|(db.course_activity_log.after_course==projectT)).select().first()
+                if project.before_course is not None:
+                    project=project.before_course
+                else:
+                    project=project.after_course
+            else:
+                project=project.name
+            infoeLevelTemp = []
+            #NAME OF PROJECT
+            infoeLevelTemp.append(project)
+            #INSERT
+            if str(request.vars['type_L'])=="all" or str(request.vars['type_L'])=="i":
+                if personal_query == '':
+                    search='academic_course_assignation_log.id_period = "'+str(period.id)+'" and academic_course_assignation_log.operation_log = "insert" and academic_course_assignation_log.date_log >="'+str(month[1])+'" and academic_course_assignation_log.date_log<="'+str(month[2])+'" and academic_course_assignation_log.after_course = "'+str(project)+'"'
+                else:
+                    search='academic_course_assignation_log.id_period = "'+str(period.id)+'" and academic_course_assignation_log.operation_log = "insert" and academic_course_assignation_log.date_log >="'+str(month[1])+'" and academic_course_assignation_log.date_log<="'+str(month[2])+'" and academic_course_assignation_log.after_course = "'+str(project)+'" and '+personal_query
+                countI = db.smart_query(db.academic_course_assignation_log,search).count()
+                infoeLevelTemp.append(countI)
+            #UPDATE
+            if str(request.vars['type_L'])=="all" or str(request.vars['type_L'])=="u":
+                if personal_query == '':
+                    search='academic_course_assignation_log.id_period = "'+str(period.id)+'" and academic_course_assignation_log.operation_log = "update" and academic_course_assignation_log.date_log >="'+str(month[1])+'" and academic_course_assignation_log.date_log<="'+str(month[2])+'" and academic_course_assignation_log.after_course = "'+str(project)+'" and academic_course_assignation_log.before_course = "'+str(project)+'"'
+                else:
+                    search='academic_course_assignation_log.id_period = "'+str(period.id)+'" and academic_course_assignation_log.operation_log = "update" and academic_course_assignation_log.date_log >="'+str(month[1])+'" and academic_course_assignation_log.date_log<="'+str(month[2])+'" and academic_course_assignation_log.after_course = "'+str(project)+'" and academic_course_assignation_log.before_course = "'+str(project)+'" and '+personal_query
+                countI = db.smart_query(db.academic_course_assignation_log,search).count()
+                infoeLevelTemp.append(countI)
+            #DELETE
+            if str(request.vars['type_L'])=="all" or str(request.vars['type_L'])=="d":
+                if personal_query == '':
+                    search='academic_course_assignation_log.id_period = "'+str(period.id)+'" and academic_course_assignation_log.operation_log = "delete" and academic_course_assignation_log.date_log >="'+str(month[1])+'" and academic_course_assignation_log.date_log<="'+str(month[2])+'" and academic_course_assignation_log.before_course = "'+str(project)+'"'
+                else:
+                    search='academic_course_assignation_log.id_period = "'+str(period.id)+'" and academic_course_assignation_log.operation_log = "delete" and academic_course_assignation_log.date_log >="'+str(month[1])+'" and academic_course_assignation_log.date_log<="'+str(month[2])+'" and academic_course_assignation_log.before_course = "'+str(project)+'" and '+personal_query
+                countI = db.smart_query(db.academic_course_assignation_log,search).count()
+                infoeLevelTemp.append(countI)
+            #INSERT PROJECT
+            infoLevel.append(infoeLevelTemp)
+    #PER ROL
+    elif str(request.vars['level'])=="4":
+        #ROLES
+        roles = GET_ROLES('academic_course_assignation_log')
+        #PERIOD OF REPORT
+        infoeLevelTemp=[]
+        infoeLevelTemp.append(T('Period'))
+        infoeLevelTemp.append(T(period.period.name)+' '+str(period.yearp))
+        infoLevel.append(infoeLevelTemp)
+        #MONTH OF REPORT
+        infoeLevelTemp=[]
+        infoeLevelTemp.append(T('Month'))
+        infoeLevelTemp.append(str(month[0]))
+        infoLevel.append(infoeLevelTemp)
+        #PROJECT OF REPORT
+        infoeLevelTemp=[]
+        infoeLevelTemp.append(T('Project'))
+        infoeLevelTemp.append(str(project))
+        infoLevel.append(infoeLevelTemp)
+        #MIDDLE LINE OF REPORT
+        infoeLevelTemp=[]
+        infoLevel.append(infoeLevelTemp)
+        #LABLE DETAIL OF REPORT
+        infoeLevelTemp=[]
+        infoeLevelTemp.append(T('Detail'))
+        infoLevel.append(infoeLevelTemp)
+        #LABELS OF DATA OF REPORT
+        infoeLevelTemp=[]
+        infoeLevelTemp.append(T('Role'))
+        if str(request.vars['type_L'])=="all" or str(request.vars['type_L'])=="i":
+            infoeLevelTemp.append(T('Total inserted'))
+        if str(request.vars['type_L'])=="all" or str(request.vars['type_L'])=="u":
+            infoeLevelTemp.append(T('Total modified'))
+        if str(request.vars['type_L'])=="all" or str(request.vars['type_L'])=="d":
+            infoeLevelTemp.append(T('Total out'))
+        infoLevel.append(infoeLevelTemp)
+
+        for rollT in roles:
+            roll=db(db.auth_group.role==rollT).select().first()
+            if roll is None:
+                roll=db(db.academic_course_assignation_log.roll.like('%'+rollT+'%')).select().first()
+                roll=roll.roll
+            else:
+                roll=roll.role
+            infoeLevelTemp = []
+            #NAME OF ROLE
+            infoeLevelTemp.append(T('Rol '+roll))
+            #INSERT
+            if str(request.vars['type_L'])=="all" or str(request.vars['type_L'])=="i":
+                if personal_query == '':
+                    search='academic_course_assignation_log.id_period = "'+str(period.id)+'" and academic_course_assignation_log.operation_log = "insert" and academic_course_assignation_log.date_log >="'+str(month[1])+'" and academic_course_assignation_log.date_log<="'+str(month[2])+'" and academic_course_assignation_log.after_course = "'+str(project)+'" and academic_course_assignation_log.roll contains "'+str(roll)+'"'
+                else:
+                    search='academic_course_assignation_log.id_period = "'+str(period.id)+'" and academic_course_assignation_log.operation_log = "insert" and academic_course_assignation_log.date_log >="'+str(month[1])+'" and academic_course_assignation_log.date_log<="'+str(month[2])+'" and academic_course_assignation_log.after_course = "'+str(project)+'" and academic_course_assignation_log.roll contains "'+str(roll)+'" and '+personal_query
+                countI = db.smart_query(db.academic_course_assignation_log,search).count()
+                infoeLevelTemp.append(countI)
+            #UPDATE
+            if str(request.vars['type_L'])=="all" or str(request.vars['type_L'])=="u":
+                if personal_query == '':
+                    search='academic_course_assignation_log.id_period = "'+str(period.id)+'" and academic_course_assignation_log.operation_log = "update" and academic_course_assignation_log.date_log >="'+str(month[1])+'" and academic_course_assignation_log.date_log<="'+str(month[2])+'" and academic_course_assignation_log.before_course = "'+str(project)+'" and academic_course_assignation_log.after_course = "'+str(project)+'" and academic_course_assignation_log.roll contains "'+str(roll)+'"'
+                else:
+                    search='academic_course_assignation_log.id_period = "'+str(period.id)+'" and academic_course_assignation_log.operation_log = "update" and academic_course_assignation_log.date_log >="'+str(month[1])+'" and academic_course_assignation_log.date_log<="'+str(month[2])+'" and academic_course_assignation_log.before_course = "'+str(project)+'" and academic_course_assignation_log.after_course = "'+str(project)+'" and academic_course_assignation_log.roll contains "'+str(roll)+'" and '+personal_query
+                countI = db.smart_query(db.academic_course_assignation_log,search).count()
+                infoeLevelTemp.append(countI)
+            #DELETE
+            if str(request.vars['type_L'])=="all" or str(request.vars['type_L'])=="d":
+                if personal_query == '':
+                    search='academic_course_assignation_log.id_period = "'+str(period.id)+'" and academic_course_assignation_log.operation_log = "delete" and academic_course_assignation_log.date_log >="'+str(month[1])+'" and academic_course_assignation_log.date_log<="'+str(month[2])+'" and academic_course_assignation_log.before_course = "'+str(project)+'" and academic_course_assignation_log.roll contains "'+str(roll)+'"'
+                else:
+                    search='academic_course_assignation_log.id_period = "'+str(period.id)+'" and academic_course_assignation_log.operation_log = "delete" and academic_course_assignation_log.date_log >="'+str(month[1])+'" and academic_course_assignation_log.date_log<="'+str(month[2])+'" and academic_course_assignation_log.before_course = "'+str(project)+'" and academic_course_assignation_log.roll contains "'+str(roll)+'" and '+personal_query
+                countI = db.smart_query(db.academic_course_assignation_log,search).count()
+                infoeLevelTemp.append(countI)
+            #INSERT ROLE
+            infoLevel.append(infoeLevelTemp)
+    #PER USER
+    elif str(request.vars['level'])=="5":
+        #USERS
+        usersProject = GET_USERS(period,project,roll,'academic_course_assignation_log')
+        #PERIOD OF REPORT
+        infoeLevelTemp=[]
+        infoeLevelTemp.append(T('Period'))
+        infoeLevelTemp.append(T(period.period.name)+' '+str(period.yearp))
+        infoLevel.append(infoeLevelTemp)
+        #MONTH OF REPORT
+        infoeLevelTemp=[]
+        infoeLevelTemp.append(T('Month'))
+        infoeLevelTemp.append(str(month[0]))
+        infoLevel.append(infoeLevelTemp)
+        #PROJECT OF REPORT
+        infoeLevelTemp=[]
+        infoeLevelTemp.append(T('Project'))
+        infoeLevelTemp.append(str(project))
+        infoLevel.append(infoeLevelTemp)
+        #ROL OF REPORT
+        infoeLevelTemp=[]
+        infoeLevelTemp.append(T('Role'))
+        infoeLevelTemp.append(T('Rol '+roll))
+        infoLevel.append(infoeLevelTemp)
+        #MIDDLE LINE OF REPORT
+        infoeLevelTemp=[]
+        infoLevel.append(infoeLevelTemp)
+        #LABLE DETAIL OF REPORT
+        infoeLevelTemp=[]
+        infoeLevelTemp.append(T('Detail'))
+        infoLevel.append(infoeLevelTemp)
+        #LABELS OF DATA OF REPORT
+        infoeLevelTemp=[]
+        infoeLevelTemp.append(T('User'))
+        if str(request.vars['type_L'])=="all" or str(request.vars['type_L'])=="i":
+            infoeLevelTemp.append(T('Total inserted'))
+        if str(request.vars['type_L'])=="all" or str(request.vars['type_L'])=="u":
+            infoeLevelTemp.append(T('Total modified'))
+        if str(request.vars['type_L'])=="all" or str(request.vars['type_L'])=="d":
+            infoeLevelTemp.append(T('Total out'))
+        infoLevel.append(infoeLevelTemp)
+
+        for userPT in usersProject:
+            userP=db(db.auth_user.username==userPT).select().first()
+            if userP is None:
+                userP=db(db.academic_course_assignation_log.user_name==userPT).select().first()
+                userP=userP.user_name
+            else:
+                userP=userP.username
+            infoeLevelTemp = []
+            #NAME OF USER
+            infoeLevelTemp.append(userP)
+            #INSERT
+            if str(request.vars['type_L'])=="all" or str(request.vars['type_L'])=="i":
+                if personal_query == '':
+                    search='academic_course_assignation_log.id_period = "'+str(period.id)+'" and academic_course_assignation_log.operation_log = "insert" and academic_course_assignation_log.date_log >="'+str(month[1])+'" and academic_course_assignation_log.date_log<="'+str(month[2])+'" and academic_course_assignation_log.after_course = "'+str(project)+'" and academic_course_assignation_log.roll contains "'+str(roll)+'" and academic_course_assignation_log.user_name ="'+str(userP)+'"'
+                else:
+                    search='academic_course_assignation_log.id_period = "'+str(period.id)+'" and academic_course_assignation_log.operation_log = "insert" and academic_course_assignation_log.date_log >="'+str(month[1])+'" and academic_course_assignation_log.date_log<="'+str(month[2])+'" and academic_course_assignation_log.after_course = "'+str(project)+'" and academic_course_assignation_log.roll contains "'+str(roll)+'" and academic_course_assignation_log.user_name ="'+str(userP)+'" and '+personal_query
+                countI = db.smart_query(db.academic_course_assignation_log,search).count()
+                infoeLevelTemp.append(countI)
+            #UPDATE
+            if str(request.vars['type_L'])=="all" or str(request.vars['type_L'])=="u":
+                if personal_query == '':
+                    search='academic_course_assignation_log.id_period = "'+str(period.id)+'" and academic_course_assignation_log.operation_log = "update" and academic_course_assignation_log.date_log >="'+str(month[1])+'" and academic_course_assignation_log.date_log<="'+str(month[2])+'" and academic_course_assignation_log.before_course = "'+str(project)+'" and academic_course_assignation_log.after_course = "'+str(project)+'" and academic_course_assignation_log.roll contains "'+str(roll)+'" and academic_course_assignation_log.user_name ="'+str(userP)+'"'
+                else:
+                    search='academic_course_assignation_log.id_period = "'+str(period.id)+'" and academic_course_assignation_log.operation_log = "update" and academic_course_assignation_log.date_log >="'+str(month[1])+'" and academic_course_assignation_log.date_log<="'+str(month[2])+'" and academic_course_assignation_log.before_course = "'+str(project)+'" and academic_course_assignation_log.after_course = "'+str(project)+'" and academic_course_assignation_log.roll contains "'+str(roll)+'" and academic_course_assignation_log.user_name ="'+str(userP)+'" and '+personal_query
+                countI = db.smart_query(db.academic_course_assignation_log,search).count()
+                infoeLevelTemp.append(countI)
+            #DELETE
+            if str(request.vars['type_L'])=="all" or str(request.vars['type_L'])=="d":
+                if personal_query == '':
+                    search='academic_course_assignation_log.id_period = "'+str(period.id)+'" and academic_course_assignation_log.operation_log = "delete" and academic_course_assignation_log.date_log >="'+str(month[1])+'" and academic_course_assignation_log.date_log<="'+str(month[2])+'" and academic_course_assignation_log.before_course = "'+str(project)+'" and academic_course_assignation_log.roll contains "'+str(roll)+'" and academic_course_assignation_log.user_name ="'+str(userP)+'"'
+                else:
+                    search='academic_course_assignation_log.id_period = "'+str(period.id)+'" and academic_course_assignation_log.operation_log = "delete" and academic_course_assignation_log.date_log >="'+str(month[1])+'" and academic_course_assignation_log.date_log<="'+str(month[2])+'" and academic_course_assignation_log.before_course = "'+str(project)+'" and academic_course_assignation_log.roll contains "'+str(roll)+'" and academic_course_assignation_log.user_name ="'+str(userP)+'" and '+personal_query
+                countI = db.smart_query(db.academic_course_assignation_log,search).count()
+                infoeLevelTemp.append(countI)
+            #INSERT USER
+            infoLevel.append(infoeLevelTemp)
+    #DATA
+    elif str(request.vars['level'])=="6":
+        #DATA
+        grid=[]
+        if str(request.vars['type_L'])=="i" or str(request.vars['type_L'])=="all":
+            if personal_query == '':
+                search='academic_course_assignation_log.id_period = "'+str(period.id)+'" and academic_course_assignation_log.operation_log = "insert" and academic_course_assignation_log.date_log >="'+str(month[1])+'" and academic_course_assignation_log.date_log<="'+str(month[2])+'" and academic_course_assignation_log.after_course = "'+str(project)+'" and academic_course_assignation_log.roll LIKE "%'+str(roll)+'%" and academic_course_assignation_log.user_name ="'+str(userP)+'"'
+            else:
+                search='academic_course_assignation_log.id_period = "'+str(period.id)+'" and academic_course_assignation_log.operation_log = "insert" and academic_course_assignation_log.date_log >="'+str(month[1])+'" and academic_course_assignation_log.date_log<="'+str(month[2])+'" and academic_course_assignation_log.after_course = "'+str(project)+'" and academic_course_assignation_log.roll LIKE "%'+str(roll)+'%" and academic_course_assignation_log.user_name ="'+str(userP)+'" and '+personal_query
+            grid.append(db.smart_query(db.academic_course_assignation_log,search).select())
+        if str(request.vars['type_L'])=="u" or str(request.vars['type_L'])=="all":
+            if personal_query == '':
+                search='academic_course_assignation_log.id_period = "'+str(period.id)+'" and academic_course_assignation_log.operation_log = "update" and academic_course_assignation_log.date_log >="'+str(month[1])+'" and academic_course_assignation_log.date_log<="'+str(month[2])+'" and academic_course_assignation_log.before_course = "'+str(project)+'" and academic_course_assignation_log.after_course = "'+str(project)+'" and academic_course_assignation_log.roll LIKE "%'+str(roll)+'%" and academic_course_assignation_log.user_name ="'+str(userP)+'"'
+            else:
+                search='academic_course_assignation_log.id_period = "'+str(period.id)+'" and academic_course_assignation_log.operation_log = "update" and academic_course_assignation_log.date_log >="'+str(month[1])+'" and academic_course_assignation_log.date_log<="'+str(month[2])+'" and academic_course_assignation_log.before_course = "'+str(project)+'" and academic_course_assignation_log.after_course = "'+str(project)+'" and academic_course_assignation_log.roll LIKE "%'+str(roll)+'%" and academic_course_assignation_log.user_name ="'+str(userP)+'" and '+personal_query
+            grid.append(db.smart_query(db.academic_course_assignation_log,search).select())
+        if str(request.vars['type_L'])=="d" or str(request.vars['type_L'])=="all":
+            if personal_query == '':
+                search='academic_course_assignation_log.id_period = "'+str(period.id)+'" and academic_course_assignation_log.operation_log = "delete" and academic_course_assignation_log.date_log >="'+str(month[1])+'" and academic_course_assignation_log.date_log<="'+str(month[2])+'" and academic_course_assignation_log.before_course = "'+str(project)+'" and academic_course_assignation_log.roll LIKE "%'+str(roll)+'%" and academic_course_assignation_log.user_name ="'+str(userP)+'"'
+            else:
+                search='academic_course_assignation_log.id_period = "'+str(period.id)+'" and academic_course_assignation_log.operation_log = "delete" and academic_course_assignation_log.date_log >="'+str(month[1])+'" and academic_course_assignation_log.date_log<="'+str(month[2])+'" and academic_course_assignation_log.before_course = "'+str(project)+'" and academic_course_assignation_log.roll LIKE "%'+str(roll)+'%" and academic_course_assignation_log.user_name ="'+str(userP)+'" and '+personal_query
+            grid.append(db.smart_query(db.academic_course_assignation_log,search).select())
+        #PERIOD
+        infoeLevelTemp=[]
+        infoeLevelTemp.append(T('Period'))
+        infoeLevelTemp.append(T(period.period.name)+' '+str(period.yearp))
+        infoLevel.append(infoeLevelTemp)
+        #MONTH
+        infoeLevelTemp=[]
+        infoeLevelTemp.append(T('Month'))
+        infoeLevelTemp.append(str(month[0]))
+        infoLevel.append(infoeLevelTemp)
+        #PROJECT
+        infoeLevelTemp=[]
+        infoeLevelTemp.append(T('Project'))
+        infoeLevelTemp.append(str(project))
+        infoLevel.append(infoeLevelTemp)
+        #ROL
+        infoeLevelTemp=[]
+        infoeLevelTemp.append(T('Role'))
+        infoeLevelTemp.append(T('Rol '+roll))
+        infoLevel.append(infoeLevelTemp)
+        #USER
+        infoeLevelTemp=[]
+        infoeLevelTemp.append(T('User'))
+        infoeLevelTemp.append(str(userP))
+        infoLevel.append(infoeLevelTemp)
+        #MIDDLE LINE
+        infoeLevelTemp=[]
+        infoeLevelTemp.append('')
+        infoLevel.append(infoeLevelTemp)
+        #DETAIL
+        infoeLevelTemp=[]
+        infoeLevelTemp.append(T('Detail'))
+        infoLevel.append(infoeLevelTemp)
+        #TITLE OF TABLE
+        infoeLevelTemp=[]
+        infoeLevelTemp.append('Operación')
+        infoeLevelTemp.append('Carnet anterior')
+        infoeLevelTemp.append('Carnet actual')
+        infoeLevelTemp.append('Laboratorio anterior')
+        infoeLevelTemp.append('Laboratorio actual')
+        infoeLevelTemp.append('Descripción')
+        infoeLevelTemp.append('Fecha')
+        infoLevel.append(infoeLevelTemp)
+        for data in grid:
+            for row in data:
+                infoeLevelTemp=[]
+                infoeLevelTemp.append(row.operation_log)
+                infoeLevelTemp.append(row.before_carnet)
+                infoeLevelTemp.append(row.after_carnet)
+                infoeLevelTemp.append(row.before_laboratory)
+                infoeLevelTemp.append(row.after_laboratory)
+                infoeLevelTemp.append(row.description)
+                infoeLevelTemp.append(row.date_log)
+                infoLevel.append(infoeLevelTemp)
+    #*****************************************************REPORT*****************************************************
+    #****************************************************************************************************************
+    #****************************************************************************************************************
+    return dict(filename='ReporteGestionAsignaciones', csvdata=infoLevel)
+
+@auth.requires_login()
+@auth.requires_membership('Super-Administrator')
 def student_assignment_management():
     #****************************************************************************************************************
     #****************************************************************************************************************
@@ -3740,7 +4256,6 @@ def student_assignment_management():
                 if project is None:
                     session.flash = T('Not valid Action.')
                     redirect(URL('default','index'))
-
             #LEVEL MORE THAN 4
             if int(request.vars['level'])>4:
                 #CHECK IF THE ROLE IS VALID
@@ -3757,7 +4272,7 @@ def student_assignment_management():
                     session.flash = T('Not valid Action.')
                     redi*rect(URL('default','index'))
     except:
-        session.flash = T('Not valid Action.')
+        session.flash = T('Not valid Action.')+'todo'
         redirect(URL('default','index'))
 
 
@@ -3830,7 +4345,7 @@ def student_assignment_management():
     from datetime import datetime
     infoLevel = []
     top5=[]
-    grid=None
+    grid=[]
     #ALL SEMESTERS
     if request.vars['level']=='1' or request.vars['level'] is None:
         if len(groupPeriods) == 0:
@@ -3926,6 +4441,8 @@ def student_assignment_management():
             session.flash = T('Report no visible: There are no parameters required to display the report.')
             redirect(URL('management_reports', 'student_assignment_management',vars=dict(list='level',level='2',period = str(request.vars['period']), type_L = str(request.vars['type_U']), querySearch=personal_query)))
 
+        #TOP 5 OF PROJECT
+        top5Tempo = []
         for projectT in projects:
             project=db(db.project.name==projectT).select().first()
             if project is None:
@@ -3945,44 +4462,44 @@ def student_assignment_management():
             infoeLevelTemp.append(project)
             #NAME OF PROJECT
             infoeLevelTemp.append(project)
+            #TOP 5 OF PROJECT
+            totalTemp=0
             #INSERT
             if str(request.vars['type_L'])=="all" or str(request.vars['type_L'])=="i":
                 if personal_query == '':
-                    search='academic_course_assignation_log.id = "-1" or academic_course_assignation_log.id > "0"'
+                    search='academic_course_assignation_log.id_period = "'+str(period.id)+'" and academic_course_assignation_log.operation_log = "insert" and academic_course_assignation_log.date_log >="'+str(month[1])+'" and academic_course_assignation_log.date_log<="'+str(month[2])+'" and academic_course_assignation_log.after_course = "'+str(project)+'"'
                 else:
-                    search=personal_query
-                print search
-                intro=db((db.academic_course_assignation_log.id_period==period.id)&(db.academic_course_assignation_log.date_log>=str(month[1]))&(db.academic_course_assignation_log.date_log<=str(month[2])))
-                countI = db.smart_query(db.academic_course_assignation_log,search).select(groupby=db.academic_course_assignation_log.id, having=((db.academic_course_assignation_log.id_period==period.id)&(db.academic_course_assignation_log.date_log>=str(month[1]))&(db.academic_course_assignation_log.date_log<=str(month[2]))))
-                infoeLevelTemp.append(len(countI))
+                    search='academic_course_assignation_log.id_period = "'+str(period.id)+'" and academic_course_assignation_log.operation_log = "insert" and academic_course_assignation_log.date_log >="'+str(month[1])+'" and academic_course_assignation_log.date_log<="'+str(month[2])+'" and academic_course_assignation_log.after_course = "'+str(project)+'" and '+personal_query
+                countI = db.smart_query(db.academic_course_assignation_log,search).count()
+                infoeLevelTemp.append(countI)
+                #TOP 5 OF PROJECT
+                totalTemp=totalTemp+countI
             #UPDATE
             if str(request.vars['type_L'])=="all" or str(request.vars['type_L'])=="u":
                 if personal_query == '':
-                    search='academic_course_assignation_log.id != "-1"'
+                    search='academic_course_assignation_log.id_period = "'+str(period.id)+'" and academic_course_assignation_log.operation_log = "update" and academic_course_assignation_log.date_log >="'+str(month[1])+'" and academic_course_assignation_log.date_log<="'+str(month[2])+'" and academic_course_assignation_log.after_course = "'+str(project)+'" and academic_course_assignation_log.before_course = "'+str(project)+'"'
                 else:
-                    search=personal_query
-                countI = db.smart_query(db.academic_course_assignation_log,search).count((db.academic_course_assignation_log.id_period==period.id)&(db.academic_course_assignation_log.date_log>=str(month[1]))&(db.academic_course_assignation_log.date_log<=str(month[2]))&((db.academic_course_assignation_log.before_course==projectT)|(db.academic_course_assignation_log.after_course==projectT)))
+                    search='academic_course_assignation_log.id_period = "'+str(period.id)+'" and academic_course_assignation_log.operation_log = "update" and academic_course_assignation_log.date_log >="'+str(month[1])+'" and academic_course_assignation_log.date_log<="'+str(month[2])+'" and academic_course_assignation_log.after_course = "'+str(project)+'" and academic_course_assignation_log.before_course = "'+str(project)+'" and '+personal_query
+                countI = db.smart_query(db.academic_course_assignation_log,search).count()
                 infoeLevelTemp.append(countI)
+                #TOP 5 OF PROJECT
+                totalTemp=totalTemp+countI
             #DELETE
             if str(request.vars['type_L'])=="all" or str(request.vars['type_L'])=="d":
                 if personal_query == '':
-                    search='academic_course_assignation_log.id != "-1"'
+                    search='academic_course_assignation_log.id_period = "'+str(period.id)+'" and academic_course_assignation_log.operation_log = "delete" and academic_course_assignation_log.date_log >="'+str(month[1])+'" and academic_course_assignation_log.date_log<="'+str(month[2])+'" and academic_course_assignation_log.before_course = "'+str(project)+'"'
                 else:
-                    search=personal_query
-                countI = db.smart_query(db.academic_course_assignation_log,search).count((db.academic_course_assignation_log.id_period==period.id)&(db.academic_course_assignation_log.date_log>=str(month[1]))&(db.academic_course_assignation_log.date_log<=str(month[2]))&((db.academic_course_assignation_log.before_course==projectT)|(db.academic_course_assignation_log.after_course==projectT)))
+                    search='academic_course_assignation_log.id_period = "'+str(period.id)+'" and academic_course_assignation_log.operation_log = "delete" and academic_course_assignation_log.date_log >="'+str(month[1])+'" and academic_course_assignation_log.date_log<="'+str(month[2])+'" and academic_course_assignation_log.before_course = "'+str(project)+'" and '+personal_query
+                countI = db.smart_query(db.academic_course_assignation_log,search).count()
                 infoeLevelTemp.append(countI)
+                #TOP 5 OF PROJECT
+                totalTemp=totalTemp+countI
             #INSERT PROJECT
             infoLevel.append(infoeLevelTemp)
+            #TOP 5 OF PROJECT
+            if totalTemp>0:
+                top5Tempo.append([totalTemp,project])
         #TOP 5 OF PROJECT
-        top5Tempo = []
-        for projectT in projects:
-            if personal_query == '':
-                search='academic_course_assignation_log.id != "-1"'
-            else:
-                search=personal_query
-            countI = db.smart_query(db.academic_course_assignation_log,search).count((db.academic_course_assignation_log.id_period==period.id)&(db.academic_course_assignation_log.date_log>=str(month[1]))&(db.academic_course_assignation_log.date_log<=str(month[2]))&((db.academic_course_assignation_log.before_course==projectT)|(db.academic_course_assignation_log.after_course==projectT)))
-            if countI>0:
-                top5Tempo.append([countI,projectT])
         top5Tempo=sorted(top5Tempo,reverse = True)
         countTop=0
         for top in top5Tempo:
@@ -4016,25 +4533,25 @@ def student_assignment_management():
             #INSERT
             if str(request.vars['type_L'])=="all" or str(request.vars['type_L'])=="i":
                 if personal_query == '':
-                    search='academic_course_assignation_log.id_period = "'+str(period.id)+'" and academic_course_assignation_log.operation_log = "insert" and academic_course_assignation_log.date_log >="'+str(month[1])+'" and academic_course_assignation_log.date_log<="'+str(month[2])+'" and academic_course_assignation_log.before_course = "'+str(project)+'" or academic_course_assignation_log.after_course = "'+str(project)+'" and academic_course_assignation_log.roll contains "'+str(roll)+'"'
+                    search='academic_course_assignation_log.id_period = "'+str(period.id)+'" and academic_course_assignation_log.operation_log = "insert" and academic_course_assignation_log.date_log >="'+str(month[1])+'" and academic_course_assignation_log.date_log<="'+str(month[2])+'" and academic_course_assignation_log.after_course = "'+str(project)+'" and academic_course_assignation_log.roll contains "'+str(roll)+'"'
                 else:
-                    search='academic_course_assignation_log.id_period = "'+str(period.id)+'" and academic_course_assignation_log.operation_log = "insert" and academic_course_assignation_log.date_log >="'+str(month[1])+'" and academic_course_assignation_log.date_log<="'+str(month[2])+'" and academic_course_assignation_log.before_course = "'+str(project)+'" or academic_course_assignation_log.after_course = "'+str(project)+'" and academic_course_assignation_log.roll contains "'+str(roll)+'" and '+personal_query
+                    search='academic_course_assignation_log.id_period = "'+str(period.id)+'" and academic_course_assignation_log.operation_log = "insert" and academic_course_assignation_log.date_log >="'+str(month[1])+'" and academic_course_assignation_log.date_log<="'+str(month[2])+'" and academic_course_assignation_log.after_course = "'+str(project)+'" and academic_course_assignation_log.roll contains "'+str(roll)+'" and '+personal_query
                 countI = db.smart_query(db.academic_course_assignation_log,search).count()
                 infoeLevelTemp.append(countI)
             #UPDATE
             if str(request.vars['type_L'])=="all" or str(request.vars['type_L'])=="u":
                 if personal_query == '':
-                    search='academic_course_assignation_log.id_period = "'+str(period.id)+'" and academic_course_assignation_log.operation_log = "update" and academic_course_assignation_log.date_log >="'+str(month[1])+'" and academic_course_assignation_log.date_log<="'+str(month[2])+'" and academic_course_assignation_log.before_course = "'+str(project)+'" or academic_course_assignation_log.after_course = "'+str(project)+'" and academic_course_assignation_log.roll contains "'+str(roll)+'"'
+                    search='academic_course_assignation_log.id_period = "'+str(period.id)+'" and academic_course_assignation_log.operation_log = "update" and academic_course_assignation_log.date_log >="'+str(month[1])+'" and academic_course_assignation_log.date_log<="'+str(month[2])+'" and academic_course_assignation_log.before_course = "'+str(project)+'" and academic_course_assignation_log.after_course = "'+str(project)+'" and academic_course_assignation_log.roll contains "'+str(roll)+'"'
                 else:
-                    search='academic_course_assignation_log.id_period = "'+str(period.id)+'" and academic_course_assignation_log.operation_log = "update" and academic_course_assignation_log.date_log >="'+str(month[1])+'" and academic_course_assignation_log.date_log<="'+str(month[2])+'" and academic_course_assignation_log.before_course = "'+str(project)+'" or academic_course_assignation_log.after_course = "'+str(project)+'" and academic_course_assignation_log.roll contains "'+str(roll)+'" and '+personal_query
+                    search='academic_course_assignation_log.id_period = "'+str(period.id)+'" and academic_course_assignation_log.operation_log = "update" and academic_course_assignation_log.date_log >="'+str(month[1])+'" and academic_course_assignation_log.date_log<="'+str(month[2])+'" and academic_course_assignation_log.before_course = "'+str(project)+'" and academic_course_assignation_log.after_course = "'+str(project)+'" and academic_course_assignation_log.roll contains "'+str(roll)+'" and '+personal_query
                 countI = db.smart_query(db.academic_course_assignation_log,search).count()
                 infoeLevelTemp.append(countI)
             #DELETE
             if str(request.vars['type_L'])=="all" or str(request.vars['type_L'])=="d":
                 if personal_query == '':
-                    search='academic_course_assignation_log.id_period = "'+str(period.id)+'" and academic_course_assignation_log.operation_log = "delete" and academic_course_assignation_log.date_log >="'+str(month[1])+'" and academic_course_assignation_log.date_log<="'+str(month[2])+'" and academic_course_assignation_log.before_course = "'+str(project)+'" or academic_course_assignation_log.after_course = "'+str(project)+'" and academic_course_assignation_log.roll contains "'+str(roll)+'"'
+                    search='academic_course_assignation_log.id_period = "'+str(period.id)+'" and academic_course_assignation_log.operation_log = "delete" and academic_course_assignation_log.date_log >="'+str(month[1])+'" and academic_course_assignation_log.date_log<="'+str(month[2])+'" and academic_course_assignation_log.before_course = "'+str(project)+'" and academic_course_assignation_log.roll contains "'+str(roll)+'"'
                 else:
-                    search='academic_course_assignation_log.id_period = "'+str(period.id)+'" and academic_course_assignation_log.operation_log = "delete" and academic_course_assignation_log.date_log >="'+str(month[1])+'" and academic_course_assignation_log.date_log<="'+str(month[2])+'" and academic_course_assignation_log.before_course = "'+str(project)+'" or academic_course_assignation_log.after_course = "'+str(project)+'" and academic_course_assignation_log.roll contains "'+str(roll)+'" and '+personal_query
+                    search='academic_course_assignation_log.id_period = "'+str(period.id)+'" and academic_course_assignation_log.operation_log = "delete" and academic_course_assignation_log.date_log >="'+str(month[1])+'" and academic_course_assignation_log.date_log<="'+str(month[2])+'" and academic_course_assignation_log.before_course = "'+str(project)+'" and academic_course_assignation_log.roll contains "'+str(roll)+'" and '+personal_query
                 countI = db.smart_query(db.academic_course_assignation_log,search).count()
                 infoeLevelTemp.append(countI)
             #INSERT ROLE
@@ -4042,11 +4559,13 @@ def student_assignment_management():
     #PER USER
     elif str(request.vars['level'])=="5":
         #VERIFY THAT CAN SHOW THE LEVEL OF THE REPORT
-        usersProject = GET_USERS(period,None,roll,'academic_course_assignation_log')
+        usersProject = GET_USERS(period,project,roll,'academic_course_assignation_log')
         if len(usersProject) == 0:
             session.flash = T('Report no visible: There are no parameters required to display the report.')
             redirect(URL('management_reports', 'student_assignment_management',vars=dict(list='level',level='4', period = str(request.vars['period']), month = str(request.vars['month']), project = str(request.vars['project']), type_L = str(request.vars['type_U']), type_U = str(request.vars['type_U']), querySearch=personal_query)))
 
+        #TOP 5 OF PROJECT
+        top5Tempo = []
         for userPT in usersProject:
             userP=db(db.auth_user.username==userPT).select().first()
             if userP is None:
@@ -4067,61 +4586,70 @@ def student_assignment_management():
             infoeLevelTemp.append(userP)
             #NAME OF USER
             infoeLevelTemp.append(userP)
+            #TOP 5 OF USER
+            totalTemp=0
             #INSERT
             if str(request.vars['type_L'])=="all" or str(request.vars['type_L'])=="i":
                 if personal_query == '':
-                    search='academic_course_assignation_log.id_period = "'+str(period.id)+'" and academic_course_assignation_log.operation_log = "insert" and academic_course_assignation_log.date_log >="'+str(month[1])+'" and academic_course_assignation_log.date_log<="'+str(month[2])+'" and academic_course_assignation_log.before_course = "'+str(project)+'" or academic_course_assignation_log.after_course = "'+str(project)+'" and academic_course_assignation_log.roll contains "'+str(roll)+'" and academic_course_assignation_log.user_name ="'+str(userP)+'"'
+                    search='academic_course_assignation_log.id_period = "'+str(period.id)+'" and academic_course_assignation_log.operation_log = "insert" and academic_course_assignation_log.date_log >="'+str(month[1])+'" and academic_course_assignation_log.date_log<="'+str(month[2])+'" and academic_course_assignation_log.after_course = "'+str(project)+'" and academic_course_assignation_log.roll contains "'+str(roll)+'" and academic_course_assignation_log.user_name ="'+str(userP)+'"'
                 else:
-                    search='academic_course_assignation_log.id_period = "'+str(period.id)+'" and academic_course_assignation_log.operation_log = "insert" and academic_course_assignation_log.date_log >="'+str(month[1])+'" and academic_course_assignation_log.date_log<="'+str(month[2])+'" and academic_course_assignation_log.before_course = "'+str(project)+'" or academic_course_assignation_log.after_course = "'+str(project)+'" and academic_course_assignation_log.roll contains "'+str(roll)+'" and academic_course_assignation_log.user_name ="'+str(userP)+'" and '+personal_query
+                    search='academic_course_assignation_log.id_period = "'+str(period.id)+'" and academic_course_assignation_log.operation_log = "insert" and academic_course_assignation_log.date_log >="'+str(month[1])+'" and academic_course_assignation_log.date_log<="'+str(month[2])+'" and academic_course_assignation_log.after_course = "'+str(project)+'" and academic_course_assignation_log.roll contains "'+str(roll)+'" and academic_course_assignation_log.user_name ="'+str(userP)+'" and '+personal_query
                 countI = db.smart_query(db.academic_course_assignation_log,search).count()
                 infoeLevelTemp.append(countI)
+                #TOP 5 OF USER
+                totalTemp=totalTemp+countI
             #UPDATE
             if str(request.vars['type_L'])=="all" or str(request.vars['type_L'])=="u":
                 if personal_query == '':
-                    search='academic_course_assignation_log.id_period = "'+str(period.id)+'" and academic_course_assignation_log.operation_log = "update" and academic_course_assignation_log.date_log >="'+str(month[1])+'" and academic_course_assignation_log.date_log<="'+str(month[2])+'" and academic_course_assignation_log.before_course = "'+str(project)+'" or academic_course_assignation_log.after_course = "'+str(project)+'" and academic_course_assignation_log.roll contains "'+str(roll)+'" and academic_course_assignation_log.user_name ="'+str(userP)+'"'
+                    search='academic_course_assignation_log.id_period = "'+str(period.id)+'" and academic_course_assignation_log.operation_log = "update" and academic_course_assignation_log.date_log >="'+str(month[1])+'" and academic_course_assignation_log.date_log<="'+str(month[2])+'" and academic_course_assignation_log.before_course = "'+str(project)+'" and academic_course_assignation_log.after_course = "'+str(project)+'" and academic_course_assignation_log.roll contains "'+str(roll)+'" and academic_course_assignation_log.user_name ="'+str(userP)+'"'
                 else:
-                    search='academic_course_assignation_log.id_period = "'+str(period.id)+'" and academic_course_assignation_log.operation_log = "update" and academic_course_assignation_log.date_log >="'+str(month[1])+'" and academic_course_assignation_log.date_log<="'+str(month[2])+'" and academic_course_assignation_log.before_course = "'+str(project)+'" or academic_course_assignation_log.after_course = "'+str(project)+'" and academic_course_assignation_log.roll contains "'+str(roll)+'" and academic_course_assignation_log.user_name ="'+str(userP)+'" and '+personal_query
+                    search='academic_course_assignation_log.id_period = "'+str(period.id)+'" and academic_course_assignation_log.operation_log = "update" and academic_course_assignation_log.date_log >="'+str(month[1])+'" and academic_course_assignation_log.date_log<="'+str(month[2])+'" and academic_course_assignation_log.before_course = "'+str(project)+'" and academic_course_assignation_log.after_course = "'+str(project)+'" and academic_course_assignation_log.roll contains "'+str(roll)+'" and academic_course_assignation_log.user_name ="'+str(userP)+'" and '+personal_query
                 countI = db.smart_query(db.academic_course_assignation_log,search).count()
                 infoeLevelTemp.append(countI)
+                #TOP 5 OF USER
+                totalTemp=totalTemp+countI
             #DELETE
             if str(request.vars['type_L'])=="all" or str(request.vars['type_L'])=="d":
                 if personal_query == '':
-                    search='academic_course_assignation_log.id_period = "'+str(period.id)+'" and academic_course_assignation_log.operation_log = "delete" and academic_course_assignation_log.date_log >="'+str(month[1])+'" and academic_course_assignation_log.date_log<="'+str(month[2])+'" and academic_course_assignation_log.before_course = "'+str(project)+'" or academic_course_assignation_log.after_course = "'+str(project)+'" and academic_course_assignation_log.roll contains "'+str(roll)+'" and academic_course_assignation_log.user_name ="'+str(userP)+'"'
+                    search='academic_course_assignation_log.id_period = "'+str(period.id)+'" and academic_course_assignation_log.operation_log = "delete" and academic_course_assignation_log.date_log >="'+str(month[1])+'" and academic_course_assignation_log.date_log<="'+str(month[2])+'" and academic_course_assignation_log.before_course = "'+str(project)+'" and academic_course_assignation_log.roll contains "'+str(roll)+'" and academic_course_assignation_log.user_name ="'+str(userP)+'"'
                 else:
-                    search='academic_course_assignation_log.id_period = "'+str(period.id)+'" and academic_course_assignation_log.operation_log = "delete" and academic_course_assignation_log.date_log >="'+str(month[1])+'" and academic_course_assignation_log.date_log<="'+str(month[2])+'" and academic_course_assignation_log.before_course = "'+str(project)+'" or academic_course_assignation_log.after_course = "'+str(project)+'" and academic_course_assignation_log.roll contains "'+str(roll)+'" and academic_course_assignation_log.user_name ="'+str(userP)+'" and '+personal_query
+                    search='academic_course_assignation_log.id_period = "'+str(period.id)+'" and academic_course_assignation_log.operation_log = "delete" and academic_course_assignation_log.date_log >="'+str(month[1])+'" and academic_course_assignation_log.date_log<="'+str(month[2])+'" and academic_course_assignation_log.before_course = "'+str(project)+'" and academic_course_assignation_log.roll contains "'+str(roll)+'" and academic_course_assignation_log.user_name ="'+str(userP)+'" and '+personal_query
                 countI = db.smart_query(db.academic_course_assignation_log,search).count()
                 infoeLevelTemp.append(countI)
-            #INSERT PROJECT
+                #TOP 5 OF USER
+                totalTemp=totalTemp+countI
+            #INSERT USER
             infoLevel.append(infoeLevelTemp)
-
-        #TOP 5 OF USERS
-        if personal_query == '':
-            search='academic_course_assignation_log.id_period = "'+str(period.id)+'" and academic_course_assignation_log.date_log >="'+str(month[1])+'" and academic_course_assignation_log.date_log<="'+str(month[2])+'" and academic_course_assignation_log.before_course = "'+str(project)+'" or academic_course_assignation_log.after_course = "'+str(project)+'" and academic_course_assignation_log.roll contains "'+str(roll)+'"'
-        else:
-            search='academic_course_assignation_log.id_period = "'+str(period.id)+'" and academic_course_assignation_log.date_log >="'+str(month[1])+'" and academic_course_assignation_log.date_log<="'+str(month[2])+'" and academic_course_assignation_log.before_course = "'+str(project)+'" or academic_course_assignation_log.after_course = "'+str(project)+'" and academic_course_assignation_log.roll contains "'+str(roll)+'" and '+personal_query
-        top5 = db.smart_query(db.academic_course_assignation_log,search).select(db.academic_course_assignation_log.user_name, db.academic_course_assignation_log.id.count(), orderby=~db.academic_course_assignation_log.id.count(), limitby=(0, 5), groupby=db.academic_course_assignation_log.user_name)
+            #TOP 5 OF USER
+            top5Tempo.append([totalTemp,userP])
+        #TOP 5 OF USER
+        top5Tempo=sorted(top5Tempo,reverse = True)
+        countTop=0
+        for top in top5Tempo:
+            if countTop<5:
+                top5.append(top)
+            countTop=countTop+1
     #DATA
     elif str(request.vars['level'])=="6":
-        if str(request.vars['type_L'])=="all":
+        if str(request.vars['type_L'])=="i" or str(request.vars['type_L'])=="all":
             if personal_query == '':
-                search='academic_course_assignation_log.id_period = "'+str(period.id)+'" and academic_course_assignation_log.date_log >="'+str(month[1])+'" and academic_course_assignation_log.date_log<="'+str(month[2])+'" and academic_course_assignation_log.before_course = "'+str(project)+'" or academic_course_assignation_log.after_course = "'+str(project)+'" and academic_course_assignation_log.roll LIKE "%'+str(roll)+'%" and academic_course_assignation_log.user_name ="'+str(userP)+'"'
+                search='academic_course_assignation_log.id_period = "'+str(period.id)+'" and academic_course_assignation_log.operation_log = "insert" and academic_course_assignation_log.date_log >="'+str(month[1])+'" and academic_course_assignation_log.date_log<="'+str(month[2])+'" and academic_course_assignation_log.after_course = "'+str(project)+'" and academic_course_assignation_log.roll LIKE "%'+str(roll)+'%" and academic_course_assignation_log.user_name ="'+str(userP)+'"'
             else:
-                search='academic_course_assignation_log.id_period = "'+str(period.id)+'" and academic_course_assignation_log.date_log >="'+str(month[1])+'" and academic_course_assignation_log.date_log<="'+str(month[2])+'" and academic_course_assignation_log.before_course = "'+str(project)+'" or academic_course_assignation_log.after_course = "'+str(project)+'" and academic_course_assignation_log.roll LIKE "%'+str(roll)+'%" and academic_course_assignation_log.user_name ="'+str(userP)+'" and '+personal_query
-        elif str(request.vars['type_L'])=="i":
+                search='academic_course_assignation_log.id_period = "'+str(period.id)+'" and academic_course_assignation_log.operation_log = "insert" and academic_course_assignation_log.date_log >="'+str(month[1])+'" and academic_course_assignation_log.date_log<="'+str(month[2])+'" and academic_course_assignation_log.after_course = "'+str(project)+'" and academic_course_assignation_log.roll LIKE "%'+str(roll)+'%" and academic_course_assignation_log.user_name ="'+str(userP)+'" and '+personal_query
+            grid.append(db.smart_query(db.academic_course_assignation_log,search).select())
+        if str(request.vars['type_L'])=="u" or str(request.vars['type_L'])=="all":
             if personal_query == '':
-                search='academic_course_assignation_log.id_period = "'+str(period.id)+'" and academic_course_assignation_log.operation_log = "insert" and academic_course_assignation_log.date_log >="'+str(month[1])+'" and academic_course_assignation_log.date_log<="'+str(month[2])+'" and academic_course_assignation_log.before_course = "'+str(project)+'" or academic_course_assignation_log.after_course = "'+str(project)+'" and academic_course_assignation_log.roll LIKE "%'+str(roll)+'%" and academic_course_assignation_log.user_name ="'+str(userP)+'"'
+                search='academic_course_assignation_log.id_period = "'+str(period.id)+'" and academic_course_assignation_log.operation_log = "update" and academic_course_assignation_log.date_log >="'+str(month[1])+'" and academic_course_assignation_log.date_log<="'+str(month[2])+'" and academic_course_assignation_log.before_course = "'+str(project)+'" and academic_course_assignation_log.after_course = "'+str(project)+'" and academic_course_assignation_log.roll LIKE "%'+str(roll)+'%" and academic_course_assignation_log.user_name ="'+str(userP)+'"'
             else:
-                search='academic_course_assignation_log.id_period = "'+str(period.id)+'" and academic_course_assignation_log.operation_log = "insert" and academic_course_assignation_log.date_log >="'+str(month[1])+'" and academic_course_assignation_log.date_log<="'+str(month[2])+'" and academic_course_assignation_log.before_course = "'+str(project)+'" or academic_course_assignation_log.after_course = "'+str(project)+'" and academic_course_assignation_log.roll LIKE "%'+str(roll)+'%" and academic_course_assignation_log.user_name ="'+str(userP)+'" and '+personal_query
-        elif str(request.vars['type_L'])=="u":
+                search='academic_course_assignation_log.id_period = "'+str(period.id)+'" and academic_course_assignation_log.operation_log = "update" and academic_course_assignation_log.date_log >="'+str(month[1])+'" and academic_course_assignation_log.date_log<="'+str(month[2])+'" and academic_course_assignation_log.before_course = "'+str(project)+'" and academic_course_assignation_log.after_course = "'+str(project)+'" and academic_course_assignation_log.roll LIKE "%'+str(roll)+'%" and academic_course_assignation_log.user_name ="'+str(userP)+'" and '+personal_query
+            grid.append(db.smart_query(db.academic_course_assignation_log,search).select())
+        if str(request.vars['type_L'])=="d" or str(request.vars['type_L'])=="all":
             if personal_query == '':
-                search='academic_course_assignation_log.id_period = "'+str(period.id)+'" and academic_course_assignation_log.operation_log = "update" and academic_course_assignation_log.date_log >="'+str(month[1])+'" and academic_course_assignation_log.date_log<="'+str(month[2])+'" and academic_course_assignation_log.before_course = "'+str(project)+'" or academic_course_assignation_log.after_course = "'+str(project)+'" and academic_course_assignation_log.roll LIKE "%'+str(roll)+'%" and academic_course_assignation_log.user_name ="'+str(userP)+'"'
+                search='academic_course_assignation_log.id_period = "'+str(period.id)+'" and academic_course_assignation_log.operation_log = "delete" and academic_course_assignation_log.date_log >="'+str(month[1])+'" and academic_course_assignation_log.date_log<="'+str(month[2])+'" and academic_course_assignation_log.before_course = "'+str(project)+'" and academic_course_assignation_log.roll LIKE "%'+str(roll)+'%" and academic_course_assignation_log.user_name ="'+str(userP)+'"'
             else:
-                search='academic_course_assignation_log.id_period = "'+str(period.id)+'" and academic_course_assignation_log.operation_log = "update" and academic_course_assignation_log.date_log >="'+str(month[1])+'" and academic_course_assignation_log.date_log<="'+str(month[2])+'" and academic_course_assignation_log.before_course = "'+str(project)+'" or academic_course_assignation_log.after_course = "'+str(project)+'" and academic_course_assignation_log.roll LIKE "%'+str(roll)+'%" and academic_course_assignation_log.user_name ="'+str(userP)+'" and '+personal_query
-        elif str(request.vars['type_L'])=="d":
-            if personal_query == '':
-                search='academic_course_assignation_log.id_period = "'+str(period.id)+'" and academic_course_assignation_log.operation_log = "delete" and academic_course_assignation_log.date_log >="'+str(month[1])+'" and academic_course_assignation_log.date_log<="'+str(month[2])+'" and academic_course_assignation_log.before_course = "'+str(project)+'" or academic_course_assignation_log.after_course = "'+str(project)+'" and academic_course_assignation_log.roll LIKE "%'+str(roll)+'%" and academic_course_assignation_log.user_name ="'+str(userP)+'"'
-            else:
-                search='academic_course_assignation_log.id_period = "'+str(period.id)+'" and academic_course_assignation_log.operation_log = "delete" and academic_course_assignation_log.date_log >="'+str(month[1])+'" and academic_course_assignation_log.date_log<="'+str(month[2])+'" and academic_course_assignation_log.before_course = "'+str(project)+'" or academic_course_assignation_log.after_course = "'+str(project)+'" and academic_course_assignation_log.roll LIKE "%'+str(roll)+'%" and academic_course_assignation_log.user_name ="'+str(userP)+'" and '+personal_query
+                search='academic_course_assignation_log.id_period = "'+str(period.id)+'" and academic_course_assignation_log.operation_log = "delete" and academic_course_assignation_log.date_log >="'+str(month[1])+'" and academic_course_assignation_log.date_log<="'+str(month[2])+'" and academic_course_assignation_log.before_course = "'+str(project)+'" and academic_course_assignation_log.roll LIKE "%'+str(roll)+'%" and academic_course_assignation_log.user_name ="'+str(userP)+'" and '+personal_query
+            grid.append(db.smart_query(db.academic_course_assignation_log,search).select())
+        #TITLE
         infoeLevelTemp=[]
         infoeLevelTemp.append(T(period.period.name)+' '+str(period.yearp))
         infoeLevelTemp.append(str(month[0]))
@@ -4129,28 +4657,4 @@ def student_assignment_management():
         infoeLevelTemp.append(T('Rol '+roll))
         infoeLevelTemp.append(str(userP))
         infoLevel.append(infoeLevelTemp)
-        #GRID
-        db.academic_course_assignation_log.id.readable = False
-        db.academic_course_assignation_log.id.writable = False
-        db.academic_course_assignation_log.user_name.readable = False
-        db.academic_course_assignation_log.user_name.writable = False
-        db.academic_course_assignation_log.roll.readable = False
-        db.academic_course_assignation_log.roll.writable = False
-        db.academic_course_assignation_log.before_course.readable = False
-        db.academic_course_assignation_log.before_course.writable = False
-        db.academic_course_assignation_log.after_course.readable = False
-        db.academic_course_assignation_log.after_course.writable = False
-        db.academic_course_assignation_log.before_year.readable = False
-        db.academic_course_assignation_log.before_year.writable = False
-        db.academic_course_assignation_log.after_year.readable = False
-        db.academic_course_assignation_log.after_year.writable = False
-        db.academic_course_assignation_log.before_semester.readable = False
-        db.academic_course_assignation_log.before_semester.writable = False
-        db.academic_course_assignation_log.after_semester.readable = False
-        db.academic_course_assignation_log.after_semester.writable = False
-        db.academic_course_assignation_log.id_academic_course_assignation.readable = False
-        db.academic_course_assignation_log.id_academic_course_assignation.writable = False
-        db.academic_course_assignation_log.id_period.readable = False
-        db.academic_course_assignation_log.id_period.writable = False
-        grid=SQLFORM.smartgrid(db.academic_course_assignation_log, constraints = dict(academic_course_assignation_log=search), csv=False, create=False, editable=False, deletable=False, paginate=9, searchable=False)
     return dict(fsearch=fsearch, filtered_by=filtered_by, personal_query=personal_query, infoLevel=infoLevel, top5=top5, grid=grid) 

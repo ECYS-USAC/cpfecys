@@ -2107,13 +2107,13 @@
 			{{if str(request.vars['level'])=="2":}}
 				window.location.href = "{{=URL('management_reports', 'grades_management',vars=dict(querySearch=personal_query))}}";
 			{{elif str(request.vars['level'])=="3":}}
-				window.location.href = "{{=URL('management_reports', 'grades_management',vars=dict(list='level',level='2',period = str(request.vars['period']), type_L = str(request.vars['type_U']), querySearch=personal_query))}}";
+				window.location.href = "{{=URL('management_reports', 'grades_management',vars=dict(level='2',period = str(request.vars['period']), type_L = str(request.vars['type_U']), querySearch=personal_query))}}";
 			{{elif str(request.vars['level'])=="4":}}
-				window.location.href = "{{=URL('management_reports', 'grades_management',vars=dict(list='level',level='3', period = str(request.vars['period']), month = str(request.vars['month']), type_L = str(request.vars['type_U']), type_U = str(request.vars['type_U']), querySearch=personal_query))}}";
+				window.location.href = "{{=URL('management_reports', 'grades_management',vars=dict(level='3', period = str(request.vars['period']), month = str(request.vars['month']), type_L = str(request.vars['type_U']), type_U = str(request.vars['type_U']), querySearch=personal_query))}}";
 			{{elif str(request.vars['level'])=="5":}}
-				window.location.href = "{{=URL('management_reports', 'grades_management',vars=dict(list='level',level='4', period = str(request.vars['period']), month = str(request.vars['month']), project = str(request.vars['project']), type_L = str(request.vars['type_U']), type_U = str(request.vars['type_U']), querySearch=personal_query))}}";
+				window.location.href = "{{=URL('management_reports', 'grades_management',vars=dict(level='4', period = str(request.vars['period']), month = str(request.vars['month']), project = str(request.vars['project']), type_L = str(request.vars['type_U']), type_U = str(request.vars['type_U']), querySearch=personal_query))}}";
 			{{elif str(request.vars['level'])=="6":}}
-				window.location.href = "{{=URL('management_reports', 'grades_management',vars=dict(list='level',level='5', period = str(request.vars['period']), month = str(request.vars['month']), project = str(request.vars['project']), roll = str(request.vars['roll']), type_L = str(request.vars['type_U']), type_U = str(request.vars['type_U']), querySearch=personal_query))}}";
+				window.location.href = "{{=URL('management_reports', 'grades_management',vars=dict(level='5', period = str(request.vars['period']), month = str(request.vars['month']), project = str(request.vars['project']), roll = str(request.vars['roll']), type_L = str(request.vars['type_U']), type_U = str(request.vars['type_U']), querySearch=personal_query))}}";
 			{{pass}}
 		}
 	{{pass}}
