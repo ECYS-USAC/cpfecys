@@ -270,9 +270,9 @@
 									<input name="template_id" type="hidden" value="{{=template_id}}">
 									<select name="ev_type">
 									{{for ev_type in db(db.evaluation_type).select():}}
-										{{if str(ev_type.id) == str(actual_template.evaluation_type.id):}}
+										{{if ev_type.id == actual_template.evaluation_type.id:}}
 											{{var_sel="selected='selected'"}}
-											{{actual_template=template}}
+											{{#actual_template=template}}
 										{{else:}}
 											{{var_sel=''}}
 										{{pass}}

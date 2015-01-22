@@ -238,6 +238,7 @@ def automation_evaluations():
                                             date_finish=date_finish_temp,
                                             semester_repeat=True,                                                
                                             description=evaluation.description,
+                                            semester=cperiod.id,
                                             repository_evaluation=evaluation.repository_evaluation)
                     
     #Second Semester
@@ -264,6 +265,7 @@ def automation_evaluations():
                                             date_finish=evaluation.date_finish + datetime.timedelta(date_finish_temp),
                                             semester_repeat=True,                                                
                                             description=evaluation.description,
+                                            semester=cperiod.id,
                                             repository_evaluation=evaluation.repository_evaluation)
     db.commit()
 

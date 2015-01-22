@@ -1548,6 +1548,7 @@ db.define_table('evaluation',
     Field('date_finish', 'date', notnull = True, label = T('Date finish')),
     Field('semester_repeat', 'boolean', notnull = True, label = T('Repeat')),
     Field('description', 'text', notnull=False, label=T('Description')),
+    Field('period', 'reference period_year', notnull = True, label = T('Period')),
     Field('repository_evaluation', 'reference repository_evaluation', notnull = True, label = T('Repository Evaluation'))
 )
 
@@ -1566,7 +1567,7 @@ db.define_table('course_assigned_activity',
 db.define_table('evaluation_result',
     Field('repository_evaluation', 'reference repository_evaluation', notnull = True, label = T('Repository Evaluation')),
     Field('evaluated', 'reference auth_user', notnull = True, label = T('Evaluated')),
-    Field('period', 'reference period', notnull = True, label = T('Period')),
+    Field('period', 'reference period_year', notnull = True, label = T('Period')),
     Field('project', 'reference project', notnull=True, label=T('Project'))
 )
 
