@@ -104,6 +104,28 @@ def evaluation_reply():
         session.flash  =T('Not authorized')
         redirect(URL('default','index'))
 
+    user_role = None
+    if auth.has_membership('Student') or auth.has_membership('Teacher'):
+        try:
+            if db((db.user_project.assigned_user == auth.user.id) & (db.user_project.period == period)).select().first() is not None:
+                if auth.has_membership('Student'):
+                    user_role = 2
+                else:
+                    user_role = 3
+        except:
+            None
+    if auth.has_membership('Academic'):
+        try:
+            academic_var = db.academic(db.academic.id_auth_user==auth.user.id)
+            if db((db.academic_course_assignation.carnet==academic_var.id)&(db.academic_course_assignation.semester==period)).select().first() is not None:
+                user_role = 5
+        except:
+            None
+
+    if var_evaluation.repository_evaluation.user_type_evaluator != user_role:
+        session.flash  =T('Not authorized')
+        redirect(URL('default','index'))
+
     var_repository_evaluation = db(db.repository_evaluation.id == var_evaluation.repository_evaluation).select().first()
     question_category = db(db.question_repository.repository_evaluation == var_evaluation.repository_evaluation).select(db.question_repository.question_type_name,distinct=True) 
     
@@ -173,9 +195,10 @@ def evaluation_reply():
 def evaluation_list():
     project = request.vars['project']
     period = request.vars['period']
-
-    if db((db.auth_user.id==auth.user.id) & (db.user_project.project==project) & (db.user_project.period == period) & \
-        ((db.user_project.period <= period) & ((db.user_project.period + db.user_project.periods) > period))).select().first() is None:
+    user = db((db.auth_user.id==auth.user.id) & (db.user_project.project==project) & (db.user_project.period == period) & \
+        ((db.user_project.period <= period) & ((db.user_project.period + db.user_project.periods) > period))).select().first()
+    
+    if user is None:
         session.flash  =T('Not authorized')
         redirect(URL('default','index'))
 
@@ -184,10 +207,30 @@ def evaluation_list():
         (db.user_project.period == period) & ((db.user_project.period <= period) & \
             ((db.user_project.period + db.user_project.periods) > period))).select()
     
+    user_role = None
+    if auth.has_membership('Student') or auth.has_membership('Teacher'):
+        try:
+            if db((db.user_project.assigned_user == auth.user.id) & (db.user_project.period == period)).select().first() is not None:
+                if auth.has_membership('Student'):
+                    user_role = 2
+                else:
+                    user_role = 3
+        except:
+            None
+    if auth.has_membership('Academic'):
+        try:
+            academic_var = db.academic(db.academic.id_auth_user==auth.user.id)
+            if db((db.academic_course_assignation.carnet==academic_var.id)&(db.academic_course_assignation.semester==period)).select().first() is not None:
+                user_role = 5
+        except:
+            None
+
+
     evaluations = db(db.evaluation.period == period).select()
     return dict(evaluations=evaluations,
                 users_project=users_project,
                 project=project,
+                user_role=user_role,
                 period=period)
 
 

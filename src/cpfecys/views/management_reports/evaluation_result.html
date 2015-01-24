@@ -23,7 +23,7 @@
 	    	{{pass}}
 	    	<div class="pull-right noPrint">
 	    		<a onclick="exportCSV();"><img src="{{=URL('static','images')}}/icono_CSV.png"></a>
-				<a class="btn yesgraph" onclick="noPrint();"><i class="icon-print"></i></a>
+				<a class="btn" onclick="noPrint();"><i class="icon-print"></i></a>
 	    	</div>
 	    	<center><h1>{{=T('Report Summary')}}</h1></center>
     	<!--HEADER OF REPORT-->
@@ -42,7 +42,10 @@
 			    			<strong>{{=T('Type')}}: </strong> {{=T('Evaluations Results')}}<br/>
 				    		<strong>{{=T('Description')}}: </strong> {{=T('Report of transactions on the notes of students')}}<br/>
 				    		<strong>{{=T('Period')}}: </strong>
-							<form class="form-inline" 
+				    		<div class="yesPrint" style="display:none;">
+					    		{{=T(period_var.period.name)}}-{{=period_var.yearp}}
+					    	</div>
+							<form class="form-inline noPrint"  
 							action="{{=URL('management_reports','evaluation_result')}}" 
 							method='get'>
 								<select name="period">
@@ -326,20 +329,36 @@
 				</td>
 				
 				<td>
-					<center><a {{if category[2]<61:}}
-							class="badge badge-important noPrint" 
+					<center>
+						{{if category[1]==-1:}}
+							<a class="badge badge-inverse noPrint" style="white-space:nowrap;" href="{{=URL('management_reports', 'evaluation_result',vars=dict(period = str(request.vars['period']), project = str(request.vars['project']), user = str(request.vars['user']), category=category[0], evaluation = str(request.vars['evaluation']), level='5', type_L = str(request.vars['type_L']), type_U = str(request.vars['type_U']) ))}}">
+								{{=T('Without reference')}}
+								</a>
 						{{else:}}
-							class="badge badge-success noPrint" 
-						{{pass}} style="white-space:nowrap;" href="{{=URL('management_reports', 'evaluation_result',vars=dict(period = str(request.vars['period']), project = str(request.vars['project']), user = str(request.vars['user']), category=category[0], evaluation = str(request.vars['evaluation']), level='5', type_L = str(request.vars['type_L']), type_U = str(request.vars['type_U']) ))}}">
-						{{=category[2]}}
-					</a>
-					<a {{if category[2]<61:}}
-							class="badge badge-important yesPrint" 
+						<a 							
+							{{if category[1]<61:}}
+								class="badge badge-important noPrint" 
+							{{else:}}
+								class="badge badge-success noPrint" 
+							{{pass}} style="white-space:nowrap;" href="{{=URL('management_reports', 'evaluation_result',vars=dict(period = str(request.vars['period']), project = str(request.vars['project']), user = str(request.vars['user']), category=category[0], evaluation = str(request.vars['evaluation']), level='5', type_L = str(request.vars['type_L']), type_U = str(request.vars['type_U']) ))}}">
+								{{=category[1]}}
+						</a>
+						{{pass}}
+					
+						{{if category[1]==-1:}}
+							<a class="badge badge-inverse yesPrint" style="white-space:nowrap; display:none">
+								{{=T('Without reference')}}
+								</a>
 						{{else:}}
-							class="badge badge-success yesPrint" 
-						{{pass}} style="white-space:nowrap; display:none">
-						{{=category[2]}}
-					</a></center>
+							<a {{if category[1]<61:}}
+									class="badge badge-important yesPrint" 
+								{{else:}}
+									class="badge badge-success yesPrint" 
+								{{pass}} style="white-space:nowrap; display:none">
+								{{=category[1]}}
+							</a>
+						{{pass}}
+					</center>
 				</td>
 				
 				
@@ -396,29 +415,27 @@
 			{{for category in infoLevel:}}
 			<tr>
 				<td>
-					<a class="noPrint" style="white-space:nowrap;" href="{{=URL('management_reports', 'evaluation_result',vars=dict(period = str(request.vars['period']), project = str(request.vars['project']), user = str(request.vars['user']), category=category[0], evaluation = str(request.vars['evaluation']), level='5', type_L = str(request.vars['type_L']), type_U = str(request.vars['type_U']) ) )}}">
-						{{=category[0]}}
-					</a>
-					<a class="yesPrint" style="white-space:nowrap; display:none">
+					<a  style="white-space:nowrap;">
 						{{=category[0]}}
 					</a>
 				</td>
 				
 				<td>
-					<center><a {{if category[2]<61:}}
-							class="badge badge-important noPrint" 
-						{{else:}}
-							class="badge badge-success noPrint" 
-						{{pass}} style="white-space:nowrap;" href="{{=URL('management_reports', 'evaluation_result',vars=dict(period = str(request.vars['period']), project = str(request.vars['project']), user = str(request.vars['user']), category=category[0], evaluation = str(request.vars['evaluation']), level='5', type_L = str(request.vars['type_L']), type_U = str(request.vars['type_U']) ))}}">
-						{{=category[2]}}
-					</a>
-					<a {{if category[2]<61:}}
-							class="badge badge-important yesPrint" 
-						{{else:}}
-							class="badge badge-success yesPrint" 
-						{{pass}} style="white-space:nowrap; display:none">
-						{{=category[2]}}
-					</a></center>
+					<center>
+					{{if category[1]==-1:}}
+						<a class="badge badge-inverse" style="white-space:nowrap;">
+							{{=T('Without reference')}}
+							</a>
+					{{else:}}
+						<a {{if category[1]<61:}}
+								class="badge badge-important" 
+							{{else:}}
+								class="badge badge-success" 
+							{{pass}} style="white-space:nowrap;">
+							{{=category[1]}}
+						</a>
+					{{pass}}
+					</center>
 				</td>
 				
 				
@@ -432,41 +449,7 @@
 </div>
 
 <script type="text/javascript">
-	$(document).ready(function(){
-		//HOME --- Buttons for execution or cancellation search
-		$("#buildSearch").click(function(){
-			$("#div_search").slideDown();
-		});
-
-		$("#cancelSearch").click(function(){
-			{{if request.vars['level'] is None or str(request.vars['level'])=="1":}}
-				window.location.href = "{{=URL('management_reports', 'grades_management')}}";
-			{{elif str(request.vars['level'])=="2":}}
-				window.location.href = "{{=URL(vars=dict(level = 2, period = request.vars['period'], type_L=request.vars['type_L']))}}";
-			{{elif str(request.vars['level'])=="3":}}
-				window.location.href = "{{=URL(vars=dict(level = 3, period = request.vars['period'], month = str(request.vars['month']), type_L=request.vars['type_L'], type_U=request.vars['type_U']))}}";
-			{{elif str(request.vars['level'])=="4":}}
-				window.location.href = "{{=URL(vars=dict(level = 4, period = request.vars['period'], month = str(request.vars['month']), project = str(request.vars['project']), type_L=request.vars['type_L'], type_U=request.vars['type_U']))}}";
-			{{elif str(request.vars['level'])=="5":}}
-				window.location.href = "{{=URL(vars=dict(level = 5, period = request.vars['period'], month = str(request.vars['month']), project = str(request.vars['project']), roll = str(request.vars['roll']), type_L=request.vars['type_L'], type_U=request.vars['type_U']))}}";
-			{{elif str(request.vars['level'])=="6":}}
-				window.location.href = "{{=URL(vars=dict(level = 6, period = request.vars['period'], month = str(request.vars['month']), project = str(request.vars['project']), roll = str(request.vars['roll']), userP = str(request.vars['userP']), type_L=request.vars['type_L'], type_U=request.vars['type_U']))}}";
-			{{pass}}
-		});
 	
-		{{if str(request.vars['level'])=="6":}}
-			$(".web2py_breadcrumbs").css("display", "none");
-		{{pass}}
-
-		$(".yesgraph").hide();
-		//END --- Buttons for execution or cancellation search
-
-		
-		
-	
-		//END --- Buttons for query construction
-	});
-
 	function noPrint(){
 		$(".noPrint").hide();
 		$(".yesPrint").show();
@@ -475,27 +458,7 @@
 		$(".noPrint").show();
 	}
 
-	function showGraph(id){
-		if(id==1){
-			$(".yesgraph").show();
-			$(".nograph").hide();
-			$(window).resize();
-		}else{
-			$(".yesgraph").hide();
-			$(".nograph").show();
-		}
-	}
-
-	function showAllGraph(id){
-		if(id==1){
-			$("#idVisible").hide();
-			$(".noVisible").show();
-		}else{
-			$(".noVisible").hide();
-			$("#idVisible").show();
-		}
-	}
-
+	
 	//INIT LEVEL UP REPORT
 	{{if request.vars['level'] is not None and str(request.vars['level'])!="1":}}
 		function levelUP(){
@@ -515,18 +478,17 @@
 	//INIT EXPORT REPORT TO CSV FILE
 	function exportCSV(){
 		{{if request.vars['level'] is None or str(request.vars['level'])=="1":}}
-			window.location.href = "{{=URL('management_reports','grades_management_export', vars=dict(list_type='csv', level='1'))}}";
+			window.location.href = "{{=URL('management_reports', 'evaluation_result_export',vars=dict(list_type='csv', level='1', period=period_var.id))}}";
 		{{elif str(request.vars['level'])=="2":}}
-			window.location.href = "{{=URL('management_reports','grades_management_export', vars=dict(list_type='csv', level='2',period = str(request.vars['period']), type_L = str(request.vars['type_L'])))}}";
+			window.location.href = "{{=URL('management_reports', 'evaluation_result_export',vars=dict(list_type='csv', level='2',period = str(request.vars['period']), type_L = str(request.vars['type_L']), evaluation =  str(request.vars['evaluation']) ))}}";
 		{{elif str(request.vars['level'])=="3":}}
-			window.location.href = "{{=URL('management_reports','grades_management_export', vars=dict(list_type='csv', level='3',period = str(request.vars['period']), month = str(request.vars['month']), type_L = str(request.vars['type_L']), type_U = str(request.vars['type_U'])))}}";
+			window.location.href = "{{=URL('management_reports', 'evaluation_result_export',vars=dict(list_type='csv', level='3',period = str(request.vars['period']), type_L = str(request.vars['type_L']), type_U = str(request.vars['type_U']), evaluation =  str(request.vars['evaluation']), project =  str(request.vars['project']) ))}}";
 		{{elif str(request.vars['level'])=="4":}}
-			window.location.href = "{{=URL('management_reports','grades_management_export', vars=dict(list_type='csv', level='4',period = str(request.vars['period']), month = str(request.vars['month']), project = str(request.vars['project']), type_L = str(request.vars['type_L']), type_U = str(request.vars['type_U'])))}}";
+			window.location.href = "{{=URL('management_reports', 'evaluation_result_export',vars=dict(list_type='csv', level='4',period = str(request.vars['period']), type_L = str(request.vars['type_L']), type_U = str(request.vars['type_U']), user =  str(request.vars['user']), evaluation =  str(request.vars['evaluation']), project =  str(request.vars['project']) ))}}";
 		{{elif str(request.vars['level'])=="5":}}
-			window.location.href = "{{=URL('management_reports','grades_management_export', vars=dict(list_type='csv', level='5',period = str(request.vars['period']), month = str(request.vars['month']), project = str(request.vars['project']), roll = str(request.vars['roll']), type_L = str(request.vars['type_L']), type_U = str(request.vars['type_U'])))}}";
-		{{elif str(request.vars['level'])=="6":}}
-			window.location.href = "{{=URL('management_reports','grades_management_export', vars=dict(list_type='csv', level='6',period = str(request.vars['period']), month = str(request.vars['month']), project = str(request.vars['project']), roll = str(request.vars['roll']), userP = str(request.vars['userP']), type_L = str(request.vars['type_L']), type_U = str(request.vars['type_U'])))}}";
+			window.location.href = "{{=URL('management_reports', 'evaluation_result_export',vars=dict(list_type='csv',category=str(request.vars['category']), level='5',period = str(request.vars['period']), type_L = str(request.vars['type_L']), type_U = str(request.vars['type_U']), user =  str(request.vars['user']), evaluation =  str(request.vars['evaluation']), project =  str(request.vars['project']) ))}}";
 		{{pass}}
+
 	}
 	//END EXPORT REPORT TO CSV FILE
 </script>

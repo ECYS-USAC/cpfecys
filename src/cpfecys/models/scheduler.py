@@ -197,6 +197,54 @@ def check_exception_semester_repeat():
                         db(db.course_limit_exception.id==exception.id).delete()	
     db.commit()
 
+def send_evaluation_notifications():
+    import datetime
+    import cpfecys
+    cperiod = cpfecys.current_year_period()
+    year = str(cperiod.yearp)
+    cdate = datetime.datetime.now()
+    date_now = datetime.date(cdate.year, cdate.month, cdate.day)
+
+    evaluation = db((db.evaluation.period==cperiod.id)&(db.evaluation.date_start==date_now)).select().first()
+    
+    email_list = []
+    if  evaluation is not None:
+        for membership in db((db.auth_membership.group_id==evaluation.repository_evaluation.user_type_evaluator)).select():
+            send_mail = False
+            links = ""
+            try:
+                if db((db.user_project.assigned_user == membership.user_id) & (db.user_project.period == cperiod.id)).select().first is not None:
+                   send_mail = True 
+                   #links = links + URL('evaluation', 'evaluation_list', vars=dict(project = user_assignation.project.name, period = cperiod.id)) + "<br>"
+            except:
+                None
+            try:
+                academic_var = db.academic(db.academic.id_auth_user==membership.user_id)
+                if db((db.academic_course_assignation.carnet==academic_var.id)&(db.academic_course_assignation.semester==cperiod.id)).select().first is not None:
+                    send_mail = True
+                    #links = links + "<br>"
+            except:
+                None
+            if send_mail == True:
+                email_list.append(membership.user_id.email)
+        try:        
+            subject = "EVALUACIONES DE DESEMPEÑO 360"
+            message = "Por este medio le solicitamos apoyo para realizar las evaluaciones de desempeño correspondientes, las cuales se encuentran disponibles en el área de <b>Evaluaciones de desempeño 360</b>.<br><br>"+ \
+                        cpfecys.get_domain() + URL('activity_control', 'courses_list')
+            was_sent = mail.send(to='dtt.ecys@dtt-ecys.org',subject=subject,message=message, bcc=email_list)
+            #MAILER LOG
+            db.mailer_log.insert(sent_message = message,
+                             destination = str(email_list),
+                             result_log = str(mail.error or '') + ':' + \
+                             str(mail.result),
+                             success = was_sent, emisor="dtt.ecys@dtt-ecys.org")
+            if was_sent==False:
+                control=control+1
+            return control
+        except:
+            None
+
+
 def automation_evaluations():
     import datetime
     import cpfecys
@@ -211,8 +259,6 @@ def automation_evaluations():
 
     #First Semester
     if cperiod.period == 1:
-    
-            
         evaluations = db((db.evaluation.date_finish<initSemester)).select()
         if evaluations.first() is not None:
             for evaluation in evaluations:
@@ -521,6 +567,7 @@ def auto_daily():
     check_exception_semester_repeat()
     automation_activities_assigned()
     automation_evaluations()
+    send_evaluation_notifications()
     return T('Total Updated Reports: ') + str(total_recheckies + total_drafties + missed_reports) + ' ' + \
             T('Automatically Updated Draft Reports: ') + str(total_drafties) + ' ' + \
             T('Automatically Updated Recheck Reports: ') + str(total_recheckies) + ' ' + \
