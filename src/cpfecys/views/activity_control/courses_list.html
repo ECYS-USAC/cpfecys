@@ -397,7 +397,11 @@
 								{{pass}}
 								>
 									<center>
-										{{assignation_var = db((db.user_project.project==course.user_project.project)&(db.user_project.assigned_user==auth.user.id)&(db.user_project.period==str(periodo.id))).select().first()}}
+										{{assignation_var = db((db.user_project.period == db.period_year.id)&\
+					                        ((db.user_project.period <= periodo.id) & \
+					                        ((db.user_project.period + db.user_project.periods) > periodo.id))&\
+					                        (db.user_project.project==course.user_project.project)).select(db.user_project.ALL).first()}}
+					                        {{print "var_:"+str(assignation_var)}}
 										<a class="btn" href="{{=URL('student_academic', 'academic_assignation', vars=dict(assignation = assignation_var.id, year_period = str(periodo.id)))}}" style="height:32px; width:32px;">
 											<img src="{{=URL('static','images')}}/academic_control/users6.png" height="32" width="32">							
 										</a><br>
@@ -627,7 +631,11 @@
 											data-step="{{step_count+=1}}{{=step_count}}" data-intro="Esta opción le permite gestionar la asignación de los estudiantes a la sección del curso en el periodo seleccionado."
 										{{pass}}
 										>
-											{{assignation_var = db((db.user_project.project==course.user_project.project)&(db.user_project.assigned_user==auth.user.id)&(db.user_project.period==str(periodo.id))).select().first()}}
+											{{assignation_var = db((db.user_project.period == db.period_year.id)&\
+					                        ((db.user_project.period <= periodo.id) & \
+					                        ((db.user_project.period + db.user_project.periods) > periodo.id))&\
+					                        (db.user_project.project==course.user_project.project)).select(db.user_project.ALL).first()}}
+					                        {{print "var_:"+str(assignation_var)}}
 											<center>
 												<a class="btn" href="{{=URL('student_academic', 'academic_assignation', vars=dict(assignation = assignation_var.id, year_period = str(periodo.id)))}}" style="height:32px; width:32px;">
 													<img src="{{=URL('static','images')}}/academic_control/users6.png" height="32" width="32">							
