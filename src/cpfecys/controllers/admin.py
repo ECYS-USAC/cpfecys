@@ -86,13 +86,13 @@ def general_report():
         assignations = get_assignations(project, period, 'Teacher' \
                 ).select(db.user_project.ALL)
         return assignations
-    def get_final_report(project_id):
+    def get_final_report(project_id,period):
         from datetime import datetime
         log_final = None
         parcial_1 = None
         parcial_2 = None
         parcial_3 = None
-        cperiod = cpfecys.current_year_period()
+        cperiod = period
         year = str(cperiod.yearp)
         start = datetime.strptime(year + '-06-01', "%Y-%m-%d")
         end = datetime.strptime(year + '-12-31', "%Y-%m-%d")
@@ -645,25 +645,33 @@ def courses_report():
             assignations = get_assignations(project, period, 'Student' \
                 ).count()
             return assignations
-
+        def obtainPeriodReport(report):
+            #Get the minimum and maximum date of the report
+            tmp_period=1
+            tmp_year=report.report_restriction.start_date.year
+            if report.report_restriction.start_date.month >= 6:
+               tmp_period=2
+            return db((db.period_year.yearp==tmp_year)&(db.period_year.period==tmp_period)).select().first()
         def count_assigned_students(project):
             assigned = []
             desertion = []
             assignations = get_assignations(project, period, 'Student' \
                 ).select(db.user_project.ALL)
-            for assignation in assignations:
+            for assignation in assignations:                
                 reports = db(db.report.assignation==assignation.id
                     ).select()
                 for report in reports:
-                    assigned.append(report.desertion_started)
+                    if obtainPeriodReport(report) == period:
+                        assigned.append(report.desertion_started)
             if assignations.first() != None:
                 desertion_assignation = assignations.first()
                 desertion_reports = db(
                     db.report.assignation==desertion_assignation.id).select()
                 for report in desertion_reports:
-                    if report.desertion_gone != None:
-                        if report.desertion_gone:
-                            desertion.append(report.desertion_gone)
+                    if obtainPeriodReport(report) == period:
+                        if report.desertion_gone != None:
+                            if report.desertion_gone:
+                                desertion.append(report.desertion_gone)
             if len(assigned) > 0:
                 assigned = max(assigned)
             else:

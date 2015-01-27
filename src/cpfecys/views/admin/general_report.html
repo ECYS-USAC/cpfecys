@@ -102,7 +102,7 @@
                     <td>{{=T('Pending')}}</td>
                 {{pass}}
                 {{final_report, metrics, parcial_1, parcial_2, parcial_3, \
-                    final, primera_r, segunda_r = get_final_report(project.id)}}
+                    final, primera_r, segunda_r = get_final_report(project.id,actual_period)}}
                 {{if final_report != None and metrics != None:}}
                 <td>
                     {{=metrics.curso_aprobados or ''}}
