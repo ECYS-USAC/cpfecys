@@ -144,6 +144,7 @@ mail.settings.sender = 'dtt.ecys@dtt-ecys.org'
 mail.settings.tls = False
 mail.settings.login = None
 
+
 ## configure auth policy
 auth.settings.registration_requires_verification = False
 auth.settings.registration_requires_approval = False

@@ -135,7 +135,7 @@
 								</td>
 								<td>
 									{{var_SG = True}}
-									{{if str(project.specific_grade) == "True":}}
+									{{if project.specific_grade == True:}}
 										{{var_SG = False}}
 									{{pass}}
 				    				{{=T(str(var_SG))}}
@@ -203,7 +203,7 @@
 												</td>
 												<td>
 													{{var_SG = True}}
-													{{if project.after_specific_grade == "true":}}
+													{{if project.after_specific_grade == True:}}
 														{{var_SG = False}}
 													{{pass}}
 													{{=T(str(var_SG))}}
@@ -225,7 +225,7 @@
 												<td>
 													<font color="Green">
 													{{var_SG = True}}
-													{{if project.after_specific_grade == "true":}}
+													{{if project.after_specific_grade == True:}}
 														{{var_SG = False}}
 													{{pass}}
 													{{=T(str(var_SG))}}
@@ -247,7 +247,7 @@
 												<td>
 													<font color="blue">
 													{{var_SG = True}}
-													{{if project.after_specific_grade == "true":}}
+													{{if project.after_specific_grade == True:}}
 														{{var_SG = False}}
 													{{pass}}
 													{{=T(str(var_SG))}}

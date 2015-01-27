@@ -317,7 +317,6 @@ def academic_assignation():
     import cpfecys
     currentyear_period = db.period_year(db.period_year.id == year_period)
     check = db.user_project(id=assignation, assigned_user = auth.user.id)
-
     if not currentyear_period:
         currentyear_period = cpfecys.current_year_period()
         changid = currentyear_period.id
@@ -561,7 +560,10 @@ def academic_assignation():
     if (currentyear_period.id == cpfecys.current_year_period().id):
         grid = SQLFORM.grid(query, orderby=db.academic_course_assignation.carnet,details=False, fields=fields, links=links, oncreate=oncreate_academic_assignation, onupdate=onupdate_academic_assignation, ondelete=ondelete_academic_assignation, csv=False, deletable=False, editable=False, paginate=100)
     else:
-        checkProject = db((db.user_project.project == check.project) & (db.user_project.assigned_user==check.assigned_user) & (db.user_project.period==currentyear_period.id)).select()
+        checkProject = db((db.user_project.assigned_user==auth.user.id)&\
+                        (db.user_project.project == check.project)&\
+                        ((db.user_project.period <= currentyear_period.id) & \
+                        ((db.user_project.period + db.user_project.periods) > currentyear_period.id))).select(db.user_project.ALL)
         b=0
         for a in checkProject:
             b=b+1
@@ -763,9 +765,6 @@ def onupdate_academic_assignation(form):
             session.flash = T('Error: Ya existe la asignacion, no se modifico el estudiante')
         
 
-
-
-
 def ondelete_academic_assignation(table_involved, id_of_the_deleted_record):
     import datetime
     cdate = datetime.datetime.now()
@@ -799,7 +798,6 @@ def ondelete_academic_assignation(table_involved, id_of_the_deleted_record):
                                                 before_laboratory = student_assignation_var.laboratorio,
                                                 id_period = str(currentyear_period.id),
                                                 description = 'Se elimino el registro desde la pagina Asignar Estudiantes')
-
 
 @auth.requires_login()
 @auth.requires(auth.has_membership('Student') or auth.has_membership('Teacher'))
@@ -1018,7 +1016,6 @@ def academic_assignation_upload():
                 name=name, files=files)
 
 
-
 @auth.requires_login()
 @auth.requires(auth.has_membership('Student') or auth.has_membership('Teacher'))
 def student_courses():
@@ -1040,7 +1037,11 @@ def student_courses():
         except:
             nameS = '--------'
         return nameS
-    return dict(assignations = db((db.user_project.assigned_user == auth.user.id) & (db.user_project.period == cpfecys.current_year_period().id)).select(), split_name=split_name, split_section=split_section)
+    year = cpfecys.current_year_period()
+    assignation = db((db.user_project.assigned_user==auth.user.id)&\
+                        ((db.user_project.period <= year.id) & \
+                        ((db.user_project.period + db.user_project.periods) > year.id))).select(db.user_project.ALL).first()
+    return dict(assignations = assignation, split_name=split_name, split_section=split_section)
 
 #Mostrar el listado de estudiantes que han sido registrados en el sistema
 @auth.requires_login()

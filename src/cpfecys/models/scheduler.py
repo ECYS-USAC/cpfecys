@@ -338,12 +338,18 @@ def automation_activities_assigned():
                 message += T('Report Required')+': '+T('You need to enter a report of the activity to be taken as valid.')+'<br>'
             message += activity.assignation.name+'<br>'+T(activity.semester.period.name)+' '+str(activity.semester.yearp)+'<br>Sistema de Seguimiento de La Escuela de Ciencias y Sistemas<br> Facultad de Ingeniería - Universidad de San Carlos de Guatemala</html>'
             #Log General del Envio
+            teacher = db((db.user_project.project == activity.assignation)&
+                      ((db.user_project.period <= activity.semester) & ((db.user_project.period + db.user_project.periods) > activity.semester))&
+                      (db.user_project.assigned_user == db.auth_user.id)&
+                      (db.auth_membership.user_id == db.auth_user.id)&
+                      (db.auth_membership.group_id == db.auth_group.id)&
+                      (db.auth_group.role == 'Teacher')).select().first()
             row = db.notification_general_log4.insert(subject=subject,
                                                 sent_message=message,
-                                                emisor='DTT-ECYS',
+                                                emisor=teacher.auth_user.username,
                                                 course=activity.assignation.name,
                                                 yearp=activity.semester.yearp,
-                                                period=T(activity.semester.period.name))
+                                                period=(activity.semester.period.name))
             ListadoCorreos=None
             email_list_log=None
             students = db((db.user_project.project == activity.assignation)&
@@ -351,7 +357,7 @@ def automation_activities_assigned():
                       (db.user_project.assigned_user == db.auth_user.id)&
                       (db.auth_membership.user_id == db.auth_user.id)&
                       (db.auth_membership.group_id == db.auth_group.id)&
-                      (db.auth_group.role == 'student')).select()
+                      (db.auth_group.role == 'Student')).select()
 
             for usersT in students:
                 if ListadoCorreos is None:

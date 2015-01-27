@@ -183,7 +183,7 @@ def _period_setup():
             db.period_year.insert(yearp = (year + 1), period = first_period)
 
         #cheack and create the configuration of firts semester of curreynt year
-        configPeriod = db.student_control_period(db.student_control_period.period_name==("Primer Semestre "+str(year)))
+        configPeriod = db.student_control_period(db.student_control_period.period_name==("Primer Semestre "+str(year+1)))
         if not configPeriod:
             dateInicialP = db.executesql('SELECT date(\''+str(year+1)+'-01-01\') as fecha;',as_dict=True)
             for d0 in dateInicialP:
