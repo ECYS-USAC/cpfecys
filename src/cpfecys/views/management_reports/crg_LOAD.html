@@ -1,0 +1,54 @@
+{{if showLevel==False:}}
+	<center>{{=T('Not valid Action.')}}</center>
+	<script type="text/javascript">
+		alert("{{=T('Not valid Action.')}}");
+		window.location.href = "{{=URL('default', 'index.html')}}";
+	</script>
+{{else:}}
+	<table class="table table-striped table-bordered">
+		<tr>
+			<th colspan="6"><center>{{=T('Change Request')}}</center></th>
+		</tr>
+		<tr>
+			<th>{{=T('User')}}</th><td>{{=requestC.username}}</td>
+			<th>{{=T('Role')}}</th><td>{{=T('Rol '+requestC.roll)}}</td>
+			<th>{{=T('Date Request')}}</th><td>{{=requestC.date_request}}</td>
+		</tr>
+		<tr>
+			<th>{{=T('Category')}}:</th><td>{{=requestC.category}}</td>
+			<th>{{=T('Activity')}}:</th><td>{{=requestC.activity}}</td>
+			<th>{{=T('Status')}}:</th><td>{{=T(requestC.after_status)}}</td>
+		</tr>
+		<tr>
+			<th>{{=T('Resolve User')}}</th><td>{{=requestC.resolve_user}}</td>
+			<th>{{=T('Resolve Date')}}</th><td>{{=requestC.date_request_resolve}}</td>
+			<th>{{=T('Role resolution')}}</th><td>{{=requestC.roll_resolve}}</td>
+		</tr>
+		<tr>
+			<th>{{=T('Description')}}:</th>
+			<td colspan="5"><pre>{{=requestC.description}}</pre></td>
+		</tr>
+		<tr>
+			<th>{{=T('Description Log')}}:</th>
+			<td colspan="5"><pre>{{=requestC.description_log}}</pre></td>
+		</tr>
+	</table>
+	<h1>{{=T('Detail of Request')}}</h1>
+	<hr>
+	<table class="table table-striped table-bordered">
+		<tr>
+			<th>{{=T('Operation')}}</th>
+			<th>{{=T('Academic')}}</th>
+			<th>{{=T('Before Grade')}}</th>
+			<th>{{=T('After Grade')}} </th>
+		</tr>
+		{{for change in requestD:}}
+			<tr>
+				<td>{{=change.operation_request}}</td>
+				<td>{{=change.academic}}</td>
+				<td><pre>{{=change.before_grade}}</pre></td>
+				<td>{{=change.after_grade}}</td>
+			</tr>
+		{{pass}}
+	</table>
+{{pass}}

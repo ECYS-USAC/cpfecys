@@ -350,7 +350,26 @@ def automation_activities_assigned():
             db(db.course_assigned_activity.id == activity.id).update(status = status)
     db.commit()
 
-
+def reject_request():
+    #CURRENT PERIOD
+    import cpfecys
+    import datetime
+    period = cpfecys.current_year_period()
+    rollR = db(db.auth_group.role=='Super-Administrator').select().first()
+    userR = db((db.auth_user.id==db.auth_membership.user_id)&(db.auth_membership.group_id==rollR.id)).select(db.auth_user.ALL).first()
+    #ACTIVITIES
+    for request in db((db.requestchange_activity.semester!=period.id)&(db.requestchange_activity.status=='Pending')).select():
+        date_resolve = datetime.datetime(request.semester.yearp, 5, 31)
+        if request.semester.period==2:
+            date_resolve = datetime.datetime(request.semester.yearp, 12, 31)
+        #OFFITIAL
+        db(db.requestchange_activity.id==request.id).update(status = 'Rejected', user_resolve = userR.id, roll_resolve = rollR.role, date_request_resolve =  date_resolve)
+        #LOG
+        request_rejected = db.requestchange_activity_log.insert(user_request=request.user_id.username, roll_request=request.roll, status='Rejected', user_resolve=userR.username, roll_resolve=rollR.role, description=request.description, date_request=request.date_request, date_request_resolve=date_resolve, category_request=request.course_activity_category.category.category, semester=request.semester.period.name, yearp=request.semester.yearp, course=request.course.name)
+        activitiesChange = db(db.requestchange_course_activity.requestchange_activity==request.id).select()
+        for actChange in activitiesChange:
+            db.requestchange_course_activity_log.insert(requestchange_activity=request_rejected, operation_request=actChange.operation_request, activity=actChange.activity, name=actChange.name, description=actChange.description, grade=actChange.grade, date_start=actChange.date_start, date_finish=actChange.date_finish)
+    #GRADES
 
 
 

@@ -1,0 +1,16 @@
+{{
+import cStringIO
+import csv
+stream=cStringIO.StringIO()
+
+csv_writer = csv.writer(stream)
+for row in csvdata:
+    csv_writer.writerow(row)
+pass
+
+nameFile = 'ReporteGestionSolicitudesCambioNotas.csv'
+
+response.headers['Content-Type']='application/vnd.ms-excel'
+response.headers['Content-disposition']='attachment; filename=' +nameFile
+response.write(stream.getvalue(), escape=False)
+}}

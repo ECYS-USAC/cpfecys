@@ -1,0 +1,58 @@
+{{if showLevel==False:}}
+	<center>{{=T('Not valid Action.')}}</center>
+	<script type="text/javascript">
+		alert("{{=T('Not valid Action.')}}");
+		window.location.href = "{{=URL('default', 'index.html')}}";
+	</script>
+{{else:}}
+	<table class="table table-striped table-bordered">
+		<tr>
+			<th colspan="6"><center>{{=T('Change Request')}}</center></th>
+		</tr>
+		<tr>
+			<th>{{=T('User')}}</th><td>{{=requestC.user_request}}</td>
+			<th>{{=T('Role')}}</th><td>{{=T('Rol '+requestC.roll_request)}}</td>
+			<th>{{=T('Date Request')}}</th><td>{{=requestC.date_request}}</td>
+		</tr>
+		<tr>
+			<th>{{=T('Category')}}:</th>
+			<td colspan="2"><center>{{=requestC.category_request}}</center></td>
+			<th>{{=T('Status')}}:</th>
+			<th colspan="2">{{=T(requestC.status)}}</th>
+		</tr>
+		<tr>
+			<th>{{=T('User resolution')}}</th>
+			<td>{{=requestC.user_resolve}}</td>
+			<th>{{=T('Date of resolution')}}</th>
+			<td>{{=requestC.date_request_resolve}}</td>
+			<th>{{=T('Role resolution')}}</th>
+			<td>{{=requestC.roll_resolve}}</td>
+		</tr>
+		<tr>
+			<th>{{=T('Description')}}:</th>
+			<td colspan="5"><pre>{{=requestC.description}}</pre></td>
+		</tr>
+	</table>
+	<h1>{{=T('Detail of Request')}}</h1>
+	<hr>
+	<table class="table table-striped table-bordered">
+		<tr>
+			<th>{{=T('Operation')}}</th>
+			<th>{{=T('Name Activity')}}</th>
+			<th>{{=T('Description of Activity')}}</th>
+			<th>{{=T('Grade of Activity')}} </th>
+			<th>{{=T('Start Date')}}</th>
+			<th>{{=T('End Date')}}</th>
+		</tr>
+		{{for change in requestD:}}
+			<tr>
+				<td>{{=change.operation_request}}</td>
+				<td>{{=change.name}}</td>
+				<td><pre>{{=change.description}}</pre></td>
+				<td>{{=change.grade}}</td>
+				<td>{{=change.date_start}}</td>
+				<td>{{=change.date_finish}}</td>
+			</tr>
+		{{pass}}
+	</table>
+{{pass}}

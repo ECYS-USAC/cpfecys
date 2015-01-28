@@ -163,6 +163,7 @@ def VALIDATE_PERIOD(period):
     except:
         return None
 
+
 @auth.requires_login()
 @auth.requires_membership('Super-Administrator')
 def VALIDATE_EVALUATION(evaluation):
@@ -171,6 +172,7 @@ def VALIDATE_EVALUATION(evaluation):
         return evaluation
     except:
         return None
+
 
 @auth.requires_login()
 @auth.requires_membership('Super-Administrator')
@@ -196,6 +198,16 @@ def VALIDATE_PROJECT(projectI,typeReport):
                     project=project.before_course
                 else:
                     project=project.after_course
+        elif typeReport=='requestchange_activity_log':
+            flag=True
+            project=db(db.requestchange_activity_log.course==projectI).select().first()
+            if project is not None:
+                project=project.course
+        elif typeReport=='request_change_g_log':
+            flag=True
+            project=db(db.request_change_g_log.project==projectI).select().first()
+            if project is not None:
+                project=project.project
         else:
             project = None
 
@@ -290,6 +302,14 @@ def VALIDATE_USER(period,project,roll,idUser,typeReport):
                 userP = db((db.academic_course_assignation_log.id_period==period.id)&((db.academic_course_assignation_log.before_course==project)|(db.academic_course_assignation_log.after_course==project))&(db.academic_course_assignation_log.roll.like('%'+str(roll)+'%'))&(db.academic_course_assignation_log.user_name==idUser)).select().first()
                 if userP is not None:
                     userP=userP.user_name
+            elif typeReport =='requestchange_activity_log':
+                userP = db((db.requestchange_activity_log.course==project)&(db.requestchange_activity_log.semester==period.period.name)&(db.requestchange_activity_log.yearp==period.yearp)&(db.requestchange_activity_log.roll_request==roll)&(db.requestchange_activity_log.user_request==idUser)).select().first()
+                if userP is not None:
+                    userP=userP.user_request
+            elif typeReport =='request_change_g_log':
+                userP = db((db.request_change_g_log.project==project)&(db.request_change_g_log.semester==T(period.period.name))&(db.request_change_g_log.yearp==period.yearp)&(db.request_change_g_log.roll==roll)&(db.request_change_g_log.username==idUser)).select().first()
+                if userP is not None:
+                    userP=userP.user_request
             else:
                 userP = None
         return userP
@@ -347,6 +367,20 @@ def GET_PROJECTS(typeReport):
             projectsTemp = db(~db.academic_course_assignation_log.after_course.belongs(projects)).select(db.academic_course_assignation_log.after_course.with_alias('name'), distinct=True)
         for project in projectsTemp:
             projects.append(project.name)
+    elif typeReport == 'requestchange_activity_log':
+        if len(projects) == 0:
+            projectsTemp = db(db.requestchange_activity_log).select(db.requestchange_activity_log.course.with_alias('name'), distinct=True)
+        else:
+            projectsTemp = db(~db.requestchange_activity_log.course.belongs(projects)).select(db.requestchange_activity_log.course.with_alias('name'), distinct=True)
+        for project in projectsTemp:
+            projects.append(project.name)
+    elif typeReport == 'request_change_g_log':
+        if len(projects) == 0:
+            projectsTemp = db(db.request_change_g_log).select(db.request_change_g_log.project.with_alias('name'), distinct=True)
+        else:
+            projectsTemp = db(~db.request_change_g_log.project.belongs(projects)).select(db.request_change_g_log.project.with_alias('name'), distinct=True)
+        for project in projectsTemp:
+            projects.append(project.name)
     else:
         session.flash = T('Not valid Action.')
         redirect(URL('default','index'))
@@ -380,31 +414,18 @@ def GET_ROLES(typeReport):
         roles.append('system')
         rolesTemp = db(~db.academic_log.roll.belongs(roles)&(db.academic_log.roll!='Academic')&(db.academic_log.roll!='DSI')).select(db.academic_log.roll.with_alias('roll'), distinct=True)
         for roll in rolesTemp:
-            for rollI in str(roll.roll).split(','):
-                flagAdd = True
-                for roll2 in roles:
-                    if roll2 == rollI or rollI=='Academic' or rollI=='DSI':
-                        flagAdd=False
-                if flagAdd == True:
-                    roles.append(rollI)
+            roles.append(roll.roll)
     elif typeReport == 'academic_course_assignation_log':
         if len(roles) == 0:
             rolesTemp = db((db.academic_course_assignation_log.roll!='Academic')&(db.academic_course_assignation_log.roll!='DSI')).select(db.academic_course_assignation_log.roll.with_alias('roll'), distinct=True)
         else:
             rolesTemp = db(~db.academic_course_assignation_log.roll.belongs(roles)&(db.academic_course_assignation_log.roll!='Academic')&(db.academic_course_assignation_log.roll!='DSI')).select(db.academic_course_assignation_log.roll.with_alias('roll'), distinct=True)
         for roll in rolesTemp:
-            for rollI in str(roll.roll).split(','):
-                flagAdd = True
-                for roll2 in roles:
-                    if roll2 == rollI or rollI=='Academic' or rollI=='DSI':
-                        flagAdd=False
-                if flagAdd == True:
-                    roles.append(rollI)
+            roles.append(roll.roll)
     else:
         session.flash = T('Not valid Action.')
         redirect(URL('default','index'))
     return roles
-
 
 @auth.requires_login()
 @auth.requires_membership('Super-Administrator')
@@ -465,6 +486,20 @@ def GET_USERS(period,project,roll,typeReport):
         searchT='academic_log.id_period = "'+str(period.id)+'" and academic_log.roll contains "'+str(roll)+'" '+condition
         for userT in db.smart_query(db.academic_log,searchT).select(db.academic_log.user_name, distinct=True):
             usersProject.append(userT.user_name)
+    elif typeReport == 'requestchange_activity_log':
+        if len(usersProject) ==0:
+            usersProjectT = db((db.requestchange_activity_log.course==project)&(db.requestchange_activity_log.semester==period.period.name)&(db.requestchange_activity_log.yearp==period.yearp)&(db.requestchange_activity_log.roll_request==roll)).select(db.requestchange_activity_log.user_request, distinct=True)
+        else:
+            usersProjectT = db((db.requestchange_activity_log.course==project)&(db.requestchange_activity_log.semester==period.period.name)&(db.requestchange_activity_log.yearp==period.yearp)&(db.requestchange_activity_log.roll_request==roll)&(~db.requestchange_activity_log.user_request.belongs(usersProject))).select(db.requestchange_activity_log.user_request, distinct=True)
+        for userT in usersProjectT:
+            usersProject.append(userT.user_request)
+    elif typeReport == 'request_change_g_log':
+        if len(usersProject) ==0:
+            usersProjectT = db((db.request_change_g_log.project==project)&(db.request_change_g_log.semester==T(period.period.name))&(db.request_change_g_log.yearp==period.yearp)&(db.request_change_g_log.roll==roll)).select(db.request_change_g_log.username, distinct=True)
+        else:
+            usersProjectT = db((db.request_change_g_log.project==project)&(db.request_change_g_log.semester==T(period.period.name))&(db.request_change_g_log.yearp==period.yearp)&(db.request_change_g_log.roll==roll)&(~db.request_change_g_log.username.belongs(usersProject))).select(db.request_change_g_log.username, distinct=True)
+        for userT in usersProjectT:
+            usersProject.append(userT.username)
     else:
         session.flash = T('Not valid Action.')
         redirect(URL('default','index'))
@@ -501,6 +536,20 @@ def GET_CATEGORIES(typeReport):
             categoriesTemp = db((~db.course_activity_log.after_course_activity_category.belongs(categories))).select(db.course_activity_log.after_course_activity_category, distinct=True)
         for category in categoriesTemp:
             categories.append(category.after_course_activity_category)
+    elif typeReport == 'requestchange_activity_log':
+        if len(categories) == 0:
+            categoriesTemp = db(db.requestchange_activity_log).select(db.requestchange_activity_log.category_request, distinct=True)
+        else:
+            categoriesTemp = db(~db.requestchange_activity_log.category_request.belongs(categories)).select(db.requestchange_activity_log.category_request, distinct=True)
+        for category in categoriesTemp:
+            categories.append(category.category_request)
+    elif typeReport == 'request_change_g_log':
+        if len(categories) == 0:
+            categoriesTemp = db(db.request_change_g_log).select(db.request_change_g_log.category, distinct=True)
+        else:
+            categoriesTemp = db(~db.request_change_g_log.category.belongs(categories)).select(db.request_change_g_log.category, distinct=True)
+        for category in categoriesTemp:
+            categories.append(category.category)
     else:
         session.flash = T('Not valid Action.')
         redirect(URL('default','index'))
@@ -537,6 +586,13 @@ def GET_ACTIVITIES(typeReport):
             activitiesTemp = db((~db.course_activity_log.after_name.belongs(activities))).select(db.course_activity_log.after_name, distinct=True)
         for activity in activitiesTemp:
             activities.append(activity.after_name)
+    elif typeReport == 'request_change_g_log':
+        if len(activities) == 0:
+            activitiesTemp = db(db.request_change_g_log).select(db.request_change_g_log.activity, distinct=True)
+        else:
+            activitiesTemp = db(~db.request_change_g_log.activity.belongs(activities)).select(db.request_change_g_log.activity, distinct=True)
+        for activity in activitiesTemp:
+            activities.append(activity.activity)
     else:
         session.flash = T('Not valid Action.')
         redirect(URL('default','index'))
@@ -580,10 +636,17 @@ def GET_DATES(typeReport):
     elif typeReport == 'academic_course_assignation_log':
         for dat in db(db.academic_course_assignation_log).select(db.academic_course_assignation_log.date_log, distinct=True):
             dates.append(dat.date_log)
+    elif typeReport == 'requestchange_activity_log':
+        for dat in db(db.requestchange_activity_log).select(db.requestchange_activity_log.date_request, distinct=True):
+            dates.append(dat.date_request)
+    elif typeReport == 'request_change_g_log':
+        for dat in db(db.request_change_g_log).select(db.request_change_g_log.date_request, distinct=True):
+            dates.append(dat.date_request)
     else:
         session.flash = T('Not valid Action.')
         redirect(URL('default','index'))
     return dates
+
 
 @auth.requires_login()
 @auth.requires_membership('Super-Administrator')
@@ -614,7 +677,7 @@ def grades_management_export():
             redirect(URL('default','index'))
 
         #CHECK THAT THE LEVEL OF REPORT IS VALID
-        if request.vars['level'] is not None and (int(request.vars['level'])<1 and int(request.vars['level'])>6):
+        if request.vars['level'] is not None and (int(request.vars['level'])<1 or int(request.vars['level'])>6):
             session.flash = T('Report no visible: There are no parameters required to display the report.')
             redirect(URL('default','index'))
         
@@ -1089,23 +1152,25 @@ def grades_management_export():
         infoLevel.append(infoeLevelTemp)
         #TITLE OF TABLE
         infoeLevelTemp=[]
-        infoeLevelTemp.append(T('Log'))
-        infoeLevelTemp.append(T('Description')+' '+T('Log'))
-        infoeLevelTemp.append(T('Category'))
+        infoeLevelTemp.append(T('Operation'))
+        infoeLevelTemp.append(T('Academic'))
         infoeLevelTemp.append(T('Activity'))
-        infoeLevelTemp.append(T('Student'))
-        infoeLevelTemp.append(T('Before Grade'))
-        infoeLevelTemp.append(T('Grade'))
+        infoeLevelTemp.append(T('Category'))
+        infoeLevelTemp.append(T('Grade Before'))
+        infoeLevelTemp.append(T('Grade After'))
+        infoeLevelTemp.append(T('Date'))
+        infoeLevelTemp.append(T('Description'))
         infoLevel.append(infoeLevelTemp)
         for operation in db.smart_query(db.grades_log,search).select():
             infoeLevelTemp=[]
-            infoeLevelTemp.append(operation.date_log)
-            infoeLevelTemp.append(operation.description)
-            infoeLevelTemp.append(operation.category)
-            infoeLevelTemp.append(operation.activity)
+            infoeLevelTemp.append(operation.operation_log)
             infoeLevelTemp.append(operation.academic)
+            infoeLevelTemp.append(operation.activity)
+            infoeLevelTemp.append(operation.category)
             infoeLevelTemp.append(operation.before_grade)
             infoeLevelTemp.append(operation.after_grade)
+            infoeLevelTemp.append(operation.date_log)
+            infoeLevelTemp.append(operation.description)
             infoLevel.append(infoeLevelTemp)
     #*****************************************************REPORT*****************************************************
     #****************************************************************************************************************
@@ -1120,14 +1185,19 @@ def grades_management():
     #****************************************************************************************************************
     #***************************************CHECK IF THERE IS A PERSONALIZED QUERY***********************************
     personal_query = ''
+    makeRedirect = False
     if request.vars['querySearch'] is not None and str(request.vars['querySearch']) != "":
         #PERSONALIZED QUERY SURE WORK
         try:
             personal_query = str(request.vars['querySearch'])
             countI = db.smart_query(db.grades_log,personal_query).count()
+            if request.vars['searchT'] is not None and str(request.vars['searchT']) == 'T':
+                makeRedirect = True
         except:
             response.flash = T('The query is not valid. The report is displayed without applying any query.')
             personal_query = ''
+    if makeRedirect == True:
+        redirect(URL('management_reports', 'grades_management',vars=dict(level = 6, period = request.vars['period'], month = str(request.vars['month']), project = str(request.vars['project']), roll = str(request.vars['roll']), userP = str(request.vars['userP']), type_L=request.vars['type_L'], type_U=request.vars['type_U'], querySearch=request.vars['querySearch'])))
 
 
     #****************************************************************************************************************
@@ -1135,7 +1205,7 @@ def grades_management():
     #******************************************VERIFY THAT ACCURATE PARAMETERS***************************************
     try:
         #CHECK THAT THE LEVEL OF REPORT IS VALID
-        if request.vars['level'] is not None and (int(request.vars['level'])<1 and int(request.vars['level'])>6):
+        if request.vars['level'] is not None and (int(request.vars['level'])<1 or int(request.vars['level'])>6):
             session.flash = T('Not valid Action.')
             redirect(URL('default','index'))
         
@@ -1260,8 +1330,9 @@ def grades_management():
     #******************************ENTERING USER******************************
     #CARNET
     fsearch.append(['academic','Estudiante',True,[1]])
-    #ID OF PERSON WHO REGISTER THE GRADE
-    fsearch.append(['user_name','Usuario Registro',True,[1]])
+    if request.vars['level'] is None or int(request.vars['level'])<=5:
+        #ID OF PERSON WHO REGISTER THE GRADE
+        fsearch.append(['user_name','Usuario Registro',True,[1]])
     #BEFORE GRADE
     fsearch.append(['before_grade','Nota Previa',False,[1]])
     #OFFICIAL GRADE
@@ -1364,7 +1435,7 @@ def grades_management():
     elif str(request.vars['level'])=="3":
         if len(projects) == 0:
             session.flash = T('Report no visible: There are no parameters required to display the report.')
-            redirect(URL('management_reports', 'grades_management',vars=dict(list='level',level='2',period = str(request.vars['period']), type_L = str(request.vars['type_U']), querySearch=personal_query)))
+            redirect(URL('management_reports', 'grades_management',vars=dict(level='2',period = str(request.vars['period']), type_L = str(request.vars['type_U']), querySearch=personal_query)))
         projects=sorted(projects)
 
         for projectT in projects:
@@ -1420,7 +1491,7 @@ def grades_management():
     elif str(request.vars['level'])=="4":
         if len(roles) == 0:
             session.flash = T('Report no visible: There are no parameters required to display the report.')
-            redirect(URL('management_reports', 'grades_management',vars=dict(list='level',level='3', period = str(request.vars['period']), month = str(request.vars['month']), type_L = str(request.vars['type_U']), type_U = str(request.vars['type_U']), querySearch=personal_query)))
+            redirect(URL('management_reports', 'grades_management',vars=dict(level='3', period = str(request.vars['period']), month = str(request.vars['month']), type_L = str(request.vars['type_U']), type_U = str(request.vars['type_U']), querySearch=personal_query)))
 
         for rollT in roles:
             roll=db(db.auth_group.role==rollT).select().first()
@@ -1472,7 +1543,7 @@ def grades_management():
         usersProject = GET_USERS(period,project,roll,'grades_log')
         if len(usersProject) == 0:
             session.flash = T('Report no visible: There are no parameters required to display the report.')
-            redirect(URL('management_reports', 'grades_management',vars=dict(list='level',level='4', period = str(request.vars['period']), month = str(request.vars['month']), project = str(request.vars['project']), type_L = str(request.vars['type_U']), type_U = str(request.vars['type_U']), querySearch=personal_query)))
+            redirect(URL('management_reports', 'grades_management',vars=dict(level='4', period = str(request.vars['period']), month = str(request.vars['month']), project = str(request.vars['project']), type_L = str(request.vars['type_U']), type_U = str(request.vars['type_U']), querySearch=personal_query)))
 
         for userPT in usersProject:
             userP=db(db.auth_user.username==userPT).select().first()
@@ -1542,6 +1613,12 @@ def grades_management():
                 search='grades_log.period = "'+T(period.period.name)+'" and grades_log.yearp = "'+str(period.yearp)+'" and grades_log.operation_log = "delete" and grades_log.date_log >="'+str(month[1])+'" and grades_log.date_log<="'+str(month[2])+'" and grades_log.project ="'+str(project)+'" and grades_log.roll ="'+str(roll)+'" and grades_log.user_name ="'+str(userP)+'"'
             else:
                 search='grades_log.period = "'+T(period.period.name)+'" and grades_log.yearp = "'+str(period.yearp)+'" and grades_log.operation_log = "delete" and grades_log.date_log >="'+str(month[1])+'" and grades_log.date_log<="'+str(month[2])+'" and grades_log.project ="'+str(project)+'" and grades_log.roll ="'+str(roll)+'" and grades_log.user_name ="'+str(userP)+'" and '+personal_query
+        grid = []
+        for data in db.smart_query(db.grades_log,search).select():
+                grid.append(data.id)
+        if len(grid) == 0:
+            grid.append(-1)
+
         infoeLevelTemp=[]
         infoeLevelTemp.append(T(period.period.name)+' '+str(period.yearp))
         infoeLevelTemp.append(str(month[0]))
@@ -1566,7 +1643,7 @@ def grades_management():
         db.grades_log.yearp.writable = False
         db.grades_log.period.readable = False
         db.grades_log.period.writable = False
-        grid=SQLFORM.smartgrid(db.grades_log, constraints = dict(grades_log=search), csv=False, create=False, editable=False, deletable=False, paginate=9, searchable=False)
+        grid = SQLFORM.grid(db.grades_log.id.belongs(grid), csv=False, create=False, editable=False, deletable=False, paginate=9, searchable=False)
     return dict(fsearch=fsearch, filtered_by=filtered_by, personal_query=personal_query, infoLevel=infoLevel, top5=top5, grid=grid) 
 
 
@@ -1887,7 +1964,7 @@ def activities_withmetric_management_export():
             redirect(URL('default','index'))
 
         #CHECK THAT THE LEVEL OF REPORT IS VALID
-        if request.vars['level'] is not None and (int(request.vars['level'])<1 and int(request.vars['level'])>6):
+        if request.vars['level'] is not None and (int(request.vars['level'])<1 or int(request.vars['level'])>6):
             session.flash = T('Not valid Action.')
             redirect(URL('default','index'))
 
@@ -2414,14 +2491,19 @@ def activities_withmetric_management():
     #****************************************************************************************************************
     #***************************************CHECK IF THERE IS A PERSONALIZED QUERY***********************************
     personal_query = ''
+    makeRedirect = False
     if request.vars['querySearch'] is not None and str(request.vars['querySearch']) != "":
         #PERSONALIZED QUERY SURE WORK
         try:
             personal_query = str(request.vars['querySearch'])
             countI = db.smart_query(db.course_activity_log,personal_query).count()
+            if request.vars['searchT'] is not None and str(request.vars['searchT']) == 'T':
+                makeRedirect = True
         except:
             response.flash = T('The query is not valid. The report is displayed without applying any query.')
             personal_query = ''
+    if makeRedirect == True:
+        redirect(URL('management_reports', 'activities_withmetric_management',vars=dict(level = 6, period = request.vars['period'], month = str(request.vars['month']), project = str(request.vars['project']), roll = str(request.vars['roll']), userP = str(request.vars['userP']), type_L=request.vars['type_L'], type_U=request.vars['type_U'], querySearch=request.vars['querySearch'])))
 
 
     #****************************************************************************************************************
@@ -2429,7 +2511,7 @@ def activities_withmetric_management():
     #******************************************VERIFY THAT ACCURATE PARAMETERS***************************************
     try:
         #CHECK THAT THE LEVEL OF REPORT IS VALID
-        if request.vars['level'] is not None and (int(request.vars['level'])<1 and int(request.vars['level'])>6):
+        if request.vars['level'] is not None and (int(request.vars['level'])<1 or int(request.vars['level'])>6):
             session.flash = T('Not valid Action.')
             redirect(URL('default','index'))
 
@@ -2554,8 +2636,9 @@ def activities_withmetric_management():
     #OPERATION LOG
     fsearch.append(['operation_log','Operación',False,[3,['insert','update','delete']]])
     #******************************ENTERING USER******************************
-    #ID OF PERSON WHO REGISTER THE GRADE
-    fsearch.append(['user_name','Usuario Registro',True,[1]])
+    if request.vars['level'] is None or int(request.vars['level'])<=5:
+        #ID OF PERSON WHO REGISTER THE GRADE
+        fsearch.append(['user_name','Usuario Registro',True,[1]])
     #BEFORE DESCRIPTION OF ACTIVITY
     fsearch.append(['before_description','Descripción Anterior',True,[1]])
     #OFFICIAL DESCRIPTION OF ACTIVITY
@@ -2681,7 +2764,7 @@ def activities_withmetric_management():
     elif str(request.vars['level'])=="3":
         if len(projects) == 0:
             session.flash = T('Report no visible: There are no parameters required to display the report.')
-            redirect(URL('management_reports', 'activities_withmetric_management',vars=dict(list='level',level='2',period = str(request.vars['period']), type_L = str(request.vars['type_U']), querySearch=personal_query)))
+            redirect(URL('management_reports', 'activities_withmetric_management',vars=dict(level='2',period = str(request.vars['period']), type_L = str(request.vars['type_U']), querySearch=personal_query)))
         projects=sorted(projects)
 
         for projectT in projects:
@@ -2737,7 +2820,7 @@ def activities_withmetric_management():
     elif str(request.vars['level'])=="4":
         if len(roles) == 0:
             session.flash = T('Report no visible: There are no parameters required to display the report.')
-            redirect(URL('management_reports', 'activities_withmetric_management',vars=dict(list='level',level='3', period = str(request.vars['period']), month = str(request.vars['month']), type_L = str(request.vars['type_U']), type_U = str(request.vars['type_U']), querySearch=personal_query)))
+            redirect(URL('management_reports', 'activities_withmetric_management',vars=dict(level='3', period = str(request.vars['period']), month = str(request.vars['month']), type_L = str(request.vars['type_U']), type_U = str(request.vars['type_U']), querySearch=personal_query)))
 
         for rollT in roles:
             roll=db(db.auth_group.role==rollT).select().first()
@@ -2789,7 +2872,7 @@ def activities_withmetric_management():
         usersProject = GET_USERS(period,project,roll,'course_activity_log')
         if len(usersProject) == 0:
             session.flash = T('Report no visible: There are no parameters required to display the report.')
-            redirect(URL('management_reports', 'activities_withmetric_management',vars=dict(list='level',level='4', period = str(request.vars['period']), month = str(request.vars['month']), project = str(request.vars['project']), type_L = str(request.vars['type_U']), type_U = str(request.vars['type_U']), querySearch=personal_query)))
+            redirect(URL('management_reports', 'activities_withmetric_management',vars=dict(level='4', period = str(request.vars['period']), month = str(request.vars['month']), project = str(request.vars['project']), type_L = str(request.vars['type_U']), type_U = str(request.vars['type_U']), querySearch=personal_query)))
 
         for userPT in usersProject:
             userP=db(db.auth_user.username==userPT).select().first()
@@ -2859,6 +2942,13 @@ def activities_withmetric_management():
                 search='course_activity_log.period = "'+T(period.period.name)+'" and course_activity_log.yearp = "'+str(period.yearp)+'" and course_activity_log.operation_log = "delete" and course_activity_log.date_log >="'+str(month[1])+'" and course_activity_log.date_log<="'+str(month[2])+'" and course_activity_log.course ="'+str(project)+'" and course_activity_log.roll ="'+str(roll)+'" and course_activity_log.user_name ="'+str(userP)+'"'
             else:
                 search='course_activity_log.period = "'+T(period.period.name)+'" and course_activity_log.yearp = "'+str(period.yearp)+'" and course_activity_log.operation_log = "delete" and course_activity_log.date_log >="'+str(month[1])+'" and course_activity_log.date_log<="'+str(month[2])+'" and course_activity_log.course ="'+str(project)+'" and course_activity_log.roll ="'+str(roll)+'" and course_activity_log.user_name ="'+str(userP)+'" and '+personal_query
+        grid = []
+        for data in db.smart_query(db.course_activity_log,search).select():
+            grid.append(data.id)
+        #REPORT
+        if len(grid) == 0:
+            grid.append(-1)
+
         infoeLevelTemp=[]
         infoeLevelTemp.append(T(period.period.name)+' '+str(period.yearp))
         infoeLevelTemp.append(str(month[0]))
@@ -2885,7 +2975,7 @@ def activities_withmetric_management():
         db.course_activity_log.before_file.writable = False
         db.course_activity_log.after_file.readable = False
         db.course_activity_log.after_file.writable = False
-        grid=SQLFORM.smartgrid(db.course_activity_log, constraints = dict(course_activity_log=search), csv=False, create=False, editable=False, deletable=False, paginate=9, searchable=False)
+        grid = SQLFORM.grid(db.course_activity_log.id.belongs(grid), csv=False, create=False, editable=False, deletable=False, paginate=9, searchable=False)
     return dict(fsearch=fsearch, filtered_by=filtered_by, personal_query=personal_query, infoLevel=infoLevel, top5=top5, grid=grid)
 
 
@@ -2903,7 +2993,7 @@ def student_management_export():
             redirect(URL('default','index'))
 
         #CHECK THAT THE LEVEL OF REPORT IS VALID
-        if request.vars['level'] is not None and (int(request.vars['level'])<1 and int(request.vars['level'])>5):
+        if request.vars['level'] is not None and (int(request.vars['level'])<1 or int(request.vars['level'])>5):
             session.flash = T('Report no visible: There are no parameters required to display the report.')
             redirect(URL('default','index'))
         
@@ -3316,14 +3406,19 @@ def student_management():
     #****************************************************************************************************************
     #***************************************CHECK IF THERE IS A PERSONALIZED QUERY***********************************
     personal_query = ''
+    makeRedirect = False
     if request.vars['querySearch'] is not None and str(request.vars['querySearch']) != "":
         #PERSONALIZED QUERY SURE WORK
         try:
             personal_query = str(request.vars['querySearch'])
             countI = db.smart_query(db.academic_log,personal_query).count()
+            if request.vars['searchT'] is not None and str(request.vars['searchT']) == 'T':
+                makeRedirect = True
         except:
             response.flash = T('The query is not valid. The report is displayed without applying any query.')
             personal_query = ''
+    if makeRedirect == True:
+        redirect(URL('management_reports', 'student_management', vars=dict(level = 5, period = request.vars['period'], month = str(request.vars['month']), roll = str(request.vars['roll']), userP = str(request.vars['userP']), type_L=request.vars['type_L'], type_U=request.vars['type_U'], querySearch=request.vars['querySearch'])))
     
 
     #****************************************************************************************************************
@@ -3331,7 +3426,7 @@ def student_management():
     #******************************************VERIFY THAT ACCURATE PARAMETERS***************************************
     try:
         #CHECK THAT THE LEVEL OF REPORT IS VALID
-        if request.vars['level'] is not None and (int(request.vars['level'])<1 and int(request.vars['level'])>5):
+        if request.vars['level'] is not None and (int(request.vars['level'])<1 or int(request.vars['level'])>5):
             session.flash = T('Not valid Action.')
             redirect(URL('default','index'))
 
@@ -3536,7 +3631,7 @@ def student_management():
     elif str(request.vars['level'])=="3":
         if len(roles) == 0:
             session.flash = T('Report no visible: There are no parameters required to display the report.')
-            redirect(URL('management_reports', 'student_management',vars=dict(list='level',level='2', period = str(request.vars['period']), month = str(request.vars['month']), type_L = str(request.vars['type_U']), type_U = str(request.vars['type_U']), querySearch=personal_query)))
+            redirect(URL('management_reports', 'student_management',vars=dict(level='2', period = str(request.vars['period']), month = str(request.vars['month']), type_L = str(request.vars['type_U']), type_U = str(request.vars['type_U']), querySearch=personal_query)))
 
         for rollT in roles:
             roll=db(db.auth_group.role==rollT).select().first()
@@ -3586,7 +3681,7 @@ def student_management():
         usersProject = GET_USERS(period,None,roll,'academic_log')
         if len(usersProject) == 0:
             session.flash = T('Report no visible: There are no parameters required to display the report.')
-            redirect(URL('management_reports', 'student_management',vars=dict(list='level',level='3', period = str(request.vars['period']), month = str(request.vars['month']), type_L = str(request.vars['type_U']), type_U = str(request.vars['type_U']), querySearch=personal_query)))
+            redirect(URL('management_reports', 'student_management',vars=dict(level='3', period = str(request.vars['period']), month = str(request.vars['month']), type_L = str(request.vars['type_U']), type_U = str(request.vars['type_U']), querySearch=personal_query)))
 
         for userPT in usersProject:
             userP=db(db.auth_user.username==userPT).select().first()
@@ -3661,6 +3756,12 @@ def student_management():
                 search='academic_log.id_period = "'+str(period.id)+'" and academic_log.operation_log = "delete" and academic_log.date_log >="'+str(month[1])+'" and academic_log.date_log<="'+str(month[2])+'" and academic_log.roll LIKE "%'+str(roll)+'%" and academic_log.user_name ="'+str(userP)+'"'
             else:
                 search='academic_log.id_period = "'+str(period.id)+'" and academic_log.operation_log = "delete" and academic_log.date_log >="'+str(month[1])+'" and academic_log.date_log<="'+str(month[2])+'" and academic_log.roll LIKE "%'+str(roll)+'%" and academic_log.user_name ="'+str(userP)+'" and '+personal_query
+        grid = []
+        for data in db.smart_query(db.academic_log,search).select():
+            grid.append(data.id)
+        #REPORT
+        if len(grid) == 0:
+            grid.append(-1)
         infoeLevelTemp=[]
         infoeLevelTemp.append(T(period.period.name)+' '+str(period.yearp))
         infoeLevelTemp.append(str(month[0]))
@@ -3678,7 +3779,7 @@ def student_management():
         db.academic_log.id_academic.writable = False
         db.academic_log.id_period.readable = False
         db.academic_log.id_period.writable = False
-        grid=SQLFORM.smartgrid(db.academic_log, constraints = dict(academic_log=search), csv=False, create=False, editable=False, deletable=False, paginate=9, searchable=False)
+        grid = SQLFORM.grid(db.academic_log.id.belongs(grid), csv=False, create=False, editable=False, deletable=False, paginate=9, searchable=False)
     return dict(fsearch=fsearch, filtered_by=filtered_by, personal_query=personal_query, infoLevel=infoLevel, top5=top5, grid=grid) 
 
 
@@ -3696,7 +3797,7 @@ def student_assignment_management_export():
             redirect(URL('default','index'))
 
         #CHECK THAT THE LEVEL OF REPORT IS VALID
-        if request.vars['level'] is not None and (int(request.vars['level'])<1 and int(request.vars['level'])>6):
+        if request.vars['level'] is not None and (int(request.vars['level'])<1 or int(request.vars['level'])>6):
             session.flash = T('Report no visible: There are no parameters required to display the report.')
             redirect(URL('default','index'))
 
@@ -4196,6 +4297,7 @@ def student_assignment_management_export():
     #****************************************************************************************************************
     return dict(filename='ReporteGestionAsignaciones', csvdata=infoLevel)
 
+
 @auth.requires_login()
 @auth.requires_membership('Super-Administrator')
 def student_assignment_management():
@@ -4203,22 +4305,26 @@ def student_assignment_management():
     #****************************************************************************************************************
     #***************************************CHECK IF THERE IS A PERSONALIZED QUERY***********************************
     personal_query = ''
+    makeRedirect = False
     if request.vars['querySearch'] is not None and str(request.vars['querySearch']) != "":
         #PERSONALIZED QUERY SURE WORK
         try:
             personal_query = str(request.vars['querySearch'])
             countI = db.smart_query(db.academic_course_assignation_log,personal_query).count()
+            if request.vars['searchT'] is not None and str(request.vars['searchT']) == 'T':
+                makeRedirect = True
         except:
             response.flash = T('The query is not valid. The report is displayed without applying any query.')
             personal_query = ''
-    
+    if makeRedirect == True:
+        redirect(URL('management_reports', 'student_assignment_management',vars=dict(level = 6, period = request.vars['period'], month = str(request.vars['month']), project = str(request.vars['project']), roll = str(request.vars['roll']), userP = str(request.vars['userP']), type_L=request.vars['type_L'], type_U=request.vars['type_U'], querySearch=request.vars['querySearch'])))
 
     #****************************************************************************************************************
     #****************************************************************************************************************
     #******************************************VERIFY THAT ACCURATE PARAMETERS***************************************
     try:
         #CHECK THAT THE LEVEL OF REPORT IS VALID
-        if request.vars['level'] is not None and (int(request.vars['level'])<1 and int(request.vars['level'])>6):
+        if request.vars['level'] is not None and (int(request.vars['level'])<1 or int(request.vars['level'])>6):
             session.flash = T('Not valid Action.')
             redirect(URL('default','index'))
 
@@ -4272,7 +4378,7 @@ def student_assignment_management():
                     session.flash = T('Not valid Action.')
                     redi*rect(URL('default','index'))
     except:
-        session.flash = T('Not valid Action.')+'todo'
+        session.flash = T('Not valid Action.')
         redirect(URL('default','index'))
 
 
@@ -4333,9 +4439,9 @@ def student_assignment_management():
     #AFTER LABORATORY
     fsearch.append(['after_laboratory','Laboratorio actual',False,[3,['True','False']]])
     #BEFORE CARNET
-    fsearch.append(['before_carnet','Carnet anterior',False,[1]])
+    fsearch.append(['before_carnet','Carnet anterior',True,[1]])
     #AFTER CARNET
-    fsearch.append(['after_carnet','Carnet actual',False,[1]])
+    fsearch.append(['after_carnet','Carnet actual',True,[1]])
 
 
     #****************************************************************************************************************
@@ -4439,7 +4545,7 @@ def student_assignment_management():
     elif str(request.vars['level'])=="3":
         if len(projects) == 0:
             session.flash = T('Report no visible: There are no parameters required to display the report.')
-            redirect(URL('management_reports', 'student_assignment_management',vars=dict(list='level',level='2',period = str(request.vars['period']), type_L = str(request.vars['type_U']), querySearch=personal_query)))
+            redirect(URL('management_reports', 'student_assignment_management',vars=dict(level='2',period = str(request.vars['period']), type_L = str(request.vars['type_U']), querySearch=personal_query)))
 
         #TOP 5 OF PROJECT
         top5Tempo = []
@@ -4510,7 +4616,7 @@ def student_assignment_management():
     elif str(request.vars['level'])=="4":
         if len(roles) == 0:
             session.flash = T('Report no visible: There are no parameters required to display the report.')
-            redirect(URL('management_reports', 'student_assignment_management',vars=dict(list='level',level='3', period = str(request.vars['period']), month = str(request.vars['month']), project = str(request.vars['project']), type_L = str(request.vars['type_U']), type_U = str(request.vars['type_U']), querySearch=personal_query)))
+            redirect(URL('management_reports', 'student_assignment_management',vars=dict(level='3', period = str(request.vars['period']), month = str(request.vars['month']), type_L = str(request.vars['type_U']), type_U = str(request.vars['type_U']), querySearch=personal_query)))
 
         for rollT in roles:
             roll=db(db.auth_group.role==rollT).select().first()
@@ -4562,7 +4668,7 @@ def student_assignment_management():
         usersProject = GET_USERS(period,project,roll,'academic_course_assignation_log')
         if len(usersProject) == 0:
             session.flash = T('Report no visible: There are no parameters required to display the report.')
-            redirect(URL('management_reports', 'student_assignment_management',vars=dict(list='level',level='4', period = str(request.vars['period']), month = str(request.vars['month']), project = str(request.vars['project']), type_L = str(request.vars['type_U']), type_U = str(request.vars['type_U']), querySearch=personal_query)))
+            redirect(URL('management_reports', 'student_assignment_management',vars=dict(level='4', period = str(request.vars['period']), month = str(request.vars['month']), project = str(request.vars['project']), type_L = str(request.vars['type_U']), type_U = str(request.vars['type_U']), querySearch=personal_query)))
 
         #TOP 5 OF PROJECT
         top5Tempo = []
@@ -4631,24 +4737,28 @@ def student_assignment_management():
             countTop=countTop+1
     #DATA
     elif str(request.vars['level'])=="6":
+        grid = []
         if str(request.vars['type_L'])=="i" or str(request.vars['type_L'])=="all":
             if personal_query == '':
                 search='academic_course_assignation_log.id_period = "'+str(period.id)+'" and academic_course_assignation_log.operation_log = "insert" and academic_course_assignation_log.date_log >="'+str(month[1])+'" and academic_course_assignation_log.date_log<="'+str(month[2])+'" and academic_course_assignation_log.after_course = "'+str(project)+'" and academic_course_assignation_log.roll LIKE "%'+str(roll)+'%" and academic_course_assignation_log.user_name ="'+str(userP)+'"'
             else:
                 search='academic_course_assignation_log.id_period = "'+str(period.id)+'" and academic_course_assignation_log.operation_log = "insert" and academic_course_assignation_log.date_log >="'+str(month[1])+'" and academic_course_assignation_log.date_log<="'+str(month[2])+'" and academic_course_assignation_log.after_course = "'+str(project)+'" and academic_course_assignation_log.roll LIKE "%'+str(roll)+'%" and academic_course_assignation_log.user_name ="'+str(userP)+'" and '+personal_query
-            grid.append(db.smart_query(db.academic_course_assignation_log,search).select())
+            for data in db.smart_query(db.academic_course_assignation_log,search).select():
+                grid.append(data.id)
         if str(request.vars['type_L'])=="u" or str(request.vars['type_L'])=="all":
             if personal_query == '':
                 search='academic_course_assignation_log.id_period = "'+str(period.id)+'" and academic_course_assignation_log.operation_log = "update" and academic_course_assignation_log.date_log >="'+str(month[1])+'" and academic_course_assignation_log.date_log<="'+str(month[2])+'" and academic_course_assignation_log.before_course = "'+str(project)+'" and academic_course_assignation_log.after_course = "'+str(project)+'" and academic_course_assignation_log.roll LIKE "%'+str(roll)+'%" and academic_course_assignation_log.user_name ="'+str(userP)+'"'
             else:
                 search='academic_course_assignation_log.id_period = "'+str(period.id)+'" and academic_course_assignation_log.operation_log = "update" and academic_course_assignation_log.date_log >="'+str(month[1])+'" and academic_course_assignation_log.date_log<="'+str(month[2])+'" and academic_course_assignation_log.before_course = "'+str(project)+'" and academic_course_assignation_log.after_course = "'+str(project)+'" and academic_course_assignation_log.roll LIKE "%'+str(roll)+'%" and academic_course_assignation_log.user_name ="'+str(userP)+'" and '+personal_query
-            grid.append(db.smart_query(db.academic_course_assignation_log,search).select())
+            for data in db.smart_query(db.academic_course_assignation_log,search).select():
+                grid.append(data.id)
         if str(request.vars['type_L'])=="d" or str(request.vars['type_L'])=="all":
             if personal_query == '':
                 search='academic_course_assignation_log.id_period = "'+str(period.id)+'" and academic_course_assignation_log.operation_log = "delete" and academic_course_assignation_log.date_log >="'+str(month[1])+'" and academic_course_assignation_log.date_log<="'+str(month[2])+'" and academic_course_assignation_log.before_course = "'+str(project)+'" and academic_course_assignation_log.roll LIKE "%'+str(roll)+'%" and academic_course_assignation_log.user_name ="'+str(userP)+'"'
             else:
                 search='academic_course_assignation_log.id_period = "'+str(period.id)+'" and academic_course_assignation_log.operation_log = "delete" and academic_course_assignation_log.date_log >="'+str(month[1])+'" and academic_course_assignation_log.date_log<="'+str(month[2])+'" and academic_course_assignation_log.before_course = "'+str(project)+'" and academic_course_assignation_log.roll LIKE "%'+str(roll)+'%" and academic_course_assignation_log.user_name ="'+str(userP)+'" and '+personal_query
-            grid.append(db.smart_query(db.academic_course_assignation_log,search).select())
+            for data in db.smart_query(db.academic_course_assignation_log,search).select():
+                grid.append(data.id)
         #TITLE
         infoeLevelTemp=[]
         infoeLevelTemp.append(T(period.period.name)+' '+str(period.yearp))
@@ -4657,4 +4767,3024 @@ def student_assignment_management():
         infoeLevelTemp.append(T('Rol '+roll))
         infoeLevelTemp.append(str(userP))
         infoLevel.append(infoeLevelTemp)
+        #REPORT
+        if len(grid) == 0:
+            grid.append(-1)
+        #GRID
+        db.academic_course_assignation_log.id.readable = False
+        db.academic_course_assignation_log.id.writable = False
+        db.academic_course_assignation_log.user_name.readable = False
+        db.academic_course_assignation_log.user_name.writable = False
+        db.academic_course_assignation_log.roll.readable = False
+        db.academic_course_assignation_log.roll.writable = False
+        db.academic_course_assignation_log.before_course.readable = False
+        db.academic_course_assignation_log.before_course.writable = False
+        db.academic_course_assignation_log.after_course.readable = False
+        db.academic_course_assignation_log.after_course.writable = False
+        db.academic_course_assignation_log.before_year.readable = False
+        db.academic_course_assignation_log.before_year.writable = False
+        db.academic_course_assignation_log.after_year.readable = False
+        db.academic_course_assignation_log.after_year.writable = False
+        db.academic_course_assignation_log.before_semester.readable = False
+        db.academic_course_assignation_log.before_semester.writable = False
+        db.academic_course_assignation_log.after_semester.readable = False
+        db.academic_course_assignation_log.after_semester.writable = False
+        db.academic_course_assignation_log.id_academic_course_assignation.readable = False
+        db.academic_course_assignation_log.id_academic_course_assignation.writable = False
+        db.academic_course_assignation_log.id_period.readable = False
+        db.academic_course_assignation_log.id_period.writable = False
+        grid = SQLFORM.grid(db.academic_course_assignation_log.id.belongs(grid), csv=False, create=False, editable=False, deletable=False, paginate=9, searchable=False)
     return dict(fsearch=fsearch, filtered_by=filtered_by, personal_query=personal_query, infoLevel=infoLevel, top5=top5, grid=grid) 
+
+
+#*************************************************************************************************************************************
+#*************************************************************************************************************************************
+#********************************************MANAGEMENT REPORT CHANGE REQUEST ACTIVITIES WITH METRIC**********************************
+@auth.requires_login()
+@auth.requires_membership('Super-Administrator')
+def change_request_activities_with_metric_management_export():
+    #VERIFI THAT ACCURATE PARAMETERS
+    try:
+        #CHECK IF THE TYPE OF EXPORT IS VALID
+        if request.vars['list_type'] is None or str(request.vars['list_type'])!="csv":
+            session.flash = T('Not valid Action.')
+            redirect(URL('default','index'))
+
+        #CHECK THAT THE LEVEL OF REPORT IS VALID
+        if request.vars['level'] is not None and (int(request.vars['level'])<1 or int(request.vars['level'])>5):
+            session.flash = T('Report no visible: There are no parameters required to display the report.')
+            redirect(URL('default','index'))
+
+        #VERIFY THAT THE PARAMETERS OF EACH LEVEL BE VALID
+        if request.vars['level'] is not None:
+            #LEVEL MORE THAN 1
+            if int(request.vars['level'])>1:
+                #CHECK IF THE TYPE OF REPORT IS VALID
+                if request.vars['type_L'] is None or (str(request.vars['type_L'])!="all" and str(request.vars['type_L'])!="i" and str(request.vars['type_L'])!="u" and str(request.vars['type_L'])!="d" and str(request.vars['type_L'])!="p"):
+                    session.flash = T('Report no visible: There are no parameters required to display the report.')
+                    redirect(URL('default','index'))
+
+                period = VALIDATE_PERIOD(request.vars['period'])
+                if period is None:
+                    session.flash = T('Report no visible: There are no parameters required to display the report.')
+                    redirect(URL('default','index'))
+            
+            #LEVEL MORE THAN 2
+            if int(request.vars['level'])>2:
+                #CHECK IF THE TYPE OF REPORT IS VALID
+                if request.vars['type_U'] is None or (str(request.vars['type_U'])!="all" and str(request.vars['type_U'])!="i" and str(request.vars['type_U'])!="u" and str(request.vars['type_U'])!="d" and str(request.vars['type_L'])!="p"):
+                    session.flash = T('Report no visible: There are no parameters required to display the report.')
+                    redirect(URL('default','index'))
+
+                #CHECK IF THE MONTH IS VALID
+                month = VALIDATE_MONTH(request.vars['month'],period)
+                if month is None:
+                    session.flash = T('Report no visible: There are no parameters required to display the report.')
+                    redirect(URL('default','index'))
+            
+            #LEVEL MORE THAN 3
+            if int(request.vars['level'])>3:
+                #CHECK IF THE PROJECT IS VALID
+                project = VALIDATE_PROJECT(request.vars['project'],'requestchange_activity_log')
+                if project is None:
+                    session.flash = T('Report no visible: There are no parameters required to display the report.')
+                    redirect(URL('default','index'))
+
+            #LEVEL MORE THAN 4
+            if int(request.vars['level'])>4:
+                #CHECK IF THE USER IS VALID
+                userP = VALIDATE_USER(period,project,'Student',request.vars['userP'],'academic_course_assignation_log')
+                if userP is None:
+                    session.flash = T('Report no visible: There are no parameters required to display the report.')
+                    redirect(URL('default','index'))
+    except:
+        session.flash = T('Not valid Action.')
+        redirect(URL('default','index'))
+
+    #CHECK IF THERE IS A PERSONALIZED QUERY
+    personal_query = ''
+    if request.vars['querySearch'] is not None and str(request.vars['querySearch']) != "":
+        #PERSONALIZED QUERY SURE WORK
+        try:
+            personal_query = str(request.vars['querySearch'])
+            countI = db.smart_query(db.requestchange_activity_log,personal_query).count()
+        except:
+            personal_query = ''
+
+    #****************************************************************************************************************
+    #****************************************************************************************************************
+    #*****************************************************REPORT*****************************************************
+    from datetime import datetime
+    #TITLE
+    infoLevel = []
+    infoeLevelTemp=[]
+    infoeLevelTemp.append('Universidad de San Carlos de Guatemala')
+    infoLevel.append(infoeLevelTemp)
+    infoeLevelTemp=[]
+    infoeLevelTemp.append('Facultad de Ingeniería')
+    infoLevel.append(infoeLevelTemp)
+    infoeLevelTemp=[]
+    infoeLevelTemp.append('Escuela de Ciencias y Sistemas')
+    infoLevel.append(infoeLevelTemp)
+    #TYPE OF REPORT
+    infoeLevelTemp=[]
+    infoeLevelTemp.append(T('Type'))
+    infoeLevelTemp.append(T('Change Request Management Activity with Metric'))
+    infoLevel.append(infoeLevelTemp)
+    #DESCRIPTION OF REPORT
+    infoeLevelTemp=[]
+    infoeLevelTemp.append(T('Description'))
+    infoeLevelTemp.append(T('Report of operations for managing change requests metric activities'))
+    infoLevel.append(infoeLevelTemp)
+    #LEVELS OF REPORT
+    #ALL SEMESTERS
+    if request.vars['level'] is None or str(request.vars['level'])=="1":
+        #MIDDLE LINE OF REPORT
+        infoeLevelTemp=[]
+        infoLevel.append(infoeLevelTemp)
+        #LABLE DETAIL OF REPORT
+        infoeLevelTemp=[]
+        infoeLevelTemp.append(T('Detail'))
+        infoLevel.append(infoeLevelTemp)
+        #LABELS OF DATA OF REPORT
+        infoeLevelTemp=[]
+        infoeLevelTemp.append(T('Period'))
+        infoeLevelTemp.append(T('Total Made Requests'))
+        infoeLevelTemp.append(T('Total Accepted request'))
+        infoeLevelTemp.append(T('Total Rejected request'))
+        infoeLevelTemp.append(T('Total Pending Requests'))
+        infoLevel.append(infoeLevelTemp)
+        for period in db(db.period_year).select(orderby=~db.period_year.id):
+            infoeLevelTemp = []
+            #NAME OF PERIOD
+            infoeLevelTemp.append(T(period.period.name)+' '+str(period.yearp))
+            #MADE
+            if personal_query == '':
+                search='requestchange_activity_log.semester = "'+period.period.name+'" and requestchange_activity_log.yearp = "'+str(period.yearp)+'" and requestchange_activity_log.status = "Pending"'
+            else:
+                search='requestchange_activity_log.semester = "'+period.period.name+'" and requestchange_activity_log.yearp = "'+str(period.yearp)+'" and requestchange_activity_log.status = "Pending" and '+personal_query
+            countI = db.smart_query(db.requestchange_activity_log,search).count()
+            infoeLevelTemp.append(countI)
+            #ACCEPTED
+            if personal_query == '':
+                search='requestchange_activity_log.semester = "'+period.period.name+'" and requestchange_activity_log.yearp = "'+str(period.yearp)+'" and requestchange_activity_log.status = "Accepted"'
+            else:
+                search='requestchange_activity_log.semester = "'+period.period.name+'" and requestchange_activity_log.yearp = "'+str(period.yearp)+'" and requestchange_activity_log.status = "Accepted" and '+personal_query
+            countI = db.smart_query(db.requestchange_activity_log,search).count()
+            infoeLevelTemp.append(countI)
+            #REJECTED
+            if personal_query == '':
+                search='requestchange_activity_log.semester = "'+period.period.name+'" and requestchange_activity_log.yearp = "'+str(period.yearp)+'" and requestchange_activity_log.status = "Rejected"'
+            else:
+                search='requestchange_activity_log.semester = "'+period.period.name+'" and requestchange_activity_log.yearp = "'+str(period.yearp)+'" and requestchange_activity_log.status = "Rejected" and '+personal_query
+            countI = db.smart_query(db.requestchange_activity_log,search).count()
+            infoeLevelTemp.append(countI)
+            #PENDING
+            infoeLevelTemp.append(infoeLevelTemp[1]-infoeLevelTemp[2]-infoeLevelTemp[3])
+            #INSERT PERIOD
+            infoLevel.append(infoeLevelTemp)
+    #PER MONTH
+    elif str(request.vars['level'])=="2":
+        #PERIOD OF REPORT
+        infoeLevelTemp=[]
+        infoeLevelTemp.append(T('Period'))
+        infoeLevelTemp.append(T(period.period.name)+' '+str(period.yearp))
+        infoLevel.append(infoeLevelTemp)
+        #MIDDLE LINE OF REPORT
+        infoeLevelTemp=[]
+        infoLevel.append(infoeLevelTemp)
+        #LABLE DETAIL OF REPORT
+        infoeLevelTemp=[]
+        infoeLevelTemp.append(T('Detail'))
+        infoLevel.append(infoeLevelTemp)
+        #LABELS OF DATA OF REPORT
+        infoeLevelTemp=[]
+        infoeLevelTemp.append(T('Month'))
+        if str(request.vars['type_L'])=="all" or str(request.vars['type_L'])=="d":
+            infoeLevelTemp.append(T('Total Made Requests'))
+        if str(request.vars['type_L'])=="all" or str(request.vars['type_L'])=="i":
+            infoeLevelTemp.append(T('Total Accepted request'))
+        if str(request.vars['type_L'])=="all" or str(request.vars['type_L'])=="u":
+            infoeLevelTemp.append(T('Total Rejected request'))
+        if str(request.vars['type_L'])=="all" or str(request.vars['type_L'])=="p":
+            infoeLevelTemp.append(T('Total Pending Requests'))
+        infoLevel.append(infoeLevelTemp)
+
+        for month in GET_MONTH_PERIOD(period):
+            start = datetime.strptime(str(period.yearp) + '-' + str(month[0]) +'-01', "%Y-%m-%d")
+            if month[2]==1:
+                end = datetime.strptime(str(period.yearp+1) + '-' + str(month[2]) +'-01', "%Y-%m-%d")
+            else:
+                end = datetime.strptime(str(period.yearp) + '-' + str(month[2]) +'-01', "%Y-%m-%d")
+            infoeLevelTemp = []
+            #NAME OF MONTH
+            infoeLevelTemp.append(month[1]+' '+str(period.yearp))
+            #MADE
+            if str(request.vars['type_L'])=="all" or str(request.vars['type_L'])=="d":
+                if personal_query == '':
+                    search='requestchange_activity_log.semester = "'+period.period.name+'" and requestchange_activity_log.yearp = "'+str(period.yearp)+'" and requestchange_activity_log.date_request >="'+str(start)+'" and requestchange_activity_log.date_request<="'+str(end)+'" and requestchange_activity_log.status = "Pending"'
+                else:
+                    search='requestchange_activity_log.semester = "'+period.period.name+'" and requestchange_activity_log.yearp = "'+str(period.yearp)+'" and requestchange_activity_log.date_request >="'+str(start)+'" and requestchange_activity_log.date_request<="'+str(end)+'" and requestchange_activity_log.status = "Pending" and '+personal_query
+                countI = db.smart_query(db.requestchange_activity_log,search).count()
+                infoeLevelTemp.append(countI)
+            #ACCEPTED
+            if str(request.vars['type_L'])=="all" or str(request.vars['type_L'])=="i":
+                if personal_query == '':
+                    search='requestchange_activity_log.semester = "'+period.period.name+'" and requestchange_activity_log.yearp = "'+str(period.yearp)+'" and requestchange_activity_log.date_request_resolve >="'+str(start)+'" and requestchange_activity_log.date_request_resolve<="'+str(end)+'" and requestchange_activity_log.status = "Accepted"'
+                else:
+                    search='requestchange_activity_log.semester = "'+period.period.name+'" and requestchange_activity_log.yearp = "'+str(period.yearp)+'" and requestchange_activity_log.date_request_resolve >="'+str(start)+'" and requestchange_activity_log.date_request_resolve<="'+str(end)+'" and requestchange_activity_log.status = "Accepted" and '+personal_query
+                countI = db.smart_query(db.requestchange_activity_log,search).count()
+                infoeLevelTemp.append(countI)
+            #REJECTED
+            if str(request.vars['type_L'])=="all" or str(request.vars['type_L'])=="u":
+                if personal_query == '':
+                    search='requestchange_activity_log.semester = "'+period.period.name+'" and requestchange_activity_log.yearp = "'+str(period.yearp)+'" and requestchange_activity_log.date_request_resolve >="'+str(start)+'" and requestchange_activity_log.date_request_resolve<="'+str(end)+'" and requestchange_activity_log.status = "Rejected"'
+                else:
+                    search='requestchange_activity_log.semester = "'+period.period.name+'" and requestchange_activity_log.yearp = "'+str(period.yearp)+'" and requestchange_activity_log.date_request_resolve >="'+str(start)+'" and requestchange_activity_log.date_request_resolve<="'+str(end)+'" and requestchange_activity_log.status = "Rejected" and '+personal_query
+                countI = db.smart_query(db.requestchange_activity_log,search).count()
+                infoeLevelTemp.append(countI)
+            #PENDING
+            if str(request.vars['type_L'])=="all" or str(request.vars['type_L'])=="p":
+                if period.period==1:
+                    if personal_query == '':
+                        search='requestchange_activity_log.semester = "'+period.period.name+'" and requestchange_activity_log.yearp = "'+str(period.yearp)+'" and requestchange_activity_log.date_request >="'+str(period.yearp)+'-01-01" and requestchange_activity_log.date_request<="'+str(end)+'" and requestchange_activity_log.status = "Pending"'
+                    else:
+                        search='requestchange_activity_log.semester = "'+period.period.name+'" and requestchange_activity_log.yearp = "'+str(period.yearp)+'" and requestchange_activity_log.date_request >="'+str(period.yearp)+'-01-01" and requestchange_activity_log.date_request<="'+str(end)+'" and requestchange_activity_log.status = "Pending" and '+personal_query
+                    countP = db.smart_query(db.requestchange_activity_log,search).count()
+                    if personal_query == '':
+                        search='requestchange_activity_log.semester = "'+period.period.name+'" and requestchange_activity_log.yearp = "'+str(period.yearp)+'" and requestchange_activity_log.date_request_resolve >="'+str(period.yearp)+'-01-01" and requestchange_activity_log.date_request_resolve<="'+str(end)+'" and requestchange_activity_log.status != "Pending"'
+                    else:
+                        search='requestchange_activity_log.semester = "'+period.period.name+'" and requestchange_activity_log.yearp = "'+str(period.yearp)+'" and requestchange_activity_log.date_request_resolve >="'+str(period.yearp)+'-01-01" and requestchange_activity_log.date_request_resolve<="'+str(end)+'" and requestchange_activity_log.status != "Pending" and '+personal_query
+                    countNP = db.smart_query(db.requestchange_activity_log,search).count()
+                else:
+                    if personal_query == '':
+                        search='requestchange_activity_log.semester = "'+period.period.name+'" and requestchange_activity_log.yearp = "'+str(period.yearp)+'" and requestchange_activity_log.date_request >="'+str(period.yearp)+'-06-01" and requestchange_activity_log.date_request<="'+str(end)+'" and requestchange_activity_log.status = "Pending"'
+                    else:
+                        search='requestchange_activity_log.semester = "'+period.period.name+'" and requestchange_activity_log.yearp = "'+str(period.yearp)+'" and requestchange_activity_log.date_request >="'+str(period.yearp)+'-06-01" and requestchange_activity_log.date_request<="'+str(end)+'" and requestchange_activity_log.status = "Pending" and '+personal_query
+                    countP = db.smart_query(db.requestchange_activity_log,search).count()
+                    if personal_query == '':
+                        search='requestchange_activity_log.semester = "'+period.period.name+'" and requestchange_activity_log.yearp = "'+str(period.yearp)+'" and requestchange_activity_log.date_request_resolve >="'+str(period.yearp)+'-06-01" and requestchange_activity_log.date_request_resolve<="'+str(end)+'" and requestchange_activity_log.status != "Pending"'
+                    else:
+                        search='requestchange_activity_log.semester = "'+period.period.name+'" and requestchange_activity_log.yearp = "'+str(period.yearp)+'" and requestchange_activity_log.date_request_resolve >="'+str(period.yearp)+'-06-01" and requestchange_activity_log.date_request_resolve<="'+str(end)+'" and requestchange_activity_log.status != "Pending" and '+personal_query
+                    countNP = db.smart_query(db.requestchange_activity_log,search).count()
+                infoeLevelTemp.append(countP-countNP)
+            #INSERT MONTH
+            infoLevel.append(infoeLevelTemp)
+    #PER PROJECT
+    elif str(request.vars['level'])=="3":
+        #PROJECTS
+        projects = GET_PROJECTS('requestchange_activity_log')
+        projects=sorted(projects)
+        #PERIOD OF REPORT
+        infoeLevelTemp=[]
+        infoeLevelTemp.append(T('Period'))
+        infoeLevelTemp.append(T(period.period.name)+' '+str(period.yearp))
+        infoLevel.append(infoeLevelTemp)
+        #MONTH OF REPORT
+        infoeLevelTemp=[]
+        infoeLevelTemp.append(T('Month'))
+        infoeLevelTemp.append(str(month[0]))
+        infoLevel.append(infoeLevelTemp)
+        #MIDDLE LINE OF REPORT
+        infoeLevelTemp=[]
+        infoLevel.append(infoeLevelTemp)
+        #LABLE DETAIL OF REPORT
+        infoeLevelTemp=[]
+        infoeLevelTemp.append(T('Detail'))
+        infoLevel.append(infoeLevelTemp)
+        #LABELS OF DATA OF REPORT
+        infoeLevelTemp=[]
+        infoeLevelTemp.append(T('Project'))
+        if str(request.vars['type_L'])=="all" or str(request.vars['type_L'])=="d":
+            infoeLevelTemp.append(T('Total Made Requests'))
+        if str(request.vars['type_L'])=="all" or str(request.vars['type_L'])=="i":
+            infoeLevelTemp.append(T('Total Accepted request'))
+        if str(request.vars['type_L'])=="all" or str(request.vars['type_L'])=="u":
+            infoeLevelTemp.append(T('Total Rejected request'))
+        if str(request.vars['type_L'])=="all" or str(request.vars['type_L'])=="p":
+            infoeLevelTemp.append(T('Total Pending Requests'))
+        infoLevel.append(infoeLevelTemp)
+
+        for projectT in projects:
+            project=db(db.project.name==projectT).select().first()
+            if project is None:
+                project=db((db.course_activity_log.before_course==projectT)|(db.course_activity_log.after_course==projectT)).select().first()
+                if project.before_course is not None:
+                    project=project.before_course
+                else:
+                    project=project.after_course
+            else:
+                project=project.name
+            infoeLevelTemp = []
+            #NAME OF PROJECT
+            infoeLevelTemp.append(project)
+            #MADE
+            if str(request.vars['type_L'])=="all" or str(request.vars['type_L'])=="d":
+                if personal_query == '':
+                    search='requestchange_activity_log.semester = "'+period.period.name+'" and requestchange_activity_log.yearp = "'+str(period.yearp)+'" and requestchange_activity_log.date_request >="'+str(month[1])+'" and requestchange_activity_log.date_request<="'+str(month[2])+'" and requestchange_activity_log.status = "Pending" and requestchange_activity_log.course = "'+str(project)+'"'
+                else:
+                    search='requestchange_activity_log.semester = "'+period.period.name+'" and requestchange_activity_log.yearp = "'+str(period.yearp)+'" and requestchange_activity_log.date_request >="'+str(month[1])+'" and requestchange_activity_log.date_request<="'+str(month[2])+'" and requestchange_activity_log.status = "Pending" and requestchange_activity_log.course = "'+str(project)+'" and '+personal_query
+                countI = db.smart_query(db.requestchange_activity_log,search).count()
+                infoeLevelTemp.append(countI)
+            #ACCEPTED
+            if str(request.vars['type_L'])=="all" or str(request.vars['type_L'])=="i":
+                if personal_query == '':
+                    search='requestchange_activity_log.semester = "'+period.period.name+'" and requestchange_activity_log.yearp = "'+str(period.yearp)+'" and requestchange_activity_log.date_request_resolve >="'+str(month[1])+'" and requestchange_activity_log.date_request_resolve<="'+str(month[2])+'" and requestchange_activity_log.status = "Accepted" and requestchange_activity_log.course = "'+str(project)+'"'
+                else:
+                    search='requestchange_activity_log.semester = "'+period.period.name+'" and requestchange_activity_log.yearp = "'+str(period.yearp)+'" and requestchange_activity_log.date_request_resolve >="'+str(month[1])+'" and requestchange_activity_log.date_request_resolve<="'+str(month[2])+'" and requestchange_activity_log.status = "Accepted" and requestchange_activity_log.course = "'+str(project)+'" and '+personal_query
+                countI = db.smart_query(db.requestchange_activity_log,search).count()
+                infoeLevelTemp.append(countI)
+            #REJECTED
+            if str(request.vars['type_L'])=="all" or str(request.vars['type_L'])=="u":
+                if personal_query == '':
+                    search='requestchange_activity_log.semester = "'+period.period.name+'" and requestchange_activity_log.yearp = "'+str(period.yearp)+'" and requestchange_activity_log.date_request_resolve >="'+str(month[1])+'" and requestchange_activity_log.date_request_resolve<="'+str(month[2])+'" and requestchange_activity_log.status = "Rejected" and requestchange_activity_log.course = "'+str(project)+'"'
+                else:
+                    search='requestchange_activity_log.semester = "'+period.period.name+'" and requestchange_activity_log.yearp = "'+str(period.yearp)+'" and requestchange_activity_log.date_request_resolve >="'+str(month[1])+'" and requestchange_activity_log.date_request_resolve<="'+str(month[2])+'" and requestchange_activity_log.status = "Rejected" and requestchange_activity_log.course = "'+str(project)+'" and '+personal_query
+                countI = db.smart_query(db.requestchange_activity_log,search).count()
+                infoeLevelTemp.append(countI)
+            #PENDING
+            if str(request.vars['type_L'])=="all" or str(request.vars['type_L'])=="p":
+                if period.period==1:
+                    if personal_query == '':
+                        search='requestchange_activity_log.semester = "'+period.period.name+'" and requestchange_activity_log.yearp = "'+str(period.yearp)+'" and requestchange_activity_log.date_request >="'+str(period.yearp)+'-01-01" and requestchange_activity_log.date_request<="'+str(month[2])+'" and requestchange_activity_log.status = "Pending" and requestchange_activity_log.course = "'+str(project)+'"'
+                    else:
+                        search='requestchange_activity_log.semester = "'+period.period.name+'" and requestchange_activity_log.yearp = "'+str(period.yearp)+'" and requestchange_activity_log.date_request >="'+str(period.yearp)+'-01-01" and requestchange_activity_log.date_request<="'+str(month[2])+'" and requestchange_activity_log.status = "Pending" and requestchange_activity_log.course = "'+str(project)+'" and '+personal_query
+                    countP = db.smart_query(db.requestchange_activity_log,search).count()
+                    if personal_query == '':
+                        search='requestchange_activity_log.semester = "'+period.period.name+'" and requestchange_activity_log.yearp = "'+str(period.yearp)+'" and requestchange_activity_log.date_request_resolve >="'+str(period.yearp)+'-01-01" and requestchange_activity_log.date_request_resolve<="'+str(month[2])+'" and requestchange_activity_log.status != "Pending" and requestchange_activity_log.course = "'+str(project)+'"'
+                    else:
+                        search='requestchange_activity_log.semester = "'+period.period.name+'" and requestchange_activity_log.yearp = "'+str(period.yearp)+'" and requestchange_activity_log.date_request_resolve >="'+str(period.yearp)+'-01-01" and requestchange_activity_log.date_request_resolve<="'+str(month[2])+'" and requestchange_activity_log.status != "Pending" and requestchange_activity_log.course = "'+str(project)+'" and '+personal_query
+                    countNP = db.smart_query(db.requestchange_activity_log,search).count()
+                else:
+                    if personal_query == '':
+                        search='requestchange_activity_log.semester = "'+period.period.name+'" and requestchange_activity_log.yearp = "'+str(period.yearp)+'" and requestchange_activity_log.date_request >="'+str(period.yearp)+'-06-01" and requestchange_activity_log.date_request<="'+str(month[2])+'" and requestchange_activity_log.status = "Pending" and requestchange_activity_log.course = "'+str(project)+'"'
+                    else:
+                        search='requestchange_activity_log.semester = "'+period.period.name+'" and requestchange_activity_log.yearp = "'+str(period.yearp)+'" and requestchange_activity_log.date_request >="'+str(period.yearp)+'-06-01" and requestchange_activity_log.date_request<="'+str(month[2])+'" and requestchange_activity_log.status = "Pending" and requestchange_activity_log.course = "'+str(project)+'" and '+personal_query
+                    countP = db.smart_query(db.requestchange_activity_log,search).count()
+                    if personal_query == '':
+                        search='requestchange_activity_log.semester = "'+period.period.name+'" and requestchange_activity_log.yearp = "'+str(period.yearp)+'" and requestchange_activity_log.date_request_resolve >="'+str(period.yearp)+'-06-01" and requestchange_activity_log.date_request_resolve<="'+str(month[2])+'" and requestchange_activity_log.status != "Pending" and requestchange_activity_log.course = "'+str(project)+'"'
+                    else:
+                        search='requestchange_activity_log.semester = "'+period.period.name+'" and requestchange_activity_log.yearp = "'+str(period.yearp)+'" and requestchange_activity_log.date_request_resolve >="'+str(period.yearp)+'-06-01" and requestchange_activity_log.date_request_resolve<="'+str(month[2])+'" and requestchange_activity_log.status != "Pending" and requestchange_activity_log.course = "'+str(project)+'" and '+personal_query
+                    countNP = db.smart_query(db.requestchange_activity_log,search).count()
+                infoeLevelTemp.append(countP-countNP)
+            #INSERT PROJECT
+            infoLevel.append(infoeLevelTemp)
+    #PER USER
+    elif str(request.vars['level'])=="4":
+        #USERS
+        usersProject = GET_USERS(period,project,'Student','requestchange_activity_log')
+        #PERIOD OF REPORT
+        infoeLevelTemp=[]
+        infoeLevelTemp.append(T('Period'))
+        infoeLevelTemp.append(T(period.period.name)+' '+str(period.yearp))
+        infoLevel.append(infoeLevelTemp)
+        #MONTH OF REPORT
+        infoeLevelTemp=[]
+        infoeLevelTemp.append(T('Month'))
+        infoeLevelTemp.append(str(month[0]))
+        infoLevel.append(infoeLevelTemp)
+        #PROJECT OF REPORT
+        infoeLevelTemp=[]
+        infoeLevelTemp.append(T('Project'))
+        infoeLevelTemp.append(str(project))
+        infoLevel.append(infoeLevelTemp)
+        #ROL OF REPORT
+        infoeLevelTemp=[]
+        infoeLevelTemp.append(T('Role'))
+        infoeLevelTemp.append(T('Rol Student'))
+        infoLevel.append(infoeLevelTemp)
+        #MIDDLE LINE OF REPORT
+        infoeLevelTemp=[]
+        infoLevel.append(infoeLevelTemp)
+        #LABLE DETAIL OF REPORT
+        infoeLevelTemp=[]
+        infoeLevelTemp.append(T('Detail'))
+        infoLevel.append(infoeLevelTemp)
+        #LABELS OF DATA OF REPORT
+        infoeLevelTemp=[]
+        infoeLevelTemp.append(T('User'))
+        if str(request.vars['type_L'])=="all" or str(request.vars['type_L'])=="d":
+            infoeLevelTemp.append(T('Total Made Requests'))
+        if str(request.vars['type_L'])=="all" or str(request.vars['type_L'])=="i":
+            infoeLevelTemp.append(T('Total Accepted request'))
+        if str(request.vars['type_L'])=="all" or str(request.vars['type_L'])=="u":
+            infoeLevelTemp.append(T('Total Rejected request'))
+        if str(request.vars['type_L'])=="all" or str(request.vars['type_L'])=="p":
+            infoeLevelTemp.append(T('Total Pending Requests'))
+        infoLevel.append(infoeLevelTemp)
+
+        for userPT in usersProject:
+            userP=db(db.auth_user.username==userPT).select().first()
+            if userP is None:
+                userP=db(db.requestchange_activity_log.user_request==userPT).select().first()
+                userP=userP.user_request
+            else:
+                userP=userP.username
+            infoeLevelTemp = []
+            #NAME OF USER
+            infoeLevelTemp.append(userP)
+            #MADE
+            if str(request.vars['type_L'])=="all" or str(request.vars['type_L'])=="d":
+                countI = 0
+                if personal_query == '':
+                    search='requestchange_activity_log.semester = "'+period.period.name+'" and requestchange_activity_log.yearp = "'+str(period.yearp)+'" and requestchange_activity_log.date_request >="'+str(month[1])+'" and requestchange_activity_log.date_request<="'+str(month[2])+'" and requestchange_activity_log.status = "Pending" and requestchange_activity_log.course = "'+str(project)+'" and requestchange_activity_log.roll_request = "Student" and requestchange_activity_log.user_request = "'+str(userP)+'"'
+                else:
+                    search='requestchange_activity_log.semester = "'+period.period.name+'" and requestchange_activity_log.yearp = "'+str(period.yearp)+'" and requestchange_activity_log.date_request >="'+str(month[1])+'" and requestchange_activity_log.date_request<="'+str(month[2])+'" and requestchange_activity_log.status = "Pending" and requestchange_activity_log.course = "'+str(project)+'" and requestchange_activity_log.roll_request = "Student" and requestchange_activity_log.user_request = "'+str(userP)+'" and '+personal_query
+                countI = db.smart_query(db.requestchange_activity_log,search).count()
+                infoeLevelTemp.append(countI)
+            #ACCEPTED
+            if str(request.vars['type_L'])=="all" or str(request.vars['type_L'])=="i":
+                if personal_query == '':
+                    search='requestchange_activity_log.semester = "'+period.period.name+'" and requestchange_activity_log.yearp = "'+str(period.yearp)+'" and requestchange_activity_log.date_request_resolve >="'+str(month[1])+'" and requestchange_activity_log.date_request_resolve<="'+str(month[2])+'" and requestchange_activity_log.status = "Accepted" and requestchange_activity_log.course = "'+str(project)+'" and requestchange_activity_log.roll_request = "Student" and requestchange_activity_log.user_request = "'+str(userP)+'"'
+                else:
+                    search='requestchange_activity_log.semester = "'+period.period.name+'" and requestchange_activity_log.yearp = "'+str(period.yearp)+'" and requestchange_activity_log.date_request_resolve >="'+str(month[1])+'" and requestchange_activity_log.date_request_resolve<="'+str(month[2])+'" and requestchange_activity_log.status = "Accepted" and requestchange_activity_log.course = "'+str(project)+'" and requestchange_activity_log.roll_request = "Student" and requestchange_activity_log.user_request = "'+str(userP)+'" and '+personal_query
+                countI = db.smart_query(db.requestchange_activity_log,search).count()
+                infoeLevelTemp.append(countI)
+            #REJECTED
+            if str(request.vars['type_L'])=="all" or str(request.vars['type_L'])=="u":
+                if personal_query == '':
+                    search='requestchange_activity_log.semester = "'+period.period.name+'" and requestchange_activity_log.yearp = "'+str(period.yearp)+'" and requestchange_activity_log.date_request_resolve >="'+str(month[1])+'" and requestchange_activity_log.date_request_resolve<="'+str(month[2])+'" and requestchange_activity_log.status = "Rejected" and requestchange_activity_log.course = "'+str(project)+'" and requestchange_activity_log.roll_request = "Student" and requestchange_activity_log.user_request = "'+str(userP)+'"'
+                else:
+                    search='requestchange_activity_log.semester = "'+period.period.name+'" and requestchange_activity_log.yearp = "'+str(period.yearp)+'" and requestchange_activity_log.date_request_resolve >="'+str(month[1])+'" and requestchange_activity_log.date_request_resolve<="'+str(month[2])+'" and requestchange_activity_log.status = "Rejected" and requestchange_activity_log.course = "'+str(project)+'" and requestchange_activity_log.roll_request = "Student" and requestchange_activity_log.user_request = "'+str(userP)+'" and '+personal_query
+                countI = db.smart_query(db.requestchange_activity_log,search).count()
+                infoeLevelTemp.append(countI)
+            #PENDING
+            if str(request.vars['type_L'])=="all" or str(request.vars['type_L'])=="p":
+                if period.period==1:
+                    if personal_query == '':
+                        search='requestchange_activity_log.semester = "'+period.period.name+'" and requestchange_activity_log.yearp = "'+str(period.yearp)+'" and requestchange_activity_log.date_request >="'+str(period.yearp)+'-01-01" and requestchange_activity_log.date_request<="'+str(month[2])+'" and requestchange_activity_log.status = "Pending" and requestchange_activity_log.course = "'+str(project)+'" and requestchange_activity_log.roll_request = "Student" and requestchange_activity_log.user_request = "'+str(userP)+'"'
+                    else:
+                        search='requestchange_activity_log.semester = "'+period.period.name+'" and requestchange_activity_log.yearp = "'+str(period.yearp)+'" and requestchange_activity_log.date_request >="'+str(period.yearp)+'-01-01" and requestchange_activity_log.date_request<="'+str(month[2])+'" and requestchange_activity_log.status = "Pending" and requestchange_activity_log.course = "'+str(project)+'" and requestchange_activity_log.roll_request = "Student" and requestchange_activity_log.user_request = "'+str(userP)+'" and '+personal_query
+                    countP = db.smart_query(db.requestchange_activity_log,search).count()
+                    if personal_query == '':
+                        search='requestchange_activity_log.semester = "'+period.period.name+'" and requestchange_activity_log.yearp = "'+str(period.yearp)+'" and requestchange_activity_log.date_request_resolve >="'+str(period.yearp)+'-01-01" and requestchange_activity_log.date_request_resolve<="'+str(month[2])+'" and requestchange_activity_log.status != "Pending" and requestchange_activity_log.course = "'+str(project)+'" and requestchange_activity_log.roll_request = "Student" and requestchange_activity_log.user_request = "'+str(userP)+'"'
+                    else:
+                        search='requestchange_activity_log.semester = "'+period.period.name+'" and requestchange_activity_log.yearp = "'+str(period.yearp)+'" and requestchange_activity_log.date_request_resolve >="'+str(period.yearp)+'-01-01" and requestchange_activity_log.date_request_resolve<="'+str(month[2])+'" and requestchange_activity_log.status != "Pending" and requestchange_activity_log.course = "'+str(project)+'" and requestchange_activity_log.roll_request = "Student" and requestchange_activity_log.user_request = "'+str(userP)+'" and '+personal_query
+                    countNP = db.smart_query(db.requestchange_activity_log,search).count()
+                else:
+                    if personal_query == '':
+                        search='requestchange_activity_log.semester = "'+period.period.name+'" and requestchange_activity_log.yearp = "'+str(period.yearp)+'" and requestchange_activity_log.date_request >="'+str(period.yearp)+'-06-01" and requestchange_activity_log.date_request<="'+str(month[2])+'" and requestchange_activity_log.status = "Pending" and requestchange_activity_log.course = "'+str(project)+'" and requestchange_activity_log.roll_request = "Student" and requestchange_activity_log.user_request = "'+str(userP)+'"'
+                    else:
+                        search='requestchange_activity_log.semester = "'+period.period.name+'" and requestchange_activity_log.yearp = "'+str(period.yearp)+'" and requestchange_activity_log.date_request >="'+str(period.yearp)+'-06-01" and requestchange_activity_log.date_request<="'+str(month[2])+'" and requestchange_activity_log.status = "Pending" and requestchange_activity_log.course = "'+str(project)+'" and requestchange_activity_log.roll_request = "Student" and requestchange_activity_log.user_request = "'+str(userP)+'" and '+personal_query
+                    countP = db.smart_query(db.requestchange_activity_log,search).count()
+                    if personal_query == '':
+                        search='requestchange_activity_log.semester = "'+period.period.name+'" and requestchange_activity_log.yearp = "'+str(period.yearp)+'" and requestchange_activity_log.date_request_resolve >="'+str(period.yearp)+'-06-01" and requestchange_activity_log.date_request_resolve<="'+str(month[2])+'" and requestchange_activity_log.status != "Pending" and requestchange_activity_log.course = "'+str(project)+'" and requestchange_activity_log.roll_request = "Student" and requestchange_activity_log.user_request = "'+str(userP)+'"'
+                    else:
+                        search='requestchange_activity_log.semester = "'+period.period.name+'" and requestchange_activity_log.yearp = "'+str(period.yearp)+'" and requestchange_activity_log.date_request_resolve >="'+str(period.yearp)+'-06-01" and requestchange_activity_log.date_request_resolve<="'+str(month[2])+'" and requestchange_activity_log.status != "Pending" and requestchange_activity_log.course = "'+str(project)+'" and requestchange_activity_log.roll_request = "Student" and requestchange_activity_log.user_request = "'+str(userP)+'" and '+personal_query
+                    countNP = db.smart_query(db.requestchange_activity_log,search).count()
+                infoeLevelTemp.append(countP-countNP)
+            #INSERT USER
+            infoLevel.append(infoeLevelTemp)
+    #DATA
+    elif str(request.vars['level'])=="5":
+        #PERIOD
+        infoeLevelTemp=[]
+        infoeLevelTemp.append(T('Period'))
+        infoeLevelTemp.append(T(period.period.name)+' '+str(period.yearp))
+        infoLevel.append(infoeLevelTemp)
+        #MONTH
+        infoeLevelTemp=[]
+        infoeLevelTemp.append(T('Month'))
+        infoeLevelTemp.append(str(month[0]))
+        infoLevel.append(infoeLevelTemp)
+        #PROJECT
+        infoeLevelTemp=[]
+        infoeLevelTemp.append(T('Project'))
+        infoeLevelTemp.append(str(project))
+        infoLevel.append(infoeLevelTemp)
+        #ROL
+        infoeLevelTemp=[]
+        infoeLevelTemp.append(T('Role'))
+        infoeLevelTemp.append(T('Rol Student'))
+        infoLevel.append(infoeLevelTemp)
+        #USER
+        infoeLevelTemp=[]
+        infoeLevelTemp.append(T('User'))
+        infoeLevelTemp.append(str(userP))
+        infoLevel.append(infoeLevelTemp)
+        #MIDDLE LINE
+        infoeLevelTemp=[]
+        infoeLevelTemp.append('')
+        infoLevel.append(infoeLevelTemp)
+        #DETAIL
+        infoeLevelTemp=[]
+        infoeLevelTemp.append(T('Detail'))
+        infoLevel.append(infoeLevelTemp)
+        #TITLE OF TABLE
+        infoeLevelTemp=[]
+        infoeLevelTemp.append('Estado')
+        infoeLevelTemp.append('Usuario Resolvio')
+        infoeLevelTemp.append('Rol Resolvio')
+        infoeLevelTemp.append('Descripción')
+        infoeLevelTemp.append('Fecha')
+        infoeLevelTemp.append('Fecha Resolvio')
+        infoeLevelTemp.append('Categoria')
+        infoLevel.append(infoeLevelTemp)
+
+        #MADE
+        if str(request.vars['type_L'])=="d":
+            if personal_query == '':
+                search='requestchange_activity_log.semester = "'+period.period.name+'" and requestchange_activity_log.yearp = "'+str(period.yearp)+'" and requestchange_activity_log.date_request >="'+str(month[1])+'" and requestchange_activity_log.date_request<="'+str(month[2])+'" and requestchange_activity_log.status = "Pending" and requestchange_activity_log.course = "'+str(project)+'" and requestchange_activity_log.roll_request = "Student" and requestchange_activity_log.user_request = "'+str(userP)+'"'
+            else:
+                search='requestchange_activity_log.semester = "'+period.period.name+'" and requestchange_activity_log.yearp = "'+str(period.yearp)+'" and requestchange_activity_log.date_request >="'+str(month[1])+'" and requestchange_activity_log.date_request<="'+str(month[2])+'" and requestchange_activity_log.status = "Pending" and requestchange_activity_log.course = "'+str(project)+'" and requestchange_activity_log.roll_request = "Student" and requestchange_activity_log.user_request = "'+str(userP)+'" and '+personal_query
+            for data in db.smart_query(db.requestchange_activity_log,search).select():
+                infoeLevelTemp=[]
+                infoeLevelTemp.append(data.status)
+                infoeLevelTemp.append(data.user_resolve)
+                infoeLevelTemp.append(data.roll_resolve)
+                infoeLevelTemp.append(data.description)
+                infoeLevelTemp.append(data.date_request)
+                infoeLevelTemp.append(data.date_request_resolve)
+                infoeLevelTemp.append(data.category_request)
+                infoLevel.append(infoeLevelTemp)
+                infoeLevelTemp=[]
+                infoeLevelTemp.append('')
+                infoeLevelTemp.append('')
+                infoeLevelTemp.append(T('Operation'))
+                infoeLevelTemp.append(T('Name Activity'))
+                infoeLevelTemp.append(T('Description of Activity'))
+                infoeLevelTemp.append(T('Grade of Activity'))
+                infoeLevelTemp.append(T('Start Date'))
+                infoeLevelTemp.append(T('End Date'))
+                infoLevel.append(infoeLevelTemp)
+                for details in db(db.requestchange_course_activity_log.requestchange_activity==data.id).select():
+                    infoeLevelTemp=[]
+                    infoeLevelTemp.append('')
+                    infoeLevelTemp.append('')
+                    infoeLevelTemp.append(details.operation_request)
+                    infoeLevelTemp.append(details.name)
+                    infoeLevelTemp.append(details.description)
+                    infoeLevelTemp.append(details.grade)
+                    infoeLevelTemp.append(details.date_start)
+                    infoeLevelTemp.append(details.date_finish)
+                    infoLevel.append(infoeLevelTemp)
+                infoeLevelTemp=[]
+                infoeLevelTemp.append('')
+                infoLevel.append(infoeLevelTemp)
+        #ACCEPTED
+        elif str(request.vars['type_L'])=="i":
+            if personal_query == '':
+                search='requestchange_activity_log.semester = "'+period.period.name+'" and requestchange_activity_log.yearp = "'+str(period.yearp)+'" and requestchange_activity_log.date_request_resolve >="'+str(month[1])+'" and requestchange_activity_log.date_request_resolve<="'+str(month[2])+'" and requestchange_activity_log.status = "Accepted" and requestchange_activity_log.course = "'+str(project)+'" and requestchange_activity_log.roll_request = "Student" and requestchange_activity_log.user_request = "'+str(userP)+'"'
+            else:
+                search='requestchange_activity_log.semester = "'+period.period.name+'" and requestchange_activity_log.yearp = "'+str(period.yearp)+'" and requestchange_activity_log.date_request_resolve >="'+str(month[1])+'" and requestchange_activity_log.date_request_resolve<="'+str(month[2])+'" and requestchange_activity_log.status = "Accepted" and requestchange_activity_log.course = "'+str(project)+'" and requestchange_activity_log.roll_request = "Student" and requestchange_activity_log.user_request = "'+str(userP)+'" and '+personal_query
+            for data in db.smart_query(db.requestchange_activity_log,search).select():
+                infoeLevelTemp=[]
+                infoeLevelTemp.append(data.status)
+                infoeLevelTemp.append(data.user_resolve)
+                infoeLevelTemp.append(data.roll_resolve)
+                infoeLevelTemp.append(data.description)
+                infoeLevelTemp.append(data.date_request)
+                infoeLevelTemp.append(data.date_request_resolve)
+                infoeLevelTemp.append(data.category_request)
+                infoLevel.append(infoeLevelTemp)
+                infoeLevelTemp=[]
+                infoeLevelTemp.append('')
+                infoeLevelTemp.append('')
+                infoeLevelTemp.append(T('Operation'))
+                infoeLevelTemp.append(T('Name Activity'))
+                infoeLevelTemp.append(T('Description of Activity'))
+                infoeLevelTemp.append(T('Grade of Activity'))
+                infoeLevelTemp.append(T('Start Date'))
+                infoeLevelTemp.append(T('End Date'))
+                infoLevel.append(infoeLevelTemp)
+                for details in db(db.requestchange_course_activity_log.requestchange_activity==data.id).select():
+                    infoeLevelTemp=[]
+                    infoeLevelTemp.append('')
+                    infoeLevelTemp.append('')
+                    infoeLevelTemp.append(details.operation_request)
+                    infoeLevelTemp.append(details.name)
+                    infoeLevelTemp.append(details.description)
+                    infoeLevelTemp.append(details.grade)
+                    infoeLevelTemp.append(details.date_start)
+                    infoeLevelTemp.append(details.date_finish)
+                    infoLevel.append(infoeLevelTemp)
+                infoeLevelTemp=[]
+                infoeLevelTemp.append('')
+                infoLevel.append(infoeLevelTemp)
+        #REJECTED
+        elif str(request.vars['type_L'])=="u":
+            if personal_query == '':
+                search='requestchange_activity_log.semester = "'+period.period.name+'" and requestchange_activity_log.yearp = "'+str(period.yearp)+'" and requestchange_activity_log.date_request_resolve >="'+str(month[1])+'" and requestchange_activity_log.date_request_resolve<="'+str(month[2])+'" and requestchange_activity_log.status = "Rejected" and requestchange_activity_log.course = "'+str(project)+'" and requestchange_activity_log.roll_request = "Student" and requestchange_activity_log.user_request = "'+str(userP)+'"'
+            else:
+                search='requestchange_activity_log.semester = "'+period.period.name+'" and requestchange_activity_log.yearp = "'+str(period.yearp)+'" and requestchange_activity_log.date_request_resolve >="'+str(month[1])+'" and requestchange_activity_log.date_request_resolve<="'+str(month[2])+'" and requestchange_activity_log.status = "Rejected" and requestchange_activity_log.course = "'+str(project)+'" and requestchange_activity_log.roll_request = "Student" and requestchange_activity_log.user_request = "'+str(userP)+'" and '+personal_query
+            for data in db.smart_query(db.requestchange_activity_log,search).select():
+                infoeLevelTemp=[]
+                infoeLevelTemp.append(data.status)
+                infoeLevelTemp.append(data.user_resolve)
+                infoeLevelTemp.append(data.roll_resolve)
+                infoeLevelTemp.append(data.description)
+                infoeLevelTemp.append(data.date_request)
+                infoeLevelTemp.append(data.date_request_resolve)
+                infoeLevelTemp.append(data.category_request)
+                infoLevel.append(infoeLevelTemp)
+                infoeLevelTemp=[]
+                infoeLevelTemp.append('')
+                infoeLevelTemp.append('')
+                infoeLevelTemp.append(T('Operation'))
+                infoeLevelTemp.append(T('Name Activity'))
+                infoeLevelTemp.append(T('Description of Activity'))
+                infoeLevelTemp.append(T('Grade of Activity'))
+                infoeLevelTemp.append(T('Start Date'))
+                infoeLevelTemp.append(T('End Date'))
+                infoLevel.append(infoeLevelTemp)
+                for details in db(db.requestchange_course_activity_log.requestchange_activity==data.id).select():
+                    infoeLevelTemp=[]
+                    infoeLevelTemp.append('')
+                    infoeLevelTemp.append('')
+                    infoeLevelTemp.append(details.operation_request)
+                    infoeLevelTemp.append(details.name)
+                    infoeLevelTemp.append(details.description)
+                    infoeLevelTemp.append(details.grade)
+                    infoeLevelTemp.append(details.date_start)
+                    infoeLevelTemp.append(details.date_finish)
+                    infoLevel.append(infoeLevelTemp)
+                infoeLevelTemp=[]
+                infoeLevelTemp.append('')
+                infoLevel.append(infoeLevelTemp)
+        #PENDING
+        elif str(request.vars['type_L'])=="p":
+            if period.period==1:
+                if personal_query == '':
+                    search='requestchange_activity_log.semester = "'+period.period.name+'" and requestchange_activity_log.yearp = "'+str(period.yearp)+'" and requestchange_activity_log.date_request >="'+str(period.yearp)+'-01-01" and requestchange_activity_log.date_request<="'+str(month[2])+'" and requestchange_activity_log.status = "Pending" and requestchange_activity_log.course = "'+str(project)+'" and requestchange_activity_log.roll_request = "Student" and requestchange_activity_log.user_request = "'+str(userP)+'"'
+                else:
+                    search='requestchange_activity_log.semester = "'+period.period.name+'" and requestchange_activity_log.yearp = "'+str(period.yearp)+'" and requestchange_activity_log.date_request >="'+str(period.yearp)+'-01-01" and requestchange_activity_log.date_request<="'+str(month[2])+'" and requestchange_activity_log.status = "Pending" and requestchange_activity_log.course = "'+str(project)+'" and requestchange_activity_log.roll_request = "Student" and requestchange_activity_log.user_request = "'+str(userP)+'" and '+personal_query
+                for pending in  db.smart_query(db.requestchange_activity_log,search).select():
+                    if personal_query == '':
+                        search='requestchange_activity_log.semester = "'+period.period.name+'" and requestchange_activity_log.yearp = "'+str(period.yearp)+'" and requestchange_activity_log.date_request_resolve >="'+str(period.yearp)+'-01-01" and requestchange_activity_log.date_request_resolve<="'+str(month[2])+'" and requestchange_activity_log.status != "Pending" and requestchange_activity_log.course = "'+str(project)+'" and requestchange_activity_log.roll_request = "Student" and requestchange_activity_log.user_request = "'+str(userP)+'" and requestchange_activity_log.description = "'+pending.description+'" and requestchange_activity_log.date_request = "'+str(pending.date_request)+'" and requestchange_activity_log.category_request = "'+pending.category_request+'"'
+                    else:
+                        search='requestchange_activity_log.semester = "'+period.period.name+'" and requestchange_activity_log.yearp = "'+str(period.yearp)+'" and requestchange_activity_log.date_request_resolve >="'+str(period.yearp)+'-01-01" and requestchange_activity_log.date_request_resolve<="'+str(month[2])+'" and requestchange_activity_log.status != "Pending" and requestchange_activity_log.course = "'+str(project)+'" and requestchange_activity_log.roll_request = "Student" and requestchange_activity_log.user_request = "'+str(userP)+'" and requestchange_activity_log.description = "'+pending.description+'" and requestchange_activity_log.date_request = "'+str(pending.date_request)+'" and requestchange_activity_log.category_request = "'+pending.category_request+'" and '+personal_query
+                    if db.smart_query(db.requestchange_activity_log,search).select().first() is None:
+                        infoeLevelTemp=[]
+                        infoeLevelTemp.append(pending.status)
+                        infoeLevelTemp.append(pending.user_resolve)
+                        infoeLevelTemp.append(pending.roll_resolve)
+                        infoeLevelTemp.append(pending.description)
+                        infoeLevelTemp.append(pending.date_request)
+                        infoeLevelTemp.append(pending.date_request_resolve)
+                        infoeLevelTemp.append(pending.category_request)
+                        infoLevel.append(infoeLevelTemp)
+                        infoeLevelTemp=[]
+                        infoeLevelTemp.append('')
+                        infoeLevelTemp.append('')
+                        infoeLevelTemp.append(T('Operation'))
+                        infoeLevelTemp.append(T('Name Activity'))
+                        infoeLevelTemp.append(T('Description of Activity'))
+                        infoeLevelTemp.append(T('Grade of Activity'))
+                        infoeLevelTemp.append(T('Start Date'))
+                        infoeLevelTemp.append(T('End Date'))
+                        infoLevel.append(infoeLevelTemp)
+                        for details in db(db.requestchange_course_activity_log.requestchange_activity==pending.id).select():
+                            infoeLevelTemp=[]
+                            infoeLevelTemp.append('')
+                            infoeLevelTemp.append('')
+                            infoeLevelTemp.append(details.operation_request)
+                            infoeLevelTemp.append(details.name)
+                            infoeLevelTemp.append(details.description)
+                            infoeLevelTemp.append(details.grade)
+                            infoeLevelTemp.append(details.date_start)
+                            infoeLevelTemp.append(details.date_finish)
+                            infoLevel.append(infoeLevelTemp)
+                        infoeLevelTemp=[]
+                        infoeLevelTemp.append('')
+                        infoLevel.append(infoeLevelTemp)
+            else:
+                if personal_query == '':
+                    search='requestchange_activity_log.semester = "'+period.period.name+'" and requestchange_activity_log.yearp = "'+str(period.yearp)+'" and requestchange_activity_log.date_request >="'+str(period.yearp)+'-06-01" and requestchange_activity_log.date_request<="'+str(month[2])+'" and requestchange_activity_log.status = "Pending" and requestchange_activity_log.course = "'+str(project)+'" and requestchange_activity_log.roll_request = "Student" and requestchange_activity_log.user_request = "'+str(userP)+'"'
+                else:
+                    search='requestchange_activity_log.semester = "'+period.period.name+'" and requestchange_activity_log.yearp = "'+str(period.yearp)+'" and requestchange_activity_log.date_request >="'+str(period.yearp)+'-06-01" and requestchange_activity_log.date_request<="'+str(month[2])+'" and requestchange_activity_log.status = "Pending" and requestchange_activity_log.course = "'+str(project)+'" and requestchange_activity_log.roll_request = "Student" and requestchange_activity_log.user_request = "'+str(userP)+'" and '+personal_query
+                for pending in  db.smart_query(db.requestchange_activity_log,search).select():
+                    if personal_query == '':
+                        search='requestchange_activity_log.semester = "'+period.period.name+'" and requestchange_activity_log.yearp = "'+str(period.yearp)+'" and requestchange_activity_log.date_request_resolve >="'+str(period.yearp)+'-06-01" and requestchange_activity_log.date_request_resolve<="'+str(month[2])+'" and requestchange_activity_log.status != "Pending" and requestchange_activity_log.course = "'+str(project)+'" and requestchange_activity_log.roll_request = "Student" and requestchange_activity_log.user_request = "'+str(userP)+'" and requestchange_activity_log.description = "'+pending.description+'" and requestchange_activity_log.date_request = "'+str(pending.date_request)+'" and requestchange_activity_log.category_request = "'+pending.category_request+'"'
+                    else:
+                        search='requestchange_activity_log.semester = "'+period.period.name+'" and requestchange_activity_log.yearp = "'+str(period.yearp)+'" and requestchange_activity_log.date_request_resolve >="'+str(period.yearp)+'-06-01" and requestchange_activity_log.date_request_resolve<="'+str(month[2])+'" and requestchange_activity_log.status != "Pending" and requestchange_activity_log.course = "'+str(project)+'" and requestchange_activity_log.roll_request = "Student" and requestchange_activity_log.user_request = "'+str(userP)+'" and requestchange_activity_log.description = "'+pending.description+'" and requestchange_activity_log.date_request = "'+str(pending.date_request)+'" and requestchange_activity_log.category_request = "'+pending.category_request+'" and '+personal_query
+                    if db.smart_query(db.requestchange_activity_log,search).select().first() is None:
+                        infoeLevelTemp=[]
+                        infoeLevelTemp.append(pending.status)
+                        infoeLevelTemp.append(pending.user_resolve)
+                        infoeLevelTemp.append(pending.roll_resolve)
+                        infoeLevelTemp.append(pending.description)
+                        infoeLevelTemp.append(pending.date_request)
+                        infoeLevelTemp.append(pending.date_request_resolve)
+                        infoeLevelTemp.append(pending.category_request)
+                        infoLevel.append(infoeLevelTemp)
+                        infoeLevelTemp=[]
+                        infoeLevelTemp.append('')
+                        infoeLevelTemp.append('')
+                        infoeLevelTemp.append(T('Operation'))
+                        infoeLevelTemp.append(T('Name Activity'))
+                        infoeLevelTemp.append(T('Description of Activity'))
+                        infoeLevelTemp.append(T('Grade of Activity'))
+                        infoeLevelTemp.append(T('Start Date'))
+                        infoeLevelTemp.append(T('End Date'))
+                        infoLevel.append(infoeLevelTemp)
+                        for details in db(db.requestchange_course_activity_log.requestchange_activity==pending.id).select():
+                            infoeLevelTemp=[]
+                            infoeLevelTemp.append('')
+                            infoeLevelTemp.append('')
+                            infoeLevelTemp.append(details.operation_request)
+                            infoeLevelTemp.append(details.name)
+                            infoeLevelTemp.append(details.description)
+                            infoeLevelTemp.append(details.grade)
+                            infoeLevelTemp.append(details.date_start)
+                            infoeLevelTemp.append(details.date_finish)
+                            infoLevel.append(infoeLevelTemp)
+                        infoeLevelTemp=[]
+                        infoeLevelTemp.append('')
+                        infoLevel.append(infoeLevelTemp)
+        #ALL
+        elif str(request.vars['type_L'])=="all":
+            #MADE AND PENDING
+            if period.period==1:
+                if personal_query == '':
+                    search='requestchange_activity_log.semester = "'+period.period.name+'" and requestchange_activity_log.yearp = "'+str(period.yearp)+'" and requestchange_activity_log.date_request >="'+str(period.yearp)+'-01-01" and requestchange_activity_log.date_request<="'+str(month[2])+'" and requestchange_activity_log.status = "Pending" and requestchange_activity_log.course = "'+str(project)+'" and requestchange_activity_log.roll_request = "Student" and requestchange_activity_log.user_request = "'+str(userP)+'"'
+                else:
+                    search='requestchange_activity_log.semester = "'+period.period.name+'" and requestchange_activity_log.yearp = "'+str(period.yearp)+'" and requestchange_activity_log.date_request >="'+str(period.yearp)+'-01-01" and requestchange_activity_log.date_request<="'+str(month[2])+'" and requestchange_activity_log.status = "Pending" and requestchange_activity_log.course = "'+str(project)+'" and requestchange_activity_log.roll_request = "Student" and requestchange_activity_log.user_request = "'+str(userP)+'" and '+personal_query
+                for pending in  db.smart_query(db.requestchange_activity_log,search).select():
+                    if personal_query == '':
+                        search='requestchange_activity_log.semester = "'+period.period.name+'" and requestchange_activity_log.yearp = "'+str(period.yearp)+'" and requestchange_activity_log.date_request_resolve >="'+str(period.yearp)+'-01-01" and requestchange_activity_log.date_request_resolve<="'+str(month[2])+'" and requestchange_activity_log.status != "Pending" and requestchange_activity_log.course = "'+str(project)+'" and requestchange_activity_log.roll_request = "Student" and requestchange_activity_log.user_request = "'+str(userP)+'" and requestchange_activity_log.description = "'+pending.description+'" and requestchange_activity_log.date_request = "'+str(pending.date_request)+'" and requestchange_activity_log.category_request = "'+pending.category_request+'"'
+                    else:
+                        search='requestchange_activity_log.semester = "'+period.period.name+'" and requestchange_activity_log.yearp = "'+str(period.yearp)+'" and requestchange_activity_log.date_request_resolve >="'+str(period.yearp)+'-01-01" and requestchange_activity_log.date_request_resolve<="'+str(month[2])+'" and requestchange_activity_log.status != "Pending" and requestchange_activity_log.course = "'+str(project)+'" and requestchange_activity_log.roll_request = "Student" and requestchange_activity_log.user_request = "'+str(userP)+'" and requestchange_activity_log.description = "'+pending.description+'" and requestchange_activity_log.date_request = "'+str(pending.date_request)+'" and requestchange_activity_log.category_request = "'+pending.category_request+'" and '+personal_query
+                    if db.smart_query(db.requestchange_activity_log,search).select().first() is None:
+                        infoeLevelTemp=[]
+                        infoeLevelTemp.append(pending.status)
+                        infoeLevelTemp.append(pending.user_resolve)
+                        infoeLevelTemp.append(pending.roll_resolve)
+                        infoeLevelTemp.append(pending.description)
+                        infoeLevelTemp.append(pending.date_request)
+                        infoeLevelTemp.append(pending.date_request_resolve)
+                        infoeLevelTemp.append(pending.category_request)
+                        infoLevel.append(infoeLevelTemp)
+                        infoeLevelTemp=[]
+                        infoeLevelTemp.append('')
+                        infoeLevelTemp.append('')
+                        infoeLevelTemp.append(T('Operation'))
+                        infoeLevelTemp.append(T('Name Activity'))
+                        infoeLevelTemp.append(T('Description of Activity'))
+                        infoeLevelTemp.append(T('Grade of Activity'))
+                        infoeLevelTemp.append(T('Start Date'))
+                        infoeLevelTemp.append(T('End Date'))
+                        infoLevel.append(infoeLevelTemp)
+                        for details in db(db.requestchange_course_activity_log.requestchange_activity==pending.id).select():
+                            infoeLevelTemp=[]
+                            infoeLevelTemp.append('')
+                            infoeLevelTemp.append('')
+                            infoeLevelTemp.append(details.operation_request)
+                            infoeLevelTemp.append(details.name)
+                            infoeLevelTemp.append(details.description)
+                            infoeLevelTemp.append(details.grade)
+                            infoeLevelTemp.append(details.date_start)
+                            infoeLevelTemp.append(details.date_finish)
+                            infoLevel.append(infoeLevelTemp)
+                        infoeLevelTemp=[]
+                        infoeLevelTemp.append('')
+                        infoLevel.append(infoeLevelTemp)
+            else:
+                if personal_query == '':
+                    search='requestchange_activity_log.semester = "'+period.period.name+'" and requestchange_activity_log.yearp = "'+str(period.yearp)+'" and requestchange_activity_log.date_request >="'+str(period.yearp)+'-06-01" and requestchange_activity_log.date_request<="'+str(month[2])+'" and requestchange_activity_log.status = "Pending" and requestchange_activity_log.course = "'+str(project)+'" and requestchange_activity_log.roll_request = "Student" and requestchange_activity_log.user_request = "'+str(userP)+'"'
+                else:
+                    search='requestchange_activity_log.semester = "'+period.period.name+'" and requestchange_activity_log.yearp = "'+str(period.yearp)+'" and requestchange_activity_log.date_request >="'+str(period.yearp)+'-06-01" and requestchange_activity_log.date_request<="'+str(month[2])+'" and requestchange_activity_log.status = "Pending" and requestchange_activity_log.course = "'+str(project)+'" and requestchange_activity_log.roll_request = "Student" and requestchange_activity_log.user_request = "'+str(userP)+'" and '+personal_query
+                for pending in  db.smart_query(db.requestchange_activity_log,search).select():
+                    if personal_query == '':
+                        search='requestchange_activity_log.semester = "'+period.period.name+'" and requestchange_activity_log.yearp = "'+str(period.yearp)+'" and requestchange_activity_log.date_request_resolve >="'+str(period.yearp)+'-06-01" and requestchange_activity_log.date_request_resolve<="'+str(month[2])+'" and requestchange_activity_log.status != "Pending" and requestchange_activity_log.course = "'+str(project)+'" and requestchange_activity_log.roll_request = "Student" and requestchange_activity_log.user_request = "'+str(userP)+'" and requestchange_activity_log.description = "'+pending.description+'" and requestchange_activity_log.date_request = "'+str(pending.date_request)+'" and requestchange_activity_log.category_request = "'+pending.category_request+'"'
+                    else:
+                        search='requestchange_activity_log.semester = "'+period.period.name+'" and requestchange_activity_log.yearp = "'+str(period.yearp)+'" and requestchange_activity_log.date_request_resolve >="'+str(period.yearp)+'-06-01" and requestchange_activity_log.date_request_resolve<="'+str(month[2])+'" and requestchange_activity_log.status != "Pending" and requestchange_activity_log.course = "'+str(project)+'" and requestchange_activity_log.roll_request = "Student" and requestchange_activity_log.user_request = "'+str(userP)+'" and requestchange_activity_log.description = "'+pending.description+'" and requestchange_activity_log.date_request = "'+str(pending.date_request)+'" and requestchange_activity_log.category_request = "'+pending.category_request+'" and '+personal_query
+                    if db.smart_query(db.requestchange_activity_log,search).select().first() is None:
+                        infoeLevelTemp=[]
+                        infoeLevelTemp.append(pending.status)
+                        infoeLevelTemp.append(pending.user_resolve)
+                        infoeLevelTemp.append(pending.roll_resolve)
+                        infoeLevelTemp.append(pending.description)
+                        infoeLevelTemp.append(pending.date_request)
+                        infoeLevelTemp.append(pending.date_request_resolve)
+                        infoeLevelTemp.append(pending.category_request)
+                        infoLevel.append(infoeLevelTemp)
+                        infoeLevelTemp=[]
+                        infoeLevelTemp.append('')
+                        infoeLevelTemp.append('')
+                        infoeLevelTemp.append(T('Operation'))
+                        infoeLevelTemp.append(T('Name Activity'))
+                        infoeLevelTemp.append(T('Description of Activity'))
+                        infoeLevelTemp.append(T('Grade of Activity'))
+                        infoeLevelTemp.append(T('Start Date'))
+                        infoeLevelTemp.append(T('End Date'))
+                        infoLevel.append(infoeLevelTemp)
+                        for details in db(db.requestchange_course_activity_log.requestchange_activity==pending.id).select():
+                            infoeLevelTemp=[]
+                            infoeLevelTemp.append('')
+                            infoeLevelTemp.append('')
+                            infoeLevelTemp.append(details.operation_request)
+                            infoeLevelTemp.append(details.name)
+                            infoeLevelTemp.append(details.description)
+                            infoeLevelTemp.append(details.grade)
+                            infoeLevelTemp.append(details.date_start)
+                            infoeLevelTemp.append(details.date_finish)
+                            infoLevel.append(infoeLevelTemp)
+                        infoeLevelTemp=[]
+                        infoeLevelTemp.append('')
+                        infoLevel.append(infoeLevelTemp)
+            #ACCEPTED
+            if personal_query == '':
+                search='requestchange_activity_log.semester = "'+period.period.name+'" and requestchange_activity_log.yearp = "'+str(period.yearp)+'" and requestchange_activity_log.date_request_resolve >="'+str(month[1])+'" and requestchange_activity_log.date_request_resolve<="'+str(month[2])+'" and requestchange_activity_log.status = "Accepted" and requestchange_activity_log.course = "'+str(project)+'" and requestchange_activity_log.roll_request = "Student" and requestchange_activity_log.user_request = "'+str(userP)+'"'
+            else:
+                search='requestchange_activity_log.semester = "'+period.period.name+'" and requestchange_activity_log.yearp = "'+str(period.yearp)+'" and requestchange_activity_log.date_request_resolve >="'+str(month[1])+'" and requestchange_activity_log.date_request_resolve<="'+str(month[2])+'" and requestchange_activity_log.status = "Accepted" and requestchange_activity_log.course = "'+str(project)+'" and requestchange_activity_log.roll_request = "Student" and requestchange_activity_log.user_request = "'+str(userP)+'" and '+personal_query
+            for data in db.smart_query(db.requestchange_activity_log,search).select():
+                infoeLevelTemp=[]
+                infoeLevelTemp.append(data.status)
+                infoeLevelTemp.append(data.user_resolve)
+                infoeLevelTemp.append(data.roll_resolve)
+                infoeLevelTemp.append(data.description)
+                infoeLevelTemp.append(data.date_request)
+                infoeLevelTemp.append(data.date_request_resolve)
+                infoeLevelTemp.append(data.category_request)
+                infoLevel.append(infoeLevelTemp)
+                infoeLevelTemp=[]
+                infoeLevelTemp.append('')
+                infoeLevelTemp.append('')
+                infoeLevelTemp.append(T('Operation'))
+                infoeLevelTemp.append(T('Name Activity'))
+                infoeLevelTemp.append(T('Description of Activity'))
+                infoeLevelTemp.append(T('Grade of Activity'))
+                infoeLevelTemp.append(T('Start Date'))
+                infoeLevelTemp.append(T('End Date'))
+                infoLevel.append(infoeLevelTemp)
+                for details in db(db.requestchange_course_activity_log.requestchange_activity==data.id).select():
+                    infoeLevelTemp=[]
+                    infoeLevelTemp.append('')
+                    infoeLevelTemp.append('')
+                    infoeLevelTemp.append(details.operation_request)
+                    infoeLevelTemp.append(details.name)
+                    infoeLevelTemp.append(details.description)
+                    infoeLevelTemp.append(details.grade)
+                    infoeLevelTemp.append(details.date_start)
+                    infoeLevelTemp.append(details.date_finish)
+                    infoLevel.append(infoeLevelTemp)
+                infoeLevelTemp=[]
+                infoeLevelTemp.append('')
+                infoLevel.append(infoeLevelTemp)
+            #REJECTED
+            if personal_query == '':
+                search='requestchange_activity_log.semester = "'+period.period.name+'" and requestchange_activity_log.yearp = "'+str(period.yearp)+'" and requestchange_activity_log.date_request_resolve >="'+str(month[1])+'" and requestchange_activity_log.date_request_resolve<="'+str(month[2])+'" and requestchange_activity_log.status = "Rejected" and requestchange_activity_log.course = "'+str(project)+'" and requestchange_activity_log.roll_request = "Student" and requestchange_activity_log.user_request = "'+str(userP)+'"'
+            else:
+                search='requestchange_activity_log.semester = "'+period.period.name+'" and requestchange_activity_log.yearp = "'+str(period.yearp)+'" and requestchange_activity_log.date_request_resolve >="'+str(month[1])+'" and requestchange_activity_log.date_request_resolve<="'+str(month[2])+'" and requestchange_activity_log.status = "Rejected" and requestchange_activity_log.course = "'+str(project)+'" and requestchange_activity_log.roll_request = "Student" and requestchange_activity_log.user_request = "'+str(userP)+'" and '+personal_query
+            for data in db.smart_query(db.requestchange_activity_log,search).select():
+                infoeLevelTemp=[]
+                infoeLevelTemp.append(data.status)
+                infoeLevelTemp.append(data.user_resolve)
+                infoeLevelTemp.append(data.roll_resolve)
+                infoeLevelTemp.append(data.description)
+                infoeLevelTemp.append(data.date_request)
+                infoeLevelTemp.append(data.date_request_resolve)
+                infoeLevelTemp.append(data.category_request)
+                infoLevel.append(infoeLevelTemp)
+                infoeLevelTemp=[]
+                infoeLevelTemp.append('')
+                infoeLevelTemp.append('')
+                infoeLevelTemp.append(T('Operation'))
+                infoeLevelTemp.append(T('Name Activity'))
+                infoeLevelTemp.append(T('Description of Activity'))
+                infoeLevelTemp.append(T('Grade of Activity'))
+                infoeLevelTemp.append(T('Start Date'))
+                infoeLevelTemp.append(T('End Date'))
+                infoLevel.append(infoeLevelTemp)
+                for details in db(db.requestchange_course_activity_log.requestchange_activity==data.id).select():
+                    infoeLevelTemp=[]
+                    infoeLevelTemp.append('')
+                    infoeLevelTemp.append('')
+                    infoeLevelTemp.append(details.operation_request)
+                    infoeLevelTemp.append(details.name)
+                    infoeLevelTemp.append(details.description)
+                    infoeLevelTemp.append(details.grade)
+                    infoeLevelTemp.append(details.date_start)
+                    infoeLevelTemp.append(details.date_finish)
+                    infoLevel.append(infoeLevelTemp)
+                infoeLevelTemp=[]
+                infoeLevelTemp.append('')
+                infoLevel.append(infoeLevelTemp)
+    #*****************************************************REPORT*****************************************************
+    #****************************************************************************************************************
+    #****************************************************************************************************************
+    return dict(filename='ReporteGestionSolicitudesCambioActividadesConMetrica', csvdata=infoLevel)
+
+
+@auth.requires_login()
+@auth.requires_membership('Super-Administrator')
+def crawm_LOAD():
+    requestC = None
+    requestD = None
+    showLevel=False
+    try:
+        requestC = db(db.requestchange_activity_log.id==int(request.vars['id'])).select().first()
+        if requestC is not None:
+            showLevel=True
+            requestD = db(db.requestchange_course_activity_log.requestchange_activity==int(request.vars['id'])).select()
+    except:
+        showLevel=False
+    return dict(showLevel=showLevel, requestC=requestC, requestD=requestD)
+
+
+@auth.requires_login()
+@auth.requires_membership('Super-Administrator')
+def change_request_activities_with_metric_management():
+    #****************************************************************************************************************
+    #****************************************************************************************************************
+    #***************************************CHECK IF THERE IS A PERSONALIZED QUERY***********************************
+    personal_query = ''
+    makeRedirect = False
+    if request.vars['querySearch'] is not None and str(request.vars['querySearch']) != "":
+        #PERSONALIZED QUERY SURE WORK
+        try:
+            personal_query = str(request.vars['querySearch'])
+            countI = db.smart_query(db.requestchange_activity_log,personal_query).count()
+            if request.vars['searchT'] is not None and str(request.vars['searchT']) == 'T':
+                makeRedirect = True
+        except:
+            response.flash = T('The query is not valid. The report is displayed without applying any query.')
+            personal_query = ''
+    if makeRedirect == True:
+        redirect(URL('management_reports', 'change_request_activities_with_metric_management',vars=dict(level = '5', period = request.vars['period'], month = str(request.vars['month']), project = str(request.vars['project']), userP = str(request.vars['userP']), type_L=request.vars['type_L'], type_U=request.vars['type_U'], querySearch=request.vars['querySearch'])))
+    
+
+    #****************************************************************************************************************
+    #****************************************************************************************************************
+    #******************************************VERIFY THAT ACCURATE PARAMETERS***************************************
+    try:
+        #CHECK THAT THE LEVEL OF REPORT IS VALID
+        if request.vars['level'] is not None and (int(request.vars['level'])<1 or int(request.vars['level'])>5):
+            session.flash = T('Not valid Action.')
+            redirect(URL('default','index'))
+
+        #VERIFY THAT THE PARAMETERS OF EACH LEVEL BE VALID
+        if request.vars['level'] is not None:
+            #LEVEL MORE THAN 1
+            if int(request.vars['level'])>1:
+                #CHECK IF THE TYPE OF REPORT IS VALID
+                if request.vars['type_L'] is None or (str(request.vars['type_L'])!="all" and str(request.vars['type_L'])!="i" and str(request.vars['type_L'])!="u" and str(request.vars['type_L'])!="d" and str(request.vars['type_L'])!="p"):
+                    session.flash = T('Not valid Action.')
+                    redirect(URL('default','index'))
+
+                period = VALIDATE_PERIOD(request.vars['period'])
+                if period is None:
+                    session.flash = T('Not valid Action.')
+                    redirect(URL('default','index'))
+            
+            #LEVEL MORE THAN 2
+            if int(request.vars['level'])>2:
+                #CHECK IF THE TYPE OF REPORT IS VALID
+                if request.vars['type_U'] is None or (str(request.vars['type_U'])!="all" and str(request.vars['type_U'])!="i" and str(request.vars['type_U'])!="u" and str(request.vars['type_U'])!="d" and str(request.vars['type_L'])!="p"):
+                    session.flash = T('Not valid Action.')
+                    redirect(URL('default','index'))
+
+                #CHECK IF THE MONTH IS VALID
+                month = VALIDATE_MONTH(request.vars['month'],period)
+                if month is None:
+                    session.flash = T('Not valid Action.')
+                    redirect(URL('default','index'))
+            
+            #LEVEL MORE THAN 3
+            if int(request.vars['level'])>3:
+                #CHECK IF THE PROJECT IS VALID
+                project = VALIDATE_PROJECT(request.vars['project'],'requestchange_activity_log')
+                if project is None:
+                    session.flash = T('Not valid Action.')
+                    redirect(URL('default','index'))
+
+            #LEVEL MORE THAN 4
+            if int(request.vars['level'])>4:
+                #CHECK IF THE USER IS VALID
+                userP = VALIDATE_USER(period,project,'Student',request.vars['userP'],'requestchange_activity_log')
+                if userP is None:
+                    session.flash = T('Not valid Action.')
+                    redirect(URL('default','index'))
+    except:
+        session.flash = T('Not valid Action.')
+        redirect(URL('default','index'))
+
+    
+    #****************************************************************************************************************
+    #****************************************************************************************************************
+    #**************************************************SEARCH REPORT*************************************************
+    def filtered_by(flag):
+        fsearch_Option=[]
+        fsearch_Option.append('=')
+        fsearch_Option.append('!=')
+        fsearch_Option.append('<')
+        fsearch_Option.append('>')
+        fsearch_Option.append('<=')
+        fsearch_Option.append('>=')
+        if flag==True:
+            fsearch_Option.append('starts with')
+            fsearch_Option.append('contains')
+            fsearch_Option.append('in')
+            fsearch_Option.append('not in')
+        return fsearch_Option
+
+
+    fsearch = []
+    #******************************COMBOS INFORMATION******************************
+    #YEARS
+    if request.vars['level']=='1' or request.vars['level'] is None:
+        groupYears = GET_YEARS()
+        if len(groupYears) != 0:
+            fsearch.append(['yearp','Año',False,[3,sorted(groupYears)]])
+    #PROJECTS
+    if request.vars['level'] is None or int(request.vars['level'])<=3:
+        projects = GET_PROJECTS('requestchange_activity_log')
+        if len(projects) != 0:
+            fsearch_Values=[]
+            fsearch_Values.append(2)
+            for projectT in projects:
+                project=db(db.project.name==projectT).select().first()
+                if project is None:
+                    project=db(db.requestchange_activity_log.project==projectT).select().first()
+                    project=project.project
+                else:
+                    project=project.name
+                fsearch_Values.append(project)
+            fsearch.append(['course','Curso',False,fsearch_Values])
+    #OPERATION LOG
+    fsearch.append(['status','Estado',False,[3,['Accepted','Rejected','Pending']]])
+    #CATEGORIES
+    groupCategories = GET_CATEGORIES('requestchange_activity_log')
+    if len(groupCategories) != 0:
+        fsearch.append(['category_request','Categoria',False,[3,sorted(groupCategories)]])
+    #DATES
+    dates = GET_DATES('requestchange_activity_log')
+    if len(dates) != 0:
+        fsearch.append(['date_request','Fecha',False,[3,sorted(dates)]])
+    #******************************ENTERING USER******************************
+    #USER REQUEST
+    if request.vars['level'] is None or int(request.vars['level'])<=4:
+        fsearch.append(['user_request','Usuario Solicitud',False,[1]])
+    fsearch.append(['description','Descripción',True,[1]])
+
+
+
+    #****************************************************************************************************************
+    #****************************************************************************************************************
+    #*****************************************************REPORT*****************************************************
+    #LEVELS OF REPORT
+    from datetime import datetime
+    infoLevel = []
+    grid = []
+    #ALL SEMESTERS
+    if request.vars['level']=='1' or request.vars['level'] is None:
+        groupPeriods = db(db.period_year).select(orderby=~db.period_year.id)
+        if len(groupPeriods) == 0:
+            session.flash = T('Report no visible: There are no parameters required to display the report.')
+            redirect(URL('default','index'))
+        for period in groupPeriods:
+            infoeLevelTemp = []
+            #ID OF PERIOD
+            infoeLevelTemp.append(period.id)
+            #NAME OF PERIOD
+            infoeLevelTemp.append(T(period.period.name)+' '+str(period.yearp))
+            #MADE
+            if personal_query == '':
+                search='requestchange_activity_log.semester = "'+period.period.name+'" and requestchange_activity_log.yearp = "'+str(period.yearp)+'" and requestchange_activity_log.status = "Pending"'
+            else:
+                search='requestchange_activity_log.semester = "'+period.period.name+'" and requestchange_activity_log.yearp = "'+str(period.yearp)+'" and requestchange_activity_log.status = "Pending" and '+personal_query
+            countI = db.smart_query(db.requestchange_activity_log,search).count()
+            infoeLevelTemp.append(countI)
+            #ACCEPTED
+            if personal_query == '':
+                search='requestchange_activity_log.semester = "'+period.period.name+'" and requestchange_activity_log.yearp = "'+str(period.yearp)+'" and requestchange_activity_log.status = "Accepted"'
+            else:
+                search='requestchange_activity_log.semester = "'+period.period.name+'" and requestchange_activity_log.yearp = "'+str(period.yearp)+'" and requestchange_activity_log.status = "Accepted" and '+personal_query
+            countI = db.smart_query(db.requestchange_activity_log,search).count()
+            infoeLevelTemp.append(countI)
+            #REJECTED
+            if personal_query == '':
+                search='requestchange_activity_log.semester = "'+period.period.name+'" and requestchange_activity_log.yearp = "'+str(period.yearp)+'" and requestchange_activity_log.status = "Rejected"'
+            else:
+                search='requestchange_activity_log.semester = "'+period.period.name+'" and requestchange_activity_log.yearp = "'+str(period.yearp)+'" and requestchange_activity_log.status = "Rejected" and '+personal_query
+            countI = db.smart_query(db.requestchange_activity_log,search).count()
+            infoeLevelTemp.append(countI)
+            #PENDING
+            infoeLevelTemp.append(infoeLevelTemp[2]-infoeLevelTemp[3]-infoeLevelTemp[4])
+            #INSERT PERIOD
+            infoLevel.append(infoeLevelTemp)
+    #PER MONTH
+    elif str(request.vars['level'])=="2":
+        for month in GET_MONTH_PERIOD(period):
+            start = datetime.strptime(str(period.yearp) + '-' + str(month[0]) +'-01', "%Y-%m-%d")
+            if month[2]==1:
+                end = datetime.strptime(str(period.yearp+1) + '-' + str(month[2]) +'-01', "%Y-%m-%d")
+            else:
+                end = datetime.strptime(str(period.yearp) + '-' + str(month[2]) +'-01', "%Y-%m-%d")
+            infoeLevelTemp = []
+            #NAME OF PERIOD
+            infoeLevelTemp.append(T(period.period.name)+' '+str(period.yearp))
+            #ID OF MONTH
+            infoeLevelTemp.append(month[0])
+            #NAME OF MONTH
+            infoeLevelTemp.append(month[1]+' '+str(period.yearp))
+            #MADE
+            if str(request.vars['type_L'])=="all" or str(request.vars['type_L'])=="d":
+                if personal_query == '':
+                    search='requestchange_activity_log.semester = "'+period.period.name+'" and requestchange_activity_log.yearp = "'+str(period.yearp)+'" and requestchange_activity_log.date_request >="'+str(start)+'" and requestchange_activity_log.date_request<="'+str(end)+'" and requestchange_activity_log.status = "Pending"'
+                else:
+                    search='requestchange_activity_log.semester = "'+period.period.name+'" and requestchange_activity_log.yearp = "'+str(period.yearp)+'" and requestchange_activity_log.date_request >="'+str(start)+'" and requestchange_activity_log.date_request<="'+str(end)+'" and requestchange_activity_log.status = "Pending" and '+personal_query
+                countI = db.smart_query(db.requestchange_activity_log,search).count()
+                infoeLevelTemp.append(countI)
+            #ACCEPTED
+            if str(request.vars['type_L'])=="all" or str(request.vars['type_L'])=="i":
+                if personal_query == '':
+                    search='requestchange_activity_log.semester = "'+period.period.name+'" and requestchange_activity_log.yearp = "'+str(period.yearp)+'" and requestchange_activity_log.date_request_resolve >="'+str(start)+'" and requestchange_activity_log.date_request_resolve<="'+str(end)+'" and requestchange_activity_log.status = "Accepted"'
+                else:
+                    search='requestchange_activity_log.semester = "'+period.period.name+'" and requestchange_activity_log.yearp = "'+str(period.yearp)+'" and requestchange_activity_log.date_request_resolve >="'+str(start)+'" and requestchange_activity_log.date_request_resolve<="'+str(end)+'" and requestchange_activity_log.status = "Accepted" and '+personal_query
+                countI = db.smart_query(db.requestchange_activity_log,search).count()
+                infoeLevelTemp.append(countI)
+            #REJECTED
+            if str(request.vars['type_L'])=="all" or str(request.vars['type_L'])=="u":
+                if personal_query == '':
+                    search='requestchange_activity_log.semester = "'+period.period.name+'" and requestchange_activity_log.yearp = "'+str(period.yearp)+'" and requestchange_activity_log.date_request_resolve >="'+str(start)+'" and requestchange_activity_log.date_request_resolve<="'+str(end)+'" and requestchange_activity_log.status = "Rejected"'
+                else:
+                    search='requestchange_activity_log.semester = "'+period.period.name+'" and requestchange_activity_log.yearp = "'+str(period.yearp)+'" and requestchange_activity_log.date_request_resolve >="'+str(start)+'" and requestchange_activity_log.date_request_resolve<="'+str(end)+'" and requestchange_activity_log.status = "Rejected" and '+personal_query
+                countI = db.smart_query(db.requestchange_activity_log,search).count()
+                infoeLevelTemp.append(countI)
+            #PENDING
+            if str(request.vars['type_L'])=="all" or str(request.vars['type_L'])=="p":
+                if period.period==1:
+                    if personal_query == '':
+                        search='requestchange_activity_log.semester = "'+period.period.name+'" and requestchange_activity_log.yearp = "'+str(period.yearp)+'" and requestchange_activity_log.date_request >="'+str(period.yearp)+'-01-01" and requestchange_activity_log.date_request<="'+str(end)+'" and requestchange_activity_log.status = "Pending"'
+                    else:
+                        search='requestchange_activity_log.semester = "'+period.period.name+'" and requestchange_activity_log.yearp = "'+str(period.yearp)+'" and requestchange_activity_log.date_request >="'+str(period.yearp)+'-01-01" and requestchange_activity_log.date_request<="'+str(end)+'" and requestchange_activity_log.status = "Pending" and '+personal_query
+                    countP = db.smart_query(db.requestchange_activity_log,search).count()
+                    if personal_query == '':
+                        search='requestchange_activity_log.semester = "'+period.period.name+'" and requestchange_activity_log.yearp = "'+str(period.yearp)+'" and requestchange_activity_log.date_request_resolve >="'+str(period.yearp)+'-01-01" and requestchange_activity_log.date_request_resolve<="'+str(end)+'" and requestchange_activity_log.status != "Pending"'
+                    else:
+                        search='requestchange_activity_log.semester = "'+period.period.name+'" and requestchange_activity_log.yearp = "'+str(period.yearp)+'" and requestchange_activity_log.date_request_resolve >="'+str(period.yearp)+'-01-01" and requestchange_activity_log.date_request_resolve<="'+str(end)+'" and requestchange_activity_log.status != "Pending" and '+personal_query
+                    countNP = db.smart_query(db.requestchange_activity_log,search).count()
+                else:
+                    if personal_query == '':
+                        search='requestchange_activity_log.semester = "'+period.period.name+'" and requestchange_activity_log.yearp = "'+str(period.yearp)+'" and requestchange_activity_log.date_request >="'+str(period.yearp)+'-06-01" and requestchange_activity_log.date_request<="'+str(end)+'" and requestchange_activity_log.status = "Pending"'
+                    else:
+                        search='requestchange_activity_log.semester = "'+period.period.name+'" and requestchange_activity_log.yearp = "'+str(period.yearp)+'" and requestchange_activity_log.date_request >="'+str(period.yearp)+'-06-01" and requestchange_activity_log.date_request<="'+str(end)+'" and requestchange_activity_log.status = "Pending" and '+personal_query
+                    countP = db.smart_query(db.requestchange_activity_log,search).count()
+                    if personal_query == '':
+                        search='requestchange_activity_log.semester = "'+period.period.name+'" and requestchange_activity_log.yearp = "'+str(period.yearp)+'" and requestchange_activity_log.date_request_resolve >="'+str(period.yearp)+'-06-01" and requestchange_activity_log.date_request_resolve<="'+str(end)+'" and requestchange_activity_log.status != "Pending"'
+                    else:
+                        search='requestchange_activity_log.semester = "'+period.period.name+'" and requestchange_activity_log.yearp = "'+str(period.yearp)+'" and requestchange_activity_log.date_request_resolve >="'+str(period.yearp)+'-06-01" and requestchange_activity_log.date_request_resolve<="'+str(end)+'" and requestchange_activity_log.status != "Pending" and '+personal_query
+                    countNP = db.smart_query(db.requestchange_activity_log,search).count()
+                infoeLevelTemp.append(countP-countNP)
+            #INSERT MONTH
+            infoLevel.append(infoeLevelTemp)
+    #PER PROJECT
+    elif str(request.vars['level'])=="3":
+        if len(projects) == 0:
+            session.flash = T('Report no visible: There are no parameters required to display the report.')
+            redirect(URL('management_reports', 'change_request_activities_with_metric_management',vars=dict(level='2',period = str(request.vars['period']), type_L = str(request.vars['type_U']), querySearch=personal_query)))
+
+        for projectT in projects:
+            project=db(db.project.name==projectT).select().first()
+            if project is None:
+                project=db((db.course_activity_log.before_course==projectT)|(db.course_activity_log.after_course==projectT)).select().first()
+                if project.before_course is not None:
+                    project=project.before_course
+                else:
+                    project=project.after_course
+            else:
+                project=project.name
+            infoeLevelTemp = []
+            #NAME OF PERIOD
+            infoeLevelTemp.append(T(period.period.name)+' '+str(period.yearp))
+            #NAME OF MONTH
+            infoeLevelTemp.append(month[0])
+            #ID OF PROJECT
+            infoeLevelTemp.append(project)
+            #NAME OF PROJECT
+            infoeLevelTemp.append(project)
+            #MADE
+            if str(request.vars['type_L'])=="all" or str(request.vars['type_L'])=="d":
+                if personal_query == '':
+                    search='requestchange_activity_log.semester = "'+period.period.name+'" and requestchange_activity_log.yearp = "'+str(period.yearp)+'" and requestchange_activity_log.date_request >="'+str(month[1])+'" and requestchange_activity_log.date_request<="'+str(month[2])+'" and requestchange_activity_log.status = "Pending" and requestchange_activity_log.course = "'+str(project)+'"'
+                else:
+                    search='requestchange_activity_log.semester = "'+period.period.name+'" and requestchange_activity_log.yearp = "'+str(period.yearp)+'" and requestchange_activity_log.date_request >="'+str(month[1])+'" and requestchange_activity_log.date_request<="'+str(month[2])+'" and requestchange_activity_log.status = "Pending" and requestchange_activity_log.course = "'+str(project)+'" and '+personal_query
+                countI = db.smart_query(db.requestchange_activity_log,search).count()
+                infoeLevelTemp.append(countI)
+            #ACCEPTED
+            if str(request.vars['type_L'])=="all" or str(request.vars['type_L'])=="i":
+                if personal_query == '':
+                    search='requestchange_activity_log.semester = "'+period.period.name+'" and requestchange_activity_log.yearp = "'+str(period.yearp)+'" and requestchange_activity_log.date_request_resolve >="'+str(month[1])+'" and requestchange_activity_log.date_request_resolve<="'+str(month[2])+'" and requestchange_activity_log.status = "Accepted" and requestchange_activity_log.course = "'+str(project)+'"'
+                else:
+                    search='requestchange_activity_log.semester = "'+period.period.name+'" and requestchange_activity_log.yearp = "'+str(period.yearp)+'" and requestchange_activity_log.date_request_resolve >="'+str(month[1])+'" and requestchange_activity_log.date_request_resolve<="'+str(month[2])+'" and requestchange_activity_log.status = "Accepted" and requestchange_activity_log.course = "'+str(project)+'" and '+personal_query
+                countI = db.smart_query(db.requestchange_activity_log,search).count()
+                infoeLevelTemp.append(countI)
+            #REJECTED
+            if str(request.vars['type_L'])=="all" or str(request.vars['type_L'])=="u":
+                if personal_query == '':
+                    search='requestchange_activity_log.semester = "'+period.period.name+'" and requestchange_activity_log.yearp = "'+str(period.yearp)+'" and requestchange_activity_log.date_request_resolve >="'+str(month[1])+'" and requestchange_activity_log.date_request_resolve<="'+str(month[2])+'" and requestchange_activity_log.status = "Rejected" and requestchange_activity_log.course = "'+str(project)+'"'
+                else:
+                    search='requestchange_activity_log.semester = "'+period.period.name+'" and requestchange_activity_log.yearp = "'+str(period.yearp)+'" and requestchange_activity_log.date_request_resolve >="'+str(month[1])+'" and requestchange_activity_log.date_request_resolve<="'+str(month[2])+'" and requestchange_activity_log.status = "Rejected" and requestchange_activity_log.course = "'+str(project)+'" and '+personal_query
+                countI = db.smart_query(db.requestchange_activity_log,search).count()
+                infoeLevelTemp.append(countI)
+            #PENDING
+            if str(request.vars['type_L'])=="all" or str(request.vars['type_L'])=="p":
+                if period.period==1:
+                    if personal_query == '':
+                        search='requestchange_activity_log.semester = "'+period.period.name+'" and requestchange_activity_log.yearp = "'+str(period.yearp)+'" and requestchange_activity_log.date_request >="'+str(period.yearp)+'-01-01" and requestchange_activity_log.date_request<="'+str(month[2])+'" and requestchange_activity_log.status = "Pending" and requestchange_activity_log.course = "'+str(project)+'"'
+                    else:
+                        search='requestchange_activity_log.semester = "'+period.period.name+'" and requestchange_activity_log.yearp = "'+str(period.yearp)+'" and requestchange_activity_log.date_request >="'+str(period.yearp)+'-01-01" and requestchange_activity_log.date_request<="'+str(month[2])+'" and requestchange_activity_log.status = "Pending" and requestchange_activity_log.course = "'+str(project)+'" and '+personal_query
+                    countP = db.smart_query(db.requestchange_activity_log,search).count()
+                    if personal_query == '':
+                        search='requestchange_activity_log.semester = "'+period.period.name+'" and requestchange_activity_log.yearp = "'+str(period.yearp)+'" and requestchange_activity_log.date_request_resolve >="'+str(period.yearp)+'-01-01" and requestchange_activity_log.date_request_resolve<="'+str(month[2])+'" and requestchange_activity_log.status != "Pending" and requestchange_activity_log.course = "'+str(project)+'"'
+                    else:
+                        search='requestchange_activity_log.semester = "'+period.period.name+'" and requestchange_activity_log.yearp = "'+str(period.yearp)+'" and requestchange_activity_log.date_request_resolve >="'+str(period.yearp)+'-01-01" and requestchange_activity_log.date_request_resolve<="'+str(month[2])+'" and requestchange_activity_log.status != "Pending" and requestchange_activity_log.course = "'+str(project)+'" and '+personal_query
+                    countNP = db.smart_query(db.requestchange_activity_log,search).count()
+                else:
+                    if personal_query == '':
+                        search='requestchange_activity_log.semester = "'+period.period.name+'" and requestchange_activity_log.yearp = "'+str(period.yearp)+'" and requestchange_activity_log.date_request >="'+str(period.yearp)+'-06-01" and requestchange_activity_log.date_request<="'+str(month[2])+'" and requestchange_activity_log.status = "Pending" and requestchange_activity_log.course = "'+str(project)+'"'
+                    else:
+                        search='requestchange_activity_log.semester = "'+period.period.name+'" and requestchange_activity_log.yearp = "'+str(period.yearp)+'" and requestchange_activity_log.date_request >="'+str(period.yearp)+'-06-01" and requestchange_activity_log.date_request<="'+str(month[2])+'" and requestchange_activity_log.status = "Pending" and requestchange_activity_log.course = "'+str(project)+'" and '+personal_query
+                    countP = db.smart_query(db.requestchange_activity_log,search).count()
+                    if personal_query == '':
+                        search='requestchange_activity_log.semester = "'+period.period.name+'" and requestchange_activity_log.yearp = "'+str(period.yearp)+'" and requestchange_activity_log.date_request_resolve >="'+str(period.yearp)+'-06-01" and requestchange_activity_log.date_request_resolve<="'+str(month[2])+'" and requestchange_activity_log.status != "Pending" and requestchange_activity_log.course = "'+str(project)+'"'
+                    else:
+                        search='requestchange_activity_log.semester = "'+period.period.name+'" and requestchange_activity_log.yearp = "'+str(period.yearp)+'" and requestchange_activity_log.date_request_resolve >="'+str(period.yearp)+'-06-01" and requestchange_activity_log.date_request_resolve<="'+str(month[2])+'" and requestchange_activity_log.status != "Pending" and requestchange_activity_log.course = "'+str(project)+'" and '+personal_query
+                    countNP = db.smart_query(db.requestchange_activity_log,search).count()
+                infoeLevelTemp.append(countP-countNP)
+            #INSERT PROJECT
+            infoLevel.append(infoeLevelTemp)
+    #PER USER
+    elif str(request.vars['level'])=="4":
+        #VERIFY THAT CAN SHOW THE LEVEL OF THE REPORT
+        usersProject = GET_USERS(period,project,'Student','requestchange_activity_log')
+        if len(usersProject) == 0:
+            session.flash = T('Report no visible: There are no parameters required to display the report.')
+            redirect(URL('management_reports', 'change_request_activities_with_metric_management',vars=dict(level='3', period = str(request.vars['period']), month = str(request.vars['month']), type_L = str(request.vars['type_U']), type_U = str(request.vars['type_U']), querySearch=personal_query)))
+
+        for userPT in usersProject:
+            userP=db(db.auth_user.username==userPT).select().first()
+            if userP is None:
+                userP=db(db.requestchange_activity_log.user_request==userPT).select().first()
+                userP=userP.user_request
+            else:
+                userP=userP.username
+            infoeLevelTemp = []
+            #NAME OF PERIOD
+            infoeLevelTemp.append(T(period.period.name)+' '+str(period.yearp))
+            #NAME OF MONTH
+            infoeLevelTemp.append(month[0])
+            #NAME OF PROJECT
+            infoeLevelTemp.append(project)
+            #ID OF USER
+            infoeLevelTemp.append(userP)
+            #NAME OF USER
+            infoeLevelTemp.append(userP)
+            #MADE
+            if str(request.vars['type_L'])=="all" or str(request.vars['type_L'])=="d":
+                countI = 0
+                if personal_query == '':
+                    search='requestchange_activity_log.semester = "'+period.period.name+'" and requestchange_activity_log.yearp = "'+str(period.yearp)+'" and requestchange_activity_log.date_request >="'+str(month[1])+'" and requestchange_activity_log.date_request<="'+str(month[2])+'" and requestchange_activity_log.status = "Pending" and requestchange_activity_log.course = "'+str(project)+'" and requestchange_activity_log.roll_request = "Student" and requestchange_activity_log.user_request = "'+str(userP)+'"'
+                else:
+                    search='requestchange_activity_log.semester = "'+period.period.name+'" and requestchange_activity_log.yearp = "'+str(period.yearp)+'" and requestchange_activity_log.date_request >="'+str(month[1])+'" and requestchange_activity_log.date_request<="'+str(month[2])+'" and requestchange_activity_log.status = "Pending" and requestchange_activity_log.course = "'+str(project)+'" and requestchange_activity_log.roll_request = "Student" and requestchange_activity_log.user_request = "'+str(userP)+'" and '+personal_query
+                countI = db.smart_query(db.requestchange_activity_log,search).count()
+                infoeLevelTemp.append(countI)
+            #ACCEPTED
+            if str(request.vars['type_L'])=="all" or str(request.vars['type_L'])=="i":
+                if personal_query == '':
+                    search='requestchange_activity_log.semester = "'+period.period.name+'" and requestchange_activity_log.yearp = "'+str(period.yearp)+'" and requestchange_activity_log.date_request_resolve >="'+str(month[1])+'" and requestchange_activity_log.date_request_resolve<="'+str(month[2])+'" and requestchange_activity_log.status = "Accepted" and requestchange_activity_log.course = "'+str(project)+'" and requestchange_activity_log.roll_request = "Student" and requestchange_activity_log.user_request = "'+str(userP)+'"'
+                else:
+                    search='requestchange_activity_log.semester = "'+period.period.name+'" and requestchange_activity_log.yearp = "'+str(period.yearp)+'" and requestchange_activity_log.date_request_resolve >="'+str(month[1])+'" and requestchange_activity_log.date_request_resolve<="'+str(month[2])+'" and requestchange_activity_log.status = "Accepted" and requestchange_activity_log.course = "'+str(project)+'" and requestchange_activity_log.roll_request = "Student" and requestchange_activity_log.user_request = "'+str(userP)+'" and '+personal_query
+                countI = db.smart_query(db.requestchange_activity_log,search).count()
+                infoeLevelTemp.append(countI)
+            #REJECTED
+            if str(request.vars['type_L'])=="all" or str(request.vars['type_L'])=="u":
+                if personal_query == '':
+                    search='requestchange_activity_log.semester = "'+period.period.name+'" and requestchange_activity_log.yearp = "'+str(period.yearp)+'" and requestchange_activity_log.date_request_resolve >="'+str(month[1])+'" and requestchange_activity_log.date_request_resolve<="'+str(month[2])+'" and requestchange_activity_log.status = "Rejected" and requestchange_activity_log.course = "'+str(project)+'" and requestchange_activity_log.roll_request = "Student" and requestchange_activity_log.user_request = "'+str(userP)+'"'
+                else:
+                    search='requestchange_activity_log.semester = "'+period.period.name+'" and requestchange_activity_log.yearp = "'+str(period.yearp)+'" and requestchange_activity_log.date_request_resolve >="'+str(month[1])+'" and requestchange_activity_log.date_request_resolve<="'+str(month[2])+'" and requestchange_activity_log.status = "Rejected" and requestchange_activity_log.course = "'+str(project)+'" and requestchange_activity_log.roll_request = "Student" and requestchange_activity_log.user_request = "'+str(userP)+'" and '+personal_query
+                countI = db.smart_query(db.requestchange_activity_log,search).count()
+                infoeLevelTemp.append(countI)
+            #PENDING
+            if str(request.vars['type_L'])=="all" or str(request.vars['type_L'])=="p":
+                if period.period==1:
+                    if personal_query == '':
+                        search='requestchange_activity_log.semester = "'+period.period.name+'" and requestchange_activity_log.yearp = "'+str(period.yearp)+'" and requestchange_activity_log.date_request >="'+str(period.yearp)+'-01-01" and requestchange_activity_log.date_request<="'+str(month[2])+'" and requestchange_activity_log.status = "Pending" and requestchange_activity_log.course = "'+str(project)+'" and requestchange_activity_log.roll_request = "Student" and requestchange_activity_log.user_request = "'+str(userP)+'"'
+                    else:
+                        search='requestchange_activity_log.semester = "'+period.period.name+'" and requestchange_activity_log.yearp = "'+str(period.yearp)+'" and requestchange_activity_log.date_request >="'+str(period.yearp)+'-01-01" and requestchange_activity_log.date_request<="'+str(month[2])+'" and requestchange_activity_log.status = "Pending" and requestchange_activity_log.course = "'+str(project)+'" and requestchange_activity_log.roll_request = "Student" and requestchange_activity_log.user_request = "'+str(userP)+'" and '+personal_query
+                    countP = db.smart_query(db.requestchange_activity_log,search).count()
+                    if personal_query == '':
+                        search='requestchange_activity_log.semester = "'+period.period.name+'" and requestchange_activity_log.yearp = "'+str(period.yearp)+'" and requestchange_activity_log.date_request_resolve >="'+str(period.yearp)+'-01-01" and requestchange_activity_log.date_request_resolve<="'+str(month[2])+'" and requestchange_activity_log.status != "Pending" and requestchange_activity_log.course = "'+str(project)+'" and requestchange_activity_log.roll_request = "Student" and requestchange_activity_log.user_request = "'+str(userP)+'"'
+                    else:
+                        search='requestchange_activity_log.semester = "'+period.period.name+'" and requestchange_activity_log.yearp = "'+str(period.yearp)+'" and requestchange_activity_log.date_request_resolve >="'+str(period.yearp)+'-01-01" and requestchange_activity_log.date_request_resolve<="'+str(month[2])+'" and requestchange_activity_log.status != "Pending" and requestchange_activity_log.course = "'+str(project)+'" and requestchange_activity_log.roll_request = "Student" and requestchange_activity_log.user_request = "'+str(userP)+'" and '+personal_query
+                    countNP = db.smart_query(db.requestchange_activity_log,search).count()
+                else:
+                    if personal_query == '':
+                        search='requestchange_activity_log.semester = "'+period.period.name+'" and requestchange_activity_log.yearp = "'+str(period.yearp)+'" and requestchange_activity_log.date_request >="'+str(period.yearp)+'-06-01" and requestchange_activity_log.date_request<="'+str(month[2])+'" and requestchange_activity_log.status = "Pending" and requestchange_activity_log.course = "'+str(project)+'" and requestchange_activity_log.roll_request = "Student" and requestchange_activity_log.user_request = "'+str(userP)+'"'
+                    else:
+                        search='requestchange_activity_log.semester = "'+period.period.name+'" and requestchange_activity_log.yearp = "'+str(period.yearp)+'" and requestchange_activity_log.date_request >="'+str(period.yearp)+'-06-01" and requestchange_activity_log.date_request<="'+str(month[2])+'" and requestchange_activity_log.status = "Pending" and requestchange_activity_log.course = "'+str(project)+'" and requestchange_activity_log.roll_request = "Student" and requestchange_activity_log.user_request = "'+str(userP)+'" and '+personal_query
+                    countP = db.smart_query(db.requestchange_activity_log,search).count()
+                    if personal_query == '':
+                        search='requestchange_activity_log.semester = "'+period.period.name+'" and requestchange_activity_log.yearp = "'+str(period.yearp)+'" and requestchange_activity_log.date_request_resolve >="'+str(period.yearp)+'-06-01" and requestchange_activity_log.date_request_resolve<="'+str(month[2])+'" and requestchange_activity_log.status != "Pending" and requestchange_activity_log.course = "'+str(project)+'" and requestchange_activity_log.roll_request = "Student" and requestchange_activity_log.user_request = "'+str(userP)+'"'
+                    else:
+                        search='requestchange_activity_log.semester = "'+period.period.name+'" and requestchange_activity_log.yearp = "'+str(period.yearp)+'" and requestchange_activity_log.date_request_resolve >="'+str(period.yearp)+'-06-01" and requestchange_activity_log.date_request_resolve<="'+str(month[2])+'" and requestchange_activity_log.status != "Pending" and requestchange_activity_log.course = "'+str(project)+'" and requestchange_activity_log.roll_request = "Student" and requestchange_activity_log.user_request = "'+str(userP)+'" and '+personal_query
+                    countNP = db.smart_query(db.requestchange_activity_log,search).count()
+                infoeLevelTemp.append(countP-countNP)
+            #INSERT USER
+            infoLevel.append(infoeLevelTemp)
+    #DATA
+    elif str(request.vars['level'])=="5":
+        #MADE
+        if str(request.vars['type_L'])=="d":
+            if personal_query == '':
+                search='requestchange_activity_log.semester = "'+period.period.name+'" and requestchange_activity_log.yearp = "'+str(period.yearp)+'" and requestchange_activity_log.date_request >="'+str(month[1])+'" and requestchange_activity_log.date_request<="'+str(month[2])+'" and requestchange_activity_log.status = "Pending" and requestchange_activity_log.course = "'+str(project)+'" and requestchange_activity_log.roll_request = "Student" and requestchange_activity_log.user_request = "'+str(userP)+'"'
+            else:
+                search='requestchange_activity_log.semester = "'+period.period.name+'" and requestchange_activity_log.yearp = "'+str(period.yearp)+'" and requestchange_activity_log.date_request >="'+str(month[1])+'" and requestchange_activity_log.date_request<="'+str(month[2])+'" and requestchange_activity_log.status = "Pending" and requestchange_activity_log.course = "'+str(project)+'" and requestchange_activity_log.roll_request = "Student" and requestchange_activity_log.user_request = "'+str(userP)+'" and '+personal_query
+            for data in db.smart_query(db.requestchange_activity_log,search).select():
+                grid.append(data.id)
+        #ACCEPTED
+        elif str(request.vars['type_L'])=="i":
+            if personal_query == '':
+                search='requestchange_activity_log.semester = "'+period.period.name+'" and requestchange_activity_log.yearp = "'+str(period.yearp)+'" and requestchange_activity_log.date_request_resolve >="'+str(month[1])+'" and requestchange_activity_log.date_request_resolve<="'+str(month[2])+'" and requestchange_activity_log.status = "Accepted" and requestchange_activity_log.course = "'+str(project)+'" and requestchange_activity_log.roll_request = "Student" and requestchange_activity_log.user_request = "'+str(userP)+'"'
+            else:
+                search='requestchange_activity_log.semester = "'+period.period.name+'" and requestchange_activity_log.yearp = "'+str(period.yearp)+'" and requestchange_activity_log.date_request_resolve >="'+str(month[1])+'" and requestchange_activity_log.date_request_resolve<="'+str(month[2])+'" and requestchange_activity_log.status = "Accepted" and requestchange_activity_log.course = "'+str(project)+'" and requestchange_activity_log.roll_request = "Student" and requestchange_activity_log.user_request = "'+str(userP)+'" and '+personal_query
+            for data in db.smart_query(db.requestchange_activity_log,search).select():
+                grid.append(data.id)
+        #REJECTED
+        elif str(request.vars['type_L'])=="u":
+            if personal_query == '':
+                search='requestchange_activity_log.semester = "'+period.period.name+'" and requestchange_activity_log.yearp = "'+str(period.yearp)+'" and requestchange_activity_log.date_request_resolve >="'+str(month[1])+'" and requestchange_activity_log.date_request_resolve<="'+str(month[2])+'" and requestchange_activity_log.status = "Rejected" and requestchange_activity_log.course = "'+str(project)+'" and requestchange_activity_log.roll_request = "Student" and requestchange_activity_log.user_request = "'+str(userP)+'"'
+            else:
+                search='requestchange_activity_log.semester = "'+period.period.name+'" and requestchange_activity_log.yearp = "'+str(period.yearp)+'" and requestchange_activity_log.date_request_resolve >="'+str(month[1])+'" and requestchange_activity_log.date_request_resolve<="'+str(month[2])+'" and requestchange_activity_log.status = "Rejected" and requestchange_activity_log.course = "'+str(project)+'" and requestchange_activity_log.roll_request = "Student" and requestchange_activity_log.user_request = "'+str(userP)+'" and '+personal_query
+            for data in db.smart_query(db.requestchange_activity_log,search).select():
+                grid.append(data.id)
+        #PENDING
+        elif str(request.vars['type_L'])=="p":
+            if period.period==1:
+                if personal_query == '':
+                    search='requestchange_activity_log.semester = "'+period.period.name+'" and requestchange_activity_log.yearp = "'+str(period.yearp)+'" and requestchange_activity_log.date_request >="'+str(period.yearp)+'-01-01" and requestchange_activity_log.date_request<="'+str(month[2])+'" and requestchange_activity_log.status = "Pending" and requestchange_activity_log.course = "'+str(project)+'" and requestchange_activity_log.roll_request = "Student" and requestchange_activity_log.user_request = "'+str(userP)+'"'
+                else:
+                    search='requestchange_activity_log.semester = "'+period.period.name+'" and requestchange_activity_log.yearp = "'+str(period.yearp)+'" and requestchange_activity_log.date_request >="'+str(period.yearp)+'-01-01" and requestchange_activity_log.date_request<="'+str(month[2])+'" and requestchange_activity_log.status = "Pending" and requestchange_activity_log.course = "'+str(project)+'" and requestchange_activity_log.roll_request = "Student" and requestchange_activity_log.user_request = "'+str(userP)+'" and '+personal_query
+                for pending in  db.smart_query(db.requestchange_activity_log,search).select():
+                    if personal_query == '':
+                        search='requestchange_activity_log.semester = "'+period.period.name+'" and requestchange_activity_log.yearp = "'+str(period.yearp)+'" and requestchange_activity_log.date_request_resolve >="'+str(period.yearp)+'-01-01" and requestchange_activity_log.date_request_resolve<="'+str(month[2])+'" and requestchange_activity_log.status != "Pending" and requestchange_activity_log.course = "'+str(project)+'" and requestchange_activity_log.roll_request = "Student" and requestchange_activity_log.user_request = "'+str(userP)+'" and requestchange_activity_log.description = "'+pending.description+'" and requestchange_activity_log.date_request = "'+str(pending.date_request)+'" and requestchange_activity_log.category_request = "'+pending.category_request+'"'
+                    else:
+                        search='requestchange_activity_log.semester = "'+period.period.name+'" and requestchange_activity_log.yearp = "'+str(period.yearp)+'" and requestchange_activity_log.date_request_resolve >="'+str(period.yearp)+'-01-01" and requestchange_activity_log.date_request_resolve<="'+str(month[2])+'" and requestchange_activity_log.status != "Pending" and requestchange_activity_log.course = "'+str(project)+'" and requestchange_activity_log.roll_request = "Student" and requestchange_activity_log.user_request = "'+str(userP)+'" and requestchange_activity_log.description = "'+pending.description+'" and requestchange_activity_log.date_request = "'+str(pending.date_request)+'" and requestchange_activity_log.category_request = "'+pending.category_request+'" and '+personal_query
+                    if db.smart_query(db.requestchange_activity_log,search).select().first() is None:
+                        grid.append(pending.id)
+            else:
+                if personal_query == '':
+                    search='requestchange_activity_log.semester = "'+period.period.name+'" and requestchange_activity_log.yearp = "'+str(period.yearp)+'" and requestchange_activity_log.date_request >="'+str(period.yearp)+'-06-01" and requestchange_activity_log.date_request<="'+str(month[2])+'" and requestchange_activity_log.status = "Pending" and requestchange_activity_log.course = "'+str(project)+'" and requestchange_activity_log.roll_request = "Student" and requestchange_activity_log.user_request = "'+str(userP)+'"'
+                else:
+                    search='requestchange_activity_log.semester = "'+period.period.name+'" and requestchange_activity_log.yearp = "'+str(period.yearp)+'" and requestchange_activity_log.date_request >="'+str(period.yearp)+'-06-01" and requestchange_activity_log.date_request<="'+str(month[2])+'" and requestchange_activity_log.status = "Pending" and requestchange_activity_log.course = "'+str(project)+'" and requestchange_activity_log.roll_request = "Student" and requestchange_activity_log.user_request = "'+str(userP)+'" and '+personal_query
+                for pending in  db.smart_query(db.requestchange_activity_log,search).select():
+                    if personal_query == '':
+                        search='requestchange_activity_log.semester = "'+period.period.name+'" and requestchange_activity_log.yearp = "'+str(period.yearp)+'" and requestchange_activity_log.date_request_resolve >="'+str(period.yearp)+'-06-01" and requestchange_activity_log.date_request_resolve<="'+str(month[2])+'" and requestchange_activity_log.status != "Pending" and requestchange_activity_log.course = "'+str(project)+'" and requestchange_activity_log.roll_request = "Student" and requestchange_activity_log.user_request = "'+str(userP)+'" and requestchange_activity_log.description = "'+pending.description+'" and requestchange_activity_log.date_request = "'+str(pending.date_request)+'" and requestchange_activity_log.category_request = "'+pending.category_request+'"'
+                    else:
+                        search='requestchange_activity_log.semester = "'+period.period.name+'" and requestchange_activity_log.yearp = "'+str(period.yearp)+'" and requestchange_activity_log.date_request_resolve >="'+str(period.yearp)+'-06-01" and requestchange_activity_log.date_request_resolve<="'+str(month[2])+'" and requestchange_activity_log.status != "Pending" and requestchange_activity_log.course = "'+str(project)+'" and requestchange_activity_log.roll_request = "Student" and requestchange_activity_log.user_request = "'+str(userP)+'" and requestchange_activity_log.description = "'+pending.description+'" and requestchange_activity_log.date_request = "'+str(pending.date_request)+'" and requestchange_activity_log.category_request = "'+pending.category_request+'" and '+personal_query
+                    if db.smart_query(db.requestchange_activity_log,search).select().first() is None:
+                        grid.append(pending.id)
+        #ALL
+        elif str(request.vars['type_L'])=="all":
+            #MADE AND PENDING
+            if period.period==1:
+                if personal_query == '':
+                    search='requestchange_activity_log.semester = "'+period.period.name+'" and requestchange_activity_log.yearp = "'+str(period.yearp)+'" and requestchange_activity_log.date_request >="'+str(period.yearp)+'-01-01" and requestchange_activity_log.date_request<="'+str(month[2])+'" and requestchange_activity_log.status = "Pending" and requestchange_activity_log.course = "'+str(project)+'" and requestchange_activity_log.roll_request = "Student" and requestchange_activity_log.user_request = "'+str(userP)+'"'
+                else:
+                    search='requestchange_activity_log.semester = "'+period.period.name+'" and requestchange_activity_log.yearp = "'+str(period.yearp)+'" and requestchange_activity_log.date_request >="'+str(period.yearp)+'-01-01" and requestchange_activity_log.date_request<="'+str(month[2])+'" and requestchange_activity_log.status = "Pending" and requestchange_activity_log.course = "'+str(project)+'" and requestchange_activity_log.roll_request = "Student" and requestchange_activity_log.user_request = "'+str(userP)+'" and '+personal_query
+                for pending in  db.smart_query(db.requestchange_activity_log,search).select():
+                    if personal_query == '':
+                        search='requestchange_activity_log.semester = "'+period.period.name+'" and requestchange_activity_log.yearp = "'+str(period.yearp)+'" and requestchange_activity_log.date_request_resolve >="'+str(period.yearp)+'-01-01" and requestchange_activity_log.date_request_resolve<="'+str(month[2])+'" and requestchange_activity_log.status != "Pending" and requestchange_activity_log.course = "'+str(project)+'" and requestchange_activity_log.roll_request = "Student" and requestchange_activity_log.user_request = "'+str(userP)+'" and requestchange_activity_log.description = "'+pending.description+'" and requestchange_activity_log.date_request = "'+str(pending.date_request)+'" and requestchange_activity_log.category_request = "'+pending.category_request+'"'
+                    else:
+                        search='requestchange_activity_log.semester = "'+period.period.name+'" and requestchange_activity_log.yearp = "'+str(period.yearp)+'" and requestchange_activity_log.date_request_resolve >="'+str(period.yearp)+'-01-01" and requestchange_activity_log.date_request_resolve<="'+str(month[2])+'" and requestchange_activity_log.status != "Pending" and requestchange_activity_log.course = "'+str(project)+'" and requestchange_activity_log.roll_request = "Student" and requestchange_activity_log.user_request = "'+str(userP)+'" and requestchange_activity_log.description = "'+pending.description+'" and requestchange_activity_log.date_request = "'+str(pending.date_request)+'" and requestchange_activity_log.category_request = "'+pending.category_request+'" and '+personal_query
+                    if db.smart_query(db.requestchange_activity_log,search).select().first() is None:
+                        grid.append(pending.id)
+            else:
+                if personal_query == '':
+                    search='requestchange_activity_log.semester = "'+period.period.name+'" and requestchange_activity_log.yearp = "'+str(period.yearp)+'" and requestchange_activity_log.date_request >="'+str(period.yearp)+'-06-01" and requestchange_activity_log.date_request<="'+str(month[2])+'" and requestchange_activity_log.status = "Pending" and requestchange_activity_log.course = "'+str(project)+'" and requestchange_activity_log.roll_request = "Student" and requestchange_activity_log.user_request = "'+str(userP)+'"'
+                else:
+                    search='requestchange_activity_log.semester = "'+period.period.name+'" and requestchange_activity_log.yearp = "'+str(period.yearp)+'" and requestchange_activity_log.date_request >="'+str(period.yearp)+'-06-01" and requestchange_activity_log.date_request<="'+str(month[2])+'" and requestchange_activity_log.status = "Pending" and requestchange_activity_log.course = "'+str(project)+'" and requestchange_activity_log.roll_request = "Student" and requestchange_activity_log.user_request = "'+str(userP)+'" and '+personal_query
+                for pending in  db.smart_query(db.requestchange_activity_log,search).select():
+                    if personal_query == '':
+                        search='requestchange_activity_log.semester = "'+period.period.name+'" and requestchange_activity_log.yearp = "'+str(period.yearp)+'" and requestchange_activity_log.date_request_resolve >="'+str(period.yearp)+'-06-01" and requestchange_activity_log.date_request_resolve<="'+str(month[2])+'" and requestchange_activity_log.status != "Pending" and requestchange_activity_log.course = "'+str(project)+'" and requestchange_activity_log.roll_request = "Student" and requestchange_activity_log.user_request = "'+str(userP)+'" and requestchange_activity_log.description = "'+pending.description+'" and requestchange_activity_log.date_request = "'+str(pending.date_request)+'" and requestchange_activity_log.category_request = "'+pending.category_request+'"'
+                    else:
+                        search='requestchange_activity_log.semester = "'+period.period.name+'" and requestchange_activity_log.yearp = "'+str(period.yearp)+'" and requestchange_activity_log.date_request_resolve >="'+str(period.yearp)+'-06-01" and requestchange_activity_log.date_request_resolve<="'+str(month[2])+'" and requestchange_activity_log.status != "Pending" and requestchange_activity_log.course = "'+str(project)+'" and requestchange_activity_log.roll_request = "Student" and requestchange_activity_log.user_request = "'+str(userP)+'" and requestchange_activity_log.description = "'+pending.description+'" and requestchange_activity_log.date_request = "'+str(pending.date_request)+'" and requestchange_activity_log.category_request = "'+pending.category_request+'" and '+personal_query
+                    if db.smart_query(db.requestchange_activity_log,search).select().first() is None:
+                        grid.append(pending.id)
+            #ACCEPTED
+            if personal_query == '':
+                search='requestchange_activity_log.semester = "'+period.period.name+'" and requestchange_activity_log.yearp = "'+str(period.yearp)+'" and requestchange_activity_log.date_request_resolve >="'+str(month[1])+'" and requestchange_activity_log.date_request_resolve<="'+str(month[2])+'" and requestchange_activity_log.status = "Accepted" and requestchange_activity_log.course = "'+str(project)+'" and requestchange_activity_log.roll_request = "Student" and requestchange_activity_log.user_request = "'+str(userP)+'"'
+            else:
+                search='requestchange_activity_log.semester = "'+period.period.name+'" and requestchange_activity_log.yearp = "'+str(period.yearp)+'" and requestchange_activity_log.date_request_resolve >="'+str(month[1])+'" and requestchange_activity_log.date_request_resolve<="'+str(month[2])+'" and requestchange_activity_log.status = "Accepted" and requestchange_activity_log.course = "'+str(project)+'" and requestchange_activity_log.roll_request = "Student" and requestchange_activity_log.user_request = "'+str(userP)+'" and '+personal_query
+            for data in db.smart_query(db.requestchange_activity_log,search).select():
+                grid.append(data.id)
+            #REJECTED
+            if personal_query == '':
+                search='requestchange_activity_log.semester = "'+period.period.name+'" and requestchange_activity_log.yearp = "'+str(period.yearp)+'" and requestchange_activity_log.date_request_resolve >="'+str(month[1])+'" and requestchange_activity_log.date_request_resolve<="'+str(month[2])+'" and requestchange_activity_log.status = "Rejected" and requestchange_activity_log.course = "'+str(project)+'" and requestchange_activity_log.roll_request = "Student" and requestchange_activity_log.user_request = "'+str(userP)+'"'
+            else:
+                search='requestchange_activity_log.semester = "'+period.period.name+'" and requestchange_activity_log.yearp = "'+str(period.yearp)+'" and requestchange_activity_log.date_request_resolve >="'+str(month[1])+'" and requestchange_activity_log.date_request_resolve<="'+str(month[2])+'" and requestchange_activity_log.status = "Rejected" and requestchange_activity_log.course = "'+str(project)+'" and requestchange_activity_log.roll_request = "Student" and requestchange_activity_log.user_request = "'+str(userP)+'" and '+personal_query
+            for data in db.smart_query(db.requestchange_activity_log,search).select():
+                grid.append(data.id)
+
+        #TITLE
+        infoeLevelTemp=[]
+        infoeLevelTemp.append(T(period.period.name)+' '+str(period.yearp))
+        infoeLevelTemp.append(str(month[0]))
+        infoeLevelTemp.append(project)
+        infoeLevelTemp.append(T('Rol Student'))
+        infoeLevelTemp.append(str(userP))
+        infoLevel.append(infoeLevelTemp)
+        #REPORT
+        if len(grid) == 0:
+            grid.append(-1)
+        db.requestchange_activity_log.id.readable = False
+        db.requestchange_activity_log.id.writable = False
+        db.requestchange_activity_log.user_request.readable = False
+        db.requestchange_activity_log.user_request.writable = False
+        db.requestchange_activity_log.roll_request.readable = False
+        db.requestchange_activity_log.roll_request.writable = False
+        db.requestchange_activity_log.semester.readable = False
+        db.requestchange_activity_log.semester.writable = False
+        db.requestchange_activity_log.yearp.readable = False
+        db.requestchange_activity_log.yearp.writable = False
+        db.requestchange_activity_log.course.readable = False
+        db.requestchange_activity_log.course.writable = False
+        links = [lambda row: A(T('Detail'),
+        _role='button', 
+        _class= 'btn btn-info', 
+        _onclick='set_values("'+str(row.id)+'");', 
+        _title=T('View Detail') ,**{"_data-toggle":"modal", "_data-target": "#detailModal"})]
+        grid = SQLFORM.grid(db.requestchange_activity_log.id.belongs(grid), links=links, csv=False, create=False, editable=False, deletable=False, details=False, paginate=9, searchable=False)
+    return dict(fsearch=fsearch, filtered_by=filtered_by, personal_query=personal_query, infoLevel=infoLevel, grid=grid)
+
+
+#*************************************************************************************************************************************
+#*************************************************************************************************************************************
+#**************************************************MANAGEMENT REPORT CHANGE REQUEST GRADES********************************************
+@auth.requires_login()
+@auth.requires_membership('Super-Administrator')
+def change_request_grades_management_export():
+    #VERIFI THAT ACCURATE PARAMETERS
+    try:
+        #CHECK IF THE TYPE OF EXPORT IS VALID
+        if request.vars['list_type'] is None or str(request.vars['list_type'])!="csv":
+            session.flash = T('Not valid Action.')
+            redirect(URL('default','index'))
+
+        #CHECK THAT THE LEVEL OF REPORT IS VALID
+        if request.vars['level'] is not None and (int(request.vars['level'])<1 or int(request.vars['level'])>5):
+            session.flash = T('Report no visible: There are no parameters required to display the report.')
+            redirect(URL('default','index'))
+
+        #VERIFY THAT THE PARAMETERS OF EACH LEVEL BE VALID
+        if request.vars['level'] is not None:
+            #LEVEL MORE THAN 1
+            if int(request.vars['level'])>1:
+                #CHECK IF THE TYPE OF REPORT IS VALID
+                if request.vars['type_L'] is None or (str(request.vars['type_L'])!="all" and str(request.vars['type_L'])!="i" and str(request.vars['type_L'])!="u" and str(request.vars['type_L'])!="d" and str(request.vars['type_L'])!="p" and str(request.vars['type_L'])!="c"):
+                    session.flash = T('Report no visible: There are no parameters required to display the report.')
+                    redirect(URL('default','index'))
+
+                period = VALIDATE_PERIOD(request.vars['period'])
+                if period is None:
+                    session.flash = T('Report no visible: There are no parameters required to display the report.')
+                    redirect(URL('default','index'))
+            
+            #LEVEL MORE THAN 2
+            if int(request.vars['level'])>2:
+                #CHECK IF THE TYPE OF REPORT IS VALID
+                if request.vars['type_U'] is None or (str(request.vars['type_U'])!="all" and str(request.vars['type_U'])!="i" and str(request.vars['type_U'])!="u" and str(request.vars['type_U'])!="d" and str(request.vars['type_L'])!="p" and str(request.vars['type_L'])!="c"):
+                    session.flash = T('Report no visible: There are no parameters required to display the report.')
+                    redirect(URL('default','index'))
+
+                #CHECK IF THE MONTH IS VALID
+                month = VALIDATE_MONTH(request.vars['month'],period)
+                if month is None:
+                    session.flash = T('Report no visible: There are no parameters required to display the report.')
+                    redirect(URL('default','index'))
+            
+            #LEVEL MORE THAN 3
+            if int(request.vars['level'])>3:
+                #CHECK IF THE PROJECT IS VALID
+                project = VALIDATE_PROJECT(request.vars['project'],'request_change_g_log')
+                if project is None:
+                    session.flash = T('Report no visible: There are no parameters required to display the report.')
+                    redirect(URL('default','index'))
+
+            #LEVEL MORE THAN 4
+            if int(request.vars['level'])>4:
+                #CHECK IF THE USER IS VALID
+                userP = VALIDATE_USER(period,project,'Student',request.vars['userP'],'request_change_g_log')
+                if userP is None:
+                    session.flash = T('Report no visible: There are no parameters required to display the report.')
+                    redirect(URL('default','index'))
+    except:
+        session.flash = T('Not valid Action.')
+        redirect(URL('default','index'))
+
+    #CHECK IF THERE IS A PERSONALIZED QUERY
+    personal_query = ''
+    if request.vars['querySearch'] is not None and str(request.vars['querySearch']) != "":
+        #PERSONALIZED QUERY SURE WORK
+        try:
+            personal_query = str(request.vars['querySearch'])
+            countI = db.smart_query(db.request_change_g_log,personal_query).count()
+        except:
+            personal_query = ''
+
+    #****************************************************************************************************************
+    #****************************************************************************************************************
+    #*****************************************************REPORT*****************************************************
+    from datetime import datetime
+    #TITLE
+    infoLevel = []
+    infoeLevelTemp=[]
+    infoeLevelTemp.append('Universidad de San Carlos de Guatemala')
+    infoLevel.append(infoeLevelTemp)
+    infoeLevelTemp=[]
+    infoeLevelTemp.append('Facultad de Ingeniería')
+    infoLevel.append(infoeLevelTemp)
+    infoeLevelTemp=[]
+    infoeLevelTemp.append('Escuela de Ciencias y Sistemas')
+    infoLevel.append(infoeLevelTemp)
+    #TYPE OF REPORT
+    infoeLevelTemp=[]
+    infoeLevelTemp.append(T('Type'))
+    infoeLevelTemp.append(T('Change Request Management Grades'))
+    infoLevel.append(infoeLevelTemp)
+    #DESCRIPTION OF REPORT
+    infoeLevelTemp=[]
+    infoeLevelTemp.append(T('Description'))
+    infoeLevelTemp.append(T('Report of operations for managing change requests grades'))
+    infoLevel.append(infoeLevelTemp)
+    #LEVELS OF REPORT
+    #ALL SEMESTERS
+    if request.vars['level'] is None or str(request.vars['level'])=="1":
+        #MIDDLE LINE OF REPORT
+        infoeLevelTemp=[]
+        infoLevel.append(infoeLevelTemp)
+        #LABLE DETAIL OF REPORT
+        infoeLevelTemp=[]
+        infoeLevelTemp.append(T('Detail'))
+        infoLevel.append(infoeLevelTemp)
+        #LABELS OF DATA OF REPORT
+        infoeLevelTemp=[]
+        infoeLevelTemp.append(T('Period'))
+        infoeLevelTemp.append(T('Total Made Requests'))
+        infoeLevelTemp.append(T('Total Accepted request'))
+        infoeLevelTemp.append(T('Total Rejected request'))
+        infoeLevelTemp.append(T('Total Canceled request'))
+        infoeLevelTemp.append(T('Total Pending Requests'))
+        infoLevel.append(infoeLevelTemp)
+        for period in groupPeriods:
+            infoeLevelTemp = []
+            #NAME OF PERIOD
+            infoeLevelTemp.append(T(period.period.name)+' '+str(period.yearp))
+            #MADE
+            if personal_query == '':
+                search='request_change_g_log.semester = "'+T(period.period.name)+'" and request_change_g_log.yearp = "'+str(period.yearp)+'" and request_change_g_log.after_status = "pending"'
+            else:
+                search='request_change_g_log.semester = "'+T(period.period.name)+'" and request_change_g_log.yearp = "'+str(period.yearp)+'" and request_change_g_log.after_status = "pending" and '+personal_query
+            countI = db.smart_query(db.request_change_g_log,search).count()
+            infoeLevelTemp.append(countI)
+            #ACCEPTED
+            if personal_query == '':
+                search='request_change_g_log.semester = "'+T(period.period.name)+'" and request_change_g_log.yearp = "'+str(period.yearp)+'" and request_change_g_log.after_status = "accepted"'
+            else:
+                search='request_change_g_log.semester = "'+T(period.period.name)+'" and request_change_g_log.yearp = "'+str(period.yearp)+'" and request_change_g_log.after_status = "accepted" and '+personal_query
+            countI = db.smart_query(db.request_change_g_log,search).count()
+            infoeLevelTemp.append(countI)
+            #REJECTED
+            if personal_query == '':
+                search='request_change_g_log.semester = "'+T(period.period.name)+'" and request_change_g_log.yearp = "'+str(period.yearp)+'" and request_change_g_log.after_status = "rejected"'
+            else:
+                search='request_change_g_log.semester = "'+T(period.period.name)+'" and request_change_g_log.yearp = "'+str(period.yearp)+'" and request_change_g_log.after_status = "rejected" and '+personal_query
+            countI = db.smart_query(db.request_change_g_log,search).count()
+            infoeLevelTemp.append(countI)
+            #CANCELED
+            if personal_query == '':
+                search='request_change_g_log.semester = "'+T(period.period.name)+'" and request_change_g_log.yearp = "'+str(period.yearp)+'" and request_change_g_log.after_status = "canceled"'
+            else:
+                search='request_change_g_log.semester = "'+T(period.period.name)+'" and request_change_g_log.yearp = "'+str(period.yearp)+'" and request_change_g_log.after_status = "canceled" and '+personal_query
+            countI = db.smart_query(db.request_change_g_log,search).count()
+            infoeLevelTemp.append(countI)
+            #PENDING
+            infoeLevelTemp.append(infoeLevelTemp[2]-infoeLevelTemp[3]-infoeLevelTemp[4]-infoeLevelTemp[5])
+            #INSERT PERIOD
+            infoLevel.append(infoeLevelTemp)
+    #PER MONTH
+    elif str(request.vars['level'])=="2":
+        #PERIOD OF REPORT
+        infoeLevelTemp=[]
+        infoeLevelTemp.append(T('Period'))
+        infoeLevelTemp.append(T(period.period.name)+' '+str(period.yearp))
+        infoLevel.append(infoeLevelTemp)
+        #MIDDLE LINE OF REPORT
+        infoeLevelTemp=[]
+        infoLevel.append(infoeLevelTemp)
+        #LABLE DETAIL OF REPORT
+        infoeLevelTemp=[]
+        infoeLevelTemp.append(T('Detail'))
+        infoLevel.append(infoeLevelTemp)
+        #LABELS OF DATA OF REPORT
+        infoeLevelTemp=[]
+        infoeLevelTemp.append(T('Month'))
+        if str(request.vars['type_L'])=="all" or str(request.vars['type_L'])=="d":
+            infoeLevelTemp.append(T('Total Made Requests'))
+        if str(request.vars['type_L'])=="all" or str(request.vars['type_L'])=="i":
+            infoeLevelTemp.append(T('Total Accepted request'))
+        if str(request.vars['type_L'])=="all" or str(request.vars['type_L'])=="u":
+            infoeLevelTemp.append(T('Total Rejected request'))
+        if str(request.vars['type_L'])=="all" or str(request.vars['type_L'])=="c":
+            infoeLevelTemp.append(T('Total Canceled request'))
+        if str(request.vars['type_L'])=="all" or str(request.vars['type_L'])=="p":
+            infoeLevelTemp.append(T('Total Pending Requests'))
+        infoLevel.append(infoeLevelTemp)
+
+        for month in GET_MONTH_PERIOD(period):
+            start = datetime.strptime(str(period.yearp) + '-' + str(month[0]) +'-01', "%Y-%m-%d")
+            if month[2]==1:
+                end = datetime.strptime(str(period.yearp+1) + '-' + str(month[2]) +'-01', "%Y-%m-%d")
+            else:
+                end = datetime.strptime(str(period.yearp) + '-' + str(month[2]) +'-01', "%Y-%m-%d")
+            infoeLevelTemp = []
+            #NAME OF MONTH
+            infoeLevelTemp.append(month[1]+' '+str(period.yearp))
+            #MADE
+            if str(request.vars['type_L'])=="all" or str(request.vars['type_L'])=="d":
+                if personal_query == '':
+                    search='request_change_g_log.semester = "'+T(period.period.name)+'" and request_change_g_log.yearp = "'+str(period.yearp)+'" and request_change_g_log.date_request >="'+str(start)+'" and request_change_g_log.date_request<="'+str(end)+'" and request_change_g_log.after_status = "pending"'
+                else:
+                    search='request_change_g_log.semester = "'+T(period.period.name)+'" and request_change_g_log.yearp = "'+str(period.yearp)+'" and request_change_g_log.date_request >="'+str(start)+'" and request_change_g_log.date_request<="'+str(end)+'" and request_change_g_log.after_status = "pending" and '+personal_query
+                countI = db.smart_query(db.request_change_g_log,search).count()
+                infoeLevelTemp.append(countI)
+            #ACCEPTED
+            if str(request.vars['type_L'])=="all" or str(request.vars['type_L'])=="i":
+                if personal_query == '':
+                    search='request_change_g_log.semester = "'+T(period.period.name)+'" and request_change_g_log.yearp = "'+str(period.yearp)+'" and request_change_g_log.date_operation >="'+str(start)+'" and request_change_g_log.date_operation<="'+str(end)+'" and request_change_g_log.after_status = "accepted"'
+                else:
+                    search='request_change_g_log.semester = "'+T(period.period.name)+'" and request_change_g_log.yearp = "'+str(period.yearp)+'" and request_change_g_log.date_operation >="'+str(start)+'" and request_change_g_log.date_operation<="'+str(end)+'" and request_change_g_log.after_status = "accepted" and '+personal_query
+                countI = db.smart_query(db.request_change_g_log,search).count()
+                infoeLevelTemp.append(countI)
+            #REJECTED
+            if str(request.vars['type_L'])=="all" or str(request.vars['type_L'])=="u":
+                if personal_query == '':
+                    search='request_change_g_log.semester = "'+T(period.period.name)+'" and request_change_g_log.yearp = "'+str(period.yearp)+'" and request_change_g_log.date_operation >="'+str(start)+'" and request_change_g_log.date_operation<="'+str(end)+'" and request_change_g_log.after_status = "rejected"'
+                else:
+                    search='request_change_g_log.semester = "'+T(period.period.name)+'" and request_change_g_log.yearp = "'+str(period.yearp)+'" and request_change_g_log.date_operation >="'+str(start)+'" and request_change_g_log.date_operation<="'+str(end)+'" and request_change_g_log.after_status = "rejected" and '+personal_query
+                countI = db.smart_query(db.request_change_g_log,search).count()
+                infoeLevelTemp.append(countI)
+            ##CANCELED
+            if str(request.vars['type_L'])=="all" or str(request.vars['type_L'])=="c":
+                if personal_query == '':
+                    search='request_change_g_log.semester = "'+T(period.period.name)+'" and request_change_g_log.yearp = "'+str(period.yearp)+'" and request_change_g_log.date_operation >="'+str(start)+'" and request_change_g_log.date_operation<="'+str(end)+'" and request_change_g_log.after_status = "canceled"'
+                else:
+                    search='request_change_g_log.semester = "'+T(period.period.name)+'" and request_change_g_log.yearp = "'+str(period.yearp)+'" and request_change_g_log.date_operation >="'+str(start)+'" and request_change_g_log.date_operation<="'+str(end)+'" and request_change_g_log.after_status = "canceled" and '+personal_query
+                countI = db.smart_query(db.request_change_g_log,search).count()
+                infoeLevelTemp.append(countI)
+            #PENDING
+            if str(request.vars['type_L'])=="all" or str(request.vars['type_L'])=="p":
+                if period.period==1:
+                    if personal_query == '':
+                        search='request_change_g_log.semester = "'+T(period.period.name)+'" and request_change_g_log.yearp = "'+str(period.yearp)+'" and request_change_g_log.date_request >="'+str(period.yearp)+'-01-01" and request_change_g_log.date_request<="'+str(end)+'" and request_change_g_log.after_status = "pending"'
+                    else:
+                        search='request_change_g_log.semester = "'+T(period.period.name)+'" and request_change_g_log.yearp = "'+str(period.yearp)+'" and request_change_g_log.date_request >="'+str(period.yearp)+'-01-01" and request_change_g_log.date_request<="'+str(end)+'" and request_change_g_log.after_status = "pending" and '+personal_query
+                    countP = db.smart_query(db.request_change_g_log,search).count()
+                    if personal_query == '':
+                        search='request_change_g_log.semester = "'+T(period.period.name)+'" and request_change_g_log.yearp = "'+str(period.yearp)+'" and request_change_g_log.date_operation >="'+str(period.yearp)+'-01-01" and request_change_g_log.date_operation<="'+str(end)+'" and request_change_g_log.after_status != "pending"'
+                    else:
+                        search='request_change_g_log.semester = "'+T(period.period.name)+'" and request_change_g_log.yearp = "'+str(period.yearp)+'" and request_change_g_log.date_operation >="'+str(period.yearp)+'-01-01" and request_change_g_log.date_operation<="'+str(end)+'" and request_change_g_log.after_status != "pending" and '+personal_query
+                    countNP = db.smart_query(db.request_change_g_log,search).count()
+                else:
+                    if personal_query == '':
+                        search='request_change_g_log.semester = "'+T(period.period.name)+'" and request_change_g_log.yearp = "'+str(period.yearp)+'" and request_change_g_log.date_request >="'+str(period.yearp)+'-06-01" and request_change_g_log.date_request<="'+str(end)+'" and request_change_g_log.after_status = "pending"'
+                    else:
+                        search='request_change_g_log.semester = "'+T(period.period.name)+'" and request_change_g_log.yearp = "'+str(period.yearp)+'" and request_change_g_log.date_request >="'+str(period.yearp)+'-06-01" and request_change_g_log.date_request<="'+str(end)+'" and request_change_g_log.after_status = "pending" and '+personal_query
+                    countP = db.smart_query(db.request_change_g_log,search).count()
+                    if personal_query == '':
+                        search='request_change_g_log.semester = "'+T(period.period.name)+'" and request_change_g_log.yearp = "'+str(period.yearp)+'" and request_change_g_log.date_operation >="'+str(period.yearp)+'-06-01" and request_change_g_log.date_operation<="'+str(end)+'" and request_change_g_log.after_status != "pending"'
+                    else:
+                        search='request_change_g_log.semester = "'+T(period.period.name)+'" and request_change_g_log.yearp = "'+str(period.yearp)+'" and request_change_g_log.date_operation >="'+str(period.yearp)+'-06-01" and request_change_g_log.date_operation<="'+str(end)+'" and request_change_g_log.after_status != "pending" and '+personal_query
+                    countNP = db.smart_query(db.request_change_g_log,search).count()
+                infoeLevelTemp.append(countP-countNP)
+            #INSERT MONTH
+            infoLevel.append(infoeLevelTemp)
+    #PER PROJECT
+    elif str(request.vars['level'])=="3":
+        #PROJECTS
+        projects = GET_PROJECTS('requestchange_activity_log')
+        projects=sorted(projects)
+        #PERIOD OF REPORT
+        infoeLevelTemp=[]
+        infoeLevelTemp.append(T('Period'))
+        infoeLevelTemp.append(T(period.period.name)+' '+str(period.yearp))
+        infoLevel.append(infoeLevelTemp)
+        #MONTH OF REPORT
+        infoeLevelTemp=[]
+        infoeLevelTemp.append(T('Month'))
+        infoeLevelTemp.append(str(month[0]))
+        infoLevel.append(infoeLevelTemp)
+        #MIDDLE LINE OF REPORT
+        infoeLevelTemp=[]
+        infoLevel.append(infoeLevelTemp)
+        #LABLE DETAIL OF REPORT
+        infoeLevelTemp=[]
+        infoeLevelTemp.append(T('Detail'))
+        infoLevel.append(infoeLevelTemp)
+        #LABELS OF DATA OF REPORT
+        infoeLevelTemp=[]
+        infoeLevelTemp.append(T('Project'))
+        if str(request.vars['type_L'])=="all" or str(request.vars['type_L'])=="d":
+            infoeLevelTemp.append(T('Total Made Requests'))
+        if str(request.vars['type_L'])=="all" or str(request.vars['type_L'])=="i":
+            infoeLevelTemp.append(T('Total Accepted request'))
+        if str(request.vars['type_L'])=="all" or str(request.vars['type_L'])=="u":
+            infoeLevelTemp.append(T('Total Rejected request'))
+        if str(request.vars['type_L'])=="all" or str(request.vars['type_L'])=="c":
+            infoeLevelTemp.append(T('Total Canceled request'))
+        if str(request.vars['type_L'])=="all" or str(request.vars['type_L'])=="p":
+            infoeLevelTemp.append(T('Total Pending Requests'))
+        infoLevel.append(infoeLevelTemp)
+
+        for projectT in projects:
+            project=db(db.project.name==projectT).select().first()
+            if project is None:
+                project=db((db.course_activity_log.before_course==projectT)|(db.course_activity_log.after_course==projectT)).select().first()
+                if project.before_course is not None:
+                    project=project.before_course
+                else:
+                    project=project.after_course
+            else:
+                project=project.name
+            infoeLevelTemp = []
+            #NAME OF PROJECT
+            infoeLevelTemp.append(project)
+            #MADE
+            if str(request.vars['type_L'])=="all" or str(request.vars['type_L'])=="d":
+                if personal_query == '':
+                    search='request_change_g_log.semester = "'+T(period.period.name)+'" and request_change_g_log.yearp = "'+str(period.yearp)+'" and request_change_g_log.date_request >="'+str(month[1])+'" and request_change_g_log.date_request<="'+str(month[2])+'" and request_change_g_log.project = "'+str(project)+'" and request_change_g_log.after_status = "pending"'
+                else:
+                    search='request_change_g_log.semester = "'+T(period.period.name)+'" and request_change_g_log.yearp = "'+str(period.yearp)+'" and request_change_g_log.date_request >="'+str(month[1])+'" and request_change_g_log.date_request<="'+str(month[2])+'" and request_change_g_log.project = "'+str(project)+'" and request_change_g_log.after_status = "pending" and '+personal_query
+                countI = db.smart_query(db.request_change_g_log,search).count()
+                infoeLevelTemp.append(countI)
+            #ACCEPTED
+            if str(request.vars['type_L'])=="all" or str(request.vars['type_L'])=="i":
+                if personal_query == '':
+                    search='request_change_g_log.semester = "'+T(period.period.name)+'" and request_change_g_log.yearp = "'+str(period.yearp)+'" and request_change_g_log.date_operation >="'+str(month[1])+'" and request_change_g_log.date_operation<="'+str(month[2])+'" and request_change_g_log.project = "'+str(project)+'" and request_change_g_log.after_status = "accepted"'
+                else:
+                    search='request_change_g_log.semester = "'+T(period.period.name)+'" and request_change_g_log.yearp = "'+str(period.yearp)+'" and request_change_g_log.date_operation >="'+str(month[1])+'" and request_change_g_log.date_operation<="'+str(month[2])+'" and request_change_g_log.project = "'+str(project)+'" and request_change_g_log.after_status = "accepted" and '+personal_query
+                countI = db.smart_query(db.request_change_g_log,search).count()
+                infoeLevelTemp.append(countI)
+            #REJECTED
+            if str(request.vars['type_L'])=="all" or str(request.vars['type_L'])=="u":
+                if personal_query == '':
+                    search='request_change_g_log.semester = "'+T(period.period.name)+'" and request_change_g_log.yearp = "'+str(period.yearp)+'" and request_change_g_log.date_operation >="'+str(month[1])+'" and request_change_g_log.date_operation<="'+str(month[2])+'" and request_change_g_log.project = "'+str(project)+'" and request_change_g_log.after_status = "rejected"'
+                else:
+                    search='request_change_g_log.semester = "'+T(period.period.name)+'" and request_change_g_log.yearp = "'+str(period.yearp)+'" and request_change_g_log.date_operation >="'+str(month[1])+'" and request_change_g_log.date_operation<="'+str(month[2])+'" and request_change_g_log.project = "'+str(project)+'" and request_change_g_log.after_status = "rejected" and '+personal_query
+                countI = db.smart_query(db.request_change_g_log,search).count()
+                infoeLevelTemp.append(countI)
+            ##CANCELED
+            if str(request.vars['type_L'])=="all" or str(request.vars['type_L'])=="c":
+                if personal_query == '':
+                    search='request_change_g_log.semester = "'+T(period.period.name)+'" and request_change_g_log.yearp = "'+str(period.yearp)+'" and request_change_g_log.date_operation >="'+str(month[1])+'" and request_change_g_log.date_operation<="'+str(month[2])+'" and request_change_g_log.project = "'+str(project)+'" and request_change_g_log.after_status = "canceled"'
+                else:
+                    search='request_change_g_log.semester = "'+T(period.period.name)+'" and request_change_g_log.yearp = "'+str(period.yearp)+'" and request_change_g_log.date_operation >="'+str(month[1])+'" and request_change_g_log.date_operation<="'+str(month[2])+'" and request_change_g_log.project = "'+str(project)+'" and request_change_g_log.after_status = "canceled" and '+personal_query
+                countI = db.smart_query(db.request_change_g_log,search).count()
+                infoeLevelTemp.append(countI)
+            #PENDING
+            if str(request.vars['type_L'])=="all" or str(request.vars['type_L'])=="p":
+                if period.period==1:
+                    if personal_query == '':
+                        search='request_change_g_log.semester = "'+T(period.period.name)+'" and request_change_g_log.yearp = "'+str(period.yearp)+'" and request_change_g_log.date_request >="'+str(period.yearp)+'-01-01" and request_change_g_log.date_request<="'+str(month[2])+'" and request_change_g_log.project = "'+str(project)+'" and request_change_g_log.after_status = "pending"'
+                    else:
+                        search='request_change_g_log.semester = "'+T(period.period.name)+'" and request_change_g_log.yearp = "'+str(period.yearp)+'" and request_change_g_log.date_request >="'+str(period.yearp)+'-01-01" and request_change_g_log.date_request<="'+str(month[2])+'" and request_change_g_log.project = "'+str(project)+'" and request_change_g_log.after_status = "pending" and '+personal_query
+                    countP = db.smart_query(db.request_change_g_log,search).count()
+                    if personal_query == '':
+                        search='request_change_g_log.semester = "'+T(period.period.name)+'" and request_change_g_log.yearp = "'+str(period.yearp)+'" and request_change_g_log.date_operation >="'+str(period.yearp)+'-01-01" and request_change_g_log.date_operation<="'+str(month[2])+'" and request_change_g_log.project = "'+str(project)+'" and request_change_g_log.after_status != "pending"'
+                    else:
+                        search='request_change_g_log.semester = "'+T(period.period.name)+'" and request_change_g_log.yearp = "'+str(period.yearp)+'" and request_change_g_log.date_operation >="'+str(period.yearp)+'-01-01" and request_change_g_log.date_operation<="'+str(month[2])+'" and request_change_g_log.project = "'+str(project)+'" and request_change_g_log.after_status != "pending" and '+personal_query
+                    countNP = db.smart_query(db.request_change_g_log,search).count()
+                else:
+                    if personal_query == '':
+                        search='request_change_g_log.semester = "'+T(period.period.name)+'" and request_change_g_log.yearp = "'+str(period.yearp)+'" and request_change_g_log.date_request >="'+str(period.yearp)+'-06-01" and request_change_g_log.date_request<="'+str(month[2])+'" and request_change_g_log.project = "'+str(project)+'" and request_change_g_log.after_status = "pending"'
+                    else:
+                        search='request_change_g_log.semester = "'+T(period.period.name)+'" and request_change_g_log.yearp = "'+str(period.yearp)+'" and request_change_g_log.date_request >="'+str(period.yearp)+'-06-01" and request_change_g_log.date_request<="'+str(month[2])+'" and request_change_g_log.project = "'+str(project)+'" and request_change_g_log.after_status = "pending" and '+personal_query
+                    countP = db.smart_query(db.request_change_g_log,search).count()
+                    if personal_query == '':
+                        search='request_change_g_log.semester = "'+T(period.period.name)+'" and request_change_g_log.yearp = "'+str(period.yearp)+'" and request_change_g_log.date_operation >="'+str(period.yearp)+'-06-01" and request_change_g_log.date_operation<="'+str(month[2])+'" and request_change_g_log.project = "'+str(project)+'" and request_change_g_log.after_status != "pending"'
+                    else:
+                        search='request_change_g_log.semester = "'+T(period.period.name)+'" and request_change_g_log.yearp = "'+str(period.yearp)+'" and request_change_g_log.date_operation >="'+str(period.yearp)+'-06-01" and request_change_g_log.date_operation<="'+str(month[2])+'" and request_change_g_log.project = "'+str(project)+'" and request_change_g_log.after_status != "pending" and '+personal_query
+                    countNP = db.smart_query(db.request_change_g_log,search).count()
+                infoeLevelTemp.append(countP-countNP)
+            #INSERT PROJECT
+            infoLevel.append(infoeLevelTemp)
+    #PER USER
+    elif str(request.vars['level'])=="4":
+        #USERS
+        usersProject = GET_USERS(period,project,'Student','requestchange_activity_log')
+        #PERIOD OF REPORT
+        infoeLevelTemp=[]
+        infoeLevelTemp.append(T('Period'))
+        infoeLevelTemp.append(T(period.period.name)+' '+str(period.yearp))
+        infoLevel.append(infoeLevelTemp)
+        #MONTH OF REPORT
+        infoeLevelTemp=[]
+        infoeLevelTemp.append(T('Month'))
+        infoeLevelTemp.append(str(month[0]))
+        infoLevel.append(infoeLevelTemp)
+        #PROJECT OF REPORT
+        infoeLevelTemp=[]
+        infoeLevelTemp.append(T('Project'))
+        infoeLevelTemp.append(str(project))
+        infoLevel.append(infoeLevelTemp)
+        #ROL OF REPORT
+        infoeLevelTemp=[]
+        infoeLevelTemp.append(T('Role'))
+        infoeLevelTemp.append(T('Rol Student'))
+        infoLevel.append(infoeLevelTemp)
+        #MIDDLE LINE OF REPORT
+        infoeLevelTemp=[]
+        infoLevel.append(infoeLevelTemp)
+        #LABLE DETAIL OF REPORT
+        infoeLevelTemp=[]
+        infoeLevelTemp.append(T('Detail'))
+        infoLevel.append(infoeLevelTemp)
+        #LABELS OF DATA OF REPORT
+        infoeLevelTemp=[]
+        infoeLevelTemp.append(T('User'))
+        if str(request.vars['type_L'])=="all" or str(request.vars['type_L'])=="d":
+            infoeLevelTemp.append(T('Total Made Requests'))
+        if str(request.vars['type_L'])=="all" or str(request.vars['type_L'])=="i":
+            infoeLevelTemp.append(T('Total Accepted request'))
+        if str(request.vars['type_L'])=="all" or str(request.vars['type_L'])=="u":
+            infoeLevelTemp.append(T('Total Rejected request'))
+        if str(request.vars['type_L'])=="all" or str(request.vars['type_L'])=="c":
+            infoeLevelTemp.append(T('Total Canceled request'))
+        if str(request.vars['type_L'])=="all" or str(request.vars['type_L'])=="p":
+            infoeLevelTemp.append(T('Total Pending Requests'))
+        infoLevel.append(infoeLevelTemp)
+
+        for userPT in usersProject:
+            userP=db(db.auth_user.username==userPT).select().first()
+            if userP is None:
+                userP=db(db.request_change_g_log.user_request==userPT).select().first()
+                userP=userP.user_request
+            else:
+                userP=userP.username
+            infoeLevelTemp = []
+            #NAME OF USER
+            infoeLevelTemp.append(userP)
+            #MADE
+            if str(request.vars['type_L'])=="all" or str(request.vars['type_L'])=="d":
+                if personal_query == '':
+                    search='request_change_g_log.semester = "'+T(period.period.name)+'" and request_change_g_log.yearp = "'+str(period.yearp)+'" and request_change_g_log.date_request >="'+str(month[1])+'" and request_change_g_log.date_request<="'+str(month[2])+'" and request_change_g_log.project = "'+str(project)+'" and request_change_g_log.roll = "Student" and request_change_g_log.username = "'+str(userP)+'" and request_change_g_log.after_status = "pending"'
+                else:
+                    search='request_change_g_log.semester = "'+T(period.period.name)+'" and request_change_g_log.yearp = "'+str(period.yearp)+'" and request_change_g_log.date_request >="'+str(month[1])+'" and request_change_g_log.date_request<="'+str(month[2])+'" and request_change_g_log.project = "'+str(project)+'" and request_change_g_log.roll = "Student" and request_change_g_log.username = "'+str(userP)+'" and request_change_g_log.after_status = "pending" and '+personal_query
+                countI = db.smart_query(db.request_change_g_log,search).count()
+                infoeLevelTemp.append(countI)
+            #ACCEPTED
+            if str(request.vars['type_L'])=="all" or str(request.vars['type_L'])=="i":
+                if personal_query == '':
+                    search='request_change_g_log.semester = "'+T(period.period.name)+'" and request_change_g_log.yearp = "'+str(period.yearp)+'" and request_change_g_log.date_operation >="'+str(month[1])+'" and request_change_g_log.date_operation<="'+str(month[2])+'" and request_change_g_log.project = "'+str(project)+'" and request_change_g_log.roll = "Student" and request_change_g_log.username = "'+str(userP)+'" and request_change_g_log.after_status = "accepted"'
+                else:
+                    search='request_change_g_log.semester = "'+T(period.period.name)+'" and request_change_g_log.yearp = "'+str(period.yearp)+'" and request_change_g_log.date_operation >="'+str(month[1])+'" and request_change_g_log.date_operation<="'+str(month[2])+'" and request_change_g_log.project = "'+str(project)+'" and request_change_g_log.roll = "Student" and request_change_g_log.username = "'+str(userP)+'" and request_change_g_log.after_status = "accepted" and '+personal_query
+                countI = db.smart_query(db.request_change_g_log,search).count()
+                infoeLevelTemp.append(countI)
+            #REJECTED
+            if str(request.vars['type_L'])=="all" or str(request.vars['type_L'])=="u":
+                if personal_query == '':
+                    search='request_change_g_log.semester = "'+T(period.period.name)+'" and request_change_g_log.yearp = "'+str(period.yearp)+'" and request_change_g_log.date_operation >="'+str(month[1])+'" and request_change_g_log.date_operation<="'+str(month[2])+'" and request_change_g_log.project = "'+str(project)+'" and request_change_g_log.roll = "Student" and request_change_g_log.username = "'+str(userP)+'" and request_change_g_log.after_status = "rejected"'
+                else:
+                    search='request_change_g_log.semester = "'+T(period.period.name)+'" and request_change_g_log.yearp = "'+str(period.yearp)+'" and request_change_g_log.date_operation >="'+str(month[1])+'" and request_change_g_log.date_operation<="'+str(month[2])+'" and request_change_g_log.project = "'+str(project)+'" and request_change_g_log.roll = "Student" and request_change_g_log.username = "'+str(userP)+'" and request_change_g_log.after_status = "rejected" and '+personal_query
+                countI = db.smart_query(db.request_change_g_log,search).count()
+                infoeLevelTemp.append(countI)
+            ##CANCELED
+            if str(request.vars['type_L'])=="all" or str(request.vars['type_L'])=="c":
+                if personal_query == '':
+                    search='request_change_g_log.semester = "'+T(period.period.name)+'" and request_change_g_log.yearp = "'+str(period.yearp)+'" and request_change_g_log.date_operation >="'+str(month[1])+'" and request_change_g_log.date_operation<="'+str(month[2])+'" and request_change_g_log.project = "'+str(project)+'" and request_change_g_log.roll = "Student" and request_change_g_log.username = "'+str(userP)+'" and request_change_g_log.after_status = "canceled"'
+                else:
+                    search='request_change_g_log.semester = "'+T(period.period.name)+'" and request_change_g_log.yearp = "'+str(period.yearp)+'" and request_change_g_log.date_operation >="'+str(month[1])+'" and request_change_g_log.date_operation<="'+str(month[2])+'" and request_change_g_log.project = "'+str(project)+'" and request_change_g_log.roll = "Student" and request_change_g_log.username = "'+str(userP)+'" and request_change_g_log.after_status = "canceled" and '+personal_query
+                countI = db.smart_query(db.request_change_g_log,search).count()
+                infoeLevelTemp.append(countI)
+            #PENDING
+            if str(request.vars['type_L'])=="all" or str(request.vars['type_L'])=="p":
+                if period.period==1:
+                    if personal_query == '':
+                        search='request_change_g_log.semester = "'+T(period.period.name)+'" and request_change_g_log.yearp = "'+str(period.yearp)+'" and request_change_g_log.date_request >="'+str(period.yearp)+'-01-01" and request_change_g_log.date_request<="'+str(month[2])+'" and request_change_g_log.project = "'+str(project)+'" and request_change_g_log.roll = "Student" and request_change_g_log.username = "'+str(userP)+'" and request_change_g_log.after_status = "pending"'
+                    else:
+                        search='request_change_g_log.semester = "'+T(period.period.name)+'" and request_change_g_log.yearp = "'+str(period.yearp)+'" and request_change_g_log.date_request >="'+str(period.yearp)+'-01-01" and request_change_g_log.date_request<="'+str(month[2])+'" and request_change_g_log.project = "'+str(project)+'" and request_change_g_log.roll = "Student" and request_change_g_log.username = "'+str(userP)+'" and request_change_g_log.after_status = "pending" and '+personal_query
+                    countP = db.smart_query(db.request_change_g_log,search).count()
+                    if personal_query == '':
+                        search='request_change_g_log.semester = "'+T(period.period.name)+'" and request_change_g_log.yearp = "'+str(period.yearp)+'" and request_change_g_log.date_operation >="'+str(period.yearp)+'-01-01" and request_change_g_log.date_operation<="'+str(month[2])+'" and request_change_g_log.project = "'+str(project)+'" and request_change_g_log.roll = "Student" and request_change_g_log.username = "'+str(userP)+'" and request_change_g_log.after_status != "pending"'
+                    else:
+                        search='request_change_g_log.semester = "'+T(period.period.name)+'" and request_change_g_log.yearp = "'+str(period.yearp)+'" and request_change_g_log.date_operation >="'+str(period.yearp)+'-01-01" and request_change_g_log.date_operation<="'+str(month[2])+'" and request_change_g_log.project = "'+str(project)+'" and request_change_g_log.roll = "Student" and request_change_g_log.username = "'+str(userP)+'" and request_change_g_log.after_status != "pending" and '+personal_query
+                    countNP = db.smart_query(db.request_change_g_log,search).count()
+                else:
+                    if personal_query == '':
+                        search='request_change_g_log.semester = "'+T(period.period.name)+'" and request_change_g_log.yearp = "'+str(period.yearp)+'" and request_change_g_log.date_request >="'+str(period.yearp)+'-06-01" and request_change_g_log.date_request<="'+str(month[2])+'" and request_change_g_log.project = "'+str(project)+'" and request_change_g_log.roll = "Student" and request_change_g_log.username = "'+str(userP)+'" and request_change_g_log.after_status = "pending"'
+                    else:
+                        search='request_change_g_log.semester = "'+T(period.period.name)+'" and request_change_g_log.yearp = "'+str(period.yearp)+'" and request_change_g_log.date_request >="'+str(period.yearp)+'-06-01" and request_change_g_log.date_request<="'+str(month[2])+'" and request_change_g_log.project = "'+str(project)+'" and request_change_g_log.roll = "Student" and request_change_g_log.username = "'+str(userP)+'" and request_change_g_log.after_status = "pending" and '+personal_query
+                    countP = db.smart_query(db.request_change_g_log,search).count()
+                    if personal_query == '':
+                        search='request_change_g_log.semester = "'+T(period.period.name)+'" and request_change_g_log.yearp = "'+str(period.yearp)+'" and request_change_g_log.date_operation >="'+str(period.yearp)+'-06-01" and request_change_g_log.date_operation<="'+str(month[2])+'" and request_change_g_log.project = "'+str(project)+'" and request_change_g_log.roll = "Student" and request_change_g_log.username = "'+str(userP)+'" and request_change_g_log.after_status != "pending"'
+                    else:
+                        search='request_change_g_log.semester = "'+T(period.period.name)+'" and request_change_g_log.yearp = "'+str(period.yearp)+'" and request_change_g_log.date_operation >="'+str(period.yearp)+'-06-01" and request_change_g_log.date_operation<="'+str(month[2])+'" and request_change_g_log.project = "'+str(project)+'" and request_change_g_log.roll = "Student" and request_change_g_log.username = "'+str(userP)+'" and request_change_g_log.after_status != "pending" and '+personal_query
+                    countNP = db.smart_query(db.request_change_g_log,search).count()
+                infoeLevelTemp.append(countP-countNP)
+            #INSERT USER
+            infoLevel.append(infoeLevelTemp)
+    #DATA
+    elif str(request.vars['level'])=="5":
+        #PERIOD
+        infoeLevelTemp=[]
+        infoeLevelTemp.append(T('Period'))
+        infoeLevelTemp.append(T(period.period.name)+' '+str(period.yearp))
+        infoLevel.append(infoeLevelTemp)
+        #MONTH
+        infoeLevelTemp=[]
+        infoeLevelTemp.append(T('Month'))
+        infoeLevelTemp.append(str(month[0]))
+        infoLevel.append(infoeLevelTemp)
+        #PROJECT
+        infoeLevelTemp=[]
+        infoeLevelTemp.append(T('Project'))
+        infoeLevelTemp.append(str(project))
+        infoLevel.append(infoeLevelTemp)
+        #ROL
+        infoeLevelTemp=[]
+        infoeLevelTemp.append(T('Role'))
+        infoeLevelTemp.append(T('Rol Student'))
+        infoLevel.append(infoeLevelTemp)
+        #USER
+        infoeLevelTemp=[]
+        infoeLevelTemp.append(T('User'))
+        infoeLevelTemp.append(str(userP))
+        infoLevel.append(infoeLevelTemp)
+        #MIDDLE LINE
+        infoeLevelTemp=[]
+        infoeLevelTemp.append('')
+        infoLevel.append(infoeLevelTemp)
+        #DETAIL
+        infoeLevelTemp=[]
+        infoeLevelTemp.append(T('Detail'))
+        infoLevel.append(infoeLevelTemp)
+        #TITLE OF TABLE
+        infoeLevelTemp=[]
+        infoeLevelTemp.append('Estado')
+        infoeLevelTemp.append('Estado')
+        infoeLevelTemp.append('Usuario Resolvio')
+        infoeLevelTemp.append('Rol Resolvio')
+        infoeLevelTemp.append('Descripción')
+        infoeLevelTemp.append('Descripción LOG')
+        infoeLevelTemp.append('Fecha')
+        infoeLevelTemp.append('Fecha Solicitud')
+        infoeLevelTemp.append('Fecha Resolvio')
+        infoeLevelTemp.append('Actividad')
+        infoeLevelTemp.append('Categoria')
+        infoLevel.append(infoeLevelTemp)
+
+        #MADE
+        if str(request.vars['type_L'])=="d":
+            if personal_query == '':
+                search='request_change_g_log.semester = "'+T(period.period.name)+'" and request_change_g_log.yearp = "'+str(period.yearp)+'" and request_change_g_log.date_request >="'+str(month[1])+'" and request_change_g_log.date_request<="'+str(month[2])+'" and request_change_g_log.project = "'+str(project)+'" and request_change_g_log.roll = "Student" and request_change_g_log.username = "'+str(userP)+'" and request_change_g_log.after_status = "pending"'
+            else:
+                search='request_change_g_log.semester = "'+T(period.period.name)+'" and request_change_g_log.yearp = "'+str(period.yearp)+'" and request_change_g_log.date_request >="'+str(month[1])+'" and request_change_g_log.date_request<="'+str(month[2])+'" and request_change_g_log.project = "'+str(project)+'" and request_change_g_log.roll = "Student" and request_change_g_log.username = "'+str(userP)+'" and request_change_g_log.after_status = "pending" and '+personal_query
+            for data in db.smart_query(db.request_change_g_log,search).select():
+                infoeLevelTemp=[]
+                infoeLevelTemp.append(data.before_status)
+                infoeLevelTemp.append(data.after_status)
+                infoeLevelTemp.append(data.resolve_user)
+                infoeLevelTemp.append(data.roll_resolve)
+                infoeLevelTemp.append(data.description)
+                infoeLevelTemp.append(data.description_log)
+                infoeLevelTemp.append(data.date_operation)
+                infoeLevelTemp.append(data.date_request)
+                infoeLevelTemp.append(data.date_request_resolve)
+                infoeLevelTemp.append(data.activity)
+                infoeLevelTemp.append(data.category)
+                infoLevel.append(infoeLevelTemp)
+                infoeLevelTemp=[]
+                infoeLevelTemp.append('')
+                infoeLevelTemp.append('')
+                infoeLevelTemp.append(T('Operation'))
+                infoeLevelTemp.append(T('Academic'))
+                infoeLevelTemp.append(T('Before Grade'))
+                infoeLevelTemp.append(T('After Grade'))
+                infoLevel.append(infoeLevelTemp)
+                for details in db(db.request_change_grade_d_log.request_change_g_log==data.id).select():
+                    infoeLevelTemp=[]
+                    infoeLevelTemp.append('')
+                    infoeLevelTemp.append('')
+                    infoeLevelTemp.append(details.operation_request)
+                    infoeLevelTemp.append(details.academic)
+                    infoeLevelTemp.append(details.before_grade)
+                    infoeLevelTemp.append(details.after_grade)
+                    infoLevel.append(infoeLevelTemp)
+                infoeLevelTemp=[]
+                infoeLevelTemp.append('')
+                infoLevel.append(infoeLevelTemp)
+        #ACCEPTED
+        elif str(request.vars['type_L'])=="i":
+            if personal_query == '':
+                search='request_change_g_log.semester = "'+T(period.period.name)+'" and request_change_g_log.yearp = "'+str(period.yearp)+'" and request_change_g_log.date_operation >="'+str(month[1])+'" and request_change_g_log.date_operation<="'+str(month[2])+'" and request_change_g_log.project = "'+str(project)+'" and request_change_g_log.roll = "Student" and request_change_g_log.username = "'+str(userP)+'" and request_change_g_log.after_status = "accepted"'
+            else:
+                search='request_change_g_log.semester = "'+T(period.period.name)+'" and request_change_g_log.yearp = "'+str(period.yearp)+'" and request_change_g_log.date_operation >="'+str(month[1])+'" and request_change_g_log.date_operation<="'+str(month[2])+'" and request_change_g_log.project = "'+str(project)+'" and request_change_g_log.roll = "Student" and request_change_g_log.username = "'+str(userP)+'" and request_change_g_log.after_status = "accepted" and '+personal_query
+            for data in db.smart_query(db.request_change_g_log,search).select():
+                infoeLevelTemp=[]
+                infoeLevelTemp.append(data.before_status)
+                infoeLevelTemp.append(data.after_status)
+                infoeLevelTemp.append(data.resolve_user)
+                infoeLevelTemp.append(data.roll_resolve)
+                infoeLevelTemp.append(data.description)
+                infoeLevelTemp.append(data.description_log)
+                infoeLevelTemp.append(data.date_operation)
+                infoeLevelTemp.append(data.date_request)
+                infoeLevelTemp.append(data.date_request_resolve)
+                infoeLevelTemp.append(data.activity)
+                infoeLevelTemp.append(data.category)
+                infoLevel.append(infoeLevelTemp)
+                infoeLevelTemp=[]
+                infoeLevelTemp.append('')
+                infoeLevelTemp.append('')
+                infoeLevelTemp.append(T('Operation'))
+                infoeLevelTemp.append(T('Academic'))
+                infoeLevelTemp.append(T('Before Grade'))
+                infoeLevelTemp.append(T('After Grade'))
+                infoLevel.append(infoeLevelTemp)
+                for details in db(db.request_change_grade_d_log.request_change_g_log==data.id).select():
+                    infoeLevelTemp=[]
+                    infoeLevelTemp.append('')
+                    infoeLevelTemp.append('')
+                    infoeLevelTemp.append(details.operation_request)
+                    infoeLevelTemp.append(details.academic)
+                    infoeLevelTemp.append(details.before_grade)
+                    infoeLevelTemp.append(details.after_grade)
+                    infoLevel.append(infoeLevelTemp)
+                infoeLevelTemp=[]
+                infoeLevelTemp.append('')
+                infoLevel.append(infoeLevelTemp)
+        #REJECTED
+        elif str(request.vars['type_L'])=="u":
+            if personal_query == '':
+                search='request_change_g_log.semester = "'+T(period.period.name)+'" and request_change_g_log.yearp = "'+str(period.yearp)+'" and request_change_g_log.date_operation >="'+str(month[1])+'" and request_change_g_log.date_operation<="'+str(month[2])+'" and request_change_g_log.project = "'+str(project)+'" and request_change_g_log.roll = "Student" and request_change_g_log.username = "'+str(userP)+'" and request_change_g_log.after_status = "rejected"'
+            else:
+                search='request_change_g_log.semester = "'+T(period.period.name)+'" and request_change_g_log.yearp = "'+str(period.yearp)+'" and request_change_g_log.date_operation >="'+str(month[1])+'" and request_change_g_log.date_operation<="'+str(month[2])+'" and request_change_g_log.project = "'+str(project)+'" and request_change_g_log.roll = "Student" and request_change_g_log.username = "'+str(userP)+'" and request_change_g_log.after_status = "rejected" and '+personal_query
+            for data in db.smart_query(db.request_change_g_log,search).select():
+                infoeLevelTemp=[]
+                infoeLevelTemp.append(data.before_status)
+                infoeLevelTemp.append(data.after_status)
+                infoeLevelTemp.append(data.resolve_user)
+                infoeLevelTemp.append(data.roll_resolve)
+                infoeLevelTemp.append(data.description)
+                infoeLevelTemp.append(data.description_log)
+                infoeLevelTemp.append(data.date_operation)
+                infoeLevelTemp.append(data.date_request)
+                infoeLevelTemp.append(data.date_request_resolve)
+                infoeLevelTemp.append(data.activity)
+                infoeLevelTemp.append(data.category)
+                infoLevel.append(infoeLevelTemp)
+                infoeLevelTemp=[]
+                infoeLevelTemp.append('')
+                infoeLevelTemp.append('')
+                infoeLevelTemp.append(T('Operation'))
+                infoeLevelTemp.append(T('Academic'))
+                infoeLevelTemp.append(T('Before Grade'))
+                infoeLevelTemp.append(T('After Grade'))
+                infoLevel.append(infoeLevelTemp)
+                for details in db(db.request_change_grade_d_log.request_change_g_log==data.id).select():
+                    infoeLevelTemp=[]
+                    infoeLevelTemp.append('')
+                    infoeLevelTemp.append('')
+                    infoeLevelTemp.append(details.operation_request)
+                    infoeLevelTemp.append(details.academic)
+                    infoeLevelTemp.append(details.before_grade)
+                    infoeLevelTemp.append(details.after_grade)
+                    infoLevel.append(infoeLevelTemp)
+                infoeLevelTemp=[]
+                infoeLevelTemp.append('')
+                infoLevel.append(infoeLevelTemp)
+        ##CANCELED
+        elif str(request.vars['type_L'])=="c":
+            if personal_query == '':
+                search='request_change_g_log.semester = "'+T(period.period.name)+'" and request_change_g_log.yearp = "'+str(period.yearp)+'" and request_change_g_log.date_operation >="'+str(month[1])+'" and request_change_g_log.date_operation<="'+str(month[2])+'" and request_change_g_log.project = "'+str(project)+'" and request_change_g_log.roll = "Student" and request_change_g_log.username = "'+str(userP)+'" and request_change_g_log.after_status = "canceled"'
+            else:
+                search='request_change_g_log.semester = "'+T(period.period.name)+'" and request_change_g_log.yearp = "'+str(period.yearp)+'" and request_change_g_log.date_operation >="'+str(month[1])+'" and request_change_g_log.date_operation<="'+str(month[2])+'" and request_change_g_log.project = "'+str(project)+'" and request_change_g_log.roll = "Student" and request_change_g_log.username = "'+str(userP)+'" and request_change_g_log.after_status = "canceled" and '+personal_query
+            for data in db.smart_query(db.request_change_g_log,search).select():
+                infoeLevelTemp=[]
+                infoeLevelTemp.append(data.before_status)
+                infoeLevelTemp.append(data.after_status)
+                infoeLevelTemp.append(data.resolve_user)
+                infoeLevelTemp.append(data.roll_resolve)
+                infoeLevelTemp.append(data.description)
+                infoeLevelTemp.append(data.description_log)
+                infoeLevelTemp.append(data.date_operation)
+                infoeLevelTemp.append(data.date_request)
+                infoeLevelTemp.append(data.date_request_resolve)
+                infoeLevelTemp.append(data.activity)
+                infoeLevelTemp.append(data.category)
+                infoLevel.append(infoeLevelTemp)
+                infoeLevelTemp=[]
+                infoeLevelTemp.append('')
+                infoeLevelTemp.append('')
+                infoeLevelTemp.append(T('Operation'))
+                infoeLevelTemp.append(T('Academic'))
+                infoeLevelTemp.append(T('Before Grade'))
+                infoeLevelTemp.append(T('After Grade'))
+                infoLevel.append(infoeLevelTemp)
+                for details in db(db.request_change_grade_d_log.request_change_g_log==data.id).select():
+                    infoeLevelTemp=[]
+                    infoeLevelTemp.append('')
+                    infoeLevelTemp.append('')
+                    infoeLevelTemp.append(details.operation_request)
+                    infoeLevelTemp.append(details.academic)
+                    infoeLevelTemp.append(details.before_grade)
+                    infoeLevelTemp.append(details.after_grade)
+                    infoLevel.append(infoeLevelTemp)
+                infoeLevelTemp=[]
+                infoeLevelTemp.append('')
+                infoLevel.append(infoeLevelTemp)
+        #PENDING
+        elif str(request.vars['type_L'])=="p":
+            if period.period==1:
+                if personal_query == '':
+                    search='request_change_g_log.semester = "'+T(period.period.name)+'" and request_change_g_log.yearp = "'+str(period.yearp)+'" and request_change_g_log.date_request >="'+str(period.yearp)+'-01-01" and request_change_g_log.date_request<="'+str(month[2])+'" and request_change_g_log.project = "'+str(project)+'" and request_change_g_log.roll = "Student" and request_change_g_log.username = "'+str(userP)+'" and request_change_g_log.after_status = "pending"'
+                else:
+                    search='request_change_g_log.semester = "'+T(period.period.name)+'" and request_change_g_log.yearp = "'+str(period.yearp)+'" and request_change_g_log.date_request >="'+str(period.yearp)+'-01-01" and request_change_g_log.date_request<="'+str(month[2])+'" and request_change_g_log.project = "'+str(project)+'" and request_change_g_log.roll = "Student" and request_change_g_log.username = "'+str(userP)+'" and request_change_g_log.after_status = "pending" and '+personal_query
+                for pending in db.smart_query(db.request_change_g_log,search).select():
+                    if personal_query == '':
+                        search='request_change_g_log.r_c_g_id = "'+str(pending.r_c_g_id)+'" and request_change_g_log.after_status != "pending"'
+                    else:
+                        search='request_change_g_log.r_c_g_id = "'+str(pending.r_c_g_id)+'" and request_change_g_log.after_status != "pending" and '+personal_query
+                    if db.smart_query(db.request_change_g_log,search).select().first() is None:
+                        infoeLevelTemp=[]
+                        infoeLevelTemp.append(pending.before_status)
+                        infoeLevelTemp.append(pending.after_status)
+                        infoeLevelTemp.append(pending.resolve_user)
+                        infoeLevelTemp.append(pending.roll_resolve)
+                        infoeLevelTemp.append(pending.description)
+                        infoeLevelTemp.append(pending.description_log)
+                        infoeLevelTemp.append(pending.date_operation)
+                        infoeLevelTemp.append(pending.date_request)
+                        infoeLevelTemp.append(pending.date_request_resolve)
+                        infoeLevelTemp.append(pending.activity)
+                        infoeLevelTemp.append(pending.category)
+                        infoLevel.append(infoeLevelTemp)
+                        infoeLevelTemp=[]
+                        infoeLevelTemp.append('')
+                        infoeLevelTemp.append('')
+                        infoeLevelTemp.append(T('Operation'))
+                        infoeLevelTemp.append(T('Academic'))
+                        infoeLevelTemp.append(T('Before Grade'))
+                        infoeLevelTemp.append(T('After Grade'))
+                        infoLevel.append(infoeLevelTemp)
+                        for details in db(db.request_change_grade_d_log.request_change_g_log==pending.id).select():
+                            infoeLevelTemp=[]
+                            infoeLevelTemp.append('')
+                            infoeLevelTemp.append('')
+                            infoeLevelTemp.append(details.operation_request)
+                            infoeLevelTemp.append(details.academic)
+                            infoeLevelTemp.append(details.before_grade)
+                            infoeLevelTemp.append(details.after_grade)
+                            infoLevel.append(infoeLevelTemp)
+                        infoeLevelTemp=[]
+                        infoeLevelTemp.append('')
+                        infoLevel.append(infoeLevelTemp)
+            else:
+                if personal_query == '':
+                    search='request_change_g_log.semester = "'+T(period.period.name)+'" and request_change_g_log.yearp = "'+str(period.yearp)+'" and request_change_g_log.date_request >="'+str(period.yearp)+'-06-01" and request_change_g_log.date_request<="'+str(month[2])+'" and request_change_g_log.project = "'+str(project)+'" and request_change_g_log.roll = "Student" and request_change_g_log.username = "'+str(userP)+'" and request_change_g_log.after_status = "pending"'
+                else:
+                    search='request_change_g_log.semester = "'+T(period.period.name)+'" and request_change_g_log.yearp = "'+str(period.yearp)+'" and request_change_g_log.date_request >="'+str(period.yearp)+'-06-01" and request_change_g_log.date_request<="'+str(month[2])+'" and request_change_g_log.project = "'+str(project)+'" and request_change_g_log.roll = "Student" and request_change_g_log.username = "'+str(userP)+'" and request_change_g_log.after_status = "pending" and '+personal_query
+                for pending in db.smart_query(db.request_change_g_log,search).select():
+                    if personal_query == '':
+                        search='request_change_g_log.r_c_g_id = "'+str(pending.r_c_g_id)+'" and request_change_g_log.after_status != "pending"'
+                    else:
+                        search='request_change_g_log.r_c_g_id = "'+str(pending.r_c_g_id)+'" and request_change_g_log.after_status != "pending" and '+personal_query
+                    if db.smart_query(db.request_change_g_log,search).select().first() is None:
+                        infoeLevelTemp=[]
+                        infoeLevelTemp.append(pending.before_status)
+                        infoeLevelTemp.append(pending.after_status)
+                        infoeLevelTemp.append(pending.resolve_user)
+                        infoeLevelTemp.append(pending.roll_resolve)
+                        infoeLevelTemp.append(pending.description)
+                        infoeLevelTemp.append(pending.description_log)
+                        infoeLevelTemp.append(pending.date_operation)
+                        infoeLevelTemp.append(pending.date_request)
+                        infoeLevelTemp.append(pending.date_request_resolve)
+                        infoeLevelTemp.append(pending.activity)
+                        infoeLevelTemp.append(pending.category)
+                        infoLevel.append(infoeLevelTemp)
+                        infoeLevelTemp=[]
+                        infoeLevelTemp.append('')
+                        infoeLevelTemp.append('')
+                        infoeLevelTemp.append(T('Operation'))
+                        infoeLevelTemp.append(T('Academic'))
+                        infoeLevelTemp.append(T('Before Grade'))
+                        infoeLevelTemp.append(T('After Grade'))
+                        infoLevel.append(infoeLevelTemp)
+                        for details in db(db.request_change_grade_d_log.request_change_g_log==pending.id).select():
+                            infoeLevelTemp=[]
+                            infoeLevelTemp.append('')
+                            infoeLevelTemp.append('')
+                            infoeLevelTemp.append(details.operation_request)
+                            infoeLevelTemp.append(details.academic)
+                            infoeLevelTemp.append(details.before_grade)
+                            infoeLevelTemp.append(details.after_grade)
+                            infoLevel.append(infoeLevelTemp)
+                        infoeLevelTemp=[]
+                        infoeLevelTemp.append('')
+                        infoLevel.append(infoeLevelTemp)
+        #ALL
+        elif str(request.vars['type_L'])=="all":
+            #MADE AND PENDING
+            if period.period==1:
+                if personal_query == '':
+                    search='request_change_g_log.semester = "'+T(period.period.name)+'" and request_change_g_log.yearp = "'+str(period.yearp)+'" and request_change_g_log.date_request >="'+str(period.yearp)+'-01-01" and request_change_g_log.date_request<="'+str(month[2])+'" and request_change_g_log.project = "'+str(project)+'" and request_change_g_log.roll = "Student" and request_change_g_log.username = "'+str(userP)+'" and request_change_g_log.after_status = "pending"'
+                else:
+                    search='request_change_g_log.semester = "'+T(period.period.name)+'" and request_change_g_log.yearp = "'+str(period.yearp)+'" and request_change_g_log.date_request >="'+str(period.yearp)+'-01-01" and request_change_g_log.date_request<="'+str(month[2])+'" and request_change_g_log.project = "'+str(project)+'" and request_change_g_log.roll = "Student" and request_change_g_log.username = "'+str(userP)+'" and request_change_g_log.after_status = "pending" and '+personal_query
+                for pending in db.smart_query(db.request_change_g_log,search).select():
+                    if personal_query == '':
+                        search='request_change_g_log.r_c_g_id = "'+str(pending.r_c_g_id)+'" and request_change_g_log.after_status != "pending"'
+                    else:
+                        search='request_change_g_log.r_c_g_id = "'+str(pending.r_c_g_id)+'" and request_change_g_log.after_status != "pending" and '+personal_query
+                    if db.smart_query(db.request_change_g_log,search).select().first() is None:
+                        infoeLevelTemp=[]
+                        infoeLevelTemp.append(pending.before_status)
+                        infoeLevelTemp.append(pending.after_status)
+                        infoeLevelTemp.append(pending.resolve_user)
+                        infoeLevelTemp.append(pending.roll_resolve)
+                        infoeLevelTemp.append(pending.description)
+                        infoeLevelTemp.append(pending.description_log)
+                        infoeLevelTemp.append(pending.date_operation)
+                        infoeLevelTemp.append(pending.date_request)
+                        infoeLevelTemp.append(pending.date_request_resolve)
+                        infoeLevelTemp.append(pending.activity)
+                        infoeLevelTemp.append(pending.category)
+                        infoLevel.append(infoeLevelTemp)
+                        infoeLevelTemp=[]
+                        infoeLevelTemp.append('')
+                        infoeLevelTemp.append('')
+                        infoeLevelTemp.append(T('Operation'))
+                        infoeLevelTemp.append(T('Academic'))
+                        infoeLevelTemp.append(T('Before Grade'))
+                        infoeLevelTemp.append(T('After Grade'))
+                        infoLevel.append(infoeLevelTemp)
+                        for details in db(db.request_change_grade_d_log.request_change_g_log==pending.id).select():
+                            infoeLevelTemp=[]
+                            infoeLevelTemp.append('')
+                            infoeLevelTemp.append('')
+                            infoeLevelTemp.append(details.operation_request)
+                            infoeLevelTemp.append(details.academic)
+                            infoeLevelTemp.append(details.before_grade)
+                            infoeLevelTemp.append(details.after_grade)
+                            infoLevel.append(infoeLevelTemp)
+                        infoeLevelTemp=[]
+                        infoeLevelTemp.append('')
+                        infoLevel.append(infoeLevelTemp)
+            else:
+                if personal_query == '':
+                    search='request_change_g_log.semester = "'+T(period.period.name)+'" and request_change_g_log.yearp = "'+str(period.yearp)+'" and request_change_g_log.date_request >="'+str(period.yearp)+'-06-01" and request_change_g_log.date_request<="'+str(month[2])+'" and request_change_g_log.project = "'+str(project)+'" and request_change_g_log.roll = "Student" and request_change_g_log.username = "'+str(userP)+'" and request_change_g_log.after_status = "pending"'
+                else:
+                    search='request_change_g_log.semester = "'+T(period.period.name)+'" and request_change_g_log.yearp = "'+str(period.yearp)+'" and request_change_g_log.date_request >="'+str(period.yearp)+'-06-01" and request_change_g_log.date_request<="'+str(month[2])+'" and request_change_g_log.project = "'+str(project)+'" and request_change_g_log.roll = "Student" and request_change_g_log.username = "'+str(userP)+'" and request_change_g_log.after_status = "pending" and '+personal_query
+                for pending in db.smart_query(db.request_change_g_log,search).select():
+                    if personal_query == '':
+                        search='request_change_g_log.r_c_g_id = "'+str(pending.r_c_g_id)+'" and request_change_g_log.after_status != "pending"'
+                    else:
+                        search='request_change_g_log.r_c_g_id = "'+str(pending.r_c_g_id)+'" and request_change_g_log.after_status != "pending" and '+personal_query
+                    if db.smart_query(db.request_change_g_log,search).select().first() is None:
+                        infoeLevelTemp=[]
+                        infoeLevelTemp.append(pending.before_status)
+                        infoeLevelTemp.append(pending.after_status)
+                        infoeLevelTemp.append(pending.resolve_user)
+                        infoeLevelTemp.append(pending.roll_resolve)
+                        infoeLevelTemp.append(pending.description)
+                        infoeLevelTemp.append(pending.description_log)
+                        infoeLevelTemp.append(pending.date_operation)
+                        infoeLevelTemp.append(pending.date_request)
+                        infoeLevelTemp.append(pending.date_request_resolve)
+                        infoeLevelTemp.append(pending.activity)
+                        infoeLevelTemp.append(pending.category)
+                        infoLevel.append(infoeLevelTemp)
+                        infoeLevelTemp=[]
+                        infoeLevelTemp.append('')
+                        infoeLevelTemp.append('')
+                        infoeLevelTemp.append(T('Operation'))
+                        infoeLevelTemp.append(T('Academic'))
+                        infoeLevelTemp.append(T('Before Grade'))
+                        infoeLevelTemp.append(T('After Grade'))
+                        infoLevel.append(infoeLevelTemp)
+                        for details in db(db.request_change_grade_d_log.request_change_g_log==pending.id).select():
+                            infoeLevelTemp=[]
+                            infoeLevelTemp.append('')
+                            infoeLevelTemp.append('')
+                            infoeLevelTemp.append(details.operation_request)
+                            infoeLevelTemp.append(details.academic)
+                            infoeLevelTemp.append(details.before_grade)
+                            infoeLevelTemp.append(details.after_grade)
+                            infoLevel.append(infoeLevelTemp)
+                        infoeLevelTemp=[]
+                        infoeLevelTemp.append('')
+                        infoLevel.append(infoeLevelTemp)
+            #ACCEPTED
+            if personal_query == '':
+                search='request_change_g_log.semester = "'+T(period.period.name)+'" and request_change_g_log.yearp = "'+str(period.yearp)+'" and request_change_g_log.date_operation >="'+str(month[1])+'" and request_change_g_log.date_operation<="'+str(month[2])+'" and request_change_g_log.project = "'+str(project)+'" and request_change_g_log.roll = "Student" and request_change_g_log.username = "'+str(userP)+'" and request_change_g_log.after_status = "accepted"'
+            else:
+                search='request_change_g_log.semester = "'+T(period.period.name)+'" and request_change_g_log.yearp = "'+str(period.yearp)+'" and request_change_g_log.date_operation >="'+str(month[1])+'" and request_change_g_log.date_operation<="'+str(month[2])+'" and request_change_g_log.project = "'+str(project)+'" and request_change_g_log.roll = "Student" and request_change_g_log.username = "'+str(userP)+'" and request_change_g_log.after_status = "accepted" and '+personal_query
+            for data in db.smart_query(db.request_change_g_log,search).select():
+                infoeLevelTemp=[]
+                infoeLevelTemp.append(data.before_status)
+                infoeLevelTemp.append(data.after_status)
+                infoeLevelTemp.append(data.resolve_user)
+                infoeLevelTemp.append(data.roll_resolve)
+                infoeLevelTemp.append(data.description)
+                infoeLevelTemp.append(data.description_log)
+                infoeLevelTemp.append(data.date_operation)
+                infoeLevelTemp.append(data.date_request)
+                infoeLevelTemp.append(data.date_request_resolve)
+                infoeLevelTemp.append(data.activity)
+                infoeLevelTemp.append(data.category)
+                infoLevel.append(infoeLevelTemp)
+                infoeLevelTemp=[]
+                infoeLevelTemp.append('')
+                infoeLevelTemp.append('')
+                infoeLevelTemp.append(T('Operation'))
+                infoeLevelTemp.append(T('Academic'))
+                infoeLevelTemp.append(T('Before Grade'))
+                infoeLevelTemp.append(T('After Grade'))
+                infoLevel.append(infoeLevelTemp)
+                for details in db(db.request_change_grade_d_log.request_change_g_log==data.id).select():
+                    infoeLevelTemp=[]
+                    infoeLevelTemp.append('')
+                    infoeLevelTemp.append('')
+                    infoeLevelTemp.append(details.operation_request)
+                    infoeLevelTemp.append(details.academic)
+                    infoeLevelTemp.append(details.before_grade)
+                    infoeLevelTemp.append(details.after_grade)
+                    infoLevel.append(infoeLevelTemp)
+                infoeLevelTemp=[]
+                infoeLevelTemp.append('')
+                infoLevel.append(infoeLevelTemp)
+            #REJECTED
+            if personal_query == '':
+                search='request_change_g_log.semester = "'+T(period.period.name)+'" and request_change_g_log.yearp = "'+str(period.yearp)+'" and request_change_g_log.date_operation >="'+str(month[1])+'" and request_change_g_log.date_operation<="'+str(month[2])+'" and request_change_g_log.project = "'+str(project)+'" and request_change_g_log.roll = "Student" and request_change_g_log.username = "'+str(userP)+'" and request_change_g_log.after_status = "rejected"'
+            else:
+                search='request_change_g_log.semester = "'+T(period.period.name)+'" and request_change_g_log.yearp = "'+str(period.yearp)+'" and request_change_g_log.date_operation >="'+str(month[1])+'" and request_change_g_log.date_operation<="'+str(month[2])+'" and request_change_g_log.project = "'+str(project)+'" and request_change_g_log.roll = "Student" and request_change_g_log.username = "'+str(userP)+'" and request_change_g_log.after_status = "rejected" and '+personal_query
+            for data in db.smart_query(db.request_change_g_log,search).select():
+                infoeLevelTemp=[]
+                infoeLevelTemp.append(data.before_status)
+                infoeLevelTemp.append(data.after_status)
+                infoeLevelTemp.append(data.resolve_user)
+                infoeLevelTemp.append(data.roll_resolve)
+                infoeLevelTemp.append(data.description)
+                infoeLevelTemp.append(data.description_log)
+                infoeLevelTemp.append(data.date_operation)
+                infoeLevelTemp.append(data.date_request)
+                infoeLevelTemp.append(data.date_request_resolve)
+                infoeLevelTemp.append(data.activity)
+                infoeLevelTemp.append(data.category)
+                infoLevel.append(infoeLevelTemp)
+                infoeLevelTemp=[]
+                infoeLevelTemp.append('')
+                infoeLevelTemp.append('')
+                infoeLevelTemp.append(T('Operation'))
+                infoeLevelTemp.append(T('Academic'))
+                infoeLevelTemp.append(T('Before Grade'))
+                infoeLevelTemp.append(T('After Grade'))
+                infoLevel.append(infoeLevelTemp)
+                for details in db(db.request_change_grade_d_log.request_change_g_log==data.id).select():
+                    infoeLevelTemp=[]
+                    infoeLevelTemp.append('')
+                    infoeLevelTemp.append('')
+                    infoeLevelTemp.append(details.operation_request)
+                    infoeLevelTemp.append(details.academic)
+                    infoeLevelTemp.append(details.before_grade)
+                    infoeLevelTemp.append(details.after_grade)
+                    infoLevel.append(infoeLevelTemp)
+                infoeLevelTemp=[]
+                infoeLevelTemp.append('')
+                infoLevel.append(infoeLevelTemp)
+            ##CANCELED
+            if personal_query == '':
+                search='request_change_g_log.semester = "'+T(period.period.name)+'" and request_change_g_log.yearp = "'+str(period.yearp)+'" and request_change_g_log.date_operation >="'+str(month[1])+'" and request_change_g_log.date_operation<="'+str(month[2])+'" and request_change_g_log.project = "'+str(project)+'" and request_change_g_log.roll = "Student" and request_change_g_log.username = "'+str(userP)+'" and request_change_g_log.after_status = "canceled"'
+            else:
+                search='request_change_g_log.semester = "'+T(period.period.name)+'" and request_change_g_log.yearp = "'+str(period.yearp)+'" and request_change_g_log.date_operation >="'+str(month[1])+'" and request_change_g_log.date_operation<="'+str(month[2])+'" and request_change_g_log.project = "'+str(project)+'" and request_change_g_log.roll = "Student" and request_change_g_log.username = "'+str(userP)+'" and request_change_g_log.after_status = "canceled" and '+personal_query
+            for data in db.smart_query(db.request_change_g_log,search).select():
+                infoeLevelTemp=[]
+                infoeLevelTemp.append(data.before_status)
+                infoeLevelTemp.append(data.after_status)
+                infoeLevelTemp.append(data.resolve_user)
+                infoeLevelTemp.append(data.roll_resolve)
+                infoeLevelTemp.append(data.description)
+                infoeLevelTemp.append(data.description_log)
+                infoeLevelTemp.append(data.date_operation)
+                infoeLevelTemp.append(data.date_request)
+                infoeLevelTemp.append(data.date_request_resolve)
+                infoeLevelTemp.append(data.activity)
+                infoeLevelTemp.append(data.category)
+                infoLevel.append(infoeLevelTemp)
+                infoeLevelTemp=[]
+                infoeLevelTemp.append('')
+                infoeLevelTemp.append('')
+                infoeLevelTemp.append(T('Operation'))
+                infoeLevelTemp.append(T('Academic'))
+                infoeLevelTemp.append(T('Before Grade'))
+                infoeLevelTemp.append(T('After Grade'))
+                infoLevel.append(infoeLevelTemp)
+                for details in db(db.request_change_grade_d_log.request_change_g_log==data.id).select():
+                    infoeLevelTemp=[]
+                    infoeLevelTemp.append('')
+                    infoeLevelTemp.append('')
+                    infoeLevelTemp.append(details.operation_request)
+                    infoeLevelTemp.append(details.academic)
+                    infoeLevelTemp.append(details.before_grade)
+                    infoeLevelTemp.append(details.after_grade)
+                    infoLevel.append(infoeLevelTemp)
+                infoeLevelTemp=[]
+                infoeLevelTemp.append('')
+                infoLevel.append(infoeLevelTemp)
+    #*****************************************************REPORT*****************************************************
+    #****************************************************************************************************************
+    #****************************************************************************************************************
+    return dict(filename='ReporteGestionSolicitudesCambioNotas', csvdata=infoLevel)
+
+
+@auth.requires_login()
+@auth.requires_membership('Super-Administrator')
+def crg_LOAD():
+    requestC = None
+    requestD = None
+    showLevel=False
+    try:
+        requestC = db(db.request_change_g_log.id==int(request.vars['id'])).select().first()
+        if requestC is not None:
+            showLevel=True
+            requestD = db(db.request_change_grade_d_log.request_change_g_log==int(request.vars['id'])).select()
+    except:
+        showLevel=False
+    return dict(showLevel=showLevel, requestC=requestC, requestD=requestD)
+
+
+@auth.requires_login()
+@auth.requires_membership('Super-Administrator')
+def change_request_grades_management():
+    #****************************************************************************************************************
+    #****************************************************************************************************************
+    #***************************************CHECK IF THERE IS A PERSONALIZED QUERY***********************************
+    personal_query = ''
+    makeRedirect = False
+    if request.vars['querySearch'] is not None and str(request.vars['querySearch']) != "":
+        #PERSONALIZED QUERY SURE WORK
+        try:
+            personal_query = str(request.vars['querySearch'])
+            countI = db.smart_query(db.request_change_g_log,personal_query).count()
+            if request.vars['searchT'] is not None and str(request.vars['searchT']) == 'T':
+                makeRedirect = True
+        except:
+            response.flash = T('The query is not valid. The report is displayed without applying any query.')
+            personal_query = ''
+    if makeRedirect == True:
+        redirect(URL('management_reports', 'change_request_grades_management',vars=dict(level = '5', period = request.vars['period'], month = str(request.vars['month']), project = str(request.vars['project']), userP = str(request.vars['userP']), type_L=request.vars['type_L'], type_U=request.vars['type_U'], querySearch=request.vars['querySearch'])))
+    
+
+    #****************************************************************************************************************
+    #****************************************************************************************************************
+    #******************************************VERIFY THAT ACCURATE PARAMETERS***************************************
+    try:
+        #CHECK THAT THE LEVEL OF REPORT IS VALID
+        if request.vars['level'] is not None and (int(request.vars['level'])<1 or int(request.vars['level'])>5):
+            session.flash = T('Not valid Action.')
+            redirect(URL('default','index'))
+
+        #VERIFY THAT THE PARAMETERS OF EACH LEVEL BE VALID
+        if request.vars['level'] is not None:
+            #LEVEL MORE THAN 1
+            if int(request.vars['level'])>1:
+                #CHECK IF THE TYPE OF REPORT IS VALID
+                if request.vars['type_L'] is None or (str(request.vars['type_L'])!="all" and str(request.vars['type_L'])!="i" and str(request.vars['type_L'])!="u" and str(request.vars['type_L'])!="d" and str(request.vars['type_L'])!="p" and str(request.vars['type_L'])!="c"):
+                    session.flash = T('Not valid Action.')
+                    redirect(URL('default','index'))
+
+                period = VALIDATE_PERIOD(request.vars['period'])
+                if period is None:
+                    session.flash = T('Not valid Action.')
+                    redirect(URL('default','index'))
+            
+            #LEVEL MORE THAN 2
+            if int(request.vars['level'])>2:
+                #CHECK IF THE TYPE OF REPORT IS VALID
+                if request.vars['type_U'] is None or (str(request.vars['type_U'])!="all" and str(request.vars['type_U'])!="i" and str(request.vars['type_U'])!="u" and str(request.vars['type_U'])!="d" and str(request.vars['type_L'])!="p" and str(request.vars['type_L'])!="c"):
+                    session.flash = T('Not valid Action.')
+                    redirect(URL('default','index'))
+
+                #CHECK IF THE MONTH IS VALID
+                month = VALIDATE_MONTH(request.vars['month'],period)
+                if month is None:
+                    session.flash = T('Not valid Action.')
+                    redirect(URL('default','index'))
+            
+            #LEVEL MORE THAN 3
+            if int(request.vars['level'])>3:
+                #CHECK IF THE PROJECT IS VALID
+                project = VALIDATE_PROJECT(request.vars['project'],'request_change_g_log')
+                if project is None:
+                    session.flash = T('Not valid Action.')
+                    redirect(URL('default','index'))
+
+            #LEVEL MORE THAN 4
+            if int(request.vars['level'])>4:
+                #CHECK IF THE USER IS VALID
+                userP = VALIDATE_USER(period,project,'Student',request.vars['userP'],'request_change_g_log')
+                if userP is None:
+                    session.flash = T('Not valid Action.')
+                    redirect(URL('default','index'))
+    except:
+        session.flash = T('Not valid Action.')
+        redirect(URL('default','index'))
+
+    
+    #****************************************************************************************************************
+    #****************************************************************************************************************
+    #**************************************************SEARCH REPORT*************************************************
+    def filtered_by(flag):
+        fsearch_Option=[]
+        fsearch_Option.append('=')
+        fsearch_Option.append('!=')
+        fsearch_Option.append('<')
+        fsearch_Option.append('>')
+        fsearch_Option.append('<=')
+        fsearch_Option.append('>=')
+        if flag==True:
+            fsearch_Option.append('starts with')
+            fsearch_Option.append('contains')
+            fsearch_Option.append('in')
+            fsearch_Option.append('not in')
+        return fsearch_Option
+
+
+    fsearch = []
+    #******************************COMBOS INFORMATION******************************
+    #YEARS
+    if request.vars['level']=='1' or request.vars['level'] is None:
+        groupYears = GET_YEARS()
+        if len(groupYears) != 0:
+            fsearch.append(['yearp','Año',False,[3,sorted(groupYears)]])
+    #PROJECTS
+    if request.vars['level'] is None or int(request.vars['level'])<=3:
+        projects = GET_PROJECTS('request_change_g_log')
+        if len(projects) != 0:
+            fsearch_Values=[]
+            fsearch_Values.append(2)
+            for projectT in projects:
+                project=db(db.project.name==projectT).select().first()
+                if project is None:
+                    project=db(db.request_change_g_log.project==projectT).select().first()
+                    project=project.project
+                else:
+                    project=project.name
+                fsearch_Values.append(project)
+            fsearch.append(['project','Curso',False,fsearch_Values])
+    #OPERATION LOG
+    fsearch.append(['after_status','Estado',False,[3,['accepted','rejected','pending','canceled']]])
+    #CATEGORIES
+    groupCategories = GET_CATEGORIES('request_change_g_log')
+    if len(groupCategories) != 0:
+        fsearch.append(['category','Categoria',False,[3,sorted(groupCategories)]])
+    #ACTIVITIES
+    groupActivities = GET_ACTIVITIES('request_change_g_log')
+    if len(groupActivities) !=0:
+        fsearch.append(['activity','Actividad',False,[3,sorted(groupActivities)]])
+    #DATES
+    dates = GET_DATES('request_change_g_log')
+    if len(dates) != 0:
+        fsearch.append(['date_request','Fecha',False,[3,sorted(dates)]])
+    #******************************ENTERING USER******************************
+    #USER REQUEST
+    if request.vars['level'] is None or int(request.vars['level'])<=4:
+        fsearch.append(['user_request','Usuario Solicitud',False,[1]])
+
+
+    #****************************************************************************************************************
+    #****************************************************************************************************************
+    #*****************************************************REPORT*****************************************************
+    #LEVELS OF REPORT
+    from datetime import datetime
+    infoLevel = []
+    grid=[]
+    #ALL SEMESTERS
+    if request.vars['level']=='1' or request.vars['level'] is None:
+        groupPeriods = db(db.period_year).select(orderby=~db.period_year.id)
+        if len(groupPeriods) == 0:
+            session.flash = T('Report no visible: There are no parameters required to display the report.')
+            redirect(URL('default','index'))
+        for period in groupPeriods:
+            infoeLevelTemp = []
+            #ID OF PERIOD
+            infoeLevelTemp.append(period.id)
+            #NAME OF PERIOD
+            infoeLevelTemp.append(T(period.period.name)+' '+str(period.yearp))
+            #MADE
+            if personal_query == '':
+                search='request_change_g_log.semester = "'+T(period.period.name)+'" and request_change_g_log.yearp = "'+str(period.yearp)+'" and request_change_g_log.after_status = "pending"'
+            else:
+                search='request_change_g_log.semester = "'+T(period.period.name)+'" and request_change_g_log.yearp = "'+str(period.yearp)+'" and request_change_g_log.after_status = "pending" and '+personal_query
+            countI = db.smart_query(db.request_change_g_log,search).count()
+            infoeLevelTemp.append(countI)
+            #ACCEPTED
+            if personal_query == '':
+                search='request_change_g_log.semester = "'+T(period.period.name)+'" and request_change_g_log.yearp = "'+str(period.yearp)+'" and request_change_g_log.after_status = "accepted"'
+            else:
+                search='request_change_g_log.semester = "'+T(period.period.name)+'" and request_change_g_log.yearp = "'+str(period.yearp)+'" and request_change_g_log.after_status = "accepted" and '+personal_query
+            countI = db.smart_query(db.request_change_g_log,search).count()
+            infoeLevelTemp.append(countI)
+            #REJECTED
+            if personal_query == '':
+                search='request_change_g_log.semester = "'+T(period.period.name)+'" and request_change_g_log.yearp = "'+str(period.yearp)+'" and request_change_g_log.after_status = "rejected"'
+            else:
+                search='request_change_g_log.semester = "'+T(period.period.name)+'" and request_change_g_log.yearp = "'+str(period.yearp)+'" and request_change_g_log.after_status = "rejected" and '+personal_query
+            countI = db.smart_query(db.request_change_g_log,search).count()
+            infoeLevelTemp.append(countI)
+            #CANCELED
+            if personal_query == '':
+                search='request_change_g_log.semester = "'+T(period.period.name)+'" and request_change_g_log.yearp = "'+str(period.yearp)+'" and request_change_g_log.after_status = "canceled"'
+            else:
+                search='request_change_g_log.semester = "'+T(period.period.name)+'" and request_change_g_log.yearp = "'+str(period.yearp)+'" and request_change_g_log.after_status = "canceled" and '+personal_query
+            countI = db.smart_query(db.request_change_g_log,search).count()
+            infoeLevelTemp.append(countI)
+            #PENDING
+            infoeLevelTemp.append(infoeLevelTemp[2]-infoeLevelTemp[3]-infoeLevelTemp[4]-infoeLevelTemp[5])
+            #INSERT PERIOD
+            infoLevel.append(infoeLevelTemp)
+    #PER MONTH
+    elif str(request.vars['level'])=="2":
+        for month in GET_MONTH_PERIOD(period):
+            start = datetime.strptime(str(period.yearp) + '-' + str(month[0]) +'-01', "%Y-%m-%d")
+            if month[2]==1:
+                end = datetime.strptime(str(period.yearp+1) + '-' + str(month[2]) +'-01', "%Y-%m-%d")
+            else:
+                end = datetime.strptime(str(period.yearp) + '-' + str(month[2]) +'-01', "%Y-%m-%d")
+            infoeLevelTemp = []
+            #NAME OF PERIOD
+            infoeLevelTemp.append(T(period.period.name)+' '+str(period.yearp))
+            #ID OF MONTH
+            infoeLevelTemp.append(month[0])
+            #NAME OF MONTH
+            infoeLevelTemp.append(month[1]+' '+str(period.yearp))
+            #MADE
+            if str(request.vars['type_L'])=="all" or str(request.vars['type_L'])=="d":
+                if personal_query == '':
+                    search='request_change_g_log.semester = "'+T(period.period.name)+'" and request_change_g_log.yearp = "'+str(period.yearp)+'" and request_change_g_log.date_request >="'+str(start)+'" and request_change_g_log.date_request<="'+str(end)+'" and request_change_g_log.after_status = "pending"'
+                else:
+                    search='request_change_g_log.semester = "'+T(period.period.name)+'" and request_change_g_log.yearp = "'+str(period.yearp)+'" and request_change_g_log.date_request >="'+str(start)+'" and request_change_g_log.date_request<="'+str(end)+'" and request_change_g_log.after_status = "pending" and '+personal_query
+                countI = db.smart_query(db.request_change_g_log,search).count()
+                infoeLevelTemp.append(countI)
+            #ACCEPTED
+            if str(request.vars['type_L'])=="all" or str(request.vars['type_L'])=="i":
+                if personal_query == '':
+                    search='request_change_g_log.semester = "'+T(period.period.name)+'" and request_change_g_log.yearp = "'+str(period.yearp)+'" and request_change_g_log.date_operation >="'+str(start)+'" and request_change_g_log.date_operation<="'+str(end)+'" and request_change_g_log.after_status = "accepted"'
+                else:
+                    search='request_change_g_log.semester = "'+T(period.period.name)+'" and request_change_g_log.yearp = "'+str(period.yearp)+'" and request_change_g_log.date_operation >="'+str(start)+'" and request_change_g_log.date_operation<="'+str(end)+'" and request_change_g_log.after_status = "accepted" and '+personal_query
+                countI = db.smart_query(db.request_change_g_log,search).count()
+                infoeLevelTemp.append(countI)
+            #REJECTED
+            if str(request.vars['type_L'])=="all" or str(request.vars['type_L'])=="u":
+                if personal_query == '':
+                    search='request_change_g_log.semester = "'+T(period.period.name)+'" and request_change_g_log.yearp = "'+str(period.yearp)+'" and request_change_g_log.date_operation >="'+str(start)+'" and request_change_g_log.date_operation<="'+str(end)+'" and request_change_g_log.after_status = "rejected"'
+                else:
+                    search='request_change_g_log.semester = "'+T(period.period.name)+'" and request_change_g_log.yearp = "'+str(period.yearp)+'" and request_change_g_log.date_operation >="'+str(start)+'" and request_change_g_log.date_operation<="'+str(end)+'" and request_change_g_log.after_status = "rejected" and '+personal_query
+                countI = db.smart_query(db.request_change_g_log,search).count()
+                infoeLevelTemp.append(countI)
+            ##CANCELED
+            if str(request.vars['type_L'])=="all" or str(request.vars['type_L'])=="c":
+                if personal_query == '':
+                    search='request_change_g_log.semester = "'+T(period.period.name)+'" and request_change_g_log.yearp = "'+str(period.yearp)+'" and request_change_g_log.date_operation >="'+str(start)+'" and request_change_g_log.date_operation<="'+str(end)+'" and request_change_g_log.after_status = "canceled"'
+                else:
+                    search='request_change_g_log.semester = "'+T(period.period.name)+'" and request_change_g_log.yearp = "'+str(period.yearp)+'" and request_change_g_log.date_operation >="'+str(start)+'" and request_change_g_log.date_operation<="'+str(end)+'" and request_change_g_log.after_status = "canceled" and '+personal_query
+                countI = db.smart_query(db.request_change_g_log,search).count()
+                infoeLevelTemp.append(countI)
+            #PENDING
+            if str(request.vars['type_L'])=="all" or str(request.vars['type_L'])=="p":
+                if period.period==1:
+                    if personal_query == '':
+                        search='request_change_g_log.semester = "'+T(period.period.name)+'" and request_change_g_log.yearp = "'+str(period.yearp)+'" and request_change_g_log.date_request >="'+str(period.yearp)+'-01-01" and request_change_g_log.date_request<="'+str(end)+'" and request_change_g_log.after_status = "pending"'
+                    else:
+                        search='request_change_g_log.semester = "'+T(period.period.name)+'" and request_change_g_log.yearp = "'+str(period.yearp)+'" and request_change_g_log.date_request >="'+str(period.yearp)+'-01-01" and request_change_g_log.date_request<="'+str(end)+'" and request_change_g_log.after_status = "pending" and '+personal_query
+                    countP = db.smart_query(db.request_change_g_log,search).count()
+                    if personal_query == '':
+                        search='request_change_g_log.semester = "'+T(period.period.name)+'" and request_change_g_log.yearp = "'+str(period.yearp)+'" and request_change_g_log.date_operation >="'+str(period.yearp)+'-01-01" and request_change_g_log.date_operation<="'+str(end)+'" and request_change_g_log.after_status != "pending"'
+                    else:
+                        search='request_change_g_log.semester = "'+T(period.period.name)+'" and request_change_g_log.yearp = "'+str(period.yearp)+'" and request_change_g_log.date_operation >="'+str(period.yearp)+'-01-01" and request_change_g_log.date_operation<="'+str(end)+'" and request_change_g_log.after_status != "pending" and '+personal_query
+                    countNP = db.smart_query(db.request_change_g_log,search).count()
+                else:
+                    if personal_query == '':
+                        search='request_change_g_log.semester = "'+T(period.period.name)+'" and request_change_g_log.yearp = "'+str(period.yearp)+'" and request_change_g_log.date_request >="'+str(period.yearp)+'-06-01" and request_change_g_log.date_request<="'+str(end)+'" and request_change_g_log.after_status = "pending"'
+                    else:
+                        search='request_change_g_log.semester = "'+T(period.period.name)+'" and request_change_g_log.yearp = "'+str(period.yearp)+'" and request_change_g_log.date_request >="'+str(period.yearp)+'-06-01" and request_change_g_log.date_request<="'+str(end)+'" and request_change_g_log.after_status = "pending" and '+personal_query
+                    countP = db.smart_query(db.request_change_g_log,search).count()
+                    if personal_query == '':
+                        search='request_change_g_log.semester = "'+T(period.period.name)+'" and request_change_g_log.yearp = "'+str(period.yearp)+'" and request_change_g_log.date_operation >="'+str(period.yearp)+'-06-01" and request_change_g_log.date_operation<="'+str(end)+'" and request_change_g_log.after_status != "pending"'
+                    else:
+                        search='request_change_g_log.semester = "'+T(period.period.name)+'" and request_change_g_log.yearp = "'+str(period.yearp)+'" and request_change_g_log.date_operation >="'+str(period.yearp)+'-06-01" and request_change_g_log.date_operation<="'+str(end)+'" and request_change_g_log.after_status != "pending" and '+personal_query
+                    countNP = db.smart_query(db.request_change_g_log,search).count()
+                infoeLevelTemp.append(countP-countNP)
+            #INSERT MONTH
+            infoLevel.append(infoeLevelTemp)
+    #PER PROJECT
+    elif str(request.vars['level'])=="3":
+        if len(projects) == 0:
+            session.flash = T('Report no visible: There are no parameters required to display the report.')
+            redirect(URL('management_reports', 'change_request_grades_management',vars=dict(level='2',period = str(request.vars['period']), type_L = str(request.vars['type_U']), querySearch=personal_query)))
+
+        for projectT in projects:
+            project=db(db.project.name==projectT).select().first()
+            if project is None:
+                project=db((db.course_activity_log.before_course==projectT)|(db.course_activity_log.after_course==projectT)).select().first()
+                if project.before_course is not None:
+                    project=project.before_course
+                else:
+                    project=project.after_course
+            else:
+                project=project.name
+            infoeLevelTemp = []
+            #NAME OF PERIOD
+            infoeLevelTemp.append(T(period.period.name)+' '+str(period.yearp))
+            #NAME OF MONTH
+            infoeLevelTemp.append(month[0])
+            #ID OF PROJECT
+            infoeLevelTemp.append(project)
+            #NAME OF PROJECT
+            infoeLevelTemp.append(project)
+            #MADE
+            if str(request.vars['type_L'])=="all" or str(request.vars['type_L'])=="d":
+                if personal_query == '':
+                    search='request_change_g_log.semester = "'+T(period.period.name)+'" and request_change_g_log.yearp = "'+str(period.yearp)+'" and request_change_g_log.date_request >="'+str(month[1])+'" and request_change_g_log.date_request<="'+str(month[2])+'" and request_change_g_log.project = "'+str(project)+'" and request_change_g_log.after_status = "pending"'
+                else:
+                    search='request_change_g_log.semester = "'+T(period.period.name)+'" and request_change_g_log.yearp = "'+str(period.yearp)+'" and request_change_g_log.date_request >="'+str(month[1])+'" and request_change_g_log.date_request<="'+str(month[2])+'" and request_change_g_log.project = "'+str(project)+'" and request_change_g_log.after_status = "pending" and '+personal_query
+                countI = db.smart_query(db.request_change_g_log,search).count()
+                infoeLevelTemp.append(countI)
+            #ACCEPTED
+            if str(request.vars['type_L'])=="all" or str(request.vars['type_L'])=="i":
+                if personal_query == '':
+                    search='request_change_g_log.semester = "'+T(period.period.name)+'" and request_change_g_log.yearp = "'+str(period.yearp)+'" and request_change_g_log.date_operation >="'+str(month[1])+'" and request_change_g_log.date_operation<="'+str(month[2])+'" and request_change_g_log.project = "'+str(project)+'" and request_change_g_log.after_status = "accepted"'
+                else:
+                    search='request_change_g_log.semester = "'+T(period.period.name)+'" and request_change_g_log.yearp = "'+str(period.yearp)+'" and request_change_g_log.date_operation >="'+str(month[1])+'" and request_change_g_log.date_operation<="'+str(month[2])+'" and request_change_g_log.project = "'+str(project)+'" and request_change_g_log.after_status = "accepted" and '+personal_query
+                countI = db.smart_query(db.request_change_g_log,search).count()
+                infoeLevelTemp.append(countI)
+            #REJECTED
+            if str(request.vars['type_L'])=="all" or str(request.vars['type_L'])=="u":
+                if personal_query == '':
+                    search='request_change_g_log.semester = "'+T(period.period.name)+'" and request_change_g_log.yearp = "'+str(period.yearp)+'" and request_change_g_log.date_operation >="'+str(month[1])+'" and request_change_g_log.date_operation<="'+str(month[2])+'" and request_change_g_log.project = "'+str(project)+'" and request_change_g_log.after_status = "rejected"'
+                else:
+                    search='request_change_g_log.semester = "'+T(period.period.name)+'" and request_change_g_log.yearp = "'+str(period.yearp)+'" and request_change_g_log.date_operation >="'+str(month[1])+'" and request_change_g_log.date_operation<="'+str(month[2])+'" and request_change_g_log.project = "'+str(project)+'" and request_change_g_log.after_status = "rejected" and '+personal_query
+                countI = db.smart_query(db.request_change_g_log,search).count()
+                infoeLevelTemp.append(countI)
+            ##CANCELED
+            if str(request.vars['type_L'])=="all" or str(request.vars['type_L'])=="c":
+                if personal_query == '':
+                    search='request_change_g_log.semester = "'+T(period.period.name)+'" and request_change_g_log.yearp = "'+str(period.yearp)+'" and request_change_g_log.date_operation >="'+str(month[1])+'" and request_change_g_log.date_operation<="'+str(month[2])+'" and request_change_g_log.project = "'+str(project)+'" and request_change_g_log.after_status = "canceled"'
+                else:
+                    search='request_change_g_log.semester = "'+T(period.period.name)+'" and request_change_g_log.yearp = "'+str(period.yearp)+'" and request_change_g_log.date_operation >="'+str(month[1])+'" and request_change_g_log.date_operation<="'+str(month[2])+'" and request_change_g_log.project = "'+str(project)+'" and request_change_g_log.after_status = "canceled" and '+personal_query
+                countI = db.smart_query(db.request_change_g_log,search).count()
+                infoeLevelTemp.append(countI)
+            #PENDING
+            if str(request.vars['type_L'])=="all" or str(request.vars['type_L'])=="p":
+                if period.period==1:
+                    if personal_query == '':
+                        search='request_change_g_log.semester = "'+T(period.period.name)+'" and request_change_g_log.yearp = "'+str(period.yearp)+'" and request_change_g_log.date_request >="'+str(period.yearp)+'-01-01" and request_change_g_log.date_request<="'+str(month[2])+'" and request_change_g_log.project = "'+str(project)+'" and request_change_g_log.after_status = "pending"'
+                    else:
+                        search='request_change_g_log.semester = "'+T(period.period.name)+'" and request_change_g_log.yearp = "'+str(period.yearp)+'" and request_change_g_log.date_request >="'+str(period.yearp)+'-01-01" and request_change_g_log.date_request<="'+str(month[2])+'" and request_change_g_log.project = "'+str(project)+'" and request_change_g_log.after_status = "pending" and '+personal_query
+                    countP = db.smart_query(db.request_change_g_log,search).count()
+                    if personal_query == '':
+                        search='request_change_g_log.semester = "'+T(period.period.name)+'" and request_change_g_log.yearp = "'+str(period.yearp)+'" and request_change_g_log.date_operation >="'+str(period.yearp)+'-01-01" and request_change_g_log.date_operation<="'+str(month[2])+'" and request_change_g_log.project = "'+str(project)+'" and request_change_g_log.after_status != "pending"'
+                    else:
+                        search='request_change_g_log.semester = "'+T(period.period.name)+'" and request_change_g_log.yearp = "'+str(period.yearp)+'" and request_change_g_log.date_operation >="'+str(period.yearp)+'-01-01" and request_change_g_log.date_operation<="'+str(month[2])+'" and request_change_g_log.project = "'+str(project)+'" and request_change_g_log.after_status != "pending" and '+personal_query
+                    countNP = db.smart_query(db.request_change_g_log,search).count()
+                else:
+                    if personal_query == '':
+                        search='request_change_g_log.semester = "'+T(period.period.name)+'" and request_change_g_log.yearp = "'+str(period.yearp)+'" and request_change_g_log.date_request >="'+str(period.yearp)+'-06-01" and request_change_g_log.date_request<="'+str(month[2])+'" and request_change_g_log.project = "'+str(project)+'" and request_change_g_log.after_status = "pending"'
+                    else:
+                        search='request_change_g_log.semester = "'+T(period.period.name)+'" and request_change_g_log.yearp = "'+str(period.yearp)+'" and request_change_g_log.date_request >="'+str(period.yearp)+'-06-01" and request_change_g_log.date_request<="'+str(month[2])+'" and request_change_g_log.project = "'+str(project)+'" and request_change_g_log.after_status = "pending" and '+personal_query
+                    countP = db.smart_query(db.request_change_g_log,search).count()
+                    if personal_query == '':
+                        search='request_change_g_log.semester = "'+T(period.period.name)+'" and request_change_g_log.yearp = "'+str(period.yearp)+'" and request_change_g_log.date_operation >="'+str(period.yearp)+'-06-01" and request_change_g_log.date_operation<="'+str(month[2])+'" and request_change_g_log.project = "'+str(project)+'" and request_change_g_log.after_status != "pending"'
+                    else:
+                        search='request_change_g_log.semester = "'+T(period.period.name)+'" and request_change_g_log.yearp = "'+str(period.yearp)+'" and request_change_g_log.date_operation >="'+str(period.yearp)+'-06-01" and request_change_g_log.date_operation<="'+str(month[2])+'" and request_change_g_log.project = "'+str(project)+'" and request_change_g_log.after_status != "pending" and '+personal_query
+                    countNP = db.smart_query(db.request_change_g_log,search).count()
+                infoeLevelTemp.append(countP-countNP)
+            #INSERT PROJECT
+            infoLevel.append(infoeLevelTemp)
+    #PER USER
+    elif str(request.vars['level'])=="4":
+        #VERIFY THAT CAN SHOW THE LEVEL OF THE REPORT
+        usersProject = GET_USERS(period,project,'Student','request_change_g_log')
+        if len(usersProject) == 0:
+            session.flash = T('Report no visible: There are no parameters required to display the report.')
+            redirect(URL('management_reports', 'change_request_grades_management',vars=dict(level='3', period = str(request.vars['period']), month = str(request.vars['month']), type_L = str(request.vars['type_U']), type_U = str(request.vars['type_U']), querySearch=personal_query)))
+
+        for userPT in usersProject:
+            userP=db(db.auth_user.username==userPT).select().first()
+            if userP is None:
+                userP=db(db.request_change_g_log.user_request==userPT).select().first()
+                userP=userP.user_request
+            else:
+                userP=userP.username
+            infoeLevelTemp = []
+            #NAME OF PERIOD
+            infoeLevelTemp.append(T(period.period.name)+' '+str(period.yearp))
+            #NAME OF MONTH
+            infoeLevelTemp.append(month[0])
+            #NAME OF PROJECT
+            infoeLevelTemp.append(project)
+            #ID OF USER
+            infoeLevelTemp.append(userP)
+            #NAME OF USER
+            infoeLevelTemp.append(userP)
+            #MADE
+            if str(request.vars['type_L'])=="all" or str(request.vars['type_L'])=="d":
+                if personal_query == '':
+                    search='request_change_g_log.semester = "'+T(period.period.name)+'" and request_change_g_log.yearp = "'+str(period.yearp)+'" and request_change_g_log.date_request >="'+str(month[1])+'" and request_change_g_log.date_request<="'+str(month[2])+'" and request_change_g_log.project = "'+str(project)+'" and request_change_g_log.roll = "Student" and request_change_g_log.username = "'+str(userP)+'" and request_change_g_log.after_status = "pending"'
+                else:
+                    search='request_change_g_log.semester = "'+T(period.period.name)+'" and request_change_g_log.yearp = "'+str(period.yearp)+'" and request_change_g_log.date_request >="'+str(month[1])+'" and request_change_g_log.date_request<="'+str(month[2])+'" and request_change_g_log.project = "'+str(project)+'" and request_change_g_log.roll = "Student" and request_change_g_log.username = "'+str(userP)+'" and request_change_g_log.after_status = "pending" and '+personal_query
+                countI = db.smart_query(db.request_change_g_log,search).count()
+                infoeLevelTemp.append(countI)
+            #ACCEPTED
+            if str(request.vars['type_L'])=="all" or str(request.vars['type_L'])=="i":
+                if personal_query == '':
+                    search='request_change_g_log.semester = "'+T(period.period.name)+'" and request_change_g_log.yearp = "'+str(period.yearp)+'" and request_change_g_log.date_operation >="'+str(month[1])+'" and request_change_g_log.date_operation<="'+str(month[2])+'" and request_change_g_log.project = "'+str(project)+'" and request_change_g_log.roll = "Student" and request_change_g_log.username = "'+str(userP)+'" and request_change_g_log.after_status = "accepted"'
+                else:
+                    search='request_change_g_log.semester = "'+T(period.period.name)+'" and request_change_g_log.yearp = "'+str(period.yearp)+'" and request_change_g_log.date_operation >="'+str(month[1])+'" and request_change_g_log.date_operation<="'+str(month[2])+'" and request_change_g_log.project = "'+str(project)+'" and request_change_g_log.roll = "Student" and request_change_g_log.username = "'+str(userP)+'" and request_change_g_log.after_status = "accepted" and '+personal_query
+                countI = db.smart_query(db.request_change_g_log,search).count()
+                infoeLevelTemp.append(countI)
+            #REJECTED
+            if str(request.vars['type_L'])=="all" or str(request.vars['type_L'])=="u":
+                if personal_query == '':
+                    search='request_change_g_log.semester = "'+T(period.period.name)+'" and request_change_g_log.yearp = "'+str(period.yearp)+'" and request_change_g_log.date_operation >="'+str(month[1])+'" and request_change_g_log.date_operation<="'+str(month[2])+'" and request_change_g_log.project = "'+str(project)+'" and request_change_g_log.roll = "Student" and request_change_g_log.username = "'+str(userP)+'" and request_change_g_log.after_status = "rejected"'
+                else:
+                    search='request_change_g_log.semester = "'+T(period.period.name)+'" and request_change_g_log.yearp = "'+str(period.yearp)+'" and request_change_g_log.date_operation >="'+str(month[1])+'" and request_change_g_log.date_operation<="'+str(month[2])+'" and request_change_g_log.project = "'+str(project)+'" and request_change_g_log.roll = "Student" and request_change_g_log.username = "'+str(userP)+'" and request_change_g_log.after_status = "rejected" and '+personal_query
+                countI = db.smart_query(db.request_change_g_log,search).count()
+                infoeLevelTemp.append(countI)
+            ##CANCELED
+            if str(request.vars['type_L'])=="all" or str(request.vars['type_L'])=="c":
+                if personal_query == '':
+                    search='request_change_g_log.semester = "'+T(period.period.name)+'" and request_change_g_log.yearp = "'+str(period.yearp)+'" and request_change_g_log.date_operation >="'+str(month[1])+'" and request_change_g_log.date_operation<="'+str(month[2])+'" and request_change_g_log.project = "'+str(project)+'" and request_change_g_log.roll = "Student" and request_change_g_log.username = "'+str(userP)+'" and request_change_g_log.after_status = "canceled"'
+                else:
+                    search='request_change_g_log.semester = "'+T(period.period.name)+'" and request_change_g_log.yearp = "'+str(period.yearp)+'" and request_change_g_log.date_operation >="'+str(month[1])+'" and request_change_g_log.date_operation<="'+str(month[2])+'" and request_change_g_log.project = "'+str(project)+'" and request_change_g_log.roll = "Student" and request_change_g_log.username = "'+str(userP)+'" and request_change_g_log.after_status = "canceled" and '+personal_query
+                countI = db.smart_query(db.request_change_g_log,search).count()
+                infoeLevelTemp.append(countI)
+            #PENDING
+            if str(request.vars['type_L'])=="all" or str(request.vars['type_L'])=="p":
+                if period.period==1:
+                    if personal_query == '':
+                        search='request_change_g_log.semester = "'+T(period.period.name)+'" and request_change_g_log.yearp = "'+str(period.yearp)+'" and request_change_g_log.date_request >="'+str(period.yearp)+'-01-01" and request_change_g_log.date_request<="'+str(month[2])+'" and request_change_g_log.project = "'+str(project)+'" and request_change_g_log.roll = "Student" and request_change_g_log.username = "'+str(userP)+'" and request_change_g_log.after_status = "pending"'
+                    else:
+                        search='request_change_g_log.semester = "'+T(period.period.name)+'" and request_change_g_log.yearp = "'+str(period.yearp)+'" and request_change_g_log.date_request >="'+str(period.yearp)+'-01-01" and request_change_g_log.date_request<="'+str(month[2])+'" and request_change_g_log.project = "'+str(project)+'" and request_change_g_log.roll = "Student" and request_change_g_log.username = "'+str(userP)+'" and request_change_g_log.after_status = "pending" and '+personal_query
+                    countP = db.smart_query(db.request_change_g_log,search).count()
+                    if personal_query == '':
+                        search='request_change_g_log.semester = "'+T(period.period.name)+'" and request_change_g_log.yearp = "'+str(period.yearp)+'" and request_change_g_log.date_operation >="'+str(period.yearp)+'-01-01" and request_change_g_log.date_operation<="'+str(month[2])+'" and request_change_g_log.project = "'+str(project)+'" and request_change_g_log.roll = "Student" and request_change_g_log.username = "'+str(userP)+'" and request_change_g_log.after_status != "pending"'
+                    else:
+                        search='request_change_g_log.semester = "'+T(period.period.name)+'" and request_change_g_log.yearp = "'+str(period.yearp)+'" and request_change_g_log.date_operation >="'+str(period.yearp)+'-01-01" and request_change_g_log.date_operation<="'+str(month[2])+'" and request_change_g_log.project = "'+str(project)+'" and request_change_g_log.roll = "Student" and request_change_g_log.username = "'+str(userP)+'" and request_change_g_log.after_status != "pending" and '+personal_query
+                    countNP = db.smart_query(db.request_change_g_log,search).count()
+                else:
+                    if personal_query == '':
+                        search='request_change_g_log.semester = "'+T(period.period.name)+'" and request_change_g_log.yearp = "'+str(period.yearp)+'" and request_change_g_log.date_request >="'+str(period.yearp)+'-06-01" and request_change_g_log.date_request<="'+str(month[2])+'" and request_change_g_log.project = "'+str(project)+'" and request_change_g_log.roll = "Student" and request_change_g_log.username = "'+str(userP)+'" and request_change_g_log.after_status = "pending"'
+                    else:
+                        search='request_change_g_log.semester = "'+T(period.period.name)+'" and request_change_g_log.yearp = "'+str(period.yearp)+'" and request_change_g_log.date_request >="'+str(period.yearp)+'-06-01" and request_change_g_log.date_request<="'+str(month[2])+'" and request_change_g_log.project = "'+str(project)+'" and request_change_g_log.roll = "Student" and request_change_g_log.username = "'+str(userP)+'" and request_change_g_log.after_status = "pending" and '+personal_query
+                    countP = db.smart_query(db.request_change_g_log,search).count()
+                    if personal_query == '':
+                        search='request_change_g_log.semester = "'+T(period.period.name)+'" and request_change_g_log.yearp = "'+str(period.yearp)+'" and request_change_g_log.date_operation >="'+str(period.yearp)+'-06-01" and request_change_g_log.date_operation<="'+str(month[2])+'" and request_change_g_log.project = "'+str(project)+'" and request_change_g_log.roll = "Student" and request_change_g_log.username = "'+str(userP)+'" and request_change_g_log.after_status != "pending"'
+                    else:
+                        search='request_change_g_log.semester = "'+T(period.period.name)+'" and request_change_g_log.yearp = "'+str(period.yearp)+'" and request_change_g_log.date_operation >="'+str(period.yearp)+'-06-01" and request_change_g_log.date_operation<="'+str(month[2])+'" and request_change_g_log.project = "'+str(project)+'" and request_change_g_log.roll = "Student" and request_change_g_log.username = "'+str(userP)+'" and request_change_g_log.after_status != "pending" and '+personal_query
+                    countNP = db.smart_query(db.request_change_g_log,search).count()
+                infoeLevelTemp.append(countP-countNP)
+            #INSERT USER
+            infoLevel.append(infoeLevelTemp)
+    #DATA
+    elif str(request.vars['level'])=="5":
+        #MADE
+        if str(request.vars['type_L'])=="d":
+            if personal_query == '':
+                search='request_change_g_log.semester = "'+T(period.period.name)+'" and request_change_g_log.yearp = "'+str(period.yearp)+'" and request_change_g_log.date_request >="'+str(month[1])+'" and request_change_g_log.date_request<="'+str(month[2])+'" and request_change_g_log.project = "'+str(project)+'" and request_change_g_log.roll = "Student" and request_change_g_log.username = "'+str(userP)+'" and request_change_g_log.after_status = "pending"'
+            else:
+                search='request_change_g_log.semester = "'+T(period.period.name)+'" and request_change_g_log.yearp = "'+str(period.yearp)+'" and request_change_g_log.date_request >="'+str(month[1])+'" and request_change_g_log.date_request<="'+str(month[2])+'" and request_change_g_log.project = "'+str(project)+'" and request_change_g_log.roll = "Student" and request_change_g_log.username = "'+str(userP)+'" and request_change_g_log.after_status = "pending" and '+personal_query
+            for data in db.smart_query(db.request_change_g_log,search).select():
+                grid.append(data.id)
+        #ACCEPTED
+        elif str(request.vars['type_L'])=="i":
+            if personal_query == '':
+                search='request_change_g_log.semester = "'+T(period.period.name)+'" and request_change_g_log.yearp = "'+str(period.yearp)+'" and request_change_g_log.date_operation >="'+str(month[1])+'" and request_change_g_log.date_operation<="'+str(month[2])+'" and request_change_g_log.project = "'+str(project)+'" and request_change_g_log.roll = "Student" and request_change_g_log.username = "'+str(userP)+'" and request_change_g_log.after_status = "accepted"'
+            else:
+                search='request_change_g_log.semester = "'+T(period.period.name)+'" and request_change_g_log.yearp = "'+str(period.yearp)+'" and request_change_g_log.date_operation >="'+str(month[1])+'" and request_change_g_log.date_operation<="'+str(month[2])+'" and request_change_g_log.project = "'+str(project)+'" and request_change_g_log.roll = "Student" and request_change_g_log.username = "'+str(userP)+'" and request_change_g_log.after_status = "accepted" and '+personal_query
+            for data in db.smart_query(db.request_change_g_log,search).select():
+                grid.append(data.id)
+        #REJECTED
+        elif str(request.vars['type_L'])=="u":
+            if personal_query == '':
+                search='request_change_g_log.semester = "'+T(period.period.name)+'" and request_change_g_log.yearp = "'+str(period.yearp)+'" and request_change_g_log.date_operation >="'+str(month[1])+'" and request_change_g_log.date_operation<="'+str(month[2])+'" and request_change_g_log.project = "'+str(project)+'" and request_change_g_log.roll = "Student" and request_change_g_log.username = "'+str(userP)+'" and request_change_g_log.after_status = "rejected"'
+            else:
+                search='request_change_g_log.semester = "'+T(period.period.name)+'" and request_change_g_log.yearp = "'+str(period.yearp)+'" and request_change_g_log.date_operation >="'+str(month[1])+'" and request_change_g_log.date_operation<="'+str(month[2])+'" and request_change_g_log.project = "'+str(project)+'" and request_change_g_log.roll = "Student" and request_change_g_log.username = "'+str(userP)+'" and request_change_g_log.after_status = "rejected" and '+personal_query
+            for data in db.smart_query(db.request_change_g_log,search).select():
+                grid.append(data.id)
+        ##CANCELED
+        elif str(request.vars['type_L'])=="c":
+            if personal_query == '':
+                search='request_change_g_log.semester = "'+T(period.period.name)+'" and request_change_g_log.yearp = "'+str(period.yearp)+'" and request_change_g_log.date_operation >="'+str(month[1])+'" and request_change_g_log.date_operation<="'+str(month[2])+'" and request_change_g_log.project = "'+str(project)+'" and request_change_g_log.roll = "Student" and request_change_g_log.username = "'+str(userP)+'" and request_change_g_log.after_status = "canceled"'
+            else:
+                search='request_change_g_log.semester = "'+T(period.period.name)+'" and request_change_g_log.yearp = "'+str(period.yearp)+'" and request_change_g_log.date_operation >="'+str(month[1])+'" and request_change_g_log.date_operation<="'+str(month[2])+'" and request_change_g_log.project = "'+str(project)+'" and request_change_g_log.roll = "Student" and request_change_g_log.username = "'+str(userP)+'" and request_change_g_log.after_status = "canceled" and '+personal_query
+            for data in db.smart_query(db.request_change_g_log,search).select():
+                grid.append(data.id)
+        #PENDING
+        elif str(request.vars['type_L'])=="p":
+            if period.period==1:
+                if personal_query == '':
+                    search='request_change_g_log.semester = "'+T(period.period.name)+'" and request_change_g_log.yearp = "'+str(period.yearp)+'" and request_change_g_log.date_request >="'+str(period.yearp)+'-01-01" and request_change_g_log.date_request<="'+str(month[2])+'" and request_change_g_log.project = "'+str(project)+'" and request_change_g_log.roll = "Student" and request_change_g_log.username = "'+str(userP)+'" and request_change_g_log.after_status = "pending"'
+                else:
+                    search='request_change_g_log.semester = "'+T(period.period.name)+'" and request_change_g_log.yearp = "'+str(period.yearp)+'" and request_change_g_log.date_request >="'+str(period.yearp)+'-01-01" and request_change_g_log.date_request<="'+str(month[2])+'" and request_change_g_log.project = "'+str(project)+'" and request_change_g_log.roll = "Student" and request_change_g_log.username = "'+str(userP)+'" and request_change_g_log.after_status = "pending" and '+personal_query
+                for pending in db.smart_query(db.request_change_g_log,search).select():
+                    if personal_query == '':
+                        search='request_change_g_log.r_c_g_id = "'+str(pending.r_c_g_id)+'" and request_change_g_log.after_status != "pending"'
+                    else:
+                        search='request_change_g_log.r_c_g_id = "'+str(pending.r_c_g_id)+'" and request_change_g_log.after_status != "pending" and '+personal_query
+                    if db.smart_query(db.request_change_g_log,search).select().first() is None:
+                        grid.append(pending.id)
+            else:
+                if personal_query == '':
+                    search='request_change_g_log.semester = "'+T(period.period.name)+'" and request_change_g_log.yearp = "'+str(period.yearp)+'" and request_change_g_log.date_request >="'+str(period.yearp)+'-06-01" and request_change_g_log.date_request<="'+str(month[2])+'" and request_change_g_log.project = "'+str(project)+'" and request_change_g_log.roll = "Student" and request_change_g_log.username = "'+str(userP)+'" and request_change_g_log.after_status = "pending"'
+                else:
+                    search='request_change_g_log.semester = "'+T(period.period.name)+'" and request_change_g_log.yearp = "'+str(period.yearp)+'" and request_change_g_log.date_request >="'+str(period.yearp)+'-06-01" and request_change_g_log.date_request<="'+str(month[2])+'" and request_change_g_log.project = "'+str(project)+'" and request_change_g_log.roll = "Student" and request_change_g_log.username = "'+str(userP)+'" and request_change_g_log.after_status = "pending" and '+personal_query
+                for pending in db.smart_query(db.request_change_g_log,search).select():
+                    if personal_query == '':
+                        search='request_change_g_log.r_c_g_id = "'+str(pending.r_c_g_id)+'" and request_change_g_log.after_status != "pending"'
+                    else:
+                        search='request_change_g_log.r_c_g_id = "'+str(pending.r_c_g_id)+'" and request_change_g_log.after_status != "pending" and '+personal_query
+                    if db.smart_query(db.request_change_g_log,search).select().first() is None:
+                        grid.append(pending.id)
+        #ALL
+        elif str(request.vars['type_L'])=="all":
+            #MADE AND PENDING
+            if period.period==1:
+                if personal_query == '':
+                    search='request_change_g_log.semester = "'+T(period.period.name)+'" and request_change_g_log.yearp = "'+str(period.yearp)+'" and request_change_g_log.date_request >="'+str(period.yearp)+'-01-01" and request_change_g_log.date_request<="'+str(month[2])+'" and request_change_g_log.project = "'+str(project)+'" and request_change_g_log.roll = "Student" and request_change_g_log.username = "'+str(userP)+'" and request_change_g_log.after_status = "pending"'
+                else:
+                    search='request_change_g_log.semester = "'+T(period.period.name)+'" and request_change_g_log.yearp = "'+str(period.yearp)+'" and request_change_g_log.date_request >="'+str(period.yearp)+'-01-01" and request_change_g_log.date_request<="'+str(month[2])+'" and request_change_g_log.project = "'+str(project)+'" and request_change_g_log.roll = "Student" and request_change_g_log.username = "'+str(userP)+'" and request_change_g_log.after_status = "pending" and '+personal_query
+                for pending in db.smart_query(db.request_change_g_log,search).select():
+                    if personal_query == '':
+                        search='request_change_g_log.r_c_g_id = "'+str(pending.r_c_g_id)+'" and request_change_g_log.after_status != "pending"'
+                    else:
+                        search='request_change_g_log.r_c_g_id = "'+str(pending.r_c_g_id)+'" and request_change_g_log.after_status != "pending" and '+personal_query
+                    if db.smart_query(db.request_change_g_log,search).select().first() is None:
+                        grid.append(pending.id)
+            else:
+                if personal_query == '':
+                    search='request_change_g_log.semester = "'+T(period.period.name)+'" and request_change_g_log.yearp = "'+str(period.yearp)+'" and request_change_g_log.date_request >="'+str(period.yearp)+'-06-01" and request_change_g_log.date_request<="'+str(month[2])+'" and request_change_g_log.project = "'+str(project)+'" and request_change_g_log.roll = "Student" and request_change_g_log.username = "'+str(userP)+'" and request_change_g_log.after_status = "pending"'
+                else:
+                    search='request_change_g_log.semester = "'+T(period.period.name)+'" and request_change_g_log.yearp = "'+str(period.yearp)+'" and request_change_g_log.date_request >="'+str(period.yearp)+'-06-01" and request_change_g_log.date_request<="'+str(month[2])+'" and request_change_g_log.project = "'+str(project)+'" and request_change_g_log.roll = "Student" and request_change_g_log.username = "'+str(userP)+'" and request_change_g_log.after_status = "pending" and '+personal_query
+                for pending in db.smart_query(db.request_change_g_log,search).select():
+                    if personal_query == '':
+                        search='request_change_g_log.r_c_g_id = "'+str(pending.r_c_g_id)+'" and request_change_g_log.after_status != "pending"'
+                    else:
+                        search='request_change_g_log.r_c_g_id = "'+str(pending.r_c_g_id)+'" and request_change_g_log.after_status != "pending" and '+personal_query
+                    if db.smart_query(db.request_change_g_log,search).select().first() is None:
+                        grid.append(pending.id)
+            #ACCEPTED
+            if personal_query == '':
+                search='request_change_g_log.semester = "'+T(period.period.name)+'" and request_change_g_log.yearp = "'+str(period.yearp)+'" and request_change_g_log.date_operation >="'+str(month[1])+'" and request_change_g_log.date_operation<="'+str(month[2])+'" and request_change_g_log.project = "'+str(project)+'" and request_change_g_log.roll = "Student" and request_change_g_log.username = "'+str(userP)+'" and request_change_g_log.after_status = "accepted"'
+            else:
+                search='request_change_g_log.semester = "'+T(period.period.name)+'" and request_change_g_log.yearp = "'+str(period.yearp)+'" and request_change_g_log.date_operation >="'+str(month[1])+'" and request_change_g_log.date_operation<="'+str(month[2])+'" and request_change_g_log.project = "'+str(project)+'" and request_change_g_log.roll = "Student" and request_change_g_log.username = "'+str(userP)+'" and request_change_g_log.after_status = "accepted" and '+personal_query
+            for data in db.smart_query(db.request_change_g_log,search).select():
+                grid.append(data.id)
+            #REJECTED
+            if personal_query == '':
+                search='request_change_g_log.semester = "'+T(period.period.name)+'" and request_change_g_log.yearp = "'+str(period.yearp)+'" and request_change_g_log.date_operation >="'+str(month[1])+'" and request_change_g_log.date_operation<="'+str(month[2])+'" and request_change_g_log.project = "'+str(project)+'" and request_change_g_log.roll = "Student" and request_change_g_log.username = "'+str(userP)+'" and request_change_g_log.after_status = "rejected"'
+            else:
+                search='request_change_g_log.semester = "'+T(period.period.name)+'" and request_change_g_log.yearp = "'+str(period.yearp)+'" and request_change_g_log.date_operation >="'+str(month[1])+'" and request_change_g_log.date_operation<="'+str(month[2])+'" and request_change_g_log.project = "'+str(project)+'" and request_change_g_log.roll = "Student" and request_change_g_log.username = "'+str(userP)+'" and request_change_g_log.after_status = "rejected" and '+personal_query
+            for data in db.smart_query(db.request_change_g_log,search).select():
+                grid.append(data.id)
+            ##CANCELED
+            if personal_query == '':
+                search='request_change_g_log.semester = "'+T(period.period.name)+'" and request_change_g_log.yearp = "'+str(period.yearp)+'" and request_change_g_log.date_operation >="'+str(month[1])+'" and request_change_g_log.date_operation<="'+str(month[2])+'" and request_change_g_log.project = "'+str(project)+'" and request_change_g_log.roll = "Student" and request_change_g_log.username = "'+str(userP)+'" and request_change_g_log.after_status = "canceled"'
+            else:
+                search='request_change_g_log.semester = "'+T(period.period.name)+'" and request_change_g_log.yearp = "'+str(period.yearp)+'" and request_change_g_log.date_operation >="'+str(month[1])+'" and request_change_g_log.date_operation<="'+str(month[2])+'" and request_change_g_log.project = "'+str(project)+'" and request_change_g_log.roll = "Student" and request_change_g_log.username = "'+str(userP)+'" and request_change_g_log.after_status = "canceled" and '+personal_query
+            for data in db.smart_query(db.request_change_g_log,search).select():
+                grid.append(data.id)
+
+        #TITLE
+        infoeLevelTemp=[]
+        infoeLevelTemp.append(T(period.period.name)+' '+str(period.yearp))
+        infoeLevelTemp.append(str(month[0]))
+        infoeLevelTemp.append(project)
+        infoeLevelTemp.append(T('Rol Student'))
+        infoeLevelTemp.append(str(userP))
+        infoLevel.append(infoeLevelTemp)
+        #REPORT
+        if len(grid) == 0:
+            grid.append(-1)
+        db.request_change_g_log.id.readable = False
+        db.request_change_g_log.id.writable = False
+        db.request_change_g_log.username.readable = False
+        db.request_change_g_log.username.writable = False
+        db.request_change_g_log.roll.readable = False
+        db.request_change_g_log.roll.writable = False
+        db.request_change_g_log.semester.readable = False
+        db.request_change_g_log.semester.writable = False
+        db.request_change_g_log.yearp.readable = False
+        db.request_change_g_log.yearp.writable = False
+        db.request_change_g_log.project.readable = False
+        db.request_change_g_log.project.writable = False
+        db.request_change_g_log.r_c_g_id.readable = False
+        db.request_change_g_log.r_c_g_id.writable = False
+        links = [lambda row: A(T('Detail'),
+        _role='button', 
+        _class= 'btn btn-info', 
+        _onclick='set_values("'+str(row.id)+'");', 
+        _title=T('View Detail') ,**{"_data-toggle":"modal", "_data-target": "#detailModal"})]
+        grid = SQLFORM.grid(db.request_change_g_log.id.belongs(grid), links=links, csv=False, create=False, editable=False, deletable=False, details=False, paginate=9, searchable=False)
+    return dict(fsearch=fsearch, filtered_by=filtered_by, personal_query=personal_query, infoLevel=infoLevel, grid=grid) 

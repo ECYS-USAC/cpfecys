@@ -1,0 +1,591 @@
+{{extend 'template.html'}}
+<!-- Additional Scripts for MARKMIN -->
+<script src="http://code.jquery.com/jquery-migrate-1.2.1.js"></script>
+<script type="text/javascript" src="{{=URL('static','markitup')}}/jquery.markitup.pack.js"></script>
+<script type="text/javascript" src="{{=URL('static','markitup')}}/sets/markmin/set.js"></script>
+<script type="text/javascript" src="{{=URL('static','js')}}/highcharts/js/highcharts.js"></script>
+<script type="text/javascript" src="{{=URL('static','js')}}/highcharts/js/modules/data.js"></script>
+<script type="text/javascript" src="{{=URL('static','js')}}/highcharts/js/modules/exporting.js"></script>
+<link rel="stylesheet" type="text/css" href="{{=URL('static','markitup')}}/skins/markitup/style.css"/>
+<link rel="stylesheet" type="text/css" href="{{=URL('static','markitup')}}/sets/markmin/style.css"/>
+<!-- //Additional Scripts for MARKMIN -->
+<div class="row-fluid container" style="overflow:auto; width:100%;">
+	<!--Search in report-->
+	<div class="navbar navbar-fixed-bottom pull-right" style="overflow:auto; width:100%;">
+    	<div class="navbar-inner">
+	    	<div>
+	    		{{if request.vars['level'] is None or str(request.vars['level'])=="1":}}
+					<form action="{{=URL('management_reports', 'change_request_activities_with_metric_management')}}" method="post">
+				{{elif str(request.vars['level'])=="2":}}
+					<form action="{{=URL('management_reports', 'change_request_activities_with_metric_management', vars=dict(level = 2, period = request.vars['period'], type_L=request.vars['type_L']))}}" method="post">
+				{{elif str(request.vars['level'])=="3":}}
+					<form action="{{=URL('management_reports', 'change_request_activities_with_metric_management', vars=dict(level = 3, period = request.vars['period'], month = str(request.vars['month']), type_L=request.vars['type_L'], type_U=request.vars['type_U']))}}" method="post">
+				{{elif str(request.vars['level'])=="4":}}
+					<form action="{{=URL('management_reports', 'change_request_activities_with_metric_management', vars=dict(level = 4, period = request.vars['period'], month = str(request.vars['month']), project = str(request.vars['project']), type_L=request.vars['type_L'], type_U=request.vars['type_U']))}}" method="post">
+				{{elif str(request.vars['level'])=="5":}}
+					<form action="{{=URL('management_reports', 'change_request_activities_with_metric_management', vars=dict(level = 5, period = request.vars['period'], month = str(request.vars['month']), project = str(request.vars['project']), userP = str(request.vars['userP']), type_L=request.vars['type_L'], type_U=request.vars['type_U'], searchT='T'))}}" method="post">
+				{{pass}}
+					<input type="text" id="querySearch" name="querySearch" value="{{=personal_query}}" readonly="readonly"/>
+					<a id="buildSearch" class="btn">{{=T('Build Search')}}</a>
+					<button type="submit"  class="btn">{{=T('Search')}}</button>
+					<a id="cancelSearch" class="btn">{{=T('Clear')}}</a>
+				</form>
+			</div>
+			<div id="div_search" style="display: none;">
+				<table>
+					<tr>
+						<td>
+							<select class="generic-widget" id="fieldSearch">
+							{{for field in fsearch:}}
+								<option value="requestchange_activity_log.{{=str(field[0])}}">{{=str(field[1])}}</option>
+							{{pass}}
+							</select>
+						</td>
+						<td>
+							{{conadorF=0}}
+							{{for field in fsearch:}}
+								{{if conadorF==0:}}
+									<select class="generic-widget" id="optionSearch_{{=str(field[0])}}">
+								{{else:}}
+									<select class="generic-widget" id="optionSearch_{{=str(field[0])}}" style="display:none;">
+								{{pass}}
+								{{for option in (filtered_by(field[2])):}}
+									<option value="{{=str(option)}}">{{=T(option)}}</option>
+								{{pass}}
+								</select>
+								{{conadorF+=1}}
+							{{pass}}
+						</td>
+						<td>
+							{{conadorF=0}}
+							{{for field in fsearch:}}
+								{{if field[3][0]==1:}}
+									{{if conadorF==0:}}
+										<input id="value_{{=str(field[0])}}" type="text" />
+									{{else:}}
+										<input id="value_{{=str(field[0])}}" type="text" style="display:none;"/>
+									{{pass}}
+								{{elif field[3][0]==2:}}
+									{{if conadorF==0:}}
+										<select class="generic-widget" id="value_{{=str(field[0])}}">
+									{{else:}}
+										<select class="generic-widget" id="value_{{=str(field[0])}}" style="display:none;">
+									{{pass}}
+										{{contadorValores4=0}}
+										{{for f in field[3]:}}
+											{{if contadorValores4!=0:}}
+												<option value="{{=f}}" title="{{=f}}">{{=f}}</option>
+											{{else:}}
+												{{contadorValores4=1}}
+											{{pass}}
+										{{pass}}
+									</select>
+								{{elif field[3][0]==3:}}
+									{{if conadorF==0:}}
+										<select class="generic-widget" id="value_{{=str(field[0])}}">
+									{{else:}}
+										<select class="generic-widget" id="value_{{=str(field[0])}}" style="display:none;">
+									{{pass}}
+										{{for f in field[3][1]:}}
+											<option value="{{=f}}" title="{{=f}}">{{=f}}</option>
+										{{pass}}
+									</select>
+								{{elif field[3][0]==4:}}
+									{{if conadorF==0:}}
+										<select class="generic-widget" id="value_{{=str(field[0])}}">
+									{{else:}}
+										<select class="generic-widget" id="value_{{=str(field[0])}}" style="display:none;">
+									{{pass}}
+										{{for f in field[3][1]:}}
+											<option value="{{=f}}" title="{{=T('Rol '+f)}}">{{=T('Rol '+f)}}</option>
+										{{pass}}
+									</select>
+								{{pass}}
+								{{conadorF+=1}}
+							{{pass}}
+						</td>
+						<td>
+							<a id="newSearch" class="btn" title="{{=T('Start building a new search')}}">{{=T('New Search')}}</a>
+						</td>
+						<td>
+							<a id="andSearch" class="btn" title="{{=T('Add this to the search as an AND term')}}">{{=T('+ And')}}</a>
+						</td>
+						<td>
+							<a id="closeSearch" class="btn">{{=T('Close')}}</a>
+						</td>
+					</tr>
+				</table>
+			</div>
+    	</div>
+    </div>
+    <!--Search in report-->
+
+    <!--REPORT CONTENTS-->
+    	<div>
+    	<!--HEADER OF REPORT-->
+	    	{{if request.vars['level'] is not None and str(request.vars['level'])!="1":}}
+	    	<div class="pull-left">
+	    		<a style="white-space:nowrap; cursor:pointer; align:right;" class="btn" onclick="levelUP();">
+	    			<span class="icon-black icon-arrow-up"></span><b>{{=T('Level Up')}}</b>
+	    		</a>
+	    	</div>
+	    	{{pass}}
+	    	<div class="pull-right">
+	    		<a onclick="exportCSV();"><img src="{{=URL('static','images')}}/icono_CSV.png"></a>
+	    	</div>
+	    	<center><h1>{{=T('Report Summary')}}</h1></center>
+	    	<hr>
+    	<!--HEADER OF REPORT-->
+    	{{if request.vars['level'] is None or str(request.vars['level'])=="1":}}
+			<img class="pull-right" src="{{=URL('static','images')}}/escudo.png">
+			<center><strong>Universidad de San Carlos de Guatemala</strong><br/>
+			<strong>Facultad de Ingeniería</strong><br/>
+			<strong>Escuela de Ciencias y Sistemas</strong></center><br/>
+			<strong>{{=T('Type')}}: </strong> {{=T('Change Request Management Activity with Metric')}}<br/>
+			<strong>{{=T('Description')}}: </strong> {{=T('Report of operations for managing change requests metric activities')}}<br/>
+			<div>
+		  		<center><h1>{{=T('Detail')}}</h1></center>
+		  		<hr>
+		  	</div>
+
+			<!--REPORT IN TABLE-->
+				<table class="table table-striped table-bordered">
+					<tr>
+						<th><center>{{=T('Period')}}</center></th>
+						<th><center>{{=T('Total Made Requests')}}</center></th>
+						<th><center>{{=T('Total Accepted request')}}</center></th>
+						<th><center>{{=T('Total Rejected request')}}</center></th>
+						<th><center>{{=T('Total Pending Requests')}}</center></th>
+					</tr>
+					{{for period in infoLevel:}}
+					<tr>
+						<td>
+							<a style="white-space:nowrap;" href="{{=URL('management_reports', 'change_request_activities_with_metric_management',vars=dict(period = period[0], level='2', type_L = 'all', querySearch=personal_query))}}">{{=period[1]}}</a>
+						</td>
+						<td>
+							<center><a class="badge badge-info" style="white-space:nowrap;" href="{{=URL('management_reports', 'change_request_activities_with_metric_management',vars=dict(period = period[0], level='2', type_L = 'd', querySearch=personal_query))}}">{{=period[2]}}</a></center>
+						</td>
+						<td>
+							<center><a class="badge badge-success" style="white-space:nowrap;" href="{{=URL('management_reports', 'change_request_activities_with_metric_management',vars=dict(period = period[0], level='2', type_L = 'i', querySearch=personal_query))}}">{{=period[3]}}</a></center>
+						</td>
+						<td>
+							<center><a class="badge badge-important" style="white-space:nowrap;" href="{{=URL('management_reports', 'change_request_activities_with_metric_management',vars=dict(period = period[0], level='2', type_L = 'u', querySearch=personal_query))}}">{{=period[4]}}</a></center>
+						</td>
+						<td>
+							<center><a class="badge" style="white-space:nowrap;" href="{{=URL('management_reports', 'change_request_activities_with_metric_management',vars=dict(period = period[0], level='2', type_L = 'p', querySearch=personal_query))}}">{{=period[5]}}</a></center>
+						</td>
+					</tr>
+					{{pass}}
+				</table>
+			<!--REPORT IN TABLE-->
+		{{elif str(request.vars['level'])=="2":}}
+	    	<img class="pull-right" src="{{=URL('static','images')}}/escudo.png">
+			<center><strong>Universidad de San Carlos de Guatemala</strong><br/>
+			<strong>Facultad de Ingeniería</strong><br/>
+			<strong>Escuela de Ciencias y Sistemas</strong></center><br/>
+			<strong>{{=T('Type')}}: </strong> {{=T('Change Request Management Activity with Metric')}}<br/>
+			<strong>{{=T('Description')}}: </strong> {{=T('Report of operations for managing change requests metric activities')}}<br/>
+			<strong>{{=T('Period')}}: </strong> {{=infoLevel[0][0]}}<br/>
+			<div>
+		  		<center><h1>{{=T('Detail')}}</h1></center>
+		  		<hr>
+		  	</div>
+
+		  	<!--REPORT IN TABLE-->
+				<table class="table table-striped table-bordered nograph">
+					<tr>
+						<th><center>{{=T('Month')}}</center></th>
+						{{if str(request.vars['type_L'])=="all" or str(request.vars['type_L'])=="d":}}
+							<th><center>{{=T('Total Made Requests')}}</center></th>
+						{{pass}}
+						{{if str(request.vars['type_L'])=="all" or str(request.vars['type_L'])=="i":}}
+							<th><center>{{=T('Total Accepted request')}}</center></th>
+						{{pass}}
+						{{if str(request.vars['type_L'])=="all" or str(request.vars['type_L'])=="u":}}
+							<th><center>{{=T('Total Rejected request')}}</center></th>
+						{{pass}}
+						{{if str(request.vars['type_L'])=="all" or str(request.vars['type_L'])=="p":}}
+							<th><center>{{=T('Total Pending Requests')}}</center></th>
+						{{pass}}
+					</tr>
+					{{for month in infoLevel:}}
+					<tr>
+						<td>
+							<a style="white-space:nowrap;" href="{{=URL('management_reports', 'change_request_activities_with_metric_management',vars=dict(period = str(request.vars['period']), month= month[1], level='3', type_U = str(request.vars['type_L']), type_L = 'all', querySearch=personal_query))}}">
+								{{=month[2]}}
+							</a>
+						</td>
+						{{if str(request.vars['type_L'])=="all" or str(request.vars['type_L'])=="d":}}
+							<td>
+								<center><a class="badge badge-info" style="white-space:nowrap;" href="{{=URL('management_reports', 'change_request_activities_with_metric_management',vars=dict(period = str(request.vars['period']), month= month[1], level='3', type_U = str(request.vars['type_L']), type_L = 'd', querySearch=personal_query))}}">
+									{{=month[3]}}
+								</a></center>
+							</td>
+						{{pass}}
+						{{if str(request.vars['type_L'])=="all" or str(request.vars['type_L'])=="i":}}
+						<td>
+							<center><a class="badge badge-success" style="white-space:nowrap;" href="{{=URL('management_reports', 'change_request_activities_with_metric_management',vars=dict(period = str(request.vars['period']), month= month[1], level='3', type_U = str(request.vars['type_L']), type_L = 'i', querySearch=personal_query))}}">
+									{{if str(request.vars['type_L'])=="all":
+										=month[4]
+									else:
+										=month[3]
+									pass
+									}}
+							</a></center>
+						</td>
+						{{pass}}
+						{{if str(request.vars['type_L'])=="all" or str(request.vars['type_L'])=="u":}}
+							<td>
+								<center><a class="badge badge-important" style="white-space:nowrap;" href="{{=URL('management_reports', 'change_request_activities_with_metric_management',vars=dict(period = str(request.vars['period']), month= month[1], level='3', type_U = str(request.vars['type_L']), type_L = 'u', querySearch=personal_query))}}">
+									{{if str(request.vars['type_L'])=="all":
+										=month[5]
+									else:
+										=month[3]
+									pass
+									}}
+								</a></center>
+							</td>
+						{{pass}}
+						{{if str(request.vars['type_L'])=="all" or str(request.vars['type_L'])=="p":}}
+							<td>
+								<center><a class="badge" style="white-space:nowrap;" href="{{=URL('management_reports', 'change_request_activities_with_metric_management',vars=dict(period = str(request.vars['period']), month= month[1], level='3', type_U = str(request.vars['type_L']), type_L = 'p', querySearch=personal_query))}}">
+									{{if str(request.vars['type_L'])=="all":
+										=month[6]
+									else:
+										=month[3]
+									pass
+									}}
+								</a></center>
+							</td>
+						{{pass}}
+					</tr>
+					{{pass}}
+				</table>
+		  	<!--REPORT IN TABLE-->
+    	{{elif str(request.vars['level'])=="3":}}
+	    	<img class="pull-right" src="{{=URL('static','images')}}/escudo.png">
+			<center><strong>Universidad de San Carlos de Guatemala</strong><br/>
+			<strong>Facultad de Ingeniería</strong><br/>
+			<strong>Escuela de Ciencias y Sistemas</strong></center><br/>
+			<strong>{{=T('Type')}}: </strong> {{=T('Change Request Management Activity with Metric')}}<br/>
+			<strong>{{=T('Description')}}: </strong> {{=T('Report of operations for managing change requests metric activities')}}<br/>
+			<strong>{{=T('Period')}}: </strong> {{=infoLevel[0][0]}}<br/>
+			<strong>{{=T('Month')}}: </strong> {{=infoLevel[0][1]}}<br/>
+			<div>
+		  		<center><h1>{{=T('Detail')}}</h1></center>
+		  		<hr>
+		  	</div>
+
+		  	<!--REPORT IN TABLE-->
+				<table class="table table-striped table-bordered nograph">
+					<tr>
+						<th><center>{{=T('Project')}}</center></th>
+						{{if str(request.vars['type_L'])=="all" or str(request.vars['type_L'])=="d":}}
+							<th><center>{{=T('Total Made Requests')}}</center></th>
+						{{pass}}
+						{{if str(request.vars['type_L'])=="all" or str(request.vars['type_L'])=="i":}}
+							<th><center>{{=T('Total Accepted request')}}</center></th>
+						{{pass}}
+						{{if str(request.vars['type_L'])=="all" or str(request.vars['type_L'])=="u":}}
+							<th><center>{{=T('Total Rejected request')}}</center></th>
+						{{pass}}
+						{{if str(request.vars['type_L'])=="all" or str(request.vars['type_L'])=="p":}}
+							<th><center>{{=T('Total Pending Requests')}}</center></th>
+						{{pass}}
+					</tr>
+					{{pieGraphR=0}}
+					{{for project in infoLevel:}}
+					{{pieGraphR=pieGraphR+1}}
+					<tr>
+						<td>
+							<a style="white-space:nowrap;" href="{{=URL('management_reports', 'change_request_activities_with_metric_management',vars=dict(period = str(request.vars['period']), month= str(request.vars['month']), project=project[2], level='4', type_U = str(request.vars['type_L']), type_L = 'all', querySearch=personal_query))}}">
+								{{=project[3]}}
+							</a>
+						</td>
+						{{if str(request.vars['type_L'])=="all" or str(request.vars['type_L'])=="d":}}
+						<td>
+							<center><a class="badge badge-info" style="white-space:nowrap;" href="{{=URL('management_reports', 'change_request_activities_with_metric_management',vars=dict(period = str(request.vars['period']), month= str(request.vars['month']), project=project[2], level='4', type_U = str(request.vars['type_L']), type_L = 'd', querySearch=personal_query))}}">
+								{{=project[4]}}
+							</a></center>
+						</td>
+						{{pass}}
+						{{if str(request.vars['type_L'])=="all" or str(request.vars['type_L'])=="i":}}
+						<td>
+							<center><a class="badge badge-success" style="white-space:nowrap;" href="{{=URL('management_reports', 'change_request_activities_with_metric_management',vars=dict(period = str(request.vars['period']), month= str(request.vars['month']), project=project[2], level='4', type_U = str(request.vars['type_L']), type_L = 'i', querySearch=personal_query))}}">
+								{{if str(request.vars['type_L'])=="all":
+									=project[5]
+								else:
+									=project[4]
+								pass
+								}}
+							</a></center>
+						</td>
+						{{pass}}
+						{{if str(request.vars['type_L'])=="all" or str(request.vars['type_L'])=="u":}}
+						<td>
+							<center><a class="badge badge-important" style="white-space:nowrap;" href="{{=URL('management_reports', 'change_request_activities_with_metric_management',vars=dict(period = str(request.vars['period']), month= str(request.vars['month']), project=project[2], level='4', type_U = str(request.vars['type_L']), type_L = 'u', querySearch=personal_query))}}">
+								{{if str(request.vars['type_L'])=="all":
+									=project[6]
+								else:
+									=project[4]
+								pass
+								}}
+							</a></center>
+						{{pass}}
+						{{if str(request.vars['type_L'])=="all" or str(request.vars['type_L'])=="p":}}
+						<td>
+							<center><a class="badge" style="white-space:nowrap;" href="{{=URL('management_reports', 'change_request_activities_with_metric_management',vars=dict(period = str(request.vars['period']), month= str(request.vars['month']), project=project[2], level='4', type_U = str(request.vars['type_L']), type_L = 'p', querySearch=personal_query))}}">
+								{{if str(request.vars['type_L'])=="all":
+									=project[7]
+								else:
+									=project[4]
+								pass
+								}}
+							</a></center>
+						{{pass}}
+					</tr>
+					{{pass}}
+				</table>
+			<!--REPORT IN TABLE-->
+			<div align="right"> {{=T('Count')}} {{=T('Projects')}}: {{=pieGraphR}}</div>
+    	{{elif str(request.vars['level'])=="4":}}
+	    	<img class="pull-right" src="{{=URL('static','images')}}/escudo.png">
+			<center><strong>Universidad de San Carlos de Guatemala</strong><br/>
+			<strong>Facultad de Ingeniería</strong><br/>
+			<strong>Escuela de Ciencias y Sistemas</strong></center><br/>
+			<strong>{{=T('Type')}}: </strong> {{=T('Change Request Management Activity with Metric')}}<br/>
+			<strong>{{=T('Description')}}: </strong> {{=T('Report of operations for managing change requests metric activities')}}<br/>
+			<strong>{{=T('Period')}}: </strong> {{=infoLevel[0][0]}}<br/>
+			<strong>{{=T('Month')}}: </strong> {{=infoLevel[0][1]}}<br/>
+			<strong>{{=T('Project')}}: </strong> {{=infoLevel[0][2]}}<br/>
+			<div>
+		  		<center><h1>{{=T('Detail')}}</h1></center>
+		  		<hr>
+		  	</div>
+
+		  	<!--REPORT IN TABLE-->
+				<table class="table table-striped table-bordered nograph">
+					<tr>
+						<th><center>{{=T('User')}}</center></th>
+						{{if str(request.vars['type_L'])=="all" or str(request.vars['type_L'])=="d":}}
+							<th><center>{{=T('Total Made Requests')}}</center></th>
+						{{pass}}
+						{{if str(request.vars['type_L'])=="all" or str(request.vars['type_L'])=="i":}}
+							<th><center>{{=T('Total Accepted request')}}</center></th>
+						{{pass}}
+						{{if str(request.vars['type_L'])=="all" or str(request.vars['type_L'])=="u":}}
+							<th><center>{{=T('Total Rejected request')}}</center></th>
+						{{pass}}
+						{{if str(request.vars['type_L'])=="all" or str(request.vars['type_L'])=="p":}}
+							<th><center>{{=T('Total Pending Requests')}}</center></th>
+						{{pass}}
+					</tr>
+					{{pieGraphU=0}}
+					{{for userP in infoLevel:}}
+					{{pieGraphU=pieGraphU+1}}
+					<tr>
+						<td>
+							<a style="white-space:nowrap;" href="{{=URL('management_reports', 'change_request_activities_with_metric_management',vars=dict(period = str(request.vars['period']), month= str(request.vars['month']), project= str(request.vars['project']), userP=userP[3], level='5', type_U = str(request.vars['type_L']), type_L = 'all', querySearch=personal_query))}}">
+								{{=userP[4]}}
+							</a>
+						</td>
+						{{if str(request.vars['type_L'])=="all" or str(request.vars['type_L'])=="d":}}
+						<td>
+							<center><a class="badge badge-info" style="white-space:nowrap;" href="{{=URL('management_reports', 'change_request_activities_with_metric_management',vars=dict(period = str(request.vars['period']), month= str(request.vars['month']), project= str(request.vars['project']), userP=userP[3], level='5', type_U = str(request.vars['type_L']), type_L = 'd', querySearch=personal_query))}}">
+								{{=userP[5]}}
+							</a></center>
+						</td>
+						{{pass}}
+						{{if str(request.vars['type_L'])=="all" or str(request.vars['type_L'])=="i":}}
+						<td>
+							<center><a class="badge badge-success" style="white-space:nowrap;" href="{{=URL('management_reports', 'change_request_activities_with_metric_management',vars=dict(period = str(request.vars['period']), month= str(request.vars['month']), project= str(request.vars['project']), userP=userP[3], level='5', type_U = str(request.vars['type_L']), type_L = 'i', querySearch=personal_query))}}">
+								{{if str(request.vars['type_L'])=="all":
+									=userP[6]
+								else:
+									=userP[5]
+								pass
+								}}
+							</a></center>
+						</td>
+						{{pass}}
+						{{if str(request.vars['type_L'])=="all" or str(request.vars['type_L'])=="u":}}
+						<td>
+							<center><a class="badge badge-important" style="white-space:nowrap;" href="{{=URL('management_reports', 'change_request_activities_with_metric_management',vars=dict(period = str(request.vars['period']), month= str(request.vars['month']), project= str(request.vars['project']), userP=userP[3], level='5', type_U = str(request.vars['type_L']), type_L = 'u', querySearch=personal_query))}}">
+								{{if str(request.vars['type_L'])=="all":
+									=userP[7]
+								else:
+									=userP[5]
+								pass
+								}}
+							</a></center>
+						</td>
+						{{pass}}
+						{{if str(request.vars['type_L'])=="all" or str(request.vars['type_L'])=="p":}}
+						<td>
+							<center><a class="badge" style="white-space:nowrap;" href="{{=URL('management_reports', 'change_request_activities_with_metric_management',vars=dict(period = str(request.vars['period']), month= str(request.vars['month']), project= str(request.vars['project']), userP=userP[3], level='5', type_U = str(request.vars['type_L']), type_L = 'p', querySearch=personal_query))}}">
+								{{if str(request.vars['type_L'])=="all":
+									=userP[8]
+								else:
+									=userP[5]
+								pass
+								}}
+							</a></center>
+						</td>
+						{{pass}}
+					</tr>
+					{{pass}}
+				</table>
+			<!--REPORT IN TABLE-->
+			<div align="right"> {{=T('Count')}} {{=T('Users')}}: {{=pieGraphU}}</div>
+		{{elif str(request.vars['level'])=="5":}}
+	    	<img class="pull-right" src="{{=URL('static','images')}}/escudo.png">
+			<center><strong>Universidad de San Carlos de Guatemala</strong><br/>
+			<strong>Facultad de Ingeniería</strong><br/>
+			<strong>Escuela de Ciencias y Sistemas</strong></center><br/>
+			<strong>{{=T('Type')}}: </strong> {{=T('Change Request Management Activity with Metric')}}<br/>
+			<strong>{{=T('Description')}}: </strong> {{=T('Report of operations for managing change requests metric activities')}}<br/>
+			<strong>{{=T('Period')}}: </strong> {{=infoLevel[0][0]}}<br/>
+			<strong>{{=T('Month')}}: </strong> {{=infoLevel[0][1]}}<br/>
+			<strong>{{=T('Project')}}: </strong> {{=infoLevel[0][2]}}<br/>
+			<strong>{{=T('User')}}: </strong> {{=infoLevel[0][4]}}<br/>
+			<div>
+		  		<center><h1>{{=T('Detail')}}</h1></center>
+		  		<hr>
+		  	</div>
+
+		  	<div id="div_grid">
+		  		{{=grid}}
+		  	</div>
+		  	<div id="detail" style="display: none;">
+				<a onclick="set_values2();" class="btn pull-right"><i class="icon-remove"></i>{{=T('Close Detail')}}</a><br/><br/>
+			  	<div id="div_detail">
+			  	</div>
+			</div>
+    	{{pass}}
+    	</div>
+	<!--REPORT CONTENTS-->    
+</div>
+
+<script type="text/javascript">
+	$(document).ready(function(){
+		//HOME --- Buttons for execution or cancellation search
+		$("#buildSearch").click(function(){
+			$("#div_search").slideDown();
+		});
+
+		$("#cancelSearch").click(function(){
+			{{if request.vars['level'] is None or str(request.vars['level'])=="1":}}
+				window.location.href = "{{=URL('management_reports', 'change_request_activities_with_metric_management')}}";
+			{{elif str(request.vars['level'])=="2":}}
+				window.location.href = "{{=URL(vars=dict(level = 2, period = request.vars['period'], type_L=request.vars['type_L']))}}";
+			{{elif str(request.vars['level'])=="3":}}
+				window.location.href = "{{=URL(vars=dict(level = 3, period = request.vars['period'], month = str(request.vars['month']), project = str(request.vars['project']), type_L=request.vars['type_L'], type_U=request.vars['type_U']))}}";
+			{{elif str(request.vars['level'])=="4":}}
+				window.location.href = "{{=URL(vars=dict(level = 4, period = request.vars['period'], month = str(request.vars['month']), project = str(request.vars['project']), type_L=request.vars['type_L'], type_U=request.vars['type_U']))}}";
+			{{elif str(request.vars['level'])=="5":}}
+				window.location.href = "{{=URL(vars=dict(level = 5, period = request.vars['period'], month = str(request.vars['month']), project = str(request.vars['project']), userP = str(request.vars['userP']), type_L=request.vars['type_L'], type_U=request.vars['type_U']))}}";
+			{{pass}}
+		});
+	
+		{{if str(request.vars['level'])=="5":}}
+			$(".web2py_breadcrumbs").css("display", "none");
+		{{pass}}
+		//END --- Buttons for execution or cancellation search
+
+		
+		//HOME --- Buttons for building the query
+		$("#closeSearch").click(function(){
+			$("#div_search").slideUp();
+		});
+
+		$("#fieldSearch").change(function(){
+			{{for fieldSearch in fsearch:}}
+				{{optionSearch = 'optionSearch_'+fieldSearch[0]}}
+				{{valuesSearch = 'value_'+fieldSearch[0]}}
+				$("#{{=optionSearch}}").css("display", "none");
+				$("#{{=valuesSearch}}").css("display", "none");
+				if (document.getElementById('fieldSearch').value == 'requestchange_activity_log.{{=str(fieldSearch[0])}}'){
+					$("#{{=optionSearch}}").css("display", "block");
+					$("#{{=valuesSearch}}").css("display", "block");
+				}
+			{{pass}}
+		});
+
+
+		$("#newSearch").click(function(){
+			{{for fieldSearch in fsearch:}}
+				{{optionSearch = 'optionSearch_'+fieldSearch[0]}}
+				{{valuesSearch = 'value_'+fieldSearch[0]}}
+				if (document.getElementById('fieldSearch').value == 'requestchange_activity_log.{{=str(fieldSearch[0])}}'){
+					document.getElementById('querySearch').value = document.getElementById('fieldSearch').value+ ' '+ document.getElementById('{{=optionSearch}}').value +' "' +document.getElementById('{{=valuesSearch}}').value+'"';
+				}
+			{{pass}}
+		});
+
+		$("#andSearch").click(function(){
+			{{for fieldSearch in fsearch:}}
+				{{optionSearch = 'optionSearch_'+fieldSearch[0]}}
+				{{valuesSearch = 'value_'+fieldSearch[0]}}
+				if (document.getElementById('fieldSearch').value == 'requestchange_activity_log.{{=str(fieldSearch[0])}}'){
+					if (document.getElementById('querySearch').value==''){
+						document.getElementById('querySearch').value = document.getElementById('fieldSearch').value+ ' '+ document.getElementById('{{=optionSearch}}').value +' "' +document.getElementById('{{=valuesSearch}}').value+'"';
+					}else{
+						document.getElementById('querySearch').value = document.getElementById('querySearch').value +" and "+ document.getElementById('fieldSearch').value+ ' '+ document.getElementById('{{=optionSearch}}').value +' "' +document.getElementById('{{=valuesSearch}}').value+'"';
+					}
+				}
+			{{pass}}
+		});
+		//END --- Buttons for query construction
+	});
+
+	//INIT LEVEL UP REPORT
+	{{if request.vars['level'] is not None and str(request.vars['level'])!="1":}}
+		function levelUP(){
+			{{if str(request.vars['level'])=="2":}}
+				window.location.href = "{{=URL('management_reports', 'change_request_activities_with_metric_management',vars=dict(querySearch=personal_query))}}";
+			{{elif str(request.vars['level'])=="3":}}
+				window.location.href = "{{=URL('management_reports', 'change_request_activities_with_metric_management',vars=dict(level='2',period = str(request.vars['period']), type_L = str(request.vars['type_U']), querySearch=personal_query))}}";
+			{{elif str(request.vars['level'])=="4":}}
+				window.location.href = "{{=URL('management_reports', 'change_request_activities_with_metric_management',vars=dict(level='3',period = str(request.vars['period']), month = str(request.vars['month']), type_L = str(request.vars['type_U']), type_U = str(request.vars['type_U']), querySearch=personal_query))}}";
+			{{elif str(request.vars['level'])=="5":}}
+				window.location.href = "{{=URL('management_reports', 'change_request_activities_with_metric_management',vars=dict(level='4', period = str(request.vars['period']), month = str(request.vars['month']), project = str(request.vars['project']), type_L = str(request.vars['type_U']), type_U = str(request.vars['type_U']), querySearch=personal_query))}}";
+			{{pass}}
+		}
+	{{pass}}
+	//END LEVEL UP REPORT
+
+	//INIT EXPORT REPORT TO CSV FILE
+	function exportCSV(){
+		{{if request.vars['level'] is None or str(request.vars['level'])=="1":}}
+			window.location.href = "{{=URL('management_reports','change_request_activities_with_metric_management_export', vars=dict(list_type='csv', level='1', querySearch=personal_query))}}";
+		{{elif str(request.vars['level'])=="2":}}
+			window.location.href = "{{=URL('management_reports','change_request_activities_with_metric_management_export', vars=dict(list_type='csv', level='2',period = str(request.vars['period']), type_L = str(request.vars['type_L']), querySearch=personal_query))}}";
+		{{elif str(request.vars['level'])=="3":}}
+			window.location.href = "{{=URL('management_reports','change_request_activities_with_metric_management_export', vars=dict(list_type='csv', level='3',period = str(request.vars['period']), month = str(request.vars['month']), type_L = str(request.vars['type_L']), type_U = str(request.vars['type_U']), querySearch=personal_query))}}";
+		{{elif str(request.vars['level'])=="4":}}
+			window.location.href = "{{=URL('management_reports','change_request_activities_with_metric_management_export', vars=dict(list_type='csv', level='4',period = str(request.vars['period']), month = str(request.vars['month']), project = str(request.vars['project']), type_L = str(request.vars['type_L']), type_U = str(request.vars['type_U']), querySearch=personal_query))}}";
+		{{elif str(request.vars['level'])=="5":}}
+			window.location.href = "{{=URL('management_reports','change_request_activities_with_metric_management_export', vars=dict(list_type='csv', level='5',period = str(request.vars['period']), month = str(request.vars['month']), project = str(request.vars['project']), userP = str(request.vars['userP']), type_L = str(request.vars['type_L']), type_U = str(request.vars['type_U']), querySearch=personal_query))}}";
+		{{pass}}
+	}
+	//END EXPORT REPORT TO CSV FILE
+
+	{{if request.vars['level'] is not None and str(request.vars['level'])=="5":}}
+	function set_values(var_id){
+		if(var_id != "None"){
+			$("#div_grid").hide();
+			$("#div_detail").load("{{=URL('management_reports','crawm_LOAD')}}?id="+var_id);
+			$("#detail").show();
+		}else{
+			jQuery('#div_detail').empty();
+			$("#detail").hide();
+			$("#div_grid").show();
+		}
+	}
+	function set_values2(){
+		jQuery('#div_detail').empty();
+		$("#detail").hide();
+		$("#div_grid").show();
+	}
+	{{pass}}
+</script>

@@ -8,3 +8,8 @@
     <small>{{=T(year.period.name)}} {{=str(year.yearp)}} </small>
 </h2>
 {{=grid}}
+
+<script type="text/javascript">
+	jQuery('#course_activity_without_metric_teacher_permition__label').empty();
+	jQuery('#course_activity_without_metric_teacher_permition__label').append('<b>{{=T('Teacher Permition')}}</b><div class=\"alert alert-warning\">{{=T('When yoy active this option the academic tutors')}}<br>{{=T('can manage the activity')}}</div>');
+</script>

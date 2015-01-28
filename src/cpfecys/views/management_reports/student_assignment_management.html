@@ -15,17 +15,17 @@
     	<div class="navbar-inner">
 	    	<div>
 	    		{{if request.vars['level'] is None or str(request.vars['level'])=="1":}}
-					<form action="{{=URL('management_reports', 'student_assignment_management/search')}}" method="post">
+					<form action="{{=URL('management_reports', 'student_assignment_management')}}" method="post">
 				{{elif str(request.vars['level'])=="2":}}
-					<form action="{{=URL('management_reports', 'student_assignment_management/search', vars=dict(level = 2, period = request.vars['period'], type_L=request.vars['type_L']))}}" method="post">
+					<form action="{{=URL('management_reports', 'student_assignment_management', vars=dict(level = 2, period = request.vars['period'], type_L=request.vars['type_L']))}}" method="post">
 				{{elif str(request.vars['level'])=="3":}}
-					<form action="{{=URL('management_reports', 'student_assignment_management/search', vars=dict(level = 3, period = request.vars['period'], month = str(request.vars['month']), type_L=request.vars['type_L'], type_U=request.vars['type_U']))}}" method="post">
+					<form action="{{=URL('management_reports', 'student_assignment_management', vars=dict(level = 3, period = request.vars['period'], month = str(request.vars['month']), type_L=request.vars['type_L'], type_U=request.vars['type_U']))}}" method="post">
 				{{elif str(request.vars['level'])=="4":}}
-					<form action="{{=URL('management_reports', 'student_assignment_management/search', vars=dict(level = 4, period = request.vars['period'], month = str(request.vars['month']), project = str(request.vars['project']), type_L=request.vars['type_L'], type_U=request.vars['type_U']))}}" method="post">
+					<form action="{{=URL('management_reports', 'student_assignment_management', vars=dict(level = 4, period = request.vars['period'], month = str(request.vars['month']), project = str(request.vars['project']), type_L=request.vars['type_L'], type_U=request.vars['type_U']))}}" method="post">
 				{{elif str(request.vars['level'])=="5":}}
-					<form action="{{=URL('management_reports', 'student_assignment_management/search', vars=dict(level = 5, period = request.vars['period'], month = str(request.vars['month']), project = str(request.vars['project']), roll = str(request.vars['roll']), type_L=request.vars['type_L'], type_U=request.vars['type_U']))}}" method="post">
+					<form action="{{=URL('management_reports', 'student_assignment_management', vars=dict(level = 5, period = request.vars['period'], month = str(request.vars['month']), project = str(request.vars['project']), roll = str(request.vars['roll']), type_L=request.vars['type_L'], type_U=request.vars['type_U']))}}" method="post">
 				{{elif str(request.vars['level'])=="6":}}
-					<form action="{{=URL('management_reports', 'student_assignment_management/search', vars=dict(level = 6, period = request.vars['period'], month = str(request.vars['month']), project = str(request.vars['project']), roll = str(request.vars['roll']), userP = str(request.vars['userP']), type_L=request.vars['type_L'], type_U=request.vars['type_U']))}}" method="post">
+					<form action="{{=URL('management_reports', 'student_assignment_management', vars=dict(level = 6, period = request.vars['period'], month = str(request.vars['month']), project = str(request.vars['project']), roll = str(request.vars['roll']), userP = str(request.vars['userP']), type_L=request.vars['type_L'], type_U=request.vars['type_U'], searchT='T'))}}" method="post">
 				{{pass}}
 					<input type="text" id="querySearch" name="querySearch" value="{{=personal_query}}" readonly="readonly"/>
 					<a id="buildSearch" class="btn">{{=T('Build Search')}}</a>
@@ -106,9 +106,6 @@
 						</td>
 						<td>
 							<a id="andSearch" class="btn" title="{{=T('Add this to the search as an AND term')}}">{{=T('+ And')}}</a>
-						</td>
-						<td>
-							<a id="orSearch" class="btn" title="{{=T('Add this to the search as an OR term')}}">{{=T('+ Or')}}</a>
 						</td>
 						<td>
 							<a id="closeSearch" class="btn">{{=T('Close')}}</a>
@@ -1850,32 +1847,9 @@
 		  		<center><h1>{{=T('Detail')}}</h1></center>
 		  		<hr>
 		  	</div>
-
+		  	
 		  	<div>
-		  		<table class="table table-striped table-bordered">
-		  			<tr>
-		  				<th>Operación</th>
-		  				<th>Carnet anterior</th>
-		  				<th>Carnet actual</th>
-		  				<th>Laboratorio anterior</th>
-		  				<th>Laboratorio actual</th>
-		  				<th>Descripción</th>
-		  				<th>Fecha</th>
-		  			</tr>
-		  		{{for data in grid:}}
-		  			{{for row in data:}}
-		  			<tr>
-		  				<td>{{=row.operation_log}}</td>
-		  				<td>{{=row.before_carnet}}</td>
-		  				<td>{{=row.after_carnet}}</td>
-		  				<td>{{=row.before_laboratory}}</td>
-		  				<td>{{=row.after_laboratory}}</td>
-		  				<td>{{=row.description}}</td>
-		  				<td>{{=row.date_log}}</td>
-		  			</tr>
-		  			{{pass}}
-		  		{{pass}}
-		  		</table>
+		  		{{=grid}}
 		  	</div>
     	{{pass}}
     	</div>
@@ -1951,20 +1925,6 @@
 						document.getElementById('querySearch').value = document.getElementById('fieldSearch').value+ ' '+ document.getElementById('{{=optionSearch}}').value +' "' +document.getElementById('{{=valuesSearch}}').value+'"';
 					}else{
 						document.getElementById('querySearch').value = document.getElementById('querySearch').value +" and "+ document.getElementById('fieldSearch').value+ ' '+ document.getElementById('{{=optionSearch}}').value +' "' +document.getElementById('{{=valuesSearch}}').value+'"';
-					}
-				}
-			{{pass}}
-		});
-
-		$("#orSearch").click(function(){
-			{{for fieldSearch in fsearch:}}
-				{{optionSearch = 'optionSearch_'+fieldSearch[0]}}
-				{{valuesSearch = 'value_'+fieldSearch[0]}}
-				if (document.getElementById('fieldSearch').value == 'academic_course_assignation_log.{{=str(fieldSearch[0])}}'){
-					if (document.getElementById('querySearch').value==''){
-						document.getElementById('querySearch').value = document.getElementById('fieldSearch').value+ ' '+ document.getElementById('{{=optionSearch}}').value +' "' +document.getElementById('{{=valuesSearch}}').value+'"';
-					}else{
-						document.getElementById('querySearch').value = document.getElementById('querySearch').value +" or "+ document.getElementById('fieldSearch').value+ ' '+ document.getElementById('{{=optionSearch}}').value +' "' +document.getElementById('{{=valuesSearch}}').value+'"';
 					}
 				}
 			{{pass}}
