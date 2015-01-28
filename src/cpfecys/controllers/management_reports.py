@@ -1647,6 +1647,376 @@ def grades_management():
     return dict(fsearch=fsearch, filtered_by=filtered_by, personal_query=personal_query, infoLevel=infoLevel, top5=top5, grid=grid) 
 
 
+#*************************************************************************************************************************************
+#*************************************************************************************************************************************
+#*****************************************************MANAGEMENT REPORT GRADES********************************************************
+@auth.requires_login()
+@auth.requires_membership('Super-Administrator')
+def evaluation_result_export():
+    #VERIFI THAT ACCURATE PARAMETERS
+    try:
+        #CHECK IF THE TYPE OF EXPORT IS VALID
+        if request.vars['list_type'] is None or str(request.vars['list_type'])!="csv":
+            session.flash = T('Not valid Action.')
+            redirect(URL('default','index'))
+
+        #CHECK THAT THE LEVEL OF REPORT IS VALID
+        if (request.vars['level'] is not None) and (int(request.vars['level'])<1 or int(request.vars['level'])>5):
+            session.flash = T('Report no visible: There are no parameters required to display the report.')
+            redirect(URL('default','index'))
+        
+        #Check if the period is change
+        if request.vars['period'] is None:
+            import cpfecys
+            cperiod = cpfecys.current_year_period()
+            period = db(db.period_year.id==cperiod.id).select().first()
+        else:
+            if request.vars['period']!='':
+                period = request.vars['period']
+                period = db(db.period_year.id==period).select().first()
+            else:
+                session.flash = T('Not valid Action.')
+                redirect(URL('default','index'))
+
+        #VERIFY THAT THE PARAMETERS OF EACH LEVEL BE VALID
+        if request.vars['level'] is not None:
+            #LEVEL MORE THAN 1
+            if int(request.vars['level'])>1:
+                #CHECK IF THE TYPE OF REPORT IS VALID
+                if request.vars['type_L'] is None or (str(request.vars['type_L'])!="all" and str(request.vars['type_L'])!="a" and str(request.vars['type_L'])!="r"):
+                    session.flash = T('Not valid Action.')
+                    redirect(URL('default','index'))
+
+                evaluation = VALIDATE_EVALUATION(request.vars['evaluation'])
+                if evaluation is None:
+                    session.flash = T('Not valid Action.')
+                    redirect(URL('default','index'))
+            
+            #LEVEL MORE THAN 2
+            if int(request.vars['level'])>2:
+                #CHECK IF THE TYPE OF REPORT IS VALID                
+                project = db(db.project.id==request.vars['project']).select().first()                 
+                if project is None:
+                    session.flash = T('Not valid Action.')
+                    redi*rect(URL('default','index'))
+                if request.vars['type_U'] is None or (str(request.vars['type_U'])!="all" and str(request.vars['type_U'])!="a" and str(request.vars['type_U'])!="r"):
+                    session.flash = T('Not valid Action.')
+                    redirect(URL('default','index'))
+
+            if int(request.vars['level'])>3:
+                #CHECK THE USER
+                userP = db(db.auth_user.id==request.vars['user']).select().first()                 
+                if userP is None:
+                    session.flash = T('Not valid Action.')
+                    redi*rect(URL('default','index'))
+
+            #LEVEL MORE THAN 4
+            if int(request.vars['level'])>4:
+                #CHECK IF THE CATEGORY IS VALID
+                category = db((db.question_repository.repository_evaluation==request.vars['evaluation'])&(db.question_repository.question_type_name==request.vars['category'])).select()
+                if category is None:
+                    session.flash = T('Not valid Action.')
+                    redirect(URL('default','index'))
+
+    except:
+        session.flash = T('Not valid Action.')
+        redirect(URL('default','index'))
+
+    
+    #****************************************************************************************************************
+    #****************************************************************************************************************
+    #*****************************************************REPORT*****************************************************
+    from datetime import datetime
+    #TITLE
+    infoLevel = []
+    infoeLevelTemp=[]
+    infoeLevelTemp.append('Universidad de San Carlos de Guatemala')
+    infoLevel.append(infoeLevelTemp)
+    infoeLevelTemp=[]
+    infoeLevelTemp.append('Facultad de Ingeniería')
+    infoLevel.append(infoeLevelTemp)
+    infoeLevelTemp=[]
+    infoeLevelTemp.append('Escuela de Ciencias y Sistemas')
+    infoLevel.append(infoeLevelTemp)
+        #LEVELS OF REPORT
+    if request.vars['level']=='1' or request.vars['level'] is None:
+        infoeLevelTemp=[]
+        infoeLevelTemp.append(T('Evaluations'))
+        infoeLevelTemp.append(T('Rol'))
+        infoeLevelTemp.append(T('Approveds'))
+        infoeLevelTemp.append(T('Reprobates'))
+        infoeLevelTemp.append(T('Total'))
+        infoLevel.append(infoeLevelTemp)
+        #aqui for evaluation in db(db.evaluation_result.period==period.id).select():
+        for evaluation in db(db.evaluation_result.period==period.id).select(groupby=db.evaluation_result.repository_evaluation):
+            infoeLevelTemp = []
+            #ID OF evaluation
+            infoeLevelTemp.append(evaluation.repository_evaluation)
+            #NAME OF EVALUATION
+            infoeLevelTemp.append((evaluation.repository_evaluation.name))
+            #NAME OF ROLS
+            infoeLevelTemp.append((evaluation.repository_evaluation.user_type_evaluated.role))
+            
+            
+            count_r = 0
+            count_a = 0
+            for evaluation_result in db(db.evaluation_result.repository_evaluation==evaluation.repository_evaluation).select():
+                result_cat = 0
+                count_cat = 0
+                for quetions_rep in db(db.question_repository.repository_evaluation==evaluation_result.repository_evaluation).select(groupby=db.question_repository.question_type_name):
+                    count_question = 0
+                    count_result = 0
+                    for quetions_rep_2 in db((db.question_repository.repository_evaluation==evaluation_result.repository_evaluation)&\
+                        (db.question_repository.question_type_name==quetions_rep.question_type_name)).select():
+                        count_answers = 0
+                        result_answers = 0
+                        for var_evaluation_solve_detail in db((db.evaluation_solve_detail.evaluation_result==evaluation_result.id)\
+                            &(db.evaluation_solve_detail.question_repository==quetions_rep_2.id)).select():
+                            result_answers = long(result_answers + (var_evaluation_solve_detail.repository_answer.grade*var_evaluation_solve_detail.total_count)/100)
+                            count_answers = count_answers + 1
+
+                        if count_answers!= 0:
+                            result_answers = long(result_answers / count_answers)
+
+                            count_question = count_question + 1                
+                            count_result = count_result + (result_answers)
+                    try:
+                        result_cat_temp = long(count_result*100/count_question)
+                        result_cat = result_cat + result_cat_temp
+                        count_cat= count_cat +1
+                    except:
+                        None
+                result_temp = long(result_cat/count_cat)
+                if result_temp < 61:
+                    count_r = count_r + 1
+                else:
+                    count_a = count_a + 1
+
+                
+                
+            infoeLevelTemp.append(count_a)
+            infoeLevelTemp.append(count_r)
+            
+            
+            
+            infoeLevelTemp.append(db(db.evaluation_result.repository_evaluation==evaluation.repository_evaluation).count())
+            infoLevel.append(infoeLevelTemp)
+
+    elif str(request.vars['level'])=="2":
+        infoeLevelTemp=[]
+        infoeLevelTemp.append(T('Project'))
+
+        if (str(request.vars['type_L']) == "all") or (str(request.vars['type_L']) == "a"):
+            infoeLevelTemp.append(T('Approveds'))
+        pass
+        if (str(request.vars['type_L']) == "all") or (str(request.vars['type_L']) == "r"):
+            infoeLevelTemp.append(T('Reprobates'))
+        pass
+        if (str(request.vars['type_L']) == "all"):
+            infoeLevelTemp.append(T('Total')) 
+        pass
+        infoLevel.append(infoeLevelTemp)
+
+        evaluations = db((db.evaluation_result.repository_evaluation==request.vars["evaluation"])&(db.evaluation_result.period==period.id)).select(groupby=db.evaluation_result.project)
+        
+        for evaluation in evaluations:
+            infoeLevelTemp = []
+            infoeLevelTemp.append(evaluation.project.name)
+            
+           
+            
+            count_r = 0
+            count_a = 0
+
+            for evaluation_result in db((db.evaluation_result.repository_evaluation==request.vars["evaluation"])&(db.evaluation_result.period==period.id)&(db.evaluation_result.project==evaluation.project)).select():
+                result_cat = 0
+                count_cat = 0
+                for quetions_rep in db(db.question_repository.repository_evaluation==evaluation_result.repository_evaluation).select(groupby=db.question_repository.question_type_name):
+                    count_question = 0
+                    count_result = 0
+                    for quetions_rep_2 in db((db.question_repository.repository_evaluation==evaluation_result.repository_evaluation)&\
+                        (db.question_repository.question_type_name==quetions_rep.question_type_name)).select():
+                        count_answers = 0
+                        result_answers = 0
+                        for var_evaluation_solve_detail in db((db.evaluation_solve_detail.evaluation_result==evaluation_result.id)\
+                            &(db.evaluation_solve_detail.question_repository==quetions_rep_2.id)).select():
+                            result_answers = long(result_answers + (var_evaluation_solve_detail.repository_answer.grade*var_evaluation_solve_detail.total_count)/100)
+                            count_answers = count_answers + 1
+
+                        if count_answers!= 0:
+                            result_answers = long(result_answers / count_answers)
+
+                            count_question = count_question + 1                
+                            count_result = count_result + (result_answers)
+                    try:
+                        result_cat_temp = long(count_result*100/count_question)
+                        result_cat = result_cat + result_cat_temp
+                        count_cat= count_cat +1
+                    except:
+                        None
+                result_temp = long(result_cat/count_cat)
+
+
+                if result_temp < 61:
+                    count_r = count_r + 1
+                else:
+                    count_a = count_a + 1
+                
+
+            infoeLevelTemp.append(count_a)
+            infoeLevelTemp.append(count_r)
+            infoeLevelTemp.append(count_a + count_r)
+
+            infoLevel.append(infoeLevelTemp)
+    
+    elif str(request.vars['level'])=="3":
+        infoeLevelTemp=[]
+        infoeLevelTemp.append(T('User name'))
+        infoeLevelTemp.append(T('Name'))
+        infoeLevelTemp.append(T('Evaluation Result'))
+        infoLevel.append(infoeLevelTemp)
+        evaluations = db((db.evaluation_result.repository_evaluation==request.vars["evaluation"])&(db.evaluation_result.project==request.vars["project"])&(db.evaluation_result.period==period.id)).select()
+        
+        for evaluation in evaluations:
+            
+            result_cat = 0
+            count_cat = 0
+            for quetions_rep in db(db.question_repository.repository_evaluation==evaluation.repository_evaluation).select(groupby=db.question_repository.question_type_name):
+                count_question = 0
+                count_result = 0
+                for quetions_rep_2 in db((db.question_repository.repository_evaluation==evaluation.repository_evaluation)&\
+                    (db.question_repository.question_type_name==quetions_rep.question_type_name)).select():
+                    count_answers = 0
+                    result_answers = 0
+                    for var_evaluation_solve_detail in db((db.evaluation_solve_detail.evaluation_result==evaluation.id)\
+                        &(db.evaluation_solve_detail.question_repository==quetions_rep_2.id)).select():
+                        result_answers = long(result_answers + (var_evaluation_solve_detail.repository_answer.grade*var_evaluation_solve_detail.total_count)/100)
+                        count_answers = count_answers + 1
+
+                    if count_answers!= 0:
+                        result_answers = long(result_answers / count_answers)
+
+                        count_question = count_question + 1                
+                        count_result = count_result + (result_answers)
+                try: 
+                    result_cat_temp = long(count_result*100/count_question)
+                    result_cat = result_cat + result_cat_temp
+                    count_cat= count_cat +1
+                except:
+                    None
+
+            result_temp = long(result_cat/count_cat)
+            
+            add_user = False
+            if str(request.vars['type_U'])=="all":
+                add_user = True
+            if str(request.vars['type_U'])=="r":
+                if result_temp < 61:
+                    add_user = True
+            if str(request.vars['type_U'])=="a":
+                if result_temp >= 61:
+                    add_user = True
+            if add_user == True:
+                infoeLevelTemp = []
+                infoeLevelTemp.append(evaluation.evaluated.username)
+                infoeLevelTemp.append(evaluation.evaluated.first_name + " "+ evaluation.evaluated.last_name)
+                infoeLevelTemp.append(result_temp)
+                
+                infoLevel.append(infoeLevelTemp)
+          
+    elif str(request.vars['level'])=="4":
+        infoeLevelTemp=[]
+        infoeLevelTemp.append(T('Category'))
+        infoeLevelTemp.append(T('Result'))
+        infoLevel.append(infoeLevelTemp)
+        evaluation = db((db.evaluation_result.repository_evaluation==request.vars["evaluation"])&\
+            (db.evaluation_result.project==request.vars["project"])&\
+            (db.evaluation_result.period==period.id)&\
+            (db.evaluation_result.evaluated==str(request.vars['user']))).select().first()
+
+        for quetions_rep in db(db.question_repository.repository_evaluation==evaluation.repository_evaluation).select(groupby=db.question_repository.question_type_name):
+            count_question = 0
+            count_result = 0
+            for quetions_rep_2 in db((db.question_repository.repository_evaluation==evaluation.repository_evaluation)&\
+                (db.question_repository.question_type_name==quetions_rep.question_type_name)).select():
+                count_answers = 0
+                result_answers = 0
+                for var_evaluation_solve_detail in db((db.evaluation_solve_detail.evaluation_result==evaluation.id)\
+                    &(db.evaluation_solve_detail.question_repository==quetions_rep_2.id)).select():
+                    result_answers = long(result_answers + (var_evaluation_solve_detail.repository_answer.grade*var_evaluation_solve_detail.total_count)/100)
+                    count_answers = count_answers + 1
+
+                if count_answers!= 0:
+                    result_answers = long(result_answers / count_answers)
+
+                    count_question = count_question + 1                
+                    count_result = count_result + (result_answers)
+                
+            try:
+                result_temp = long(count_result*100/count_question)
+                infoeLevelTemp = []
+                infoeLevelTemp.append(quetions_rep.question_type_name)
+                infoeLevelTemp.append(result_temp)
+
+                infoLevel.append(infoeLevelTemp)
+
+            except:
+                result_temp = long(-1)
+                infoeLevelTemp = []
+                infoeLevelTemp.append(quetions_rep.question_type_name)
+                infoeLevelTemp.append(result_temp)
+
+                infoLevel.append(infoeLevelTemp)
+
+    elif str(request.vars['level'])=="5":
+        infoeLevelTemp=[]
+        infoeLevelTemp.append(T('Question'))
+        infoeLevelTemp.append(T('Result'))
+        infoLevel.append(infoeLevelTemp)
+        evaluation = db((db.evaluation_result.repository_evaluation==request.vars["evaluation"])&\
+            (db.evaluation_result.project==request.vars["project"])&\
+            (db.evaluation_result.period==period.id)&\
+            (db.evaluation_result.evaluated==str(request.vars['user']))).select().first()
+
+        count_question = 0
+        count_result = 0
+        for quetions_rep_2 in db((db.question_repository.repository_evaluation==evaluation.repository_evaluation)&\
+            (db.question_repository.question_type_name==request.vars['category'])).select():
+            count_answers = 0
+            result_answers = 0
+            for var_evaluation_solve_detail in db((db.evaluation_solve_detail.evaluation_result==evaluation.id)\
+                &(db.evaluation_solve_detail.question_repository==quetions_rep_2.id)).select():
+                result_answers = long(result_answers + (var_evaluation_solve_detail.repository_answer.grade*var_evaluation_solve_detail.total_count)/100)
+                count_answers = count_answers + 1
+
+            if count_answers!= 0:
+                result_answers = long(result_answers / count_answers)
+
+                result_temp = long(result_answers*100)
+                count_question = count_question + 1                
+                count_result = count_result + (result_answers)
+            
+        
+            try:
+                infoeLevelTemp = []
+                infoeLevelTemp.append(quetions_rep_2.question)
+                infoeLevelTemp.append(result_temp)
+
+                infoLevel.append(infoeLevelTemp)
+            except:
+                infoeLevelTemp = []
+                infoeLevelTemp.append(quetions_rep_2.question)
+                infoeLevelTemp.append(-1)
+
+                infoLevel.append(infoeLevelTemp)
+    
+    #*****************************************************REPORT*****************************************************
+    #****************************************************************************************************************
+    #****************************************************************************************************************
+    return dict(filename='ResultadoDeEvaluaciones', csvdata=infoLevel)
+
+
+
 @auth.requires_login()
 @auth.requires_membership('Super-Administrator')
 def evaluation_result():
@@ -1655,7 +2025,7 @@ def evaluation_result():
     #******************************************VERIFY THAT ACCURATE PARAMETERS***************************************
     try:
         #CHECK THAT THE LEVEL OF REPORT IS VALID
-        if request.vars['level'] is not None and (int(request.vars['level'])<1 and int(request.vars['level'])>4):
+        if (request.vars['level'] is not None) and (int(request.vars['level'])<1 or int(request.vars['level'])>5):
             session.flash = T('Not valid Action.')
             redirect(URL('default','index'))
         
@@ -1741,21 +2111,40 @@ def evaluation_result():
             
             count_r = 0
             count_a = 0
-
             for evaluation_result in db(db.evaluation_result.repository_evaluation==evaluation.repository_evaluation).select():
-                count_question = 0
-                count_result = 0
-                for eval_detail in db((db.evaluation_solve_detail.evaluation_result==evaluation_result.id)).select():
-                    count_question = count_question + 1
-                    count_result = long(count_result + eval_detail.repository_answer.grade/100)
+                result_cat = 0
+                count_cat = 0
+                for quetions_rep in db(db.question_repository.repository_evaluation==evaluation_result.repository_evaluation).select(groupby=db.question_repository.question_type_name):
+                    count_question = 0
+                    count_result = 0
+                    for quetions_rep_2 in db((db.question_repository.repository_evaluation==evaluation_result.repository_evaluation)&\
+                        (db.question_repository.question_type_name==quetions_rep.question_type_name)).select():
+                        count_answers = 0
+                        result_answers = 0
+                        for var_evaluation_solve_detail in db((db.evaluation_solve_detail.evaluation_result==evaluation_result.id)\
+                            &(db.evaluation_solve_detail.question_repository==quetions_rep_2.id)).select():
+                            result_answers = long(result_answers + (var_evaluation_solve_detail.repository_answer.grade*var_evaluation_solve_detail.total_count)/100)
+                            count_answers = count_answers + 1
 
-                result_temp = long(count_result*100/count_question)
+                        if count_answers!= 0:
+                            result_answers = long(result_answers / count_answers)
+
+                            count_question = count_question + 1                
+                            count_result = count_result + (result_answers)
+                    try:
+                        result_cat_temp = long(count_result*100/count_question)
+                        result_cat = result_cat + result_cat_temp
+                        count_cat= count_cat +1
+                    except:
+                        None
+                result_temp = long(result_cat/count_cat)
                 if result_temp < 61:
                     count_r = count_r + 1
                 else:
                     count_a = count_a + 1
-                
 
+                
+                
             infoeLevelTemp.append(count_a)
             infoeLevelTemp.append(count_r)
             
@@ -1797,11 +2186,12 @@ def evaluation_result():
 
                             count_question = count_question + 1                
                             count_result = count_result + (result_answers)
-                        
-                    result_cat_temp = long(count_result*100/count_question)
-                    result_cat = result_cat + result_cat_temp
-                    count_cat= count_cat +1
-
+                    try:
+                        result_cat_temp = long(count_result*100/count_question)
+                        result_cat = result_cat + result_cat_temp
+                        count_cat= count_cat +1
+                    except:
+                        None
                 result_temp = long(result_cat/count_cat)
 
 
@@ -1814,10 +2204,6 @@ def evaluation_result():
             infoeLevelTemp.append(count_a)
             infoeLevelTemp.append(count_r)
 
-
-            infoeLevelTemp.append(2)
-            infoeLevelTemp.append(2)
-            infoeLevelTemp.append(2)
             infoLevel.append(infoeLevelTemp)
     elif str(request.vars['level'])=="3":
         evaluations = db((db.evaluation_result.repository_evaluation==request.vars["evaluation"])&(db.evaluation_result.project==request.vars["project"])&(db.evaluation_result.period==period.id)).select()
@@ -1843,10 +2229,12 @@ def evaluation_result():
 
                         count_question = count_question + 1                
                         count_result = count_result + (result_answers)
-                    
-                result_cat_temp = long(count_result*100/count_question)
-                result_cat = result_cat + result_cat_temp
-                count_cat= count_cat +1
+                try: 
+                    result_cat_temp = long(count_result*100/count_question)
+                    result_cat = result_cat + result_cat_temp
+                    count_cat= count_cat +1
+                except:
+                    None
 
             result_temp = long(result_cat/count_cat)
             
@@ -1866,9 +2254,6 @@ def evaluation_result():
                 infoeLevelTemp.append(evaluation.evaluated.first_name + " "+ evaluation.evaluated.last_name)
                 infoeLevelTemp.append(result_temp)
                 
-                infoeLevelTemp.append(2)
-                infoeLevelTemp.append(2)
-                infoeLevelTemp.append(2)
                 infoLevel.append(infoeLevelTemp)
           
             
@@ -1897,17 +2282,21 @@ def evaluation_result():
                     count_question = count_question + 1                
                     count_result = count_result + (result_answers)
                 
-            
-            result_temp = long(count_result*100/count_question)
-            infoeLevelTemp = []
-            infoeLevelTemp.append(quetions_rep.question_type_name)
-            infoeLevelTemp.append(result_temp)
+            try:
+                result_temp = long(count_result*100/count_question)
+                infoeLevelTemp = []
+                infoeLevelTemp.append(quetions_rep.question_type_name)
+                infoeLevelTemp.append(result_temp)
 
-            infoeLevelTemp.append(result_temp)
-            infoeLevelTemp.append(result_temp)
-            infoeLevelTemp.append(result_temp)
-            infoLevel.append(infoeLevelTemp)
+                infoLevel.append(infoeLevelTemp)
 
+            except:
+                result_temp = long(-1)
+                infoeLevelTemp = []
+                infoeLevelTemp.append(quetions_rep.question_type_name)
+                infoeLevelTemp.append(result_temp)
+
+                infoLevel.append(infoeLevelTemp)
 
         
 
@@ -1937,17 +2326,22 @@ def evaluation_result():
                 count_result = count_result + (result_answers)
             
         
-            
-            infoeLevelTemp = []
-            infoeLevelTemp.append(quetions_rep_2.question)
-            infoeLevelTemp.append(result_temp)
+            try:
+                infoeLevelTemp = []
+                infoeLevelTemp.append(quetions_rep_2.question)
+                infoeLevelTemp.append(result_temp)
 
-            infoeLevelTemp.append(result_temp)
-            infoeLevelTemp.append(result_temp)
-            infoeLevelTemp.append(result_temp)
-            infoLevel.append(infoeLevelTemp)
+                infoLevel.append(infoeLevelTemp)
+            except:
+                infoeLevelTemp = []
+                infoeLevelTemp.append(quetions_rep_2.question)
+                infoeLevelTemp.append(-1)
+
+                infoLevel.append(infoeLevelTemp)
     
     return dict(infoLevel=infoLevel, top5=top5, grid=grid, period_var=period) 
+
+
 
 
 #*************************************************************************************************************************************

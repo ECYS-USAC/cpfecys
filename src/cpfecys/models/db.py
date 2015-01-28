@@ -144,6 +144,7 @@ mail.settings.sender = 'dtt.ecys@dtt-ecys.org'
 mail.settings.tls = False
 mail.settings.login = None
 
+
 ## configure auth policy
 auth.settings.registration_requires_verification = False
 auth.settings.registration_requires_approval = False
@@ -714,7 +715,7 @@ db.define_table('academic_course_assignation_log',
 
 db.define_table('library',
                 Field('name', 'text', notnull=True, unique=False, label = T('Name')),
-                Field('file_data', 'upload', notnull=True, label = T('File_data'), requires=[IS_UPLOAD_FILENAME(extension = '(pdf|zip)',error_message='Solo se aceptan archivos con extension zip|pdf'),IS_LENGTH(2097152,error_message='El tamaño máximo del archivo es 2MB')]),
+                Field('file_data', 'upload', notnull=True, label = T('File_data'), requires=[IS_UPLOAD_FILENAME(extension = '(pdf|zip|rar)',error_message='Solo se aceptan archivos con extension zip|pdf|rar'),IS_LENGTH(2097152,error_message='El tamaño máximo del archivo es 2MB')]),
                 Field('description', 'text', notnull=True, unique=False, label = T('Description')),
                 Field('visible', 'boolean', label = T('Visible')),
                 Field('period', 'reference period_year', notnull=True, label = T('Period')),
@@ -791,7 +792,7 @@ db.define_table('course_activity',
 db.define_table('course_activity_without_metric',
     Field('name', 'string', notnull=True, unique=False, label = T('Name')),
     Field('description', 'text', notnull=False, unique=False, label = T('Description')),
-    Field('fileReport', 'upload', notnull=False, label='Reporte', requires=[IS_NULL_OR(IS_UPLOAD_FILENAME(extension = '(pdf|zip)',error_message='Solo se aceptan archivos con extension zip|pdf')),IS_LENGTH(2097152,error_message='El tamaño máximo del archivo es 2MB')]),
+    Field('fileReport', 'upload', notnull=False, label='Reporte', requires=[IS_NULL_OR(IS_UPLOAD_FILENAME(extension = '(pdf|zip|rar)',error_message='Solo se aceptan archivos con extension zip|pdf|rar')),IS_LENGTH(2097152,error_message='El tamaño máximo del archivo es 2MB')]),
     Field('semester', 'reference period_year', notnull=True),
     Field('assignation', 'reference project', notnull=True),
     Field('laboratory', 'boolean', notnull=True, label = T('Laboratory')),
@@ -1548,6 +1549,7 @@ db.define_table('evaluation',
     Field('date_finish', 'date', notnull = True, label = T('Date finish')),
     Field('semester_repeat', 'boolean', notnull = True, label = T('Repeat')),
     Field('description', 'text', notnull=False, label=T('Description')),
+    Field('period', 'reference period_year', notnull = True, label = T('Period')),
     Field('repository_evaluation', 'reference repository_evaluation', notnull = True, label = T('Repository Evaluation'))
 )
 
@@ -1557,7 +1559,7 @@ db.define_table('course_assigned_activity',
     Field('report_required', 'boolean', notnull=True, label = T('Report Required')),
     Field('status', 'string', label = T('Status')),
     Field('automatic_approval', 'boolean', notnull=True, label = T('Automatic Approval')),
-    Field('fileReport', 'upload', notnull=False, label='Reporte', requires=[IS_NULL_OR(IS_UPLOAD_FILENAME(extension = '(pdf|zip)',error_message='Solo se aceptan archivos con extension zip|pdf')),IS_LENGTH(2097152,error_message='El tamaño máximo del archivo es 2MB')]),
+    Field('fileReport', 'upload', notnull=False, label='Reporte', requires=[IS_NULL_OR(IS_UPLOAD_FILENAME(extension = '(pdf|zip|rar)',error_message='Solo se aceptan archivos con extension zip|pdf|rar')),IS_LENGTH(2097152,error_message='El tamaño máximo del archivo es 2MB')]),
     Field('semester', 'reference period_year', notnull=True),
     Field('assignation', 'reference project', notnull=True),
     Field('date_start', 'date', notnull = True, default = datetime.datetime.now(), label = T('Date'))
@@ -1566,7 +1568,7 @@ db.define_table('course_assigned_activity',
 db.define_table('evaluation_result',
     Field('repository_evaluation', 'reference repository_evaluation', notnull = True, label = T('Repository Evaluation')),
     Field('evaluated', 'reference auth_user', notnull = True, label = T('Evaluated')),
-    Field('period', 'reference period', notnull = True, label = T('Period')),
+    Field('period', 'reference period_year', notnull = True, label = T('Period')),
     Field('project', 'reference project', notnull=True, label=T('Project'))
 )
 

@@ -114,12 +114,12 @@
             })
             $("#pr-{{=project.id}}-propios").click(function(){         
                 $("#div_project_{{=project.id}}_propios").toggle();
-                $("#div_project_{{=project.id}}_propios").load('{{=URL('notification','teacher_register_mail.load')}}',{project: {{=project.id}}});  
+                $("#div_project_{{=project.id}}_propios").load('{{=URL('notification','teacher_register_mail.load',vars = dict(project=project.id,period=request.vars["period"]) )}}');  
             })
             {{for assignation in obtain_Persons(project):}}
               $("#pr-{{=project.id}}-{{=assignation.user_project.id}}").click(function(){         
                     $("#div_project_{{=project.id}}_{{=assignation.user_project.id}}").toggle();
-                    $("#div_project_{{=project.id}}_{{=assignation.user_project.id}}").load('{{=URL('notification','teacher_register_mail.load')}}',{userN:{{=assignation.user_project.assigned_user}}, project: {{=project.id}}});  
+                    $("#div_project_{{=project.id}}_{{=assignation.user_project.id}}").load('{{=URL('notification','teacher_register_mail.load')}}',{userN:{{=assignation.user_project.assigned_user}}, project: {{=project.id}}, period: {{=request.vars["period"]}} });  
                 })  
             {{pass}}
         {{pass}}

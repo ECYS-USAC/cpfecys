@@ -38,6 +38,7 @@
 
 <!---------------------------INSERT---------------------------->
 {{if (request.vars['op'] == "add_grade") | (request.vars['op'] == "add_grade_list"): }}
+  {{print "entrooo1"}}
   <script type="text/javascript">
     document.getElementById('information_text').className = "badge badge-important";
     jQuery('#information_text').empty();
@@ -389,7 +390,7 @@
             </div>
             {{if exist_request_change == False:}}
               <textarea class="string" cols="40" type="text" value="" id="request_description" style="width:95%;"/>
-              <a  tabindex="502" role="button"  class="btn btn-success"  onclick="save__request_changes();">            
+              <a id="requestbtn" tabindex="502" role="button"  class="btn btn-success"  onclick="save__request_changes();">            
               <span class="icon-white icon-ok-sign"></span>
                 {{=T('Change Request')}}
               </a>
@@ -531,6 +532,7 @@
   }
 
   function save__request_changes(){
+    $("#requestbtn").css("display","none");
     {{if exist_request_change == True:}}
       alert("{{=T('Can not make operation because there is a pending request change. Please resolve it before proceeding.')}}");
     {{else:}}
@@ -596,6 +598,7 @@
                   coment = prompt("{{=T('Please enter the reason for the change.')}}","");  
                 }                
               {{pass}}
+              
               $("#grades_list").load("{{=URL('activity_control','grades.html')}}?op=add_grade_list&amp;activity={{=var_activity.id}}&amp;project={{=var_project.id}}&amp;year={{=var_period.id}}&amp;carnet="+carnet_list+"&amp;grade="+grade_list+"&amp;description_var="+encodeURIComponent(description_var)); 
             }
             

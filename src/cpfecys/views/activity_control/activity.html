@@ -1449,7 +1449,7 @@
 											</tr>
 										{{pass}}
 										{{if category.specific_grade==True:}}
-											{{if total_var2E < totalCategoryE:}}
+											{{if round(float(total_var2E),2) < round(float(totalCategoryE),2):}}
 												<tr>
 													<td colspan="3">
 														<center>

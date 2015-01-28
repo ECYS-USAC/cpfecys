@@ -1,257 +1,3 @@
-import collections
-import math
-
-from fractions import Fraction
-from decimal import Decimal
-
-
-class StatisticsError(ValueError):
-    pass
-
-
-def _sum(data, start=0):
-    # We fail as soon as we reach a value that is not an int or the type of
-    # the first value which is not an int. E.g. _sum([int, int, float, int])
-    # is okay, but sum([int, int, float, Fraction]) is not.
-    allowed_types = set([int, type(start)])
-    n, d = _exact_ratio(start)
-    partials = {d: n}  # map {denominator: sum of numerators}
-    # Micro-optimizations.
-    exact_ratio = _exact_ratio
-    partials_get = partials.get
-    # Add numerators for each denominator.
-    for x in data:
-        _check_type(type(x), allowed_types)
-        n, d = exact_ratio(x)
-        partials[d] = partials_get(d, 0) + n
-    # Find the expected result type. If allowed_types has only one item, it
-    # will be int; if it has two, use the one which isn't int.
-    assert len(allowed_types) in (1, 2)
-    if len(allowed_types) == 1:
-        assert allowed_types.pop() is int
-        T = int
-    else:
-        T = (allowed_types - set([int])).pop()
-    if None in partials:
-        assert issubclass(T, (float, Decimal))
-        assert not math.isfinite(partials[None])
-        return T(partials[None])
-    total = Fraction()
-    for d, n in sorted(partials.items()):
-        total += Fraction(n, d)
-    if issubclass(T, int):
-        assert total.denominator == 1
-        return T(total.numerator)
-    if issubclass(T, Decimal):
-        return T(total.numerator)/total.denominator
-    return T(total)
-
-
-def _check_type(T, allowed):
-    if T not in allowed:
-        if len(allowed) == 1:
-            allowed.add(T)
-        else:
-            types = ', '.join([t.__name__ for t in allowed] + [T.__name__])
-            raise TypeError("unsupported mixed types: %s" % types)
-
-
-def _exact_ratio(x):
-    
-    try:
-        try:
-            # int, Fraction
-            return (x.numerator, x.denominator)
-        except AttributeError:
-            # float
-            try:
-                return x.as_integer_ratio()
-            except AttributeError:
-                # Decimal
-                try:
-                    return _decimal_to_ratio(x)
-                except AttributeError:
-                    msg = "can't convert type '{}' to numerator/denominator"
-                    #raise TypeError(msg.format(type(x).__name__)) from None
-    except (OverflowError, ValueError):
-        # INF or NAN
-        if __debug__:
-            # Decimal signalling NANs cannot be converted to float :-(
-            if isinstance(x, Decimal):
-                assert not x.is_finite()
-            else:
-                assert not math.isfinite(x)
-        return (x, None)
-
-
-# FIXME This is faster than Fraction.from_decimal, but still too slow.
-def _decimal_to_ratio(d):
-   
-    sign, digits, exp = d.as_tuple()
-    if exp in ('F', 'n', 'N'):  # INF, NAN, sNAN
-        assert not d.is_finite()
-        raise ValueError
-    num = 0
-    for digit in digits:
-        num = num*10 + digit
-    if exp < 0:
-        den = 10**-exp
-    else:
-        num *= 10**exp
-        den = 1
-    if sign:
-        num = -num
-    return (num, den)
-
-
-def _counts(data):
-    # Generate a table of sorted (value, frequency) pairs.
-    table = collections.Counter(iter(data)).most_common()
-    if not table:
-        return table
-    # Extract the values with the highest frequency.
-    maxfreq = table[0][1]
-    for i in range(1, len(table)):
-        if table[i][1] != maxfreq:
-            table = table[:i]
-            break
-    return table
-
-
-def mean(data):
-    
-    if iter(data) is data:
-        data = list(data)
-    n = len(data)
-    if n < 1:
-        raise StatisticsError('mean requires at least one data point')
-    return _sum(data)/n
-
-
-def median(data):
-    
-    data = sorted(data)
-    n = len(data)
-    if n == 0:
-        raise StatisticsError("no median for empty data")
-    if n%2 == 1:
-        return data[n//2]
-    else:
-        i = n//2
-        return (data[i - 1] + data[i])/2
-
-def median_low(data):
-    
-    data = sorted(data)
-    n = len(data)
-    if n == 0:
-        raise StatisticsError("no median for empty data")
-    if n%2 == 1:
-        return data[n//2]
-    else:
-        return data[n//2 - 1]
-
-
-def median_high(data):
-    
-    data = sorted(data)
-    n = len(data)
-    if n == 0:
-        raise StatisticsError("no median for empty data")
-    return data[n//2]
-
-
-def median_grouped(data, interval=1):
-    
-    data = sorted(data)
-    n = len(data)
-    if n == 0:
-        raise StatisticsError("no median for empty data")
-    elif n == 1:
-        return data[0]
-    # Find the value at the midpoint. Remember this corresponds to the
-    # centre of the class interval.
-    x = data[n//2]
-    for obj in (x, interval):
-        if isinstance(obj, (str, bytes)):
-            raise TypeError('expected number but got %r' % obj)
-    try:
-        L = x - interval/2  # The lower limit of the median interval.
-    except TypeError:
-        # Mixed type. For now we just coerce to float.
-        L = float(x) - float(interval)/2
-    cf = data.index(x)  # Number of values below the median interval.
-    # FIXME The following line could be more efficient for big lists.
-    f = data.count(x)  # Number of data points in the median interval.
-    return L + interval*(n/2 - cf)/f
-
-
-def mode(data):
-    # Generate a table of sorted (value, frequency) pairs.
-    table = _counts(data)
-    if len(table) == 1:
-        return table[0][0]
-    elif table:
-        raise StatisticsError(
-                'no unique mode; found %d equally common values' % len(table)
-                )
-    else:
-        raise StatisticsError('no mode for empty data')
-
-
-
-def _ss(data, c=None):
-    if c is None:
-        c = mean(data)
-    ss = _sum((x-c)**2 for x in data)
-    # The following sum should mathematically equal zero, but due to rounding
-    # error may not.
-    ss -= _sum((x-c) for x in data)**2/len(data)
-    assert not ss < 0, 'negative sum of square deviations: %f' % ss
-    return ss
-
-
-def variance(data, xbar=None):
-    if iter(data) is data:
-        data = list(data)
-    n = len(data)
-    if n < 2:
-        raise StatisticsError('variance requires at least two data points')
-    ss = _ss(data, xbar)
-    return ss/(n-1)
-
-
-def pvariance(data, mu=None):
-   
-    if iter(data) is data:
-        data = list(data)
-    n = len(data)
-    if n < 1:
-        raise StatisticsError('pvariance requires at least one data point')
-    ss = _ss(data, mu)
-    return ss/n
-
-
-def stdev(data, xbar=None):
-    
-    var = variance(data, xbar)
-    try:
-        return var.sqrt()
-    except AttributeError:
-        return math.sqrt(var)
-
-
-def pstdev(data, mu=None):
-    
-    var = pvariance(data, mu)
-    try:
-        return var.sqrt()
-    except AttributeError:
-        return math.sqrt(var)
-
-
-
-
 @auth.requires_login()
 @auth.requires(auth.has_membership('Student') or auth.has_membership('Teacher') or auth.has_membership('Super-Administrator') or auth.has_membership('Academic') or auth.has_membership('Ecys-Administrator'))
 def courses_list():
@@ -280,6 +26,7 @@ def courses_list():
 
     if(auth.has_membership('Super-Administrator') or auth.has_membership('Ecys-Administrator')):
         periods = db(db.period_year).select()
+
     else:
         periods_temp = db(db.period_year).select()
         periods = []
@@ -287,7 +34,10 @@ def courses_list():
             added = False
             if auth.has_membership('Student') or auth.has_membership('Teacher'):
                 try:
-                    if db((db.user_project.assigned_user == auth.user.id) & (db.user_project.period == period_temp.id)).select().first() is not None:
+                    if db((db.user_project.assigned_user==auth.user.id)&\
+                        (db.user_project.period == db.period_year.id)&\
+                        ((db.user_project.period <= period_temp.id) & \
+                        ((db.user_project.period + db.user_project.periods) > period_temp.id))).select(db.user_project.ALL).first() is not None:
                         periods.append(period_temp)
                         added = True
                 except:
@@ -332,13 +82,141 @@ def courses_list():
 
     response.view='activity_control/courses_list.html'
     if (auth.has_membership('Super-Administrator') or auth.has_membership('Ecys-Administrator')):
-        coursesAdmin = db(db.project.area_level==area.id).select()
+        #coursesAdmin = db(db.project.area_level==area.id).select()
+        coursesAdmin = []
+        for course in db(db.project.area_level==area.id).select(orderby=db.project.name):
+            average_laboratory = float(0)
+            average_class = float(0)
+
+            for letter in 'lc':
+                matrix_category = []
+                num_category = 0
+                category_grade_total = 0
+
+                laboratory_var = False
+                if letter == 'l':
+                    laboratory_var=True
+                pass
+
+                for category_var in db((db.course_activity_category.assignation == course.id) &(db.course_activity_category.semester== period.id)&(db.course_activity_category.laboratory==laboratory_var)).select() :
+                    if category_var.category.category != 'Laboratorio':
+                        dont_pass = False
+                        
+                        if dont_pass == False:
+
+                            average=float(0)
+                            total_activity=float(0)
+                            num_activity=0
+                            matrix_specific_grade = []
+                            activity_grade_total=float(0)
+                            for activity_var in db((db.course_activity.course_activity_category == category_var.id)).select() : 
+                                total_grades = db(db.grades.activity==activity_var.id).count()
+                                if total_grades != 0:
+                                    averageA = db.executesql('select avg(grade) as average from grades where activity='+str(activity_var.id)+';',as_dict=True)
+                                    for d0 in averageA:
+                                        if d0['average']!=None:
+                                            average=float(d0['average'])
+                                        pass
+                                    pass
+                                    if category_var.specific_grade==False:
+                                        total_activity=total_activity+average
+                                    else:
+                                        temp_vect2 = []
+                                        temp_vect2.append(average*(float(activity_var.grade))/100)
+                                        temp_vect2.append(float(activity_var.grade))
+                                        matrix_specific_grade.append(temp_vect2)
+                                        activity_grade_total=activity_grade_total+float(activity_var.grade)
+                                    pass #-------if-category_var.specific_grade==False
+                                    num_activity=num_activity+1
+                                pass #-------if total_grades != 0
+                            pass #-------for-activity_var
+
+                            try:
+                                if category_var.specific_grade==False:
+                                    temp_vect = []
+                                    
+                                    temp_vect.append((total_activity)/(num_activity)) 
+                                    temp_vect.append(float(category_var.grade)) 
+                                    matrix_category.append(temp_vect) 
+                                    if total_activity != 0:
+                                        category_grade_total = category_grade_total + category_var.grade
+                                    pass
+                                else:
+                                    temp_vect = []
+                                    for var_x in matrix_specific_grade: 
+                                        total_activity = total_activity+((var_x[0])*float(category_var.grade)/(activity_grade_total))
+                                    pass
+                                    if total_activity != 0:
+                                        temp_vect.append(total_activity*100/float(category_var.grade)) 
+                                        temp_vect.append(float(category_var.grade)) 
+                                        matrix_category.append(temp_vect) 
+                                        category_grade_total = category_grade_total + category_var.grade
+                                    pass
+                                pass
+                            except:
+                                None
+                            pass
+                            num_category = num_category + 1
+                        pass
+                    
+                    else:
+                        
+                        validate_laboratory_var = None
+                        try:
+                            academic_assig = db(db.academic_course_assignation.id == request.vars['academic'] ).select().first()
+                            validate_laboratory_var = db((db.validate_laboratory.carnet == academic_assig.carnet) & (db.validate_laboratory.semester == academic_assig.semester) & (db.validate_laboratory.project == academic_assig.assignation)).select().first()
+                        except:
+                            None
+                        pass
+                        
+                        
+
+                        if validate_laboratory_var is not None:
+                            temp_vect = []
+                            temp_vect.append(validate_laboratory_var.grade) 
+                            temp_vect.append(float(category_var.grade)) 
+                            matrix_category.append(temp_vect) 
+                            category_grade_total = category_grade_total + category_var.grade
+                        elif average_laboratory != 0:
+                            temp_vect = []
+                            temp_vect.append(average_laboratory) 
+                            temp_vect.append(float(category_var.grade)) 
+                            matrix_category.append(temp_vect) 
+                            category_grade_total = category_grade_total + category_var.grade
+                        pass
+                    pass
+                pass #-------for-category_var
+
+
+                #----------------------Calculing Total Average----------
+                total_average=float(0)
+                for var_x in matrix_category: 
+                    total_average = total_average + (var_x[0]*var_x[1]/float(category_grade_total))
+                pass
+
+                if letter == 'l':
+                    average_laboratory = total_average
+                else:
+                    average_class = total_average
+                pass
+                
+            pass
+            coursesAdmin.append([course.id, course.name, average_class,average_laboratory])
     elif auth.has_membership('Teacher'):
-        coursesAdmin = db((db.user_project.assigned_user == auth.user.id) & (db.user_project.period == period.id) & (db.user_project.project==db.project.id) & (db.project.area_level==area.id)).select()
+        coursesAdmin =  db((db.user_project.assigned_user==auth.user.id)&\
+                        (db.user_project.period == db.period_year.id)&\
+                        ((db.user_project.period <= period.id) & \
+                        ((db.user_project.period + db.user_project.periods) > period.id))&\
+                        (db.user_project.project==db.project.id)&\
+                        (db.project.area_level==area.id) ).select()
     elif auth.has_membership('Student'):
-        coursesAdmin = db((db.user_project.assigned_user == auth.user.id) & (db.user_project.period == period.id) & (db.user_project.project==db.project.id) & (db.project.area_level==area.id)).select(countcoursesAdmin).first()
-        countcoursesAdminT = coursesAdmin[countcoursesAdmin]
-        coursesAdmin = db((db.user_project.assigned_user == auth.user.id) & (db.user_project.period == period.id) & (db.user_project.project==db.project.id) & (db.project.area_level==area.id)).select()        
+        coursesAdmin = db((db.user_project.assigned_user==auth.user.id)&\
+                        (db.user_project.period == db.period_year.id)&\
+                        ((db.user_project.period <= period.id) & \
+                        ((db.user_project.period + db.user_project.periods) > period.id))&\
+                        (db.user_project.project==db.project.id)&\
+                        (db.project.area_level==area.id) ).select()
+        countcoursesAdminT = len(coursesAdmin)
 
         academicCourse = db(db.academic.carnet==auth.user.username).select().first()
         if academicCourse is not None:
@@ -382,10 +260,16 @@ def students_control():
     
     project_select = db(db.project.id==project_var).select().first()
 
+    
+    assigned_to_project = False
+    assigantion = None
+
     if auth.has_membership('Super-Administrator') == False and auth.has_membership('Ecys-Administrator') == False :
         try:
-            assigantion = db((db.user_project.assigned_user == auth.user.id) & (db.user_project.period == year.id) & (db.user_project.project == project_var)).select().first()
-            
+            assigantion = db((db.user_project.assigned_user==auth.user.id)&\
+                        (db.user_project.project == project_var)&\
+                        ((db.user_project.period <= year.id) & \
+                        ((db.user_project.period + db.user_project.periods) > year.id))).select(db.user_project.ALL).first() 
             if assigantion is None:
                 academic_var = db(db.academic.carnet==auth.user.username).select().first()
                 try:
@@ -399,14 +283,12 @@ def students_control():
                 except:
                     session.flash=T('Not valid Action.')
                     redirect(URL('default','index'))
+            else:
+                assigned_to_project = True
         except:
             session.flash=T('Not valid Action.')
             redirect(URL('default','index'))
-    assigantion = db((db.user_project.assigned_user == auth.user.id) & (db.user_project.period == year.id) & (db.user_project.project == project_var)).select().first()
-    if assigantion is None:
-        assigned_to_project = False
-    else:
-        assigned_to_project = True
+    
 
     visited = db((db.page_visited.user_id == auth.user.id) & (db.page_visited.page_name == 'students_control')).select().first()
 
@@ -465,7 +347,12 @@ def control_students_grades():
     pass
 
     if (auth.has_membership('Super-Administrator') == False and auth.has_membership('Ecys-Administrator') == False):
-        assigantion = db((db.user_project.assigned_user == auth.user.id) & (db.user_project.period == var_period.id) & (db.user_project.project == var_project.id)).select().first()
+
+        assigantion = db((db.user_project.assigned_user==auth.user.id)&\
+                        (db.user_project.project == var_project)&\
+                        ((db.user_project.period <= var_period.id) & \
+                        ((db.user_project.period + db.user_project.periods) > var_period.id))).select(db.user_project.ALL).first()
+
         exception_query = db(db.course_laboratory_exception.project == id_project).select().first()
         if exception_query is None:
             exception_s_var = False
@@ -537,8 +424,6 @@ def grades():
     coment = request.vars['coment']
     if coment is None:
         coment = ""
-    
-    
 
     var_period = db(db.period_year.id==id_year).select().first()
     if not var_period:
@@ -664,156 +549,169 @@ def grades():
                 request.vars['grade'] = grade_list[cont_temp]
                 cont_temp = cont_temp+1
             request.vars['carnet'] = carnet_id
-        
-        
-            try:
-                academic_var =  db(db.academic.carnet==request.vars['carnet']).select().first()
+            
+            if request.vars['carnet'] != "":
+                try:
+                    academic_var =  db(db.academic.carnet==request.vars['carnet']).select().first()
 
-                assig_var =  db((db.academic_course_assignation.assignation==var_project.id) & (db.academic_course_assignation.semester==var_period.id) & (db.academic_course_assignation.carnet == academic_var.id)).select().first()
-                  #--------------------------------------------INSERT GRADE-------------------------------------
-                if request_change_var == False:
-                    if (exist_request_change == True or exist_activity_request_change == True ):
-                        add_grade_error = True
-                        message_var = T('Can not make operation because there is a pending request change. Please resolve it before proceeding.')
-                    else:
-                        grade_before = db((db.grades.academic_assignation==assig_var.id) & (db.grades.activity==var_activity.id) ).select().first() 
-                        if grade_before is None:
-                            if (var_activity.laboratory == False) | (assig_var.laboratorio == var_activity.laboratory):
-                                grade = db.grades.insert(academic_assignation = assig_var.id,
-                                                activity = var_activity.id,
-                                                grade =  request.vars['grade'])
+                    assig_var =  db((db.academic_course_assignation.assignation==var_project.id) & (db.academic_course_assignation.semester==var_period.id) & (db.academic_course_assignation.carnet == academic_var.id)).select().first()
+                      #--------------------------------------------INSERT GRADE-------------------------------------
+                    if request_change_var == False:
+                        if (exist_request_change == True or exist_activity_request_change == True ):
+                            add_grade_error = True
+                            message_var = T('Can not make operation because there is a pending request change. Please resolve it before proceeding.')
+                        else:
+                            grade_before = db((db.grades.academic_assignation==assig_var.id) & (db.grades.activity==var_activity.id) ).select().first() 
+                            if grade_before is None:
+                                if (var_activity.laboratory == False) | (assig_var.laboratorio == var_activity.laboratory):
+                                    grade = db.grades.insert(academic_assignation = assig_var.id,
+                                                    activity = var_activity.id,
+                                                    grade =  request.vars['grade'])
 
-                                if grade != None:
-                                    #--------------------------------------------log-------------------------------------
-                                    db.grades_log.insert(user_name = auth.user.username,
-                                                    roll = rol_log,
-                                                    operation_log = 'insert',
-                                                    academic_assignation_id = assig_var.id,
-                                                    academic = assig_var.carnet.carnet,
-                                                    project = assig_var.assignation.name,
-                                                    activity = var_activity.name,
-                                                    activity_id = var_activity.id,
-                                                    category = var_activity.course_activity_category.category.category,
-                                                    period = T(assig_var.semester.period.name),
-                                                    yearp = assig_var.semester.yearp,
-                                                    after_grade = request.vars['grade'],
-                                                    description = T('Inserted from Grades page')+" - "+coment
-                                                     )
-                                    if request.vars['op'] == "add_grade":
-                                        add_grade_flash = True
-                                        message_var = T('Grade added') + " | Carnet: "+ str(academic_var.carnet) +" "+ T('Grade')+ ": " + str(grade.grade)
-                                    pass
+                                    if grade != None:
+                                        #--------------------------------------------log-------------------------------------
+                                        db.grades_log.insert(user_name = auth.user.username,
+                                                        roll = rol_log,
+                                                        operation_log = 'insert',
+                                                        academic_assignation_id = assig_var.id,
+                                                        academic = assig_var.carnet.carnet,
+                                                        project = assig_var.assignation.name,
+                                                        activity = var_activity.name,
+                                                        activity_id = var_activity.id,
+                                                        category = var_activity.course_activity_category.category.category,
+                                                        period = T(assig_var.semester.period.name),
+                                                        yearp = assig_var.semester.yearp,
+                                                        after_grade = request.vars['grade'],
+                                                        description = T('Inserted from Grades page')+" - "+coment
+                                                         )
+                                        if request.vars['op'] == "add_grade":
+                                            add_grade_flash = True
+                                            message_var = T('Grade added') + " | Carnet: "+ str(academic_var.carnet) +" "+ T('Grade')+ ": " + str(grade.grade)
+                                        pass
+                                    else:
+                                        add_grade_error = True
+                                        message_var = T('Failed to add grade') + " | Carnet: "+ str(academic_var.carnet)+" " + T('Grade')+": " + str(grade.grade)
+                                    pass  #----grade!=None---
                                 else:
                                     add_grade_error = True
                                     message_var = T('Failed to add grade') + " | Carnet: "+ str(academic_var.carnet)+" " + T('Grade')+": " + str(grade.grade)
                                 pass  #----grade!=None---
                             else:
                                 add_grade_error = True
-                                message_var = T('Failed to add grade') + " | Carnet: "+ str(academic_var.carnet)+" " + T('Grade')+": " + str(grade.grade)
-                            pass  #----grade!=None---
-                        else:
-                            add_grade_error = True
-                            message_var = T('Failed to add grade') + " | Carnet: "+ request.vars['carnet']+" " + T('Already have an associated grade')
-                        pass #-------grade_before-is-None---  
-                    pass  #------exist_request_change-==-True----
-                  #--------------------------------------------INSERT REQUEST-------------------------------------
-                else:
-                    if (exist_activity_request_change == True ):
-                        alert_message = True
-                        message_var2 = T('Can not make operation because there is a pending request change. Please resolve it before proceeding.')
-                        
+                                message_var = T('Failed to add grade') + " | Carnet: "+ request.vars['carnet']+" " + T('Already have an associated grade')
+                            pass #-------grade_before-is-None---  
+                        pass  #------exist_request_change-==-True----
+                      #--------------------------------------------INSERT REQUEST-------------------------------------
                     else:
-                        grade_before = db((db.grades.academic_assignation==assig_var.id) & (db.grades.activity==var_activity.id) ).select().first() 
-                        
-                        var_grade_before = None
-                        var_operation = 'insert'
-                        if grade_before != None:
-                            var_grade_before = grade_before.grade
-                            var_operation = 'update'
-                        pass
-                        
-                        request_change = db((db.request_change_grades.activity== var_activity.id) & (db.request_change_grades.status=='pending') ).select().first() 
-                        if request_change is None:
-                            grade = db.request_change_grades.insert(user_id = auth.user.id,
-                                                                  activity = var_activity.id,
-                                                                  status =  'pending',
-                                                                  roll = rol_log,
-                                                                  period = assig_var.semester.id,
-                                                                  project = assig_var.assignation.id,
-                                                                  description = request.vars['description_var'])
-                        
-                            #-------------------------------------LOG-----------------------------------------------
-                            log_id = db.request_change_g_log.insert(r_c_g_id = grade,
-                                                          username = auth.user.username,
-                                                          roll = rol_log,
-                                                          after_status = 'pending',
-                                                          description = request.vars['description_var'],
-                                                          description_log = T('Inserted from Grades page'),
-                                                          semester = T(assig_var.semester.period.name),
-                                                          yearp = assig_var.semester.yearp,
-                                                          activity = var_activity.name,
-                                                          category = var_activity.course_activity_category.category.category,
-                                                          project = assig_var.assignation.name
-                                                        )
-                        pass #--------request_change-is-None----
-                        request_change = db((db.request_change_grades.activity== var_activity.id) & (db.request_change_grades.status=='pending') ).select().first() 
-                        rq_grade = db.request_change_grades_detail.insert(request_change_grades = request_change.id,
-                                                                              academic_assignation = assig_var.id,
-                                                                              before_grade = var_grade_before,
-                                                                              operation_request = var_operation,
-                                                                              after_grade = request.vars['grade'])
+                        if (exist_activity_request_change == True ):
+                            alert_message = True
+                            message_var2 = T('Can not make operation because there is a pending request change. Please resolve it before proceeding.')
+                            
+                        else:
+                            grade_before = db((db.grades.academic_assignation==assig_var.id) & (db.grades.activity==var_activity.id) ).select().first() 
+                            
+                            var_grade_before = None
+                            var_operation = 'insert'
+                            if grade_before != None:
+                                var_grade_before = grade_before.grade
+                                var_operation = 'update'
+                            pass
+                            
+                            request_change = db((db.request_change_grades.activity== var_activity.id) & (db.request_change_grades.status=='pending') ).select().first() 
+                            if request_change is None:
+                                grade = db.request_change_grades.insert(user_id = auth.user.id,
+                                                                      activity = var_activity.id,
+                                                                      status =  'pending',
+                                                                      roll = rol_log,
+                                                                      period = assig_var.semester.id,
+                                                                      project = assig_var.assignation.id,
+                                                                      description = request.vars['description_var'])
+                            
+                                #-------------------------------------LOG-----------------------------------------------
+                                log_id = db.request_change_g_log.insert(r_c_g_id = grade,
+                                                              username = auth.user.username,
+                                                              roll = rol_log,
+                                                              after_status = 'pending',
+                                                              description = request.vars['description_var'],
+                                                              description_log = T('Inserted from Grades page'),
+                                                              semester = T(assig_var.semester.period.name),
+                                                              yearp = assig_var.semester.yearp,
+                                                              activity = var_activity.name,
+                                                              category = var_activity.course_activity_category.category.category,
+                                                              project = assig_var.assignation.name
+                                                            )
+                            pass #--------request_change-is-None----
+                            request_change = db((db.request_change_grades.activity== var_activity.id) & (db.request_change_grades.status=='pending') ).select().first() 
+                            rq_grade = db.request_change_grades_detail.insert(request_change_grades = request_change.id,
+                                                                                  academic_assignation = assig_var.id,
+                                                                                  before_grade = var_grade_before,
+                                                                                  operation_request = var_operation,
+                                                                                  after_grade = request.vars['grade'])
+                            log_id = db((db.request_change_g_log.r_c_g_id== request_change.id) & (db.request_change_g_log.after_status=='pending') ).select().first() 
+                            db.request_change_grade_d_log.insert(request_change_g_log = log_id.id,
+                                                              operation_request = var_operation,
+                                                              academic = academic_var.carnet,
+                                                              before_grade = var_grade_before,
+                                                              after_grade = request.vars['grade']
+                                                              )
 
-                        log_id = db((db.request_change_g_log.r_c_g_id== request_change.id) & (db.request_change_g_log.after_status=='pending') ).select().first() 
+                            send_mail_var = True
+                        
+                            
 
-                        db.request_change_grade_d_log.insert(request_change_g_log = log_id.id,
-                                                          operation_request = var_operation,
-                                                          academic = academic_var.carnet,
-                                                          before_grade = var_grade_before,
-                                                          after_grade = request.vars['grade']
-                                                          )
-                                        
-                        send_mail_var = True
+                    pass #-------request_change_var-==-False---
                     
-                        
-
-                pass #-------request_change_var-==-False---
-                
-                  
-            except:
-                if academic_var is None:
-                    add_grade_error = True
-                    message_var = T('Failed to add grade') + " | Carnet: "+ request.vars['carnet'] +" " + T('not exist')
-                else:
-                    add_grade_error = True
-                    message_var = T('Failed to add grade')
+                      
+                except:
+                    if academic_var is None:
+                        add_grade_error = True
+                        message_var = T('Failed to add grade') + " | Carnet: "+ request.vars['carnet'] +" " + T('not exist')
+                    else:
+                        add_grade_error = True
+                        message_var = T('Failed to add grade')
+                    pass
                 pass
-            pass
 
         pass
         if send_mail_var == True:
             #send mail
             project_name = var_project.name
             project_id = id_project
-            check = db.user_project(project = project_id, period = var_period.id, assigned_user = auth.user.id)
-            #Message
-            users2 = db((db.auth_user.id==db.user_project.assigned_user)&(db.user_project.period == check.period) & (db.user_project.project==check.project)&(db.auth_membership.user_id==db.user_project.assigned_user)&(db.auth_membership.group_id==3)).select().first()
-            subject="Solicitud de cambio de notas - "+project_name
-            message2="<br>Por este medio se le informa que el(la) practicante "+check.assigned_user.first_name+" "+check.assigned_user.last_name+" ha creado una solicitud de cambio en las notas del laboratorio del Curso de \""+project_name+"\"."
-            message2=message2+"<br>Para aceptar o rechazar dicha solicitud dirigirse al control de solicitudes o al siguiente link: " +cpfecys.get_domain()+ "cpfecys/activity_control/solve_request_change_grades?course="+str(project_id)
-            message2=message2+"<br>Saludos.<br><br>Sistema de Seguimiento de La Escuela de Ciencias y Sistemas<br>Facultad de Ingeniería - Universidad de San Carlos de Guatemala</html>"
-            #Send Mail to the Teacher
-            message="<html>Catedratico(a) "+users2.auth_user.first_name+" "+users2.auth_user.last_name+" reciba un cordial saludo.<br>"
-            message3=message+message2
+            check = db((db.user_project.assigned_user==auth.user.id)&\
+                        (db.user_project.project == project_id)&\
+                        ((db.user_project.period <= var_period.id) & \
+                        ((db.user_project.period + db.user_project.periods) > var_period.id))).select(db.user_project.ALL).first()
 
-            #fail1 = send_mail_to_students(message3,subject,users2.auth_user.email,check,var_period.period.name,var_period.yearp) 
-            fail1=0#Esto hay que quitarlo****************************************************************************************************************!!!!!!!
-            if fail1==1:
-                alert_message = True
+                         #db.user_project(project = project_id, period = var_period.id, assigned_user = auth.user.id)
+            #Message
+            #users2 = db((db.auth_user.id==db.user_project.assigned_user)&(db.user_project.period == check.period) & (db.user_project.project==check.project)&(db.auth_membership.user_id==db.user_project.assigned_user)&(db.auth_membership.group_id==3)).select().first()
+            try:
+                users2 = db((db.auth_user.id==db.user_project.assigned_user)&\
+                            (db.user_project.project == project_id)&\
+                            ((db.user_project.period <= var_period.id) & \
+                            ((db.user_project.period + db.user_project.periods) > var_period.id))&\
+                            (db.auth_membership.user_id==db.user_project.assigned_user)&\
+                            (db.auth_membership.group_id==3)).select().first()
+                
+                subject="Solicitud de cambio de notas - "+project_name
+                message2="<br>Por este medio se le informa que el(la) practicante "+check.assigned_user.first_name+" "+check.assigned_user.last_name+" ha creado una solicitud de cambio en las notas del laboratorio del Curso de \""+project_name+"\"."
+                message2=message2+"<br>Para aceptar o rechazar dicha solicitud dirigirse al control de solicitudes o al siguiente link: " +cpfecys.get_domain()+ "cpfecys/activity_control/solve_request_change_grades?course="+str(project_id)
+                message2=message2+"<br>Saludos.<br><br>Sistema de Seguimiento de La Escuela de Ciencias y Sistemas<br>Facultad de Ingeniería - Universidad de San Carlos de Guatemala</html>"
+                #Send Mail to the Teacher
+                message="<html>Catedratico(a) "+users2.auth_user.first_name+" "+users2.auth_user.last_name+" reciba un cordial saludo.<br>"
+                message3=message+message2
+
+                fail1 = send_mail_to_students(message3,subject,users2.auth_user.email,check,var_period.period.name,var_period.yearp) 
+                #fail1=0#Esto hay que quitarlo****************************************************************************************************************!!!!!!!
+                if fail1==1:
+                    alert_message = True
+                    message_var2 = T("Request has been sent") + ". " + T("Failed to send email to teacher")
+                
+                else:
+                    alert_message = True
+                    message_var2 = T("Request has been sent") + ". " + T("Sent email to teacher")
+            except:
                 message_var2 = T("Request has been sent") + ". " + T("Failed to send email to teacher")
-            
-            else:
-                alert_message = True
-                message_var2 = T("Request has been sent") + ". " + T("Sent email to teacher")
             
     pass
     return dict(academic_assig=tempAcademic, 
@@ -833,10 +731,6 @@ def grades():
         actual_period = actual_period,
         course_ended = course_ended
         )
-
-
-
-
 
 @auth.requires_login()
 @auth.requires_membership('Super-Administrator')
@@ -875,7 +769,6 @@ def partials():
     grid = SQLFORM.grid(db.partials, maxtextlength=100,csv=False,deletable=False,)
     return dict(grid=grid)
 
-
 @auth.requires_login()
 def semaphore():
     period = db(db.period_year.id==request.vars['period']).select().first()
@@ -888,7 +781,12 @@ def request_change_weighting():
     year = db(db.period_year.id == request.vars['year']).select().first() 
     year_semester = year.period
 
-    assignation = db((db.user_project.assigned_user == auth.user.id) & (db.user_project.period == year.id) & (db.user_project.project == request.vars['project'])).select().first()
+    assignation = db((db.user_project.assigned_user==auth.user.id)&\
+                        (db.user_project.project == request.vars['project'])&\
+                        ((db.user_project.period <= year.id) & \
+                        ((db.user_project.period + db.user_project.periods) > year.id))).select(db.user_project.ALL).first()
+
+
     if assignation is None:
         session.flash = T("Action not allowed")
         redirect(URL('default','index'))    
@@ -985,22 +883,37 @@ def request_change_weighting():
 
                     project_name = check.name
                     project_id = check.id
-                    check = db.user_project(project = check.id, period = year.id, assigned_user = auth.user.id)
+                    #check = db.user_project(project = check.id, period = year.id, assigned_user = auth.user.id)
                     #Message
-                    users2 = db((db.auth_user.id==db.user_project.assigned_user)&(db.user_project.period == check.period) & (db.user_project.project==check.project)&(db.auth_membership.user_id==db.user_project.assigned_user)&(db.auth_membership.group_id==3)).select().first()
-                    subject="Solicitud de cambio de ponderación - "+project_name
-                    message2="<br>Por este medio se le informa que el(la) practicante "+check.assigned_user.first_name+" "+check.assigned_user.last_name+" ha creado una solicitud de cambio en la ponderación del laboratorio del Curso de \""+project_name+"\"."
-                    message2=message2+"<br>Para aceptar o rechazar dicha solicitud dirigirse al control de solicitudes o al siguiente link: " +cpfecys.get_domain()+ "cpfecys/activity_control/solve_request_change_weighting?course="+str(project_id)
-                    message2=message2+"<br>Saludos.<br><br>Sistema de Seguimiento de La Escuela de Ciencias y Sistemas<br>Facultad de Ingeniería - Universidad de San Carlos de Guatemala</html>"
-                    #Send Mail to the Teacher
-                    message="<html>Catedratico(a) "+users2.auth_user.first_name+" "+users2.auth_user.last_name+" reciba un cordial saludo.<br>"
-                    message3=message+message2
-                    #fail1 = send_mail_to_students(message3,subject,users2.auth_user.email,check,year_semester.name,year.yearp) 
-                    fail1=0#Esto hay que quitarlo****************************************************************************************************************!!!!!!!
-                    if fail1==1:
-                        response.flash = T("Request has been sent") + " - " + T("Failed to send email to teacher")
-                    else:
-                        response.flash = T("Request has been sent") + " - " + T("Sent email to teacher")                        
+                    #users2 = db((db.auth_user.id==db.user_project.assigned_user)&(db.user_project.period == check.period) & (db.user_project.project==check.project)&(db.auth_membership.user_id==db.user_project.assigned_user)&(db.auth_membership.group_id==3)).select().first()
+                    try:
+                        check = db((db.user_project.assigned_user==auth.user.id)&\
+                            (db.user_project.project == request.vars['project'])&\
+                            ((db.user_project.period <= int(request.vars['year'])) & \
+                            ((db.user_project.period + db.user_project.periods) > int(request.vars['year']) ))).select(db.user_project.ALL).first()
+
+                        users2 = db((db.auth_user.id==db.user_project.assigned_user)&\
+                            (db.user_project.project == request.vars['project'])&\
+                            ((db.user_project.period <= int(request.vars['year']) ) & \
+                            ((db.user_project.period + db.user_project.periods) > int(request.vars['year']) ))&\
+                            (db.auth_membership.user_id==db.user_project.assigned_user)&\
+                            (db.auth_membership.group_id==3)).select().first()
+
+                        subject="Solicitud de cambio de ponderación - "+project_name
+                        message2="<br>Por este medio se le informa que el(la) practicante "+check.assigned_user.first_name+" "+check.assigned_user.last_name+" ha creado una solicitud de cambio en la ponderación del laboratorio del Curso de \""+project_name+"\"."
+                        message2=message2+"<br>Para aceptar o rechazar dicha solicitud dirigirse al control de solicitudes o al siguiente link: " +cpfecys.get_domain()+ "cpfecys/activity_control/solve_request_change_weighting?course="+str(project_id)
+                        message2=message2+"<br>Saludos.<br><br>Sistema de Seguimiento de La Escuela de Ciencias y Sistemas<br>Facultad de Ingeniería - Universidad de San Carlos de Guatemala</html>"
+                        #Send Mail to the Teacher
+                        message="<html>Catedratico(a) "+users2.auth_user.first_name+" "+users2.auth_user.last_name+" reciba un cordial saludo.<br>"
+                        message3=message+message2
+                        fail1 = send_mail_to_students(message3,subject,users2.auth_user.email,check,year_semester.name,year.yearp) 
+                        #fail1=0#Esto hay que quitarlo****************************************************************************************************************!!!!!!!
+                        if fail1==1:
+                            response.flash = T("Request has been sent") + " - " + T("Failed to send email to teacher")
+                        else:
+                            response.flash = T("Request has been sent") + " - " + T("Sent email to teacher")                        
+                    except:
+                        None
                     return dict(name = project_name,
                         semester = year_semester.name,
                         year = year.yearp,
@@ -1053,7 +966,13 @@ def request_change_weighting_load():
         else:
             change = db((db.request_change_weighting.id == change_id)).select().first()
     
-    assignation = db((db.user_project.assigned_user == auth.user.id) & (db.user_project.period == year.id) & (db.user_project.project == project_id)).select().first()
+    assignation = db((db.user_project.assigned_user==auth.user.id)&\
+                        (db.user_project.project == project_id)&\
+                        ((db.user_project.period <= year.id) & \
+                        ((db.user_project.period + db.user_project.periods) > year.id))).select(db.user_project.ALL).first()
+
+
+
     if (assignation is None) & (auth.has_membership('Super-Administrator') == False) & (auth.has_membership('Ecys-Administrator') == False):
         session.flash = T("Action not allowed")
         redirect(URL('default','index'))    
@@ -1082,7 +1001,12 @@ def solve_request_change_weighting():
         #Check if teacher or other role
         course=None
         if auth.has_membership('Teacher'):
-            course = db((db.user_project.assigned_user == auth.user.id) & (db.user_project.period == cpfecys.current_year_period().id) & (db.user_project.project==courseCheck)).select().first()
+            course = db((db.user_project.assigned_user==auth.user.id)&\
+                        (db.user_project.project == courseCheck)&\
+                        ((db.user_project.period <= cpfecys.current_year_period().id) & \
+                        ((db.user_project.period + db.user_project.periods) > cpfecys.current_year_period().id))).select(db.user_project.ALL).first()
+
+
             if (course is None):
                 session.flash=T('You do not have permission to view course requests')
                 redirect(URL('default','index'))
@@ -1120,7 +1044,11 @@ def solve_request_change_grades():
         #Check if teacher or other role
         course=None
         if auth.has_membership('Teacher'):
-            course = db((db.user_project.assigned_user == auth.user.id) & (db.user_project.period == cpfecys.current_year_period().id) & (db.user_project.project==courseCheck)).select().first()
+            course = db((db.user_project.assigned_user==auth.user.id)&\
+                        (db.user_project.project == courseCheck)&\
+                        ((db.user_project.period <= cpfecys.current_year_period().id) & \
+                        ((db.user_project.period + db.user_project.periods) > cpfecys.current_year_period().id))).select(db.user_project.ALL).first()
+
             if (course is None):
                 session.flash=T('You do not have permission to view course requests')
                 redirect(URL('default','index'))
@@ -1152,7 +1080,11 @@ def control_weighting():
     year = db(db.period_year.id == request.vars['year']).select().first() 
     year_semester = year.period
 
-    assigantion = db((db.user_project.assigned_user == auth.user.id) & (db.user_project.period == year.id) & (db.user_project.project == request.vars['project'])).select().first()
+    assigantion = db((db.user_project.assigned_user==auth.user.id)&\
+                        (db.user_project.project == request.vars['project'])&\
+                        ((db.user_project.period <= year.id) & \
+                        ((db.user_project.period + db.user_project.periods) > year.id))).select(db.user_project.ALL).first()
+
     if assigantion is None:
         assigned_to_project = False
     else:
@@ -1175,8 +1107,12 @@ def students_control_full():
 
     project_var = request.vars['project']
     if auth.has_membership('Super-Administrator') == False and auth.has_membership('Ecys-Administrator') == False :
-        assigantion = db((db.user_project.assigned_user == auth.user.id) & (db.user_project.period == year.id) & (db.user_project.project == project_var)).select().first()
-        
+        assigantion = db((db.user_project.assigned_user==auth.user.id)&\
+                        (db.user_project.project == project_var)&\
+                        ((db.user_project.period <= year.id) & \
+                        ((db.user_project.period + db.user_project.periods) > year.id))).select(db.user_project.ALL).first()
+
+
         if assigantion is None:
             academic_var = db(db.academic.carnet==auth.user.username).select().first()
             try:
@@ -1224,7 +1160,11 @@ def weighting():
     pass
     project_var = db(db.project.id == project).select().first() 
     year = db(db.period_year.id == request.vars['year']).select().first() 
-    assigantion = db((db.user_project.assigned_user == auth.user.id) & (db.user_project.period == year.id) & (db.user_project.project == project)).select().first()
+
+    assigantion = db((db.user_project.assigned_user==auth.user.id)&\
+                        (db.user_project.project == project)&\
+                        ((db.user_project.period <= year.id) & \
+                        ((db.user_project.period + db.user_project.periods) > year.id))).select(db.user_project.ALL).first()
     
     if assigantion is None:
         assigned_to_project = False
@@ -1291,7 +1231,11 @@ def control_activity():
     year_semester = year.period
     project = db(db.project.id==request.vars['project']).select().first()
 
-    assigantion = db((db.user_project.assigned_user == auth.user.id) & (db.user_project.period == year.id) & (db.user_project.project == project.id)).select().first()
+    assigantion = db((db.user_project.assigned_user==auth.user.id)&\
+                        (db.user_project.project == project.id)&\
+                        ((db.user_project.period <= year.id) & \
+                        ((db.user_project.period + db.user_project.periods) > year.id))).select(db.user_project.ALL).first()
+
     if assigantion is None:
         assigned_to_project = False
     else:
@@ -1303,6 +1247,7 @@ def control_activity():
             project = project,
             type=request.vars['type'],
             assigned_to_project = assigned_to_project)
+
 @auth.requires_login()
 def activity():
     import cpfecys
@@ -1311,7 +1256,12 @@ def activity():
     typ = request.vars['type']
     
     year = db(db.period_year.id == request.vars['year']).select().first() 
-    assigantion = db((db.user_project.assigned_user == auth.user.id) & (db.user_project.period == request.vars['year']) & (db.user_project.project == project)).select().first()
+    assigantion = db((db.user_project.assigned_user==auth.user.id)&\
+                        (db.user_project.project == project)&\
+                        ((db.user_project.period <= year.id) & \
+                        ((db.user_project.period + db.user_project.periods) > year.id))).select(db.user_project.ALL).first()
+
+
     if assigantion is None:
         assigned_to_project = False
     else:
@@ -1331,7 +1281,12 @@ def control_students_modals2():
 @auth.requires(auth.has_membership('Student'))
 def request_change_activity():
     #Obtener al tutor del proyecto
-    check = db.user_project(project = request.vars['project'], period = request.vars['year'], assigned_user = auth.user.id)
+    check = db((db.user_project.assigned_user==auth.user.id)&\
+                        (db.user_project.project == request.vars['project'])&\
+                        ((db.user_project.period <= int(request.vars['year'])) & \
+                        ((db.user_project.period + db.user_project.periods) > int(request.vars['year']) ))).select(db.user_project.ALL).first()
+
+
     if (check is None):
         redirect(URL('default','index'))
 
@@ -1444,10 +1399,19 @@ def requestchangeactivity():
                     activitiesChange = db(db.requestchange_course_activity.requestchange_activity==Draft.id).select()
                     for actChange in activitiesChange:
                         db.requestchange_course_activity_log.insert(requestchange_activity=idR, operation_request=actChange.operation_request, activity=actChange.activity, name=actChange.name, description=actChange.description, grade=actChange.grade, date_start=actChange.date_start, date_finish=actChange.date_finish)
-                    #Check the user project
-                    check = db.user_project(project = request.vars['project'], period = request.vars['year'], assigned_user = auth.user.id)
-                    #Message
-                    users2 = db((db.auth_user.id==db.user_project.assigned_user)&(db.user_project.period == check.period) & (db.user_project.project==check.project)&(db.auth_membership.user_id==db.user_project.assigned_user)&(db.auth_membership.group_id==3)).select().first()
+
+                    check = db((db.user_project.assigned_user==auth.user.id)&\
+                        (db.user_project.project == request.vars['project'])&\
+                        ((db.user_project.period <= int(request.vars['year'])) & \
+                        ((db.user_project.period + db.user_project.periods) > int(request.vars['year']) ))).select(db.user_project.ALL).first()
+
+                    users2 = db((db.auth_user.id==db.user_project.assigned_user)&\
+                        (db.user_project.project == request.vars['project'])&\
+                        ((db.user_project.period <= int(request.vars['year']) ) & \
+                        ((db.user_project.period + db.user_project.periods) > int(request.vars['year']) ))&\
+                        (db.auth_membership.user_id==db.user_project.assigned_user)&\
+                        (db.auth_membership.group_id==3)).select().first()
+
                     try:
                         subject="Solicitud de cambio de actividades - "+project.name
                         
@@ -1458,8 +1422,8 @@ def requestchangeactivity():
                         #Send Mail to the Teacher
                         message="<html>catedratico(a) "+users2.auth_user.first_name+" "+users2.auth_user.last_name+" reciba un cordial saludo.<br>"
                         message3=message+message2
-                        #fail1 = send_mail_to_students(message3,subject,users2.auth_user.email,check,year.period.name,year.yearp)
-                        fail1=0#Esto hay que quitarlo****************************************************************************************************************!!!!!!!
+                        fail1 = send_mail_to_students(message3,subject,users2.auth_user.email,check,year.period.name,year.yearp)
+                        #fail1=0#Esto hay que quitarlo****************************************************************************************************************!!!!!!!
                         #Refresh the var Draft
                         Draft=None
                         if fail1==1:
@@ -1468,6 +1432,7 @@ def requestchangeactivity():
                             stateRequest=4
                     except:
                         stateRequest=2
+
                 else:
                     Draft=None
                     stateRequest=5
@@ -1525,7 +1490,13 @@ def courses_list_request():
     area = db(db.area_level.name=='DTT Tutor Académico').select().first()
     courses_request=None
     if auth.has_membership('Teacher'):
-        courses_request = db((db.user_project.assigned_user == auth.user.id) & (db.user_project.period == cpfecys.current_year_period().id) & (db.user_project.project==db.project.id) & (db.project.area_level==area.id)).select()
+        courses_request = db((db.user_project.assigned_user==auth.user.id)&\
+                        (db.user_project.project==db.project.id)&\
+                        (db.project.area_level==area.id)&\
+                        ((db.user_project.period <= cpfecys.current_year_period().id) & \
+                        ((db.user_project.period + db.user_project.periods) > cpfecys.current_year_period().id))).select()
+
+
     if auth.has_membership('Super-Administrator') or auth.has_membership('Ecys-Administrator'):
         courses_request = db(db.project.area_level==area.id).select()
 
@@ -1616,7 +1587,10 @@ def solve_request_change_activity():
         #Check if teacher or other role
         course=None
         if auth.has_membership('Teacher'):
-            course = db((db.user_project.assigned_user == auth.user.id) & (db.user_project.period == cpfecys.current_year_period().id) & (db.user_project.project==courseCheck)).select().first()
+            course = db((db.user_project.assigned_user==auth.user.id)&\
+                        (db.user_project.project == courseCheck)&\
+                        ((db.user_project.period <= cpfecys.current_year_period().id) & \
+                        ((db.user_project.period + db.user_project.periods) > cpfecys.current_year_period().id))).select(db.user_project.ALL).first()
             if (course is None):
                 session.flash=T('You do not have permission to view course requests')
                 redirect(URL('default','index'))
@@ -1703,7 +1677,11 @@ def control_activity_without_metric():
     year_semester = year.period
     project = db(db.project.id==request.vars['project']).select().first()
 
-    assigantion = db((db.user_project.assigned_user == auth.user.id) & (db.user_project.period == year.id) & (db.user_project.project == project.id)).select().first()
+    assigantion = db((db.user_project.assigned_user==auth.user.id)&\
+                        (db.user_project.project == project.id)&\
+                        ((db.user_project.period <= year.id) & \
+                        ((db.user_project.period + db.user_project.periods) > year.id))).select(db.user_project.ALL).first()
+
     if assigantion is None:
         assigned_to_project = False
     else:
@@ -1774,7 +1752,10 @@ def management_activity_without_metric():
             query = ((db.course_activity_without_metric.semester==year.id) & (db.course_activity_without_metric.assignation==project.id))
             grid = SQLFORM.grid(query, csv=False, paginate=10, searchable=False)
         elif auth.has_membership('Teacher'):
-            assigantion = db((db.user_project.assigned_user == auth.user.id) & (db.user_project.period == year.id) & (db.user_project.project == project)).select().first()
+            assigantion = db((db.user_project.assigned_user==auth.user.id)&\
+                        (db.user_project.project == project)&\
+                        ((db.user_project.period <= year.id) & \
+                        ((db.user_project.period + db.user_project.periods) > year.id))).select(db.user_project.ALL).first()
             if assigantion is None:
                 session.flash = T('Not valid Action.')
                 redirect(URL('default','index'))
@@ -1788,7 +1769,10 @@ def management_activity_without_metric():
                     query = ((db.course_activity_without_metric.semester==year.id) & (db.course_activity_without_metric.assignation==project.id)&(db.course_activity_without_metric.laboratory==False))
                     grid = SQLFORM.grid(query, csv=False, paginate=10, searchable=False)
         elif auth.has_membership('Student'):
-            assigantion = db((db.user_project.assigned_user == auth.user.id) & (db.user_project.period == year.id) & (db.user_project.project == project)).select().first()
+            assigantion = db((db.user_project.assigned_user==auth.user.id)&\
+                        (db.user_project.project == project)&\
+                        ((db.user_project.period <= year.id) & \
+                        ((db.user_project.period + db.user_project.periods) > year.id))).select(db.user_project.ALL).first()
             if assigantion is None:
                 session.flash = T('Not valid Action.')
                 redirect(URL('default','index'))
@@ -1850,7 +1834,10 @@ def validate_laboratory():
             redirect(URL('default','index'))
         else:
             if auth.has_membership('Super-Administrator') == False and auth.has_membership('Ecys-Administrator')==False:
-                assigantion = db((db.user_project.assigned_user == auth.user.id) & (db.user_project.period == year.id) & (db.user_project.project == project)).select().first()
+                assigantion = db((db.user_project.assigned_user==auth.user.id)&\
+                        (db.user_project.project == project)&\
+                        ((db.user_project.period <= year.id) & \
+                        ((db.user_project.period + db.user_project.periods) > year.id))).select(db.user_project.ALL).first()
                 if assigantion is None:
                     session.flash = T('Not valid Action.')
                     redirect(URL('default','index'))
@@ -2007,7 +1994,11 @@ def oncreate_validate_laboratory(form):
             redirect(URL('default','index'))
         else:
             if auth.has_membership('Super-Administrator') == False and auth.has_membership('Ecys-Administrator')==False:
-                assigantion = db((db.user_project.assigned_user == auth.user.id) & (db.user_project.period == year.id) & (db.user_project.project == project)).select().first()
+                assigantion = db((db.user_project.assigned_user==auth.user.id)&\
+                        (db.user_project.project == project)&\
+                        ((db.user_project.period <= year.id) & \
+                        ((db.user_project.period + db.user_project.periods) > year.id))).select(db.user_project.ALL).first()
+
                 if assigantion is None:
                     db(db.validate_laboratory.id==form.vars.id).delete()
                     session.flash = T('Not valid Action.')
@@ -2178,7 +2169,10 @@ def ondelete_validate_laboratory(table_involved, id_of_the_deleted_record):
             redirect(URL('default','index'))
         else:
             if auth.has_membership('Super-Administrator') == False and auth.has_membership('Ecys-Administrator')==False:
-                assigantion = db((db.user_project.assigned_user == auth.user.id) & (db.user_project.period == year.id) & (db.user_project.project == project)).select().first()
+                assigantion = db((db.user_project.assigned_user==auth.user.id)&\
+                        (db.user_project.project == project)&\
+                        ((db.user_project.period <= year.id) & \
+                        ((db.user_project.period + db.user_project.periods) > year.id))).select(db.user_project.ALL).first()
                 if assigantion is None:
                     session.flash = T('Not valid Action.')
                     redirect(URL('default','index'))
@@ -2311,7 +2305,10 @@ def onupdate_validate_laboratory(form):
             messageFail=T('Not valid Action.')
         else:
             if auth.has_membership('Super-Administrator') == False and auth.has_membership('Ecys-Administrator')==False:
-                assigantion = db((db.user_project.assigned_user == auth.user.id) & (db.user_project.period == year.id) & (db.user_project.project == project)).select().first()
+                assigantion = db((db.user_project.assigned_user==auth.user.id)&\
+                        (db.user_project.project == project)&\
+                        ((db.user_project.period <= year.id) & \
+                        ((db.user_project.period + db.user_project.periods) > year.id))).select(db.user_project.ALL).first()
                 if assigantion is None:
                     failCheck=2
                     messageFail=T('Not valid Action.')
@@ -2543,7 +2540,10 @@ def laboratory_replacing():
             redirect(URL('default','index'))
         else:
             if auth.has_membership('Super-Administrator') == False and auth.has_membership('Ecys-Administrator')==False:
-                assigantion = db((db.user_project.assigned_user == auth.user.id) & (db.user_project.period == year.id) & (db.user_project.project == project)).select().first()
+                assigantion = db((db.user_project.assigned_user==auth.user.id)&\
+                        (db.user_project.project == project)&\
+                        ((db.user_project.period <= year.id) & \
+                        ((db.user_project.period + db.user_project.periods) > year.id))).select(db.user_project.ALL).first()
                 if assigantion is None:
                     session.flash = T('Not valid Action.')
                     redirect(URL('default','index'))
@@ -2715,7 +2715,10 @@ def oncreate_laboratory_replacing(form):
             redirect(URL('default','index'))
         else:
             if auth.has_membership('Super-Administrator') == False and auth.has_membership('Ecys-Administrator')==False:
-                assigantion = db((db.user_project.assigned_user == auth.user.id) & (db.user_project.period == year.id) & (db.user_project.project == project)).select().first()
+                assigantion = db((db.user_project.assigned_user==auth.user.id)&\
+                        (db.user_project.project == project)&\
+                        ((db.user_project.period <= year.id) & \
+                        ((db.user_project.period + db.user_project.periods) > year.id))).select(db.user_project.ALL).first()
                 if assigantion is None:
                     db(db.validate_laboratory.id==form.vars.id).delete()
                     session.flash = T('Not valid Action.')
@@ -2892,7 +2895,10 @@ def onupdate_laboratory_replacing(form):
             messageFail=T('Not valid Action.')
         else:
             if auth.has_membership('Super-Administrator') == False and auth.has_membership('Ecys-Administrator')==False:
-                assigantion = db((db.user_project.assigned_user == auth.user.id) & (db.user_project.period == year.id) & (db.user_project.project == project)).select().first()
+                assigantion = db((db.user_project.assigned_user==auth.user.id)&\
+                        (db.user_project.project == project)&\
+                        ((db.user_project.period <= year.id) & \
+                        ((db.user_project.period + db.user_project.periods) > year.id))).select(db.user_project.ALL).first()
                 if assigantion is None:
                     failCheck=2
                     messageFail=T('Not valid Action.')
@@ -3088,16 +3094,7 @@ def onupdate_laboratory_replacing(form):
         if failCheck==2:
             redirect(URL('default','index'))
 
-
-
-
-
-
-
-
-
 #------------------------------------course_first_recovery_test--------------
-
 @auth.requires_login()
 @auth.requires(auth.has_membership('Student') or auth.has_membership('Teacher') or auth.has_membership('Super-Administrator') or auth.has_membership('Ecys-Administrator'))
 def course_first_recovery_test():
@@ -3178,7 +3175,10 @@ def course_first_recovery_test():
             else:
                 grid = SQLFORM.grid(query, csv=False, paginate=50, oncreate=oncreate_course_first_recovery_test, onupdate=onupdate_course_first_recovery_test, ondelete=ondelete_course_first_recovery_test, searchable=False)
     elif auth.has_membership('Student'):
-        assigantion = db((db.user_project.assigned_user == auth.user.id) & (db.user_project.period == year.id) & (db.user_project.project == project)).select().first()
+        assigantion = db((db.user_project.assigned_user==auth.user.id)&\
+                        (db.user_project.project == project)&\
+                        ((db.user_project.period <= year.id) & \
+                        ((db.user_project.period + db.user_project.periods) > year.id))).select(db.user_project.ALL).first()
         if assigantion is None:
             session.flash = T('Not valid Action.')
             redirect(URL('default','index'))
@@ -3194,7 +3194,10 @@ def course_first_recovery_test():
                 query = ((db.course_first_recovery_test.semester==year.id)&(db.course_first_recovery_test.project==project.id))
                 grid = SQLFORM.grid(query, csv=False, create=False, editable=False, deletable=False, paginate=50, searchable=False)
     elif auth.has_membership('Teacher'):
-        assigantion = db((db.user_project.assigned_user == auth.user.id) & (db.user_project.period == year.id) & (db.user_project.project == project)).select().first()
+        assigantion = db((db.user_project.assigned_user==auth.user.id)&\
+                        (db.user_project.project == project)&\
+                        ((db.user_project.period <= year.id) & \
+                        ((db.user_project.period + db.user_project.periods) > year.id))).select(db.user_project.ALL).first()
         if assigantion is None:
             session.flash = T('Not valid Action.')
             redirect(URL('default','index'))
@@ -3509,7 +3512,10 @@ def course_second_recovery_test():
             else:
                 grid = SQLFORM.grid(query, csv=False, paginate=50, oncreate=oncreate_course_second_recovery_test, onupdate=onupdate_course_second_recovery_test, ondelete=ondelete_course_second_recovery_test, searchable=False)
     elif auth.has_membership('Student'):
-        assigantion = db((db.user_project.assigned_user == auth.user.id) & (db.user_project.period == year.id) & (db.user_project.project == project)).select().first()
+        assigantion = db((db.user_project.assigned_user==auth.user.id)&\
+                        (db.user_project.project == project)&\
+                        ((db.user_project.period <= year.id) & \
+                        ((db.user_project.period + db.user_project.periods) > year.id))).select(db.user_project.ALL).first()
         if assigantion is None:
             session.flash = T('Not valid Action.')
             redirect(URL('default','index'))
@@ -3525,7 +3531,10 @@ def course_second_recovery_test():
                 query = ((db.course_second_recovery_test.semester==year.id)&(db.course_second_recovery_test.project==project.id))
                 grid = SQLFORM.grid(query, csv=False, create=False, editable=False, deletable=False, paginate=50, searchable=False)
     elif auth.has_membership('Teacher'):
-        assigantion = db((db.user_project.assigned_user == auth.user.id) & (db.user_project.period == year.id) & (db.user_project.project == project)).select().first()
+        assigantion = db((db.user_project.assigned_user==auth.user.id)&\
+                        (db.user_project.project == project)&\
+                        ((db.user_project.period <= year.id) & \
+                        ((db.user_project.period + db.user_project.periods) > year.id))).select(db.user_project.ALL).first()
         if assigantion is None:
             session.flash = T('Not valid Action.')
             redirect(URL('default','index'))
@@ -3793,7 +3802,10 @@ def Course_Format_Technical_School():
             redirect(URL('default','index'))
 
     if auth.has_membership('Super-Administrator') == False and auth.has_membership('Ecys-Administrator')==False:
-        assigantion = db((db.user_project.assigned_user == auth.user.id) & (db.user_project.period == year.id) & (db.user_project.project == project_var.id)).select().first()
+        assigantion = db((db.user_project.assigned_user==auth.user.id)&\
+                        (db.user_project.project == project_var.id)&\
+                        ((db.user_project.period <= year.id) & \
+                        ((db.user_project.period + db.user_project.periods) > year.id))).select(db.user_project.ALL).first()
         if assigantion is None:
             session.flash = T('Not valid Action.')
             redirect(URL('default','index'))
@@ -3885,6 +3897,7 @@ def Course_Format_Technical_School():
     l=[]
     t=[]
     t.append(T('Carnet'))
+    t.append(T('Name'))
     t.append(T('Laboratory'))
     t.append('Zona')
     if request.vars['op'] == '1':
@@ -3900,6 +3913,12 @@ def Course_Format_Technical_School():
     for t1 in students:
         t=[]
         t.append(str(t1.carnet.carnet))
+        try:
+            var_auth_user = db((db.auth_user.id==t1.carnet.id_auth_user)).select().first()
+            t.append(str(var_auth_user.first_name) + " " + str(var_auth_user.last_name))
+        except:
+            t.append("")
+        pass
         #Position in the vector of activities-
         posVCC=0
         #Vars to the control of grade of the student
@@ -4108,7 +4127,10 @@ def general_report_activities_export():
             redirect(URL('default','index'))
 
     if auth.has_membership('Super-Administrator') == False and auth.has_membership('Ecys-Administrator')==False:
-        assigantion = db((db.user_project.assigned_user == auth.user.id) & (db.user_project.period == year.id) & (db.user_project.project == project_var.id)).select().first()
+        assigantion = db((db.user_project.assigned_user==auth.user.id)&\
+                        (db.user_project.project == project_var.id)&\
+                        ((db.user_project.period <= year.id) & \
+                        ((db.user_project.period + db.user_project.periods) > year.id))).select(db.user_project.ALL).first()
         if assigantion is None:
             try:
                 academic_var = db(db.academic.carnet==auth.user.username).select().first()
@@ -4130,8 +4152,19 @@ def general_report_activities_export():
         session.flash = T('Not valid Action.')
         redirect(URL('default','index'))
 
-    teacher = db((db.user_project.period == year.id) & (db.user_project.project == project_var.id) & (db.user_project.assigned_user==db.auth_user.id)&(db.auth_user.id==db.auth_membership.user_id)&(db.auth_membership.group_id==3)).select().first()
-    practice = db((db.user_project.period == year.id) & (db.user_project.project == project_var.id) & (db.user_project.assigned_user==db.auth_user.id)&(db.auth_user.id==db.auth_membership.user_id)&(db.auth_membership.group_id==2)).select()
+    teacher = db(((db.user_project.period <= year.id) & \
+        ((db.user_project.period + db.user_project.periods) > year.id))&\
+        (db.user_project.project == project_var.id) & \
+        (db.user_project.assigned_user==db.auth_user.id)&\
+        (db.auth_user.id==db.auth_membership.user_id)&\
+        (db.auth_membership.group_id==3)).select().first()
+
+    practice = db(((db.user_project.period <= year.id) & \
+        ((db.user_project.period + db.user_project.periods) > year.id))&\
+        (db.user_project.project == project_var.id) & \
+        (db.user_project.assigned_user==db.auth_user.id)&\
+        (db.auth_user.id==db.auth_membership.user_id)&\
+        (db.auth_membership.group_id==2)).select()
     if request.vars['type'] == 'class':
         academic_assig2 = db((db.academic.id==db.academic_course_assignation.carnet)&(db.academic_course_assignation.semester == year.id) & (db.academic_course_assignation.assignation==project_var.id)).select(orderby=db.academic.carnet)
     else:
@@ -4465,7 +4498,12 @@ def general_report_activities_export():
             t=[]
         else:
             t.append(str(t1.carnet.carnet))
-
+            try:
+                var_auth_user = db((db.auth_user.id==t1.carnet.id_auth_user)).select().first()
+                t.append(str(var_auth_user.first_name) + " " + str(var_auth_user.last_name))
+            except:
+                t.append("")
+            pass
             #<!--Position in the vector of activities-->
             posVCC=0
             #<!--Vars to the control of grade of the student-->
@@ -4548,7 +4586,11 @@ def General_report_activities():
 
     tutor_access = False
     if auth.has_membership('Super-Administrator') == False and auth.has_membership('Ecys-Administrator')==False:
-        assigantion = db((db.user_project.assigned_user == auth.user.id) & (db.user_project.period == year.id) & (db.user_project.project == project_var.id)).select().first()
+        assigantion = db((db.user_project.assigned_user==auth.user.id)&\
+                        (db.user_project.project == project_var.id)&\
+                        ((db.user_project.period <= year.id) & \
+                        ((db.user_project.period + db.user_project.periods) > year.id))).select(db.user_project.ALL).first()
+
         if assigantion is None:
             try:
                 academic_var = db(db.academic.carnet==auth.user.username).select().first()
@@ -4575,8 +4617,20 @@ def General_report_activities():
         session.flash = T('Not valid Action.')
         redirect(URL('default','index'))
 
-    teacher = db((db.user_project.period == year.id) & (db.user_project.project == project_var.id) & (db.user_project.assigned_user==db.auth_user.id)&(db.auth_user.id==db.auth_membership.user_id)&(db.auth_membership.group_id==3)).select().first()
-    practice = db((db.user_project.period == year.id) & (db.user_project.project == project_var.id) & (db.user_project.assigned_user==db.auth_user.id)&(db.auth_user.id==db.auth_membership.user_id)&(db.auth_membership.group_id==2)).select()
+    teacher = db(((db.user_project.period <= year.id) & \
+        ((db.user_project.period + db.user_project.periods) > year.id))&\
+        (db.user_project.project == project_var.id) & \
+        (db.user_project.assigned_user==db.auth_user.id)&\
+        (db.auth_user.id==db.auth_membership.user_id)&\
+        (db.auth_membership.group_id==3)).select().first()
+
+    practice = db(((db.user_project.period <= year.id) & \
+        ((db.user_project.period + db.user_project.periods) > year.id))&\
+        (db.user_project.project == project_var.id) & \
+        (db.user_project.assigned_user==db.auth_user.id)&\
+        (db.auth_user.id==db.auth_membership.user_id)&\
+        (db.auth_membership.group_id==2)).select()
+
     if request.vars['type'] == 'class':
         academic_assig = db((db.academic.id==db.academic_course_assignation.carnet)&(db.academic_course_assignation.semester == year.id) & (db.academic_course_assignation.assignation==project_var.id)).select(orderby=db.academic.carnet)
     else:
@@ -4946,7 +5000,10 @@ def course_requirement():
             redirect(URL('default','index'))
 
     if auth.has_membership('Super-Administrator') == False and auth.has_membership('Ecys-Administrator')==False:
-        assigantion = db((db.user_project.assigned_user == auth.user.id) & (db.user_project.period == year.id) & (db.user_project.project == project_var.id)).select().first()
+        assigantion = db((db.user_project.assigned_user==auth.user.id)&\
+                        (db.user_project.project == project_var.id)&\
+                        ((db.user_project.period <= year.id) & \
+                        ((db.user_project.period + db.user_project.periods) > year.id))).select(db.user_project.ALL).first()
         if assigantion is None:
             session.flash = T('Not valid Action.')
             redirect(URL('default','index'))
@@ -5066,7 +5123,11 @@ def management_approval_students_requirement():
 
 
     if auth.has_membership('Super-Administrator') == False and auth.has_membership('Ecys-Administrator')==False:
-        assigantion = db((db.user_project.assigned_user == auth.user.id) & (db.user_project.period == year.id) & (db.user_project.project == project_var.id)).select().first()
+        assigantion = db((db.user_project.assigned_user==auth.user.id)&\
+                        (db.user_project.project == project_var.id)&\
+                        ((db.user_project.period <= year.id) & \
+                        ((db.user_project.period + db.user_project.periods) > year.id))).select(db.user_project.ALL).first()
+
         if assigantion is None:
             session.flash = T('Not valid Action.')
             redirect(URL('default','index'))
@@ -9773,6 +9834,7 @@ def control_assigned_activity():
         project = db(db.project.id==request.vars['project']).select().first()
 
         assigantion = db((db.user_project.assigned_user == auth.user.id) & (db.user_project.project == project.id) & ((db.user_project.period <= year.id) & ((db.user_project.period + db.user_project.periods) > year.id))).select().first()
+
         if assigantion is None:
             assigned_to_project = False
         else:
@@ -9997,7 +10059,7 @@ def oncreate_assigned_activity(form):
                                             emisor=auth.user.username,
                                             course=project.name,
                                             yearp=period.yearp,
-                                            period=T(period.period.name))
+                                            period=(period.period.name))
         ListadoCorreos=None
         email_list_log=None
         for usersT in db((db.user_project.project==project.id) & (db.user_project.assigned_user != auth.user.id) & ((db.user_project.period <= period.id) & ((db.user_project.period + db.user_project.periods) > period.id))).select():

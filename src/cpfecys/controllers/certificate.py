@@ -48,11 +48,13 @@ def index():
             else:
                 acum_score += (report.score or 0)
             report_body.append(TR(TD(report.report_restriction.name),
+                                  TD("  "),
                                   TD(report.created),
                                   TD((report.teacher_comment or 'Sin Comentario')[:25]),
                                   TD(score_date or 'Nunca Calificado'),
                                   TD(score or '0')))
         rows_report = [THEAD(TR(TH("Reporte",_width="20%"),
+                                TH("     ",_width="10%"),
                                 TH("Fecha Entrega",_width="20%"),
                                 TH("Comentario",_width="20%"),
                                 TH("Fecha Calificación",_width="20%"),
@@ -143,6 +145,7 @@ def index():
                 self.ln(5)
                 self.cell(190,0,'',1,1,'L')
                 self.ln(5)
+                
                 #self.cell(35) # padding
                 #self.set_font('Times','B',18)
                 #self.cell(190,7,"Constancia de Entrega de Reportes y Cumplimiento",0,1,'C')
@@ -161,8 +164,9 @@ def index():
                 self.cell(0,5,u'Firma:_______________________', 0, 1, 'C')
                 import cpfecys
                 cparams = cpfecys.get_custom_parameters()
-                self.cell(0,4,unicode(cparams.coordinator_name), 0, 1, 'C')
-                self.cell(0,4,unicode(cparams.coordinator_title), 0, 1, 'C')
+                self.cell(0,4,unicode(cparams.coordinator_name,"utf-8"), 0, 1, 'C')
+                #print "cparams.coordinator_title:"+str(cparams.coordinator_name)
+                self.cell(0,4,unicode(cparams.coordinator_title,"utf-8"), 0, 1, 'C')
                 import datetime
                 self.cell(0,5,'Generado: ' + datetime.datetime.now().strftime("%Y-%m-%d %H:%M"),0,0,'L')
                 self.cell(0,5,txt,0,1,'R')

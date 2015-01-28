@@ -1,25 +1,161 @@
 {{extend 'template.html'}}
-<script type="text/javascript" src="{{=URL('static','markitup')}}/sets/markmin/set.js"></script>
-<link rel="stylesheet" type="text/css" href="{{=URL('static','markitup')}}/sets/markmin/style.css"/>
 
-{{if auth.has_membership('Academic') or auth.has_membership('Student'):}}
-   
-    {{review = db((db.photo_review.user_id == auth.user.id)).select().first()
-    if review is None:}}
-        <script>
-            alert("{{=T('Your photo has not been reviewed. Please contact an academic tutor to be accepted.')}}");
-        </script>
-    {{else:
-        if review.accepted == False:
-            }}
-            <script>
-                alert("¡{{=T('Photo Rejected')}}, {{=T('please enter a new photo')}}!\n{{=T('Remember that photography is for academic use; therefore must be commensurate with the seriousness of the case, otherwise it will be blocked.')}}");
-            </script>
-        {{pass
-    pass
-    }}
-            
-{{pass}}
+
+<div id="ja-slideshow" class="wrap ">
+	<div class="main clearfix">
+		<div id="ja-ss-103" class="ja-ss ja-ss-wrap" style="visibility: visible;">
+			<div class="ja-ss-items">
+				<div class="ja-ss-item ja-ss-item-ghost" style="position: relative; visibility: visible; z-index: 1;">
+					<img src="/cpfecys/static/images/home-images/sl-4.jpg" alt="Undergraduate programs for allAliquam Sed mauris quis tincidunt duis tristique eget Morbi consectetuer.">
+					<div class="ja-ss-desc">
+						<h3>Escuela de Ciencias y Sistemas</h3>
+						<p>
+							Facultad de Ingeniería - USAC
+						</p>
+					</div>
+					<div class="ja-ss-mask mask-left">&nbsp;</div>
+					<div class="ja-ss-mask mask-right">&nbsp;</div>
+				</div>				
+			</div>
+			<div class="ja-ss-btns clearfix">
+				<span class="ja-ss-prev">« Previous</span>
+				<span class="ja-ss-next">Next  »</span>
+			</div>
+		</div>
+		
+		
+		<!-- Fix animation in IE -->
+		<!--[if IE]>
+			<script type="text/javascript">
+				jassurl = '/modules/mod_jaslideshowlite/assets/'; 
+			</script>
+			<script type="text/javascript" src="/modules/mod_jaslideshowlite/assets/js/iefix.js"></script>
+		<![endif]-->
+	</div>
+</div>
+
+<div id="ja-topsl1" class="wrap ">
+	<div class="main clearfix">
+		<!-- SPOTLIGHT -->
+		<div class="ja-box column ja-box-full" style="width: 100%;">
+			<div class="ja-moduletable moduletable  clearfix" id="Mod109">
+				<div class="ja-box-ct clearfix">
+					<div class="custom">
+						<div class="department-list">
+							<ul class="department-list">
+								<li class="icon-1">
+									<a href="/index.php/managementxs" title="Horarios del semestre">Horarios</a>									
+									<span class="department-name">Horarios</span>
+								</li>
+								<li class="icon-2">
+									<a href="/index.php/accounting" title="Eventos de la Escuela">Eventos</a>
+									<span class="department-name">Eventos</span>
+								</li>
+								<li class="icon-3">
+									<a href="/index.php/economics" title="Programas de curso">Programas</a>
+									<span class="department-name">Programas</span>
+								</li>
+								<li class="icon-4">
+									<a href="/index.php/technology" title="Enlace a la pagina de USAC">Universidad</a>
+									<span class="department-name">Universidad</span>
+								</li>
+								<li class="icon-5">
+									<a href="/index.php/finance" title="Sample">Finance</a>
+									<span class="department-name">Finance</span>
+								</li>
+								<li class="icon-5">
+									<a href="/index.php/finance" title="Sample">Finance</a>
+									<span class="department-name">Finance</span>
+								</li>
+								<li class="icon-6">
+									<a href="/index.php/officer" title="Siguenos en Facebook">Facebook</a>
+									<span class="department-name">Facebook</span>
+								</li>
+								<li class="icon-7">
+									<a href="/index.php/humanities" title="Siguenos en Twitter">Twitter</a>
+									<span class="department-name">Twitter</span>
+								</li>
+								<li class="icon-8">
+									<a href="/index.php/geography" title="Siguenos en nuestro canal de Youtube">Youtube</a>
+									<span class="department-name">Youtube</span>
+								</li>								
+							</ul>
+						</div>
+					</div>
+				</div>
+			</div>	
+		</div>		
+	</div>
+</div>
+
+
+<div class="ja-box column ja-box-left" style="width: 25%; min-height: 208px;">
+	<div class="ja-moduletable moduletable  clearfix" id="Mod97">
+		<h3><span>La ingeniería en sistemas no solo es programar</span></h3>
+		<div class="ja-box-ct clearfix">
+			<div class="custom">
+				<div class="inner-div">
+					<img src="/cpfecys/static/images/home-images/articulo1.jpg" alt="Sample image" title="Sample image">
+					<p>Proyecto de aeronautica aplicando conocimientos de sistemas</p>
+					<p class="readmore"><a href="#" title="Read more">Read more</a></p>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+
+
+
+<div class="ja-box column ja-box-center" style="width: 25%; min-height: 208px;">
+	<div class="ja-moduletable moduletable  clearfix" id="Mod98">
+		<h3><span>La industria de desarrollo de videojuegos en Guatemala</span></h3>
+		<div class="ja-box-ct clearfix">
+			<div class="custom">
+				<div class="inner-div">
+					<img src="/cpfecys/static/images/home-images/articulo2.png" alt="Sample image" title="Sample image">
+					<p>Conoce sobre los retos que presentan las empresas de este tipo en Guatemala</p>
+					<p class="readmore"><a href="#" title="Read more">Read more</a></p>
+				</div>
+			</div>
+		</div>
+    </div>	
+</div>
+
+<div class="ja-box column ja-box-center" style="width: 25%; min-height: 208px;">
+	<div class="ja-moduletable moduletable  clearfix" id="Mod99">
+		<h3><span>¡Deberías certificarte! Credibilidad y confianza</span></h3>
+		<div class="ja-box-ct clearfix">
+			<div class="custom">
+				<div class="inner-div">
+					<img src="/cpfecys/static/images/home-images/articulo3.jpg" alt="Sample image" title="Sample image">
+					<p>Una forma de demostrar lo que has aprendido es certificandote</p>
+					<p class="readmore"><a href="#" title="Read more">Read more</a></p>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+
+<div class="ja-box column ja-box-right" style="width: 25%; min-height: 208px;">
+	<div class="ja-moduletable moduletable  clearfix" id="Mod100">
+		<h3><span>Drones: El emisario del futuro</span></h3>
+		<div class="ja-box-ct clearfix">
+			<div class="custom">
+				<div class="inner-div">
+					<img src="/cpfecys/static/images/home-images/articulo4.jpg" alt="Sample image" title="Sample image">
+					<p>Estos aparatos han evolucionado mucho, conoce de ellos</p>
+					<p class="readmore"><a href="#" title="Read more">Read more</a></p>
+				</div>
+			</div>
+		</div>
+    </div>	
+</div>
+
+
+
+
+<!--<script type="text/javascript" src="{{=URL('static','markitup')}}/sets/markmin/set.js"></script>
+<link rel="stylesheet" type="text/css" href="{{=URL('static','markitup')}}/sets/markmin/style.css"/>
 <table style="width:100%;">
     <tr>
 </td>
@@ -46,6 +182,24 @@
         {{pass}}
         </div>
     </td>
-
 </tr>
 </table>
+-->
+{{if auth.has_membership('Academic') or auth.has_membership('Student'):}}
+   
+    {{review = db((db.photo_review.user_id == auth.user.id)).select().first()
+    if review is None:}}
+        <script>
+            alert("{{=T('Your photo has not been reviewed. Please contact an academic tutor to be accepted.')}}");
+        </script>
+    {{else:
+        if review.accepted == False:
+            }}
+            <script>
+                alert("¡{{=T('Photo Rejected')}}, {{=T('please enter a new photo')}}!\n{{=T('Remember that photography is for academic use; therefore must be commensurate with the seriousness of the case, otherwise it will be blocked.')}}");
+            </script>
+        {{pass
+    pass
+    }}
+            
+{{pass}}

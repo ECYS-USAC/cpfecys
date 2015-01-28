@@ -82,13 +82,14 @@ if auth.has_membership(role="Super-Administrator"):
 
 
 cont_news = 0
+project_list = []
 if auth.has_membership(role="Teacher") or auth.has_membership(role="Student"):
     var_count = 0
     var_count_report = 0
 
     projects = db(db.user_project.assigned_user == auth.user.id).select(db.user_project.project,distinct=True)
     for project in projects:
-        
+        project_list.append(project.project.name)
         mails = db((db.academic_send_mail_log.course==project.project.name)).select()
         for a in mails:
             var_query = db.academic_send_mail_detail((db.academic_send_mail_detail.academic_send_mail_log==a.id) & (db.academic_send_mail_detail.username==auth.user.username))
@@ -100,7 +101,7 @@ if auth.has_membership(role="Teacher") or auth.has_membership(role="Student"):
             pass
         pass
 
-        for a in db((db.notification_general_log4.course==project.project.name)).select():
+        for a in db((db.notification_general_log4.course==project.project.name)).select(db.notification_general_log4.id,distinct=True):
             var_query = db.notification_log4((db.notification_log4.register==a.id) & (db.notification_log4.username==auth.user.username))
             if var_query != None:
                 if db((db.read_mail.id_auth_user == auth.user.id) & (db.read_mail.id_mail == a.id) ).select().first() == None:
@@ -128,8 +129,11 @@ if auth.has_membership(role="Academic"):
     academic_var = db.academic(db.academic.id_auth_user==auth.user.id)
     if academic_var is not None:
         assignation_var = db((db.academic_course_assignation.carnet==academic_var.id)).select(db.academic_course_assignation.assignation,distinct=True)
+        if len(project_list) == 0:
+            project_list.append("-1")
+            
         for assignation in assignation_var:
-            for a in db((db.notification_general_log4.course==assignation.assignation.name)).select():
+            for a in db((db.notification_general_log4.course==assignation.assignation.name)&(~db.notification_general_log4.course.belongs(project_list) )).select():
                 var_query = db.notification_log4((db.notification_log4.register==a.id) & (db.notification_log4.username==auth.user.username))
                 
                 if var_query != None:

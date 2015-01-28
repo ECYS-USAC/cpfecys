@@ -68,6 +68,17 @@
 			{{pass}}
 		{{pass}}
 	</table>
+	<script type="text/javascript">
+	$(document).ready(function(){
+			
+	  	});
+
+		function view_mail(var_id, var_project_id){ 
+
+	  		$("#mail_div").load("{{=URL('notification_student','inbox_mails_load.html')}}?operation=view_mail&amp;mail_id="+var_id+"&amp;var_project_id="+var_project_id);
+	 		
+		}
+	</script>
 
 {{pass}}
 
@@ -168,14 +179,3 @@
 {{pass}}
 
 
-<script type="text/javascript">
-	$(document).ready(function(){
-		
-  	});
-
-	function view_mail(var_id, var_project_id){ 
-
-  		$("#mail_div").load("{{=URL('notification_student','inbox_mails_load.html')}}?operation=view_mail&amp;mail_id="+var_id+"&amp;var_project_id="+var_project_id);
- 		
-	}
-</script>

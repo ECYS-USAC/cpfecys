@@ -20,8 +20,8 @@
 		</tr>
 		{{for evaluation in evaluations:}}
 		
-		
-			{{if auth.has_membership(evaluation.repository_evaluation.user_type_evaluator):}}
+			
+			{{if evaluation.repository_evaluation.user_type_evaluator == user_role:}}
 				{{if ((evaluation.date_start <= date.today() ) & (evaluation.date_finish >= date.today() )):}}
 					{{for user_p in users_project:}}						
 						{{if db( (db.auth_membership.user_id == user_p.assigned_user.id) & (db.auth_membership.group_id == evaluation.repository_evaluation.user_type_evaluated) ).select().first() is not None:}}

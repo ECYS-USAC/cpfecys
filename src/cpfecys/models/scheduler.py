@@ -30,6 +30,7 @@ def assignation_done_succesful(assignation):
     # Get all the reports of this assignation
     average_report = 0
     status = True
+    check_report = True
     message = ''
     total_reports = assignation.report.count()
     for report in assignation.report.select():
@@ -37,6 +38,7 @@ def assignation_done_succesful(assignation):
         if report.dtt_approval is None:
             # I don't think status has to change since by average the student can win
             # status = False
+            check_report = False
             message += T('A report was not checked by DTT Admin. Contact Admin.')
             message += ' '
         elif report.dtt_approval is False:
@@ -108,7 +110,7 @@ def assignation_done_succesful(assignation):
         if period == None:
             break
     # Check if they where delivered
-    return {'status':status, 'message':message}
+    return {'status':status, 'message':message, 'check_report':check_report}
 
 # Auto Freeze happens automatically, it FREEZES the assignation when it ends.
 # Successful means all needed reports and items where delivered
@@ -116,15 +118,16 @@ def assignation_done_succesful(assignation):
 def auto_freeze():
     # Get the current month and year
     import datetime
+    import cpfecys
     current_date = datetime.datetime.now()
-    current_month = T(current_date.strftime("%B"))
+    current_month = (current_date.strftime("%B"))
     current_year = current_date.year
     # Get every period that has to be autoasigned within current month
     periods_to_work = db(db.assignation_freeze.pmonth == current_month).select()
     # For each assignation_freeze
     for period in periods_to_work:
-        current_period_year = db.period_year((db.period_year.period == period)&
-                                             (db.period_year.yearp == current_year))
+        
+        current_period_year = cpfecys.current_year_period()
         # this period means that we should check the ones that end in first_semester for example
         # or the ones that end in second_semester; it always applies to current year
         # Get all the assignations still active
@@ -139,15 +142,18 @@ def auto_freeze():
             finish = ass_id + length
             final = db.period_year(id = finish)
             if final and current_period_year:
+                  
                 if final.id == current_period_year.id:
                     validation = assignation_done_succesful(assignation)
-                    if validation['status']:
-                        assignation.assignation_comment = validation['message']
-                        assignation.assignation_status = db.assignation_status(name = 'Successful')
-                    else:
-                        assignation.assignation_comment = validation['message']
-                        assignation.assignation_status = db.assignation_status(name = 'Failed')
-                    assignation.update_record()
+                    if validation['check_report']:
+                        if validation['status']:
+                            assignation.assignation_comment = validation['message']
+                            assignation.assignation_status = db.assignation_status(name = 'Successful')
+                        else:
+                            assignation.assignation_comment = validation['message']
+                            assignation.assignation_status = db.assignation_status(name = 'Failed')
+                        assignation.update_record()
+                    
     db.commit()
 
 
@@ -197,6 +203,54 @@ def check_exception_semester_repeat():
                         db(db.course_limit_exception.id==exception.id).delete()	
     db.commit()
 
+def send_evaluation_notifications():
+    import datetime
+    import cpfecys
+    cperiod = cpfecys.current_year_period()
+    year = str(cperiod.yearp)
+    cdate = datetime.datetime.now()
+    date_now = datetime.date(cdate.year, cdate.month, cdate.day)
+
+    evaluation = db((db.evaluation.period==cperiod.id)&(db.evaluation.date_start==date_now)).select().first()
+    
+    email_list = []
+    if  evaluation is not None:
+        for membership in db((db.auth_membership.group_id==evaluation.repository_evaluation.user_type_evaluator)).select():
+            send_mail = False
+            links = ""
+            try:
+                if db((db.user_project.assigned_user == membership.user_id) & (db.user_project.period == cperiod.id)).select().first is not None:
+                   send_mail = True 
+                   #links = links + URL('evaluation', 'evaluation_list', vars=dict(project = user_assignation.project.name, period = cperiod.id)) + "<br>"
+            except:
+                None
+            try:
+                academic_var = db.academic(db.academic.id_auth_user==membership.user_id)
+                if db((db.academic_course_assignation.carnet==academic_var.id)&(db.academic_course_assignation.semester==cperiod.id)).select().first is not None:
+                    send_mail = True
+                    #links = links + "<br>"
+            except:
+                None
+            if send_mail == True:
+                email_list.append(membership.user_id.email)
+        try:        
+            subject = "EVALUACIONES DE DESEMPEÑO 360"
+            message = "Por este medio le solicitamos apoyo para realizar las evaluaciones de desempeño correspondientes, las cuales se encuentran disponibles en el área de <b>Evaluaciones de desempeño 360</b>.<br><br>"+ \
+                        cpfecys.get_domain() + URL('activity_control', 'courses_list')
+            was_sent = mail.send(to='dtt.ecys@dtt-ecys.org',subject=subject,message=message, bcc=email_list)
+            #MAILER LOG
+            db.mailer_log.insert(sent_message = message,
+                             destination = str(email_list),
+                             result_log = str(mail.error or '') + ':' + \
+                             str(mail.result),
+                             success = was_sent, emisor="dtt.ecys@dtt-ecys.org")
+            if was_sent==False:
+                control=control+1
+            return control
+        except:
+            None
+
+
 def automation_evaluations():
     import datetime
     import cpfecys
@@ -211,8 +265,6 @@ def automation_evaluations():
 
     #First Semester
     if cperiod.period == 1:
-    
-            
         evaluations = db((db.evaluation.date_finish<initSemester)).select()
         if evaluations.first() is not None:
             for evaluation in evaluations:
@@ -238,6 +290,7 @@ def automation_evaluations():
                                             date_finish=date_finish_temp,
                                             semester_repeat=True,                                                
                                             description=evaluation.description,
+                                            semester=cperiod.id,
                                             repository_evaluation=evaluation.repository_evaluation)
                     
     #Second Semester
@@ -264,6 +317,7 @@ def automation_evaluations():
                                             date_finish=evaluation.date_finish + datetime.timedelta(date_finish_temp),
                                             semester_repeat=True,                                                
                                             description=evaluation.description,
+                                            semester=cperiod.id,
                                             repository_evaluation=evaluation.repository_evaluation)
     db.commit()
 
@@ -290,12 +344,18 @@ def automation_activities_assigned():
                 message += T('Report Required')+': '+T('You need to enter a report of the activity to be taken as valid.')+'<br>'
             message += activity.assignation.name+'<br>'+T(activity.semester.period.name)+' '+str(activity.semester.yearp)+'<br>Sistema de Seguimiento de La Escuela de Ciencias y Sistemas<br> Facultad de Ingeniería - Universidad de San Carlos de Guatemala</html>'
             #Log General del Envio
+            teacher = db((db.user_project.project == activity.assignation)&
+                      ((db.user_project.period <= activity.semester) & ((db.user_project.period + db.user_project.periods) > activity.semester))&
+                      (db.user_project.assigned_user == db.auth_user.id)&
+                      (db.auth_membership.user_id == db.auth_user.id)&
+                      (db.auth_membership.group_id == db.auth_group.id)&
+                      (db.auth_group.role == 'Teacher')).select().first()
             row = db.notification_general_log4.insert(subject=subject,
                                                 sent_message=message,
-                                                emisor='DTT-ECYS',
+                                                emisor=teacher.auth_user.username,
                                                 course=activity.assignation.name,
                                                 yearp=activity.semester.yearp,
-                                                period=T(activity.semester.period.name))
+                                                period=(activity.semester.period.name))
             ListadoCorreos=None
             email_list_log=None
             students = db((db.user_project.project == activity.assignation)&
@@ -303,7 +363,7 @@ def automation_activities_assigned():
                       (db.user_project.assigned_user == db.auth_user.id)&
                       (db.auth_membership.user_id == db.auth_user.id)&
                       (db.auth_membership.group_id == db.auth_group.id)&
-                      (db.auth_group.role == 'student')).select()
+                      (db.auth_group.role == 'Student')).select()
 
             for usersT in students:
                 if ListadoCorreos is None:
@@ -538,6 +598,7 @@ def auto_daily():
     check_exception_semester_repeat()
     automation_activities_assigned()
     automation_evaluations()
+    send_evaluation_notifications()
     return T('Total Updated Reports: ') + str(total_recheckies + total_drafties + missed_reports) + ' ' + \
             T('Automatically Updated Draft Reports: ') + str(total_drafties) + ' ' + \
             T('Automatically Updated Recheck Reports: ') + str(total_recheckies) + ' ' + \
