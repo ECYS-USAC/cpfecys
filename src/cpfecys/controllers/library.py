@@ -11,7 +11,7 @@ def file_managers():
             except:
                 periods = []
         else:
-            periods = db((db.period_year.id == db.user_project.period)&(db.user_project.assigned_user==auth.user.id)).select(db.period_year.id, db.period_year.yearp, db.period_year.period, distinct = True)
+            periods = db( ((db.user_project.period <= db.period_year.id) & ((db.user_project.period + db.user_project.periods) > db.period_year.id)) &(db.user_project.assigned_user==auth.user.id)).select(db.period_year.id, db.period_year.yearp, db.period_year.period, distinct = True)
         return periods
     #The list of the projects
     def obtainProjects(func,period):
@@ -22,11 +22,11 @@ def file_managers():
             except:
                 rproject = []
         else:
-            rproject = db((db.user_project.assigned_user==auth.user.id)&(db.user_project.period==period)).select()
+            rproject = db((db.user_project.assigned_user==auth.user.id)&((db.user_project.period <= period) & ((db.user_project.period + db.user_project.periods) > period)) ).select()
         return rproject
     #The list of the final students
     def obtainStudents(project):
-        persons = db((db.user_project.project == project.project)&(db.user_project.period==project.period)&(db.auth_membership.user_id==db.user_project.assigned_user)&(db.auth_membership.group_id==2)).select()
+        persons = db((db.user_project.project == project.project)&((db.user_project.period <= project.period) & ((db.user_project.period + db.user_project.periods) > project.period))&(db.auth_membership.user_id==db.user_project.assigned_user)&(db.auth_membership.group_id==2)).select()
         return persons
     
     #Existe alguna accion
@@ -78,7 +78,7 @@ def file_managers():
         elif tipo != '0':
             project = int(pro)+0
             check = db.user_project(id = project)
-            year = db.period_year(id=check.period)
+            year = db.period_year(id=request.vars["semester"])
             year_semester = db.period(id=year.period)
             #Obtain the current period of year
             period = cpfecys.current_year_period()
@@ -90,7 +90,7 @@ def file_managers():
             db.library.project.default = check.project
             db.library.period.readable = False
             db.library.period.writable = False
-            db.library.period.default = check.period
+            db.library.period.default = year.id
             db.library.owner_file.writable = False
             db.library.owner_file.readable = False
             db.library.owner_file.default = check.assigned_user
@@ -99,7 +99,7 @@ def file_managers():
             nameSemester = T(year_semester.name)
             nameYear = year.yearp
             
-            rproject = db((db.user_project.assigned_user==auth.user.id)&(db.user_project.period==year.id)).select()
+            rproject = db((db.user_project.assigned_user==auth.user.id)&((db.user_project.period <= year.id) & ((db.user_project.period + db.user_project.periods) > year.id)) ).select()
             this_project = db((db.user_project.id==pro)).select().first()
             none_access = False
             for var_project in rproject:
@@ -112,28 +112,28 @@ def file_managers():
 
             if tipo=='1':
                 usernombre=check.assigned_user.first_name
-                query = ((db.library.owner_file==check.assigned_user)&(db.library.project==check.project)&(db.library.period==check.period))
+                query = ((db.library.owner_file==check.assigned_user)&(db.library.project==check.project)&(db.library.period==year.id))
                 if period.id == year.id:
                     grid = SQLFORM.grid(query, csv=False, paginate=9)
                 else:
-                    links = [lambda row: A('Enlazar Semestre Actual',_href=URL("library","change_period",args=[row.id]))]
+                    links = [lambda row: A('Enlazar Semestre Actual',_href=URL("library","change_period",vars = dict(semester=request.vars["semester"]),args=[row.id]))]
                     grid = SQLFORM.grid(query, links=links, csv=False, paginate=9)
             elif tipo=='2':
                 db.library.owner_file.readable = True
-                query = ((db.library.visible==True)&(db.library.owner_file!=check.assigned_user)&(db.library.project==check.project)&(db.library.period==check.period))
+                query = ((db.library.visible==True)&(db.library.owner_file!=check.assigned_user)&(db.library.project==check.project)&(db.library.period==year.id))
                 grid = SQLFORM.grid(query, csv=False, create=False, editable=False, deletable=False, paginate=9)
                 usernombre=T('Share')
             elif tipo=='3':
                 usernombre=check.assigned_user.first_name
-                query = ((db.library.owner_file==check.assigned_user)&(db.library.project==check.project)&(db.library.period==check.period))
+                query = ((db.library.owner_file==check.assigned_user)&(db.library.project==check.project)&(db.library.period==year.id))
                 if period.id == year.id:
                     grid = SQLFORM.grid(query, csv=False, paginate=9)
                 else:
-                    links = [lambda row: A('Enlazar Semestre Actual',_href=URL("library","change_period",args=[row.id]))]
+                    links = [lambda row: A('Enlazar Semestre Actual',_href=URL("library","change_period",vars = dict(semester=request.vars["semester"]),args=[row.id]))]
                     grid = SQLFORM.grid(query, links=links, csv=False, paginate=9)
             elif tipo=='4':
                 usernombre=check.assigned_user.first_name
-                query = ((db.library.owner_file==check.assigned_user)&(db.library.project==check.project)&(db.library.period==check.period))
+                query = ((db.library.owner_file==check.assigned_user)&(db.library.project==check.project)&(db.library.period==year.id))
                 grid = SQLFORM.grid(query, csv=False, create=False, editable=False, deletable=False, paginate=9)
             else:
                 session.flash = T('Not valid Action.')
@@ -173,7 +173,7 @@ def change_period():
 
         if total == 0:
             count2 = db.user_project.id.count()
-            project2 = db((db.user_project.project==f.project)&(db.user_project.assigned_user==f.owner_file)&(db.user_project.period==period)).select(count2)
+            project2 = db((db.user_project.project==f.project)&(db.user_project.assigned_user==f.owner_file)&((db.user_project.period <= period) & ((db.user_project.period + db.user_project.periods) > period))).select(count2)
             total2=2
             for s2 in project2:
                 total2 = s2[count2]
@@ -182,7 +182,7 @@ def change_period():
                 session.flash  =T('The file was copy to the actual semester')
             else:
                 session.flash  ='El archivo no se puede copiar, ya que no tiene asignado el curso en el semestre actual'
-            redirect(URL('library','file_managers'))
+            redirect(URL('library','file_managers',vars = dict(semester=request.vars["semester"])))
         else:
             session.flash  =T('The file already exists')
-            redirect(URL('library','file_managers'))
+            redirect(URL('library','file_managers',vars = dict(semester=request.vars["semester"])))

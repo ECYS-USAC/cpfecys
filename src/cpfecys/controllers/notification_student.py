@@ -33,24 +33,37 @@ def inbox():
         period_id = str(cperiod.id)
 
     if (auth.has_membership('Student') or auth.has_membership('Teacher')):
-        coursesAdmin = db((db.user_project.assigned_user == auth.user.id) & (db.user_project.period == period_id) & (db.user_project.project==db.project.id) ).select()
-        temp = db((db.user_project.assigned_user == auth.user.id) & (db.user_project.project==db.project.id) ).select(db.user_project.period ,distinct=True)
-        for t in temp:
-            exists = False
-            for t2 in period_list:
-                if str(T(t.period.period.name) + t.period.yearp) == str(T(t2.semester.period.name) + t2.semester.yearp):
-                    exists = True
+        #coursesAdmin = db((db.user_project.assigned_user == auth.user.id) & (db.user_project.period == period_id) & (db.user_project.project==db.project.id) ).select()
+        coursesAdmin = db((db.user_project.assigned_user==auth.user.id)&\
+                        (db.user_project.project == db.project.id)&\
+                        ((db.user_project.period <= period_id) & \
+                        ((db.user_project.period + db.user_project.periods) > period_id))).select()          
+        #temp = db((db.user_project.assigned_user == auth.user.id) & (db.user_project.project==db.project.id) ).select(db.user_project.period ,distinct=True)
+        
+        for t in db(db.period_year).select():
+            assignation_temp = db((db.user_project.assigned_user==auth.user.id)&\
+                        (db.user_project.project == db.project.id)&\
+                        ((db.user_project.period <= t.id) & \
+                        ((db.user_project.period + db.user_project.periods) > t.id))).select(db.user_project.ALL).first()
+            
+            if assignation_temp is not None:                
+                exists = False
+
+                for t2 in period_list:
+
+                    if t.id == t2.semester:
+                        exists = True
+                    pass
                 pass
-            pass
-            if exists == False:
-                period_list2.append(t)
-            pass
+                if exists == False:
+                    period_list2.append(t)
+                pass
         pass
     pass
 
-
+    period_var = db(db.period_year.id == period_id).select().first()
         
-    return dict(assignations=assignations,email=auth.user.email,period_id=period_id,period_list=period_list,cperiod=cperiod.id,coursesAdmin=coursesAdmin, period_list2=period_list2)
+    return dict(assignations=assignations,email=auth.user.email,period_var=period_var,period_id=period_id,period_list=period_list,cperiod=cperiod.id,coursesAdmin=coursesAdmin, period_list2=period_list2)
 
 @auth.requires_login()
 @auth.requires(auth.has_membership('Student') or auth.has_membership('Teacher') or auth.has_membership('Academic'))
@@ -234,7 +247,8 @@ def reply_mail_with_email(email, message, remessage, retime, resub ,subject, sem
             session.flash = T('Not valid Action.')
             redirect(URL('default', 'index'))
         else:
-            coursesAdmin = db((db.user_project.assigned_user == auth.user.id) & (db.user_project.period == semester.id) & (db.user_project.project==db.project.id) ).select()
+            coursesAdmin = db((db.user_project.assigned_user == auth.user.id) & ((db.user_project.period <= semester.id) & \
+                        ((db.user_project.period + db.user_project.periods) > semester.id)) & (db.user_project.project==db.project.id) ).select()
     
     
 

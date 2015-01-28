@@ -70,7 +70,7 @@
         {{for project in projects:}}
             $("#pr-{{=project.id}}").click(function(){         
                 $("#div_project_{{=project.id}}").toggle();
-                $("#div_project_{{=project.id}}").load('{{=URL('notification','register_mail.load')}}',{project: {{=project.id}}});  
+                $("#div_project_{{=project.id}}").load('{{=URL('notification','register_mail.load')}}',{project: {{=project.id}} , period: {{=request.vars["period"]}}  });  
             })
         {{pass}}
     })

@@ -280,10 +280,10 @@
 								{{pass}}
 								>
 									<center>
-										<a class="btn" href="{{=URL('notification', 'teacher_mail_notifications', vars=dict(assignation = assignation_var.id ))}}" style="height:32px; width:32px;">
+										<a class="btn" href="{{=URL('notification', 'teacher_mail_notifications', vars=dict(assignation = assignation_var.id, period = periodo.id ))}}" style="height:32px; width:32px;">
 											<img src="{{=URL('static','images')}}/academic_control/send4.png" height="32" width="32">
 										</a><br>
-										<a href="{{=URL('notification', 'teacher_mail_notifications', vars=dict(assignation = assignation_var.id))}}">
+										<a href="{{=URL('notification', 'teacher_mail_notifications', vars=dict(assignation = assignation_var.id, period = periodo.id))}}">
 											{{=T('Send Notice')}}
 										</a>
 									</center>
@@ -309,10 +309,10 @@
 								>
 									<center>
 										
-										<a class="btn" href="{{=URL('library', 'file_managers', vars=dict( pro = assignation_var.id, tipo='3'))}}" style="height:32px; width:32px;">
+										<a class="btn" href="{{=URL('library', 'file_managers', vars=dict( pro = assignation_var.id, tipo='3', semester = periodo.id))}}" style="height:32px; width:32px;">
 											<img src="{{=URL('static','images')}}/academic_control/file96.png" height="32" width="32">
 										</a><br>
-										<a  href="{{=URL('library', 'file_managers', vars=dict( pro = assignation_var.id, tipo='3'))}}">
+										<a  href="{{=URL('library', 'file_managers', vars=dict( pro = assignation_var.id, tipo='3', semester = periodo.id))}}">
 											{{=T('Library')}}
 										</a>
 									</center>
@@ -514,10 +514,10 @@
 										{{pass}}
 										>
 											<center>
-												<a class="btn" href="{{=URL('notification', 'mail_notifications', vars=dict( assignation = assignation_var.id))}}" style="height:32px; width:32px;">
+												<a class="btn" href="{{=URL('notification', 'mail_notifications', vars=dict( assignation = assignation_var.id, period = periodo.id))}}" style="height:32px; width:32px;">
 													<img src="{{=URL('static','images')}}/academic_control/send4.png" height="32" width="32">
 												</a><br>
-												<a href="{{=URL('notification', 'mail_notifications', vars=dict( assignation = assignation_var.id))}}">
+												<a href="{{=URL('notification', 'mail_notifications', vars=dict( assignation = assignation_var.id, period = periodo.id))}}">
 													{{=T('Send Notice')}}
 												</a>
 											</center>
@@ -543,10 +543,10 @@
 										>
 											<center>
 												
-												<a class="btn" href="{{=URL('library', 'file_managers', vars=dict( pro = assignation_var.id, tipo='3'))}}" style="height:32px; width:32px;">
+												<a class="btn" href="{{=URL('library', 'file_managers', vars=dict( pro = assignation_var.id, tipo='3', semester = periodo.id))}}" style="height:32px; width:32px;">
 													<img src="{{=URL('static','images')}}/academic_control/file96.png" height="32" width="32">
 												</a><br>
-												<a  href="{{=URL('library', 'file_managers', vars=dict( pro = assignation_var.id, tipo='3'))}}">
+												<a  href="{{=URL('library', 'file_managers', vars=dict( pro = assignation_var.id, tipo='3', semester = periodo.id))}}">
 													{{=T('Library')}}
 												</a>
 											</center>

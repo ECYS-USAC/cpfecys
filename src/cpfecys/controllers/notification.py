@@ -46,7 +46,6 @@ def teacher_register_mail_notifications_detail():
 @auth.requires_login()
 @auth.requires_membership('Teacher')
 def teacher_register_mail_notifications():
-#db.user_project.assigned_user == auth.user.id
     #Obtain the current period of the system and all the register periods
     period = cpfecys.current_year_period()
 
@@ -55,7 +54,7 @@ def teacher_register_mail_notifications():
     for period_temp in periods_temp:
         if auth.has_membership('Student') or auth.has_membership('Teacher'):
             try:
-                if db((db.user_project.assigned_user == auth.user.id) & (db.user_project.period == period_temp.id)).select().first() is not None:
+                if db((db.user_project.assigned_user == auth.user.id) & ((db.user_project.period <= period_temp.id) & ((db.user_project.period + db.user_project.periods) > period_temp.id)) ).select().first() is not None:
                     periods.append(period_temp)
             except:
                 None
@@ -70,7 +69,7 @@ def teacher_register_mail_notifications():
     response.view='notification/teacher_register_mail_notifications.html'
 
     #obtain the projects where the student is register and is of the select semester
-    projects = db((db.user_project.period==period) & (db.user_project.assigned_user == auth.user.id)).select()
+    projects = db(((db.user_project.period <= period) & ((db.user_project.period + db.user_project.periods) > period)) & (db.user_project.assigned_user == auth.user.id)).select()
 #    dest=[]
  #   for student in allProject:
   #      dest.append(student.project)
@@ -111,11 +110,15 @@ def teacher_register_mail_notifications():
         return notices
 
     def obtain_Persons(project):
-        persons = db((db.user_project.assigned_user!=auth.user.id)&(db.user_project.project == project.project)&(db.user_project.period==project.period)&(db.auth_membership.user_id==db.user_project.assigned_user)&(db.auth_membership.group_id==2)).select()
+        persons = db((db.user_project.assigned_user!=auth.user.id)\
+                    &(db.user_project.project == project.project)\
+                    &(((db.user_project.period <= project.period)\
+                    & ((db.user_project.period + db.user_project.periods) > project.period))\
+                    &(db.auth_membership.user_id==db.user_project.assigned_user)&(db.auth_membership.group_id==2)) ).select()
         return persons
 
     def obtain_PersonsA(project):
-        persons = db((db.user_project.assigned_user==auth.user.id) & (db.user_project.project == project.project)&(db.user_project.period==project.period)).select()
+        persons = db((db.user_project.assigned_user==auth.user.id) & (db.user_project.project == project.project)&((db.user_project.period <= project.period) & ((db.user_project.period + db.user_project.periods) > project.period)) ).select()
         return persons
 
     return dict(obtain_PersonsA=obtain_PersonsA,obtain_Persons=obtain_Persons, obtain_nameProjects=obtain_nameProjects,periods=periods, projects=projects, obtain_notices=obtain_notices)
@@ -124,17 +127,18 @@ def teacher_register_mail_notifications():
 def teacher_register_mail():
     notices=None
     tipoD=0
+    period = db(db.period_year.id == request.vars["period"]).select().first()
     if request.vars['userN'] != None and request.vars['project']!=None:
         usuario = db(db.auth_user.id==request.vars['userN']).select().first()
         project = request.vars['project']
         userproject = db(db.user_project.id==project).select().first()
-        notices  = db((db.notification_general_log4.emisor==usuario.username) & (db.notification_general_log4.course==userproject.project.name)&(db.notification_general_log4.period==userproject.period.period.name)&(db.notification_general_log4.yearp==userproject.period.yearp)).select()
+        notices  = db((db.notification_general_log4.emisor==usuario.username) & (db.notification_general_log4.course==userproject.project.name)&(db.notification_general_log4.period==period.period.name)&(db.notification_general_log4.yearp==period.yearp)).select()
         tipoD=1
     else:
         if request.vars['project']!=None:
             project = request.vars['project']
             userproject = db(db.user_project.id==project).select().first()
-            notices  = db((db.notification_general_log4.emisor==auth.user.username) & (db.notification_general_log4.course==userproject.project.name)&(db.notification_general_log4.period==userproject.period.period.name)&(db.notification_general_log4.yearp==userproject.period.yearp)).select()
+            notices  = db((db.notification_general_log4.emisor==auth.user.username) & (db.notification_general_log4.course==userproject.project.name)&(db.notification_general_log4.period==period.period.name)&(db.notification_general_log4.yearp==period.yearp)).select()
             tipoD=2
     return dict(notices=notices, tipoD=tipoD)
 
@@ -278,9 +282,9 @@ def teacher_mail_notifications():
         session.last_assignation = check.id
 
 
-    year = db.period_year(id=check.period)
+    year = db.period_year(id=request.vars["period"])
     year_semester = db.period(id=year.period)
-    period = check.period
+    period = year.id
     var=""
     if (request.args(0) == 'send'):
         #Tipo estudiante al que se le enviara el correo
@@ -295,7 +299,7 @@ def teacher_mail_notifications():
         #Check that the user select only one group of students
         if not tipoes or count_selectItems(tipoes)!=1:
             session.flash = T('You must select only one group of students')
-            redirect(URL('notification', 'teacher_mail_notifications'))
+            redirect(URL('notification', 'teacher_mail_notifications',vars =  dict(period=year.id)))
             return
         #Obtener la lista de destinatarios en base a los usuarios presionados
         if ((tipoes=='specific' and (listado!= None or listado2!= None)) or (tipoes!='specific')) and message != '' and subject != '':
@@ -315,11 +319,11 @@ def teacher_mail_notifications():
                     users1 = db((db.academic.id==db.academic_course_assignation.carnet)&(db.academic_course_assignation.semester == period) & (db.academic_course_assignation.assignation==check.project) & (db.academic_course_assignation.laboratorio=='False')).select(count1)
                     totalC1 = count_Items(users1,count1)
                 elif tipoes =='fp':
-                    users2 = db((db.auth_user.id==db.user_project.assigned_user)&(db.user_project.period == period) & (db.user_project.project==check.project)&(db.auth_membership.user_id==db.user_project.assigned_user)&(db.auth_membership.group_id==2)).select(count2)
+                    users2 = db((db.auth_user.id==db.user_project.assigned_user)&((db.user_project.period <= period) & ((db.user_project.period + db.user_project.periods) > period))& (db.user_project.project==check.project)&(db.auth_membership.user_id==db.user_project.assigned_user)&(db.auth_membership.group_id==2)).select(count2)
                     totalC2 = count_Items(users2,count2)
                 else:
                     users1 = db((db.academic.id==db.academic_course_assignation.carnet)&(db.academic_course_assignation.semester == period) & (db.academic_course_assignation.assignation==check.project)).select(count1)
-                    users2 = db((db.auth_user.id==db.user_project.assigned_user)&(db.user_project.period == period) & (db.user_project.project==check.project)&(db.auth_membership.user_id==db.user_project.assigned_user)&(db.auth_membership.group_id==2)).select(count2)
+                    users2 = db((db.auth_user.id==db.user_project.assigned_user)&((db.user_project.period <= period) & ((db.user_project.period + db.user_project.periods) > period)) & (db.user_project.project==check.project)&(db.auth_membership.user_id==db.user_project.assigned_user)&(db.auth_membership.group_id==2)).select(count2)
                     totalC1 = count_Items(users1,count1)
                     totalC2 = count_Items(users2,count2)
                 if tipoes=='all' and (totalC1>0 or totalC2>0):
@@ -330,7 +334,7 @@ def teacher_mail_notifications():
                             user1.append(user.academic)
                     if totalC2 >0:
                         user2 = []
-                        users2 = db((db.auth_user.id==db.user_project.assigned_user)&(db.user_project.period == period) & (db.user_project.project==check.project)&(db.auth_membership.user_id==db.user_project.assigned_user)&(db.auth_membership.group_id==2)).select()
+                        users2 = db((db.auth_user.id==db.user_project.assigned_user)&((db.user_project.period <= period) & ((db.user_project.period + db.user_project.periods) > period)) & (db.user_project.project==check.project)&(db.auth_membership.user_id==db.user_project.assigned_user)&(db.auth_membership.group_id==2)).select()
                         for user in users2:
                             user2.append(user.auth_user)
                 elif tipoes =='cl' and totalC1 > 0:
@@ -345,7 +349,7 @@ def teacher_mail_notifications():
                         user1.append(user.academic)
                 elif tipoes =='fp' and totalC2 > 0:
                     user2 = []
-                    users2 = db((db.auth_user.id==db.user_project.assigned_user)&(db.user_project.period == period) & (db.user_project.project==check.project)&(db.auth_membership.user_id==db.user_project.assigned_user)&(db.auth_membership.group_id==2)).select()
+                    users2 = db((db.auth_user.id==db.user_project.assigned_user)&((db.user_project.period <= period) & ((db.user_project.period + db.user_project.periods) > period)) & (db.user_project.project==check.project)&(db.auth_membership.user_id==db.user_project.assigned_user)&(db.auth_membership.group_id==2)).select()
                     for user in users2:
                         user2.append(user.auth_user)
             else:
@@ -385,13 +389,13 @@ def teacher_mail_notifications():
                     session.flash = T('Avisos enviados - Existen '+str(fail) + ' avisos fallidos, revise el registro de avisos')
                 else:
                     session.flash = T('Notices Sent')
-                redirect(URL('notification', 'teacher_mail_notifications'))
+                redirect(URL('notification', 'teacher_mail_notifications',vars =  dict(period=year.id)))
             else:
                 session.flash = T('No recipient who sent the message')
-            redirect(URL('notification', 'teacher_mail_notifications'))
+            redirect(URL('notification', 'teacher_mail_notifications',vars =  dict(period=year.id)))
         else:
             session.flash = T('Fill all fields of notification')
-            redirect(URL('notification', 'teacher_mail_notifications'))
+            redirect(URL('notification', 'teacher_mail_notifications',vars =  dict(period=year.id)))
 
     def get_projects(grupo):
         #Obtener la asignacion del estudiante
@@ -421,7 +425,7 @@ def teacher_mail_notifications():
                 return students
             else:
                 #obtain the final practice students assigned in the course where the user is the manager
-                students = db((db.user_project.project==check.project)&(db.user_project.period==check.period)&(db.user_project.assigned_user!=check.assigned_user)&(db.auth_membership.user_id==db.user_project.assigned_user)&(db.auth_membership.group_id==2)).select()
+                students = db((db.user_project.project==check.project)&((db.user_project.period <= check.period) & ((db.user_project.period + db.user_project.periods) > check.period))&(db.user_project.assigned_user!=check.assigned_user)&(db.auth_membership.user_id==db.user_project.assigned_user)&(db.auth_membership.group_id==2)).select()
                 return students
 
     if session.notification_subject == None:
@@ -531,7 +535,7 @@ def teacher_courses_mail_notifications():
         except:
             nameS = '--------'
         return nameS
-    return dict(assignations = db((db.user_project.assigned_user == auth.user.id) & (db.user_project.period == cpfecys.current_year_period().id)).select(), split_name=split_name, split_section=split_section)
+    return dict(assignations = db((db.user_project.assigned_user == auth.user.id) & ((db.user_project.period <= cpfecys.current_year_period().id) & ((db.user_project.period + db.user_project.periods) > cpfecys.current_year_period().id)) ).select(), split_name=split_name, split_section=split_section)
 
 
 
@@ -589,7 +593,7 @@ def register_mail_notifications():
     for period_temp in periods_temp:
         if auth.has_membership('Student') or auth.has_membership('Teacher'):
             try:
-                if db((db.user_project.assigned_user == auth.user.id) & (db.user_project.period == period_temp.id)).select().first() is not None:
+                if db((db.user_project.assigned_user == auth.user.id) & ((db.user_project.period <= period_temp.id) & ((db.user_project.period + db.user_project.periods) > period_temp.id)) ).select().first() is not None:
                     periods.append(period_temp)
             except:
                 None
@@ -603,7 +607,7 @@ def register_mail_notifications():
     response.view='notification/register_mail_notifications.html'
 
     #obtain the projects where the student is register and is of the select semester
-    projects = db((db.user_project.period==period) & (db.user_project.assigned_user == auth.user.id)).select()
+    projects = db(((db.user_project.period <= period) & ((db.user_project.period + db.user_project.periods) > period)) & (db.user_project.assigned_user==auth.user.id) ).select()
 
     def obtain_nameProjects(userP):
         p = db(db.project.id==userP).select()
@@ -619,8 +623,10 @@ def register_mail():
     notices=None    
     if request.vars['project'] != None:
         project = request.vars['project']
+        period = db(db.period_year.id == request.vars['period']).select().first()
+        print "period:"+str(period)
         userproject = db(db.user_project.id==project).select().first()
-        notices  = db((db.notification_general_log4.emisor==auth.user.username) & (db.notification_general_log4.course==userproject.project.name)&(db.notification_general_log4.period==userproject.period.period.name)&(db.notification_general_log4.yearp==userproject.period.yearp)).select()
+        notices  = db((db.notification_general_log4.emisor==auth.user.username) & (db.notification_general_log4.course==userproject.project.name)&(db.notification_general_log4.period==period.period.name)&(db.notification_general_log4.yearp==period.yearp)).select()
     return dict(notices=notices)
 
 
@@ -757,11 +763,12 @@ def mail_notifications():
     else:
         session.last_assignation = check.id
 
-    period = check.period
+    
 
-    year = db.period_year(id=check.period)
+    year = db.period_year(id=request.vars['period'])
     year_semester = db.period(id=year.period)
     var=""
+    period = year.id
     if (request.args(0) == 'send'):
         #Tipo estudiante al que se le enviara el correo
         tipoes = request.vars['tipoe']
@@ -774,7 +781,7 @@ def mail_notifications():
         #Check that the user select only one group of students
         if not tipoes or count_selectItems(tipoes)!=1:
             session.flash = T('You must select only one group of students')
-            redirect(URL('notification', 'mail_notifications'))
+            redirect(URL('notification', 'mail_notifications',vars = dict(period = year.id) ))
             return
         #Obtener la lista de destinatarios en base a los usuarios presionados
         if ((tipoes=='specific' and listado!= None) or (tipoes!='specific')) and message != '' and subject != '':
@@ -822,10 +829,10 @@ def mail_notifications():
                 students=None
             else:
                 session.flash = T('No recipient who sent the message')
-            redirect(URL('notification', 'mail_notifications'))
+            redirect(URL('notification', 'mail_notifications', vars =  dict(period=year.id) ))
         else:
             session.flash = T('Fill all fields of notification')
-            redirect(URL('notification', 'mail_notifications'))
+            redirect(URL('notification', 'mail_notifications',vars =  dict(period=year.id) ))
 
     def get_projects(grupo):
         import cpfecys
@@ -985,9 +992,14 @@ def attachment_files():
 
 def search_files(): 
     if request.vars['search_input'] is None:
+        import cpfecys
         #projects = db((db.project.id==db.user_project.project)&(db.period.id==db.user_project.period)&(db.user_project.assigned_user==auth.user.id)).select()
         #all_list = db((db.library.owner_file==auth.user.id) or ((db.library.project == session.project_id) & (db.library.visible==True)) ).select()
-        all_list = db(((db.library.visible==True)&(db.library.owner_file!=auth.user.id)&(db.library.project==db.project.id)&(db.period.id==db.user_project.period)&(db.project.id==db.user_project.project)&(db.user_project.assigned_user==auth.user.id))).select()
+        all_list = db((db.library.visible==True)&(db.library.owner_file!=auth.user.id)\
+            &(db.library.project==db.project.id)&(db.project.id==db.user_project.project)&\
+            (db.user_project.assigned_user==auth.user.id)&((db.user_project.period <= cpfecys.current_year_period().id ) \
+                & ((db.user_project.period + db.user_project.periods) > cpfecys.current_year_period().id))\
+            &(db.library.period ==  db.user_project.period)  ).select()
         p=[]
         for a in all_list:
             p.append(a.library)
@@ -998,8 +1010,12 @@ def search_files():
         #all_list = db((db.library.visible==True)&(db.library.project==db.project.id)&(db.period.id==db.user_project.period)&(db.project.id==db.user_project.project)&(db.user_project.assigned_user==auth.user.id)).select()
         #all_list = db((db.library.owner_file==auth.user.id) or ((db.library.project == session.project_id) & (db.library.visible==True)) ).select()
         #all_list = db( ((db.library.owner_file==auth.user.id) or ((db.library.project == session.project_id) & (db.library.visible==True) & (db.library.owner_file!=auth.user.id)) ) & (db.library.name.like('%'+request.vars['search_input']+'%'))).select()
-
-        all_list = db(((db.library.name.like('%'+request.vars['search_input']+'%'))&(db.library.visible==True)&(db.library.owner_file!=auth.user.id)&(db.library.project==db.project.id)&(db.period.id==db.user_project.period)&(db.project.id==db.user_project.project)&(db.user_project.assigned_user==auth.user.id))).select()
+        import cpfecys
+        all_list = db((db.library.name.like('%'+request.vars['search_input']+'%'))&(db.library.visible==True)&(db.library.owner_file!=auth.user.id)\
+            &(db.library.project==db.project.id)&(db.project.id==db.user_project.project)&\
+            (db.user_project.assigned_user==auth.user.id)&((db.user_project.period <= cpfecys.current_year_period().id ) \
+                & ((db.user_project.period + db.user_project.periods) > cpfecys.current_year_period().id))\
+            &(db.library.period ==  db.user_project.period)  ).select()
         p=[]
         for a in all_list:
             p.append(a.library)
@@ -1036,7 +1052,7 @@ def courses_mail_notifications():
         except:
             nameS = '--------'
         return nameS
-    return dict(assignations = db((db.user_project.assigned_user == auth.user.id) & (db.user_project.period == cpfecys.current_year_period().id)).select(), split_name=split_name, split_section=split_section)
+    return dict(assignations = db((db.user_project.assigned_user == auth.user.id) & ((db.user_project.period <= cpfecys.current_year_period().id) & ((db.user_project.period + db.user_project.periods) > cpfecys.current_year_period().id)) ).select(), split_name=split_name, split_section=split_section)
 
 
 #Function use to obtain the count of the items

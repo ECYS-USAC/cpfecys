@@ -24,12 +24,12 @@
 									<option  onclick="refresh_period({{=per.semester.id}});" value="{{=per.semester.id}}" {{=var_sel}} >{{=T(per.semester.period.name)}} {{=per.semester.yearp}}</option>
 								{{pass}}
 								{{for per in period_list2:}}
-									{{if str(per.period.id) == str(period_id):}}
+									{{if str(per.id) == str(period_id):}}
 										{{var_sel="selected='selected'"}}
 									{{else:}}
 										{{var_sel=''}}
 									{{pass}}
-									<option  onclick="refresh_period({{=per.period.id}});" value="{{=per.period.id}}" {{=var_sel}} >{{=T(per.period.period.name)}} {{=per.period.yearp}}</option>
+									<option  onclick="refresh_period({{=per.id}});" value="{{=per.id}}" {{=var_sel}} >{{=T(per.period.name)}} {{=per.yearp}}</option>
 								{{pass}}
 							</select>
 						</td>
@@ -70,11 +70,17 @@
 											<tr bgcolor="#D8D8D8"> 
 												<td width="100%" >
 													<span class="icon-book"></span> &nbsp 
-													<a style="cursor:pointer;" onclick="click_link({{=assignation.assignation.id}});">
+													<a style="cursor:pointer;" onclick="click_link_{{=assignation.assignation.id}}({{=assignation.assignation.id}});">
 															<b>
 														{{=assignation.assignation.name}}
 															</b>
 													</a>
+													<script type="text/javascript">
+														function click_link_{{=assignation.assignation.id}}(var_id){
+													  		$("#mail_"+var_id).toggle(700);
+													  		$("#mail_"+var_id).load("{{=URL('notification_student','inbox_mails_load.html')}}?operation=mails_list&amp;email={{=email}}&amp;period_id={{=period_id}}&amp;project_id="+var_id);
+														}
+													</script>
 												</td>
 												{{if cont_news>0:}}
 													<td align="right">
@@ -103,7 +109,7 @@
 									
 										{{cont_news = 0}}
 										{{cont_mails = 0}}
-										{{mails = db((db.academic_send_mail_log.yearp==course.user_project.period.yearp) & (db.academic_send_mail_log.period==course.user_project.period.period.name) & (db.academic_send_mail_log.course==course.user_project.project.name)).select()}}
+										{{mails = db((db.academic_send_mail_log.yearp==period_var.yearp) & (db.academic_send_mail_log.period==period_var.period.name) & (db.academic_send_mail_log.course==course.user_project.project.name)).select()}}
 										
 								        {{for a in mails:
 								            
@@ -119,7 +125,7 @@
 
 								        {{cont_news_1 = cont_news}}
 
-										{{mails2 = db((db.notification_general_log4.yearp==course.user_project.period.yearp) & (db.notification_general_log4.period==course.user_project.period.period.name) & (db.notification_general_log4.course==course.user_project.project.name)).select()}}
+										{{mails2 = db((db.notification_general_log4.yearp==period_var.yearp) & (db.notification_general_log4.period==period_var.period.name) & (db.notification_general_log4.course==course.user_project.project.name)).select()}}
 										{{for a in range(len(mails2)-1, -1, -1):}}
 											{{	#SHOW JUST EMAILS SENDED TO ME
 												var_query = db.notification_log4((db.notification_log4.register==mails2[a].id) & (db.notification_log4.username==auth.user.username))
@@ -136,10 +142,17 @@
 											<tr bgcolor="#FAFAFA">
 												<td width="100%">
 													<span class="icon-book"></span> &nbsp 
-													<a style="cursor:pointer;" onclick="click_link2({{=course.user_project.project.id}});">
+													<a style="cursor:pointer;" onclick="click_link2_{{=course.user_project.project.id}}({{=course.user_project.project.id}});">
 														{{=course.user_project.project.name}}
 													</a>
+													<script type="text/javascript">
+														function click_link2_{{=course.user_project.project.id}}(var_id){
+													  		$("#mail_"+var_id).toggle(700);
+													  		$("#mail_"+var_id).load("{{=URL('notification_student','inbox_student_mails_load.html')}}?operation=mails_list&amp;email={{=email}}&amp;period_id={{=period_id}}&amp;cont_news={{=cont_news_2}}&amp;cont_news_1={{=cont_news_1}}&amp;cont_mails={{=cont_news}}&amp;project_id="+var_id);
+														}
+													</script>
 												</td>
+												{{cont_news_2=0}}
 												{{if cont_news>0:}}
 													<td align="right">
 														<span id="information_text" class="badge btn-success">{{=T('New Mails')}} {{=cont_news}}</span> 
@@ -195,15 +208,9 @@
   	});
   	
 
-	function click_link(var_id){
-  		$("#mail_"+var_id).toggle(700);
-  		$("#mail_"+var_id).load("{{=URL('notification_student','inbox_mails_load.html')}}?operation=mails_list&amp;email={{=email}}&amp;period_id={{=period_id}}&amp;project_id="+var_id);
-	}
+	
 
-	function click_link2(var_id){
-  		$("#mail_"+var_id).toggle(700);
-  		$("#mail_"+var_id).load("{{=URL('notification_student','inbox_student_mails_load.html')}}?operation=mails_list&amp;email={{=email}}&amp;period_id={{=period_id}}&amp;cont_news={{=cont_news_1}}&amp;cont_mails={{=cont_news_2}}&amp;project_id="+var_id);
-	}
+	
 	
 </script>
 

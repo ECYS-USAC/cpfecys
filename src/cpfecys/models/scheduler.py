@@ -30,6 +30,7 @@ def assignation_done_succesful(assignation):
     # Get all the reports of this assignation
     average_report = 0
     status = True
+    check_report = True
     message = ''
     total_reports = assignation.report.count()
     for report in assignation.report.select():
@@ -37,6 +38,7 @@ def assignation_done_succesful(assignation):
         if report.dtt_approval is None:
             # I don't think status has to change since by average the student can win
             # status = False
+            check_report = False
             message += T('A report was not checked by DTT Admin. Contact Admin.')
             message += ' '
         elif report.dtt_approval is False:
@@ -108,7 +110,7 @@ def assignation_done_succesful(assignation):
         if period == None:
             break
     # Check if they where delivered
-    return {'status':status, 'message':message}
+    return {'status':status, 'message':message, 'check_report':check_report}
 
 # Auto Freeze happens automatically, it FREEZES the assignation when it ends.
 # Successful means all needed reports and items where delivered
@@ -116,15 +118,16 @@ def assignation_done_succesful(assignation):
 def auto_freeze():
     # Get the current month and year
     import datetime
+    import cpfecys
     current_date = datetime.datetime.now()
-    current_month = T(current_date.strftime("%B"))
+    current_month = (current_date.strftime("%B"))
     current_year = current_date.year
     # Get every period that has to be autoasigned within current month
     periods_to_work = db(db.assignation_freeze.pmonth == current_month).select()
     # For each assignation_freeze
     for period in periods_to_work:
-        current_period_year = db.period_year((db.period_year.period == period)&
-                                             (db.period_year.yearp == current_year))
+        
+        current_period_year = cpfecys.current_year_period()
         # this period means that we should check the ones that end in first_semester for example
         # or the ones that end in second_semester; it always applies to current year
         # Get all the assignations still active
@@ -139,15 +142,18 @@ def auto_freeze():
             finish = ass_id + length
             final = db.period_year(id = finish)
             if final and current_period_year:
+                  
                 if final.id == current_period_year.id:
                     validation = assignation_done_succesful(assignation)
-                    if validation['status']:
-                        assignation.assignation_comment = validation['message']
-                        assignation.assignation_status = db.assignation_status(name = 'Successful')
-                    else:
-                        assignation.assignation_comment = validation['message']
-                        assignation.assignation_status = db.assignation_status(name = 'Failed')
-                    assignation.update_record()
+                    if validation['check_report']:
+                        if validation['status']:
+                            assignation.assignation_comment = validation['message']
+                            assignation.assignation_status = db.assignation_status(name = 'Successful')
+                        else:
+                            assignation.assignation_comment = validation['message']
+                            assignation.assignation_status = db.assignation_status(name = 'Failed')
+                        assignation.update_record()
+                    
     db.commit()
 
 

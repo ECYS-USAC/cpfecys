@@ -112,7 +112,7 @@
 											<div style="overflow:auto; width:100%; height:150px;">
 											   	<!--course_members-->
 											   	<table class="table-striped table-bordered">
-											   		{{for memb in db((db.user_project.period==period_id) & (db.user_project.project==assignation.assignation.id) & (db.user_project.assigned_user == db.auth_membership.user_id) & (db.auth_membership.group_id==2) ).select():}}
+											   		{{for memb in db(((db.user_project.period <= period_id) & ((db.user_project.period + db.user_project.periods) > period_id)) & (db.user_project.project==assignation.assignation.id) & (db.user_project.assigned_user == db.auth_membership.user_id) & (db.auth_membership.group_id==2) ).select():}}
 													  	<tr>
 													  	  <td>
 														    <input type="checkbox" 
@@ -132,7 +132,7 @@
 											<div style="overflow:auto; width:75%; height:150px;">
 											   	<!--course_members-->
 											   	<table class="table-striped table-bordered">							   		
-											   		{{for memb in db((db.user_project.period==period_id) & (db.user_project.project==assignation.assignation.id) & (db.user_project.assigned_user == db.auth_membership.user_id) & (db.auth_membership.group_id==3) ).select():}}
+											   		{{for memb in db(((db.user_project.period <= period_id) & ((db.user_project.period + db.user_project.periods) > period_id)) & (db.user_project.project==assignation.assignation.id) & (db.user_project.assigned_user == db.auth_membership.user_id) & (db.auth_membership.group_id==3) ).select():}}
 													  	<tr>
 													  	  <td>
 														    <input type="checkbox" 

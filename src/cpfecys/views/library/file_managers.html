@@ -26,7 +26,7 @@
                                 <br>
                                     <div id="a-div_period_{{=period.semester.id}}" style="display: none; padding-left: 20px; white-space:nowrap;">
                                     {{for project in obtainProjects(1,period.semester.id):}}
-                                        <a href="{{=URL(vars=dict(tipo=5, semester=period.semester.id, pro = project.assignation.id))}}" id="a-pr-{{=project.assignation.id}}" style="white-space:nowrap; cursor:pointer;"><span id="a-span_pr_{{=project.assignation.id}}" class="icon-folder-close"></span>&nbsp;<font   size="2">{{=T(project.assignation.name)}}</a>
+                                        <a href="{{=URL(vars=dict(tipo=5, semester=period.semester.id, pro = project.assignation.id))}}" id="a-pr-{{=project.assignation.id}}-p{{=period.semester.id}}" style="white-space:nowrap; cursor:pointer;"><span id="a-span_pr_{{=project.assignation.id}}-p{{=period.semester.id}}" class="icon-folder-close"></span>&nbsp;<font   size="2">{{=T(project.assignation.name)}}</a>
                                         <br>
                                         
                                     {{pass}}
@@ -47,18 +47,18 @@
                                 <br>
                                     <div id="div_period_{{=period.id}}" style="display: none; padding-left: 20px; white-space:nowrap;">
                                     {{for project in obtainProjects(0,period.id):}}
-                                        <a id="pr-{{=project.id}}" style="white-space:nowrap; cursor:pointer;"><span id="span_pr_{{=project.id}}" class="icon-folder-close"></span>&nbsp;<font   size="2">{{=T(project.project.name)}}</a>
+                                        <a id="pr-{{=project.id}}-p-{{=period.id}}" style="white-space:nowrap; cursor:pointer;"><span id="span_pr_{{=project.id}}-p-{{=period.id}}" class="icon-folder-close"></span>&nbsp;<font   size="2">{{=T(project.project.name)}}</a>
                                         <br>
-                                        <div id="div_project_{{=project.id}}" style="display: none; padding-left: 20px; white-space:nowrap;">
+                                        <div id="div_project_{{=project.id}}-p-{{=period.id}}" style="display: none; padding-left: 20px; white-space:nowrap;">
                                         {{if auth.has_membership('Student'):}}
-                                            <a href="{{=URL(vars=dict(tipo=1, pro = project.id))}}" style="white-space:nowrap;"><span class="icon-folder-close"></span>&nbsp;<font   size="2">{{=T('Owns')}}</a>
+                                            <a href="{{=URL(vars=dict(tipo=1, pro = project.id, semester=period.id))}}" style="white-space:nowrap;"><span class="icon-folder-close"></span>&nbsp;<font   size="2">{{=T('Owns')}}</a>
                                                 <br>
-                                            <a href="{{=URL(vars=dict(tipo=2, pro = project.id))}}" style="white-space:nowrap;"><span class="icon-folder-close"></span>&nbsp;<font   size="2">{{=T('Share')}}</a>
+                                            <a href="{{=URL(vars=dict(tipo=2, pro = project.id, semester=period.id))}}" style="white-space:nowrap;"><span class="icon-folder-close"></span>&nbsp;<font   size="2">{{=T('Share')}}</a>
                                         {{else:}}
-                                            <a href="{{=URL(vars=dict(tipo=3, pro = project.id))}}" style="white-space:nowrap;"><span class="icon-folder-close"></span>&nbsp;<font   size="2">{{=T('Owns')}}</a>
+                                            <a href="{{=URL(vars=dict(tipo=3, pro = project.id, semester=period.id))}}" style="white-space:nowrap;"><span class="icon-folder-close"></span>&nbsp;<font   size="2">{{=T('Owns')}}</a>
                                             {{for student in obtainStudents(project):}}
                                                 <br>
-                                                <a href="{{=URL(vars=dict(tipo=4, pro = student.user_project.id))}}" style="white-space:nowrap;"><span class="icon-folder-close"></span>&nbsp;<font   size="2">{{=T(student.user_project.assigned_user.first_name)}}</a>
+                                                <a href="{{=URL(vars=dict(tipo=4, pro = student.user_project.id, semester=period.id))}}" style="white-space:nowrap;"><span class="icon-folder-close"></span>&nbsp;<font   size="2">{{=T(student.user_project.assigned_user.first_name)}}</a>
                                             {{pass}}
                                         {{pass}}
                                         </div>
@@ -97,12 +97,12 @@
                 }
             })
             {{for project in obtainProjects(0,period.id):}}
-                $("#pr-{{=project.id}}").click(function(){         
-                    $("#div_project_{{=project.id}}").toggle();
-                    if (document.getElementById('span_pr_{{=project.id}}').className == "icon-folder-close") {
-                        document.getElementById('span_pr_{{=project.id}}').className = "icon-folder-open";
+                $("#pr-{{=project.id}}-p-{{=period.id}}").click(function(){         
+                    $("#div_project_{{=project.id}}-p-{{=period.id}}").toggle();
+                    if (document.getElementById('span_pr_{{=project.id}}-p-{{=period.id}}').className == "icon-folder-close") {
+                        document.getElementById('span_pr_{{=project.id}}-p-{{=period.id}}').className = "icon-folder-open";
                     }else{
-                        document.getElementById('span_pr_{{=project.id}}').className = "icon-folder-close";
+                        document.getElementById('span_pr_{{=project.id}}-p-{{=period.id}}').className = "icon-folder-close";
                     }
                 })
             {{pass}}
@@ -118,11 +118,11 @@
                 }
             })
             {{for project in obtainProjects(1,period.semester.id):}}
-                $("#a-pr-{{=project.assignation.id}}").click(function(){  
-                    if (document.getElementById('a-span_pr_{{=project.assignation.id}}').className == "icon-folder-close") {
-                        document.getElementById('a-span_pr_{{=project.assignation.id}}').className = "icon-folder-open";
+                $("#a-pr-{{=project.assignation.id}}-p{{=period.semester.id}}").click(function(){  
+                    if (document.getElementById('a-span_pr_{{=project.assignation.id}}-p{{=period.semester.id}}').className == "icon-folder-close") {
+                        document.getElementById('a-span_pr_{{=project.assignation.id}}-p{{=period.semester.id}}').className = "icon-folder-open";
                     }else{
-                        document.getElementById('a-span_pr_{{=project.assignation.id}}').className = "icon-folder-close";
+                        document.getElementById('a-span_pr_{{=project.assignation.id}}-p{{=period.semester.id}}').className = "icon-folder-close";
                     }
                 })
             {{pass}}
