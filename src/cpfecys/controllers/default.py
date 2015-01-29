@@ -27,19 +27,14 @@ def event_editor():
     assignation = request.vars['assignation']
     #check assignation belongs to this user
     import cpfecys
-    check = db.user_project(id = assignation, assigned_user = auth.user.id)
+    check =  db((db.user_project.assigned_user==auth.user.id)&\
+            (db.user_project.id == assignation)&\
+            ((db.user_project.period <= cpfecys.current_year_period().id) & \
+            ((db.user_project.period + db.user_project.periods) > cpfecys.current_year_period().id))).select(db.user_project.ALL).first()
+
     if (check is None):
-        #check if there is no assignation or if it is locked (shouldn't be touched)
-        if (session.last_assignation is None):
-            redirect(URL('default','index'))
-            return
-        else:
-            check = db.user_project(id = session.last_assignation)
-            if cpfecys.assignation_is_locked(check):
-                redirect(URL('default','index'))
-                return
-    else:
-        session.last_assignation = check.id
+        redirect(URL('default','index'))
+        
     cyearperiod = cpfecys.current_year_period()
     db.public_event.semester.default = cyearperiod.id
     db.public_event.semester.writable = False

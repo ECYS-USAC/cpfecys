@@ -267,7 +267,16 @@ def teacher_mail_notifications():
     #Obtener la asignacion del estudiante
     assignation = request.vars['assignation']
     #Obtener al tutor del proyecto
-    check = db.user_project(id = assignation, assigned_user = auth.user.id)
+    year = db.period_year(id=request.vars["period"])
+    year_semester = db.period(id=year.period)
+    period = year.id
+
+    check =  db((db.user_project.assigned_user==auth.user.id)&\
+            (db.user_project.id == assignation)&\
+            ((db.user_project.period <= year.id) & \
+            ((db.user_project.period + db.user_project.periods) > year.id))).select(db.user_project.ALL).first()
+
+
     if (check is None):
         #check if there is no assignation or if it is locked (shouldn't be touched)
         if (session.last_assignation is None):
@@ -282,9 +291,7 @@ def teacher_mail_notifications():
         session.last_assignation = check.id
 
 
-    year = db.period_year(id=request.vars["period"])
-    year_semester = db.period(id=year.period)
-    period = year.id
+    
     var=""
     if (request.args(0) == 'send'):
         #Tipo estudiante al que se le enviara el correo
@@ -750,6 +757,16 @@ def mail_notifications():
     assignation = request.vars['assignation']
     #Obtener al tutor del proyecto
     check = db.user_project(id = assignation, assigned_user = auth.user.id)
+
+    year = db.period_year(id=request.vars["period"])
+    year_semester = db.period(id=year.period)
+    period = year.id
+
+    check =  db((db.user_project.assigned_user==auth.user.id)&\
+            (db.user_project.id == assignation)&\
+            ((db.user_project.period <= year.id) & \
+            ((db.user_project.period + db.user_project.periods) > year.id))).select(db.user_project.ALL).first()
+    
     if (check is None):
         #check if there is no assignation or if it is locked (shouldn't be touched)
         if (session.last_assignation is None):
@@ -765,10 +782,7 @@ def mail_notifications():
 
     
 
-    year = db.period_year(id=request.vars['period'])
-    year_semester = db.period(id=year.period)
     var=""
-    period = year.id
     if (request.args(0) == 'send'):
         #Tipo estudiante al que se le enviara el correo
         tipoes = request.vars['tipoe']

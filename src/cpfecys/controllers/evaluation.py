@@ -87,12 +87,12 @@ def evaluation_reply():
     evaluation = request.vars['evaluation']
     evaluated = request.vars['evaluated']
 
-    if db((db.auth_user.id==auth.user.id) & (db.user_project.project==project) & (db.user_project.period == period) & \
+    if db((db.auth_user.id==auth.user.id) & (db.user_project.project==project) & \
         ((db.user_project.period <= period) & ((db.user_project.period + db.user_project.periods) > period))).select().first() is None:
         session.flash  =T('Not authorized')
         redirect(URL('default','index'))
 
-    evaluated = db((db.auth_user.id==evaluated) & (db.user_project.project==project) & (db.user_project.period == period) & \
+    evaluated = db((db.auth_user.id==evaluated) & (db.user_project.project==project) & \
         ((db.user_project.period <= period) & ((db.user_project.period + db.user_project.periods) > period))).select().first() 
     if evaluated is None:
         session.flash  =T('Not authorized')
@@ -107,7 +107,8 @@ def evaluation_reply():
     user_role = None
     if auth.has_membership('Student') or auth.has_membership('Teacher'):
         try:
-            if db((db.user_project.assigned_user == auth.user.id) & (db.user_project.period == period)).select().first() is not None:
+            if db((db.user_project.assigned_user == auth.user.id) & \
+                ((db.user_project.period <= period) & ((db.user_project.period + db.user_project.periods) > period))).select().first() is not None:
                 if auth.has_membership('Student'):
                     user_role = 2
                 else:
@@ -195,7 +196,7 @@ def evaluation_reply():
 def evaluation_list():
     project = request.vars['project']
     period = request.vars['period']
-    user = db((db.auth_user.id==auth.user.id) & (db.user_project.project==project) & (db.user_project.period == period) & \
+    user = db((db.auth_user.id==auth.user.id) & (db.user_project.project==project) & \
         ((db.user_project.period <= period) & ((db.user_project.period + db.user_project.periods) > period))).select().first()
     
     if user is None:
@@ -204,13 +205,13 @@ def evaluation_list():
 
     from datetime import date
     users_project =  db((db.user_project.project==project) & \
-        (db.user_project.period == period) & ((db.user_project.period <= period) & \
-            ((db.user_project.period + db.user_project.periods) > period))).select()
+        ((db.user_project.period <= period) & ((db.user_project.period + db.user_project.periods) > period))).select()
     
     user_role = None
     if auth.has_membership('Student') or auth.has_membership('Teacher'):
         try:
-            if db((db.user_project.assigned_user == auth.user.id) & (db.user_project.period == period)).select().first() is not None:
+            if db((db.user_project.assigned_user == auth.user.id) & \
+                ((db.user_project.period <= period) & ((db.user_project.period + db.user_project.periods) > period)) ).select().first() is not None:
                 if auth.has_membership('Student'):
                     user_role = 2
                 else:
