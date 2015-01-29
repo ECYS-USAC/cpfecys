@@ -13,16 +13,18 @@
 </h3>
 <div class="accordion" id="practice_assignation_accordion">
     <div class="accordion-group">
-        {{assignation_finished = True}}
+        {{assignation_finished = False}}
         {{total_assignations = 0}}
         {{for item in assignations:}}
-        {{total_assignations += 1}}
-        {{if not item.user_project.assignation_ignored:}}
-        {{if (item.user_project.assignation_status == None) or \
-             (item.user_project.assignation_status.name == 'Failed'):}}
-          {{assignation_finished = False}}
-        {{pass}}
-        {{pass}}
+            {{total_assignations += 1}}
+            {{if not item.user_project.assignation_ignored:}}
+                {{if (item.user_project.assignation_status is not None):}}
+                    {{if (item.user_project.assignation_status.name == 'Successful'):}}
+                        {{assignation_finished = True}}
+                    {{pass}}
+                {{pass}}
+
+            {{pass}}
         <div class="accordion-heading">
             <div class="row-fluid">
                 <a class="accordion-toggle"

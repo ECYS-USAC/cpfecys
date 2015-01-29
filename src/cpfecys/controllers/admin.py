@@ -404,7 +404,7 @@ def assignations():
     orderby3 = db.auth_user.username
     orderby4 = db.auth_user.first_name
     data = db(q_selected_period_assignations&q2&q3&q4&q5&q6&q7&q8&q9\
-        ).select(orderby=orderby|orderby2|orderby3|orderby4)
+        ).select(orderby=orderby|orderby2|orderby3|orderby4,groupby=db.user_project.id)
     current_period_name = T(cpfecys.second_period.name)
     if currentyear_period.period == cpfecys.first_period.id:
         current_period_name = T(cpfecys.first_period.name)
@@ -431,7 +431,7 @@ def assignations():
         user.update_record(
                 registration_key=enabled)
         redirect(URL('admin', 'assignations', \
-            vars=dict(year_period = currentyear_period)))
+            vars=dict(year_period = currentyear_period.id)))
 
     return dict(data = data,
                 currentyear_period = currentyear_period,

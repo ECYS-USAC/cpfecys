@@ -4,17 +4,22 @@
 def index():
     #Get the assignations of the current user!
     response.title = u"Constancia de Entrega de Reportes y Cumplimiento de requisitos de Práctica Final"
-    assignations = db((db.user_project.assigned_user == auth.user.id)&
-                      (db.user_project.assignation_ignored == False)).select()
-    assignations_html = DIV()
-    for assignation in assignations:
+    #assignations = db((db.user_project.assigned_user == auth.user.id)&
+    #                  (db.user_project.assignation_ignored == False)&(db.user_project.assignation_status == db.assignation_status.id) & (db.assignation_status.name == 'Successful')).select(db.user_project.ALL)
+    #assignations_html = DIV()
+
+    def get_body(assignation):
+        assignations_html = DIV()
+    #for assignation in assignations:
         assignation_finished = True
+        report_average = 0
+
         if (assignation.assignation_status == None) or \
            (assignation.assignation_status.name == 'Failed'):
                 session.flash = T('Invalid Action')
                 return dict()
         #Get the assigned user that is a teacher withing same user_project
-        dude_in_charge = db((db.user_project.id == 2)&
+        dude_in_charge = db((db.user_project.project == assignation.project)&
                         (db.user_project.assigned_user == db.auth_user.id)&
                         (db.auth_membership.user_id == db.auth_user.id)&
                         (db.auth_membership.group_id == db.auth_group.id)&
@@ -34,31 +39,34 @@ def index():
             created_date = report.created
             if report.never_delivered:
                 created_date = 'Nunca Entregado'
-            score = report.score
+            score = str(report.score)
             score_date = report.score_date
             if report.dtt_approval == False:
-                score = (report.score or '0') + ', reprobado DTT.'
+                score = (str(report.score) or '0') + ', reprobado DTT.'
                 acum_score += 0
             if report.dtt_approval == None:
-                score = (report.score or '0') + ', pendiente DTT.'
+                score = (str(report.score) or '0') + ', pendiente DTT.'
                 acum_score += 0
             if not report.admin_score is None:
-                score_date = 'Calificado por DTT: ' + str(report.admin_score)
-                acum_score += (report.admin_score or 0)
+                score_date = 'Calificado por DTT'
+                acum_score += ((report.admin_score) or 0)
+                score = str(report.admin_score)
             else:
                 acum_score += (report.score or 0)
             report_body.append(TR(TD(report.report_restriction.name),
                                   TD("  "),
                                   TD(report.created),
-                                  TD((report.teacher_comment or 'Sin Comentario')[:25]),
+                                  
                                   TD(score_date or 'Nunca Calificado'),
+                                  TD("     "),
                                   TD(score or '0')))
-        rows_report = [THEAD(TR(TH("Reporte",_width="20%"),
-                                TH("     ",_width="10%"),
-                                TH("Fecha Entrega",_width="20%"),
-                                TH("Comentario",_width="20%"),
+        rows_report = [THEAD(TR(TH("Reporte",_width="25%"),
+                                TH("     ",_width="15%"),
+                                TH("Fecha Entrega",_width="15%"),
+                                
                                 TH("Fecha Calificación",_width="20%"),
-                                TH("Nota",_width="20%"))),
+                                TH("  ",_width="5%"),
+                                TH("Nota",_width="5%"))),
                        report_body]
 
         items_head = TBODY()
@@ -99,13 +107,13 @@ def index():
                          TH("",_width="10%"))),
                 TBODY(TR(TD(B(u"Inicio de Asignación:")),TD(s),
                          TD(B(u"Duración de Asignación:")), TD(str(assignation.periods) + " Semestres")),
-                      TR(),
+                      #TR(),
                       TR(TD(B(u"Código Área:")),TD(assignation.project.area_level.id)),
                       TR(TD(B(u"Código Proyecto:")),TD(assignation.project.project_id)),
                       TR(TD(B(u"Área:")),TD(str(assignation.project.area_level.name))),
                       TR(TD(B(u"Proyecto:")),TD(assignation.project.name)),
                       TR(TD(B(u"Encargado(a):")),TD(dude_in_charge)),
-                      TR(),
+                      #TR(),
                       TR(TD(B(u"Carnet:")),TD(assignation.assigned_user.username)),
                       TR(TD(B(u"Nombre del Practicante:")),
                          TD(assignation.assigned_user.first_name + ' ' + assignation.assigned_user.last_name)),
@@ -115,9 +123,11 @@ def index():
                       TR(TD(B(u"Total de Entregables:")),TD(items_total)))]
         table_assignation = TABLE(*rows, _border="0", _align="center", _width="100%")
         assignations_html.append(SPAN(H3('Resumen de Asignación'),table_assignation,reports,
-                                HR(),
-                                HR()))
-    placeholder = DIV(H2(u'Asignaciones a Proyectos'),assignations_html)
+                                #HR(),
+                                #HR()
+                                ))
+        return DIV(H2(u'Asignaciones a Proyectos'),assignations_html)
+    #placeholder = DIV(H2(u'Asignaciones a Proyectos'),assignations_html)
     if request.extension == 'pdf':
         from gluon.contrib.pyfpdf import FPDF, HTMLMixin
         # create a custom class with the required functionalities 
@@ -172,8 +182,12 @@ def index():
                 self.cell(0,5,txt,0,1,'R')
         pdf=MyFPDF()
         # create a page and serialize/render HTML objects
-        pdf.add_page()
-        pdf.write_html(unicode(str(XML(SPAN(B(CENTER('Solvencia de Entrega de Reportes y Cumplimiento ')),B(CENTER("de")),B(CENTER("Requisitos de Práctica Final")),DIV(placeholder)),
+        
+        assignations = db((db.user_project.assigned_user == auth.user.id)&
+                          (db.user_project.assignation_ignored == False)&(db.user_project.assignation_status == db.assignation_status.id) & (db.assignation_status.name == 'Successful')).select(db.user_project.ALL)
+        for x in assignations:
+            pdf.add_page()
+            pdf.write_html(unicode(str(XML(SPAN(B(CENTER('Solvencia de Entrega de Reportes y Cumplimiento ')),B(CENTER("de")),B(CENTER("Requisitos de Práctica Final")),DIV(get_body(x))),
                                        sanitize=False)), "utf-8"))
         #pdf.write_html(str(XML(CENTER(chart), sanitize=False)))
         # prepare PDF to download:

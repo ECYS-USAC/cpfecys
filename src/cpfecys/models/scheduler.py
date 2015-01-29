@@ -33,6 +33,8 @@ def assignation_done_succesful(assignation):
     check_report = True
     message = ''
     total_reports = assignation.report.count()
+    min_score = db(db.custom_parameters.id>0).select().first().min_score
+    sum_reports = 0
     for report in assignation.report.select():
         # Check DTT Approval
         if report.dtt_approval is None:
@@ -48,10 +50,21 @@ def assignation_done_succesful(assignation):
             message += ' '
         else:
             # Save for average grading
-            average_report += (float(report.score)/float(total_reports))
+            if report.score is None:
+                if report.admin_score is None:
+                    if report.min_score is None:
+                        report.admin_score = min_score
+                    else:
+                        report.admin_score = report.min_score
+                    report.update_record()
+                    sum_reports += float(report.admin_score)
+                else:
+                    sum_reports += float(report.admin_score)
+            else:
+                sum_reports += float(report.score)
     # Check the grade (average) to be beyond the expected minimal grade in current settings
-    min_score = db(db.custom_parameters.id>0).select().first().min_score
-    if average_report < min_score:
+    
+    if (float(sum_reports)/float(total_reports)) < min_score:
         #he lost the practice due to reports
         status = False
         message += T('To consider assignation to be valid, report grades should be above: ') + min_score
@@ -249,6 +262,7 @@ def send_evaluation_notifications():
             return control
         except:
             None
+    db.commit()
 
 
 def automation_evaluations():
@@ -429,6 +443,7 @@ def reject_request():
         activitiesChange = db(db.requestchange_course_activity.requestchange_activity==request.id).select()
         for actChange in activitiesChange:
             db.requestchange_course_activity_log.insert(requestchange_activity=request_rejected, operation_request=actChange.operation_request, activity=actChange.activity, name=actChange.name, description=actChange.description, grade=actChange.grade, date_start=actChange.date_start, date_finish=actChange.date_finish)
+    db.commit()
     #GRADES
 
 
