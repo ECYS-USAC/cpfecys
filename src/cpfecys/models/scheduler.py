@@ -632,7 +632,7 @@ cpfecys.force_student_data_update(request.env.path_info,
 #import cpfecys
 period = cpfecys.current_year_period()
 data = db((db.item_restriction.is_public == True)&
-          (db.item_restriction.period == period)).select()
+          ((db.item_restriction.period == period)|(db.item_restriction.permanent == True))).select()
 mnu = []
 for d in data:
     mnu.append((T(d.name), False, URL('default', 'resources', vars=dict(r=d.id))))

@@ -62,7 +62,10 @@ def index():
                         ==item_restriction_id))
 
     def items_instance(item_restriction, assignation):
+        import cpfecys
+        period = cpfecys.current_year_period()
         return db((db.item.item_restriction==item_restriction.id)&
+                    (db.item.created==period.id)&
                     (db.item.assignation==assignation.user_project.id)&
                     (db.item.is_active==True))
 

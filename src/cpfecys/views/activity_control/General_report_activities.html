@@ -890,9 +890,9 @@
                                         {{pass}}
                                         <td>
                                             <center>
-                                                {{if totalCarry < float(controlP.min_average):}}
+                                                {{if round(totalCarry,0) < float(controlP.min_average):}}
                                                     <span class="label label-important">
-                                                {{elif totalCarry>=float(controlP.min_average) and totalCarry <= float(controlP.max_average):}}
+                                                {{elif round(totalCarry,0)>=float(controlP.min_average) and round(totalCarry,0) <= float(controlP.max_average):}}
                                                     <span class="label label-warning">
                                                 {{else:}}
                                                     <span class="label label-success">
