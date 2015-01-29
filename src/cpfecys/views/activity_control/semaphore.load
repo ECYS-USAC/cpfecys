@@ -95,7 +95,11 @@
 						{{else:}}
 							{{averageA = db((db.grades.activity==activity_var.id)&(db.grades.academic_assignation == request.vars['academic'])).select().first()}}
 							{{if averageA!=  None:}}
-								{{average=float(averageA.grade)}}
+								{{if int(averageA.grade) == int(0):}}
+									{{average=float(00.001)}}
+								{{else:}}
+									{{average=float(averageA.grade)}}
+								{{pass}}
 							{{else:}}
 								{{average=float(00.001)}}
 							{{pass}}
