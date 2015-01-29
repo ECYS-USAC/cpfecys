@@ -10,6 +10,7 @@
 	  	<fieldset>
 	  		<label for="subject">{{=T('To')}}</label>
 	  		<h4><small>{{=name}}</small></h4>
+	  		<input name="semester_id" type="hidden" value="{{=request.vars['semester_id']}}">
 	  		<input name="mail" type="hidden" value="{{=email}}">
 	  		<input name="name" type="hidden" value="{{=name}}">
 	  		<input name="remessage" type="hidden" value="{{=remessage}}">
@@ -48,6 +49,7 @@
 					</form>
 				<form action="{{=URL('notification_student', 'send_mail/send')}}" method="post">
 					<input name="var_course" id="var_course"  type="hidden" value="">
+					<input name="semester_id" type="hidden" value="{{=request.vars['semester_id']}}">
 				  <h3>{{=T('My Courses')}}</h3>
 				  <div style="overflow:auto; width:75%; height:150px;">
 				  	

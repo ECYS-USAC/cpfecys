@@ -75,7 +75,7 @@
 
 		function view_mail(var_id, var_project_id){ 
 
-	  		$("#mail_div").load("{{=URL('notification_student','inbox_mails_load.html')}}?operation=view_mail&amp;mail_id="+var_id+"&amp;var_project_id="+var_project_id);
+	  		$("#mail_div").load("{{=URL('notification_student','inbox_mails_load.html')}}?operation=view_mail&amp;mail_id="+var_id+"&amp;period_id={{=request.vars['period_id']}}&amp;var_project_id="+var_project_id);
 	 		
 		}
 	</script>
@@ -166,7 +166,7 @@
 			</script>
 			<div align="right">
 				
-					 <a id="myButton" href="{{=URL('notification_student', 'send_mail', vars=dict(mail = emisor.email, name = emisor.first_name + ' ' +emisor.last_name , remessage = mail.sent_message, retime = mail.time_date, resub = mail.subject, var_project_id = request.vars['var_project_id']))}}" role="button" class="btn btn-success"   > 
+					 <a id="myButton" href="{{=URL('notification_student', 'send_mail', vars=dict(mail = emisor.email, name = emisor.first_name + ' ' +emisor.last_name , remessage = mail.sent_message, retime = mail.time_date, resub = mail.subject, semester_id = request.vars['period_id'], var_project_id = request.vars['var_project_id']))}}" role="button" class="btn btn-success"   > 
 	                	{{=T('Reply')}}
 	              	</a>
 	            

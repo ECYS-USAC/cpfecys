@@ -123,10 +123,27 @@ def inbox_student_mails_load():
 def send_mail():        
     import cpfecys
     cperiod = cpfecys.current_year_period()
-    if request.vars['semester_id'] is None:
-        period_id = cperiod.id
+
+    try:
+        carnet_var = db(db.academic.id_auth_user==auth.user.id).select().first()
+        assigned_user_var = db((db.academic_course_assignation.carnet==carnet_var.id)&(db.academic_course_assignation.assignation==request.vars['project'])).select().first()
+        if (assigned_user_var.semester == cperiod.id) or ((assigned_user_var.semester + 1) == cperiod.id):
+            None
+        else:
+            session.flash  =T('Not authorized')
+            redirect(URL('default','index'))
+    except:
+        session.flash  =T('Not authorized')
+        redirect(URL('default','index'))
+
+    if (request.vars['semester_id'] is None) or (str(request.vars['semester_id']) == "None"):
+            period_id = cperiod.id
     else:
-        period_id = request.vars['semester_id'] 
+        period_id = request.vars['semester_id']
+    cperiod =  db(db.period_year.id==period_id).select().first()
+    
+    
+    
     period_list = []
     if (request.args(0) == 'send'):
         email = request.vars['mail']
