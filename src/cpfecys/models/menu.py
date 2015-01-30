@@ -11,7 +11,7 @@ response.title = request.application.replace('_',' ').title()
 response.subtitle = ''
 
 ## read more at http://dev.w3.org/html5/markup/meta.name.html
-response.meta.author = 'Boris Aguilar <me@borisaguilar.com> & Omar Vides <omarvides@gmail.com>'
+response.meta.author = 'Boris Aguilar <me@borisaguilar.com> & Omar Vides <omarvides@gmail.com> & William Abdalla <wil.fuentes005@gmail.com> & Gustavo Vega <lecatavo@gmail.com>'
 response.meta.description = T('Application to manage Final Practice in USAC')
 response.meta.keywords = 'usac'
 #response.meta.generator = ''
@@ -146,6 +146,14 @@ if auth.has_membership(role="Academic"):
 if auth.has_membership(role="Ecys-Administrator"):
     response.menu.extend([(T('Manage')+" "+T('Academic Control'), False, URL('activity_control','courses_list'), [])
     ])
+
+    response.menu.extend([(T('Management Reports'), False, URL(), [
+        (T('Change Request Grades'), False, URL('management_reports','change_request_grades_management'), []),
+        (T('Performance of students'), False, URL('management_reports','performance_students'), []),
+        (T('History Evaluations'), False, URL('management_reports','evaluation_result'), [])
+        ]),
+    ])
+    
 
 if auth.has_membership(role="Student"):
     response.menu.extend([(T('Final Practice'), False,  URL('student', 'index'), [])

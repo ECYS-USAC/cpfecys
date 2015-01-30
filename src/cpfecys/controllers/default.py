@@ -17,10 +17,6 @@ def events():
                             (db.public_event.assignation == db.user_project.id)&
                             (db.user_project.project == db.project.id) \
                             ).select(orderby=db.project.name))
-@auth.requires_login()
-def event_edition():
-    #show all assignations of current user
-    return dict(assignations = db((db.user_project.assigned_user == auth.user.id) & (db.user_project.period == cpfecys.current_year_period().id)).select())
 
 @auth.requires_login()
 def event_editor():

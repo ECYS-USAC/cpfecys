@@ -216,7 +216,7 @@ def audit_teacher_mail_notifications_courses_list():
 
         #Obtain all the teachers that has register in the system in the select period
         def current_teacher(project):
-            students = db((db.user_project.project==project)&(db.user_project.period==period)&(db.auth_membership.user_id==db.user_project.assigned_user)&(db.auth_membership.group_id==3)).select()
+            students = db((db.user_project.project==project)&((db.user_project.period <= period) & ((db.user_project.period + db.user_project.periods) > period))&(db.auth_membership.user_id==db.user_project.assigned_user)&(db.auth_membership.group_id==3)).select()
             return students
 
         #Functions that ar use to obtain the notices
@@ -297,7 +297,7 @@ def audit_student_mail_notifications_courses_list():
 
         #Obtain all the practising that has register in the system in the select period
         def current_practising(project):
-            students = db((db.user_project.project==project)&(db.user_project.period==period)&(db.auth_membership.user_id==db.user_project.assigned_user)&(db.auth_membership.group_id==2)).select()
+            students = db((db.user_project.project==project)&((db.user_project.period <= period) & ((db.user_project.period + db.user_project.periods) > period))&(db.auth_membership.user_id==db.user_project.assigned_user)&(db.auth_membership.group_id==2)).select()
             return students
 
         #Functions that ar use to obtain the notices
