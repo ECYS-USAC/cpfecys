@@ -706,24 +706,24 @@ def report():
                 endDateActivity=None
                 initSemester=None
                 if cperiod.period == 1:
-                    initSemester = datetime.strptime(str(cperiod.yearp) + '-' + '01-01', "%Y-%m-%d")
+                    initSemester = datetime.datetime.strptime(str(cperiod.yearp) + '-' + '01-01', "%Y-%m-%d")
                     if report.report_restriction.is_final==False:
                         activities_F=[]
                         nameReportSplit = report.report_restriction.name.upper()
                         nameReportSplit = nameReportSplit.split(' ')
                         for word in nameReportSplit:
                             if word=='ENERO':
-                                endDateActivity = datetime.strptime(str(cperiod.yearp) + '-' + '02-01', "%Y-%m-%d")
+                                endDateActivity = datetime.datetime.strptime(str(cperiod.yearp) + '-' + '02-01', "%Y-%m-%d")
                             elif word=='FEBRERO':
-                                endDateActivity = datetime.strptime(str(cperiod.yearp) + '-' + '03-01', "%Y-%m-%d")
+                                endDateActivity = datetime.datetime.strptime(str(cperiod.yearp) + '-' + '03-01', "%Y-%m-%d")
                             elif word=='MARZO':
-                                endDateActivity = datetime.strptime(str(cperiod.yearp) + '-' + '04-01', "%Y-%m-%d")
+                                endDateActivity = datetime.datetime.strptime(str(cperiod.yearp) + '-' + '04-01', "%Y-%m-%d")
                             elif word=='ABRIL':
-                                endDateActivity = datetime.strptime(str(cperiod.yearp) + '-' + '05-01', "%Y-%m-%d")
+                                endDateActivity = datetime.datetime.strptime(str(cperiod.yearp) + '-' + '05-01', "%Y-%m-%d")
                             elif word=='MAYO':
-                                endDateActivity = datetime.strptime(str(cperiod.yearp) + '-' + '06-01', "%Y-%m-%d")
+                                endDateActivity = datetime.datetime.strptime(str(cperiod.yearp) + '-' + '06-01', "%Y-%m-%d")
                     else:
-                        endDateActivity = datetime.strptime(str(cperiod.yearp) + '-' + '06-01', "%Y-%m-%d")
+                        endDateActivity = datetime.datetime.strptime(str(cperiod.yearp) + '-' + '06-01', "%Y-%m-%d")
                 else:
                     initSemester = datetime.datetime.strptime(str(cperiod.yearp) + '-' + '06-01', "%Y-%m-%d")
                     if report.report_restriction.is_final==False:
