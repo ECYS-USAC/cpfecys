@@ -140,7 +140,7 @@
                                     <td>
                                         {{if report.score == report.min_score and report.min_score !=0  \
                                             and report.min_score != None:}}
-                                            <span class="label label-warning">Aproved with minimum</span>
+                                            <span class="label label-warning">{{=T('Aproved with minimum')}}</span>
                                         {{elif report.score > report.min_score:}}
                                             <span class="label label-success">{{=T('Aproved')}}</span>
                                         {{elif report.min_score !=0 and report.min_score != None:}}
@@ -200,6 +200,7 @@
                                         {{if (report.status['name'] == 'Draft') \
                                         or (report.status['name'] == 'Recheck') \
                                         and is_indate_range(report):}}
+                                        {{if report.dtt_approval is None or report.dtt_approval==True:}}
                                         <a class="btn"
                                            href="{{=URL('student',
                                                  'report/edit',
@@ -207,6 +208,7 @@
                                             <span class="icon-edit"></span>
                                             {{=T('Edit Report')}}
                                         </a>
+                                        {{pass}}
                                         {{pass}}
                                     {{pass}}
                                     </td>

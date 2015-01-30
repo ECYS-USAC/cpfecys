@@ -359,15 +359,21 @@
 								{{pass}}
 								>
 									{{
+									tempReports=[]
 									var_count_report = 0
 									my_projects = db((db.user_project.assigned_user == auth.user.id)&(db.project.id == db.user_project.project)).select()
 							        for project in my_projects:
 							            for assignation in project.project.user_project.select():
 							            	if str(assignation.project.id) == str(course.user_project.project):
 								                q=((assignation.report((db.report.status == db.report_status.id)&((db.report_status.name == 'Grading')|(db.report_status.name == 'EnabledForTeacher')))))
-								                var_count_report = var_count_report + q.count()
+								                for report in q.select():
+								                	tempReports.append(report.report.id)
+								                pass
 								            pass
 							            pass
+							        pass
+							        for report in db(db.report.id.belongs(tempReports)).select():
+							        	var_count_report+=1
 							        pass
 									}}
 									<center>

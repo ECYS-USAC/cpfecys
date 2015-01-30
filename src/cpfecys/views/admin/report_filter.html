@@ -87,10 +87,8 @@
 				{{hours_left = hours_left - (report.hours or 0)}}
                 {{hours = report.hours}}
                 {{show = False}}
-                {{entries = \
-                    count_log_entries(report)[0]['COUNT(log_entry.id)']}}
-                {{metrics = \
-                    count_metrics_report(report)[0]['COUNT(log_metrics.id)']}}
+                {{entries = count_log_entries(report)}}
+                {{metrics = count_metrics_report(report)}}
                 {{anomalies = \
                     count_anomalies(report)[0]['COUNT(log_entry.id)']}}
                 {{if report.assignation.project.area_level.name==\

@@ -81,7 +81,11 @@
                 <td>{{=record['restriction'].start_date}}</td>
                 <td>{{=record['restriction'].end_date}}</td>
                 <td></td>
-                <td></td>
+                <td>
+                    <a class="btn btn-info"  href="{{=URL(vars=dict(period= request.vars['period'], status = request.vars['status'], report = record['restriction'].id, assignation = record['assignation'].user_project.id))}}">
+                        <span class="icon-plus"></span>{{=T('Create Report')}}
+                    </a>
+                </td>
             </tr>
             {{pass}}
 			</tbody>
