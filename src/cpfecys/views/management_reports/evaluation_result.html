@@ -422,18 +422,51 @@
 				
 				<td>
 					<center>
-					{{if category[1]==-1:}}
-						<a class="badge badge-inverse" style="white-space:nowrap;">
-							{{=T('Without reference')}}
+					
+					
+						{{if (category[1]==-1)&(category[2] is None):}}
+							<a class="badge badge-inverse" style="white-space:nowrap;">
+								{{=T('Without reference')}}
+								</a>
+						{{else:}}
+							{{if category[2] is None:}}
+							<a {{if category[1]<61:}}
+									class="badge badge-important" 
+								{{else:}}
+									class="badge badge-success" 
+								{{pass}} style="white-space:nowrap;">
+								{{=category[1]}}
 							</a>
-					{{else:}}
-						<a {{if category[1]<61:}}
-								class="badge badge-important" 
+							
 							{{else:}}
-								class="badge badge-success" 
-							{{pass}} style="white-space:nowrap;">
-							{{=category[1]}}
-						</a>
+						<a href="#myModal" role="button" class="btn btn-info" data-toggle="modal">{{=T('Answers')}}</a><br>
+						<div id="myModal" class="modal hide fade" tabindex="-1" role="dialog"
+							aria-labelledby="myModalLabel" aria-hidden="true">
+
+							 <div class="modal-header">
+							    <button type="button" class="close" data-dismiss="modal"
+							aria-hidden="true">×</button>
+							      <h3 id="myModalLabel">
+							          <span class="icon-question-sign"></span>
+							          {{=T('Ayuda Carga Masiva Alumnos')}}
+							      </h3>
+							  </div>
+							  <div class="modal-body">
+							    <div class="well">
+							        {{for x in category[2]:}}
+							        	<pre>
+{{=x.answer}}
+							        	</pre>
+							        {{pass}}
+							    </div>
+							   </div>						  
+
+							  <div class="modal-footer">
+							      <button class="btn" data-dismiss="modal"
+							aria-hidden="true">{{=T('Close')}}</button>
+							  </div>
+						</div>
+					{{pass}}
 					{{pass}}
 					</center>
 				</td>

@@ -205,6 +205,7 @@ def evaluation_list():
         ((db.user_project.period <= period) & ((db.user_project.period + db.user_project.periods) > period))).select()
     
     user_role = None
+    user = None
     if auth.has_membership('Student') or auth.has_membership('Teacher'):
         try:
             user = db((db.user_project.assigned_user == auth.user.id) & \

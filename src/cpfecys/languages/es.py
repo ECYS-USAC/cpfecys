@@ -2431,7 +2431,7 @@
 'Which called the function %s located in the file %s': 'La cual llamó la función %s localizada en el archivo %s',
 'William': 'William',
 'with 200x300px size': 'de tamaño de 200x300px',
-'With this option you can set the assignment status': 'Con esta opción podrá establecer el estado de la asignación',
+'With this option you can set the assignment status': 'Con esta opción podrá establecer el estado de la asignación (Activo, Exitosa, Reprobado)',
 'Within this space you can create or remove the approval of the student meeting the requirement that applied to the course.': 'Dentro de este espacio puede crear o eliminar la aprobación del estudiante del requisito que se encuentro aplicado al curso.',
 'Within this space you can create, edit or delete a requirement to apply to the course.': 'Dentro de este espacio puede crear, editar o eliminar un requisito que desee aplicar al curso.',
 'Within this space you can create, edit or delete records from laboratory equivalence.': 'Dentro de este espacio puede crear, editar o eliminar una equivalencia de laboratorio.',

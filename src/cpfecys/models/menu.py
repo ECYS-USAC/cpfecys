@@ -229,7 +229,7 @@ if auth.has_membership(role="Super-Administrator"):
         (T('Change Request Activities with Metric'), False, URL('management_reports','change_request_activities_with_metric_management'), []),
         (T('Change Request Grades'), False, URL('management_reports','change_request_grades_management'), []),
         (T('Performance of students'), False, URL('management_reports','performance_students'), []),
-        (T('History Evaluations'), False, URL('management_reports','evaluation_result'), [])
+        (T('Evaluations'), False, URL('management_reports','evaluation_result'), [])
     ]))
 
 if auth.has_membership(role="Super-Administrator"):

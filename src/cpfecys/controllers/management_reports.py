@@ -2122,8 +2122,8 @@ def evaluation_result():
                         result_answers = 0
                         for var_evaluation_solve_detail in db((db.evaluation_solve_detail.evaluation_result==evaluation_result.id)\
                             &(db.evaluation_solve_detail.question_repository==quetions_rep_2.id)).select():
-                            result_answers = long(result_answers + (var_evaluation_solve_detail.repository_answer.grade*var_evaluation_solve_detail.total_count)/100)
-                            count_answers = count_answers + 1
+                            result_answers = long(result_answers + (var_evaluation_solve_detail.repository_answer.grade*var_evaluation_solve_detail.total_count))
+                            count_answers = count_answers + var_evaluation_solve_detail.total_count
 
                         if count_answers!= 0:
                             result_answers = long(result_answers / count_answers)
@@ -2131,7 +2131,7 @@ def evaluation_result():
                             count_question = count_question + 1                
                             count_result = count_result + (result_answers)
                     try:
-                        result_cat_temp = long(count_result*100/count_question)
+                        result_cat_temp = long(count_result/count_question)
                         result_cat = result_cat + result_cat_temp
                         count_cat= count_cat +1
                     except:
@@ -2177,8 +2177,8 @@ def evaluation_result():
                         result_answers = 0
                         for var_evaluation_solve_detail in db((db.evaluation_solve_detail.evaluation_result==evaluation_result.id)\
                             &(db.evaluation_solve_detail.question_repository==quetions_rep_2.id)).select():
-                            result_answers = long(result_answers + (var_evaluation_solve_detail.repository_answer.grade*var_evaluation_solve_detail.total_count)/100)
-                            count_answers = count_answers + 1
+                            result_answers = long(result_answers + (var_evaluation_solve_detail.repository_answer.grade*var_evaluation_solve_detail.total_count))
+                            count_answers = count_answers + var_evaluation_solve_detail.total_count
 
                         if count_answers!= 0:
                             result_answers = long(result_answers / count_answers)
@@ -2186,7 +2186,7 @@ def evaluation_result():
                             count_question = count_question + 1                
                             count_result = count_result + (result_answers)
                     try:
-                        result_cat_temp = long(count_result*100/count_question)
+                        result_cat_temp = long(count_result/count_question)
                         result_cat = result_cat + result_cat_temp
                         count_cat= count_cat +1
                     except:
@@ -2220,8 +2220,8 @@ def evaluation_result():
                     result_answers = 0
                     for var_evaluation_solve_detail in db((db.evaluation_solve_detail.evaluation_result==evaluation.id)\
                         &(db.evaluation_solve_detail.question_repository==quetions_rep_2.id)).select():
-                        result_answers = long(result_answers + (var_evaluation_solve_detail.repository_answer.grade*var_evaluation_solve_detail.total_count)/100)
-                        count_answers = count_answers + 1
+                        result_answers = long(result_answers + (var_evaluation_solve_detail.repository_answer.grade*var_evaluation_solve_detail.total_count))
+                        count_answers = count_answers + var_evaluation_solve_detail.total_count
 
                     if count_answers!= 0:
                         result_answers = long(result_answers / count_answers)
@@ -2229,7 +2229,7 @@ def evaluation_result():
                         count_question = count_question + 1                
                         count_result = count_result + (result_answers)
                 try: 
-                    result_cat_temp = long(count_result*100/count_question)
+                    result_cat_temp = long(count_result/count_question)
                     result_cat = result_cat + result_cat_temp
                     count_cat= count_cat +1
                 except:
@@ -2272,8 +2272,8 @@ def evaluation_result():
                 result_answers = 0
                 for var_evaluation_solve_detail in db((db.evaluation_solve_detail.evaluation_result==evaluation.id)\
                     &(db.evaluation_solve_detail.question_repository==quetions_rep_2.id)).select():
-                    result_answers = long(result_answers + (var_evaluation_solve_detail.repository_answer.grade*var_evaluation_solve_detail.total_count)/100)
-                    count_answers = count_answers + 1
+                    result_answers = long(result_answers + (var_evaluation_solve_detail.repository_answer.grade*var_evaluation_solve_detail.total_count))
+                    count_answers = count_answers + var_evaluation_solve_detail.total_count
 
                 if count_answers!= 0:
                     result_answers = long(result_answers / count_answers)
@@ -2282,7 +2282,7 @@ def evaluation_result():
                     count_result = count_result + (result_answers)
                 
             try:
-                result_temp = long(count_result*100/count_question)
+                result_temp = long(count_result/count_question)
                 infoeLevelTemp = []
                 infoeLevelTemp.append(quetions_rep.question_type_name)
                 infoeLevelTemp.append(result_temp)
@@ -2308,19 +2308,31 @@ def evaluation_result():
 
         count_question = 0
         count_result = 0
+
         for quetions_rep_2 in db((db.question_repository.repository_evaluation==evaluation.repository_evaluation)&\
             (db.question_repository.question_type_name==request.vars['category'])).select():
             count_answers = 0
             result_answers = 0
-            for var_evaluation_solve_detail in db((db.evaluation_solve_detail.evaluation_result==evaluation.id)\
-                &(db.evaluation_solve_detail.question_repository==quetions_rep_2.id)).select():
-                result_answers = long(result_answers + (var_evaluation_solve_detail.repository_answer.grade*var_evaluation_solve_detail.total_count)/100)
-                count_answers = count_answers + 1
+            result_temp = -1
+            text_show = None
+            answer_detail = db((db.evaluation_solve_detail.evaluation_result==evaluation.id)\
+                &(db.evaluation_solve_detail.question_repository==quetions_rep_2.id)).select()
+
+            if answer_detail.first() is None:
+                text_show = db((db.evaluation_solve_text.evaluation_result==evaluation.id)\
+                &(db.evaluation_solve_text.question_repository==quetions_rep_2.id)).select()
+                if text_show.first() is None:
+                    text_show= None
+
+                
+            for var_evaluation_solve_detail in answer_detail:
+                result_answers = long(result_answers + (var_evaluation_solve_detail.repository_answer.grade*var_evaluation_solve_detail.total_count))
+                count_answers = count_answers + var_evaluation_solve_detail.total_count
 
             if count_answers!= 0:
                 result_answers = long(result_answers / count_answers)
 
-                result_temp = long(result_answers*100)
+                result_temp = long(result_answers)
                 count_question = count_question + 1                
                 count_result = count_result + (result_answers)
             
@@ -2329,6 +2341,7 @@ def evaluation_result():
                 infoeLevelTemp = []
                 infoeLevelTemp.append(quetions_rep_2.question)
                 infoeLevelTemp.append(result_temp)
+                infoeLevelTemp.append(text_show)
 
                 infoLevel.append(infoeLevelTemp)
             except:
