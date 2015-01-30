@@ -20,7 +20,9 @@
 		
 	}
 </script>
-
+{{if auth.has_membership('Super-Administrator'):}}
+	<div class="alert"><b>{{=T('Note')}}:</b> {{=T("Students add by the Super Administrator, did't validate with the webservice and is automatically creates a user profiles with academic permission.")}}</div>
+{{pass}}
 {{=grid}}
 
 <!-- PIC MODAL -->

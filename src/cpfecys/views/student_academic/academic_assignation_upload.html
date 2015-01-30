@@ -1,5 +1,5 @@
 {{extend 'template.html'}}
-<a href="{{=URL('academic_assignation')}}" class="btn" ><i class="icon-arrow-left"></i> {{=T('Back')}}</a>
+<a href="{{=URL('student_academic','academic_assignation', vars = dict(assignation=request.vars['assignation']))}}" class="btn" ><i class="icon-arrow-left"></i> {{=T('Back')}}</a>
 
 <h2>
     {{=T('Carga Masiva Alumnos')}}
@@ -29,7 +29,7 @@ aria-hidden="true">×</button>
                   <li>{{=T('The characteristics of the bulk load file are:')}}</li>
                   <dd><li type="circle">{{=T('Comma delimited CSV Extension.')}}</li></dd>
                   <dd>
-                    <li type="circle">{{=T('3 Columns')}}:</li>
+                    <li type="circle">{{=T('2 Columns')}}:</li>
                     <dl>
                         <dd>
                             <li type="disc">
@@ -105,7 +105,8 @@ aria-hidden="true">{{=T('Close')}}</button>
 </div>
 {{else:}}
 <div class="well">
+    <div class="alert alert-warning"><b>{{=T('Note')}}:</b> {{=T('This process can take several minutes')}}.</div>
     {{=FORM(INPUT(_type='file',_name='csvfile'),
-    INPUT(_type='submit',_value='Upload'))}}
+    INPUT(_type='submit',_value=T('Upload')))}}
 </div>
 {{ pass }}

@@ -9,6 +9,10 @@ data-toggle="modal">
 <br>
    <small>{{=name}}</small>
 </h2>
+<a title ="{{=T('This option lets you view the list of all users in the system and add new users')}}" class="btn btn-info" href="{{=URL('student_academic','academic')}}">{{=T('General List of Academic')}}</a>
+        <a class="btn btn-success" href="{{=URL(vars=dict(listado='True'))}}">{{=T('Create Assistance List')}}</a>
+        <!--a class="btn btn-warning" href="{{=(URL('student_academic','attendance_list',vars=dict(list='true',project=check.project,period=currentyear_period.id)))}}">{{=T('Create profiles for academic')}}</a-->
+
 <div id="myModal" class="modal hide fade" tabindex="-1" role="dialog"
 aria-labelledby="myModalLabel" aria-hidden="true">
 
@@ -107,9 +111,7 @@ data-toggle="tab">
             $(input1Str).insertAfter("#w2p_keywords");
           }); 
         </script>
-        <a class="btn btn-info" href="{{=URL('student_academic','academic')}}">{{=T('General List of Academic')}}</a>
-        <a class="btn btn-success" href="{{=URL(vars=dict(listado='True'))}}">{{=T('Create Assistance List')}}</a>
-        <a class="btn btn-warning" href="{{=(URL('student_academic','attendance_list',vars=dict(list='true',project=check.project,period=currentyear_period.id)))}}">{{=T('Create profiles for academic')}}</a>
+        
           {{=grid}}
       </div>
   </div>
@@ -307,8 +309,15 @@ data-toggle="tab">
 </div>
 
 <script type="text/javascript">
+  jQuery('#academic_course_assignation_carnet__label').empty();
+  jQuery('#academic_course_assignation_carnet__label').append('{{=T('Carnet')}}:<div class=\"alert alert-warning\">{{=T('If the student you want to add is not in the list,')}}<br>{{=T(' you must first add it to the list in the ')}}<b>{{=T('General List of Academic')}}</b></div>');
+</script>
+
+<script type="text/javascript">
   function close_errors(){
       $("#error_modal").css("display", "none");
+
+      
   }
   function click_acept_photo(var_id) {
     $("#div_action_2").load("{{=URL('student_academic','photo.load')}}?option=accept&amp;id_user="+var_id );

@@ -37,28 +37,34 @@ def current_year_period():
 response.menu = [(T('Home'), False, URL('default', 'index'), [])]
 if auth.has_membership(role="Super-Administrator"):
     response.menu.extend([
-        (T('Users Administration'), False, URL(),[
+        (T('Users'), False, URL(),[
              (T('Final Practice Admin'), False, URL('admin', 'final_practice'), []),
              (T('Users'), False, URL('admin', 'users'), []),
+             (T('Academic'), False, URL('student_academic','academic'), []),
              (T('Roles'), False, URL('admin', 'roles'), []),
              ]),
-        (T('Assignation Administration'), False, URL(),[
+        (T('Assignation'), False, URL(),[
              (T('Assignation By Semester'), False, URL('admin', 'assignations'), []),
              (T('Assignation Freeze Dates'), False, URL('admin', 'assignation_freeze'), []),
              ]),
-         (T('Projects Administration'), False, URL(),[
+         (T('Projects'), False, URL(),[
             (T('Areas'), False, URL('admin', 'areas'), []),
             (T('Projects'), False, URL('admin', 'projects'), []),
             ]),
-         (T('Frontend Administration'), False, URL(),[
-             (T('Links Manager'), False, URL('admin', 'links'), []),
-             (T('Files Manager'), False, URL('admin', 'files_manager'), []),
-             (T('News'), False, URL('admin', 'notifications_manager'), []),
-             (T('Mail Notifications Manager'), False, URL(), [
-                (T('Send Mail'), False, URL('admin', 'mail_notifications'), []),
-                (T('Mail Log'), False, URL('admin', 'mail_log'), []),]),
-             ]),
-         (T('Reports Administration'), False, URL(),[
+         (T('Academic Control'), False, URL(), [
+            (T('Manage')+" "+T('Academic Control'), False, URL('activity_control','courses_list'), []),
+            (T('Pending Requests'), False, URL('activity_control','courses_list_request'), []),
+            ((T('Parameters'), False, URL(), [    
+                (T('Categories for weighting'), False, URL('activity_control','activity_category'), []),
+                (T('Partials Management'), False, URL('activity_control','partials'), []),
+                (T('Period'), False, URL('activity_control','student_control_period'), [])
+            ])),
+            ((T('Exceptions'), False, URL(), [    
+                (T('Course and Laboratory Exceptions'), False, URL('activity_control','course_laboratory_exception'), []),
+                (T('Course Time Limit Exception'), False, URL('activity_control','course_limit_exception'), [])
+            ]))
+        ]),
+         (T('Practice Reports'), False, URL(),[
              (T('Report Mandatory Blocks'), False, URL('admin', 'report_requirements'), []),
              (T('Reports and Restrictions'), False, URL('admin', 'report_restrictions'), []),
              (T('Items Manager'), False, URL('admin', 'items_manager'), []),
@@ -66,7 +72,30 @@ if auth.has_membership(role="Super-Administrator"):
              (T('Anomalies per periods'), False, URL('admin', 'anomalies_list/periods'), []),
              (T('Delivered Items Administrator'), False, URL('admin', 'manage_items/periods'), []),
              (T('Delivered Download'), False, URL('admin', 'delivered_download'), []),
+         ]),
+        (T('Evaluations')+" 360", False, URL(), [
+            (T('Manage Templates'), False, URL('evaluation','evaluation_template'), []),
+            (T('Manage Evaluations'), False, URL('evaluation','evaluation'), []),
+            (T('Evaluations Repository'), False, URL('evaluation','repository_evaluation'), []),
+            (T('Evaluations Results'), False, URL('evaluation','evaluation_results'), []),
+
+            ((T('Template Parameters'), False, URL(), [    
+                (T('Answers'), False, URL('evaluation','answer'), []),
+                (T('Templates'), False, URL('evaluation','template'), []),
+                (T('Type answer'), False, URL('evaluation','answer_type'), []),
+                (T('Type question'), False, URL('evaluation','question_type'), []),
+                (T('Type evaluation'), False, URL('evaluation','evaluation_type'), [])
+            ]))            
+        ]),
+         (T('Frontend'), False, URL(),[
+             (T('Links Manager'), False, URL('admin', 'links'), []),
+             (T('Files Manager'), False, URL('admin', 'files_manager'), []),
+             (T('News'), False, URL('admin', 'notifications_manager'), []),
+             (T('Mail Notifications Manager'), False, URL(), [
+                (T('Send Mail'), False, URL('admin', 'mail_notifications'), []),
+                (T('Mail Log'), False, URL('admin', 'mail_log'), []),]),
              ]),
+         
          (T('System Configuration'), False, URL(),[
              (T('Parameters configuration'), False, URL('admin', 'parameters'), []),
              (T('Configuration Web Service'), False, URL('student_academic', 'student_validation_parameters'), []),
@@ -78,6 +107,7 @@ if auth.has_membership(role="Super-Administrator"):
              (T('System-wide Mail Logs'), False, URL('mailer', 'index'), []),
              (T('Scheduler Report'), False, URL('admin', 'scheduler_activity'), []),
              ]),
+         
     ])
 
 
@@ -190,39 +220,7 @@ if (auth.is_logged_in()):
         
 
 if auth.has_membership(role="Super-Administrator"):
-    user_menu.append((T('Academic'), False, URL(), [
-    (T('General List of Academic'), False, URL('student_academic','academic'), []),    
-    ]))
-
-if auth.has_membership(role="Super-Administrator"):
-    user_menu.append((T('Academic Control'), False, URL(), [
-        (T('Manage')+" "+T('Academic Control'), False, URL('activity_control','courses_list'), []),
-        (T('Pending Requests'), False, URL('activity_control','courses_list_request'), []),
-        ((T('Parameters'), False, URL(), [    
-            (T('Categories for weighting'), False, URL('activity_control','activity_category'), []),
-            (T('Partials Management'), False, URL('activity_control','partials'), []),
-            (T('Period'), False, URL('activity_control','student_control_period'), [])
-        ])),
-        ((T('Exceptions'), False, URL(), [    
-            (T('Course and Laboratory Exceptions'), False, URL('activity_control','course_laboratory_exception'), []),
-            (T('Course Time Limit Exception'), False, URL('activity_control','course_limit_exception'), [])
-        ]))
-    ]))
-    user_menu.append((T('Evaluations'), False, URL(), [
-        (T('Manage Templates'), False, URL('evaluation','evaluation_template'), []),
-        (T('Manage Evaluations'), False, URL('evaluation','evaluation'), []),
-        (T('Evaluations Repository'), False, URL('evaluation','repository_evaluation'), []),
-        (T('Evaluations Results'), False, URL('evaluation','evaluation_results'), []),
-
-        ((T('Template Parameters'), False, URL(), [    
-            (T('Answers'), False, URL('evaluation','answer'), []),
-            (T('Templates'), False, URL('evaluation','template'), []),
-            (T('Type answer'), False, URL('evaluation','answer_type'), []),
-            (T('Type question'), False, URL('evaluation','question_type'), []),
-            (T('Type evaluation'), False, URL('evaluation','evaluation_type'), [])
-        ]))
-        
-    ]))
+    
     user_menu.append((T('Management Reports'), False, URL(), [
         (T('Grades'), False, URL('management_reports','grades_management'), []),
         (T('Activities Metric'), False, URL('management_reports','activities_withmetric_management'), []),

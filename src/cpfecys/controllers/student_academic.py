@@ -1085,6 +1085,8 @@ def academic():
         grid = SQLFORM.grid(
         query, oncreate=oncreate_academic,links=links, editable=False, onupdate=onupdate_academic, ondelete=ondelete_academic,  maxtextlength=100,csv=False)
     else:
+        db.academic.email.writable = False
+        db.academic.email.default = "email@email.com"
         grid = SQLFORM.grid(
         query, oncreate=oncreate_academic, onupdate=onupdate_academic, ondelete=ondelete_academic,  maxtextlength=100,csv=False,editable=False,deletable=False,details=False)
     return dict(grid=grid)
@@ -1108,12 +1110,11 @@ def oncreate_academic(form):
             i = i+1
         else:
             roll_var = roll_var + ',' + a.group_id.role  
-
     db.academic_log.insert(user_name = auth.user.username, 
                                 roll =  roll_var, 
                                 operation_log = 'insert', 
                                 after_carnet = form.vars.carnet, 
-                                after_email = form.vars.email, 
+                                after_email = "email@email.com", 
                                 id_academic = form.vars.id, 
                                 id_period = str(currentyear_period.id),
                                 description = 'Se agrego registro desde la pagina agregar estudiantes.')

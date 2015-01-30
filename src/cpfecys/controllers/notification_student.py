@@ -123,15 +123,19 @@ def inbox_student_mails_load():
 def send_mail():        
     import cpfecys
     cperiod = cpfecys.current_year_period()
+    
 
+    assigned = db((db.user_project.assigned_user == auth.user.id) & ((db.user_project.period <= cperiod.id) & \
+                        ((db.user_project.period + db.user_project.periods + 1) > cperiod.id)) & (db.user_project.project==request.vars['project']) ).select(db.user_project.ALL).first()
     try:
-        carnet_var = db(db.academic.id_auth_user==auth.user.id).select().first()
-        assigned_user_var = db((db.academic_course_assignation.carnet==carnet_var.id)&(db.academic_course_assignation.assignation==request.vars['project'])).select().first()
-        if (assigned_user_var.semester == cperiod.id) or ((assigned_user_var.semester + 1) == cperiod.id):
-            None
-        else:
-            session.flash  =T('Not authorized')
-            redirect(URL('default','index'))
+        if assigned is None:
+            carnet_var = db(db.academic.id_auth_user==auth.user.id).select().first()
+            assigned_user_var = db((db.academic_course_assignation.carnet==carnet_var.id)&(db.academic_course_assignation.assignation==request.vars['project'])).select().first()
+            if (assigned_user_var.semester == cperiod.id) or ((assigned_user_var.semester + 1) == cperiod.id):
+                None
+            else:
+                session.flash  =T('Not authorized')
+                redirect(URL('default','index'))
     except:
         session.flash  =T('Not authorized')
         redirect(URL('default','index'))
@@ -195,7 +199,7 @@ def send_mail():
             remessage = request.vars['remessage']
             retime = request.vars['retime']
             resub = request.vars['resub']
-            project_var = db.project(db.project.id==request.vars['var_project_id'])
+            project_var = db.project(db.project.id==request.vars['project'])
             var_project_name = project_var.name
             return dict(email=email,name=name,remessage=remessage,retime=retime,resub=resub,var_project_name=var_project_name)
         else:

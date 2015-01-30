@@ -1249,6 +1249,7 @@ def academic_update(*args):
 def academic_insert(*args):
     academic_var = db.auth_group(db.auth_group.role=='Academic')
     user_var = db.auth_user(db.auth_user.username==str(args[0]['carnet']))
+    session.flash = T('Academic added.')
     if user_var is None:
         #WEBSERVICE
         web_service = check_student(str(args[0]['carnet']))
@@ -1318,6 +1319,7 @@ def academic_insert(*args):
                        roll_var = roll_var + ',' + a.group_id.role
                 import cpfecys
                 currentyear_period = cpfecys.current_year_period()
+                session.flash = T('The record was removed because it failed the webservice validation')
                 db.academic_log.insert(user_name = auth.user.username, 
                             roll =  str(roll_var), 
                             operation_log = 'delete', 

@@ -30,13 +30,15 @@
 			</td>
 		</tr>
 		<tr>
-			<td  style="width:15%;">
+			<td  colspan = style="width:15%;">
 				<b>{{=T('Evaluator')}}</b>
 			</td>
 			<td  style="width:35%;">
+
 				<img id="img_img" src="{{= URL('default/download', auth.user.photo)}}" alt="No photo" height="30px" width="30px">
 				{{=str(auth.user.first_name)}}
 				{{=str(auth.user.last_name)}}
+
 			</td>
 			<td  style="width:15%;">
 				<b>{{=T('Evaluated')}}</b>
@@ -67,6 +69,7 @@
 			</td>
 		</tr>
 	</table>
+	<div class="alert"><div align="left"><b>{{=T('Note')}}:</b> {{=T('Your data will not be stored in answering the evaluation')}}.</div></div>
 	<table class="table table-striped table-bordered">
 		{{for category in question_category:}}
 			{{category = db(db.question_repository.question_type_name == category.question_type_name).select().first() }}
