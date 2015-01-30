@@ -805,6 +805,30 @@ def periods():
     grid = SQLFORM.grid(db.period_year)
     return locals()
 
+
+@auth.requires_login()
+@auth.requires(auth.has_membership('Student') or auth.has_membership('Teacher'))
+def example_upload():
+    #FILE
+    infoLevel = []
+    #HEADER OF FILE
+    infoeLevelTemp=[]
+    infoeLevelTemp.append('Carne')
+    infoeLevelTemp.append('Laboratorio')
+    infoLevel.append(infoeLevelTemp)
+    #BODY OF FILE
+    infoeLevelTemp=[]
+    infoeLevelTemp.append('200000001')
+    infoeLevelTemp.append('T')
+    infoLevel.append(infoeLevelTemp)
+    infoeLevelTemp=[]
+    infoeLevelTemp.append('200000002')
+    infoeLevelTemp.append('F')
+    infoLevel.append(infoeLevelTemp)
+    return dict(filename='Ejemplo_Carga_Alumno', csvdata=infoLevel)
+
+
+
 @auth.requires_login()
 @auth.requires(auth.has_membership('Student') or auth.has_membership('Teacher'))
 def academic_assignation_upload():
