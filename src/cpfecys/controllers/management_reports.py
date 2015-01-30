@@ -8210,7 +8210,8 @@ def performance_students():
     groupPeriods = None
     project = None
     period = None
-    typeFinal = None
+    type_Level = None
+    controlP= None
     categoriesLevel = []
     try:
         #CHECK THAT THE LEVEL OF REPORT IS VALID
@@ -8521,7 +8522,6 @@ def performance_students():
             type_Level = str(request.vars['type_L']).split('_')
             #LABORATORY
             if type_Level[0]=='l' or type_Level[0]=='c':
-                typeFinal = 'Laboratorio'
                 categoriesLab = []
                 for categories in db((db.course_activity_category.assignation == project.id) &(db.course_activity_category.semester== period.id)&(db.course_activity_category.laboratory==True)).select():
                     activityClass = []
@@ -8529,11 +8529,12 @@ def performance_students():
                     for activity in db(db.course_activity.course_activity_category == categories.id).select():
                         activityClass.append(activity)
                         totalA=totalA+1
+                    if totalA<1:
+                        totalA=1
                     categoriesLab.append([categories,activityClass,totalA])
 
             #CLASS
             if type_Level[0]=='c':
-                typeFinal = 'Clase'
                 categoriesClass = []
                 for categories in db((db.course_activity_category.assignation == project.id) &(db.course_activity_category.semester== period.id)&(db.course_activity_category.laboratory==False)).select():
                     if categories.category.category != 'Laboratorio':
@@ -8542,15 +8543,22 @@ def performance_students():
                         for activity in db(db.course_activity.course_activity_category == categories.id).select():
                             activityClass.append(activity)
                             totalA=totalA+1
+                        if totalA<1:
+                            totalA=1
                         categoriesClass.append([categories,activityClass,totalA])
                     else:
                         categoriesClass.append([categories,0])
+                categoriesLevel = categoriesClass
+            else:
+                categoriesLevel = categoriesLab
 
             #GRADE OF STUDENT
             for student in db((db.academic_course_assignation.semester==period.id)&(db.academic_course_assignation.assignation==project.id)).select():
+                student_Temp = []
                 grade_Laboratory = int(0)
                 totalCarry=float(0)
                 totalFinal=float(0)
+                student_Temp.append(student.carnet.carnet)
 
                 #GRADE OF LABORATORY
                 validate_laboratory = db((db.validate_laboratory.semester==period.id)&(db.validate_laboratory.project==project.id)&(db.validate_laboratory.carnet==student.id)).select().first()
@@ -8572,44 +8580,73 @@ def performance_students():
                                     totalActivities_Lab=category_Lab[2]*100
                                     totalCategory_Lab=float((totalCategory_Lab*float(category_Lab[0].grade))/float(totalActivities_Lab))
                                 totalCarry_Lab=totalCarry_Lab+totalCategory_Lab
+                                if type_Level[0]=='l':
+                                    checkGrade = float((totalCategory_Lab*float(100))/float(category_Lab[0].grade))
+                                    student_Temp.append(checkGrade)
                             grade_Laboratory=int(round(totalCarry_Lab,0))
+                            if type_Level[0]=='l':
+                                student_Temp.append(grade_Laboratory)
+                                if grade_Laboratory<int(controlP.min_average):
+                                    if str(type_Level[1])=="all" or str(type_Level[1])=="d":
+                                        infoLevel.append(student_Temp)
+                                elif grade_Laboratory>=int(controlP.min_average) and grade_Laboratory<=int(controlP.max_average):
+                                    if str(type_Level[1])=="all" or str(type_Level[1])=="u":
+                                        infoLevel.append(student_Temp)
+                                else:
+                                    if str(type_Level[1])=="all" or str(type_Level[1])=="i":
+                                        infoLevel.append(student_Temp)
                 else:
                     grade_Laboratory=int(round(validate_laboratory.grade,0))
                 
 
                 #GRADE OF CLASS
                 if type_Level[0]=='c':
-                    for categoryClass in categoriesClass:
-                        totalCategory=float(0)
-                        if categoryClass[0].category.category == 'Examen Final':
-                            for c in categoryClass[1]:
-                                studentGrade = db((db.grades.activity==c.id)&(db.grades.academic_assignation==student.id)).select().first()
-                                if studentGrade is not None:
-                                    if categoryClass[0].specific_grade==True:
-                                        totalFinal=totalFinal+float((studentGrade.grade*c.grade)/100)
-                                    else:
-                                        totalFinal=totalFinal+float(studentGrade.grade)
+                    if len(categoriesClass)>0:
+                        for categoryClass in categoriesClass:
+                            totalCategory=float(0)
+                            if categoryClass[0].category.category == 'Examen Final':
+                                for c in categoryClass[1]:
+                                    studentGrade = db((db.grades.activity==c.id)&(db.grades.academic_assignation==student.id)).select().first()
+                                    if studentGrade is not None:
+                                        if categoryClass[0].specific_grade==True:
+                                            totalFinal=totalFinal+float((studentGrade.grade*c.grade)/100)
+                                        else:
+                                            totalFinal=totalFinal+float(studentGrade.grade)
 
-                            if categoryClass[0].specific_grade==False:
-                                totalActivities=categoryClass[2]*100
-                                totalFinal=float((totalFinal*float(categoryClass[0].grade))/float(totalActivities))
-                            totalFinal=int(round(totalFinal,0))
-                        elif categoryClass[0].category.category == 'Laboratorio':
-                            totalCategory=float((grade_Laboratory*categoryClass[0].grade)/100)
-                            totalCarry=totalCarry+totalCategory
+                                if categoryClass[0].specific_grade==False:
+                                    totalActivities=categoryClass[2]*100
+                                    totalFinal=float((totalFinal*float(categoryClass[0].grade))/float(totalActivities))
+                                totalFinal=int(round(totalFinal,0))
+                                checkGrade = float((totalFinal*float(100))/float(categoryClass[0].grade))
+                                student_Temp.append(checkGrade)
+                            elif categoryClass[0].category.category == 'Laboratorio':
+                                totalCategory=float((grade_Laboratory*categoryClass[0].grade)/100)
+                                totalCarry=totalCarry+totalCategory
+                                student_Temp.append(grade_Laboratory)
+                            else:
+                                for c in categoryClass[1]:
+                                    studentGrade = db((db.grades.activity==c.id)&(db.grades.academic_assignation==student.id)).select().first()
+                                    if studentGrade is not None:
+                                        if categoryClass[0].specific_grade==True:
+                                            totalCategory=totalCategory+float((studentGrade.grade*c.grade)/100)
+                                        else:
+                                            totalCategory=totalCategory+float(studentGrade.grade)
+
+                                if categoryClass[0].specific_grade==False:
+                                    totalActivities=categoryClass[2]*100
+                                    totalCategory=float((totalCategory*float(categoryClass[0].grade))/float(totalActivities))
+                                totalCarry=totalCarry+totalCategory
+                                checkGrade = float((totalCategory*float(100))/float(categoryClass[0].grade))
+                                student_Temp.append(checkGrade)
+                        totalCarry=int(round(totalCarry,0))+totalFinal
+                        student_Temp.append(totalCarry)
+                        if totalCarry<int(controlP.min_average):
+                            if str(type_Level[1])=="all" or str(type_Level[1])=="d":
+                                infoLevel.append(student_Temp)
+                        elif totalCarry>=int(controlP.min_average) and totalCarry<=int(controlP.max_average):
+                            if str(type_Level[1])=="all" or str(type_Level[1])=="u":
+                                infoLevel.append(student_Temp)
                         else:
-                            for c in categoryClass[1]:
-                                studentGrade = db((db.grades.activity==c.id)&(db.grades.academic_assignation==student.id)).select().first()
-                                if studentGrade is not None:
-                                    if categoryClass[0].specific_grade==True:
-                                        totalCategory=totalCategory+float((studentGrade.grade*c.grade)/100)
-                                    else:
-                                        totalCategory=totalCategory+float(studentGrade.grade)
-
-                            if categoryClass[0].specific_grade==False:
-                                totalActivities=categoryClass[2]*100
-                                totalCategory=float((totalCategory*float(categoryClass[0].grade))/float(totalActivities))
-
-                            totalCarry=totalCarry+totalCategory
-                    totalCarry=int(round(totalCarry,0))+totalFinal
-    return dict(groupPeriods=groupPeriods, period=period, project = project, infoLevel=infoLevel, exist_Laboratory=exist_Laboratory, typeFinal=typeFinal, categoriesLevel=categoriesLevel)
+                            if str(type_Level[1])=="all" or str(type_Level[1])=="i":
+                                infoLevel.append(student_Temp)
+    return dict(groupPeriods=groupPeriods, period=period, project = project, infoLevel=infoLevel, exist_Laboratory=exist_Laboratory, type_Level=type_Level, categoriesLevel=categoriesLevel, controlP=controlP)
