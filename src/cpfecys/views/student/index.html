@@ -214,50 +214,52 @@
                                     </td>
                                 </tr>
                                 {{pass}}
-                                {{cperiod_year = cpfecys.current_year_period()}}
-                                {{for available_report in  \
-                                available_reports(cperiod_year).select():}}
-                                    {{if to_be_created(available_report, \
-                                    item.user_project):}}
-                                    <tr class="info">
-                                        <td>
-                                          {{=available_report.name}}
-                                        </td>
-                                        <td>
-                                          {{=T('Pending')}}
-                                        </td>
-                                        <td>
-                                          {{=str(available_report.start_date) \
-                                            + ' - ' + \
-                                                str(available_report.end_date)}}
-                                        </td>
-                                        <td>
-                                          {{=T('Pending')}}
-                                        </td>
-                                        <td>
-                                          0
-                                        </td>
-                                        <td>
-                                          <div class="label label-info">
-                                            {{=T('Grade pending')}}
-                                          </div>
-                                        </td>
-                                        <td>
-                                          <div class="label">
-                                            {{=T('Pending')}}
-                                          </div>
-                                        </td>
-                                        <td>
-                                          <a class="btn btn-info" 
-                                          href="{{=URL('student','report/create', \
-                                          vars=dict(assignation = \
-                                          item.user_project.id, report_restriction = \
-                                          available_report.id))}}">
-                                            <span class="icon-plus"></span>
-                                            {{=T('Create Report')}}
-                                          </a>
-                                        </td>
-                                    </tr>
+                                {{if not cpfecys.assignation_is_locked(item.user_project):}}
+                                    {{cperiod_year = cpfecys.current_year_period()}}
+                                    {{for available_report in  \
+                                    available_reports(cperiod_year).select():}}
+                                        {{if to_be_created(available_report, \
+                                        item.user_project):}}
+                                        <tr class="info">
+                                            <td>
+                                              {{=available_report.name}}
+                                            </td>
+                                            <td>
+                                              {{=T('Pending')}}
+                                            </td>
+                                            <td>
+                                              {{=str(available_report.start_date) \
+                                                + ' - ' + \
+                                                    str(available_report.end_date)}}
+                                            </td>
+                                            <td>
+                                              {{=T('Pending')}}
+                                            </td>
+                                            <td>
+                                              0
+                                            </td>
+                                            <td>
+                                              <div class="label label-info">
+                                                {{=T('Grade pending')}}
+                                              </div>
+                                            </td>
+                                            <td>
+                                              <div class="label">
+                                                {{=T('Pending')}}
+                                              </div>
+                                            </td>
+                                            <td>
+                                              <a class="btn btn-info" 
+                                              href="{{=URL('student','report/create', \
+                                              vars=dict(assignation = \
+                                              item.user_project.id, report_restriction = \
+                                              available_report.id))}}">
+                                                <span class="icon-plus"></span>
+                                                {{=T('Create Report')}}
+                                              </a>
+                                            </td>
+                                        </tr>
+                                        {{pass}}
                                     {{pass}}
                                 {{pass}}
                             </tbody>

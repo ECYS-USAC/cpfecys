@@ -35,6 +35,7 @@ def assignation_done_succesful(assignation):
     total_reports = assignation.report.count()
     min_score = db(db.custom_parameters.id>0).select().first().min_score
     sum_reports = 0
+    validate_Report = True
     for report in assignation.report.select():
         # Check DTT Approval
         if report.dtt_approval is None:
@@ -45,7 +46,7 @@ def assignation_done_succesful(assignation):
             message += ' '
         elif report.dtt_approval is False:
             # I don't think status has to change since by average the student can win
-            # status = False
+            status = False
             message += T('A report was not approved by DTT Admin. Thus considered failed.')
             message += ' '
         else:
@@ -60,11 +61,23 @@ def assignation_done_succesful(assignation):
                     sum_reports += float(report.admin_score)
                 else:
                     sum_reports += float(report.admin_score)
+                if report.min_score is None:
+                    if report.admin_score < min_score:
+                        validate_Report = False
+                else:
+                    if report.admin_score < report.min_score:
+                        validate_Report = False
             else:
                 sum_reports += float(report.score)
+                if report.min_score is None:
+                    if report.score < min_score:
+                        validate_Report = False
+                else:
+                    if report.score < report.min_score:
+                        validate_Report = False
     # Check the grade (average) to be beyond the expected minimal grade in current settings
     
-    if (float(sum_reports)/float(total_reports)) < min_score:
+    if (float(sum_reports)/float(total_reports)) < min_score or validate_Report==False:
         #he lost the practice due to reports
         status = False
         message += T('To consider assignation to be valid, report grades should be above: ') + min_score
@@ -927,6 +940,39 @@ def auto_daily():
                                  never_delivered = True,
                                  teacher_comment =  T('The period of time to create the report finished and it was never completed; so automatically it is considered as failed.'))
     
+    if currentyear_period.period == cpfecys.first_period.id:
+        date_min = datetime.datetime(currentyear_period.yearp-1, 7, 1)
+        date_max = datetime.datetime(currentyear_period.yearp, 1, 1)
+    else:
+        date_min = datetime.datetime(currentyear_period.yearp, 1, 1)
+        date_max = datetime.datetime(currentyear_period.yearp, 7, 1)
+    expired_restrictions = db((db.report_restriction.end_date < current_date)&
+                              (db.report_restriction.start_date >= date_min)&
+                              (db.report_restriction.end_date >= date_min)&
+                              (db.report_restriction.start_date < date_max)&
+                              (db.report_restriction.end_date < date_max)&
+                              (db.report_restriction.is_enabled == True)).select()
+    ## Get all assignations for this period_year
+    semester_assignations = db((db.user_project.period <= currentyear_period.id-1)&
+                     ((db.user_project.period + db.user_project.periods) > currentyear_period.id-1)).select()
+    # For every assignation and restriction
+    ## This makes all missed assignations automatically not sent and set to failed reports :(
+    missed_reports = 0
+    status_acceptance = db.report_status(db.report_status.name == 'Acceptance')
+    for assignation in semester_assignations:
+        for restriction in expired_restrictions:
+            reports = db((db.report.assignation == assignation.id)&
+                         (db.report.report_restriction == restriction.id)).count()
+            if not(reports > 0):
+                missed_reports += 1
+                db.report.insert(assignation = assignation.id,
+                                 min_score = cpfecys.get_custom_parameters().min_score,
+                                 report_restriction = restriction.id,
+                                 created = current_date,
+                                 score = 0,
+                                 status = status_acceptance,
+                                 never_delivered = True,
+                                 teacher_comment =  T('The period of time to create the report finished and it was never completed; so automatically it is considered as failed.'))
 
 
     #***********************************************************************************************************************
