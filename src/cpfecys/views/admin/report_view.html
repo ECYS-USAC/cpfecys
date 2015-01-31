@@ -432,6 +432,18 @@
             </div>
         </div>
         <div class="row-fluid">
+          {{if report.assignation.project.area_level.name=='DTT Tutor Académico' and (report.status.name=='Draft' or report.status.name=='Recheck'):}}
+            {{for log in activitiesTutor['activities_F']:}}
+                <!-- Display Helper -->
+                {{inc_vars = dict(editable = False,
+                date = log.date_start,
+                edit_action = None,
+                delete_action = None,
+                content = MARKMIN('Nombre: "'+log.name+'" Descripción: "'+log.description+'"', markmin_settings))}}
+                {{include 'include/display-report-log-future.html'}}
+                <!-- //Display Helper -->
+            {{pass}}
+          {{else:}}
             {{for log in report.log_future.select():}}
             <!-- Display Helper -->
             {{inc_vars = dict(editable = False,
@@ -442,6 +454,7 @@
             {{include 'include/display-report-log-future.html'}}
             <!-- //Display Helper -->
             {{pass}}
+          {{pass}}
         </div>
     </div>
     {{if not(report.footer is None):}}

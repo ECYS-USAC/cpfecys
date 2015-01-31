@@ -782,7 +782,7 @@ def activities_report_tutor(report):
 
         #Activities with metric
         activitiesMBefore = db((db.log_entry.log_type==temp_logType)&(db.log_entry.period==cperiod.id)&(db.log_entry.tActivity==True)&(db.log_entry.report.belongs(beforeReports))).select(db.log_entry.idActivity.with_alias('id'))
-        activitiesGrades = db(db.grades).select(db.grades.activity.with_alias('id'), distinct=True)
+        activitiesGrades = db((db.grades.academic_assignation==db.academic_course_assignation.id)&(db.academic_course_assignation.semester==cperiod.id)&(db.academic_course_assignation.assignation==report.assignation.project)).select(db.grades.activity.with_alias('id'), distinct=True)
         if activitiesGrades.first() is not None:
             activities_M_Real=[]
             if activitiesMBefore.first() is None:
@@ -956,7 +956,7 @@ def auto_daily():
                                     description=awm[1],
                                     report=d.report.id,
                                     period=cperiod.id,
-                                    tActivity='F',
+                                    tActivity='T',
                                     idActivity=awm[17]
                                     )
                 db.log_metrics.insert(description=awm[1],
@@ -1011,7 +1011,7 @@ def auto_daily():
                                     description=awm[1],
                                     report=rech.report.id,
                                     period=cperiod.id,
-                                    tActivity='F',
+                                    tActivity='T',
                                     idActivity=awm[17]
                                     )
                 db.log_metrics.insert(description=awm[1],

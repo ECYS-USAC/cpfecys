@@ -1700,7 +1700,7 @@ def report():
 
                 #Activities with metric
                 activitiesMBefore = db((db.log_entry.log_type==temp_logType)&(db.log_entry.period==cperiod.id)&(db.log_entry.tActivity==True)&(db.log_entry.report.belongs(beforeReports))).select(db.log_entry.idActivity.with_alias('id'))
-                activitiesGrades = db(db.grades).select(db.grades.activity.with_alias('id'), distinct=True)
+                activitiesGrades = db((db.grades.academic_assignation==db.academic_course_assignation.id)&(db.academic_course_assignation.semester==cperiod.id)&(db.academic_course_assignation.assignation==report.assignation.project)).select(db.grades.activity.with_alias('id'), distinct=True)
                 if activitiesGrades.first() is not None:
                     activities_M_Real=[]
                     if activitiesMBefore.first() is None:
@@ -1789,7 +1789,7 @@ def report():
         if activities_F is None:
             activities_F=[]
 
-        activities_count = activities_count+len(activities_WM)
+        activities_count = activities_count+len(activities_WM)+len(activities_M)
         metrics_count = metrics_count+len(activities_M)
         #***********************************************************************************************************************
         #******************************************************PHASE 2 DTT******************************************************
@@ -1955,7 +1955,7 @@ def report():
 
                 #Activities with metric
                 activitiesMBefore = db((db.log_entry.log_type==temp_logType)&(db.log_entry.period==cperiod.id)&(db.log_entry.tActivity==True)&(db.log_entry.report.belongs(beforeReports))).select(db.log_entry.idActivity.with_alias('id'))
-                activitiesGrades = db(db.grades).select(db.grades.activity.with_alias('id'), distinct=True)
+                activitiesGrades = db((db.grades.academic_assignation==db.academic_course_assignation.id)&(db.academic_course_assignation.semester==cperiod.id)&(db.academic_course_assignation.assignation==report.assignation.project)).select(db.grades.activity.with_alias('id'), distinct=True)
                 if activitiesGrades.first() is not None:
                     activities_M_Real=[]
                     if activitiesMBefore.first() is None:
@@ -2044,7 +2044,7 @@ def report():
         if activities_F is None:
             activities_F=[]
 
-        activities_count = activities_count+len(activities_WM)
+        activities_count = activities_count+len(activities_WM)+len(activities_M)
         metrics_count = metrics_count+len(activities_M)
         #***********************************************************************************************************************
         #******************************************************PHASE 2 DTT******************************************************
@@ -2145,7 +2145,7 @@ def report():
                                     description=awm[1],
                                     report=report.id,
                                     period=cperiod.id,
-                                    tActivity='F',
+                                    tActivity='T',
                                     idActivity=awm[17]
                                     )
                 db.log_metrics.insert(description=awm[1],
@@ -2346,7 +2346,7 @@ def report():
 
                     #Activities with metric
                     activitiesMBefore = db((db.log_entry.log_type==temp_logType)&(db.log_entry.period==cperiod.id)&(db.log_entry.tActivity==True)&(db.log_entry.report.belongs(beforeReports))).select(db.log_entry.idActivity.with_alias('id'))
-                    activitiesGrades = db(db.grades).select(db.grades.activity.with_alias('id'), distinct=True)
+                    activitiesGrades = db((db.grades.academic_assignation==db.academic_course_assignation.id)&(db.academic_course_assignation.semester==cperiod.id)&(db.academic_course_assignation.assignation==report.assignation.project)).select(db.grades.activity.with_alias('id'), distinct=True)
                     if activitiesGrades.first() is not None:
                         activities_M_Real=[]
                         if activitiesMBefore.first() is None:
