@@ -3862,7 +3862,8 @@ def Course_Format_Technical_School():
 
     if totalW!=float(100):
         session.flash= T('Can not find the correct weighting defined in the course. You can not use this function')
-        redirect(URL('default','index'))
+        
+        redirect(URL('activity_control','students_control', vars = dict(period=request.vars['period'],project=request.vars['project']) ))
 
 
     totalW=float(0)
@@ -3890,7 +3891,7 @@ def Course_Format_Technical_School():
 
         if totalW!=float(100):
             session.flash= T('Can not find the correct weighting defined in the laboratory. You can not use this function')
-            redirect(URL('default','index'))
+            redirect(URL('activity_control','students_control', vars = dict(period=request.vars['period'],project=request.vars['project']) ))
 
     requirement = db((db.course_requirement.semester==year.id)&(db.course_requirement.project==project_var.id)).select().first()
 
@@ -4205,7 +4206,7 @@ def general_report_activities_export():
     if request.vars['type'] == 'class':
         if totalW!=float(100):
             session.flash= T('Can not find the correct weighting defined in the course. You can not use this function')
-            redirect(URL('default','index'))
+            redirect(URL('activity_control','students_control', vars = dict(period=request.vars['period'],project=request.vars['project']) ))
 
     totalW=float(0)
     LabCategory=None
@@ -4232,7 +4233,7 @@ def general_report_activities_export():
 
         if totalW!=float(100):
             session.flash= T('Can not find the correct weighting defined in the laboratory. You can not use this function')
-            redirect(URL('default','index'))
+            redirect(URL('activity_control','students_control', vars = dict(period=request.vars['period'],project=request.vars['project']) ))
 
     requirement = db((db.course_requirement.semester==year.id)&(db.course_requirement.project==project_var.id)).select().first()
 
@@ -4673,7 +4674,7 @@ def General_report_activities():
     if request.vars['type'] == 'class':
         if totalW!=float(100):
             session.flash= T('Can not find the correct weighting defined in the course. You can not use this function')
-            redirect(URL('default','index'))
+            redirect(URL('activity_control','students_control', vars = dict(period=request.vars['period'],project=request.vars['project']) ))
 
     totalW=float(0)
     LabCategory=None
@@ -4700,7 +4701,7 @@ def General_report_activities():
 
         if totalW!=float(100):
             session.flash= T('Can not find the correct weighting defined in the laboratory. You can not use this function')
-            redirect(URL('default','index'))
+            redirect(URL('activity_control','students_control', vars = dict(period=request.vars['period'],project=request.vars['project']) ))
 
     #Enable the course
     if request.vars['list'] =='cancel':

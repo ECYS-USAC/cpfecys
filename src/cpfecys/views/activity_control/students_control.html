@@ -10,8 +10,18 @@
           <span class="icon-white icon-question-sign"></span>
       </a>
       <br>
-      <small>{{=nameP}}</small>
+        <small>{{=nameP}}</small>
     </h1>
+    <div align="right">
+      <a class="btn btn-info" title="{{=T('General Report of Activities')}}" href="{{=URL('activity_control', 'General_report_activities',vars=dict(project = request.vars['project'], period = year, type='class'))}}" data-step="{{step_count+=1}}{{=step_count}}" data-intro="Esta opción le permitirá visualizar el listado de los alumnos asignados al curso con sus respectivas notas. También podrá gestionar los exámenes de retrasadas, los requisitos del curso entre otras opciones. "> 
+          <span class="icon-file"></span>
+        {{=T('Class Report')}}
+        </a>
+        <a class="btn btn-info" title="{{=T('General Report of Activities')}}" href="{{=URL('activity_control', 'General_report_activities',vars=dict(project = request.vars['project'], period = year, type='lab'))}}"> 
+          <span class="icon-file"></span>
+        {{=T('Laboratory Report')}}
+        </a>
+    </div>
     <table style="width:100%;">
       <tr>
         <td style="width:25%;">

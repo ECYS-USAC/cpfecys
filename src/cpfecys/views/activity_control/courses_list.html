@@ -160,10 +160,15 @@
 						{{pass}}
 						>
 							<div class="navbar-inner">
-								<center><h4>{{=split_name(course.user_project.project.name)}}</h4></center>
+								<a style="cursor:pointer;" onclick="click_project_{{=course.user_project.project}}()"><center><h4>{{=split_name(course.user_project.project.name)}}</h4></center></a>
+								<script type="text/javascript">
+									function click_project_{{=course.user_project.project}}(){
+										$("#div_course_{{=course.user_project.project}}").toggle(300);
+									}
+								</script>
 							</div>
 						</div>
-						<div class="well">
+						<div class="well" id="div_course_{{=course.user_project.project}}">
 						<table>
 							<tr>
 								<td width="35%"
@@ -446,10 +451,16 @@
 						{{pass}}
 						>
 							<div class="navbar-inner" >
-								<center><h4>{{=split_name(course.user_project.project.name)}}</h4></center>
+								<a style="cursor:pointer;" onclick="click_project_student_{{=course.user_project.project}}()"><center><h4>{{=split_name(course.user_project.project.name)}}</h4></center></a>
+								<script type="text/javascript">
+									function click_project_student_{{=course.user_project.project}}(){
+										$("#div_course_student_{{=course.user_project.project}}").toggle(300);
+									}
+								</script>
 							</div>
+
 						</div>
-						<div class="well">
+						<div class="well" id="div_course_student_{{=course.user_project.project}}">
 						<table>
 							<tr>
 								<td width="35%"
@@ -603,12 +614,9 @@
 			</table>
 			{{pass}}
 
-			{{if countcoursesAdminT!=0 and coursesStudentT!=0:}}
-			<br><br>
-			{{pass}}
 			
 			{{if coursesStudentT>0:}}
-				<table width="77%">
+				<table >
 					{{var_do=True}}
 					{{for course in coursesStudent:}}
 						<tr>
@@ -619,10 +627,15 @@
 							{{pass}}
 							>
 								<div class="navbar-inner">
-									<center><h4>{{=split_name(course.academic_course_assignation.assignation.name)}}</h4></center>
+									<a style="cursor:pointer;" onclick="click_project_academic_{{=course.academic_course_assignation.assignation}}()"><center><h4>{{=split_name(course.academic_course_assignation.assignation.name)}}</h4></center></a>
+									<script type="text/javascript">
+										function click_project_academic_{{=course.academic_course_assignation.assignation}}(){
+											$("#div_course_academic_{{=course.academic_course_assignation.assignation}}").toggle(300);
+										}
+									</script>
 								</div>
 							</div>
-							<div class="well" style="background-color:#FAFAFA;">
+							<div class="well" style="background-color:#FAFAFA;" id="div_course_academic_{{=course.academic_course_assignation.assignation}}">
 							<table>
 								<tr>
 									<td width="45%"
