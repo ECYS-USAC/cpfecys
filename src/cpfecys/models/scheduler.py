@@ -906,7 +906,8 @@ def auto_daily():
                               (db.report_restriction.end_date < date_max)&
                               (db.report_restriction.is_enabled == True)).select()
     ## Get all assignations for this period_year
-    semester_assignations = db((db.user_project.period <= currentyear_period.id)).select()
+    semester_assignations = db((db.user_project.period <= currentyear_period.id)&
+                     ((db.user_project.period + db.user_project.periods) > currentyear_period.id)).select()
     # For every assignation and restriction
     ## This makes all missed assignations automatically not sent and set to failed reports :(
     missed_reports = 0
