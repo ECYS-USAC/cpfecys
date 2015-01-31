@@ -8204,7 +8204,6 @@ def change_request_grades_management():
 @auth.requires(auth.has_membership('Super-Administrator') or auth.has_membership('Ecys-Administrator'))
 def performance_students():
     #************************************************PARAMETERS AND VALIDATION***************************************
-    from datetime import datetime
     infoLevel = []
     exist_Laboratory = False
     groupPeriods = None
@@ -8553,7 +8552,7 @@ def performance_students():
                 categoriesLevel = categoriesLab
 
             #GRADE OF STUDENT
-            for student in db((db.academic_course_assignation.semester==period.id)&(db.academic_course_assignation.assignation==project.id)).select():
+            for student in db((db.academic.id==db.academic_course_assignation.carnet)&(db.academic_course_assignation.semester == period.id) & (db.academic_course_assignation.assignation==project.id)).select(db.academic_course_assignation.ALL, orderby=db.academic.carnet):
                 student_Temp = []
                 grade_Laboratory = int(0)
                 totalCarry=float(0)
