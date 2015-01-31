@@ -1754,7 +1754,6 @@ def send_mail_to_users(users, message, roles, projects, subject, log=False):
 
     userList= []
     for user in users:
-        #print user.email
         if user.email != None and user.email != '':
             userList.append(user.email)
 
@@ -2243,7 +2242,6 @@ def report_filter():
             +'<br/>' \
             + T('DTT-ECYS') \
             + ' ' + cpfecys.get_domain() + '<br />' + signat + '</html>'
-            print message
             was_sent = mail.send(to=user.email,
               subject=subject,
               message=message)

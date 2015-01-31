@@ -962,7 +962,6 @@ def report_header():
             session.flash = T('Report updated.')
             redirect(URL('student','report/edit', vars = dict(report = report.id)))
         else:
-            print 5
             session.flash = T('Selected report can\'t be edited. Select a valid report.')
             redirect(URL('student','index'))
     raise HTTP(404)
