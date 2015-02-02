@@ -2811,5 +2811,5 @@ def final_practice():
 def users():
     orderby = dict(auth_user=[db.auth_user.first_name, \
                 db.auth_user.username])
-    grid = SQLFORM.smartgrid(db.auth_user,linked_tables=['auth_membership','auth_event','auth_cas','user_project'], orderby=orderby)
+    grid = SQLFORM.smartgrid(db.auth_user,linked_tables=['auth_membership','auth_event','auth_cas','user_project','item','report'], orderby=orderby)
     return dict(grid = grid)
