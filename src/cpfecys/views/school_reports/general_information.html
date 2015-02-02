@@ -14,7 +14,7 @@
     	<div>
     	<!--HEADER OF REPORT-->
 	    	{{if request.vars['level'] is not None and str(request.vars['level'])!="1":}}
-	    	<div class="pull-left noPrint">
+	    	<div class="pull-left">
 	    		<a style="white-space:nowrap; cursor:pointer; align:right;" class="btn" onclick="levelUP();">
 	    			<span class="icon-black icon-arrow-up"></span><b>{{=T('Level Up')}}</b>
 	    		</a>
@@ -31,7 +31,7 @@
 			<strong>Escuela de Ciencias y Sistemas</strong></center><br/>
 			<strong>{{=T('Type')}}: </strong> {{=T('Performance of students')}}<br/>
 			<strong>{{=T('Description')}}: </strong> {{=T('Report on the overview of the courses registered in the system.')}}<br/>
-			<strong>{{=T('Period')}}: </strong> {{=T(period.period.name)}}-{{=period.yearp}}
+			<strong>{{=T('Period')}}: </strong> {{=T(period.period.name)}} {{=period.yearp}}
     	<!--HEADER OF REPORT-->
     	{{if request.vars['level'] is None or str(request.vars['level'])=="1":}}
     		<form class="form-inline" action="{{=URL('school_reports','general_information')}}" method='get'>
@@ -110,7 +110,103 @@
 			<br/><strong>{{=T('Course')}}: </strong> {{=project.name}}<br/><br/>
 			<table class="table table-striped table-bordered">
 				<tr>
-					<TH><center>Información del curso</center></TH>
+					<TH colspan="2"><center>Información del curso</center></TH>
+				</tr>
+				<tr>
+					<!--Assigned Users-->
+					<td>
+						<div>
+							<b>{{=T('Current Teacher')}}:</b><br/>
+							{{if len(infoLevel[0])<=0:}}
+								<div style="padding:0px 140px;">
+									<b>{{=T('Not assigned')}}</b>
+								</div>
+							{{else:}}
+								{{for student in infoLevel[0]:}}
+								<div>
+									<table class="table table-striped table-bordered">
+										<tr>
+											<td>
+												<center><img src="{{= URL('default/download', student.assigned_user.photo)}}" alt="No photo" height="50%" width="50%"></center>
+											</td>
+											<td>
+												<b>{{=T('Username')}}:</b> {{=student.assigned_user.username}}<br>
+												<b>{{=T('Name')}}:</b> {{=student.assigned_user.first_name}} {{=student.assigned_user.last_name}}<br>
+												<b>{{=T('Email')}}:</b> {{=student.assigned_user.email}}<br>
+												<b>{{=T('Phone')}}:</b> {{=student.assigned_user.phone}}
+											</td>
+										</tr>
+									</table>
+								</div>
+								{{pass}}
+							{{pass}}
+						</div>
+						<br>
+						<div>
+							<b>{{=T('Assigned Tutor')}}:</b>
+							{{if len(infoLevel[1])<=0:}}
+								<div style="padding:0px 140px;">
+									<b>{{=T('Not assigned')}}</b>
+								</div>
+							{{else:}}
+								{{for student in infoLevel[1]:}}
+								<div>
+									<table class="table table-striped table-bordered">
+										<tr>
+											<td>
+												<center><img src="{{= URL('default/download', student.assigned_user.photo)}}" alt="No photo" height="50%" width="50%"></center>
+											</td>
+											<td>
+												<b>{{=T('Username')}}:</b> {{=student.assigned_user.username}}<br>
+												<b>{{=T('Name')}}:</b> {{=student.assigned_user.first_name}} {{=student.assigned_user.last_name}}<br>
+												<b>{{=T('Email')}}:</b> {{=student.assigned_user.email}}<br>
+												<b>{{=T('Phone')}}:</b> {{=student.assigned_user.phone}}
+											</td>
+										</tr>
+									</table>
+								</div>
+								{{pass}}
+							{{pass}}
+						</div>
+					</td>
+					<!--Timetable-->
+					<td>
+						<div>
+							Horario Clase
+							{{if len(infoLevel[2])<=0:}}
+								<div style="padding:0px 140px;">
+									<b>{{=T('Not assigned')}}</b>
+								</div>
+							{{else:}}
+								{{for student in infoLevel[1]:}}
+								<br/>
+								<div style="padding:0px 140px;">
+									<b>{{=T('Username')}}:</b> {{=student.assigned_user.username}}<br>
+									<b>{{=T('Name')}}:</b> {{=student.assigned_user.first_name}} {{=student.assigned_user.last_name}}<br>
+									<b>{{=T('Email')}}:</b> {{=student.assigned_user.email}}<br>
+								</div>
+								{{pass}}
+							{{pass}}
+						</div>
+						<br>
+						<div>
+							Horario Laboratorio
+							{{if len(infoLevel[1])<=0:}}
+								<div style="padding:0px 140px;">
+									<b>{{=T('Not assigned')}}</b>
+								</div>
+							{{else:}}
+								{{for student in infoLevel[1]:}}
+								<br/>
+								<div style="padding:0px 140px;">
+									<b>{{=T('Username')}}:</b> {{=student.assigned_user.username}}<br>
+									<b>{{=T('Name')}}:</b> {{=student.assigned_user.first_name}} {{=student.assigned_user.last_name}}<br>
+									<b>{{=T('Email')}}:</b> {{=student.assigned_user.email}}<br>
+								</div>
+								{{pass}}
+							{{pass}}
+						</div>
+					</td>
 				</tr>
 			</table>
 		{{pass}}

@@ -93,14 +93,28 @@ def assignation_done_succesful(assignation):
         # Get the item_restrictions for this period, for the area of the assignation,
         # removing the ones that don't belong to this assignation since are exceptions
         # and not allowing optionals
-        rows = db((db.item_restriction.period == period)&
-                  (db.item_restriction_area.area_level == assignation.project.area_level)&
-                  (db.item_restriction_area.item_restriction == db.item_restriction.id)&
-                  (db.item_restriction_exception.project == assignation.project.id)&
-                  (db.item_restriction_exception.item_restriction != db.item_restriction.id)&
-                  (db.item_restriction.optional == False)).select()
+        #rows = db((db.item_restriction.period == period)&
+        #          (db.item_restriction_area.area_level == assignation.project.area_level)&
+        #          (db.item_restriction_area.item_restriction == db.item_restriction.id)&
+        #          (db.item_restriction_exception.project == assignation.project.id)&
+        #          (db.item_restriction_exception.item_restriction != db.item_restriction.id)&
+        #          (db.item_restriction.optional == False)).select()
+
+        restrictionsItem = []
+        for rI in db(db.item_restriction_exception.project == assignation.project.id).select():
+            restrictionsItem.append(rI.item_restriction)
+        if len(restrictionsItem)==0:
+            restrictionsItem.append(-1)
+            
+        rows = db(((db.item_restriction.period==period) | (db.item_restriction.permanent==True))&
+                (db.item_restriction.is_enabled==True)&
+                (db.item_restriction_area.item_restriction==db.item_restriction.id)&
+                (db.item_restriction_area.area_level==assignation.project.area_level.id)&
+                (~db.item_restriction.id.belongs(restrictionsItem))&
+                (db.item_restriction.optional == False)).select()
+
         for row in rows:
-            items = row.item_restriction.item(db.item.is_active != False).select()
+            items = db((db.item.item_restriction==row.item_restriction.id)&(db.item.assignation==assignation.id)&(db.item.is_active != False)).select()
             if not items:
                 status = False
                 message += T('There is a missing deliverable item: ') + row.item_restriction.name + '.'

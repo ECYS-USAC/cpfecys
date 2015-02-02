@@ -93,4 +93,9 @@ def general_information():
         if len(infoLevel[0])<=0 and len(infoLevel[1])<=0:
             session.flash = T('Report no visible: There is no assignment in the selected project within six months.')
             redirect(URL('school_reports', 'general_information',vars=dict(period = period.id)))
+        sc = db(db.item_restriction.name=='Horario Clase').select().first()
+        if sc is None or (sc is not None and len(infoLevel[1])<=0):
+            infoLevel.append([])
+        else:
+            sc_V
     return dict(groupPeriods=groupPeriods, period=period, infoLevel=infoLevel, project=project)
