@@ -97,5 +97,5 @@ def general_information():
         if sc is None or (sc is not None and len(infoLevel[1])<=0):
             infoLevel.append([])
         else:
-            sc_V
+            None
     return dict(groupPeriods=groupPeriods, period=period, infoLevel=infoLevel, project=project)
