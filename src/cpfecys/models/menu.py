@@ -153,9 +153,16 @@ if auth.has_membership(role="Teacher") or auth.has_membership(role="Student"):
         my_projects = db((db.user_project.assigned_user == auth.user.id)&(db.project.id == db.user_project.project)).select()
         for project in my_projects:
             for assignation in project.project.user_project.select():
-                q=((assignation.report((db.report.status == db.report_status.id)&((db.report_status.name == 'Grading')|(db.report_status.name == 'EnabledForTeacher')))))
-                for report in q.select():
-                    tempReports.append(report.report.id)
+                teacher_var =db((db.user_project.project == assignation.project)&
+                        (db.user_project.assigned_user == db.auth_user.id)&
+                        (db.auth_membership.user_id == db.auth_user.id)&
+                        (db.auth_membership.group_id == db.auth_group.id)&
+                        (db.auth_group.role == 'Teacher')).select().first()
+                if teacher_var is not None:
+                    if teacher_var.user_project.assigned_user == auth.user.id:
+                        q=((assignation.report((db.report.status == db.report_status.id)&((db.report_status.name == 'Grading')|(db.report_status.name == 'EnabledForTeacher')))))
+                        for report in q.select():
+                            tempReports.append(report.report.id)
         for report in db(db.report.id.belongs(tempReports)).select():
             var_count_report+=1
 

@@ -614,7 +614,7 @@
             <h2>
             {{=T('Generate Final Practice Certification')}}
             </h2>
-            <a class="btn btn-success" href="{{=URL('certificate', 'index.pdf')}}">{{=T('Generate Certification')}}</a>
+            <a class="btn btn-success" href="{{=URL('certificate', 'index.pdf',vars = dict(user=auth.user.id) )}}">{{=T('Generate Certification')}}</a>
         </div>
     {{pass}}
 </div>

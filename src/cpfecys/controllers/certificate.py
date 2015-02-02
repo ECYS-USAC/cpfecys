@@ -183,7 +183,7 @@ def index():
         pdf=MyFPDF()
         # create a page and serialize/render HTML objects
         
-        assignations = db((db.user_project.assigned_user == auth.user.id)&
+        assignations = db((db.user_project.assigned_user == request.vars['user'])&
                           (db.user_project.assignation_ignored == False)&(db.user_project.assignation_status == db.assignation_status.id) & (db.assignation_status.name == 'Successful')).select(db.user_project.ALL)
         for x in assignations:
             pdf.add_page()

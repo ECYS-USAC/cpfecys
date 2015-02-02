@@ -96,6 +96,7 @@
                       <th>{{=T('Assignation Length')}}</th>
                       <th>{{=T('Assignation State')}}</th>
                       <th>{{=T('Assignation Validity')}}</th>
+                      <th>{{=T('Generate Final Practice Certification')}}</th>
                   </tr>
               </thead>
               <tbody>
@@ -165,6 +166,11 @@
                               {{pass}}
                           </a>
                       </td>
+                      <td>
+                        <a class="btn btn-warning" href="{{=URL('certificate', 'index.pdf',vars = dict(user=row.auth_user.id) )}}">{{=T('Generate Certification')}}</a>
+                        
+                      </td>
+                      
                   </tr>
                   {{pass}}
               </tbody>
