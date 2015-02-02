@@ -2715,6 +2715,8 @@ def assignation_upload():
                         #add user to role 'student'
                         auth.add_membership('Student', usr)
                 else:
+                    if db((db.auth_group.role == "Student")&(db.auth_membership.group_id == db.auth_group.id)&(db.auth_membership.user_id == usr.id)).select().first() is None:
+                        auth.add_membership('Student', usr)
                     assignation = db.user_project(
                         (db.user_project.assigned_user == usr.id)&
                         (db.user_project.project == project)&
@@ -2811,5 +2813,5 @@ def final_practice():
 def users():
     orderby = dict(auth_user=[db.auth_user.first_name, \
                 db.auth_user.username])
-    grid = SQLFORM.smartgrid(db.auth_user,linked_tables=['auth_membership','auth_event','auth_cas','user_project','item','report'], orderby=orderby)
+    grid = SQLFORM.smartgrid(db.auth_user,linked_tables=['auth_membership','auth_event','auth_cas','user_project','report'], orderby=orderby)
     return dict(grid = grid)

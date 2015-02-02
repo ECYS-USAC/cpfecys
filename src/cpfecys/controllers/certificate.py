@@ -141,7 +141,7 @@ def index():
                     logo=os.path.join(request.folder,'static/logo-usac.png')
                 else:
                     logo = os.path.join(request.folder, 'uploads', logo)
-                self.image(logo,10,8,33)
+                #self.image(logo,10,8,33)
                 self.set_font('Times','B',18)
                 self.cell(35) # padding
                 self.cell(155,7,"UNIVERSIDAD DE SAN CARLOS DE GUATEMALA",0,1,'L')
