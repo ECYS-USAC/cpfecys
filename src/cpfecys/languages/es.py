@@ -1611,6 +1611,7 @@
 'Profile was created successfully': 'Se creo perfil con éxito',
 'Profiles created': 'Perfiles creados',
 'project': 'Proyecto',
+'Project': 'Project',
 'Project Area': 'Área de Proyecto',
 'Project code is not valid.                      Check please.': 'Project code is not valid.                      Check please.',
 'Project Id': 'Código del Proyecto',

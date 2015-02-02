@@ -1907,7 +1907,7 @@ def report_list():
             (db.report_restriction.end_date<=end)&
             (db.report_restriction.is_enabled==True)).select()
         pending = 0
-        assignations = get_assignations(False, cperiod, 'Student').select()
+        assignations = get_assignations(False, pyear, 'Student').select()
         for assignation in assignations:
             for restriction in restrictions:
                 report = db(
@@ -2013,7 +2013,12 @@ def report_list():
         reports = db((db.report_restriction.start_date>=start)&
             (db.report_restriction.end_date<=end)&
             (db.report.report_restriction==db.report_restriction.id)&
-            (db.report.never_delivered == True))
+            (db.report.never_delivered == True)&
+            (db.user_project.id==db.report.assignation)&
+            (db.auth_user.id==db.user_project.assigned_user)&
+            (db.auth_membership.user_id==db.auth_user.id)&
+            (db.auth_group.id==db.auth_membership.group_id)&
+            (db.auth_group.role=='Student'))
         return reports.count()
     def count_reports(pyear, status, exclude):
         from datetime import datetime
@@ -2306,6 +2311,9 @@ def report_filter():
             (db.report.report_restriction==db.report_restriction.id)&
             (db.user_project.id==db.report.assignation)&
             (db.auth_user.id==db.user_project.assigned_user)&
+            (db.auth_membership.user_id==db.auth_user.id)&
+            (db.auth_group.id==db.auth_membership.group_id)&
+            (db.auth_group.role=='Student')&
             (db.project.id==db.user_project.project)&
             (db.report.never_delivered == True))
         status_instance = reports.select()
