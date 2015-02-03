@@ -33,11 +33,15 @@
 		<script>
 			function click_acept() {
 				$("#div_action").load("{{=URL('student_academic', 'photo.load', vars=dict(option = 'accept', id_user = request.vars['id_user']))}}");
-				location.reload(); 
+				{{if auth.has_membership('Super-Administrator') == False:}}
+					location.reload();
+				{{pass}}
 			}
-			function click_reject() {
+			function click_reject() {				
 				$("#div_action").load("{{=URL('student_academic', 'photo.load', vars=dict(option = 'reject', id_user = request.vars['id_user']))}}");
-				location.reload(); 
+				{{if auth.has_membership('Super-Administrator') == False:}}
+					location.reload();
+				{{pass}}
 			}
 		</script>
 		{{if photo is not None:}}
@@ -60,7 +64,15 @@
 		except:
 			None
 		pass
+		
 	}}
+	{{if auth.has_membership('Super-Administrator'):}}
+		<script>
+			$(document).ready(function(){
+				location.reload(); 
+			}); 
+		</script>
+	{{pass}}
 {{elif request.vars['option'] == 'reject':}}
 	{{
 		try:
@@ -74,5 +86,13 @@
 		except:
 			None
 		pass
+		
 	}}
+	{{if auth.has_membership('Super-Administrator'):}}
+		<script>
+			$(document).ready(function(){
+				location.reload(); 
+			}); 
+		</script>
+	{{pass}}
 {{pass}}

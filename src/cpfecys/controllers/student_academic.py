@@ -1091,8 +1091,12 @@ def academic():
         #Modal photo
         def get_button_clas(carnet_pa):
             review = db((db.photo_review.user_id == carnet_pa)).select().first()
+
             if review is None:
-                class_button = 'btn btn-info'
+                if db(db.auth_user.id==carnet_pa).select(db.auth_user.photo).first().photo is None:
+                    class_button = 'btn'
+                else:
+                    class_button = 'btn btn-info'
             else:
                 if review.accepted == True:
                     class_button = 'btn btn-success'
@@ -1104,7 +1108,7 @@ def academic():
         _role='button', 
         _class= get_button_clas(row.id_auth_user), 
         _onclick='set_values("'+str(row.id_auth_user)+'");', 
-        _title=T('Edit academic information') ,**{"_data-toggle":"modal", "_data-target": "#picModal"})]   
+        _title=T('View photo') ,**{"_data-toggle":"modal", "_data-target": "#picModal"})]   
         
         grid = SQLFORM.grid(
         query, oncreate=oncreate_academic,links=links, editable=False, onupdate=onupdate_academic, ondelete=ondelete_academic,  maxtextlength=100,csv=False)
@@ -1115,6 +1119,7 @@ def academic():
         query, oncreate=oncreate_academic, onupdate=onupdate_academic, ondelete=ondelete_academic,  maxtextlength=100,csv=False,editable=False,deletable=False,details=False)
     return dict(grid=grid)
 
+@auth.requires_login()
 def photo():
     return dict(var="")
 
