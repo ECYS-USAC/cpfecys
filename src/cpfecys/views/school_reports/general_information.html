@@ -52,23 +52,23 @@
 			<div>
 				<table class="pull-right table-striped table-bordered">
 		  			<tr>
-		  				<th colspan="3"><center>FILTRAR CURSOS</center></th>
+		  				<th colspan="3"><center>{{=T('Filter Courses')}}</center></th>
 		  			</tr>
 					<tr>
 						<td>
-							<a style="cursor:pointer;" onclick="visible_C(1);" title="Mostrar todos los cursos">
-								<span class="label label-info">Todos</span>
+							<a style="cursor:pointer;" onclick="visible_C(1);" title="{{=T('View all courses')}}">
+								<span class="label label-info">{{=T('All')}}</span>
 	                    	</a>
 						</td>
 						<td>
 							
-							<a style="cursor:pointer;" onclick="visible_C(2);" title="Mostrar cursos activos">
-	                    		<span class="label label-success">Activos</span>
+							<a style="cursor:pointer;" onclick="visible_C(2);" title="{{=T('Show active courses')}}">
+	                    		<span class="label label-success">{{=T('Assets')}}</span>
 	                    	</a>
 						</td>
 						<td>
-							<a style="cursor:pointer;" onclick="visible_C(3);" title="Mostrar cursos inactivos">
-	                    		<span class="label label-inverse">Inactivos</span>
+							<a style="cursor:pointer;" onclick="visible_C(3);" title="{{=T('Show inactive courses')}}">
+	                    		<span class="label label-inverse">{{=T('Inactive')}}</span>
 	                    	</a>
 						</td>
 					</tr>
@@ -79,10 +79,10 @@
 		  		
 				<table class="table table-striped table-bordered">
 					<tr>
-						<th>Curso</th>
-						<th><center>Catedraticos Activos</center></th>
-						<th><center>Tutores Academicos Activos</center></th>
-						<th><center>Estado de Curso</center></th>
+						<th>{{=T('Course')}}</th>
+						<th><center>{{=T('Active professors')}}</center></th>
+						<th><center>{{=T('Academic Tutors Assets')}}</center></th>
+						<th><center>{{=T('State of Course')}}</center></th>
 					</tr>
 					{{for project in infoLevel:}}
 						{{if project[2]>0 or project[3]>0:}}
@@ -96,10 +96,10 @@
 							<td><center>
 								{{if project[2]>0 or project[3]>0:}}
 									<a style="cursor:pointer;" onclick="next_Level({{=project[0]}});" title="Ir al curso">
-										<span class="label label-success">Activo</span>
+										<span class="label label-success">{{=T('Active')}}</span>
 									</a>
 								{{else:}}
-									<span class="label label-inverse">Inactivo</span>
+									<span class="label label-inverse">{{=T('Inactive')}}</span>
 								{{pass}}
 							</center></td>
 						</tr>
@@ -110,7 +110,7 @@
 			<br/><strong>{{=T('Course')}}: </strong> {{=project.name}}<br/><br/>
 			<table class="table table-striped table-bordered">
 				<tr>
-					<TH colspan="2"><center>Información del curso</center></TH>
+					<TH colspan="2"><center>{{=T('Course Information')}}</center></TH>
 				</tr>
 				<tr>
 					<!--Assigned Users-->
@@ -172,36 +172,38 @@
 					<!--Timetable-->
 					<td>
 						<div>
-							Horario Clase
+							<b>Horario Clase:</b>
 							{{if len(infoLevel[2])<=0:}}
 								<div style="padding:0px 140px;">
 									<b>{{=T('Not assigned')}}</b>
 								</div>
 							{{else:}}
-								{{for student in infoLevel[1]:}}
+								{{for student in infoLevel[2]:}}
 								<br/>
 								<div style="padding:0px 140px;">
-									<b>{{=T('Username')}}:</b> {{=student.assigned_user.username}}<br>
-									<b>{{=T('Name')}}:</b> {{=student.assigned_user.first_name}} {{=student.assigned_user.last_name}}<br>
-									<b>{{=T('Email')}}:</b> {{=student.assigned_user.email}}<br>
+									<b>{{=T('Location')}}:</b> {{=student.physical_location}}<br>
+									<b>{{=T('Day')}}:</b> {{=db(db.day_of_week.id==student.day_of_week).select().first()['name']}}<br>
+									<b>{{=T('Start Hour')}}:</b> {{=student.start_time}}<br>
+									<b>{{=T('End Hour')}}:</b> {{=student.end_time}}<br>
 								</div>
 								{{pass}}
 							{{pass}}
 						</div>
 						<br>
 						<div>
-							Horario Laboratorio
-							{{if len(infoLevel[1])<=0:}}
+							<b>Horario Laboratorio:</b>
+							{{if len(infoLevel[3])<=0:}}
 								<div style="padding:0px 140px;">
 									<b>{{=T('Not assigned')}}</b>
 								</div>
 							{{else:}}
-								{{for student in infoLevel[1]:}}
+								{{for student in infoLevel[3]:}}
 								<br/>
 								<div style="padding:0px 140px;">
-									<b>{{=T('Username')}}:</b> {{=student.assigned_user.username}}<br>
-									<b>{{=T('Name')}}:</b> {{=student.assigned_user.first_name}} {{=student.assigned_user.last_name}}<br>
-									<b>{{=T('Email')}}:</b> {{=student.assigned_user.email}}<br>
+									<b>{{=T('Location')}}:</b> {{=student.physical_location}}<br>
+									<b>{{=T('Day')}}:</b> {{=db(db.day_of_week.id==student.day_of_week).select().first()['name']}}<br>
+									<b>{{=T('Start Hour')}}:</b> {{=student.start_time}}<br>
+									<b>{{=T('End Hour')}}:</b> {{=student.end_time}}<br>
 								</div>
 								{{pass}}
 							{{pass}}
@@ -233,6 +235,18 @@
 
 		function next_Level(id){
 			window.location.href = "{{=URL('school_reports', 'general_information')}}?level=2&amp;period={{=period.id}}&amp;project="+id;
+		}
+
+		function exportCSV(){
+			window.location.href = "{{=URL('school_reports','general_information_export', vars=dict(list_type='csv', level='1',period = str(request.vars['period'])))}}";
+		}
+	{{else:}}
+		function levelUP(){
+			window.location.href = "{{=URL('school_reports', 'general_information')}}?period={{=period.id}}";
+		}
+
+		function exportCSV(){
+			window.location.href = "{{=URL('school_reports','general_information_export', vars=dict(list_type='csv', level='2',period = str(request.vars['period']), project = str(request.vars['project'])))}}";
 		}
 	{{pass}}
 </script>
