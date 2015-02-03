@@ -84,6 +84,9 @@ data-toggle="tab">
           {{=T('Upload Acadmics')}}
       </a></li>
   </ul>
+  {{if (date_finish is not None)&(currentyear_period.id == cperiod.id):}}
+    <div class="alert alert-danger">{{=T('Deadline for entry')}}: {{=date_finish}}.</div>  
+  {{pass}}
   <div class="tab-content">
       <div class="tab-pane" id="setuptab">
           <form>

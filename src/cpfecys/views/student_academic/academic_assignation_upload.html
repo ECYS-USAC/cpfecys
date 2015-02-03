@@ -105,8 +105,24 @@ aria-hidden="true">{{=T('Close')}}</button>
 </div>
 {{else:}}
 <div class="well">
-    <div class="alert alert-warning"><b>{{=T('Note')}}:</b> {{=T('This process can take several minutes')}}.</div>
-    {{=FORM(INPUT(_type='file',_name='csvfile'),
-    INPUT(_type='submit',_value=T('Upload')))}}
+    {{if auth.has_membership('Student'):}}
+      {{if (date_finish is not None):}}
+        {{if (datetime.datetime.now()<date_finish):}}
+          <div class="alert alert-danger">{{=T('Deadline for entry')}}: {{=date_finish}}.</div>
+          <div class="alert alert-warning"><b>{{=T('Note')}}:</b> {{=T('This process can take several minutes')}}.</div>
+          {{=FORM(INPUT(_type='file',_name='csvfile'),
+          INPUT(_type='submit',_value=T('Upload')))}}
+        {{else:}}
+          <div class="alert alert-danger">{{=T('It ended the date of admission')}}.</div>    
+        {{pass}}
+      {{else:}}
+        <div class="alert alert-danger">{{=T('It ended the date of admission')}}.</div>
+      {{pass}}
+    {{else:}}
+        <div class="alert alert-warning"><b>{{=T('Note')}}:</b> {{=T('This process can take several minutes')}}.</div>
+        {{=FORM(INPUT(_type='file',_name='csvfile'),
+        INPUT(_type='submit',_value=T('Upload')))}}
+    {{pass}}
+    
 </div>
 {{ pass }}

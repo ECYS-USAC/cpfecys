@@ -335,8 +335,8 @@ def academic_assignation():
     cyearperiod = cpfecys.current_year_period()
 
     #Temporal---------------------------------------------------------------------------------------------
-    if request.vars['listado'] =='True':
-        redirect(URL('student_academic','attendance_list',vars=dict(usuario_proyecto=str(check.id))))
+    #if request.vars['listado'] =='True':
+    #    redirect(URL('student_academic','attendance_list',vars=dict(usuario_proyecto=str(check.id))))
 
     
     #Temporal---------------------------------------------------------------------------------------------
@@ -556,8 +556,28 @@ def academic_assignation():
                 _class="btn btn-danger",
                 _onclick="click_reject_photo("+str(has_foto(db(db.academic.id==int(row.carnet)).select(db.academic.id_auth_user).first().id_auth_user))+")")]
    
-   
-    if (currentyear_period.id == cpfecys.current_year_period().id):
+    permition_var = True
+    date_finish = None
+    if auth.has_membership('Student'):
+        control_period = db((db.student_control_period.period_name==T(str(cpfecys.current_year_period().period.name))+" "+str(cpfecys.current_year_period().yearp))).select().first()
+        try:
+            date_finish = control_period.date_finish
+            if  ( (datetime.datetime.now() < control_period.date_start) | (datetime.datetime.now() > control_period.date_finish) ):
+                except_var = False            
+                for course_exception in db(db.course_limit_exception.project==check.project).select():
+                    if (datetime.datetime.now() < course_exception.date_finish):
+                        date_finish = course_exception.date_finish
+                        except_var = True
+                    pass
+                pass
+                if except_var == False:
+                    date_finish = None
+                    permition_var = False
+        except:
+            permition_var = False
+    else:
+        None
+    if ((currentyear_period.id == cpfecys.current_year_period().id)&(permition_var == True)):
         grid = SQLFORM.grid(query, orderby=db.academic_course_assignation.carnet,details=False, fields=fields, links=links, oncreate=oncreate_academic_assignation, onupdate=onupdate_academic_assignation, ondelete=ondelete_academic_assignation, csv=False, deletable=False, editable=False, paginate=100)
     else:
         checkProject = db((db.user_project.assigned_user==auth.user.id)&\
@@ -595,7 +615,9 @@ def academic_assignation():
                 other_periods = other_periods,
                 name = check.project.name,
                 check = check,
-                assignation = check.id)
+                assignation = check.id,
+                date_finish = date_finish,
+                cperiod=cpfecys.current_year_period())
 
 def oncreate_academic_assignation(form):
     import datetime
@@ -1033,11 +1055,32 @@ def academic_assignation_upload():
                     periods = periods,
                     current_period = current_period,
                     name=name, files=files)
+
+    permition_var = True
+    date_finish = None
+    if auth.has_membership('Student'):
+        control_period = db((db.student_control_period.period_name==T(str(cpfecys.current_year_period().period.name))+" "+str(cpfecys.current_year_period().yearp))).select().first()
+        try:
+            date_finish = control_period.date_finish
+            if  ( (datetime.datetime.now() < control_period.date_start) | (datetime.datetime.now() > control_period.date_finish) ):
+                except_var = False
+                for course_exception in db(db.course_limit_exception.project==check.project).select():
+                    if (datetime.datetime.now() < course_exception.date_finish):
+                        date_finish = course_exception.date_finish
+                        except_var = True
+                    pass
+                pass
+                if except_var == False:
+                    permition_var = False
+        except:
+            permition_var = False
     return dict(success = False,
                 file = False,
                 periods = periods,
                 current_period = current_period,
-                name=name, files=files)
+                name=name, files=files,
+                permition_var = permition_var,
+                date_finish = date_finish)
 
 
 @auth.requires_login()
