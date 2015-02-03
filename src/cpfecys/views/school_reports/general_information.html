@@ -29,7 +29,7 @@
 			<center><strong>Universidad de San Carlos de Guatemala</strong><br/>
 			<strong>Facultad de Ingeniería</strong><br/>
 			<strong>Escuela de Ciencias y Sistemas</strong></center><br/>
-			<strong>{{=T('Type')}}: </strong> {{=T('Performance of students')}}<br/>
+			<strong>{{=T('Type')}}: </strong> {{=T('General Information')}}<br/>
 			<strong>{{=T('Description')}}: </strong> {{=T('Report on the overview of the courses registered in the system.')}}<br/>
 			<strong>{{=T('Period')}}: </strong> {{=T(period.period.name)}} {{=period.yearp}}
     	<!--HEADER OF REPORT-->
@@ -238,7 +238,7 @@
 		}
 
 		function exportCSV(){
-			window.location.href = "{{=URL('school_reports','general_information_export', vars=dict(list_type='csv', level='1',period = str(request.vars['period'])))}}";
+			window.location.href = "{{=URL('school_reports','general_information_export', vars=dict(list_type='csv', level='1',period = period.id))}}";
 		}
 	{{else:}}
 		function levelUP(){

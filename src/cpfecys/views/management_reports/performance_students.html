@@ -14,7 +14,7 @@
     	<div>
     	<!--HEADER OF REPORT-->
 	    	{{if request.vars['level'] is not None and str(request.vars['level'])!="1":}}
-	    	<div class="pull-left noPrint">
+	    	<div class="pull-left">
 	    		<a style="white-space:nowrap; cursor:pointer; align:right;" class="btn" onclick="levelUP();">
 	    			<span class="icon-black icon-arrow-up"></span><b>{{=T('Level Up')}}</b>
 	    		</a>
@@ -57,7 +57,7 @@
 		  	<!--REPORT IN TABLE-->
 				<table class="table table-striped table-bordered">
 					<tr>
-						<th><center>{{=T('Period')}}</center></th>
+						<th><center>{{=T('Course')}}</center></th>
 						<th><center>{{=T('Students above average')}}</center></th>
 						<th><center>{{=T('Students on the average')}}</center></th>
 						<th><center>{{=T('Students Below Average')}}</center></th>
@@ -242,3 +242,28 @@
     	</div>
 	<!--REPORT CONTENTS-->    
 </div>
+<script type="text/javascript">
+	//INIT LEVEL UP REPORT
+	{{if request.vars['level'] is not None and str(request.vars['level'])!="1":}}
+		function levelUP(){
+			{{if str(request.vars['level'])=="2":}}
+				window.location.href = "{{=URL('management_reports', 'performance_students',vars=dict(period=period.id))}}";
+			{{elif str(request.vars['level'])=="3":}}
+				window.location.href = "{{=URL('management_reports', 'performance_students',vars=dict(level='2',period = period.id, project=project.id, type_L = str(request.vars['type_U'])))}}";
+			{{pass}}
+		}
+	{{pass}}
+	//END LEVEL UP REPORT
+
+	//INIT EXPORT REPORT TO CSV FILE
+	function exportCSV(){
+		{{if request.vars['level'] is None or str(request.vars['level'])=="1":}}
+			window.location.href = "{{=URL('management_reports','performance_students_export', vars=dict(list_type='csv', level='1', period=period.id))}}";
+		{{elif str(request.vars['level'])=="2":}}
+			window.location.href = "{{=URL('management_reports','performance_students_export', vars=dict(list_type='csv', level='2',period = period.id, project=project.id, type_L = str(request.vars['type_L'])))}}";
+		{{elif str(request.vars['level'])=="3":}}
+			window.location.href = "{{=URL('management_reports','performance_students_export', vars=dict(list_type='csv', level='3',period = period.id, project=project.id, type_L = str(request.vars['type_L']), type_U = str(request.vars['type_U'])))}}";
+		{{pass}}
+	}
+	//END EXPORT REPORT TO CSV FILE
+</script>

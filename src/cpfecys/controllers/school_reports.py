@@ -30,6 +30,11 @@ def general_information_export():
     period = None
     project = None
     try:
+        #CHECK IF THE TYPE OF EXPORT IS VALID
+        if request.vars['list_type'] is None or str(request.vars['list_type'])!="csv":
+            session.flash = T('Not valid Action.')
+            redirect(URL('default','index'))
+            
         #CHECK THAT THE LEVEL OF REPORT IS VALID
         if request.vars['level'] is not None and (int(request.vars['level'])<1 or int(request.vars['level'])>2):
             session.flash = T('Not valid Action.')
@@ -54,11 +59,6 @@ def general_information_export():
 
         #CHECK PARAMETERS
         if request.vars['level']=='1' or request.vars['level'] is None:
-            groupPeriods = db(db.period_year).select(orderby=~db.period_year.id)
-            if len(groupPeriods) == 0:
-                session.flash = T('Report no visible: There are no parameters required to display the report.')
-                redirect(URL('default','index'))
-
             groupProjects = db(db.project.area_level==area.id).select(orderby=db.project.name)
             if len(groupProjects) == 0:
                 session.flash = T('Report no visible: There are no parameters required to display the report.')
@@ -87,7 +87,7 @@ def general_information_export():
     #TYPE OF REPORT
     infoeLevelTemp=[]
     infoeLevelTemp.append(T('Type'))
-    infoeLevelTemp.append(T('Performance of students'))
+    infoeLevelTemp.append(T('General Information'))
     infoLevel.append(infoeLevelTemp)
     #DESCRIPTION OF REPORT
     infoeLevelTemp=[]

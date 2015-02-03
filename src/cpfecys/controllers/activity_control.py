@@ -3811,7 +3811,7 @@ def Course_Format_Technical_School():
             redirect(URL('default','index'))
         else:
             if auth.has_membership('Student')==True:
-                exception_query = db(db.course_laboratory_exception.project == project.id).select().first()
+                exception_query = db(db.course_laboratory_exception.project == project_var.id).select().first()
                 if exception_query is None:
                     session.flash = T('Not valid Action.')
                     redirect(URL('default','index'))
