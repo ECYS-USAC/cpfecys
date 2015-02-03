@@ -1677,39 +1677,40 @@ def mail_notifications():
                     send_mail_to_users(users.select(db.auth_user.ALL), 
                         message, dsi_role, projects,
                         subject,files_attach)
-                if role.role == 'Academic':
-                    users = db(
-                        (db.auth_user.id==db.auth_membership.user_id)&
-                        (db.auth_membership.group_id==db.auth_group.id)&
-                        (db.auth_group.id.belongs(roles))&
-                        #Until here we get users from role
-                        (db.academic_course_assignation.assignation.belongs(projects))&
-                        (db.academic.id==db.academic_course_assignation.carnet)&
-                        (db.auth_user.id==db.academic.id_auth_user)&
-                        #Until here we get users from role assigned to projects
-                        (db.academic_course_assignation.semester==period.id)
-                        )
-
                 else:
-                    users = db(
-                        (db.auth_user.id==db.auth_membership.user_id)&
-                        (db.auth_membership.group_id==db.auth_group.id)&
-                        (db.auth_group.id.belongs(roles))&
-                        #Until here we get users from role
-                        (db.user_project.project.belongs(projects))&
-                        (db.auth_user.id==db.user_project.assigned_user)&
-                        #Until here we get users from role assigned to projects
-                        (db.user_project.period==db.period_year.id)&
-                        ( (db.user_project.assignation_status==None)|
-                          ((db.user_project.period <= period.id)&
-                          ((db.user_project.period + db.user_project.periods) > \
-                          period.id)) )
-                        )
-                #return users._select(db.auth_user.ALL, distinct=True)
-                users = users.select(db.auth_user.ALL, distinct=True)
-                #return users
-                send_mail_to_users(users, message, \
-                    roles, projects, subject,files_attach, True)
+                    if role.role == 'Academic':
+                        users = db(
+                            (db.auth_user.id==db.auth_membership.user_id)&
+                            (db.auth_membership.group_id==db.auth_group.id)&
+                            (db.auth_group.id.belongs(roles))&
+                            #Until here we get users from role
+                            (db.academic_course_assignation.assignation.belongs(projects))&
+                            (db.academic.id==db.academic_course_assignation.carnet)&
+                            (db.auth_user.id==db.academic.id_auth_user)&
+                            #Until here we get users from role assigned to projects
+                            (db.academic_course_assignation.semester==period.id)
+                            )
+
+                    else:
+                        users = db(
+                            (db.auth_user.id==db.auth_membership.user_id)&
+                            (db.auth_membership.group_id==db.auth_group.id)&
+                            (db.auth_group.id.belongs(roles))&
+                            #Until here we get users from role
+                            (db.user_project.project.belongs(projects))&
+                            (db.auth_user.id==db.user_project.assigned_user)&
+                            #Until here we get users from role assigned to projects
+                            (db.user_project.period==db.period_year.id)&
+                            ( (db.user_project.assignation_status==None)|
+                              ((db.user_project.period <= period.id)&
+                              ((db.user_project.period + db.user_project.periods) > \
+                              period.id)) )
+                            )
+                    #return users._select(db.auth_user.ALL, distinct=True)
+                    users = users.select(db.auth_user.ALL, distinct=True)
+                    #return users
+                    send_mail_to_users(users, message, \
+                        roles, projects, subject,files_attach, True)
 
             session.flash = T('Mail successfully sent')
             redirect(URL('admin', 'mail_notifications'))
