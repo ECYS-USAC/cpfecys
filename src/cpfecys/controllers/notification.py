@@ -398,7 +398,7 @@ def teacher_mail_notifications():
         session.notification_message = ''    
 
     upload_form = FORM(INPUT(_name='file_name',_type='text'),
-                        INPUT(_name='file_upload',_type='file',requires=[IS_UPLOAD_FILENAME(extension = '(pdf|zip)',error_message='Solo se aceptan archivos con extension zip|pdf'),IS_LENGTH(2097152,error_message='El tamaño máximo del archivo es 2MB')]),
+                        INPUT(_name='file_upload',_type='file',requires=[IS_UPLOAD_FILENAME(extension = '(pdf|rar|zip)',error_message='Solo se aceptan archivos con extension zip|pdf|rar'),IS_LENGTH(2097152,error_message='El tamaño máximo del archivo es 2MB')]),
                         INPUT(_name='file_description',_type='text'),
                         INPUT(_name='file_visible',_type='checkbox'))
 
@@ -801,7 +801,7 @@ def mail_notifications():
         session.notification_message = ''    
 
     upload_form = FORM(INPUT(_name='file_name',_type='text'),
-                        INPUT(_name='file_upload',_type='file',requires=[IS_UPLOAD_FILENAME(extension = '(pdf|zip)',error_message='Solo se aceptan archivos con extension zip|pdf'),IS_LENGTH(2097152,error_message='El tamaño máximo del archivo es 2MB')]),
+                        INPUT(_name='file_upload',_type='file',requires=[IS_UPLOAD_FILENAME(extension = '(pdf|rar|zip)',error_message='Solo se aceptan archivos con extension zip|pdf|rar'),IS_LENGTH(2097152,error_message='El tamaño máximo del archivo es 2MB')]),
                         INPUT(_name='file_description',_type='text'),
                         INPUT(_name='file_visible',_type='checkbox'))
 

@@ -1541,7 +1541,7 @@ def active_teachers():
         ' para generar su contraseña puede visitar el siguiente enlace e ' +\
         'ingresar su usuario ' + recovery
         subject = 'DTT-ECYS Bienvenido'
-        send_mail_to_users([user], message, None, None, subject)
+        send_mail_to_users([user], message, None, None, subject,None)
         user.update_record(load_alerted=True)
     elif request.args(0) == 'notifyall':
         users = get_assignations(False, period, 'Teacher'
@@ -1553,7 +1553,7 @@ def active_teachers():
             ' para generar su contraseña puede visitar el siguiente enlace e ' +\
             'ingresar su usuario ' + recovery
             subject = 'DTT-ECYS Bienvenido'
-            send_mail_to_users([user], message, None, None, subject)
+            send_mail_to_users([user], message, None, None, subject,None)
             user.update_record(load_alerted=True)
     elif request.args(0) == 'notifypending':
         project = False
@@ -1578,7 +1578,7 @@ def active_teachers():
             ' para generar su contraseña puede visitar el siguiente enlace e ' +\
             'ingresar su usuario ' + recovery
             subject = 'DTT-ECYS Bienvenido'
-            send_mail_to_users([user], message, None, None, subject)
+            send_mail_to_users([user], message, None, None, subject,None)
             user.update_record(load_alerted=True)
 
     assignations = get_assignations(False, period, 'Teacher' \
@@ -1640,11 +1640,22 @@ def courses_report_detail():
 @auth.requires_membership('Super-Administrator')
 def mail_notifications():
     period = cpfecys.current_year_period()
+    attachment_list = request.vars['attachment_list']
+    message = request.vars['message']
+    subject = request.vars['subject']
+
+    files_attach = []
+    if attachment_list is not None:
+        if isinstance(attachment_list, str):
+            attachment_list = [attachment_list]
+        for file_var in attachment_list:
+            files_attach.append(file_var)
+
+    
     if (request.args(0) == 'send'):
         roles = request.vars['role']
         projects = request.vars['project']
-        message = request.vars['message']
-        subject = request.vars['subject']
+        
 
         if isinstance(roles, str):
             roles = [roles]
@@ -1665,26 +1676,40 @@ def mail_notifications():
                     dsi_role = [group_id]
                     send_mail_to_users(users.select(db.auth_user.ALL), 
                         message, dsi_role, projects,
-                        subject)
+                        subject,files_attach)
+                if role.role == 'Academic':
+                    users = db(
+                        (db.auth_user.id==db.auth_membership.user_id)&
+                        (db.auth_membership.group_id==db.auth_group.id)&
+                        (db.auth_group.id.belongs(roles))&
+                        #Until here we get users from role
+                        (db.academic_course_assignation.assignation.belongs(projects))&
+                        (db.academic.id==db.academic_course_assignation.carnet)&
+                        (db.auth_user.id==db.academic.id_auth_user)&
+                        #Until here we get users from role assigned to projects
+                        (db.academic_course_assignation.semester==period.id)
+                        )
 
-                users = db(
-                    (db.auth_user.id==db.auth_membership.user_id)&
-                    (db.auth_membership.group_id==db.auth_group.id)&
-                    (db.auth_group.id.belongs(roles))&
-                    #Until here we get users from role
-                    (db.user_project.project.belongs(projects))&
-                    (db.auth_user.id==db.user_project.assigned_user)&
-                    #Until here we get users from role assigned to projects
-                    (db.user_project.period==db.period_year.id)&
-                    ((db.user_project.period <= period.id)&
-                    ((db.user_project.period + db.user_project.periods) > \
-                     period.id))
-                    )
+                else:
+                    users = db(
+                        (db.auth_user.id==db.auth_membership.user_id)&
+                        (db.auth_membership.group_id==db.auth_group.id)&
+                        (db.auth_group.id.belongs(roles))&
+                        #Until here we get users from role
+                        (db.user_project.project.belongs(projects))&
+                        (db.auth_user.id==db.user_project.assigned_user)&
+                        #Until here we get users from role assigned to projects
+                        (db.user_project.period==db.period_year.id)&
+                        ( (db.user_project.assignation_status==None)|
+                          ((db.user_project.period <= period.id)&
+                          ((db.user_project.period + db.user_project.periods) > \
+                          period.id)) )
+                        )
                 #return users._select(db.auth_user.ALL, distinct=True)
                 users = users.select(db.auth_user.ALL, distinct=True)
                 #return users
                 send_mail_to_users(users, message, \
-                    roles, projects, subject, True)
+                    roles, projects, subject,files_attach, True)
 
             session.flash = T('Mail successfully sent')
             redirect(URL('admin', 'mail_notifications'))
@@ -1700,10 +1725,53 @@ def mail_notifications():
                     dsi_role = [group_id]
                     send_mail_to_users(users.select(db.auth_user.ALL), 
                         message, dsi_role, projects,
-                        subject)
+                        subject,files_attach)
         else:
             session.flash = T('At least a project and a role must be selected')
             redirect(URL('admin', 'mail_notifications'))
+
+    upload_form = FORM(INPUT(_name='file_name',_type='text'),
+                        INPUT(_name='file_upload',_type='file',requires=[IS_UPLOAD_FILENAME(extension = '(pdf|zip)',error_message='Solo se aceptan archivos con extension zip|pdf|rar'),IS_LENGTH(2097152,error_message='El tamaño máximo del archivo es 2MB')]),
+                        INPUT(_name='file_visible',_type='checkbox'),
+                        INPUT(_name='file_public',_type='checkbox'))
+    if upload_form.accepts(request.vars,formname='upload_form'):
+        try:
+            if ( upload_form.vars.file_name is "" ) or ( upload_form.vars.file_upload is "") or ( upload_form.vars.file_description is ""):
+                response.flash = T('You must enter all fields.')
+            else:
+                exists = db.uploaded_file((db.uploaded_file.name == upload_form.vars.file_name))
+                if exists is None:                    
+                    file_var = db.uploaded_file.file_data.store(upload_form.vars.file_upload.file, upload_form.vars.file_upload.filename)
+                    
+                    var_visible = False
+                    if upload_form.vars.file_visible:
+                        var_visible = True
+                    var_public = False
+                    if upload_form.vars.file_public:
+                        var_public = True
+
+                    upload_file = db.uploaded_file.insert(file_data=file_var,
+                                            name=upload_form.vars.file_name,
+                                            visible=var_visible,
+                                            is_public=var_public
+                                            )
+                    files_attach.append(upload_file)
+                    response.flash = T('File loaded successfully.')
+                else:
+                    response.flash = T('File already exists.')
+        except:
+            response.flash = T('Error loading file.')
+    
+
+    attach_form = FORM(INPUT(_name='check_files',_type='checkbox'))
+
+    if attach_form.accepts(request.vars,formname='attach_form'):
+        check_files = attach_form.vars.check_files
+        if isinstance(check_files, str):
+            check_files = [check_files]
+        for file_var in check_files:
+            files_attach.append(file_var)
+        
 
     groups = db(db.auth_group.role!='Super-Administrator').select()
     areas = db(db.area_level).select()
@@ -1714,11 +1782,19 @@ def mail_notifications():
         name = name.lower()
         name = name.replace(' ', '-')
         return name
+
+    if subject is None:
+        subject = ""
+    if message is None:
+        message = ""
     return dict(groups=groups,
         areas=areas,
         get_projects=get_projects,
         prepare_name=prepare_name,
-        markmin_settings = cpfecys.get_markmin)
+        markmin_settings = cpfecys.get_markmin,
+        attachment_list = files_attach,
+        subject=subject,
+        message=message)
 
 @auth.requires_login()
 @auth.requires_membership('Super-Administrator')
@@ -1728,7 +1804,7 @@ def mail_log():
 
 @auth.requires_login()
 @auth.requires_membership('Super-Administrator')
-def send_mail_to_users(users, message, roles, projects, subject, log=False):
+def send_mail_to_users(users, message, roles, projects, subject, attachment_list, log=False):
     if log:
         import datetime
         cdate = datetime.datetime.now()
@@ -1747,10 +1823,17 @@ def send_mail_to_users(users, message, roles, projects, subject, log=False):
             projects=projects_text[1:],
             sent=cdate)
 
-
+    attachment_m = '<br><br><b>' + T('Attachments') +":</b><br>"
     import cpfecys
+    if attachment_list != []:
+        for attachment_var in db(db.uploaded_file.id.belongs(attachment_list)).select():
+            attachment_m = attachment_m + '<a href="' + cpfecys.get_domain() + URL('default/download', attachment_var.file_data) +'" target="blank"> '+ attachment_var.name + '</a> <br>'
+    else:        
+        attachment_m = ''
+
+    
     message = message.replace("\n","<br>")
-    message = '<html>' + message + '<br>'+ (cpfecys.get_custom_parameters().email_signature or '') + '</html>'
+    message = '<html>' + message + '<br>'+ (cpfecys.get_custom_parameters().email_signature or '') + attachment_m + '</html>'
 
     userList= []
     for user in users:

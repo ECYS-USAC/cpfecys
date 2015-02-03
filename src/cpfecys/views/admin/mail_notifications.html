@@ -15,11 +15,40 @@
 	<form action="{{=URL('admin', 'mail_notifications/send')}}" method="post">
 	  <fieldset>
 	  	<label for="subject">{{=T('Subject')}}</label>
-	    <input type="text" id="subject" name="subject">
+	    <input class="subject_class"  type="text" id="subject" name="subject" value="{{=subject}}">
+
 	    <label for="message">{{=T('Message')}}</label>
-	    <textarea id="message" name="message" rows="8"></textarea>
+	    <textarea class="message_class" style="width:99%" id="message" name="message" rows="8">{{=message}}</textarea>
+	    <div id="div_list_attachments" >
+			<div class="well">
+				
+			    <div>               	
+			    	<a id="attachments" > 
+			    	<span class="icon-folder-open"></span>
+			    	{{=T('Attachments')}}
+					({{=len(attachment_list)}})
+			    	</a> 
+			    	<div  id="attachmentsDiv" value="attachmentsDiv" style="overflow:auto;">
+			    		<table>
+						{{for file_var in db(db.uploaded_file.id.belongs(attachment_list)).select():}}
+							<tr>
+								<td>
+									&nbsp &nbsp <input type="checkbox" value="{{= file_var.id }}" name="attachment_list" checked><span class="icon-file"></span><a href="{{=URL('default/download', file_var.file_data)}}" target="blank">  {{=file_var.name}} </a> 
+								</td>
+							</tr>
+						{{pass}}
+						</table>		    		
+			        </div>
+			    </div>
+	    	</div>
+	    </div>
+
 	    <button type="submit" class="btn btn-success">{{=T('Send')}}</button>
+	    <a href="#attachModal" role="button" class="btn btn-primary" data-toggle="modal"> 
+	    	{{=T('Attach')}} <span class="icon-white icon-upload">
+	    </a>
 	  </fieldset>
+
 	  <div class="label label-info">{{=T('Note')}}: {{=T('To send message \
 	  to DSI users, No course must be selected')}}</div>
 	  <table>
@@ -80,12 +109,159 @@
 
 	</div>
 </div>
+
+
+
 <script type="text/javascript">
 	$(document).ready(function(){
 		$('.area_trigger').click(function(event){
 			target = $(this).attr('target');
 			$('.'+target).trigger('click');
 		})
+		$("#attachments").click(function(){			
+			$("#attachmentsDiv").toggle();	
+			$("#remove_div").toggle();	
+					
+		})
+		$("#var_all").click(function(){			
+			$("#div_all").css("display", "block");
+			$("#div_upload").css("display", "none");
+			$("#attach_button").css("display", "block");
+			
+		})
+		$("#var_upload").click(function(){			
+			$("#div_upload").css("display", "block");
+			$("#div_all").css("display", "none");
+			$("#attach_button").css("display", "none");
+			
+		})
+
+		$(".subject_class").keyup(function(){
+        	$(".subject_class").val($(this).val());
+    	});
+    	$(".message_class").keyup(function(){
+        	$(".message_class").val($(this).val());
+    	});
 	});
 
 </script>
+
+<!-- Attach Div-->
+
+<div id="attachModal" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true" > 
+  <div class="modal-header">
+    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+      <h3 id="myModalLabel">
+          <span class="icon-upload"></span>
+          {{=T('Attach file')}}
+      </h3>
+  </div>
+  <div class="modal-body" style="overflow:auto; height:500px;">
+  	<ul id="myTab" class="nav nav-tabs">
+     	<li class="active" id="var_upload"><a href="#" data-toggle="tab">{{=T('Upload')}}</a></li>
+		
+  		<li id="var_all"><a href="#home" data-toggle="tab">{{=T('All files')}}</a></li>
+	    
+  	</ul>
+
+  	<div id="div_upload" >
+  		<form action="" enctype="multipart/form-data" method="post" >
+  			{{for file_var in db(db.uploaded_file.id.belongs(attachment_list)).select():}}
+				<input type="hidden" value="{{= file_var.id }}" name="attachment_list">
+			{{pass}}
+			<input class="subject_class"  type="hidden" id="subject" name="subject">
+			<input class="message_class"  type="hidden" id="message" name="message">
+  			<div align="center">
+  				<table >
+  					<tr>
+  						<td align="left">
+							<input name="_formname" type="hidden" value="upload_form">
+							<label>{{=T('File name')}}</label>
+							<input class="string" name="file_name" type="text" value="">
+							<label>{{=T('Select file')}}</label>
+							<input class="upload" name="file_upload" type="file" id="upload_button">
+							<div id="uploadError" style="display: none;" class="alert-error">
+								{{=T('File size must be 2MB or below with pdf, rar or zip extension')}}
+							</div>
+							<label>{{=T('is_visible')}}&nbsp &nbsp<input type="checkbox" name="file_visible"></label>
+							<label>{{=T('is_public')}}&nbsp &nbsp<input type="checkbox" name="file_public"></label>
+							
+						</td>
+					</tr>
+					<tr >
+						<td >
+							<div align="right">	
+								<input type="submit" class="btn btn-primary" value="{{=T('Upload file')}}">
+							</div>
+						<td>
+					</tr>
+				</table>
+			</div>
+		</form>
+  	</div>
+
+    <div id="div_all" style="display: none;">
+		<form   action="#div_list_attachments" enctype="multipart/form-data" method="post" >
+			<input name="_formname" type="hidden" value="attach_form">
+			{{for file_var in db(db.uploaded_file.id.belongs(attachment_list)).select():}}
+				<input type="hidden" value="{{= file_var.id }}" name="attachment_list">
+			{{pass}}
+			<input class="subject_class"  type="hidden" id="subject" name="subject">
+			<input class="message_class"  type="hidden" id="message" name="message">
+			<div class="well" style="overflow:auto;">
+			    <div> 
+			    	<a id="allFiles" > 
+			    	<span class="icon-folder-open"></span>
+			    	{{=T('All files')}}
+			    	</a>
+			    	<div  id="allDiv" value="allDiv" style="overflow:auto;  height:200px; ">
+			    		<table >
+							<tr>
+								<th>
+								</td><th>
+									{{=T('Name')}}
+								</th><th>
+									{{=T('Visible')}}
+								</th><th>
+									{{=T('is public')}}
+								</th>
+							</tr>
+							{{for all_var in db(db.uploaded_file).select():}}
+								<tr>
+									<td style="white-space:nowrap;">
+										&nbsp &nbsp <input type="checkbox" value="{{=all_var.id}}" name="check_files" >
+									</td><td style="white-space:nowrap;">
+										<span class="icon-file"></span><a style="white-space:nowrap;" href="{{=URL('default/download', all_var.file_data)}}" target="blank">    {{= all_var.name }} </a> 
+									</td><td style="white-space:nowrap;"> 
+										- {{=T(str(all_var.visible)) }}
+									</td><td style="white-space:nowrap;"> 
+										- {{=T(str(all_var.is_public))}}
+									</td></tr>
+							{{pass}}
+							</table>
+							<div  id="div1" value="div1">		    			        	
+							</div>
+			        </div>
+			    </div>
+			</div>
+			<div id="attach_button" style="display: none;" align="right">
+		  		<input type="submit" role="button" class="btn btn-primary" value="{{=T('Attach')}}">					    
+			</div>
+		</form>
+    	
+    </div>
+
+  </div>
+  
+	  <div class="modal-footer" align="right">
+	  	<table align="right">
+	  		<tr >
+				<td>
+	      			<button class="btn" data-dismiss="modal" aria-hidden="true">{{=T('Close')}}</button>
+	      		</td>
+	      	</tr>
+	    </table>
+	  </div>
+	
+</div>
+<!--Finish Attach Div-->
