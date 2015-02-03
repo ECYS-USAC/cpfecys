@@ -2518,7 +2518,7 @@
 'You need to enter a report of the activity to be taken as valid.': 'Se necesita que ingrese un reporte de la actividad para que se tome como válida.',
 'You visited the url %s': 'Usted visitó la url %s',
 'You will be redirected to the page academic control': 'Será redireccionado a la página de control académico.',
-'Your data will not be stored in answering the evaluation': 'Sus datos no serán almacenados al responder la evaluación.',
+'Your data will not be stored in answering the evaluation': 'Se le garantiza que el sistema no registrara sus datos personales al resolver esta evaluación.',
 'Your performance is': 'Su desempeño',
 'Your photo has not been reviewed. Please contact an academic tutor to be accepted.': 'Su foto no ha sido revisada. Por favor contactar a un tutor académico para que sea aceptada.',
 'Your username is: %(username)s': 'Your username is: %(username)s',
