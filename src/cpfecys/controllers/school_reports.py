@@ -687,7 +687,6 @@ def general_period_export():
             infoLevel.append(infoeLevelTemp)
     return dict(filename='InformacionPeriodo', csvdata=infoLevel)
 
-
 @auth.requires_login()
 @auth.requires_membership('Ecys-Administrator')
 def general_period():
@@ -1237,8 +1236,6 @@ def historic_course_export():
                 infoLevel.append(infoeLevelTemp)
     return dict(filename='HistoricoPorCurso', csvdata=infoLevel)
 
-
-
 @auth.requires_login()
 @auth.requires_membership('Ecys-Administrator')
 def historic_course():
@@ -1544,5 +1541,273 @@ def historic_course():
 #**************************************************REPORT PERCENTAGE CHANGE GRADES****************************************************
 @auth.requires_login()
 @auth.requires_membership('Ecys-Administrator')
+def percentage_change_grades_export():
+    infoLevel = []
+    period = None
+    project = None
+    try:
+        #CHECK THAT THE LEVEL OF REPORT IS VALID
+        if request.vars['level'] is not None and (int(request.vars['level'])<1 or int(request.vars['level'])>2):
+            session.flash = T('Not valid Action.')
+            redirect(URL('default','index'))
+
+        #CHECK THAT THE AREA EXIST
+        area = db(db.area_level.name=='DTT Tutor Académico').select().first()
+        if area is None:
+            session.flash = T('Report no visible: There are no parameters required to display the report.')
+            redirect(URL('default','index'))
+
+        #CHECK IF THE PERIOD IS CHANGE
+        if request.vars['period'] is None:
+            import cpfecys
+            cperiod = cpfecys.current_year_period()
+            period = db(db.period_year.id==cperiod.id).select().first()
+        else:
+            period = db(db.period_year.id==int(request.vars['period'])).select().first()
+            if period is None:
+                session.flash = T('Not valid Action.')
+                redirect(URL('default','index'))
+
+        #CHECK PARAMETERS
+        if request.vars['level']=='1' or request.vars['level'] is None:
+            groupProjects = db(db.project.area_level==area.id).select(orderby=db.project.name)
+            if len(groupProjects) == 0:
+                session.flash = T('Report no visible: There are no parameters required to display the report.')
+                redirect(URL('default','index'))
+        else:
+            project = db((db.project.id==int(request.vars['project']))&(db.project.area_level==area.id)).select().first()
+            if project is None:
+                session.flash = T('Not valid Action.')
+                redirect(URL('default','index'))
+    except:
+        session.flash = T('Not valid Action.')
+        redirect(URL('default','index'))
+
+    #*****************************************************REPORT*****************************************************
+    #TITLE
+    infoLevel = []
+    infoeLevelTemp=[]
+    infoeLevelTemp.append('Universidad de San Carlos de Guatemala')
+    infoLevel.append(infoeLevelTemp)
+    infoeLevelTemp=[]
+    infoeLevelTemp.append('Facultad de Ingeniería')
+    infoLevel.append(infoeLevelTemp)
+    infoeLevelTemp=[]
+    infoeLevelTemp.append('Escuela de Ciencias y Sistemas')
+    infoLevel.append(infoeLevelTemp)
+    #TYPE OF REPORT
+    infoeLevelTemp=[]
+    infoeLevelTemp.append(T('Type'))
+    infoeLevelTemp.append(T('Historic per course'))
+    infoLevel.append(infoeLevelTemp)
+    #DESCRIPTION OF REPORT
+    infoeLevelTemp=[]
+    infoeLevelTemp.append(T('Description'))
+    infoeLevelTemp.append(T('Report on the historic course information.'))
+    infoLevel.append(infoeLevelTemp)
+    #PERIOD OF REPORT
+    infoeLevelTemp=[]
+    infoeLevelTemp.append(T('Period'))
+    infoeLevelTemp.append(T(period.period.name)+' '+str(period.yearp))
+    infoLevel.append(infoeLevelTemp)
+    #ALL SEMESTERS
+    if request.vars['level']=='1' or request.vars['level'] is None:
+        #MIDDLE LINE OF REPORT
+        infoeLevelTemp=[]
+        infoLevel.append(infoeLevelTemp)
+        #LABLE DETAIL OF REPORT
+        infoeLevelTemp=[]
+        infoeLevelTemp.append(T('Detail'))
+        infoLevel.append(infoeLevelTemp)
+        nameCourses = []
+        #HEADER
+        infoeLevelTemp=[]
+        infoeLevelTemp.append(T('Course'))
+        infoeLevelTemp.append(T('Percent Change'))
+        infoeLevelTemp.append(T('Number of sections'))
+        infoLevel.append(infoeLevelTemp)
+        nameCourses = []
+        #Fill all the courses once time
+        for project in groupProjects:
+            #Get only name
+            nameC = get_name(project)
+            #Get unique name
+            nameC = get_unique_name(nameC)
+            #Fill the name of the courses
+            exits = False
+            for iterator in nameCourses:
+                if iterator==nameC:
+                    exits=True
+                    break
+            if exits==False:
+                nameCourses.append(nameC)
+        #TOTAL OF CHANGES
+        totalChanges = db((db.grades_log.yearp==period.yearp)&(db.grades_log.period==T(period.period.name))&((db.grades_log.operation_log=='update')|(db.grades_log.operation_log=='delete'))).count()
+        #FOR COURSE
+        for course in nameCourses:
+            sections = db(db.project.name.like('%'+course+'%')).select()
+            infoeLevelTemp=[]
+            infoeLevelTemp.append(course)
+            infoeLevelTemp.append(0)
+            infoeLevelTemp.append(len(sections))
+            if totalChanges>0:
+                for project in sections:
+                    infoeLevelTemp[1]+=db((db.grades_log.yearp==period.yearp)&(db.grades_log.period==T(period.period.name))&(db.grades_log.project==project.name)&((db.grades_log.operation_log=='update')|(db.grades_log.operation_log=='delete'))).count()
+                infoeLevelTemp[1] = round(((float(infoeLevelTemp[1])*float(100))/float(totalChanges)),2)
+            infoLevel.append(infoeLevelTemp)
+    else:
+        #Get only name
+        nameC = get_name(project)
+        #Get unique name
+        nameC = get_unique_name(nameC)
+        #TOTAL OF CHANGES
+        totalChanges = 0
+        #FOR COURSE
+        rolesC=db(db.grades_log).select(db.grades_log.roll, distinct=True)
+        #PROJECT OF REPORT
+        infoeLevelTemp=[]
+        infoeLevelTemp.append(T('Course'))
+        infoeLevelTemp.append(nameC)
+        infoLevel.append(infoeLevelTemp)
+        #MIDDLE LINE OF REPORT
+        infoeLevelTemp=[]
+        infoLevel.append(infoeLevelTemp)
+        #LABLE DETAIL OF REPORT
+        infoeLevelTemp=[]
+        infoeLevelTemp.append(T('Detail'))
+        infoLevel.append(infoeLevelTemp)
+        nameCourses = []
+        #HEADER
+        infoeLevelTemp=[]
+        infoeLevelTemp.append(T('Section'))
+        for rc in rolesC:
+            infoeLevelTemp.append(T('Percent Change')+' '+T('Rol '+rc.roll))
+        infoLevel.append(infoeLevelTemp)
+        sections = db(db.project.name.like('%'+nameC+'%')).select()
+        for section in sections:
+            totalChanges+=db((db.grades_log.yearp==period.yearp)&(db.grades_log.period==T(period.period.name))&(db.grades_log.project==section.name)&((db.grades_log.operation_log=='update')|(db.grades_log.operation_log=='delete'))).count()
+        for section in sections:
+            infoeLevelTemp=[]
+            infoeLevelTemp.append(section.name)
+            for rc in rolesC:
+                infoeLevelTemp.append(0)
+            if totalChanges>0:
+                position=1
+                for rc in rolesC:
+                    infoeLevelTemp[position]+=db((db.grades_log.yearp==period.yearp)&(db.grades_log.period==T(period.period.name))&(db.grades_log.project==section.name)&(db.grades_log.roll==rc.roll)&((db.grades_log.operation_log=='update')|(db.grades_log.operation_log=='delete'))).count()
+                    infoeLevelTemp[position] = round(((float(infoeLevelTemp[position])*float(100))/float(totalChanges)),2)
+                    position+=1
+            infoLevel.append(infoeLevelTemp)
+    return dict(filename='PorcentajeCambioNotas', csvdata=infoLevel)
+
+
+@auth.requires_login()
+@auth.requires_membership('Ecys-Administrator')
 def percentage_change_grades():
-    None
+    infoLevel = []
+    groupPeriods = None
+    period = None
+    project = None
+    rolesC=None
+    try:
+        #CHECK THAT THE LEVEL OF REPORT IS VALID
+        if request.vars['level'] is not None and (int(request.vars['level'])<1 or int(request.vars['level'])>2):
+            session.flash = T('Not valid Action.')
+            redirect(URL('default','index'))
+
+        #CHECK THAT THE AREA EXIST
+        area = db(db.area_level.name=='DTT Tutor Académico').select().first()
+        if area is None:
+            session.flash = T('Report no visible: There are no parameters required to display the report.')
+            redirect(URL('default','index'))
+
+        #CHECK IF THE PERIOD IS CHANGE
+        if request.vars['period'] is None:
+            import cpfecys
+            cperiod = cpfecys.current_year_period()
+            period = db(db.period_year.id==cperiod.id).select().first()
+        else:
+            period = db(db.period_year.id==int(request.vars['period'])).select().first()
+            if period is None:
+                session.flash = T('Not valid Action.')
+                redirect(URL('default','index'))
+
+        #CHECK PARAMETERS
+        if request.vars['level']=='1' or request.vars['level'] is None:
+            groupPeriods = db(db.period_year).select(orderby=~db.period_year.id)
+            if len(groupPeriods) == 0:
+                session.flash = T('Report no visible: There are no parameters required to display the report.')
+                redirect(URL('default','index'))
+
+            groupProjects = db(db.project.area_level==area.id).select(orderby=db.project.name)
+            if len(groupProjects) == 0:
+                session.flash = T('Report no visible: There are no parameters required to display the report.')
+                redirect(URL('default','index'))
+        else:
+            project = db((db.project.id==int(request.vars['project']))&(db.project.area_level==area.id)).select().first()
+            if project is None:
+                session.flash = T('Not valid Action.')
+                redirect(URL('default','index'))
+    except:
+        session.flash = T('Not valid Action.')
+        redirect(URL('default','index'))
+
+    #*****************************************************REPORT*****************************************************
+    #ALL SEMESTERS
+    if request.vars['level']=='1' or request.vars['level'] is None:
+        nameCourses = []
+        #Fill all the courses once time
+        for project in groupProjects:
+            #Get only name
+            nameC = get_name(project)
+            #Get unique name
+            nameC = get_unique_name(nameC)
+            #Fill the name of the courses
+            exits = False
+            for iterator in nameCourses:
+                if iterator==nameC:
+                    exits=True
+                    break
+            if exits==False:
+                nameCourses.append(nameC)
+        #TOTAL OF CHANGES
+        totalChanges = db((db.grades_log.yearp==period.yearp)&(db.grades_log.period==T(period.period.name))&((db.grades_log.operation_log=='update')|(db.grades_log.operation_log=='delete'))).count()
+        #FOR COURSE
+        for course in nameCourses:
+            sections = db(db.project.name.like('%'+course+'%')).select()
+            infoeLevelTemp=[]
+            infoeLevelTemp.append(sections.first().id)
+            infoeLevelTemp.append(course)
+            infoeLevelTemp.append(0)
+            infoeLevelTemp.append(len(sections))
+            if totalChanges>0:
+                for project in sections:
+                    infoeLevelTemp[2]+=db((db.grades_log.yearp==period.yearp)&(db.grades_log.period==T(period.period.name))&(db.grades_log.project==project.name)&((db.grades_log.operation_log=='update')|(db.grades_log.operation_log=='delete'))).count()
+                infoeLevelTemp[2] = round(((float(infoeLevelTemp[2])*float(100))/float(totalChanges)),2)
+            infoLevel.append(infoeLevelTemp)
+    else:
+        #Get only name
+        nameC = get_name(project)
+        #Get unique name
+        nameC = get_unique_name(nameC)
+        #TOTAL OF CHANGES
+        totalChanges = 0
+        #FOR COURSE
+        rolesC=db(db.grades_log).select(db.grades_log.roll, distinct=True)
+        sections = db(db.project.name.like('%'+nameC+'%')).select()
+        for section in sections:
+            totalChanges+=db((db.grades_log.yearp==period.yearp)&(db.grades_log.period==T(period.period.name))&(db.grades_log.project==section.name)&((db.grades_log.operation_log=='update')|(db.grades_log.operation_log=='delete'))).count()
+        for section in sections:
+            infoeLevelTemp=[]
+            infoeLevelTemp.append(section.name)
+            for rc in rolesC:
+                infoeLevelTemp.append(0)
+            if totalChanges>0:
+                position=1
+                for rc in rolesC:
+                    infoeLevelTemp[position]+=db((db.grades_log.yearp==period.yearp)&(db.grades_log.period==T(period.period.name))&(db.grades_log.project==section.name)&(db.grades_log.roll==rc.roll)&((db.grades_log.operation_log=='update')|(db.grades_log.operation_log=='delete'))).count()
+                    infoeLevelTemp[position] = round(((float(infoeLevelTemp[position])*float(100))/float(totalChanges)),2)
+                    position+=1
+            infoLevel.append(infoeLevelTemp)
+        project=nameC
+    return dict(groupPeriods=groupPeriods, period=period, infoLevel=infoLevel, project=project, rolesC=rolesC)

@@ -2500,6 +2500,8 @@
 'Yearp': 'Año',
 'YES': 'Export full report',
 'Yes': 'Si',
+'Percent Change': 'Porcentaje de cambio',
+'Report on the percentage change of notes that have made the diferent roles inde courses.': 'Reporte sobre el porcentaje de cambio de notas que han realizado los distintos roles dentro los cursos.',
 'Percentage change of notes': 'Porcentaje de cambio de notas',
 'With assignments': 'Con asignaciones',
 'Without assignments': 'Sin asignaciones',

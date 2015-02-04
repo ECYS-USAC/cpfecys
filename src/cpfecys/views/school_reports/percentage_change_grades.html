@@ -1,0 +1,115 @@
+{{extend 'template.html'}}
+<!-- Additional Scripts for MARKMIN -->
+<script src="http://code.jquery.com/jquery-migrate-1.2.1.js"></script>
+<script type="text/javascript" src="{{=URL('static','markitup')}}/jquery.markitup.pack.js"></script>
+<script type="text/javascript" src="{{=URL('static','markitup')}}/sets/markmin/set.js"></script>
+<script type="text/javascript" src="{{=URL('static','js')}}/highcharts/js/highcharts.js"></script>
+<script type="text/javascript" src="{{=URL('static','js')}}/highcharts/js/modules/data.js"></script>
+<script type="text/javascript" src="{{=URL('static','js')}}/highcharts/js/modules/exporting.js"></script>
+<link rel="stylesheet" type="text/css" href="{{=URL('static','markitup')}}/skins/markitup/style.css"/>
+<link rel="stylesheet" type="text/css" href="{{=URL('static','markitup')}}/sets/markmin/style.css"/>
+<!-- //Additional Scripts for MARKMIN -->
+<div class="row-fluid container" style="overflow:auto; width:100%;">
+    <!--REPORT CONTENTS-->
+    	<div>
+    	<!--HEADER OF REPORT-->
+	    	{{if request.vars['level'] is not None and str(request.vars['level'])!="1":}}
+	    	<div class="pull-left">
+	    		<a style="white-space:nowrap; cursor:pointer; align:right;" class="btn" onclick="levelUP();">
+	    			<span class="icon-black icon-arrow-up"></span><b>{{=T('Level Up')}}</b>
+	    		</a>
+	    	</div>
+	    	{{pass}}
+	    	<div class="pull-right">
+	    		<a onclick="exportCSV();"><img src="{{=URL('static','images')}}/icono_CSV.png"></a>
+	    	</div>
+	    	<center><h1>{{=T('Report Summary')}}</h1></center>
+	    	<hr>
+	    	<img class="pull-right" src="{{=URL('static','images')}}/escudo.png">
+			<center><strong>Universidad de San Carlos de Guatemala</strong><br/>
+			<strong>Facultad de Ingeniería</strong><br/>
+			<strong>Escuela de Ciencias y Sistemas</strong></center><br/>
+			<strong>{{=T('Type')}}: </strong> {{=T('Percentage change of notes')}}<br/>
+			<strong>{{=T('Description')}}: </strong> {{=T('Report on the percentage change of notes that have made the diferent roles inde courses.')}}<br/>
+			<strong>{{=T('Period')}}: </strong> {{=T(period.period.name)}} {{=period.yearp}}
+    	<!--HEADER OF REPORT-->
+    	{{if request.vars['level'] is None or str(request.vars['level'])=="1":}}
+    		<form class="form-inline" action="{{=URL('school_reports','percentage_change_grades')}}" method='get'>
+				<select name="period">
+				{{for period_I in groupPeriods:}}
+					{{if str(period_I.id) == str(period.id):}}
+						{{var_sel="selected='selected'"}}
+					{{else:}}
+						{{var_sel=''}}
+					{{pass}}
+				  <option value="{{=period_I.id}}" {{=var_sel}}>
+				  {{=T(period_I.period.name)}}-{{=period_I.yearp}}
+				  </option>
+				{{pass}}
+				</select>
+				<input class="btn" type="submit" value="{{=T('Go')}}">
+			</form>
+		  	<!--REPORT IN TABLE-->
+				<table class="table table-striped table-bordered">
+					<tr>
+						<th>{{=T('Course')}}</th>
+						<th><center>{{=T('Percent Change')}}</center></th>
+						<th><center>{{=T('Number of sections')}}</center></th>
+					</tr>
+					{{for project in infoLevel:}}
+						<tr>
+							<td>
+								<a style="cursor:pointer;" onclick="next_Level({{=project[0]}});">{{=project[1]}}</a>
+							</td>
+							<td><center>{{=project[2]}} %</center></td>
+							<td><center>{{=project[3]}}</center></td>
+						</tr>
+					{{pass}}
+				</table>
+			<!--REPORT IN TABLE-->
+		{{elif str(request.vars['level'])=="2":}}
+			<br/><strong>{{=T('Course')}}: </strong> {{=project}}<br/><br/>
+		  	<!--REPORT IN TABLE-->
+				<table class="table table-striped table-bordered">
+					<tr>
+						<th>{{=T('Section')}}</th>
+						{{for rc in rolesC:}}
+							<th><center>{{=T('Percent Change')}} {{=T('Rol '+rc.roll)}}</center></th>
+						{{pass}}
+					</tr>
+					{{for project in infoLevel:}}
+						<tr>
+							<td>
+								{{=project[0]}}
+							</td>
+							{{for pos in range(1,len(project)):}}
+								<td><center>{{=project[pos]}} %</center></td>
+							{{pass}}
+						</tr>
+					{{pass}}
+				</table>
+			<!--REPORT IN TABLE-->
+		{{pass}}
+    	</div>
+	<!--REPORT CONTENTS-->    
+</div>
+
+<script type="text/javascript">
+	{{if request.vars['level'] is None or str(request.vars['level'])=="1":}}
+		function next_Level(id){
+			window.location.href = "{{=URL('school_reports', 'percentage_change_grades')}}?level=2&amp;period={{=period.id}}&amp;project="+id;
+		}
+
+		function exportCSV(){
+			window.location.href = "{{=URL('school_reports','percentage_change_grades_export', vars=dict(list_type='csv', level='1',period = period.id))}}";
+		}
+	{{else:}}
+		function levelUP(){
+			window.location.href = "{{=URL('school_reports', 'percentage_change_grades')}}?period={{=period.id}}";
+		}
+
+		function exportCSV(){
+			window.location.href = "{{=URL('school_reports','percentage_change_grades_export', vars=dict(list_type='csv', level='2',period = str(request.vars['period']), project = str(request.vars['project'])))}}";
+		}
+	{{pass}}
+</script>
