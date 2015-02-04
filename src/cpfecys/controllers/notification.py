@@ -389,7 +389,7 @@ def teacher_mail_notifications():
                 return students
             else:
                 #obtain the final practice students assigned in the course where the user is the manager
-                students = db((db.user_project.project==check.project)&((db.user_project.period <= check.period) & ((db.user_project.period + db.user_project.periods) > check.period))&(db.user_project.assigned_user!=check.assigned_user)&(db.auth_membership.user_id==db.user_project.assigned_user)&(db.auth_membership.group_id==2)).select()
+                students = db((db.user_project.project==check.project)&((db.user_project.period <= period) & ((db.user_project.period + db.user_project.periods) > period))&(db.user_project.assigned_user!=check.assigned_user)&(db.auth_membership.user_id==db.user_project.assigned_user)&(db.auth_membership.group_id==2)).select()
                 return students
 
     if session.notification_subject == None:

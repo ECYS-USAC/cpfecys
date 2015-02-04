@@ -16,14 +16,6 @@
 							<input name="_formname" type="hidden" value="select_form">
 			              	<select class="generic-widget" id="semester_id" name="semester_id">
 								{{for per in period_list:}}
-									{{if str(per.semester.id) == str(period_id):}}
-										{{var_sel="selected='selected'"}}
-									{{else:}}
-										{{var_sel=''}}
-									{{pass}}
-									<option  onclick="refresh_period({{=per.semester.id}});" value="{{=per.semester.id}}" {{=var_sel}} >{{=T(per.semester.period.name)}} {{=per.semester.yearp}}</option>
-								{{pass}}
-								{{for per in period_list2:}}
 									{{if str(per.id) == str(period_id):}}
 										{{var_sel="selected='selected'"}}
 									{{else:}}
@@ -31,6 +23,7 @@
 									{{pass}}
 									<option  onclick="refresh_period({{=per.id}});" value="{{=per.id}}" {{=var_sel}} >{{=T(per.period.name)}} {{=per.yearp}}</option>
 								{{pass}}
+								
 							</select>
 						</td>
 						<td>
@@ -185,7 +178,7 @@
 
 
 <!--View mail Modal -->
-<div id="mailModal" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true" > 
+<div id="mailModal" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true" style="overflow:auto;" > 
 	<div id ="a" class="modal-header">
       <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
            &nbsp;   
