@@ -2243,7 +2243,7 @@ def report_filter():
     elif int(status) == -2:#Reprobados
         reports = db((db.report.created>start)&
             (db.report.created<end)&
-            (db.report.score<=db.report.min_score)&
+            (db.report.score<db.report.min_score)&
             (db.report.min_score!=None)&
             (db.report.min_score!=0)&
             (db.report.never_delivered==None or

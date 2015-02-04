@@ -15,14 +15,17 @@
             {{=T(status_instance.name)}}
             </h1>
         {{pass}}
+        <a class="show_class"  style="cursor:pointer;" onclick="visible_detail();">
+              {{=T('View Detail')}}
+          </a>
+          <a class="hide_class" style="cursor:pointer; display:none;" onclick="hide_detail();">
+              {{=T('Hide Detail')}}
+          </a>
 		<table id="report-filter" class="table table-bordered">
 			<thead>
-                <tr>
-                    <th colspan="10"></th>
-                    <th colspan="2">{{=T('Actions')}}</th>
-                </tr>
+                
 				<tr>
-                    <th>
+                    <th class="hide_class" style="display:none">
                         {{=T('Num')}}
                     </th>
 					<th>
@@ -34,7 +37,7 @@
 					<th>
 						{{=T('School id')}}
 					</th>
-                    <th>
+                    <th class="hide_class" style="display:none">
                         {{=T('Email')}}
                     </th>
 					<th>
@@ -52,10 +55,10 @@
 					<th>
                         {{=T('Report Summary')}}
 					</th>
-					<th>
+					<th class="hide_class" style="display:none">
 						{{=T('Started')}}
 					</th>
-					<th>
+					<th class="hide_class" style="display:none">
 						{{=T('Ends')}}
 					</th>
                     <th>
@@ -104,7 +107,7 @@
                     {{if show:}}
                     {{count += 1}}
     				<tr>
-                        <td>
+                        <td class="hide_class" style="display:none">
                             {{=count}}
                         </td>
     					<td>
@@ -116,7 +119,7 @@
     					<td>
     						{{=report.assignation.assigned_user.username}}	
     					</td>
-                        <td>
+                        <td  class="hide_class" style="display:none">
                             {{=report.assignation.assigned_user.email}}  
                         </td>                        
     					<td>
@@ -148,10 +151,10 @@
                             <b>{{=T('Anomalies')}}:</b>
                             {{=anomalies}}
     					</td>
-    					<td>
+    					<td  class="hide_class" style="display:none">
     						{{=report.assignation.period.yearp}} - {{=T(report.assignation.period.period.name)}}
     					</td>
-    					<td>
+    					<td class="hide_class" style="display:none">
     						{{=calculate_ending_date(report)}}
     					</td>
                         <td>
@@ -211,8 +214,12 @@
                     {{pass}}
                 {{pass}}
                 <tr>
-                    <td colspan="11"></td>
+                     <td class="hide_class" style="display:none" colspan="12">
+                    </td>
+                    <td class="show_class" colspan="8">
+                    </td>
                     <td>
+                    
                         <div class="pull-right right">
                             <b>{{=T('DTT Approval')}}:</b>
                             <a class="btn btn-success"
@@ -235,3 +242,13 @@
 		</table>
 	</div>
 </div>
+<script type="text/javascript">
+    function visible_detail(){
+      $(".hide_class").css("display", "table-cell");
+      $(".show_class").css("display", "none");
+    }
+    function hide_detail(){
+      $(".show_class").css("display", "table-cell");
+      $(".hide_class").css("display", "none");
+    }
+</script>

@@ -20,12 +20,6 @@ def evaluation():
     grid = SQLFORM.smartgrid(query, csv=False)
     return dict(grid=grid)
 
-@auth.requires_login()
-@auth.requires_membership('Super-Administrator')
-def evaluation_results():
-    query=db.evaluation_result
-    grid = SQLFORM.smartgrid(query, csv=False)
-    return dict(grid=grid)
     
 @auth.requires_login()
 @auth.requires_membership('Super-Administrator')
