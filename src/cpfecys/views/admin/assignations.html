@@ -1,6 +1,6 @@
 {{extend 'template.html'}}
 <h2>
-    {{=T('Final Practice Administration')}}
+    {{=T('Final Practices')}}
     <a href="#myModal" role="button" class="btn btn-primary" data-toggle="modal">
         <span class="icon-white icon-question-sign"></span>
     </a>
@@ -77,6 +77,13 @@
             <i class="icon-download icon-white"></i>
             {{=T('Excel (XLS)')}}
         </a>
+          <a class="show_class"  style="cursor:pointer;" onclick="visible_detail();">
+              {{=T('View Student Information')}}
+          </a>
+          <a class="hide_class" style="cursor:pointer; display:none;" onclick="hide_detail();">
+              {{=T('Hide Student Information')}}
+          </a>
+        <br>
           <table id="assignations" class="table table-bordered table-hover table-striped">
               <thead>
                   <tr>
@@ -84,19 +91,19 @@
                       <th>{{=T('Last Name')}}</th>
                       <th>{{=T('First Name')}}</th>
                       <th>{{=T('Carnet')}}</th>
-                      <th>{{=T('Email')}}</th>
-                      <th>{{=T('Phone')}}</th>
-                      <th>{{=T('Working Address')}}</th>
-                      <th>{{=T('Company Name')}}</th>
-                      <th>{{=T('Work Phone')}}</th>
-                      <th>{{=T('Home Address')}}</th>
+                      <th class="hide_class" style="display:none">{{=T('Email')}}</th>
+                      <th class="hide_class" style="display:none">{{=T('Phone')}}</th>
+                      <th class="hide_class" style="display:none">{{=T('Working Address')}}</th>
+                      <th class="hide_class" style="display:none">{{=T('Company Name')}}</th>
+                      <th class="hide_class" style="display:none">{{=T('Work Phone')}}</th>
+                      <th class="hide_class" style="display:none">{{=T('Home Address')}}</th>
                       <th>{{=T('Area')}}</th>
                       <th>{{=T('Proyecto')}}</th>
-                      <th>{{=T('Assignation Start')}}</th>
-                      <th>{{=T('Assignation Length')}}</th>
-                      <th>{{=T('Assignation State')}}</th>
-                      <th>{{=T('Assignation Validity')}}</th>
-                      <th>{{=T('Generate Final Practice Certification')}}</th>
+                      <td><b>{{=T('Assignation Start')}}</b></td>
+                      <td><b>{{=T('Assignation Length')}}</b></td>
+                      <td><b>{{=T('Assignation State')}}</b></td>
+                      <td><b>{{=T('Assignation Validity')}}</b></td>
+                      <td><b>{{=T('Generate Final Practice Certification')}}</b></td>
                   </tr>
               </thead>
               <tbody>
@@ -127,12 +134,12 @@
                       <td>{{=row.auth_user.last_name}}</td>
                       <td>{{=row.auth_user.first_name}}</td>
                       <td>{{=row.auth_user.username}}</td>
-                      <td>{{=row.auth_user.email}}</td>
-                      <td>{{=row.auth_user.phone or T('Pending')}}</td>
-                      <td>{{=row.auth_user.work_address or 'N/A'}}</td>
-                      <td>{{=row.auth_user.company_name or 'N/A'}}</td>
-                      <td>{{=row.auth_user.work_phone or 'N/A'}}</td>
-                      <td>{{=row.auth_user.home_address or 'N/A'}}</td>
+                      <td class="hide_class" style="display:none">{{=row.auth_user.email}}</td>
+                      <td class="hide_class" style="display:none">{{=row.auth_user.phone or T('Pending')}}</td>
+                      <td class="hide_class" style="display:none">{{=row.auth_user.work_address or 'N/A'}}</td>
+                      <td class="hide_class" style="display:none">{{=row.auth_user.company_name or 'N/A'}}</td>
+                      <td class="hide_class" style="display:none">{{=row.auth_user.work_phone or 'N/A'}}</td>
+                      <td class="hide_class" style="display:none">{{=row.auth_user.home_address or 'N/A'}}</td>
                       <td>{{=row.project.area_level.name or 'N/A'}}</td>
                       <td>{{=row.project.name}}</td>
                       <td>{{=row.period_year.yearp}} - {{=T(row.period_year.period.name)}}</td>
@@ -181,8 +188,16 @@
 <hr />
 <script>
     $(function(){
-        $('.pop').popover();
+        $('.pop').popover();        
     });
+    function visible_detail(){
+      $(".hide_class").css("display", "table-cell");
+      $(".show_class").css("display", "none");
+    }
+    function hide_detail(){
+      $(".show_class").css("display", "table-cell");
+      $(".hide_class").css("display", "none");
+    }
 </script>
 {{if request.is_local:}}
 {{=response.toolbar()}}

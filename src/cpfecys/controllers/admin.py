@@ -1691,11 +1691,11 @@ def mail_notifications():
                             (db.academic_course_assignation.semester==period.id)
                             )
 
-                    else:
+                    elif role.role == 'Student':
                         users = db(
                             (db.auth_user.id==db.auth_membership.user_id)&
                             (db.auth_membership.group_id==db.auth_group.id)&
-                            (db.auth_group.id.belongs(roles))&
+                            (db.auth_group.id == role.id)&
                             #Until here we get users from role
                             (db.user_project.project.belongs(projects))&
                             (db.auth_user.id==db.user_project.assigned_user)&
@@ -1703,6 +1703,20 @@ def mail_notifications():
                             (db.user_project.period==db.period_year.id)&
                             ( (db.user_project.assignation_status==None)|
                               ((db.user_project.period <= period.id)&
+                              ((db.user_project.period + db.user_project.periods) > \
+                              period.id)) )
+                            )
+                    elif role.role == 'Teacher':
+                        users = db(
+                            (db.auth_user.id==db.auth_membership.user_id)&
+                            (db.auth_membership.group_id==db.auth_group.id)&
+                            (db.auth_group.id == role.id)&
+                            #Until here we get users from role
+                            (db.user_project.project.belongs(projects))&
+                            (db.auth_user.id==db.user_project.assigned_user)&
+                            #Until here we get users from role assigned to projects
+                            (db.user_project.period==db.period_year.id)&
+                            ( ((db.user_project.period <= period.id)&
                               ((db.user_project.period + db.user_project.periods) > \
                               period.id)) )
                             )
@@ -2229,7 +2243,7 @@ def report_filter():
     elif int(status) == -2:#Reprobados
         reports = db((db.report.created>start)&
             (db.report.created<end)&
-            (db.report.score<=db.report.min_score)&
+            (db.report.score<db.report.min_score)&
             (db.report.min_score!=None)&
             (db.report.min_score!=0)&
             (db.report.never_delivered==None or
