@@ -12,13 +12,7 @@ def inbox():
     assignations = []
     coursesAdmin = []
 
-    try:
-        academic_var = db.academic(db.academic.id_auth_user==auth.user.id)
-
-        period_list = db(db.academic_course_assignation.carnet==academic_var.id).select(db.academic_course_assignation.semester,distinct=True)
     
-    except:
-        None
     
     select_form = FORM(INPUT(_name='semester_id',_type='text'))
 
@@ -45,25 +39,33 @@ def inbox():
                         (db.user_project.project == db.project.id)&\
                         ((db.user_project.period <= t.id) & \
                         ((db.user_project.period + db.user_project.periods) > t.id))).select(db.user_project.ALL).first()
-            
-            if assignation_temp is not None:                
-                exists = False
+    
+    periods_temp = db(db.period_year).select(orderby=~db.period_year.id)
+    periods = []
+    for period_temp in periods_temp:
+        added = False
+        if auth.has_membership('Student') or auth.has_membership('Teacher'):
+            try:
+                if db((db.user_project.assigned_user==auth.user.id)&\
+                    (db.user_project.period == db.period_year.id)&\
+                    ((db.user_project.period <= t.id) & \
+                    ((db.user_project.period + db.user_project.periods) > period_temp.id))).select(db.user_project.ALL).first() is not None:
+                    periods.append(period_temp)
+                    added = True
+            except:
+                None
+        if auth.has_membership('Academic'):
+            try:
+                if db((db.academic_course_assignation.carnet==academic_var.id)&(db.academic_course_assignation.semester==period_temp.id)).select().first() is not None:
+                    if added == False:
+                        periods.append(period_temp)
 
-                for t2 in period_list:
-
-                    if t.id == t2.semester:
-                        exists = True
-                    pass
-                pass
-                if exists == False:
-                    period_list2.append(t)
-                pass
-        pass
-    pass
+            except:
+                None
 
     period_var = db(db.period_year.id == period_id).select().first()
         
-    return dict(assignations=assignations,email=auth.user.email,period_var=period_var,period_id=period_id,period_list=period_list,cperiod=cperiod.id,coursesAdmin=coursesAdmin, period_list2=period_list2)
+    return dict(assignations=assignations,email=auth.user.email,period_var=period_var,period_id=period_id,period_list=periods,cperiod=cperiod.id,coursesAdmin=coursesAdmin)
 
 @auth.requires_login()
 @auth.requires(auth.has_membership('Student') or auth.has_membership('Teacher') or auth.has_membership('Academic'))

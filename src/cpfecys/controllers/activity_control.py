@@ -28,7 +28,7 @@ def courses_list():
         periods = db(db.period_year).select()
 
     else:
-        periods_temp = db(db.period_year).select()
+        periods_temp = db(db.period_year).select(orderby=~db.period_year.id)
         periods = []
         for period_temp in periods_temp:
             added = False
