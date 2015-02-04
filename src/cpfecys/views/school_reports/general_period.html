@@ -1,0 +1,124 @@
+{{extend 'template.html'}}
+<!-- Additional Scripts for MARKMIN -->
+<script src="http://code.jquery.com/jquery-migrate-1.2.1.js"></script>
+<script type="text/javascript" src="{{=URL('static','markitup')}}/jquery.markitup.pack.js"></script>
+<script type="text/javascript" src="{{=URL('static','markitup')}}/sets/markmin/set.js"></script>
+<script type="text/javascript" src="{{=URL('static','js')}}/highcharts/js/highcharts.js"></script>
+<script type="text/javascript" src="{{=URL('static','js')}}/highcharts/js/modules/data.js"></script>
+<script type="text/javascript" src="{{=URL('static','js')}}/highcharts/js/modules/exporting.js"></script>
+<link rel="stylesheet" type="text/css" href="{{=URL('static','markitup')}}/skins/markitup/style.css"/>
+<link rel="stylesheet" type="text/css" href="{{=URL('static','markitup')}}/sets/markmin/style.css"/>
+<!-- //Additional Scripts for MARKMIN -->
+<div class="row-fluid container" style="overflow:auto; width:100%;">
+    <!--REPORT CONTENTS-->
+    	<div>
+    	<!--HEADER OF REPORT-->
+	    	<div class="pull-right">
+	    		<a onclick="exportCSV();"><img src="{{=URL('static','images')}}/icono_CSV.png"></a>
+	    	</div>
+	    	<center><h1>{{=T('Report Summary')}}</h1></center>
+	    	<hr>
+	    	<img class="pull-right" src="{{=URL('static','images')}}/escudo.png">
+			<center><strong>Universidad de San Carlos de Guatemala</strong><br/>
+			<strong>Facultad de Ingeniería</strong><br/>
+			<strong>Escuela de Ciencias y Sistemas</strong></center><br/>
+			<strong>{{=T('Type')}}: </strong> {{=T('Overview of semester')}}<br/>
+			<strong>{{=T('Description')}}: </strong> {{=T('Report on the overview of courses per semester.')}}<br/>
+			<strong>{{=T('Period')}}: </strong> {{=T(period.period.name)}} {{=period.yearp}}
+			<form class="form-inline" action="{{=URL('school_reports','general_period')}}" method='get'>
+				<select name="period">
+				{{for period_I in groupPeriods:}}
+					{{if str(period_I.id) == str(period.id):}}
+						{{var_sel="selected='selected'"}}
+					{{else:}}
+						{{var_sel=''}}
+					{{pass}}
+				  <option value="{{=period_I.id}}" {{=var_sel}}>
+				  {{=T(period_I.period.name)}}-{{=period_I.yearp}}
+				  </option>
+				{{pass}}
+				</select>
+				<input class="btn" type="submit" value="{{=T('Go')}}">
+			</form>
+    	<!--HEADER OF REPORT-->
+    	<br>
+    	<!--BODY OF REPORT-->
+    		<table class="pull-right">
+				<tr>
+					<td>
+						<span class="label label-success">&nbsp;&nbsp;&nbsp;</span>&nbsp;<b>{{=T('Above average')}} </b>
+					</td>
+					<td></td>
+					<td>
+						<span class="label label-warning">&nbsp;&nbsp;&nbsp;</span>&nbsp;<b>{{=T('On the average')}} </b>
+					</td>
+					<td></td>
+			 		<td>
+			 			<span class="label label-important">&nbsp;&nbsp;&nbsp;</span>&nbsp;<b>{{=T('Below Average')}}</b>
+			 		</td>
+				</tr>
+			</table>
+			<table class="table table-striped table-bordered">
+				{{first=True}}
+				{{for project in infoLevel:}}
+					<tr>
+						{{if first==True:}}
+							{{for field in project:}}
+								<Td><center><b>{{=field}}</b></center></TD>
+							{{pass}}
+						{{else:}}
+							<td><b>{{=project[0]}}</b></td>
+							<td><center>{{=project[1]}}</center></td>
+							{{for field in range(2,len(project)-2):}}
+								<td><center>
+                                    {{if float(project[field]) < float(controlP.min_average):}}
+                                        <FONT COLOR="#FA4545">
+                                    {{elif float(project[field])>=float(controlP.min_average) and float(project[field]) <= float(controlP.max_average):}}
+                                        <FONT STYLE="color: #C5B911; text-shadow: -1px -1px 0 #F2F5A9, 1px -1px 0 #F2F5A9, -1px 1px 0 #F2F5A9, 1px 1px 0 #F2F5A9;   ">
+                                    {{else:}}
+                                        <FONT STYLE="color: Green; text-shadow: -1px -1px 0 #CBE9C4, 1px -1px 0 #CBE9C4, -1px 1px 0 #CBE9C4, 1px 1px 0 #CBE9C4;   ">
+                                    {{pass}}
+                                    {{=str(project[field])}}
+                                    </font>
+                                </center></td>
+							{{pass}}
+							<td>
+								<center>
+									{{if float(project[len(project)-2]) < float(controlP.min_average):}}
+	                                    <span class="label label-important">
+	                                {{elif float(project[len(project)-2])>=float(controlP.min_average) and float(project[len(project)-2]) <= float(controlP.max_average):}}
+	                                    <span class="label label-warning">
+	                                {{else:}}
+	                                    <span class="label label-success">
+	                                {{pass}}
+	                                {{=str(project[len(project)-2])}}
+	                                </span>
+	                            </center>
+							</td>
+							<td>
+								<center>
+									{{if float(project[len(project)-1]) < float(controlP.min_average):}}
+	                                    <span class="label label-important">
+	                                {{elif float(project[len(project)-1])>=float(controlP.min_average) and float(project[len(project)-1]) <= float(controlP.max_average):}}
+	                                    <span class="label label-warning">
+	                                {{else:}}
+	                                    <span class="label label-success">
+	                                {{pass}}
+	                                {{=str(project[len(project)-1])}}
+	                                </span>
+	                            </center>
+							</td>
+						{{pass}}
+					{{first=False}}
+					</tr>
+				{{pass}}
+			</table>
+		<!--BODY OF REPORT-->
+    	</div>
+	<!--REPORT CONTENTS-->    
+</div>
+<script type="text/javascript">
+	function exportCSV(){
+		window.location.href = "{{=URL('school_reports','general_period_export', vars=dict(list_type='csv', period = period.id))}}";
+	}
+</script>

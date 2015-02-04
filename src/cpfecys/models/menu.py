@@ -199,7 +199,7 @@ if auth.has_membership(role="Ecys-Administrator"):
 
     response.menu.extend([(T('School Reports'), False, URL(), [
         (T('General Information'), False, URL('school_reports','general_information'), []),
-        (T('Performance of students'), False, URL('management_reports','performance_students'), []),
+        (T('Overview of semester'), False, URL('school_reports','general_period'), []),
         (T('History Evaluations'), False, URL('management_reports','evaluation_result'), [])
         ]),
     ])
