@@ -1,0 +1,163 @@
+{{extend 'template.html'}}
+<!-- Additional Scripts for MARKMIN -->
+<script src="http://code.jquery.com/jquery-migrate-1.2.1.js"></script>
+<script type="text/javascript" src="{{=URL('static','markitup')}}/jquery.markitup.pack.js"></script>
+<script type="text/javascript" src="{{=URL('static','markitup')}}/sets/markmin/set.js"></script>
+<script type="text/javascript" src="{{=URL('static','js')}}/highcharts/js/highcharts.js"></script>
+<script type="text/javascript" src="{{=URL('static','js')}}/highcharts/js/modules/data.js"></script>
+<script type="text/javascript" src="{{=URL('static','js')}}/highcharts/js/modules/exporting.js"></script>
+<link rel="stylesheet" type="text/css" href="{{=URL('static','markitup')}}/skins/markitup/style.css"/>
+<link rel="stylesheet" type="text/css" href="{{=URL('static','markitup')}}/sets/markmin/style.css"/>
+<!-- //Additional Scripts for MARKMIN -->
+<div class="row-fluid container" style="overflow:auto; width:100%;">
+    <!--REPORT CONTENTS-->
+    	<div>
+    	<!--HEADER OF REPORT-->
+	    	{{if request.vars['level'] is not None and str(request.vars['level'])!="1":}}
+	    	<div class="pull-left">
+	    		<a style="white-space:nowrap; cursor:pointer; align:right;" class="btn" onclick="levelUP();">
+	    			<span class="icon-black icon-arrow-up"></span><b>{{=T('Level Up')}}</b>
+	    		</a>
+	    	</div>
+	    	{{pass}}
+	    	<div class="pull-right">
+	    		<a onclick="exportCSV();"><img src="{{=URL('static','images')}}/icono_CSV.png"></a>
+	    	</div>
+	    	<center><h1>{{=T('Report Summary')}}</h1></center>
+	    	<hr>
+	    	<img class="pull-right" src="{{=URL('static','images')}}/escudo.png">
+			<center><strong>Universidad de San Carlos de Guatemala</strong><br/>
+			<strong>Facultad de Ingeniería</strong><br/>
+			<strong>Escuela de Ciencias y Sistemas</strong></center><br/>
+			<strong>{{=T('Type')}}: </strong> {{=T('Historic per course')}}<br/>
+			<strong>{{=T('Description')}}: </strong> {{=T('Report on the historic course information.')}}<br/>
+			<strong>{{=T('Period')}}: </strong> {{=T(period.period.name)}} {{=period.yearp}}
+    	<!--HEADER OF REPORT-->
+    	{{if request.vars['level'] is None or str(request.vars['level'])=="1":}}
+    		<form class="form-inline" action="{{=URL('school_reports','historic_course')}}" method='get'>
+				<select name="period">
+				{{for period_I in groupPeriods:}}
+					{{if str(period_I.id) == str(period.id):}}
+						{{var_sel="selected='selected'"}}
+					{{else:}}
+						{{var_sel=''}}
+					{{pass}}
+				  <option value="{{=period_I.id}}" {{=var_sel}}>
+				  {{=T(period_I.period.name)}}-{{=period_I.yearp}}
+				  </option>
+				{{pass}}
+				</select>
+				<input class="btn" type="submit" value="{{=T('Go')}}">
+			</form>
+			<div>
+				<table class="pull-right table-striped table-bordered">
+		  			<tr>
+		  				<th colspan="3"><center>{{=T('Filter Courses')}}</center></th>
+		  			</tr>
+					<tr>
+						<td>
+							<a style="cursor:pointer;" onclick="visible_C(1);" title="{{=T('View all courses')}}">
+								<span class="label label-info">{{=T('All')}}</span>
+	                    	</a>
+						</td>
+						<td>
+							
+							<a style="cursor:pointer;" onclick="visible_C(2);" title="{{=T('Show active courses')}}">
+	                    		<span class="label label-success">{{=T('With assignments')}}</span>
+	                    	</a>
+						</td>
+						<td>
+							<a style="cursor:pointer;" onclick="visible_C(3);" title="{{=T('Show inactive courses')}}">
+	                    		<span class="label label-inverse">{{=T('Without assignments')}}</span>
+	                    	</a>
+						</td>
+					</tr>
+				</table><br/><br/><br/>
+		  	</div>
+		  	<!--REPORT IN TABLE-->
+				<table class="table table-striped table-bordered">
+					<tr>
+						<th>{{=T('Course')}}</th>
+						<th><center>{{=T('Total number of students assigned to the course')}}</center></th>
+						<th><center>{{=T('Passed the course')}}</center></th>
+						<th><center>{{=T('Reprobate the course')}}</center></th>
+						<th><center>{{=T('Number of sections')}}</center></th>
+					</tr>
+					{{for project in infoLevel:}}
+						{{if project[2]>0:}}
+							<tr class="course_active">
+						{{else:}}
+							<tr class="course_inactive">
+						{{pass}}
+							<td>
+								<a style="cursor:pointer;" onclick="next_Level({{=project[0]}});">{{=project[1]}}</a>
+							</td>
+							<td><center>{{=project[2]}}</center></td>
+							<td><center>{{=project[3]}}</center></td>
+							<td><center>{{=project[4]}}</center></td>
+							<td><center>{{=project[5]}}</center></td>
+						</tr>
+					{{pass}}
+				</table>
+			<!--REPORT IN TABLE-->
+		{{elif str(request.vars['level'])=="2":}}
+			<br/><strong>{{=T('Course')}}: </strong> {{=project}}<br/><br/>
+		  	<!--REPORT IN TABLE-->
+				<table class="table table-striped table-bordered">
+					<tr>
+						<th>{{=T('Section')}}</th>
+						<th><center>{{=T('Total number of students assigned to the course')}}</center></th>
+						<th><center>{{=T('Passed the course')}}</center></th>
+						<th><center>{{=T('Reprobate the course')}}</center></th>
+					</tr>
+					{{for project in infoLevel:}}
+						<tr>
+							<td>
+								{{=project[0]}}
+							</td>
+							<td><center>{{=project[1]}}</center></td>
+							<td><center>{{=project[2]}}</center></td>
+							<td><center>{{=project[3]}}</center></td>
+						</tr>
+					{{pass}}
+				</table>
+			<!--REPORT IN TABLE-->
+		{{pass}}
+    	</div>
+	<!--REPORT CONTENTS-->    
+</div>
+
+<script type="text/javascript">
+	{{if request.vars['level'] is None or str(request.vars['level'])=="1":}}
+		function visible_C(id){
+			if (id==1){
+				$(".course_active").css("display", "");
+				$(".course_inactive").css("display", "");
+			}else{
+				if (id==2){
+					$(".course_active").css("display", "");
+					$(".course_inactive").css("display", "none");
+				}else{
+					$(".course_active").css("display", "none");
+					$(".course_inactive").css("display", "");
+				}
+			}
+		}
+
+		function next_Level(id){
+			window.location.href = "{{=URL('school_reports', 'historic_course')}}?level=2&amp;period={{=period.id}}&amp;project="+id;
+		}
+
+		function exportCSV(){
+			window.location.href = "{{=URL('school_reports','historic_course_export', vars=dict(list_type='csv', level='1',period = period.id))}}";
+		}
+	{{else:}}
+		function levelUP(){
+			window.location.href = "{{=URL('school_reports', 'historic_course')}}?period={{=period.id}}";
+		}
+
+		function exportCSV(){
+			window.location.href = "{{=URL('school_reports','historic_course_export', vars=dict(list_type='csv', level='2',period = str(request.vars['period']), project = str(request.vars['project'])))}}";
+		}
+	{{pass}}
+</script>
