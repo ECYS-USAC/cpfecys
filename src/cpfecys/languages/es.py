@@ -1856,7 +1856,6 @@
 'Roll': 'Rol',
 'Rols Academic': 'Estudiantes',
 'Rols DSI': 'DSI',
-'Rols Ecys-Administrator': 'Rols Ecys-Administrator',
 'Rols Student': 'Tutores Academicos',
 'Rols Teacher': 'Catedrático',
 'Rows in Table': 'Filas en la tabla',
