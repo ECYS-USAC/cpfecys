@@ -1823,15 +1823,16 @@ def send_mail_to_users(users, message, roles, projects, subject, attachment_list
             roles=roles_text[1:],
             projects=projects_text[1:],
             sent=cdate)
-
-    attachment_m = '<br><br><b>' + T('Attachments') +":</b><br>"
-    import cpfecys
-    if attachment_list != []:
-        for attachment_var in db(db.uploaded_file.id.belongs(attachment_list)).select():
-            attachment_m = attachment_m + '<a href="' + cpfecys.get_domain() + URL('default/download', attachment_var.file_data) +'" target="blank"> '+ attachment_var.name + '</a> <br>'
-    else:        
-        attachment_m = ''
-
+    try:
+        attachment_m = '<br><br><b>' + T('Attachments') +":</b><br>"
+        import cpfecys
+        if attachment_list != []:
+            for attachment_var in db(db.uploaded_file.id.belongs(attachment_list)).select():
+                attachment_m = attachment_m + '<a href="' + cpfecys.get_domain() + URL('default/download', attachment_var.file_data) +'" target="blank"> '+ attachment_var.name + '</a> <br>'
+        else:        
+            attachment_m = ''
+    except:
+        None
     
     message = message.replace("\n","<br>")
     message = '<html>' + message + '<br>'+ (cpfecys.get_custom_parameters().email_signature or '') + attachment_m + '</html>'
