@@ -150,6 +150,15 @@ def audit_register_mail_notifications_detail():
 @auth.requires_login()
 @auth.requires_membership('Super-Administrator')
 def audit_register_mail_notifications():
+    period = cpfecys.current_year_period()
+    if request.vars['period'] != None:
+        period = request.vars['period']
+        area = request.vars['area']
+        period = db(db.period_year.id==period).select().first()
+        if not period:
+            session.flash = T('Not valid Action.')
+            redirect(URL('default', 'index'))
+
     user = request.vars['user']
     if user == None:
         session.flash = T('Not valid Action.')
@@ -173,20 +182,7 @@ def audit_register_mail_notifications():
     def obtain_notices(user):
         #name project
         n=obtain_nameProject(user)
-
-        #name of the year
-        anio = db(db.period_year.id==n.period).select()
-        nameY = ''
-        idP = ''
-        for a in anio:
-            nameY=a.yearp
-            idP = a.period
-
-        #name of period
-        nameS=obtain_period(idP)
-        #obtain all the notices that has the user has register
-        notices  = db((db.notification_general_log4.emisor==n.assigned_user.username) & (db.notification_general_log4.course==n.project.name)&(db.notification_general_log4.period==nameS)&(db.notification_general_log4.yearp==nameY)).select()
-        return notices
+        return db((db.notification_general_log4.emisor==n.assigned_user.username) & (db.notification_general_log4.course==n.project.name)&(db.notification_general_log4.period==period.period.name)&(db.notification_general_log4.yearp==period.yearp)).select()
 
     return dict(user=user, obtain_nameProject=obtain_nameProject, obtain_notices=obtain_notices)
 
@@ -220,43 +216,9 @@ def audit_teacher_mail_notifications_courses_list():
             return students
 
         #Functions that ar use to obtain the notices
-        def obtain_nameProjects(userP):
-            p = db(db.project.id==userP).select()
-            nameP = ''
-            for p2 in p:
-                nameP=p2.name
-            return nameP
-
-        def obtain_period(periodo):
-            semester = db(db.period.id==periodo).select()
-            nameS = ''
-            for s in semester:
-                nameS=s.name
-            return nameS
-
         def total_notices(project):
-            #name project
-            n=obtain_nameProjects(project.project)
-
-            #name of the year
-            anio = db(db.period_year.id==project.period).select()
-            nameY = ''
-            idP = ''
-            for a in anio:
-                nameY=a.yearp
-                idP = a.period
-
-            #name of period
-            nameS=obtain_period(idP)
-            #obtain all the notices that has the user has register
-            count = db.notification_general_log4.id.count()
-            notices  = db((db.notification_general_log4.emisor==project.assigned_user.username) & (db.notification_general_log4.course==n)&(db.notification_general_log4.period==nameS)&(db.notification_general_log4.yearp==nameY)).select(count)
-            total = 0
-            for s in notices:
-                total = s[count]
-            return total
-
-        return dict(projects=projects, periods=periods, area=area, current_teacher=current_teacher, total_notices=total_notices)
+            return db((db.notification_general_log4.emisor==project.assigned_user.username) & (db.notification_general_log4.course==project.project.name)&(db.notification_general_log4.period==period.period.name)&(db.notification_general_log4.yearp==period.yearp)).count()
+        return dict(projects=projects, periods=periods, area=area, current_teacher=current_teacher, total_notices=total_notices, periodA=period)
     else:
         session.flash = "Action not allowed"
         redirect(URL('default','index'))
@@ -301,43 +263,10 @@ def audit_student_mail_notifications_courses_list():
             return students
 
         #Functions that ar use to obtain the notices
-        def obtain_nameProjects(userP):
-            p = db(db.project.id==userP).select()
-            nameP = ''
-            for p2 in p:
-                nameP=p2.name
-            return nameP
-
-        def obtain_period(periodo):
-            semester = db(db.period.id==periodo).select()
-            nameS = ''
-            for s in semester:
-                nameS=s.name
-            return nameS
-
         def total_notices(project):
-            #name project
-            n=obtain_nameProjects(project.project)
+            return db((db.notification_general_log4.emisor==project.assigned_user.username) & (db.notification_general_log4.course==project.project.name)&(db.notification_general_log4.period==period.period.name)&(db.notification_general_log4.yearp==period.yearp)).count()
 
-            #name of the year
-            anio = db(db.period_year.id==project.period).select()
-            nameY = ''
-            idP = ''
-            for a in anio:
-                nameY=a.yearp
-                idP = a.period
-
-            #name of period
-            nameS=obtain_period(idP)
-            #obtain all the notices that has the user has register
-            count = db.notification_general_log4.id.count()
-            notices  = db((db.notification_general_log4.emisor==project.assigned_user.username) & (db.notification_general_log4.course==n)&(db.notification_general_log4.period==nameS)&(db.notification_general_log4.yearp==nameY)).select(count)
-            total = 0
-            for s in notices:
-                total = s[count]
-            return total
-
-        return dict(projects=projects, periods=periods, area=area, current_practising=current_practising, total_notices=total_notices)
+        return dict(projects=projects, periods=periods, area=area, current_practising=current_practising, total_notices=total_notices, periodA=period)
     else:
         session.flash = "Action not allowed"
         redirect(URL('default','index'))

@@ -46,7 +46,7 @@
                                         {{else:}}
                                             <th colspan="1"><small>{{=tnotices}}</small></th>
                                             <th colspan="1">
-                                                <a class="btn" href="{{=URL('audit','audit_register_mail_notifications', vars=dict(user=teacher.user_project.id))}}"><i class="icon-eye-open"></i> {{=T('Detail')}}</a>
+                                                <a class="btn" href="{{=URL('audit','audit_register_mail_notifications', vars=dict(user=teacher.user_project.id, period=periodA.id))}}"><i class="icon-eye-open"></i> {{=T('Detail')}}</a>
                                             </th>
                                         {{pass}}
                                 </tr>
