@@ -1588,6 +1588,14 @@ def active_teachers():
                 db.auth_user.last_name|\
                 db.auth_user.first_name)
     periods = db(db.period_year).select()
+    go_to_academic = False
+    try:
+        if request.vars['next'] == "academic" :
+            go_to_academic = True
+    except:
+        None
+    if go_to_academic == True:
+        redirect(URL('student_academic','academic'))
     return dict(periods=periods, assignations=assignations,
         actual_period=period)
 
@@ -1837,6 +1845,7 @@ def send_mail_to_users(users, message, roles, projects, subject, attachment_list
             roles=roles_text[1:],
             projects=projects_text[1:],
             sent=cdate)
+    attachment_m = ''
     try:
         attachment_m = '<br><br><b>' + T('Attachments') +":</b><br>"
         import cpfecys
@@ -1846,7 +1855,7 @@ def send_mail_to_users(users, message, roles, projects, subject, attachment_list
         else:        
             attachment_m = ''
     except:
-        None
+        attachment_m = ''
     
     message = message.replace("\n","<br>")
     message = '<html>' + message + '<br>'+ (cpfecys.get_custom_parameters().email_signature or '') + attachment_m + '</html>'

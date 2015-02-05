@@ -1245,7 +1245,24 @@ def academic_delete(*args):
         None
 
 def academic_update(*args):
-    None
+    try:
+        
+        auth_var = db.auth_user(db.auth_user.id==str(args[0]['id_auth_user']))
+        db(db.auth_user.id == auth_var.id).update(email = str(args[0]['email']))
+        #log
+        import cpfecys
+        cperiod = cpfecys.current_year_period()
+        db.academic_log.insert(user_name = 'system',
+                        roll = 'system',
+                        operation_log = 'update', 
+                        before_carnet = args[0]['carnet'],
+                        before_email = auth_var.email,
+                        after_carnet = args[0]['carnet'],
+                        after_email = str(args[0]['email']),
+                        id_period = cperiod,
+                        description = T('Registration data was update because academic was update'))
+    except:
+        None     
 
 def academic_insert(*args):
     academic_var = db.auth_group(db.auth_group.role=='Academic')

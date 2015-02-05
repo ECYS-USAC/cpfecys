@@ -1130,7 +1130,9 @@ def academic():
 
     if auth.has_membership('Super-Administrator'):
         
-        db.academic.email.readable = True        
+        db.academic.email.readable = True
+        db.academic.email.writable = True
+        db.academic.carnet.writable = False
         #Modal photo
         def get_button_clas(carnet_pa):
             review = db((db.photo_review.user_id == carnet_pa)).select().first()
@@ -1151,10 +1153,18 @@ def academic():
         _role='button', 
         _class= get_button_clas(row.id_auth_user), 
         _onclick='set_values("'+str(row.id_auth_user)+'");', 
-        _title=T('View photo') ,**{"_data-toggle":"modal", "_data-target": "#picModal"})]   
+        _title=T('View photo') ,**{"_data-toggle":"modal", "_data-target": "#picModal"})]
+
+        links += [lambda row: A(T('Notify'),
+        _role='button', 
+        _class= 'btn btn-inverse', 
+        _href= URL('admin', 'active_teachers/mail', vars=dict(user=row.id_auth_user,next="academic")), 
+        _title=T('Notify'))]   
         
+
+       
         grid = SQLFORM.grid(
-        query, oncreate=oncreate_academic,links=links, editable=False, onupdate=onupdate_academic, ondelete=ondelete_academic,  maxtextlength=100,csv=False)
+        query, oncreate=oncreate_academic,links=links,  onupdate=onupdate_academic, ondelete=ondelete_academic,  maxtextlength=100,csv=False)
     else:
         db.academic.email.writable = False
         db.academic.email.default = "email@email.com"
