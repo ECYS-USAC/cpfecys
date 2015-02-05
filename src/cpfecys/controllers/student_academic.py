@@ -335,8 +335,8 @@ def academic_assignation():
     cyearperiod = cpfecys.current_year_period()
 
     #Temporal---------------------------------------------------------------------------------------------
-    #if request.vars['listado'] =='True':
-    #    redirect(URL('student_academic','attendance_list',vars=dict(usuario_proyecto=str(check.id))))
+    if request.vars['listado'] =='True':
+        redirect(URL('student_academic','attendance_list',vars=dict(usuario_proyecto=str(check.id))))
 
     
     #Temporal---------------------------------------------------------------------------------------------
@@ -503,16 +503,23 @@ def academic_assignation():
                 return -1
             else:
                 return id_auth
-        
     
-    links = [{'header':T('Photo'), 
-                'body':lambda row: A(IMG(_src= URL('default/download', get_auth_user((db(db.academic.id==int(row.carnet)).select(db.academic.id_auth_user).first().id_auth_user)).photo ), 
-                    _width=50, _height=40, _id='image'), 
-        _style="cursor:pointer;"        ,
-        _onclick='set_photo("'+str(db(db.academic.id==int(row.carnet)).select(db.academic.id_auth_user).first().id_auth_user)+'");', 
-        _title=T('View photo') ,**{"_data-toggle":"modal", "_data-target": "#picModal"}) 
-                
+    current_period_var = False    
+    if (request.vars['year_period'] is None) or (str(request.vars['year_period']) == str(cpfecys.current_year_period().id)):
+        current_period_var = True
 
+    if current_period_var == True:
+        links = [{'header':T('Photo'), 
+                    'body':lambda row: A(IMG(_src= URL('default/download', get_auth_user((db(db.academic.id==int(row.carnet)).select(db.academic.id_auth_user).first().id_auth_user)).photo ), 
+                        _width=50, _height=40, _id='image'), 
+            _style="cursor:pointer;"        ,
+            _onclick='set_photo("'+str(db(db.academic.id==int(row.carnet)).select(db.academic.id_auth_user).first().id_auth_user)+'");', 
+            _title=T('View photo') ,**{"_data-toggle":"modal", "_data-target": "#picModal"}) 
+                    }]
+    else:
+        links = [{'header':T('Photo'), 
+                    'body':lambda row: A(IMG(_src= URL('default/download', get_auth_user((db(db.academic.id==int(row.carnet)).select(db.academic.id_auth_user).first().id_auth_user)).photo ), 
+                        _width=50, _height=40, _id='image'))      
                 }]
 
     links += [{'header':T('Carnet'), 
@@ -528,16 +535,14 @@ def academic_assignation():
     links += [{'header':T('Laboratory'), 
                 'body':lambda row: T(str(row.laboratorio))}] 
 
-    links += [{'header':T('Photo State'), 
+
+    if current_period_var == True:
+        links += [{'header':T('Photo State'), 
                 'body':lambda row: A(get_photo_state((db(db.academic.id==int(row.carnet)).select(db.academic.id_auth_user).first().id_auth_user)).result,
                     _id="label_"+str(db(db.academic.id==int(row.carnet)).select(db.academic.id_auth_user).first().id_auth_user),
                     _style="cursor:pointer; color:"+get_photo_state((db(db.academic.id==int(row.carnet)).select(db.academic.id_auth_user).first().id_auth_user)).color+";",
                     _onclick='set_photo("'+str(db(db.academic.id==int(row.carnet)).select(db.academic.id_auth_user).first().id_auth_user)+'");',**{"_data-toggle":"modal", "_data-target": "#picModal"} ) }] 
 
-
-        
-
-    if (request.vars['year_period'] is None) or (str(request.vars['year_period']) == str(cpfecys.current_year_period().id)):
         links += [{'header':T('Assignation'), 
                 'body':lambda row: A(T('Edit'), 
             _role='button', 
@@ -548,14 +553,14 @@ def academic_assignation():
                 +'"'+str(row.laboratorio)+'")', 
             _title=T('Edit academic assignation')+' '+str( db(db.academic.id==int(row.carnet)).select(db.academic.carnet).first().carnet ) ,**{"_data-toggle":"modal", "_data-target": "#attachModal"})}]
     
-    links += [lambda row: A(T('Accept Photo'),
-                _class="btn btn-success",
-                _onclick="click_acept_photo("+str(has_foto(db(db.academic.id==int(row.carnet)).select(db.academic.id_auth_user).first().id_auth_user))+")")]
+        links += [lambda row: A(T('Accept Photo'),
+                    _class="btn btn-success",
+                    _onclick="click_acept_photo("+str(has_foto(db(db.academic.id==int(row.carnet)).select(db.academic.id_auth_user).first().id_auth_user))+")")]
 
-    links += [lambda row: A(T('Reject Photo'),
-                _class="btn btn-danger",
-                _onclick="click_reject_photo("+str(has_foto(db(db.academic.id==int(row.carnet)).select(db.academic.id_auth_user).first().id_auth_user))+")")]
-   
+        links += [lambda row: A(T('Reject Photo'),
+                    _class="btn btn-danger",
+                    _onclick="click_reject_photo("+str(has_foto(db(db.academic.id==int(row.carnet)).select(db.academic.id_auth_user).first().id_auth_user))+")")]
+       
     permition_var = True
     date_finish = None
     if auth.has_membership('Student'):

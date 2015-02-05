@@ -136,7 +136,9 @@ def user():
                     db.auth_user.photo.writable = False
                 pass
             pass
-        pass            
+        pass 
+        if (auth.has_membership('Teacher')):
+            db.auth_user.username.writable = False
     pass
     return dict(form=auth())
 
