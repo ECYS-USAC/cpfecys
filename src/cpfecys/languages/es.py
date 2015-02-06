@@ -446,7 +446,7 @@
 'Completed': 'Completado',
 'COMPLETED': 'COMPLETADO',
 'Components and Plugins': 'Componentes y Plugins',
-'Configuration': 'Configuration',
+'Configuration': 'Configuración',
 'Configuration Web Service': 'Configuración Servicio Web',
 'Confirm': 'Confirmar',
 'Confirm action': 'Confirmar acción',

@@ -85,12 +85,7 @@ if auth.has_membership(role="Super-Administrator"):
                 (T('Type evaluation'), False, URL('evaluation','evaluation_type'), [])
             ]))            
         ]),
-         (T('Frontend'), False, URL(),[
-             (T('Links'), False, URL('admin', 'links'), []),
-             (T('Files'), False, URL('admin', 'files_manager'), []),
-             (T('News'), False, URL('admin', 'notifications_manager'), []),
-             (T('Send Mail'), False, URL('admin', 'mail_notifications'), []),
-         ]),
+         
          
          (T('Configuration'), False, URL(),[
             (T('System Parameters'), False, URL('admin', 'parameters'), []),
@@ -102,29 +97,13 @@ if auth.has_membership(role="Super-Administrator"):
             (T('Configuration Web Service'), False, URL('student_academic', 'student_validation_parameters'), []),
             (T('Assignation Freeze Dates'), False, URL('admin', 'assignation_freeze'), []),
          ]),
-         (T('Reports'), False, URL(),[
-            ((T('Summary Information of Practitioners'), False, URL(), [
-                (T('Courses reports'), False, URL('admin', 'courses_report/areas'), []),
-                (T('Summary of Semester'), False, URL('admin', 'general_report'), []),
-            ])),
-            ((T('Management in Real Time'), False, URL(), [
-                (T('Management Academic'), False, URL('management_reports','student_management'), []),
-                (T('Student Assignment'), False, URL('management_reports','student_assignment_management'), []),
-                (T('Management Grades'), False, URL('management_reports','grades_management'), []),
-                (T('Activities Metric'), False, URL('management_reports','activities_withmetric_management'), []),
-                (T('Change Request Activities with Metric'), False, URL('management_reports','change_request_activities_with_metric_management'), []),
-                (T('Change Request Grades'), False, URL('management_reports','change_request_grades_management'), []),
-                (T('Performance of students'), False, URL('management_reports','performance_students'), []),
-                (T('Evaluations'), False, URL('management_reports','evaluation_result'), [])
-            ])),
-            ((T('Notifications'), False, URL(), [
-                (T('Teacher notices'), False, URL('audit','audit_teacher_mail_notifications_areas'), []),
-                (T('Student notices'), False, URL('audit', 'audit_student_mail_notifications_areas'), []),
-                (T('Mail Log'), False, URL('admin', 'mail_log'), []),
-                (T('System-wide Mail Logs'), False, URL('mailer', 'index'), []),
-            ])),             
-             (T('Scheduler Report'), False, URL('admin', 'scheduler_activity'), []),
+         (T('Frontend'), False, URL(),[
+             (T('Links'), False, URL('admin', 'links'), []),
+             (T('Files'), False, URL('admin', 'files_manager'), []),
+             (T('News'), False, URL('admin', 'notifications_manager'), []),
+             (T('Send Mail'), False, URL('admin', 'mail_notifications'), []),
          ]),
+         
          
     ])
 
@@ -220,7 +199,8 @@ if auth.has_membership(role="Ecys-Administrator"):
         (T('Percentage change of notes'), False, URL('school_reports','percentage_change_grades'), [])
         ]),
     ])
-    
+
+
 
 if auth.has_membership(role="Student"):
     response.menu.extend([(T('Final Practice'), False,  URL('student', 'index'), [])
@@ -260,6 +240,31 @@ if (auth.is_logged_in()):
 response.menu.extend(user_menu)
 DEVELOPMENT_MENU = False
 
+if auth.has_membership(role="Super-Administrator"):
+    response.menu.extend([ (T('Reports'), False, URL(),[
+            ((T('Summary Information of Practitioners'), False, URL(), [
+                (T('Courses reports'), False, URL('admin', 'courses_report/areas'), []),
+                (T('Summary of Semester'), False, URL('admin', 'general_report'), []),
+            ])),
+            ((T('Management in Real Time'), False, URL(), [
+                (T('Management Academic'), False, URL('management_reports','student_management'), []),
+                (T('Student Assignment'), False, URL('management_reports','student_assignment_management'), []),
+                (T('Management Grades'), False, URL('management_reports','grades_management'), []),
+                (T('Activities Metric'), False, URL('management_reports','activities_withmetric_management'), []),
+                (T('Change Request Activities with Metric'), False, URL('management_reports','change_request_activities_with_metric_management'), []),
+                (T('Change Request Grades'), False, URL('management_reports','change_request_grades_management'), []),
+                (T('Performance of students'), False, URL('management_reports','performance_students'), []),
+                (T('Evaluations'), False, URL('management_reports','evaluation_result'), [])
+            ])),
+            ((T('Notifications'), False, URL(), [
+                (T('Teacher notices'), False, URL('audit','audit_teacher_mail_notifications_areas'), []),
+                (T('Student notices'), False, URL('audit', 'audit_student_mail_notifications_areas'), []),
+                (T('Mail Log'), False, URL('admin', 'mail_log'), []),
+                (T('System-wide Mail Logs'), False, URL('mailer', 'index'), []),
+            ])),             
+             (T('Scheduler Report'), False, URL('admin', 'scheduler_activity'), []),
+         ]),
+    ])
 #########################################################################
 ## provide shortcuts for development. remove in production
 #########################################################################
