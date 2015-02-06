@@ -138,6 +138,10 @@ def user():
             pass
         pass 
         if (auth.has_membership('Teacher')):
+            if str(request.vars["edit_foto"]) == "True":
+                db.auth_user.photo.writable = True
+            else:
+                db.auth_user.photo.writable = False
             db.auth_user.username.writable = False
     pass
     return dict(form=auth())

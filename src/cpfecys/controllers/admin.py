@@ -2929,5 +2929,6 @@ def final_practice():
 def users():
     orderby = dict(auth_user=[db.auth_user.first_name, \
                 db.auth_user.username])
+    db.auth_user.photo.writable = False
     grid = SQLFORM.smartgrid(db.auth_user,linked_tables=['auth_membership','auth_event','auth_cas','user_project','report'], orderby=orderby)
     return dict(grid = grid)

@@ -33,11 +33,12 @@
 }
 
 #ja-header #header-inner2 {
-	width: 40%;
+	width: 60%;
 }
 
 #ja-header #header-inner3 {
-	width: 30%;
+	width: 10%;
+	float:right;
 }
 
 #ja-slideshow {
@@ -167,6 +168,10 @@ margin-right: 0;
 
 
 ul.department-list li.icon-1 a{background-image:url('../images/home-images/dep-1.png');}
+
+ul.department-list li a:hover, ul.department-list li a:focus, ul.department-list li a:active {
+background-position: left bottom;
+}
 
 ul.department-list li.icon-2 a{background-image:url('../images/home-images/dep-2.png');}
 

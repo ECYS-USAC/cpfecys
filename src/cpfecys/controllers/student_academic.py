@@ -1137,7 +1137,7 @@ def academic():
         
         db.academic.email.readable = True
         db.academic.email.writable = True
-        db.academic.carnet.writable = False
+        
         #Modal photo
         def get_button_clas(carnet_pa):
             review = db((db.photo_review.user_id == carnet_pa)).select().first()
@@ -1166,7 +1166,8 @@ def academic():
         _href= URL('admin', 'active_teachers/mail', vars=dict(user=row.id_auth_user,next="academic")), 
         _title=T('Notify'))]   
         
-
+        if 'edit' in request.args:
+            db.academic.carnet.writable = False     
        
         grid = SQLFORM.grid(
         query, oncreate=oncreate_academic,links=links,  onupdate=onupdate_academic, ondelete=ondelete_academic,  maxtextlength=100,csv=False)

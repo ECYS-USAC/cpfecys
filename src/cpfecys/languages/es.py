@@ -84,6 +84,7 @@
 'Actions': 'Acciones',
 'Activated': 'Activadas',
 'Active': 'Activo',
+'Active Photo Edit': 'Activar Edición de Foto',
 'Active professors': 'Catedráticos Activos',
 'Active Teachers': 'Encargados Activos',
 'Actividad sin nota': 'Actividad sin nota',

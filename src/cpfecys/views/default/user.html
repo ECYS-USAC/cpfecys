@@ -44,6 +44,11 @@ pass
 
 =form
 
+if (request.args(0) == 'profile')&(auth.has_membership('Teacher')):}}
+	<script type="text/javascript">
+		$("#auth_user_photo__label").replaceWith("<a class='btn btn-success' href='{{=URL('default','user/profile' , vars=dict(edit_foto=True) )}}'>{{=T('Active Photo Edit')}}</a>");
+	</script>
+{{pass
 
 }}
 </div>
