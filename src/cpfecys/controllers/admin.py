@@ -722,23 +722,22 @@ def course_report_exception():
 @auth.requires_membership('Super-Administrator')
 def scheduler_activity():
     auto_daily()
-    return dict(data = db3(db3.scheduler_run.id>0).select())
+    return dict(data = db3(db3.scheduler_run.id>0).select(orderby = ~ db3.scheduler_run.id))
 
 @auth.requires_login()
 @auth.requires_membership('Super-Administrator')
 def dtt_general_approval():
     from datetime import datetime
-    cperiod = cpfecys.current_year_period()
-    year = str(cperiod.yearp)
-    if cperiod.period == 1:
-        start = datetime.strptime(year + '-01-01', "%Y-%m-%d")
-        end = datetime.strptime(year + '-06-01', "%Y-%m-%d")
-    else:
-        start = datetime.strptime(year + '-06-01', "%Y-%m-%d")
-        end = datetime.strptime(year + '-12-31', "%Y-%m-%d")
     status = request.vars['status']
     period = request.vars['period']
     approve = request.vars['approve']
+    cperiod = db(db.period_year.id==period).select().first()
+    if cperiod.period == 1:
+        start = datetime.strptime(str(cperiod.yearp) + '-01-01', "%Y-%m-%d")
+        end = datetime.strptime(str(cperiod.yearp) + '-06-01', "%Y-%m-%d")
+    else:
+        start = datetime.strptime(str(cperiod.yearp) + '-06-01', "%Y-%m-%d")
+        end = datetime.strptime(str(cperiod.yearp+1) + '-01-01', "%Y-%m-%d")
     # Get the coincident reports
     if status == 'None':
         reports = db((db.report.created>start)&

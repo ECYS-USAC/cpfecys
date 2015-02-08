@@ -256,6 +256,12 @@ if auth.has_membership(role="Super-Administrator"):
                 (T('Performance of students'), False, URL('management_reports','performance_students'), []),
                 (T('Evaluations'), False, URL('management_reports','evaluation_result'), [])
             ])),
+            ((T('School Reports'), False, URL(), [
+                (T('General Information'), False, URL('school_reports','general_information'), []),
+                (T('Overview of semester'), False, URL('school_reports','general_period'), []),
+                (T('Historic per course'), False, URL('school_reports','historic_course'), []),
+                (T('Percentage change of notes'), False, URL('school_reports','percentage_change_grades'), [])
+            ])),
             ((T('Notifications'), False, URL(), [
                 (T('Teacher notices'), False, URL('audit','audit_teacher_mail_notifications_areas'), []),
                 (T('Student notices'), False, URL('audit', 'audit_student_mail_notifications_areas'), []),
