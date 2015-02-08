@@ -2222,7 +2222,7 @@ def report():
         valid = not(report is None)
         ## Validate assignation
         import cpfecys
-        if valid: valid = not cpfecys.assignation_is_locked(report.assignation)
+        #if valid: valid = not cpfecys.assignation_is_locked(report.assignation)
         # Validate that the report belongs to user
         if valid: valid = cpfecys.student_validation_report_owner(report.id)
         if valid:
