@@ -84,7 +84,8 @@ def courses_list():
     if (auth.has_membership('Super-Administrator') or auth.has_membership('Ecys-Administrator')):
         #coursesAdmin = db(db.project.area_level==area.id).select()
         coursesAdmin = []
-        for course in db(db.project.area_level==area.id).select(orderby=db.project.name):
+        #for course in db(db.project.area_level==area.id).select(orderby=db.project.name):
+        for course in db((db.project.area_level==area.id)&(db.user_project.project==db.project.id)&(db.user_project.period == db.period_year.id)&((db.user_project.period <= period.id)&((db.user_project.period + db.user_project.periods) > period.id))).select(db.project.ALL, orderby=db.project.name, distinct=True):
             average_laboratory = float(0)
             average_class = float(0)
 

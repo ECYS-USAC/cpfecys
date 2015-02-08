@@ -2696,62 +2696,68 @@ def teacher_assignation_upload():
                 rphone = row[6] or ''
                 rlast_name = row[3]
                 rfirst_name = row[4]
-                ## check if user exists
-                usr = db.auth_user(db.auth_user.username == rusername)
-                project = db.project(db.project.project_id == rproject)
-                if usr is None:
-                    ## find it on chamilo (db2)
-                    if not uv_off:
-                        usr = db2.user_user(db2.user_user.username == rusername)
-                        if usr is None:
-                            # report error and get on to next row
-                            row.append(T('Error: ') + T('User is not valid. \
-                                User doesn\'t exist in UV.'))
-                            error_users.append(row)
-                            continue
+                #VALIDATE EMAIL
+                if IS_EMAIL()(remail)[1]:
+                    row.append('Error: ' + T('The email entered is incorrect.'))
+                    error_users.append(row)
+                    continue
+                else:
+                    ## check if user exists
+                    usr = db.auth_user(db.auth_user.username == rusername)
+                    project = db.project(db.project.project_id == rproject)
+                    if usr is None:
+                        ## find it on chamilo (db2)
+                        if not uv_off:
+                            usr = db2.user_user(db2.user_user.username == rusername)
+                            if usr is None:
+                                # report error and get on to next row
+                                row.append(T('Error: ') + T('User is not valid. \
+                                    User doesn\'t exist in UV.'))
+                                error_users.append(row)
+                                continue
+                            else:
+                                # insert the new user
+                                usr = db.auth_user.insert(username = usr.username,
+                                                        password = usr.password,
+                                                        phone = usr.phone,
+                                                        last_name = usr.lastname,
+                                                        first_name = usr.firstname,
+                                                        email = usr.email)
+                                #add user to role 'Teacher'
+                                auth.add_membership('Teacher', usr)
                         else:
-                            # insert the new user
-                            usr = db.auth_user.insert(username = usr.username,
-                                                    password = usr.password,
-                                                    phone = usr.phone,
-                                                    last_name = usr.lastname,
-                                                    first_name = usr.firstname,
-                                                    email = usr.email)
+                            #insert a new user with csv data
+                            usr = db.auth_user.insert(username = rusername,
+                                                      email = remail,
+                                                      first_name=rfirst_name,
+                                                      last_name=rlast_name,
+                                                      phone=rphone)
                             #add user to role 'Teacher'
                             auth.add_membership('Teacher', usr)
                     else:
-                        #insert a new user with csv data
-                        usr = db.auth_user.insert(username = rusername,
-                                                  email = remail,
-                                                  first_name=rfirst_name,
-                                                  last_name=rlast_name,
-                                                  phone=rphone)
-                        #add user to role 'Teacher'
-                        auth.add_membership('Teacher', usr)
-                else:
-                    assignation = db.user_project(
-                        (db.user_project.assigned_user == usr.id)&
-                        (db.user_project.project == project)&
-                        (db.user_project.period == current_period)&
-                        (db.user_project.assignation_status == None))
-                    if assignation != None:
-                        row.append(T('Error: ') + T('User \
-                         was already assigned, Please Manually Assign Him.'))
+                        assignation = db.user_project(
+                            (db.user_project.assigned_user == usr.id)&
+                            (db.user_project.project == project)&
+                            (db.user_project.period == current_period)&
+                            (db.user_project.assignation_status == None))
+                        if assignation != None:
+                            row.append(T('Error: ') + T('User \
+                             was already assigned, Please Manually Assign Him.'))
+                            error_users.append(row)
+                            continue
+                    if project != None:
+                        db.user_project.insert(assigned_user = usr,
+                                                project = project,
+                                                period = current_period,
+                                                periods = rassignation_length,
+                                                pro_bono = rpro_bono,
+                                                hours = rhours)
+                    else:
+                        # project_id is not valid
+                        row.append('Error: ' + T('Project code is not valid. \
+                         Check please.'))
                         error_users.append(row)
                         continue
-                if project != None:
-                    db.user_project.insert(assigned_user = usr,
-                                            project = project,
-                                            period = current_period,
-                                            periods = rassignation_length,
-                                            pro_bono = rpro_bono,
-                                            hours = rhours)
-                else:
-                    # project_id is not valid
-                    row.append('Error: ' + T('Project code is not valid. \
-                     Check please.'))
-                    error_users.append(row)
-                    continue
         except csv.Error:
             response.flash = T('File doesn\'t seem properly encoded.')
             return dict(success = False,
@@ -2800,63 +2806,69 @@ def assignation_upload():
                 rpro_bono = (row[5] == 'Si') or (row[5] == 'si')
                 rhours = row[6]
                 remail = row[7]
-                ## check if user exists
-                usr = db.auth_user(db.auth_user.username == rusername)
-                project = db.project(db.project.project_id == rproject)
-                if usr is None:
-                    ## find it on chamilo (db2)
-                    if not uv_off:
-                        usr = db2.user_user(db2.user_user.username == rusername)
-                        if usr is None:
-                            # report error and get on to next row
-                            row.append(T('Error: ') + T('User is not valid. \
-                                User doesn\'t exist in UV.'))
-                            error_users.append(row)
-                            continue
+                #VALIDATE EMAIL
+                if IS_EMAIL()(remail)[1]:
+                    row.append('Error: ' + T('The email entered is incorrect.'))
+                    error_users.append(row)
+                    continue
+                else:
+                    ## check if user exists
+                    usr = db.auth_user(db.auth_user.username == rusername)
+                    project = db.project(db.project.project_id == rproject)
+                    if usr is None:
+                        ## find it on chamilo (db2)
+                        if not uv_off:
+                            usr = db2.user_user(db2.user_user.username == rusername)
+                            if usr is None:
+                                # report error and get on to next row
+                                row.append(T('Error: ') + T('User is not valid. \
+                                    User doesn\'t exist in UV.'))
+                                error_users.append(row)
+                                continue
+                            else:
+                                # insert the new user
+                                usr = db.auth_user.insert(username = usr.username,
+                                                        password = usr.password,
+                                                        phone = usr.phone,
+                                                        last_name = usr.lastname,
+                                                        first_name = usr.firstname,
+                                                        email = usr.email)
+                                #add user to role 'student'
+                                auth.add_membership('Student', usr)
                         else:
-                            # insert the new user
-                            usr = db.auth_user.insert(username = usr.username,
-                                                    password = usr.password,
-                                                    phone = usr.phone,
-                                                    last_name = usr.lastname,
-                                                    first_name = usr.firstname,
-                                                    email = usr.email)
+                            #insert a new user with csv data
+                            usr = db.auth_user.insert(username = rusername,
+                                                      email = remail)
                             #add user to role 'student'
                             auth.add_membership('Student', usr)
                     else:
-                        #insert a new user with csv data
-                        usr = db.auth_user.insert(username = rusername,
-                                                  email = remail)
-                        #add user to role 'student'
-                        auth.add_membership('Student', usr)
-                else:
-                    if db((db.auth_group.role == "Student")&(db.auth_membership.group_id == db.auth_group.id)&(db.auth_membership.user_id == usr.id)).select().first() is None:
-                        auth.add_membership('Student', usr)
-                    assignation = db.user_project(
-                        (db.user_project.assigned_user == usr.id)&
-                        (db.user_project.project == project)&
-                        (db.user_project.assignation_status == None))
-                    if assignation != None:
-                        row.append(T('Error: ') + T('User \
-                         was already assigned, Please Manually Assign Him.'))
+                        if db((db.auth_group.role == "Student")&(db.auth_membership.group_id == db.auth_group.id)&(db.auth_membership.user_id == usr.id)).select().first() is None:
+                            auth.add_membership('Student', usr)
+                        assignation = db.user_project(
+                            (db.user_project.assigned_user == usr.id)&
+                            (db.user_project.project == project)&
+                            (db.user_project.assignation_status == None))
+                        if assignation != None:
+                            row.append(T('Error: ') + T('User \
+                             was already assigned, Please Manually Assign Him.'))
+                            error_users.append(row)
+                            #assignation.update_record(periods = \
+                                #rassignation_length, pro_bono = \
+                                #rpro_bono)
+                            continue
+                    if project != None:
+                        db.user_project.insert(assigned_user = usr,
+                                                project = project,
+                                                period = current_period,
+                                                periods = rassignation_length,
+                                                pro_bono = rpro_bono,
+                                                hours = rhours)
+                    else:
+                        # project_id is not valid
+                        row.append('Error: ' + T('Project code is not valid. \
+                         Check please.'))
                         error_users.append(row)
-                        #assignation.update_record(periods = \
-                            #rassignation_length, pro_bono = \
-                            #rpro_bono)
                         continue
-                if project != None:
-                    db.user_project.insert(assigned_user = usr,
-                                            project = project,
-                                            period = current_period,
-                                            periods = rassignation_length,
-                                            pro_bono = rpro_bono,
-                                            hours = rhours)
-                else:
-                    # project_id is not valid
-                    row.append('Error: ' + T('Project code is not valid. \
-                     Check please.'))
-                    error_users.append(row)
-                    continue
         except csv.Error:
             response.flash = T('File doesn\'t seem properly encoded.')
             return dict(success = False,
