@@ -49,31 +49,6 @@
 				</select>
 				<input class="btn" type="submit" value="{{=T('Go')}}">
 			</form>
-			<div>
-				<table class="pull-right table-striped table-bordered">
-		  			<tr>
-		  				<th colspan="3"><center>{{=T('Filter Courses')}}</center></th>
-		  			</tr>
-					<tr>
-						<td>
-							<a style="cursor:pointer;" onclick="visible_C(1);" title="{{=T('View all courses')}}">
-								<span class="label label-info">{{=T('All')}}</span>
-	                    	</a>
-						</td>
-						<td>
-							
-							<a style="cursor:pointer;" onclick="visible_C(2);" title="{{=T('Show active courses')}}">
-	                    		<span class="label label-success">{{=T('With assignments')}}</span>
-	                    	</a>
-						</td>
-						<td>
-							<a style="cursor:pointer;" onclick="visible_C(3);" title="{{=T('Show inactive courses')}}">
-	                    		<span class="label label-inverse">{{=T('Without assignments')}}</span>
-	                    	</a>
-						</td>
-					</tr>
-				</table><br/><br/><br/>
-		  	</div>
 		  	<!--REPORT IN TABLE-->
 				<table class="table table-striped table-bordered">
 					<tr>
@@ -84,11 +59,7 @@
 						<th><center>{{=T('Number of sections')}}</center></th>
 					</tr>
 					{{for project in infoLevel:}}
-						{{if project[2]>0:}}
-							<tr class="course_active">
-						{{else:}}
-							<tr class="course_inactive">
-						{{pass}}
+						<tr>
 							<td>
 								<a style="cursor:pointer;" onclick="next_Level({{=project[0]}});">{{=project[1]}}</a>
 							</td>
@@ -129,21 +100,6 @@
 
 <script type="text/javascript">
 	{{if request.vars['level'] is None or str(request.vars['level'])=="1":}}
-		function visible_C(id){
-			if (id==1){
-				$(".course_active").css("display", "");
-				$(".course_inactive").css("display", "");
-			}else{
-				if (id==2){
-					$(".course_active").css("display", "");
-					$(".course_inactive").css("display", "none");
-				}else{
-					$(".course_active").css("display", "none");
-					$(".course_inactive").css("display", "");
-				}
-			}
-		}
-
 		function next_Level(id){
 			window.location.href = "{{=URL('school_reports', 'historic_course')}}?level=2&amp;period={{=period.id}}&amp;project="+id;
 		}

@@ -1,5 +1,5 @@
 @auth.requires_login()
-@auth.requires_membership('Ecys-Administrator')
+@auth.requires(auth.has_membership('Super-Administrator') or auth.has_membership('Ecys-Administrator'))
 def get_assignations(project, period, role):
     assignations = db(
                     (db.auth_user.id==db.user_project.assigned_user)&
@@ -19,7 +19,7 @@ def get_assignations(project, period, role):
 
 
 @auth.requires_login()
-@auth.requires_membership('Ecys-Administrator')
+@auth.requires(auth.has_membership('Super-Administrator') or auth.has_membership('Ecys-Administrator'))
 def get_name(project):
     try:
         (nameP, projectSection) = str(project.name).split('(')
@@ -43,7 +43,7 @@ def get_name(project):
 
 
 @auth.requires_login()
-@auth.requires_membership('Ecys-Administrator')
+@auth.requires(auth.has_membership('Super-Administrator') or auth.has_membership('Ecys-Administrator'))
 def get_unique_name(project):
     nameC = db(db.project.name.like('%'+project+'%')).select().first()[db.project.name]
     #nameC = nameC.name
@@ -70,7 +70,7 @@ def get_unique_name(project):
 #*************************************************************************************************************************************
 #**************************************************REPORT INFORMATION GENERAL*********************************************************
 @auth.requires_login()
-@auth.requires_membership('Ecys-Administrator')
+@auth.requires(auth.has_membership('Super-Administrator') or auth.has_membership('Ecys-Administrator'))
 def general_information_export():
     infoLevel = []
     groupPeriods = None
@@ -375,7 +375,7 @@ def general_information_export():
     return dict(filename='InformacionGeneral', csvdata=infoLevel)
     
 @auth.requires_login()
-@auth.requires_membership('Ecys-Administrator')
+@auth.requires(auth.has_membership('Super-Administrator') or auth.has_membership('Ecys-Administrator'))
 def general_information():
     infoLevel = []
     groupPeriods = None
@@ -466,7 +466,7 @@ def general_information():
 #*************************************************************************************************************************************
 #**************************************************REPORT INFORMATION PERIOD**********************************************************
 @auth.requires_login()
-@auth.requires_membership('Ecys-Administrator')
+@auth.requires(auth.has_membership('Super-Administrator') or auth.has_membership('Ecys-Administrator'))
 def general_period_export():
     infoLevel = []
     groupPeriods = None
@@ -495,7 +495,12 @@ def general_period_export():
                 redirect(URL('default','index'))
 
         #CHECK PARAMETERS
-        groupProjects = db(db.project.area_level==area.id).select(orderby=db.project.name)
+        #groupProjects = db(db.project.area_level==area.id).select(orderby=db.project.name)
+        groupProjects = db((db.project.area_level==area.id)&
+                        (db.user_project.project==db.project.id)&
+                        (db.user_project.period == db.period_year.id)&
+                        ((db.user_project.period <= period.id)&
+                        ((db.user_project.period + db.user_project.periods) > period.id))).select(db.project.ALL, orderby=db.project.name, distinct=True)
         if len(groupProjects) == 0:
             session.flash = T('Report no visible: There are no parameters required to display the report.')
             redirect(URL('default','index'))
@@ -688,7 +693,7 @@ def general_period_export():
     return dict(filename='InformacionPeriodo', csvdata=infoLevel)
 
 @auth.requires_login()
-@auth.requires_membership('Ecys-Administrator')
+@auth.requires(auth.has_membership('Super-Administrator') or auth.has_membership('Ecys-Administrator'))
 def general_period():
     infoLevel = []
     groupPeriods = None
@@ -717,7 +722,12 @@ def general_period():
             session.flash = T('Report no visible: There are no parameters required to display the report.')
             redirect(URL('default','index'))
 
-        groupProjects = db(db.project.area_level==area.id).select(orderby=db.project.name)
+        #groupProjects = db(db.project.area_level==area.id).select(orderby=db.project.name)
+        groupProjects = db((db.project.area_level==area.id)&
+                        (db.user_project.project==db.project.id)&
+                        (db.user_project.period == db.period_year.id)&
+                        ((db.user_project.period <= period.id)&
+                        ((db.user_project.period + db.user_project.periods) > period.id))).select(db.project.ALL, orderby=db.project.name, distinct=True)
         if len(groupProjects) == 0:
             session.flash = T('Report no visible: There are no parameters required to display the report.')
             redirect(URL('default','index'))
@@ -882,7 +892,7 @@ def general_period():
 #*************************************************************************************************************************************
 #**************************************************REPORT HISTORIC COURSE*************************************************************
 @auth.requires_login()
-@auth.requires_membership('Ecys-Administrator')
+@auth.requires(auth.has_membership('Super-Administrator') or auth.has_membership('Ecys-Administrator'))
 def historic_course_export():
     infoLevel = []
     period = None
@@ -917,7 +927,11 @@ def historic_course_export():
 
         #CHECK PARAMETERS
         if request.vars['level']=='1' or request.vars['level'] is None:
-            groupProjects = db(db.project.area_level==area.id).select(orderby=db.project.name)
+            groupProjects = db((db.project.area_level==area.id)&
+                        (db.user_project.project==db.project.id)&
+                        (db.user_project.period == db.period_year.id)&
+                        ((db.user_project.period <= period.id)&
+                        ((db.user_project.period + db.user_project.periods) > period.id))).select(db.project.ALL, orderby=db.project.name, distinct=True)
             if len(groupProjects) == 0:
                 session.flash = T('Report no visible: There are no parameters required to display the report.')
                 redirect(URL('default','index'))
@@ -991,7 +1005,11 @@ def historic_course_export():
                 nameCourses.append(nameC)
         #FOR COURSE
         for course in nameCourses:
-            sections = db(db.project.name.like('%'+course+'%')).select()
+            sections = db((db.project.name.like('%'+course+'%'))&
+                        (db.user_project.project==db.project.id)&
+                        (db.user_project.period == db.period_year.id)&
+                        ((db.user_project.period <= period.id)&
+                        ((db.user_project.period + db.user_project.periods) > period.id))).select(db.project.ALL, orderby=db.project.name, distinct=True)
             infoeLevelTemp=[]
             infoeLevelTemp.append(course)
             infoeLevelTemp.append(0)
@@ -1054,8 +1072,6 @@ def historic_course_export():
                                         totalCategory_Lab=float((totalCategory_Lab*float(category_Lab[0].grade))/float(totalActivities_Lab))
                                     totalCarry_Lab=totalCarry_Lab+totalCategory_Lab
                                 grade_Laboratory=int(round(totalCarry_Lab,0))
-                                if grade_Laboratory>=61:
-                                    infoeLevelTemp[3]=infoeLevelTemp[3]+1
                     else:
                         grade_Laboratory=int(round(validate_laboratory.grade,0))
                     
@@ -1097,6 +1113,8 @@ def historic_course_export():
                         totalCarry = int(round(totalCarry,0))
                         if totalCarry>=61:
                             infoeLevelTemp[2]=infoeLevelTemp[2]+1
+                        else:
+                            infoeLevelTemp[3]=infoeLevelTemp[3]+1
             infoLevel.append(infoeLevelTemp)
     #PROJECT
     elif request.vars['level']=='2':
@@ -1128,7 +1146,11 @@ def historic_course_export():
         infoLevel.append(infoeLevelTemp)
         #FOR COURSE
         for course in nameCourses:
-            sections = db(db.project.name.like('%'+course+'%')).select()
+            sections = db((db.project.name.like('%'+course+'%'))&
+                        (db.user_project.project==db.project.id)&
+                        (db.user_project.period == db.period_year.id)&
+                        ((db.user_project.period <= period.id)&
+                        ((db.user_project.period + db.user_project.periods) > period.id))).select(db.project.ALL, orderby=db.project.name, distinct=True)
             for project in sections:
                 infoeLevelTemp=[]
                 infoeLevelTemp.append(project.name)
@@ -1190,8 +1212,6 @@ def historic_course_export():
                                         totalCategory_Lab=float((totalCategory_Lab*float(category_Lab[0].grade))/float(totalActivities_Lab))
                                     totalCarry_Lab=totalCarry_Lab+totalCategory_Lab
                                 grade_Laboratory=int(round(totalCarry_Lab,0))
-                                if grade_Laboratory>=61:
-                                    infoeLevelTemp[3]=infoeLevelTemp[3]+1
                     else:
                         grade_Laboratory=int(round(validate_laboratory.grade,0))
                     
@@ -1233,11 +1253,13 @@ def historic_course_export():
                         totalCarry = int(round(totalCarry,0))
                         if totalCarry>=61:
                             infoeLevelTemp[2]=infoeLevelTemp[2]+1
+                        else:
+                            infoeLevelTemp[3]=infoeLevelTemp[3]+1
                 infoLevel.append(infoeLevelTemp)
     return dict(filename='HistoricoPorCurso', csvdata=infoLevel)
 
 @auth.requires_login()
-@auth.requires_membership('Ecys-Administrator')
+@auth.requires(auth.has_membership('Super-Administrator') or auth.has_membership('Ecys-Administrator'))
 def historic_course():
     infoLevel = []
     groupPeriods = None
@@ -1273,7 +1295,12 @@ def historic_course():
                 session.flash = T('Report no visible: There are no parameters required to display the report.')
                 redirect(URL('default','index'))
 
-            groupProjects = db(db.project.area_level==area.id).select(orderby=db.project.name)
+            #groupProjects = db(db.project.area_level==area.id).select(orderby=db.project.name)
+            groupProjects = db((db.project.area_level==area.id)&
+                        (db.user_project.project==db.project.id)&
+                        (db.user_project.period == db.period_year.id)&
+                        ((db.user_project.period <= period.id)&
+                        ((db.user_project.period + db.user_project.periods) > period.id))).select(db.project.ALL, orderby=db.project.name, distinct=True)
             if len(groupProjects) == 0:
                 session.flash = T('Report no visible: There are no parameters required to display the report.')
                 redirect(URL('default','index'))
@@ -1306,7 +1333,11 @@ def historic_course():
                 nameCourses.append(nameC)
         #FOR COURSE
         for course in nameCourses:
-            sections = db(db.project.name.like('%'+course+'%')).select()
+            sections = db((db.project.name.like('%'+course+'%'))&
+                        (db.user_project.project==db.project.id)&
+                        (db.user_project.period == db.period_year.id)&
+                        ((db.user_project.period <= period.id)&
+                        ((db.user_project.period + db.user_project.periods) > period.id))).select(db.project.ALL, orderby=db.project.name, distinct=True)
             infoeLevelTemp=[]
             infoeLevelTemp.append(sections.first().id)
             infoeLevelTemp.append(course)
@@ -1370,8 +1401,6 @@ def historic_course():
                                         totalCategory_Lab=float((totalCategory_Lab*float(category_Lab[0].grade))/float(totalActivities_Lab))
                                     totalCarry_Lab=totalCarry_Lab+totalCategory_Lab
                                 grade_Laboratory=int(round(totalCarry_Lab,0))
-                                if grade_Laboratory>=61:
-                                    infoeLevelTemp[4]=infoeLevelTemp[4]+1
                     else:
                         grade_Laboratory=int(round(validate_laboratory.grade,0))
                     
@@ -1413,6 +1442,8 @@ def historic_course():
                         totalCarry = int(round(totalCarry,0))
                         if totalCarry>=61:
                             infoeLevelTemp[3]=infoeLevelTemp[3]+1
+                        else:
+                            infoeLevelTemp[4]=infoeLevelTemp[4]+1
             infoLevel.append(infoeLevelTemp)
     #PROJECT
     elif request.vars['level']=='2':
@@ -1425,7 +1456,11 @@ def historic_course():
         nameCourses.append(nameC)
         #FOR COURSE
         for course in nameCourses:
-            sections = db(db.project.name.like('%'+course+'%')).select()
+            sections = db((db.project.name.like('%'+course+'%'))&
+                        (db.user_project.project==db.project.id)&
+                        (db.user_project.period == db.period_year.id)&
+                        ((db.user_project.period <= period.id)&
+                        ((db.user_project.period + db.user_project.periods) > period.id))).select(db.project.ALL, orderby=db.project.name, distinct=True)
             for project in sections:
                 infoeLevelTemp=[]
                 infoeLevelTemp.append(project.name)
@@ -1487,8 +1522,6 @@ def historic_course():
                                         totalCategory_Lab=float((totalCategory_Lab*float(category_Lab[0].grade))/float(totalActivities_Lab))
                                     totalCarry_Lab=totalCarry_Lab+totalCategory_Lab
                                 grade_Laboratory=int(round(totalCarry_Lab,0))
-                                if grade_Laboratory>=61:
-                                    infoeLevelTemp[3]=infoeLevelTemp[3]+1
                     else:
                         grade_Laboratory=int(round(validate_laboratory.grade,0))
                     
@@ -1530,6 +1563,8 @@ def historic_course():
                         totalCarry = int(round(totalCarry,0))
                         if totalCarry>=61:
                             infoeLevelTemp[2]=infoeLevelTemp[2]+1
+                        else:
+                            infoeLevelTemp[3]=infoeLevelTemp[3]+1
                 infoLevel.append(infoeLevelTemp)
         project=nameC
     return dict(groupPeriods=groupPeriods, period=period, infoLevel=infoLevel, project=project)
@@ -1540,7 +1575,7 @@ def historic_course():
 #*************************************************************************************************************************************
 #**************************************************REPORT PERCENTAGE CHANGE GRADES****************************************************
 @auth.requires_login()
-@auth.requires_membership('Ecys-Administrator')
+@auth.requires(auth.has_membership('Super-Administrator') or auth.has_membership('Ecys-Administrator'))
 def percentage_change_grades_export():
     infoLevel = []
     period = None
@@ -1570,7 +1605,12 @@ def percentage_change_grades_export():
 
         #CHECK PARAMETERS
         if request.vars['level']=='1' or request.vars['level'] is None:
-            groupProjects = db(db.project.area_level==area.id).select(orderby=db.project.name)
+            #groupProjects = db(db.project.area_level==area.id).select(orderby=db.project.name)
+            groupProjects = db((db.project.area_level==area.id)&
+                        (db.user_project.project==db.project.id)&
+                        (db.user_project.period == db.period_year.id)&
+                        ((db.user_project.period <= period.id)&
+                        ((db.user_project.period + db.user_project.periods) > period.id))).select(db.project.ALL, orderby=db.project.name, distinct=True)
             if len(groupProjects) == 0:
                 session.flash = T('Report no visible: There are no parameters required to display the report.')
                 redirect(URL('default','index'))
@@ -1645,7 +1685,12 @@ def percentage_change_grades_export():
         totalChanges = db((db.grades_log.yearp==period.yearp)&(db.grades_log.period==T(period.period.name))&((db.grades_log.operation_log=='update')|(db.grades_log.operation_log=='delete'))).count()
         #FOR COURSE
         for course in nameCourses:
-            sections = db(db.project.name.like('%'+course+'%')).select()
+            #sections = db(db.project.name.like('%'+course+'%')).select()
+            sections = db((db.project.name.like('%'+course+'%'))&
+                        (db.user_project.project==db.project.id)&
+                        (db.user_project.period == db.period_year.id)&
+                        ((db.user_project.period <= period.id)&
+                        ((db.user_project.period + db.user_project.periods) > period.id))).select(db.project.ALL, orderby=db.project.name, distinct=True)
             infoeLevelTemp=[]
             infoeLevelTemp.append(course)
             infoeLevelTemp.append(0)
@@ -1683,7 +1728,12 @@ def percentage_change_grades_export():
         for rc in rolesC:
             infoeLevelTemp.append(T('Percent Change')+' '+T('Rol '+rc.roll))
         infoLevel.append(infoeLevelTemp)
-        sections = db(db.project.name.like('%'+nameC+'%')).select()
+        #sections = db(db.project.name.like('%'+nameC+'%')).select()
+        sections = db((db.project.name.like('%'+nameC+'%'))&
+                        (db.user_project.project==db.project.id)&
+                        (db.user_project.period == db.period_year.id)&
+                        ((db.user_project.period <= period.id)&
+                        ((db.user_project.period + db.user_project.periods) > period.id))).select(db.project.ALL, orderby=db.project.name, distinct=True)
         for section in sections:
             totalChanges+=db((db.grades_log.yearp==period.yearp)&(db.grades_log.period==T(period.period.name))&(db.grades_log.project==section.name)&((db.grades_log.operation_log=='update')|(db.grades_log.operation_log=='delete'))).count()
         for section in sections:
@@ -1702,7 +1752,7 @@ def percentage_change_grades_export():
 
 
 @auth.requires_login()
-@auth.requires_membership('Ecys-Administrator')
+@auth.requires(auth.has_membership('Super-Administrator') or auth.has_membership('Ecys-Administrator'))
 def percentage_change_grades():
     infoLevel = []
     groupPeriods = None
@@ -1739,7 +1789,12 @@ def percentage_change_grades():
                 session.flash = T('Report no visible: There are no parameters required to display the report.')
                 redirect(URL('default','index'))
 
-            groupProjects = db(db.project.area_level==area.id).select(orderby=db.project.name)
+            #groupProjects = db(db.project.area_level==area.id).select(orderby=db.project.name)
+            groupProjects = db((db.project.area_level==area.id)&
+                        (db.user_project.project==db.project.id)&
+                        (db.user_project.period == db.period_year.id)&
+                        ((db.user_project.period <= period.id)&
+                        ((db.user_project.period + db.user_project.periods) > period.id))).select(db.project.ALL, orderby=db.project.name, distinct=True)
             if len(groupProjects) == 0:
                 session.flash = T('Report no visible: There are no parameters required to display the report.')
                 redirect(URL('default','index'))
@@ -1774,7 +1829,12 @@ def percentage_change_grades():
         totalChanges = db((db.grades_log.yearp==period.yearp)&(db.grades_log.period==T(period.period.name))&((db.grades_log.operation_log=='update')|(db.grades_log.operation_log=='delete'))).count()
         #FOR COURSE
         for course in nameCourses:
-            sections = db(db.project.name.like('%'+course+'%')).select()
+            #sections = db(db.project.name.like('%'+course+'%')).select()
+            sections = db((db.project.name.like('%'+course+'%'))&
+                        (db.user_project.project==db.project.id)&
+                        (db.user_project.period == db.period_year.id)&
+                        ((db.user_project.period <= period.id)&
+                        ((db.user_project.period + db.user_project.periods) > period.id))).select(db.project.ALL, orderby=db.project.name, distinct=True)
             infoeLevelTemp=[]
             infoeLevelTemp.append(sections.first().id)
             infoeLevelTemp.append(course)
@@ -1794,7 +1854,12 @@ def percentage_change_grades():
         totalChanges = 0
         #FOR COURSE
         rolesC=db(db.grades_log).select(db.grades_log.roll, distinct=True)
-        sections = db(db.project.name.like('%'+nameC+'%')).select()
+        #sections = db(db.project.name.like('%'+nameC+'%')).select()
+        sections = db((db.project.name.like('%'+nameC+'%'))&
+                        (db.user_project.project==db.project.id)&
+                        (db.user_project.period == db.period_year.id)&
+                        ((db.user_project.period <= period.id)&
+                        ((db.user_project.period + db.user_project.periods) > period.id))).select(db.project.ALL, orderby=db.project.name, distinct=True)
         for section in sections:
             totalChanges+=db((db.grades_log.yearp==period.yearp)&(db.grades_log.period==T(period.period.name))&(db.grades_log.project==section.name)&((db.grades_log.operation_log=='update')|(db.grades_log.operation_log=='delete'))).count()
         for section in sections:

@@ -8237,7 +8237,11 @@ def performance_students_export():
 
         #CHECK PARAMETERS
         if request.vars['level']=='1' or request.vars['level'] is None:
-            groupProjects = db(db.project.area_level==area.id).select(orderby=db.project.name)
+            groupProjects = db((db.project.area_level==area.id)&
+                        (db.user_project.project==db.project.id)&
+                        (db.user_project.period == db.period_year.id)&
+                        ((db.user_project.period <= period.id)&
+                        ((db.user_project.period + db.user_project.periods) > period.id))).select(db.project.ALL, orderby=db.project.name, distinct=True)
             if len(groupProjects) == 0:
                 session.flash = T('Report no visible: There are no parameters required to display the report.')
                 redirect(URL('default','index'))
@@ -8774,7 +8778,11 @@ def performance_students():
                 session.flash = T('Report no visible: There are no parameters required to display the report.')
                 redirect(URL('default','index'))
 
-            groupProjects = db(db.project.area_level==area.id).select(orderby=db.project.name)
+            groupProjects = db((db.project.area_level==area.id)&
+                        (db.user_project.project==db.project.id)&
+                        (db.user_project.period == db.period_year.id)&
+                        ((db.user_project.period <= period.id)&
+                        ((db.user_project.period + db.user_project.periods) > period.id))).select(db.project.ALL, orderby=db.project.name, distinct=True)
             if len(groupProjects) == 0:
                 session.flash = T('Report no visible: There are no parameters required to display the report.')
                 redirect(URL('default','index'))
