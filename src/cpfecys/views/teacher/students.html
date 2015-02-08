@@ -50,6 +50,7 @@
           <table>
               <thead>
                   <tr>
+                      <th>{{=T('Photo')}}</th>
                       <th>{{=T('Carnet')}}</th>
                       <th>{{=T('Name')}}</th>
                       <th>{{=T('Actions')}}</th>
@@ -58,6 +59,17 @@
               <tbody>
                   {{for item in current_data:}}
                   <tr>
+                      <td>
+                        {{review = db((db.photo_review.user_id == item.user_project.assigned_user.id)).select().first()}}
+                          {{if review is None:}}
+                            {{None}}
+                          {{else:}}
+                            {{if review.accepted == True:}}
+                              <img id="img_img" src="{{= URL('default/download', item.user_project.assigned_user.photo)}}" alt="No photo" height="30px" width="30px">
+                            {{pass}}
+                          {{pass}}
+
+                      </td>
                       <td>{{=item.user_project.assigned_user['username']}}</td>
                       <td>{{=item.user_project.assigned_user['first_name'] + ' ' + item.user_project.assigned_user['last_name']}}</td>
                       <td>

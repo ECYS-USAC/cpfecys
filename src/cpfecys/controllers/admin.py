@@ -2932,3 +2932,19 @@ def users():
     db.auth_user.photo.writable = False
     grid = SQLFORM.smartgrid(db.auth_user,linked_tables=['auth_membership','auth_event','auth_cas','user_project','report'], orderby=orderby)
     return dict(grid = grid)
+
+@auth.requires_login()
+@auth.requires_membership('Super-Administrator')
+def user_mail_update():
+    query = db.auth_user
+    db.auth_user.first_name.writable = False
+    db.auth_user.last_name.writable = False
+    db.auth_user.phone.writable = False
+    db.auth_user.home_address.writable = False
+    db.auth_user.work_address.writable = False
+    db.auth_user.company_name.writable = False    
+    db.auth_user.work_phone.writable = False
+    db.auth_user.password.writable = False
+    db.auth_user.photo.writable = False
+    grid = SQLFORM.grid(query)    
+    return dict(grid =grid)

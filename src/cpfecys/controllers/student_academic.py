@@ -305,6 +305,17 @@ def attendance_list():
         else:
             redirect(URL('default','index'))
 
+def get_auth_user(id_auth):
+    var_return = db(db.auth_user.id == id_auth).select().first()
+    if var_return is None:
+        class temp:
+            photo = ''
+            first_name = ''
+            last_name = ''
+        return temp
+    else:
+        return var_return
+
 @auth.requires_login()
 @auth.requires(auth.has_membership('Student') or auth.has_membership('Teacher'))
 def academic_assignation():
@@ -461,17 +472,6 @@ def academic_assignation():
             return class_button
         except:
             return 'btn'
-
-    def get_auth_user(id_auth):
-        var_return = db(db.auth_user.id == id_auth).select().first()
-        if var_return is None:
-            class temp:
-                photo = ''
-                first_name = ''
-                last_name = ''
-            return temp
-        else:
-            return var_return
     
     def get_photo_state(id_auth):
         review = db((db.photo_review.user_id == id_auth)).select().first()
@@ -1153,8 +1153,12 @@ def academic():
                 else:
                     class_button = 'btn btn-danger'
             return class_button
+        links = [{'header':T('Photo'), 
+                    'body':lambda row: A(IMG(_src= URL('default/download', get_auth_user(row.id_auth_user).photo ), 
+                        _width=50, _height=40, _id='image'))      
+                }]
 
-        links = [lambda row: A(T('View photo'),
+        links += [lambda row: A(T('View photo'),
         _role='button', 
         _class= get_button_clas(row.id_auth_user), 
         _onclick='set_values("'+str(row.id_auth_user)+'");', 
