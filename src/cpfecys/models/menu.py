@@ -39,6 +39,7 @@ if auth.has_membership(role="Super-Administrator"):
     response.menu.extend([
         (T('Users'), False, URL(),[
              (T('Users'), False, URL('admin', 'users'), []),
+             (T('Teachers'), False, URL('admin', 'user_mail_update'), []),
              (T('Academic'), False, URL('student_academic','academic'), []),
              (T('Roles'), False, URL('admin', 'roles'), []),
              ]),

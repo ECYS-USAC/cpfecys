@@ -2102,7 +2102,7 @@
 'teacher comment': 'Comentario',
 'Teacher CSV Assignation': 'Asignación de Catedrático por CSV',
 'Teacher Failed': 'Reprobado por catedrático',
-'Teacher List': 'Teacher List',
+'Teacher List': 'Listado Catedráticos',
 'Teacher name': 'Nombre del catedrático',
 'Teacher Name': 'Nombre del catedrático',
 'Teacher notices': 'Avisos Catedrático',

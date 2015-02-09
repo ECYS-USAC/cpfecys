@@ -2947,15 +2947,39 @@ def users():
 @auth.requires_login()
 @auth.requires_membership('Super-Administrator')
 def user_mail_update():
-    query = db.auth_user
+    groupTeacher = []
+    for teacher in db((db.auth_membership.group_id==db.auth_group.id)&(db.auth_group.role=='Teacher')).select(db.auth_membership.user_id, distinct=True):
+        groupTeacher.append(teacher.user_id)
+
+    if len(groupTeacher)<=0:
+        groupTeacher.append(-1)
+
     db.auth_user.first_name.writable = False
     db.auth_user.last_name.writable = False
     db.auth_user.phone.writable = False
+    db.auth_user.phone.readable = False
     db.auth_user.home_address.writable = False
+    db.auth_user.home_address.readable = False
     db.auth_user.work_address.writable = False
-    db.auth_user.company_name.writable = False    
+    db.auth_user.work_address.readable = False
+    db.auth_user.company_name.writable = False
+    db.auth_user.company_name.readable = False
     db.auth_user.work_phone.writable = False
+    db.auth_user.work_phone.readable = False
     db.auth_user.password.writable = False
+    db.auth_user.password.readable = False
     db.auth_user.photo.writable = False
-    grid = SQLFORM.grid(query)    
+    db.auth_user.photo.readable = False
+    grid = SQLFORM.grid(db.auth_user.id.belongs(groupTeacher), oncreate=oncreate_user_mail_update)
     return dict(grid =grid)
+
+
+def oncreate_user_mail_update(form):
+    new_Teacher = db(db.auth_user.id == form.vars.id).select().first()
+    rol_Teacher = db(db.auth_group.role=='Teacher').select().first()
+    if rol_Teacher is None:
+        db(db.auth_user.id==new_Teacher.id).delete()
+        session.flash = T('Not valid Action.')
+        redirect(URL('default','index'))
+    else:
+        db.auth_membership.insert(user_id=new_Teacher.id, group_id=rol_Teacher.id)
