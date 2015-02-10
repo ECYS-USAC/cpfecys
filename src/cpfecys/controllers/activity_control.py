@@ -15,7 +15,11 @@ def courses_list():
     countcoursesStudent = db.academic_course_assignation.id.count()
     coursesStudentT = 0
     
-
+    ecys_var=False
+    if request.vars['ecys'] == "True":
+        ecys_var=True
+    
+    
     import cpfecys
     #Obtain the current period of the system and all the register periods
     period = cpfecys.current_year_period()
@@ -24,7 +28,7 @@ def courses_list():
         academic_var = db.academic(db.academic.id_auth_user==auth.user.id)
     pass
 
-    if(auth.has_membership('Super-Administrator') or auth.has_membership('Ecys-Administrator')):
+    if(auth.has_membership('Super-Administrator') or (auth.has_membership('Ecys-Administrator') & (ecys_var == True)) ):
         periods = db(db.period_year).select()
 
     else:
@@ -81,7 +85,7 @@ def courses_list():
             redirect(URL('default','index'))
 
     response.view='activity_control/courses_list.html'
-    if (auth.has_membership('Super-Administrator') or auth.has_membership('Ecys-Administrator')):
+    if (auth.has_membership('Super-Administrator') or (auth.has_membership('Ecys-Administrator')& (ecys_var == True)) ):
         #coursesAdmin = db(db.project.area_level==area.id).select()
         coursesAdmin = []
         #for course in db(db.project.area_level==area.id).select(orderby=db.project.name):
@@ -236,7 +240,7 @@ def courses_list():
 
 
     visited = db((db.page_visited.user_id == auth.user.id) & (db.page_visited.page_name == 'courses_list')).select().first()
-    return dict(visited = visited, coursesAdmin = coursesAdmin, countcoursesAdminT=countcoursesAdminT, coursesStudent=coursesStudent, coursesStudentT=coursesStudentT, split_name=split_name, split_section=split_section, periods=periods,period=period,periodo=period, currentyear_period = cpfecys.current_year_period())
+    return dict(visited = visited, coursesAdmin = coursesAdmin, countcoursesAdminT=countcoursesAdminT, coursesStudent=coursesStudent, coursesStudentT=coursesStudentT, split_name=split_name, split_section=split_section, periods=periods,period=period,periodo=period, currentyear_period = cpfecys.current_year_period(),ecys_var=ecys_var)
 
 
 @auth.requires_login()

@@ -183,7 +183,7 @@ if auth.has_membership(role="Academic"):
             pass
         
 if auth.has_membership(role="Ecys-Administrator"):
-    response.menu.extend([(T('Manage')+" "+T('Academic Control'), False, URL('activity_control','courses_list'), [])
+    response.menu.extend([(T('Manage')+" "+T('Academic Control'), False, URL('activity_control','courses_list',vars =dict(ecys="True") ), [])
     ])
 
     response.menu.extend([(T('Management Reports'), False, URL(), [
