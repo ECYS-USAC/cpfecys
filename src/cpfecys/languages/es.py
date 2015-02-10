@@ -2001,6 +2001,7 @@
 'Solicitar Cambio': 'Solicitar Cambio',
 'Solicitar re-establecer contraseña': 'Solicitar re-establecer contraseña',
 'Solo se aceptan archivos con extension zip|pdf': 'Solo se aceptan archivos con extension zip|pdf',
+'Solo se aceptan archivos con extension zip|pdf|rar': 'Solo se aceptan archivos con extension zip|pdf|rar',
 'some files could not be removed': 'algunos archivos no pudieron ser eliminados.',
 'Specific Grade': 'Nota Especifica',
 'specific grade': 'nota especifica',
