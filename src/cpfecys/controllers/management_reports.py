@@ -330,55 +330,96 @@ def GET_YEARS():
 
 @auth.requires_login()
 @auth.requires(auth.has_membership('Super-Administrator') or auth.has_membership('Ecys-Administrator'))
-def GET_PROJECTS(typeReport):
+def GET_PROJECTS(typeReport, period):
     projects=[]
     #OFFICIAL PROJECTS
     area = db(db.area_level.name=='DTT Tutor Académico').select().first()
     if area is not None:
-        for project in db(db.project.area_level==area.id).select(db.project.name.with_alias('name'), distinct=True):
-            projects.append(project.name)
+        if period is None:
+            for project in db(db.project.area_level==area.id).select(db.project.name.with_alias('name'), distinct=True, orderby=db.project.name):
+                projects.append(project.name)
+        else:
+            for project in db((db.project.area_level==area.id)&(db.user_project.project==db.project.id)&(db.user_project.period == db.period_year.id)&((db.user_project.period <= period.id)&((db.user_project.period + db.user_project.periods) > period.id))).select(db.project.name.with_alias('name'), distinct=True, orderby=db.project.name):
+                projects.append(project.name)
+
 
     #PROJECTS IN LOGS
     if typeReport == 'grades_log':
         if len(projects) == 0:
-            projectsTemp = db(db.grades_log).select(db.grades_log.project.with_alias('name'), distinct=True)
+            if period is None:
+                projectsTemp = db(db.grades_log).select(db.grades_log.project.with_alias('name'), distinct=True)
+            else:
+                projectsTemp = db((db.grades_log.period == T(period.period.name))&(db.grades_log.yearp==str(period.yearp))).select(db.grades_log.project.with_alias('name'), distinct=True)
         else:
-            projectsTemp = db(~db.grades_log.project.belongs(projects)).select(db.grades_log.project.with_alias('name'), distinct=True)
+            if period is None:
+                projectsTemp = db(~db.grades_log.project.belongs(projects)).select(db.grades_log.project.with_alias('name'), distinct=True)
+            else:
+                projectsTemp = db((db.grades_log.period == T(period.period.name))&(db.grades_log.yearp==str(period.yearp))&(~db.grades_log.project.belongs(projects))).select(db.grades_log.project.with_alias('name'), distinct=True)
         for project in projectsTemp:
             projects.append(project.name)
     elif typeReport == 'course_activity_log':
         if len(projects) == 0:
-            projectsTemp = db(db.course_activity_log).select(db.course_activity_log.course.with_alias('name'), distinct=True)
+            if period is None:
+                projectsTemp = db(db.course_activity_log).select(db.course_activity_log.course.with_alias('name'), distinct=True)
+            else:
+                projectsTemp = db((db.course_activity_log.period == T(period.period.name))&(db.course_activity_log.yearp==str(period.yearp))).select(db.course_activity_log.course.with_alias('name'), distinct=True)
         else:
-            projectsTemp = db(~db.course_activity_log.course.belongs(projects)).select(db.course_activity_log.course.with_alias('name'), distinct=True)
+            if period is None:
+                projectsTemp = db(~db.course_activity_log.course.belongs(projects)).select(db.course_activity_log.course.with_alias('name'), distinct=True)
+            else:
+                projectsTemp = db((db.course_activity_log.period == T(period.period.name))&(db.course_activity_log.yearp==str(period.yearp))&(~db.course_activity_log.course.belongs(projects))).select(db.course_activity_log.course.with_alias('name'), distinct=True)
         for project in projectsTemp:
             projects.append(project.name)
     elif typeReport == 'academic_course_assignation_log':
         if len(projects) == 0:
-            projectsTemp = db(db.academic_course_assignation_log).select(db.academic_course_assignation_log.before_course.with_alias('name'), distinct=True)
+            if period is None:
+                projectsTemp = db(db.academic_course_assignation_log).select(db.academic_course_assignation_log.before_course.with_alias('name'), distinct=True)
+            else:
+                projectsTemp = db(db.academic_course_assignation_log.id_period == str(period.id)).select(db.academic_course_assignation_log.before_course.with_alias('name'), distinct=True)
         else:
-            projectsTemp = db(~db.academic_course_assignation_log.before_course.belongs(projects)).select(db.academic_course_assignation_log.before_course.with_alias('name'), distinct=True)
+            if period is None:
+                projectsTemp = db(~db.academic_course_assignation_log.before_course.belongs(projects)).select(db.academic_course_assignation_log.before_course.with_alias('name'), distinct=True)
+            else:
+                projectsTemp = db((db.academic_course_assignation_log.id_period == str(period.id))&(~db.academic_course_assignation_log.before_course.belongs(projects))).select(db.academic_course_assignation_log.before_course.with_alias('name'), distinct=True)
         for project in projectsTemp:
             projects.append(project.name)
 
         if len(projects) == 0:
-            projectsTemp = db(db.academic_course_assignation_log).select(db.academic_course_assignation_log.after_course.with_alias('name'), distinct=True)
+            if period is None:
+                projectsTemp = db(db.academic_course_assignation_log).select(db.academic_course_assignation_log.after_course.with_alias('name'), distinct=True)
+            else:
+                projectsTemp = db(db.academic_course_assignation_log.id_period == str(period.id)).select(db.academic_course_assignation_log.after_course.with_alias('name'), distinct=True)
         else:
-            projectsTemp = db(~db.academic_course_assignation_log.after_course.belongs(projects)).select(db.academic_course_assignation_log.after_course.with_alias('name'), distinct=True)
+            if period is None:
+                projectsTemp = db(~db.academic_course_assignation_log.after_course.belongs(projects)).select(db.academic_course_assignation_log.after_course.with_alias('name'), distinct=True)
+            else:
+                projectsTemp = db((db.academic_course_assignation_log.id_period == str(period.id))&(~db.academic_course_assignation_log.after_course.belongs(projects))).select(db.academic_course_assignation_log.after_course.with_alias('name'), distinct=True)
         for project in projectsTemp:
             projects.append(project.name)
     elif typeReport == 'requestchange_activity_log':
         if len(projects) == 0:
-            projectsTemp = db(db.requestchange_activity_log).select(db.requestchange_activity_log.course.with_alias('name'), distinct=True)
+            if period is None:
+                projectsTemp = db(db.requestchange_activity_log).select(db.requestchange_activity_log.course.with_alias('name'), distinct=True)
+            else:
+                projectsTemp = db((db.requestchange_activity_log.semester == period.period.name)&(db.requestchange_activity_log.yearp==str(period.yearp))).select(db.requestchange_activity_log.course.with_alias('name'), distinct=True)
         else:
-            projectsTemp = db(~db.requestchange_activity_log.course.belongs(projects)).select(db.requestchange_activity_log.course.with_alias('name'), distinct=True)
+            if period is None:
+                projectsTemp = db(~db.requestchange_activity_log.course.belongs(projects)).select(db.requestchange_activity_log.course.with_alias('name'), distinct=True)
+            else:
+                projectsTemp = db((db.requestchange_activity_log.semester == period.period.name)&(db.requestchange_activity_log.yearp==str(period.yearp))&(~db.requestchange_activity_log.course.belongs(projects))).select(db.requestchange_activity_log.course.with_alias('name'), distinct=True)
         for project in projectsTemp:
             projects.append(project.name)
     elif typeReport == 'request_change_g_log':
         if len(projects) == 0:
-            projectsTemp = db(db.request_change_g_log).select(db.request_change_g_log.project.with_alias('name'), distinct=True)
+            if period is None:
+                projectsTemp = db(db.request_change_g_log).select(db.request_change_g_log.project.with_alias('name'), distinct=True)
+            else:
+                projectsTemp = db((db.request_change_g_log.semester == T(period.period.name))&(db.request_change_g_log.yearp==str(period.yearp))).select(db.request_change_g_log.project.with_alias('name'), distinct=True)
         else:
-            projectsTemp = db(~db.request_change_g_log.project.belongs(projects)).select(db.request_change_g_log.project.with_alias('name'), distinct=True)
+            if period is None:
+                projectsTemp = db(~db.request_change_g_log.project.belongs(projects)).select(db.request_change_g_log.project.with_alias('name'), distinct=True)
+            else:
+                projectsTemp = db((db.request_change_g_log.semester == T(period.period.name))&(db.request_change_g_log.yearp==str(period.yearp))&(~db.request_change_g_log.project.belongs(projects))).select(db.request_change_g_log.project.with_alias('name'), distinct=True)
         for project in projectsTemp:
             projects.append(project.name)
     else:
@@ -876,7 +917,11 @@ def grades_management_export():
     #PER PROJECT
     elif str(request.vars['level'])=="3":
         #PROJECTS
-        projects = GET_PROJECTS('grades_log')
+        #projects = GET_PROJECTS('grades_log')
+        try:
+            projects = GET_PROJECTS('grades_log',period)
+        except:
+            projects = GET_PROJECTS('grades_log',None)
         projects=sorted(projects)
         #PERIOD OF REPORT
         infoeLevelTemp=[]
@@ -1290,7 +1335,11 @@ def grades_management():
             fsearch.append(['yearp','Año',False,[3,sorted(groupYears)]])
     #PROJECTS
     if request.vars['level'] is None or int(request.vars['level'])<=3:
-        projects = GET_PROJECTS('grades_log')
+        #projects = GET_PROJECTS('grades_log')
+        try:
+            projects = GET_PROJECTS('grades_log',period)
+        except:
+            projects = GET_PROJECTS('grades_log',None)
         if len(projects) != 0:
             fsearch_Values=[]
             fsearch_Values.append(4)
@@ -2570,7 +2619,11 @@ def activities_withmetric_management_export():
     #PER PROJECT
     elif str(request.vars['level'])=="3":
         #PROJECTS
-        projects = GET_PROJECTS('course_activity_log')
+        #projects = GET_PROJECTS('course_activity_log')
+        try:
+            projects = GET_PROJECTS('course_activity_log',period)
+        except:
+            projects = GET_PROJECTS('course_activity_log',None)
         projects=sorted(projects)
         #PERIOD OF REPORT
         infoeLevelTemp=[]
@@ -3003,7 +3056,11 @@ def activities_withmetric_management():
             fsearch.append(['yearp','Año',False,[3,sorted(groupYears)]])
     #PROJECTS
     if request.vars['level'] is None or int(request.vars['level'])<=3:
-        projects = GET_PROJECTS('course_activity_log')
+        #projects = GET_PROJECTS('course_activity_log')
+        try:
+            projects = GET_PROJECTS('course_activity_log',period)
+        except:
+            projects = GET_PROJECTS('course_activity_log',None)
         if len(projects) != 0:
             fsearch_Values=[]
             fsearch_Values.append(4)
@@ -4402,7 +4459,11 @@ def student_assignment_management_export():
     #PER PROJECT
     elif str(request.vars['level'])=="3":
         #PROJECTS
-        projects = GET_PROJECTS('academic_course_assignation_log')
+        #projects = GET_PROJECTS('academic_course_assignation_log')
+        try:
+            projects = GET_PROJECTS('academic_course_assignation_log',period)
+        except:
+            projects = GET_PROJECTS('academic_course_assignation_log',None)
         projects=sorted(projects)
         #PERIOD OF REPORT
         infoeLevelTemp=[]
@@ -4811,7 +4872,11 @@ def student_assignment_management():
     #******************************COMBOS INFORMATION******************************
     #PROJECTS
     if request.vars['level'] is None or int(request.vars['level'])<=3:
-        projects = GET_PROJECTS('academic_course_assignation_log')
+        #projects = GET_PROJECTS('academic_course_assignation_log')
+        try:
+            projects = GET_PROJECTS('academic_course_assignation_log',period)
+        except:
+            projects = GET_PROJECTS('academic_course_assignation_log',None)
         if len(projects) != 0:
             projects=sorted(projects)
             fsearch.append(['before_course','Curso anterior',False,[3,projects]])
@@ -5439,7 +5504,11 @@ def change_request_activities_with_metric_management_export():
     #PER PROJECT
     elif str(request.vars['level'])=="3":
         #PROJECTS
-        projects = GET_PROJECTS('requestchange_activity_log')
+        #projects = GET_PROJECTS('requestchange_activity_log')
+        try:
+            projects = GET_PROJECTS('requestchange_activity_log',period)
+        except:
+            projects = GET_PROJECTS('requestchange_activity_log',None)
         projects=sorted(projects)
         #PERIOD OF REPORT
         infoeLevelTemp=[]
@@ -6194,7 +6263,11 @@ def change_request_activities_with_metric_management():
             fsearch.append(['yearp','Año',False,[3,sorted(groupYears)]])
     #PROJECTS
     if request.vars['level'] is None or int(request.vars['level'])<=3:
-        projects = GET_PROJECTS('requestchange_activity_log')
+        #projects = GET_PROJECTS('requestchange_activity_log')
+        try:
+            projects = GET_PROJECTS('requestchange_activity_log',period)
+        except:
+            projects = GET_PROJECTS('requestchange_activity_log',None)
         if len(projects) != 0:
             fsearch_Values=[]
             fsearch_Values.append(2)
@@ -6869,7 +6942,11 @@ def change_request_grades_management_export():
     #PER PROJECT
     elif str(request.vars['level'])=="3":
         #PROJECTS
-        projects = GET_PROJECTS('requestchange_activity_log')
+        #projects = GET_PROJECTS('request_change_g_log')
+        try:
+            projects = GET_PROJECTS('request_change_g_log',period)
+        except:
+            projects = GET_PROJECTS('request_change_g_log',None)
         projects=sorted(projects)
         #PERIOD OF REPORT
         infoeLevelTemp=[]
@@ -7726,7 +7803,11 @@ def change_request_grades_management():
             fsearch.append(['yearp','Año',False,[3,sorted(groupYears)]])
     #PROJECTS
     if request.vars['level'] is None or int(request.vars['level'])<=3:
-        projects = GET_PROJECTS('request_change_g_log')
+        #projects = GET_PROJECTS('request_change_g_log')
+        try:
+            projects = GET_PROJECTS('request_change_g_log',period)
+        except:
+            projects = GET_PROJECTS('request_change_g_log',None)
         if len(projects) != 0:
             fsearch_Values=[]
             fsearch_Values.append(2)
