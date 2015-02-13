@@ -6,20 +6,12 @@
 		<div id="ja-ss-103" class="ja-ss ja-ss-wrap" style="visibility: visible;">
 			<div class="ja-ss-items">
 				<div class="ja-ss-item ja-ss-item-ghost" style="position: relative; visibility: visible; z-index: 1;">
-					<img src="/cpfecys/static/images/home-images/sl-4.jpg" alt="Undergraduate programs for allAliquam Sed mauris quis tincidunt duis tristique eget Morbi consectetuer.">
+					<img src="/cpfecys/static/images/home-images/sl-4.jpg" alt="Ingeniería - USAC">
 					<div class="ja-ss-desc">
 						<h3>Escuela de Ciencias y Sistemas</h3>
-						<p>
-							Facultad de Ingeniería - USAC
-						</p>
+						<p>Facultad de Ingeniería - USAC</p>
 					</div>
-					<div class="ja-ss-mask mask-left">&nbsp;</div>
-					<div class="ja-ss-mask mask-right">&nbsp;</div>
-				</div>				
-			</div>
-			<div class="ja-ss-btns clearfix">
-				<span class="ja-ss-prev">« Previous</span>
-				<span class="ja-ss-next">Next  »</span>
+				</div>
 			</div>
 		</div>
 		
@@ -33,6 +25,135 @@
 		<![endif]-->
 	</div>
 </div>
+
+{{for art in db(db.magazine).select(orderby=~db.magazine.id, limitby=(0, 1)):}}
+	<div class="ja-box column ja-box-left">
+		<div class="ja-moduletable moduletable clearfix" id="Mod97">
+			<h4><span>{{=art.name}}</span></h4>
+			<div class="ja-box-ct clearfix">
+				<div class="custom">
+					<div class="inner-div">
+						<img src="{{= URL('default/download', art.image_file)}}" alt="Sample image" title="Sample image">
+						<p style="text-align:left; width:80%">{{=art.content_text[:150]}}</p>
+						<p class="readmore"><a href="#" title="Read more">Read more</a></p>
+					</div>
+				</div>
+			</div>
+	    </div>	
+	</div>
+{{pass}}
+
+{{for art in db(db.magazine).select(orderby=~db.magazine.id, limitby=(1, 2)):}}
+	<div class="ja-box column ja-box-center">
+		<div class="ja-moduletable moduletable clearfix" id="Mod98">
+			<h4><span>{{=art.name}}</span></h4>
+			<div class="ja-box-ct clearfix">
+				<div class="custom">
+					<div class="inner-div">
+						<img src="{{= URL('default/download', art.image_file)}}" alt="Sample image" title="Sample image">
+						<p style="text-align:left; width:80%">{{=art.content_text[:150]}}</p>
+						<p class="readmore"><a href="#" title="Read more">Read more</a></p>
+					</div>
+				</div>
+			</div>
+	    </div>	
+	</div>
+{{pass}}
+
+{{for art in db(db.magazine).select(orderby=~db.magazine.id, limitby=(2, 3)):}}
+	<div class="ja-box column ja-box-center">
+		<div class="ja-moduletable moduletable clearfix" id="Mod99">
+			<h4><span>{{=art.name}}</span></h4>
+			<div class="ja-box-ct clearfix">
+				<div class="custom">
+					<div class="inner-div">
+						<img src="{{= URL('default/download', art.image_file)}}" alt="Sample image" title="Sample image">
+						<p style="text-align:left; width:80%">{{=art.content_text[:150]}}</p>
+						<p class="readmore"><a href="#" title="Read more">Read more</a></p>
+					</div>
+				</div>
+			</div>
+	    </div>	
+	</div>
+{{pass}}
+
+{{for art in db(db.magazine).select(orderby=~db.magazine.id, limitby=(3, 4)):}}
+	<div class="ja-box column ja-box-right">
+		<div class="ja-moduletable moduletable clearfix" id="Mod100">
+			<h4><span>{{=art.name}}</span></h4>
+			<div class="ja-box-ct clearfix">
+				<div class="custom">
+					<div class="inner-div">
+						<img src="{{= URL('default/download', art.image_file)}}" alt="Sample image" title="Sample image">
+						<p style="text-align:left; width:80%">{{=art.content_text[:150]}}</p>
+						<p class="readmore"><a href="#" title="Read more">Read more</a></p>
+					</div>
+				</div>
+			</div>
+	    </div>	
+	</div>
+{{pass}}
+
+<script type="text/javascript" src="{{=URL('static','markitup')}}/sets/markmin/set.js"></script>
+<link rel="stylesheet" type="text/css" href="{{=URL('static','markitup')}}/sets/markmin/style.css"/>
+<script type="text/javascript">
+jQuery( document ).ready(function($) {
+    jQuery(".mostrar").click(function(){
+		var qValor = jQuery(this).html();
+		var qId = jQuery(this).attr("data-id");
+		if(qValor == "mas"){
+			jQuery(this).html("menos");
+			jQuery("#data-" + qId + " .less").fadeOut(1);//.css("display","none");//
+			jQuery("#data-" + qId + " .all").fadeIn(100);//.css("display","block");//
+		}else{
+			jQuery(this).html("mas");
+			jQuery("#data-" + qId + " .less").fadeIn(1);//.css("display","block");//
+			jQuery("#data-" + qId + " .all").fadeOut(100);//.css("display","none");//
+		}
+	});
+});
+</script>
+<table style="width:100%;">
+    <tr>
+</td>
+    <td style="width:90%;">
+        <div style="overflow:auto; height:500px; ">
+		{{contadorF=0}}
+        {{for notification in range(len(front_notification)-1, -1, -1):}}
+            {{contadorF+=1}}
+			{{if front_notification[notification].visible:}}
+                {{if front_notification[notification].promoted:}}
+                    <div class="hero-unit">
+                        <hr />
+                        <h1>{{=front_notification[notification].name}}</h1>
+                        <hr />
+						<div class="more-less">
+							{{=MARKMIN(front_notification[notification].content_text[:25], markmin_settings)}}
+							<div class="more-block">
+								{{=MARKMIN(front_notification[notification].content_text, markmin_settings)}}
+							</div>							
+						</div>
+						
+                    </div>
+        		{{else:}}
+					<div id="data-{{=contadorF}}">
+						<hr />
+                        <h1>{{=front_notification[notification].name}} <span class="mostrar" data-id="{{=contadorF}}">mas</span></h1>
+                        <hr />
+						<div class="less">
+								{{=MARKMIN(front_notification[notification].content_text[:150], markmin_settings)}}
+						</div>
+                        <div class="all" style="display: none;">
+								{{=MARKMIN(front_notification[notification].content_text, markmin_settings)}}								
+						</div>
+					</div>
+                {{pass}}
+            {{pass}}
+        {{pass}}
+        </div>
+    </td>
+</tr>
+</table>
 
 <div id="ja-topsl1" class="wrap ">
 	<div class="main clearfix">
@@ -89,102 +210,6 @@
 </div>
 
 
-<!--div class="ja-box column ja-box-left" style="width: 25%; min-height: 208px;">
-	<div class="ja-moduletable moduletable  clearfix" id="Mod97">
-		<h3><span>La ingeniería en sistemas no solo es programar</span></h3>
-		<div class="ja-box-ct clearfix">
-			<div class="custom">
-				<div class="inner-div">
-					<img src="/cpfecys/static/images/home-images/articulo1.jpg" alt="Sample image" title="Sample image">
-					<p>Proyecto de aeronautica aplicando conocimientos de sistemas</p>
-					<p class="readmore"><a href="#" title="Read more">Read more</a></p>
-				</div>
-			</div>
-		</div>
-	</div>
-</div>
-
-
-
-<div class="ja-box column ja-box-center" style="width: 25%; min-height: 208px;">
-	<div class="ja-moduletable moduletable  clearfix" id="Mod98">
-		<h3><span>La industria de desarrollo de videojuegos en Guatemala</span></h3>
-		<div class="ja-box-ct clearfix">
-			<div class="custom">
-				<div class="inner-div">
-					<img src="/cpfecys/static/images/home-images/articulo2.png" alt="Sample image" title="Sample image">
-					<p>Conoce sobre los retos que presentan las empresas de este tipo en Guatemala</p>
-					<p class="readmore"><a href="#" title="Read more">Read more</a></p>
-				</div>
-			</div>
-		</div>
-    </div>	
-</div>
-
-<div class="ja-box column ja-box-center" style="width: 25%; min-height: 208px;">
-	<div class="ja-moduletable moduletable  clearfix" id="Mod99">
-		<h3><span>¡Deberías certificarte! Credibilidad y confianza</span></h3>
-		<div class="ja-box-ct clearfix">
-			<div class="custom">
-				<div class="inner-div">
-					<img src="/cpfecys/static/images/home-images/articulo3.jpg" alt="Sample image" title="Sample image">
-					<p>Una forma de demostrar lo que has aprendido es certificandote</p>
-					<p class="readmore"><a href="#" title="Read more">Read more</a></p>
-				</div>
-			</div>
-		</div>
-	</div>
-</div>
-
-<div class="ja-box column ja-box-right" style="width: 25%; min-height: 208px;">
-	<div class="ja-moduletable moduletable  clearfix" id="Mod100">
-		<h3><span>Drones: El emisario del futuro</span></h3>
-		<div class="ja-box-ct clearfix">
-			<div class="custom">
-				<div class="inner-div">
-					<img src="/cpfecys/static/images/home-images/articulo4.jpg" alt="Sample image" title="Sample image">
-					<p>Estos aparatos han evolucionado mucho, conoce de ellos</p>
-					<p class="readmore"><a href="#" title="Read more">Read more</a></p>
-				</div>
-			</div>
-		</div>
-    </div>	
-</div>
-
-
-
-
-<!--<script type="text/javascript" src="{{=URL('static','markitup')}}/sets/markmin/set.js"></script>
-<link rel="stylesheet" type="text/css" href="{{=URL('static','markitup')}}/sets/markmin/style.css"/>
-<table style="width:100%;">
-    <tr>
-</td>
-    <td style="width:90%;">
-        <div style="overflow:auto; height:500px; ">
-        {{for notification in range(len(front_notification)-1, -1, -1):}}
-            {{if front_notification[notification].visible:}}
-                {{if front_notification[notification].promoted:}}
-                    <div class="hero-unit">
-                        <hr />
-                        <h1>{{=front_notification[notification].name}}</h1>
-                        <hr />
-                        <div>{{=MARKMIN(front_notification[notification].content_text, markmin_settings)}}</div>
-                    </div>
-        		{{else:}}
-                	<div class="jumbotron">
-                        <hr />
-                        <h1>{{=front_notification[notification].name}}</h1>
-                        <hr />
-                        <div>{{=MARKMIN(front_notification[notification].content_text, markmin_settings)}}</div>
-                    </div>
-                {{pass}}
-            {{pass}}
-        {{pass}}
-        </div>
-    </td>
-</tr>
-</table>
--->
 {{if auth.has_membership('Academic') or auth.has_membership('Student'):}}
    
     {{review = db((db.photo_review.user_id == auth.user.id)).select().first()
@@ -203,3 +228,5 @@
     }}
             
 {{pass}}
+
+ 

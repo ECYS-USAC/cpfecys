@@ -420,6 +420,19 @@ db.define_table('metrics_type',
                 format='%(name)s'
                 )
 
+#Frontend notification
+db.define_table('magazine',
+                Field('name', 'string', notnull=True, length = 150, label = T('name')),
+                Field('content_text', 'text', notnull=False, length = 250, \
+                    label = T('content_text')),
+                Field('url', 'string', notnull=False, label = T('url/URL')),
+                Field('visible', 'boolean', notnull=False, label = T('visible')),
+                Field('image_file', 'upload', default='', notnull=False, label = T('image_file'), \
+                    requires=[IS_IMAGE(extensions =('jpeg', 'png'), maxsize=(480, 280),\
+                    error_message=T('Only files are accepted with extension') +\
+                    ' png|jpg'+" "+T('with 480x280px size')+".")])
+                )
+
 ## End of semester details of report
 db.define_table('log_final',
                 Field('curso_asignados_actas', 'integer', notnull = True, \

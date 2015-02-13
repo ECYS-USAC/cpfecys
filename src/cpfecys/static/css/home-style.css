@@ -90,7 +90,7 @@ clear: both;
 	display: block;
 	float: left;
 	margin: 0;
-	height: 430px;
+	height: auto;
 	overflow: hidden;
 	position: absolute;
 	right: 0;
@@ -115,11 +115,12 @@ clear: both;
 	left: 0;
 	position: absolute;
 	bottom: 30%;
+	height: auto;
 	-webkit-box-sizing: border-box;
 	-moz-box-sizing: border-box;
 	box-sizing: border-box;
 	padding: 20px;
-	width: 450px;
+	width: 40%;
 	z-index: 110;
 }
 
@@ -219,4 +220,53 @@ bottom: 0px;
 left: 0;
 text-align: center;
 width: 100%;
+}
+
+
+.complete{
+    display:none;
+}
+
+.more{
+    background:lightblue;
+    color:navy;
+    font-size:13px;
+    padding:3px;
+    cursor:pointer;
+}
+
+.ja-box-ct .inner-div img {
+	width: 100%;
+	height: auto;
+}
+
+.ja-box-left div.moduletable {
+	padding-right: 0;
+}
+
+.ja-box .ja-moduletable {
+	padding-left: 0;
+	padding-right: 0;
+}
+
+.ja-box .ja-moduletable h4 {
+	height: 50px;
+}
+
+.mostrar {
+	cursor: pointer;
+	background:lightblue;
+	color:navy;
+	font-size:13px;
+	padding:3px;
+}
+.ja-box {
+	width: 25%;
+}
+
+
+@media all and (max-width: 450px) and (min-width: 200px) {
+    .ja-box {
+		width: 100%;
+	}
 }

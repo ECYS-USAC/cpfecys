@@ -181,7 +181,13 @@ if auth.has_membership(role="Academic"):
                     pass
                 pass
             pass
-        
+
+
+if auth.has_membership(role="Magazine"):
+    response.menu.extend([(T('Magazine'), False, URL('magazine','management_magazine',vars =dict(ecys="True") ), [])
+    ])
+
+
 if auth.has_membership(role="Ecys-Administrator"):
     response.menu.extend([(T('Manage')+" "+T('Academic Control'), False, URL('activity_control','courses_list',vars =dict(ecys="True") ), [])
     ])
