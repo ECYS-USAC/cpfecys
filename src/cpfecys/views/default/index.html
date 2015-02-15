@@ -35,7 +35,7 @@
 					<div class="inner-div">
 						<img src="{{= URL('default/download', art.image_file)}}" alt="Sample image" title="Sample image">
 						<p style="text-align:left; width:80%">{{=art.content_text[:150]}}</p>
-						<p class="readmore"><a href="#" title="Read more">Read more</a></p>
+						<p class="readmore"><a href="{{=art.url}}" title="Read more">Read more</a></p>
 					</div>
 				</div>
 			</div>
@@ -52,7 +52,7 @@
 					<div class="inner-div">
 						<img src="{{= URL('default/download', art.image_file)}}" alt="Sample image" title="Sample image">
 						<p style="text-align:left; width:80%">{{=art.content_text[:150]}}</p>
-						<p class="readmore"><a href="#" title="Read more">Read more</a></p>
+						<p class="readmore"><a href="{{=art.url}}" title="Read more">Read more</a></p>
 					</div>
 				</div>
 			</div>
@@ -69,7 +69,7 @@
 					<div class="inner-div">
 						<img src="{{= URL('default/download', art.image_file)}}" alt="Sample image" title="Sample image">
 						<p style="text-align:left; width:80%">{{=art.content_text[:150]}}</p>
-						<p class="readmore"><a href="#" title="Read more">Read more</a></p>
+						<p class="readmore"><a href="{{=art.url}}" title="Read more">Read more</a></p>
 					</div>
 				</div>
 			</div>
@@ -86,7 +86,7 @@
 					<div class="inner-div">
 						<img src="{{= URL('default/download', art.image_file)}}" alt="Sample image" title="Sample image">
 						<p style="text-align:left; width:80%">{{=art.content_text[:150]}}</p>
-						<p class="readmore"><a href="#" title="Read more">Read more</a></p>
+						<p class="readmore"><a href="{{=art.url}}" title="Read more">Read more</a></p>
 					</div>
 				</div>
 			</div>
@@ -117,26 +117,26 @@ jQuery( document ).ready(function($) {
     <tr>
 </td>
     <td style="width:90%;">
+		<h2>NOTIFICACIONES</h2>
         <div style="overflow:auto; height:500px; ">
 		{{contadorF=0}}
         {{for notification in range(len(front_notification)-1, -1, -1):}}
             {{contadorF+=1}}
 			{{if front_notification[notification].visible:}}
-                {{if front_notification[notification].promoted:}}
-                    <div class="hero-unit">
+                {{if front_notification[notification].promoted:}}                    
+					<div class="ja-moduletable moduletable  clearfix" id="data-{{=contadorF}}">
                         <hr />
-                        <h1>{{=front_notification[notification].name}}</h1>
+                        <h1>{{=front_notification[notification].name}} <span class="mostrar" data-id="{{=contadorF}}">mas</span></h1>
                         <hr />
-						<div class="more-less">
-							{{=MARKMIN(front_notification[notification].content_text[:25], markmin_settings)}}
-							<div class="more-block">
-								{{=MARKMIN(front_notification[notification].content_text, markmin_settings)}}
-							</div>							
+						<div class="less">
+								{{=MARKMIN(front_notification[notification].content_text[:150], markmin_settings)}}
 						</div>
-						
+                        <div class="all" style="display: none;">
+								{{=MARKMIN(front_notification[notification].content_text, markmin_settings)}}
+						</div>
                     </div>
         		{{else:}}
-					<div id="data-{{=contadorF}}">
+					<div class="jumbotron" id="data-{{=contadorF}}">
 						<hr />
                         <h1>{{=front_notification[notification].name}} <span class="mostrar" data-id="{{=contadorF}}">mas</span></h1>
                         <hr />
@@ -144,7 +144,7 @@ jQuery( document ).ready(function($) {
 								{{=MARKMIN(front_notification[notification].content_text[:150], markmin_settings)}}
 						</div>
                         <div class="all" style="display: none;">
-								{{=MARKMIN(front_notification[notification].content_text, markmin_settings)}}								
+								{{=MARKMIN(front_notification[notification].content_text, markmin_settings)}}
 						</div>
 					</div>
                 {{pass}}
@@ -165,7 +165,7 @@ jQuery( document ).ready(function($) {
 						<div class="department-list">
 							<ul class="department-list">
 								<li class="icon-1">
-									<a href="{{=URL('default', 'resources',vars = dict(r = 10))}}" title="Horarios del semestre">Horarios</a>									
+									<a href="{{=URL('default', 'resources',vars = dict(r = 10))}}" title="Horarios del semestre">Horarios</a>
 									<span class="department-name">Horarios</span>
 								</li>
 								<li class="icon-2">
