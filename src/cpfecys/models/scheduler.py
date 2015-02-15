@@ -1077,6 +1077,53 @@ def auto_daily():
                                     report=rech.report.id,
                                     period=cperiod.id
                                     )
+
+    #ALL DRAFTS FILL IF THEY HAVE ACADEMIC TUTORS AND ACTIVITIES
+    drafties = db((db.report.status == db.report_status(name = 'Draft'))&
+               (db.report_restriction.end_date < current_date)&
+               (db.report.report_restriction == db.report_restriction.id)).select(db.report.ALL)
+
+    for report in drafties:
+        reqs = db(db.area_report_requirement.area_level == report.assignation.project.area_level).select()
+        minimal_requirements = True
+        if report.assignation.project.area_level.name!='DTT Tutor Académico':
+            for req in reqs:
+                if (req.report_requirement.name == 'Registrar Estadisticas Finales de Curso') \
+                and (report.report_restriction.is_final) \
+                and (final_stats == 0):
+                    minimal_requirements = False
+                    break
+                if (req.report_requirement.name == 'Encabezado') and \
+                            (report.heading is None):
+                    minimal_requirements = False
+                    break
+                if (req.report_requirement.name == 'Pie de Reporte') and \
+                            (report.footer is None):
+                    minimal_requirements = False
+                    break
+                if (req.report_requirement.name == 'Registrar Actividad') and \
+                            (activities_count == 0):
+                    minimal_requirements = False
+                    break
+                if (req.report_requirement.name == 'Registrar Actividad con Metricas') and \
+                            (metrics_count == 0):
+                    minimal_requirements = False
+                    break
+                if (req.report_requirement.name == 'Registrar Deserciones') and \
+                            (report.desertion_started is None):
+                    minimal_requirements = False
+                    break
+                if (req.report_requirement.name == 'Registrar Horas Completadas') and \
+                            (report.hours is None):
+                    minimal_requirements = False
+                    break
+            if not minimal_requirements:
+                report.score = 0
+                report.status = db.report_status(name = 'Acceptance')
+                report.teacher_comment =  T('The period of time to create the report finished and it was never completed; so automatically it is considered as failed.')
+                report.never_delivered = True
+                report.min_score = cpfecys.get_custom_parameters().min_score
+                report.update_record()
     #***********************************************************************************************************************
     #******************************************************PHASE 2 DTT******************************************************
 
