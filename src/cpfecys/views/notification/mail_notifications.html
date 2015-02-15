@@ -38,6 +38,16 @@
 			   	  	<tr>
 		   	  		  <td>
 		   	  			<input type="checkbox" class="tipo_trigger" 
+		   	  			target="finalPractice"  name="tipoe" id="finalPractice" value="fp">
+		   	  		  </td>
+		   	  		  <td>
+		   	  		    {{=T('Rol Teacher')}}
+		   	  		  </td>
+			   	  	</tr>
+			   	  	<tr>
+			   	  	<tr>
+		   	  		  <td>
+		   	  			<input type="checkbox" class="tipo_trigger" 
 		   	  			target="claboratorio" name="tipoe" id="claboratorio" value="cl">
 		   	  		  </td>
 		   	  		  <td>
@@ -106,6 +116,31 @@
 							  <td>
 							  	{{=project.carnet.carnet}}
 							  </td>
+							</tr>
+						  	{{pass}}
+					  	</table>
+					  	<!--Fin de tabla de alumnos sin laboratorio-->
+				  	</div>
+				</div>
+			</td>
+			<td>
+				<div id="students_content3" style="display: none;">
+					<h3><small>{{=T('Final Practice Student')}}</small></h3>
+					<div style="overflow:auto; height:110px;">
+						<!--Tabla de Alumnos sin Laboratorio-->
+				   	  	<table class="table-striped table-bordered">
+						  	{{for project in get_projects(3):}}
+						  	<tr>
+						  	  <td>
+							    <input type="checkbox" class="finalPractice" ="project" name="listado2"
+					    value="{{=project.user_project.assigned_user}}">
+							  </td>
+							  <td>
+							  	{{=project.user_project.assigned_user.username}}
+							  </td>
+							  <td>
+							  	{{=project.user_project.assigned_user.first_name}}&nbsp;{{=project.user_project.assigned_user.last_name}}
+					  		  </td>
 							</tr>
 						  	{{pass}}
 					  	</table>
@@ -411,32 +446,50 @@
 			if ($("#specific").attr("checked")){
 			   $("#students_content").css("display", "block");
 			   $("#students_content2").css("display", "block");
+			   $("#students_content3").css("display", "block");
 			}else{
 			   $("#students_content").css("display", "none");
 			   $("#students_content2").css("display", "none");
+			   $("#students_content3").css("display", "none");
 			}
 			$("#all").attr("checked", false);
+			$("#finalPractice").attr("checked", false);
 			$("#slaboratorio").attr("checked", false);
 			$("#claboratorio").attr("checked", false);
 		})
 		$("#all").click(function(){
 			$("#students_content").css("display", "none");
 			$("#students_content2").css("display", "none");
+			$("#students_content3").css("display", "none");
 			$("#specific").attr("checked", false);
+			$("#finalPractice").attr("checked", false);
+			$("#slaboratorio").attr("checked", false);
+			$("#claboratorio").attr("checked", false);
+		})
+		$("#finalPractice").click(function(){
+			$("#students_content").css("display", "none");
+			$("#students_content2").css("display", "none");
+			$("#students_content3").css("display", "none");
+			$("#specific").attr("checked", false);
+			$("#all").attr("checked", false);
 			$("#slaboratorio").attr("checked", false);
 			$("#claboratorio").attr("checked", false);
 		})
 		$("#claboratorio").click(function(){
 			$("#students_content").css("display", "none");
 			$("#students_content2").css("display", "none");
+			$("#students_content3").css("display", "none");
 			$("#specific").attr("checked", false);
+			$("#finalPractice").attr("checked", false);
 			$("#all").attr("checked", false);
 			$("#slaboratorio").attr("checked", false);
 		})
 		$("#slaboratorio").click(function(){
 			$("#students_content").css("display", "none");
 			$("#students_content2").css("display", "none");
+			$("#students_content3").css("display", "none");
 			$("#specific").attr("checked", false);
+			$("#finalPractice").attr("checked", false);
 			$("#all").attr("checked", false);
 			$("#claboratorio").attr("checked", false);
 		})

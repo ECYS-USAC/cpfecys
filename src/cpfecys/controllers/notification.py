@@ -125,7 +125,7 @@ def teacher_search_destination():
 #**********************ENVIAR AVISOS**********************
 #*********************************************************
 @auth.requires_login()
-@auth.requires_membership('Teacher')
+@auth.requires(auth.has_membership('Student') or auth.has_membership('Teacher'))
 def teacher_send_mail_to_students(users1, users2, message, subject, check, semester, year):
     #Obtener valores reales (no ids)
     nameS2 = check.assigned_user.first_name+" "+check.assigned_user.last_name
@@ -149,7 +149,11 @@ def teacher_send_mail_to_students(users1, users2, message, subject, check, semes
         None
     period = T(semester)+' '+str(year)
     message = message.replace("\n","<br>")
-    messageC = '<html>' + message + attachment_m + '<br><br>Catedrático:'+str(nameS2)+'<br>'+str(period)+'<br>'+str(nameP)+'<br>Sistema de Seguimiento de La Escuela de Ciencias y Sistemas<br> Facultad de Ingeniería - Universidad de San Carlos de Guatemala</html>'
+    
+    if auth.has_membership('Student'):
+        messageC = '<html>' + message + attachment_m + '<br><br>Tutor Academico: '+str(nameS2)+'<br>'+str(period)+'<br>'+str(nameP)+'<br>Sistema de Seguimiento de La Escuela de Ciencias y Sistemas<br> Facultad de Ingeniería - Universidad de San Carlos de Guatemala</html>'
+    else:
+        messageC = '<html>' + message + attachment_m + '<br><br>Catedrático:'+str(nameS2)+'<br>'+str(period)+'<br>'+str(nameP)+'<br>Sistema de Seguimiento de La Escuela de Ciencias y Sistemas<br> Facultad de Ingeniería - Universidad de San Carlos de Guatemala</html>'
     #variable de control
     control = 0
     #Log General del Envio
@@ -159,6 +163,7 @@ def teacher_send_mail_to_students(users1, users2, message, subject, check, semes
                                         course=check.project.name,
                                         yearp=year,
                                         period=semester)
+
     #Ciclo para el envio de correos para estudiantes
     ListadoCorreos = None
     email_list_log=""
@@ -267,6 +272,7 @@ def teacher_mail_notifications():
             return
         #Obtener la lista de destinatarios en base a los usuarios presionados
         if ((tipoes=='specific' and (listado!= None or listado2!= None)) or (tipoes!='specific')) and message != '' and subject != '':
+            rol=2
             users1 = None
             users2 = None
             count1 = db.academic_course_assignation.id.count()
@@ -283,11 +289,11 @@ def teacher_mail_notifications():
                     users1 = db((db.academic.id==db.academic_course_assignation.carnet)&(db.academic_course_assignation.semester == period) & (db.academic_course_assignation.assignation==check.project) & (db.academic_course_assignation.laboratorio=='False')).select(count1)
                     totalC1 = count_Items(users1,count1)
                 elif tipoes =='fp':
-                    users2 = db((db.auth_user.id==db.user_project.assigned_user)&((db.user_project.period <= period) & ((db.user_project.period + db.user_project.periods) > period))& (db.user_project.project==check.project)&(db.auth_membership.user_id==db.user_project.assigned_user)&(db.auth_membership.group_id==2)).select(count2)
+                    users2 = db((db.auth_user.id==db.user_project.assigned_user)&((db.user_project.period <= period) & ((db.user_project.period + db.user_project.periods) > period))& (db.user_project.project==check.project)&(db.auth_membership.user_id==db.user_project.assigned_user)&(db.auth_membership.group_id==rol)).select(count2)
                     totalC2 = count_Items(users2,count2)
                 else:
                     users1 = db((db.academic.id==db.academic_course_assignation.carnet)&(db.academic_course_assignation.semester == period) & (db.academic_course_assignation.assignation==check.project)).select(count1)
-                    users2 = db((db.auth_user.id==db.user_project.assigned_user)&((db.user_project.period <= period) & ((db.user_project.period + db.user_project.periods) > period)) & (db.user_project.project==check.project)&(db.auth_membership.user_id==db.user_project.assigned_user)&(db.auth_membership.group_id==2)).select(count2)
+                    users2 = db((db.auth_user.id==db.user_project.assigned_user)&((db.user_project.period <= period) & ((db.user_project.period + db.user_project.periods) > period)) & (db.user_project.project==check.project)&(db.auth_membership.user_id==db.user_project.assigned_user)&(db.auth_membership.group_id==rol)).select(count2)
                     totalC1 = count_Items(users1,count1)
                     totalC2 = count_Items(users2,count2)
                 if tipoes=='all' and (totalC1>0 or totalC2>0):
@@ -298,7 +304,7 @@ def teacher_mail_notifications():
                             user1.append(user.academic)
                     if totalC2 >0:
                         user2 = []
-                        users2 = db((db.auth_user.id==db.user_project.assigned_user)&((db.user_project.period <= period) & ((db.user_project.period + db.user_project.periods) > period)) & (db.user_project.project==check.project)&(db.auth_membership.user_id==db.user_project.assigned_user)&(db.auth_membership.group_id==2)).select()
+                        users2 = db((db.auth_user.id==db.user_project.assigned_user)&((db.user_project.period <= period) & ((db.user_project.period + db.user_project.periods) > period)) & (db.user_project.project==check.project)&(db.auth_membership.user_id==db.user_project.assigned_user)&(db.auth_membership.group_id==rol)).select()
                         for user in users2:
                             user2.append(user.auth_user)
                 elif tipoes =='cl' and totalC1 > 0:
@@ -313,7 +319,7 @@ def teacher_mail_notifications():
                         user1.append(user.academic)
                 elif tipoes =='fp' and totalC2 > 0:
                     user2 = []
-                    users2 = db((db.auth_user.id==db.user_project.assigned_user)&((db.user_project.period <= period) & ((db.user_project.period + db.user_project.periods) > period)) & (db.user_project.project==check.project)&(db.auth_membership.user_id==db.user_project.assigned_user)&(db.auth_membership.group_id==2)).select()
+                    users2 = db((db.auth_user.id==db.user_project.assigned_user)&((db.user_project.period <= period) & ((db.user_project.period + db.user_project.periods) > period)) & (db.user_project.project==check.project)&(db.auth_membership.user_id==db.user_project.assigned_user)&(db.auth_membership.group_id==rol)).select()
                     for user in users2:
                         user2.append(user.auth_user)
             else:
@@ -672,6 +678,7 @@ def mail_notifications():
         tipoes = request.vars['tipoe']
         #Obtener listado alumnos a enviar mensaje
         listado = request.vars['listado']
+        listado2 = request.vars['listado2']
         #Mensaje que se enviara
         message = request.vars['message']
         #Asunto del mensaje que se enviara
@@ -682,64 +689,110 @@ def mail_notifications():
             redirect(URL('notification', 'mail_notifications',vars = dict(period = year.id, assignation=check.id) ))
             return
         #Obtener la lista de destinatarios en base a los usuarios presionados
-        if ((tipoes=='specific' and listado!= None) or (tipoes!='specific')) and message != '' and subject != '':
-            #Check that the user select only one group of students
-            users = None
-            dest=[]
-            count = db.academic_course_assignation.id.count()
-            if tipoes =='all' or tipoes=='cl' or tipoes =='sl':
-                if tipoes=='all':
-                    users2 = db((db.academic_course_assignation.semester == period) & (db.academic_course_assignation.assignation==check.project)).select(count)
-                elif tipoes =='cl':
-                    users2 = db((db.academic.id==db.academic_course_assignation.carnet)&(db.academic_course_assignation.semester == period) & (db.academic_course_assignation.assignation==check.project) & (db.academic_course_assignation.laboratorio=='True')).select(count)
+        if ((tipoes=='specific' and (listado!= None or listado2!= None)) or (tipoes!='specific')) and message != '' and subject != '':
+            rol=3
+            users1 = None
+            users2 = None
+            count1 = db.academic_course_assignation.id.count()
+            count2 = db.auth_user.id.count()
+            user1 = None
+            user2 = None
+            totalC1 = 0
+            totalC2 = 0
+            if tipoes =='all' or tipoes=='cl' or tipoes =='sl' or tipoes =='fp':
+                if tipoes =='cl':
+                    users1 = db((db.academic.id==db.academic_course_assignation.carnet)&(db.academic_course_assignation.semester == period) & (db.academic_course_assignation.assignation==check.project) & (db.academic_course_assignation.laboratorio=='True')).select(count1)
+                    totalC1 = count_Items(users1,count1)
+                elif tipoes =='sl':
+                    users1 = db((db.academic.id==db.academic_course_assignation.carnet)&(db.academic_course_assignation.semester == period) & (db.academic_course_assignation.assignation==check.project) & (db.academic_course_assignation.laboratorio=='False')).select(count1)
+                    totalC1 = count_Items(users1,count1)
+                elif tipoes =='fp':
+                    users2 = db((db.auth_user.id==db.user_project.assigned_user)&((db.user_project.period <= period) & ((db.user_project.period + db.user_project.periods) > period))& (db.user_project.project==check.project)&(db.auth_membership.user_id==db.user_project.assigned_user)&(db.auth_membership.group_id==rol)).select(count2)
+                    totalC2 = count_Items(users2,count2)
                 else:
-                    users2 = db((db.academic.id==db.academic_course_assignation.carnet)&(db.academic_course_assignation.semester == period) & (db.academic_course_assignation.assignation==check.project) & (db.academic_course_assignation.laboratorio=='False')).select(count)
-                totalC = count_Items(users2,count)
-                if totalC > 0:
-                    if tipoes=='all':
-                        users2 = db((db.academic.id==db.academic_course_assignation.carnet)&(db.academic_course_assignation.semester == period) & (db.academic_course_assignation.assignation==check.project)).select()
-                    elif tipoes =='cl':
-                        users2 = db((db.academic.id==db.academic_course_assignation.carnet)&(db.academic.id==db.academic_course_assignation.carnet)&(db.academic_course_assignation.semester == period) & (db.academic_course_assignation.assignation==check.project) & (db.academic_course_assignation.laboratorio=='True')).select()
-                    else:
-                        users2 = db((db.academic.id==db.academic_course_assignation.carnet)&(db.academic.id==db.academic_course_assignation.carnet)&(db.academic_course_assignation.semester == period) & (db.academic_course_assignation.assignation==check.project) & (db.academic_course_assignation.laboratorio=='False')).select()
-                    users = []
+                    users1 = db((db.academic.id==db.academic_course_assignation.carnet)&(db.academic_course_assignation.semester == period) & (db.academic_course_assignation.assignation==check.project)).select(count1)
+                    users2 = db((db.auth_user.id==db.user_project.assigned_user)&((db.user_project.period <= period) & ((db.user_project.period + db.user_project.periods) > period)) & (db.user_project.project==check.project)&(db.auth_membership.user_id==db.user_project.assigned_user)&(db.auth_membership.group_id==rol)).select(count2)
+                    totalC1 = count_Items(users1,count1)
+                    totalC2 = count_Items(users2,count2)
+                if tipoes=='all' and (totalC1>0 or totalC2>0):
+                    if totalC1>0:
+                        user1 = []
+                        users1 = db((db.academic.id==db.academic_course_assignation.carnet)&(db.academic_course_assignation.semester == period) & (db.academic_course_assignation.assignation==check.project)).select()
+                        for user in users1:
+                            user1.append(user.academic)
+                    if totalC2 >0:
+                        user2 = []
+                        users2 = db((db.auth_user.id==db.user_project.assigned_user)&((db.user_project.period <= period) & ((db.user_project.period + db.user_project.periods) > period)) & (db.user_project.project==check.project)&(db.auth_membership.user_id==db.user_project.assigned_user)&(db.auth_membership.group_id==rol)).select()
+                        for user in users2:
+                            user2.append(user.auth_user)
+                elif tipoes =='cl' and totalC1 > 0:
+                    user1 = []
+                    users1 = db((db.academic.id==db.academic_course_assignation.carnet)&(db.academic.id==db.academic_course_assignation.carnet)&(db.academic_course_assignation.semester == period) & (db.academic_course_assignation.assignation==check.project) & (db.academic_course_assignation.laboratorio=='True')).select()
+                    for user in users1:
+                        user1.append(user.academic)
+                elif tipoes =='sl' and totalC1 > 0:
+                    user1 = []
+                    users1 = db((db.academic.id==db.academic_course_assignation.carnet)&(db.academic.id==db.academic_course_assignation.carnet)&(db.academic_course_assignation.semester == period) & (db.academic_course_assignation.assignation==check.project) & (db.academic_course_assignation.laboratorio=='False')).select()
+                    for user in users1:
+                        user1.append(user.academic)
+                elif tipoes =='fp' and totalC2 > 0:
+                    user2 = []
+                    users2 = db((db.auth_user.id==db.user_project.assigned_user)&((db.user_project.period <= period) & ((db.user_project.period + db.user_project.periods) > period)) & (db.user_project.project==check.project)&(db.auth_membership.user_id==db.user_project.assigned_user)&(db.auth_membership.group_id==rol)).select()
                     for user in users2:
-                        users.append(user.academic)
+                        user2.append(user.auth_user)
             else:
-                students = request.vars['listado']
-                try:
-                    students.append(-1)
-                    students.remove(-1)
-                    for student in students:
-                        dest.append(student)
-                    users = db(db.academic.id.belongs(dest)).select()
-                except:
-                    users = db(db.academic.id==request.vars['listado']).select()
+                #Obtain the list of destination for the students
+                if listado != None:
+                    dest=[]
+                    students = request.vars['listado']
+                    try:
+                        students.append(-1)
+                        students.remove(-1)
+                        for student in students:
+                            dest.append(student)
+                        #consultar a la base de datos para obtener a los usuarios a los que enviaremos
+                        user1 = db(db.academic.id.belongs(dest)).select()
+                    except:
+                        #consultar a la base de datos para obtener a los usuarios a los que enviaremos
+                        user1 = db(db.academic.id==request.vars['listado']).select()
+                #obtain the list of destination for the final practices students
+                if listado2 != None:
+                    dest=[]
+                    students = request.vars['listado2']
+                    try:
+                        students.append(-1)
+                        students.remove(-1)
+                        for student in students:
+                            dest.append(student)
+                        #consultar a la base de datos para obtener a los usuarios a los que enviaremos
+                        user2 = db(db.auth_user.id.belongs(dest)).select()
+                    except:
+                        #consultar a la base de datos para obtener a los usuarios a los que enviaremos
+                        user2 = db(db.auth_user.id==request.vars['listado2']).select()
 
-            if users != None:
+            if user1 != None or user2 != None:
                 #Realizar el envio de mensajes
-                fail = send_mail_to_students(users,message,subject,check,year_semester.name,year.yearp)
+                fail = teacher_send_mail_to_students(user1,user2,message,subject,check,year_semester.name,year.yearp)
                 if fail > 0:
                     session.flash = T('Avisos enviados - Existen '+str(fail) + ' avisos fallidos, revise el registro de avisos')
                 else:
                     session.flash = T('Notices Sent')
-                dest=None
-                students=None
+                redirect(URL('notification', 'mail_notifications',vars =  dict(period=year.id, assignation=check.id)))
             else:
                 session.flash = T('No recipient who sent the message')
-            redirect(URL('notification', 'mail_notifications', vars =  dict(period=year.id, assignation=check.id) ))
+            redirect(URL('notification', 'mail_notifications',vars =  dict(period=year.id, assignation=check.id)))
         else:
             session.flash = T('Fill all fields of notification')
             redirect(URL('notification', 'mail_notifications',vars =  dict(period=year.id, assignation=check.id) ))
 
     def get_projects(grupo):
         import cpfecys
-        
+        #Obtener la asignacion del estudiante
+        assignation = request.vars['assignation']
+        #Obtener al tutor
+        check = db.user_project(id = assignation, assigned_user = auth.user.id)
         if grupo == 1:       
-            #Obtener la asignacion del estudiante
-            assignation = request.vars['assignation']
-            #Obtener al tutor
-            check = db.user_project(id = assignation, assigned_user = auth.user.id)
+            
 
             import cpfecys
             if (check is None):
@@ -759,7 +812,11 @@ def mail_notifications():
             #Obtener los estudiantes del tutor y asignados al proyecto
             students = db((db.academic_course_assignation.semester == period) & (db.academic_course_assignation.assignation==check.project) & (db.academic_course_assignation.laboratorio=='True')).select()
             return students
-        else:
+        elif grupo == 3:
+            #obtain the final practice students assigned in the course where the user is the manager
+            students = db((db.user_project.project==check.project)&((db.user_project.period <= period) & ((db.user_project.period + db.user_project.periods) > period))&(db.user_project.assigned_user!=check.assigned_user)&(db.auth_membership.user_id==db.user_project.assigned_user)&(db.auth_membership.group_id==3)).select()
+            return students
+        else:                
             #Obtener la asignacion del estudiante
             assignation = request.vars['assignation']
             #Obtener al tutor
